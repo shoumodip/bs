@@ -9,6 +9,7 @@ typedef struct {
     bool error;
 
     Chunk *chunk;
+    GC *gc;
 } Compiler;
 
 bool compile(Compiler *compiler, Chunk *chunk);

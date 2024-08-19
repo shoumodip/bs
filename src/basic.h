@@ -16,8 +16,6 @@ typedef struct {
 #define SVArg(s) (int)(s).size, (s).data
 #define SVStatic(s) ((SV){s, sizeof(s) - 1})
 
-bool sv_eq(SV a, SV b);
-
 // Defer
 #define return_defer(value)                                                                        \
     do {                                                                                           \

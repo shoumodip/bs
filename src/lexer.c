@@ -3,6 +3,10 @@
 
 #include "lexer.h"
 
+static bool sv_eq(SV a, SV b) {
+    return a.size == b.size && memcmp(a.data, b.data, b.size) == 0;
+}
+
 static void lexer_advance(Lexer *lexer) {
     if (*lexer->sv.data == '\n') {
         if (lexer->sv.size > 1) {
@@ -22,6 +26,14 @@ static char lexer_consume(Lexer *lexer) {
     return lexer->sv.data[-1];
 }
 
+static bool lexer_match(Lexer *lexer, char ch) {
+    if (lexer->sv.size > 0 && *lexer->sv.data == ch) {
+        lexer_advance(lexer);
+        return true;
+    }
+    return false;
+}
+
 Lexer lexer_new(const char *path, SV sv) {
     return (Lexer){
         .sv = sv,
@@ -36,7 +48,7 @@ void lexer_buffer(Lexer *lexer, Token token) {
     lexer->buffer = token;
 }
 
-static_assert(COUNT_TOKENS == 12, "Update lexer_next()");
+static_assert(COUNT_TOKENS == 13, "Update lexer_next()");
 bool lexer_next(Lexer *lexer, Token *token) {
     if (lexer->peeked) {
         lexer->peeked = false;
@@ -78,6 +90,22 @@ bool lexer_next(Lexer *lexer, Token *token) {
         while (lexer->sv.size > 0 && (isalnum(*lexer->sv.data) || *lexer->sv.data == '_')) {
             lexer_advance(lexer);
         }
+    } else if (lexer_match(lexer, '"')) {
+        while (lexer->sv.size > 0 && *lexer->sv.data != '"') {
+            lexer_advance(lexer);
+        }
+
+        if (lexer->sv.size == 0) {
+            if (!lexer->quiet) {
+                fprintf(stderr, PosFmt "error: unterminated string\n", PosArg(token->pos));
+            }
+
+            token->sv.size -= lexer->sv.size;
+            return false;
+        }
+
+        token->type = TOKEN_STR;
+        lexer_advance(lexer);
     } else {
         switch (lexer_consume(lexer)) {
         case ';':
@@ -112,6 +140,8 @@ bool lexer_next(Lexer *lexer, Token *token) {
                     PosArg(token->pos),
                     *token->sv.data);
             }
+
+            token->sv.size -= lexer->sv.size;
             return false;
         }
     }

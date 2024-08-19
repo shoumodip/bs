@@ -2,10 +2,6 @@
 
 #include "basic.h"
 
-bool sv_eq(SV a, SV b) {
-    return a.size == b.size && memcmp(a.data, b.data, b.size) == 0;
-}
-
 char *read_file(const char *path, size_t *size) {
     char *result = NULL;
 

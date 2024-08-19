@@ -1,6 +1,5 @@
 #include "token.h"
 
-static_assert(COUNT_TOKENS == 12, "Update token_type_name()");
 const char *token_type_name(TokenType type) {
     switch (type) {
     case TOKEN_EOF:
@@ -14,6 +13,9 @@ const char *token_type_name(TokenType type) {
 
     case TOKEN_NUM:
         return "number";
+
+    case TOKEN_STR:
+        return "string";
 
     case TOKEN_TRUE:
     case TOKEN_FALSE:
@@ -37,7 +39,7 @@ const char *token_type_name(TokenType type) {
     case TOKEN_NOT:
         return "'!'";
 
-    default:
+    case COUNT_TOKENS:
         assert(false && "unreachable");
     }
 }

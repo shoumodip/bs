@@ -20,13 +20,17 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
+    VM vm = {0};
     Chunk chunk = {0};
-    Compiler compiler = {.lexer = lexer_new(path, (SV){contents, size})};
+    Compiler compiler = {
+        .lexer = lexer_new(path, (SV){contents, size}),
+        .gc = &vm.gc,
+    };
+
     if (!compile(&compiler, &chunk)) {
         return_defer(1);
     }
 
-    Vm vm = {0};
     if (!vm_run(&vm, &chunk)) {
         return_defer(1);
     }

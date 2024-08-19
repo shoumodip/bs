@@ -2,27 +2,41 @@
 
 #include "vm.h"
 
-static void vm_push(Vm *vm, Value value) {
+static void vm_push(VM *vm, Value value) {
     values_push(&vm->stack, value);
 }
 
-static Value vm_pop(Vm *vm) {
+static Value vm_pop(VM *vm) {
     return vm->stack.data[--vm->stack.count];
 }
 
-static size_t vm_read_int(Vm *vm) {
+static size_t vm_read_int(VM *vm) {
     const size_t index = *(size_t *)vm->ip;
     vm->ip += sizeof(index);
     return index;
 }
 
-void vm_free(Vm *vm) {
+static void gc_free_object(GC *gc, Object *object) {
+    switch (object->type) {
+    case OBJECT_STR:
+        gc_realloc(gc, object, sizeof(ObjectStr) + ((ObjectStr *)object)->size, 0);
+        break;
+    }
+}
+
+void vm_free(VM *vm) {
     values_free(&vm->stack);
+
+    Object *object = vm->gc.objects;
+    while (object) {
+        Object *next = object->next;
+        gc_free_object(&vm->gc, object);
+        object = next;
+    }
 }
 
 static_assert(COUNT_OPS == 11, "Update vm_run()");
-static_assert(COUNT_VALUES == 3, "Update vm_run()");
-bool vm_run(Vm *vm, Chunk *chunk) {
+bool vm_run(VM *vm, Chunk *chunk) {
     vm->chunk = chunk;
     vm->ip = vm->chunk->data;
 

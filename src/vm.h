@@ -8,9 +8,10 @@ typedef struct {
     uint8_t *ip;
 
     Values stack;
-} Vm;
+    GC gc;
+} VM;
 
-void vm_free(Vm *vm);
-bool vm_run(Vm *vm, Chunk *chunk);
+void vm_free(VM *vm);
+bool vm_run(VM *vm, Chunk *chunk);
 
 #endif // VM_H

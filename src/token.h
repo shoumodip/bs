@@ -20,6 +20,7 @@ typedef enum {
 
     TOKEN_NIL,
     TOKEN_NUM,
+    TOKEN_STR,
     TOKEN_TRUE,
     TOKEN_FALSE,
     TOKEN_IDENT,

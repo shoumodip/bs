@@ -10,7 +10,7 @@ typedef enum {
     POWER_PRE
 } Power;
 
-static_assert(COUNT_TOKENS == 12, "Update token_type_powers[]");
+static_assert(COUNT_TOKENS == 13, "Update token_type_powers[]");
 const Power token_type_powers[COUNT_TOKENS] = {
     [TOKEN_ADD] = POWER_ADD,
     [TOKEN_SUB] = POWER_ADD,
@@ -29,7 +29,7 @@ static void compile_error(Compiler *compiler) {
 }
 
 static_assert(COUNT_OPS == 11, "Update compile_expr()");
-static_assert(COUNT_TOKENS == 12, "Update compile_expr()");
+static_assert(COUNT_TOKENS == 13, "Update compile_expr()");
 static void compile_expr(Compiler *compiler, Power mbp) {
     Token token;
     if (!lexer_next(&compiler->lexer, &token)) {
@@ -40,6 +40,13 @@ static void compile_expr(Compiler *compiler, Power mbp) {
     switch (token.type) {
     case TOKEN_NIL:
         chunk_push(compiler->chunk, OP_NIL);
+        break;
+
+    case TOKEN_STR:
+        chunk_const(
+            compiler->chunk,
+            OP_CONST,
+            value_object(object_str_new(compiler->gc, token.sv.data + 1, token.sv.size - 2)));
         break;
 
     case TOKEN_NUM:
