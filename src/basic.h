@@ -58,7 +58,7 @@ typedef struct {
             assert((l)->data);                                                                     \
         }                                                                                          \
                                                                                                    \
-        if ((v) != NULL) {                                                                         \
+        if ((v)) {                                                                                 \
             memcpy((l)->data + (l)->count, (v), (c) * sizeof(*(l)->data));                         \
             (l)->count += (c);                                                                     \
         }                                                                                          \

@@ -46,7 +46,7 @@ static void compile_expr(Compiler *compiler, Power mbp) {
         chunk_const(
             compiler->chunk,
             OP_CONST,
-            value_object(object_str_new(compiler->gc, token.sv.data + 1, token.sv.size - 2)));
+            value_object(gc_new_object_str(compiler->gc, token.sv.data + 1, token.sv.size - 2)));
         break;
 
     case TOKEN_NUM:

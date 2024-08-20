@@ -45,6 +45,7 @@ typedef struct {
     size_t capacity;
 } Values;
 
+// TODO: Use gc_realloc
 #define values_push da_push
 #define values_free da_free
 
@@ -54,6 +55,21 @@ typedef struct {
     char data[];
 } ObjectStr;
 
+bool object_str_eq(ObjectStr *a, ObjectStr *b);
+
+typedef struct {
+    ObjectStr *key;
+    Value value;
+} Entry;
+
+#define TABLE_MAX_LOAD 0.75
+
+typedef struct {
+    Entry *data;
+    size_t count;
+    size_t capacity;
+} Table;
+
 void value_print(Value value);
 
 typedef struct {
@@ -62,6 +78,12 @@ typedef struct {
 
 void *gc_realloc(GC *gc, void *previous, size_t old_size, size_t new_size);
 
-ObjectStr *object_str_new(GC *gc, const char *data, size_t size);
+void table_free(Table *table, GC *gc);
+bool table_remove(Table *table, ObjectStr *key);
+
+bool table_get(Table *table, ObjectStr *key, Value *value);
+bool table_set(Table *table, GC *gc, ObjectStr *key, Value value);
+
+ObjectStr *gc_new_object_str(GC *gc, const char *data, size_t size);
 
 #endif // VALUE_H
