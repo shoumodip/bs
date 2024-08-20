@@ -10,10 +10,18 @@ static Value vm_pop(VM *vm) {
     return vm->stack.data[--vm->stack.count];
 }
 
+static Value vm_peek(VM *vm, size_t offset) {
+    return vm->stack.data[vm->stack.count - offset - 1];
+}
+
 static size_t vm_read_int(VM *vm) {
     const size_t index = *(size_t *)vm->ip;
     vm->ip += sizeof(index);
     return index;
+}
+
+static Value *vm_read_const(VM *vm) {
+    return &vm->chunk->constants.data[vm_read_int(vm)];
 }
 
 static void gc_free_object(GC *gc, Object *object) {
@@ -26,6 +34,7 @@ static void gc_free_object(GC *gc, Object *object) {
 
 void vm_free(VM *vm) {
     values_free(&vm->stack);
+    table_free(&vm->globals, &vm->gc);
 
     Object *object = vm->gc.objects;
     while (object) {
@@ -35,7 +44,7 @@ void vm_free(VM *vm) {
     }
 }
 
-static_assert(COUNT_OPS == 13, "Update vm_run()");
+static_assert(COUNT_OPS == 16, "Update vm_run()");
 bool vm_run(VM *vm, Chunk *chunk) {
     vm->chunk = chunk;
     vm->ip = vm->chunk->data;
@@ -63,7 +72,7 @@ bool vm_run(VM *vm, Chunk *chunk) {
             break;
 
         case OP_CONST:
-            vm_push(vm, vm->chunk->constants.data[vm_read_int(vm)]);
+            vm_push(vm, *vm_read_const(vm));
             break;
 
         case OP_ADD: {
@@ -144,6 +153,34 @@ bool vm_run(VM *vm, Chunk *chunk) {
         case OP_NOT:
             vm_push(vm, value_bool(value_is_falsey(vm_pop(vm))));
             break;
+
+        case OP_GDEF:
+            table_set(
+                &vm->globals, &vm->gc, (ObjectStr *)vm_read_const(vm)->as.object, vm_peek(vm, 0));
+            vm_pop(vm);
+            break;
+
+        case OP_GGET: {
+            ObjectStr *name = (ObjectStr *)vm_read_const(vm)->as.object;
+
+            Value value;
+            if (!table_get(&vm->globals, name, &value)) {
+                fprintf(stderr, "error: undefined variable '" SVFmt "'\n", SVArg(*name));
+                return false;
+            }
+
+            vm_push(vm, value);
+        } break;
+
+        case OP_GSET: {
+            ObjectStr *name = (ObjectStr *)vm_read_const(vm)->as.object;
+
+            if (table_set(&vm->globals, &vm->gc, name, vm_pop(vm))) {
+                table_remove(&vm->globals, name);
+                fprintf(stderr, "error: undefined variable '" SVFmt "'\n", SVArg(*name));
+                return false;
+            }
+        } break;
 
         case OP_PRINT:
             value_print(vm_pop(vm));

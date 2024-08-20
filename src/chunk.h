@@ -21,6 +21,10 @@ typedef enum {
     OP_NEG,
     OP_NOT,
 
+    OP_GDEF,
+    OP_GGET,
+    OP_GSET,
+
     OP_PRINT,
     COUNT_OPS,
 } Op;
@@ -33,9 +37,6 @@ typedef struct {
     Values constants;
 } Chunk;
 
-#define chunk_push da_push
-
 void chunk_free(Chunk *chunk);
-void chunk_const(Chunk *chunk, Op op, Value value);
 
 #endif // CHUNK_H

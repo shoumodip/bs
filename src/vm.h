@@ -7,8 +7,10 @@ typedef struct {
     Chunk *chunk;
     uint8_t *ip;
 
-    Values stack;
     GC gc;
+    Values stack;
+
+    Table globals;
 } VM;
 
 void vm_free(VM *vm);

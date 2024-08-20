@@ -8,8 +8,9 @@ typedef struct {
     Lexer lexer;
     bool error;
 
-    Chunk *chunk;
     GC *gc;
+    Chunk *chunk;
+    size_t last_op;
 
     Token current;
     Token previous;

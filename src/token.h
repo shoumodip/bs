@@ -30,7 +30,11 @@ typedef enum {
     TOKEN_MUL,
     TOKEN_DIV,
 
+    TOKEN_SET,
+
     TOKEN_NOT,
+
+    TOKEN_VAR,
 
     TOKEN_PRINT,
     COUNT_TOKENS
