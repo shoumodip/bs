@@ -5,6 +5,18 @@
 #include "lexer.h"
 
 typedef struct {
+    Token token;
+    size_t depth;
+} Local;
+
+typedef struct {
+    Local *data;
+    size_t count;
+    size_t depth;
+    size_t capacity;
+} Scope;
+
+typedef struct {
     Lexer lexer;
     bool error;
 
@@ -14,6 +26,8 @@ typedef struct {
 
     Token current;
     Token previous;
+
+    Scope *scope;
 } Compiler;
 
 bool compile(Compiler *compiler, Chunk *chunk);

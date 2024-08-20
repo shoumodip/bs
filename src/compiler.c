@@ -10,7 +10,7 @@ typedef enum {
     POWER_PRE
 } Power;
 
-static_assert(COUNT_TOKENS == 16, "Update token_type_powers[]");
+static_assert(COUNT_TOKENS == 18, "Update token_type_powers[]");
 const Power token_type_powers[COUNT_TOKENS] = {
     [TOKEN_ADD] = POWER_ADD,
     [TOKEN_SUB] = POWER_ADD,
@@ -64,7 +64,7 @@ static void compile_expect(Compiler *compiler, TokenType type) {
     compile_error(compiler);
 }
 
-static_assert(COUNT_TOKENS == 16, "Update compile_synchronize()");
+static_assert(COUNT_TOKENS == 18, "Update compile_synchronize()");
 static void compile_synchronize(Compiler *compiler) {
     if (compiler->lexer.quiet) {
         compiler->lexer.quiet = false;
@@ -100,8 +100,8 @@ static void compile_unexpected(Compiler *compiler) {
     compile_error(compiler);
 }
 
-static Value compile_ident_const(Compiler *compiler, Token token) {
-    return value_object(gc_new_object_str(compiler->gc, token.sv.data, token.sv.size));
+static Value compile_ident_const(Compiler *compiler, SV name) {
+    return value_object(gc_new_object_str(compiler->gc, name.data, name.size));
 }
 
 static void compile_chunk_push(Compiler *compiler, Op op) {
@@ -124,8 +124,25 @@ static void compile_chunk_push_value(Compiler *compiler, Op op, Value value) {
     da_push_many(compiler->chunk, &index, bytes);
 }
 
-static_assert(COUNT_OPS == 16, "Update compile_expr()");
-static_assert(COUNT_TOKENS == 16, "Update compile_expr()");
+static bool scope_find(Scope *scope, SV name, size_t *index) {
+    for (size_t i = scope->count; i > 0; i--) {
+        if (sv_eq(scope->data[i - 1].token.sv, name)) {
+            *index = i - 1;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static void compile_scope_init(Compiler *compiler, Scope *scope) {
+    scope->count = 0;
+    scope->depth = 0;
+    compiler->scope = scope;
+}
+
+static_assert(COUNT_OPS == 19, "Update compile_expr()");
+static_assert(COUNT_TOKENS == 18, "Update compile_expr()");
 static void compile_expr(Compiler *compiler, Power mbp) {
     compile_advance(compiler);
 
@@ -155,10 +172,15 @@ static void compile_expr(Compiler *compiler, Power mbp) {
         compile_chunk_push(compiler, OP_FALSE);
         break;
 
-    case TOKEN_IDENT:
-        compile_chunk_push_value(
-            compiler, OP_GGET, compile_ident_const(compiler, compiler->previous));
-        break;
+    case TOKEN_IDENT: {
+        size_t local_index;
+        if (scope_find(compiler->scope, compiler->previous.sv, &local_index)) {
+            compile_chunk_push_int(compiler, OP_LGET, local_index);
+        } else {
+            compile_chunk_push_value(
+                compiler, OP_GGET, compile_ident_const(compiler, compiler->previous.sv));
+        }
+    } break;
 
     case TOKEN_SUB:
         compile_expr(compiler, POWER_PRE);
@@ -215,7 +237,14 @@ static void compile_expr(Compiler *compiler, Power mbp) {
 
                 compile_expr(compiler, lbp);
                 compile_chunk_push_int(compiler, OP_GSET, index);
-                compile_chunk_push(compiler, OP_NIL);
+            } break;
+
+            case OP_LGET: {
+                const size_t index = *(size_t *)&compiler->chunk->data[compiler->last_op + 1];
+                compiler->chunk->count = compiler->last_op;
+
+                compile_expr(compiler, lbp);
+                compile_chunk_push_int(compiler, OP_LSET, index);
             } break;
 
             default:
@@ -230,15 +259,39 @@ static void compile_expr(Compiler *compiler, Power mbp) {
     }
 }
 
-static_assert(COUNT_OPS == 16, "Update compile_expr()");
-static_assert(COUNT_TOKENS == 16, "Update compile_stmt()");
+static_assert(COUNT_OPS == 19, "Update compile_expr()");
+static_assert(COUNT_TOKENS == 18, "Update compile_stmt()");
 static void compile_stmt(Compiler *compiler) {
     switch (compiler->current.type) {
+    case TOKEN_LBRACE:
+        compile_advance(compiler);
+
+        compiler->scope->depth++;
+        while (compiler->current.type != TOKEN_RBRACE && compiler->current.type != TOKEN_EOF) {
+            compile_stmt(compiler);
+        }
+        compiler->scope->depth--;
+
+        size_t drops = 0;
+        while (compiler->scope->count &&
+               compiler->scope->data[compiler->scope->count - 1].depth > compiler->scope->depth) {
+            drops++;
+            compiler->scope->count--;
+        }
+
+        if (drops == 1) {
+            compile_chunk_push(compiler, OP_DROP);
+        } else if (drops) {
+            compile_chunk_push_int(compiler, OP_DROPS, drops);
+        }
+        compile_expect(compiler, TOKEN_RBRACE);
+        break;
+
     case TOKEN_VAR: {
         compile_advance(compiler);
         compile_expect(compiler, TOKEN_IDENT);
 
-        const Value identifier = compile_ident_const(compiler, compiler->previous);
+        const Token name = compiler->previous;
         if (compile_match(compiler, TOKEN_SET)) {
             compile_expr(compiler, POWER_SET);
         } else {
@@ -246,7 +299,16 @@ static void compile_stmt(Compiler *compiler) {
         }
         compile_expect(compiler, TOKEN_EOL);
 
-        compile_chunk_push_value(compiler, OP_GDEF, identifier);
+        if (compiler->scope->depth) {
+            da_push(
+                compiler->scope,
+                ((Local){
+                    .token = name,
+                    .depth = compiler->scope->depth,
+                }));
+        } else {
+            compile_chunk_push_value(compiler, OP_GDEF, compile_ident_const(compiler, name.sv));
+        }
     } break;
 
     case TOKEN_PRINT:
@@ -266,13 +328,17 @@ static void compile_stmt(Compiler *compiler) {
 }
 
 bool compile(Compiler *compiler, Chunk *chunk) {
+    Scope scope = {0};
+    compile_scope_init(compiler, &scope);
+
     compiler->chunk = chunk;
 
     compile_advance(compiler);
     while (compiler->current.type != TOKEN_EOF) {
         compile_stmt(compiler);
     }
-
     compile_chunk_push(compiler, OP_HALT);
+
+    da_free(&scope);
     return !compiler->error;
 }

@@ -8,6 +8,7 @@
 typedef enum {
     OP_HALT,
     OP_DROP,
+    OP_DROPS,
 
     OP_NIL,
     OP_TRUE,
@@ -24,6 +25,8 @@ typedef enum {
     OP_GDEF,
     OP_GGET,
     OP_GSET,
+    OP_LGET,
+    OP_LSET,
 
     OP_PRINT,
     COUNT_OPS,
@@ -38,5 +41,6 @@ typedef struct {
 } Chunk;
 
 void chunk_free(Chunk *chunk);
+void chunk_print(Chunk *chunk);
 
 #endif // CHUNK_H

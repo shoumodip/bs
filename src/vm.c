@@ -44,7 +44,7 @@ void vm_free(VM *vm) {
     }
 }
 
-static_assert(COUNT_OPS == 16, "Update vm_run()");
+static_assert(COUNT_OPS == 19, "Update vm_run()");
 bool vm_run(VM *vm, Chunk *chunk) {
     vm->chunk = chunk;
     vm->ip = vm->chunk->data;
@@ -57,6 +57,10 @@ bool vm_run(VM *vm, Chunk *chunk) {
 
         case OP_DROP:
             vm_pop(vm);
+            break;
+
+        case OP_DROPS:
+            vm->stack.count -= vm_read_int(vm);
             break;
 
         case OP_NIL:
@@ -175,20 +179,28 @@ bool vm_run(VM *vm, Chunk *chunk) {
         case OP_GSET: {
             ObjectStr *name = (ObjectStr *)vm_read_const(vm)->as.object;
 
-            if (table_set(&vm->globals, &vm->gc, name, vm_pop(vm))) {
+            if (table_set(&vm->globals, &vm->gc, name, vm_peek(vm, 0))) {
                 table_remove(&vm->globals, name);
                 fprintf(stderr, "error: undefined variable '" SVFmt "'\n", SVArg(*name));
                 return false;
             }
         } break;
 
+        case OP_LGET:
+            vm_push(vm, vm->stack.data[vm_read_int(vm)]);
+            break;
+
+        case OP_LSET:
+            vm->stack.data[vm_read_int(vm)] = vm_peek(vm, 0);
+            break;
+
         case OP_PRINT:
             value_print(vm_pop(vm));
-            putchar('\n');
+            printf("\n");
             break;
 
         default:
-            fprintf(stderr, "error: invalid op %d\n", op);
+            fprintf(stderr, "error: invalid op %d at offset %zu\n", op, vm->ip - vm->chunk->data);
             return false;
         }
     }

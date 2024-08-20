@@ -3,10 +3,6 @@
 
 #include "lexer.h"
 
-static bool sv_eq(SV a, SV b) {
-    return a.size == b.size && memcmp(a.data, b.data, b.size) == 0;
-}
-
 static void lexer_advance(Lexer *lexer) {
     if (*lexer->sv.data == '\n') {
         if (lexer->sv.size > 1) {
@@ -43,7 +39,7 @@ Lexer lexer_new(const char *path, SV sv) {
     };
 }
 
-static_assert(COUNT_TOKENS == 16, "Update lexer_next()");
+static_assert(COUNT_TOKENS == 18, "Update lexer_next()");
 bool lexer_next(Lexer *lexer, Token *token) {
     while (lexer->sv.size > 0) {
         if (isspace(*lexer->sv.data)) {
@@ -100,6 +96,14 @@ bool lexer_next(Lexer *lexer, Token *token) {
         switch (lexer_consume(lexer)) {
         case ';':
             token->type = TOKEN_EOL;
+            break;
+
+        case '{':
+            token->type = TOKEN_LBRACE;
+            break;
+
+        case '}':
+            token->type = TOKEN_RBRACE;
             break;
 
         case '+':
