@@ -10,6 +10,9 @@ typedef struct {
 
     Chunk *chunk;
     GC *gc;
+
+    Token current;
+    Token previous;
 } Compiler;
 
 bool compile(Compiler *compiler, Chunk *chunk);

@@ -32,6 +32,7 @@ typedef enum {
 
     TOKEN_NOT,
 
+    TOKEN_PRINT,
     COUNT_TOKENS
 } TokenType;
 

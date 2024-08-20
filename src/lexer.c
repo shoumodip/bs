@@ -43,19 +43,8 @@ Lexer lexer_new(const char *path, SV sv) {
     };
 }
 
-void lexer_buffer(Lexer *lexer, Token token) {
-    lexer->peeked = true;
-    lexer->buffer = token;
-}
-
-static_assert(COUNT_TOKENS == 13, "Update lexer_next()");
+static_assert(COUNT_TOKENS == 14, "Update lexer_next()");
 bool lexer_next(Lexer *lexer, Token *token) {
-    if (lexer->peeked) {
-        lexer->peeked = false;
-        *token = lexer->buffer;
-        return true;
-    }
-
     while (lexer->sv.size > 0) {
         if (isspace(*lexer->sv.data)) {
             lexer_advance(lexer);
@@ -98,6 +87,7 @@ bool lexer_next(Lexer *lexer, Token *token) {
         if (lexer->sv.size == 0) {
             if (!lexer->quiet) {
                 fprintf(stderr, PosFmt "error: unterminated string\n", PosArg(token->pos));
+                lexer->quiet = true;
             }
 
             token->sv.size -= lexer->sv.size;
@@ -139,6 +129,7 @@ bool lexer_next(Lexer *lexer, Token *token) {
                     PosFmt "error: invalid character '%c'\n",
                     PosArg(token->pos),
                     *token->sv.data);
+                lexer->quiet = true;
             }
 
             token->sv.size -= lexer->sv.size;
@@ -155,39 +146,9 @@ bool lexer_next(Lexer *lexer, Token *token) {
             token->type = TOKEN_TRUE;
         } else if (sv_eq(token->sv, SVStatic("false"))) {
             token->type = TOKEN_FALSE;
+        } else if (sv_eq(token->sv, SVStatic("print"))) {
+            token->type = TOKEN_PRINT;
         }
-    }
-
-    return true;
-}
-
-bool lexer_peek(Lexer *lexer, Token *token) {
-    if (!lexer->peeked) {
-        bool result = lexer_next(lexer, token);
-        lexer_buffer(lexer, *token);
-        return result;
-    }
-
-    *token = lexer->buffer;
-    return true;
-}
-
-bool lexer_expect(Lexer *lexer, TokenType type) {
-    Token token;
-    if (!lexer_next(lexer, &token)) {
-        return false;
-    }
-
-    if (token.type != type) {
-        if (!lexer->quiet) {
-            fprintf(
-                stderr,
-                PosFmt "Error: expected %s, got %s\n",
-                PosArg(token.pos),
-                token_type_name(type),
-                token_type_name(token.type));
-        }
-        return false;
     }
 
     return true;

@@ -45,7 +45,6 @@ typedef struct {
     size_t capacity;
 } Values;
 
-// TODO: Use gc_realloc
 #define values_push da_push
 #define values_free da_free
 

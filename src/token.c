@@ -1,5 +1,6 @@
 #include "token.h"
 
+static_assert(COUNT_TOKENS == 14, "Update token_type_name()");
 const char *token_type_name(TokenType type) {
     switch (type) {
     case TOKEN_EOF:
@@ -39,7 +40,10 @@ const char *token_type_name(TokenType type) {
     case TOKEN_NOT:
         return "'!'";
 
-    case COUNT_TOKENS:
+    case TOKEN_PRINT:
+        return "'print'";
+
+    default:
         assert(false && "unreachable");
     }
 }

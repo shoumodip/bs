@@ -7,6 +7,7 @@
 
 typedef enum {
     OP_HALT,
+    OP_DROP,
 
     OP_NIL,
     OP_TRUE,
@@ -20,6 +21,7 @@ typedef enum {
     OP_NEG,
     OP_NOT,
 
+    OP_PRINT,
     COUNT_OPS,
 } Op;
 

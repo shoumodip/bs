@@ -35,7 +35,7 @@ void vm_free(VM *vm) {
     }
 }
 
-static_assert(COUNT_OPS == 11, "Update vm_run()");
+static_assert(COUNT_OPS == 13, "Update vm_run()");
 bool vm_run(VM *vm, Chunk *chunk) {
     vm->chunk = chunk;
     vm->ip = vm->chunk->data;
@@ -44,9 +44,11 @@ bool vm_run(VM *vm, Chunk *chunk) {
         const Op op = *vm->ip++;
         switch (op) {
         case OP_HALT:
-            value_print(vm_pop(vm));
-            printf("\n");
             return true;
+
+        case OP_DROP:
+            vm_pop(vm);
+            break;
 
         case OP_NIL:
             vm_push(vm, value_nil);
@@ -141,6 +143,11 @@ bool vm_run(VM *vm, Chunk *chunk) {
 
         case OP_NOT:
             vm_push(vm, value_bool(value_is_falsey(vm_pop(vm))));
+            break;
+
+        case OP_PRINT:
+            value_print(vm_pop(vm));
+            putchar('\n');
             break;
 
         default:
