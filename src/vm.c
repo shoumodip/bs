@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "debug.h"
 #include "vm.h"
 
 static void vm_push(VM *vm, Value value) {
@@ -78,7 +79,7 @@ bool vm_run(VM *vm, Chunk *chunk, bool step) {
             printf("\n");
 
             size_t offset = vm->ip - vm->chunk->data;
-            chunk_print_op(vm->chunk, &offset);
+            debug_op(vm->chunk, &offset);
             printf("----------------------------------------\n");
             getchar();
         }
