@@ -1,8 +1,8 @@
 #ifndef COMPILER_H
 #define COMPILER_H
 
-#include "chunk.h"
 #include "lexer.h"
+#include "value.h"
 
 typedef struct {
     Token token;

@@ -33,6 +33,31 @@ bool value_is_falsey(Value value) {
     return value.type == VALUE_NIL || (value.type == VALUE_BOOL && !value.as.boolean);
 }
 
+void chunk_free(Chunk *chunk) {
+    values_free(&chunk->constants);
+    da_free(chunk);
+}
+
+void chunk_push_op(Chunk *chunk, Op op) {
+    chunk->last = chunk->count;
+    da_push(chunk, op);
+}
+
+void chunk_push_op_int(Chunk *chunk, Op op, size_t value) {
+    const size_t bytes = sizeof(value);
+    chunk_push_op(chunk, op);
+    da_push_many(chunk, &value, bytes);
+}
+
+void chunk_push_op_value(Chunk *chunk, Op op, Value value) {
+    const size_t index = chunk->constants.count;
+    const size_t bytes = sizeof(index);
+    values_push(&chunk->constants, value);
+
+    chunk_push_op(chunk, op);
+    da_push_many(chunk, &index, bytes);
+}
+
 bool object_str_eq(ObjectStr *a, ObjectStr *b) {
     if (!a || !b) {
         return false;

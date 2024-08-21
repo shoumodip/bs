@@ -166,12 +166,12 @@ static void compile_scope_end(Compiler *compiler) {
     if (drops == 1) {
         chunk_push_op(compiler->chunk, OP_DROP);
     } else if (drops) {
-        chunk_push_int(compiler->chunk, OP_DROPS, drops);
+        chunk_push_op_int(compiler->chunk, OP_DROPS, drops);
     }
 }
 
 static size_t compile_jump_start(Compiler *compiler, Op op) {
-    chunk_push_int(compiler->chunk, op, 0);
+    chunk_push_op_int(compiler->chunk, op, 0);
     return compiler->chunk->count - 1 - sizeof(size_t);
 }
 
@@ -181,7 +181,7 @@ static void compile_jump_patch(Compiler *compiler, size_t addr) {
 }
 
 static void compile_jump_direct(Compiler *compiler, Op op, size_t addr) {
-    chunk_push_int(compiler->chunk, op, addr - compiler->chunk->count - 1 - sizeof(size_t));
+    chunk_push_op_int(compiler->chunk, op, addr - compiler->chunk->count - 1 - sizeof(size_t));
 }
 
 static_assert(COUNT_TOKENS == 32, "Update compile_expr()");
@@ -194,7 +194,7 @@ static void compile_expr(Compiler *compiler, Power mbp) {
         break;
 
     case TOKEN_STR:
-        chunk_push_value(
+        chunk_push_op_value(
             compiler->chunk,
             OP_CONST,
             value_object(gc_new_object_str(
@@ -202,7 +202,7 @@ static void compile_expr(Compiler *compiler, Power mbp) {
         break;
 
     case TOKEN_NUM:
-        chunk_push_value(
+        chunk_push_op_value(
             compiler->chunk, OP_CONST, value_num(strtod(compiler->previous.sv.data, NULL)));
         break;
 
@@ -217,9 +217,9 @@ static void compile_expr(Compiler *compiler, Power mbp) {
     case TOKEN_IDENT: {
         size_t local_index;
         if (scope_find(compiler->scope, compiler->previous.sv, &local_index)) {
-            chunk_push_int(compiler->chunk, OP_LGET, local_index);
+            chunk_push_op_int(compiler->chunk, OP_LGET, local_index);
         } else {
-            chunk_push_value(
+            chunk_push_op_value(
                 compiler->chunk, OP_GGET, compile_ident_const(compiler, compiler->previous.sv));
         }
     } break;
@@ -336,7 +336,7 @@ static void compile_expr(Compiler *compiler, Power mbp) {
             compiler->chunk->count = compiler->chunk->last;
 
             compile_expr(compiler, lbp);
-            chunk_push_int(compiler->chunk, op, index);
+            chunk_push_op_int(compiler->chunk, op, index);
         } break;
 
         default:
@@ -453,7 +453,7 @@ static void compile_stmt(Compiler *compiler) {
         if (compiler->scope->depth) {
             compiler->scope->data[index].token = name;
         } else {
-            chunk_push_value(compiler->chunk, OP_GDEF, compile_ident_const(compiler, name.sv));
+            chunk_push_op_value(compiler->chunk, OP_GDEF, compile_ident_const(compiler, name.sv));
         }
     } break;
 

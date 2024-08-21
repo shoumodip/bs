@@ -1,7 +1,7 @@
 #ifndef VM_H
 #define VM_H
 
-#include "chunk.h"
+#include "op.h"
 
 typedef struct {
     Chunk *chunk;

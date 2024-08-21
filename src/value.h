@@ -1,7 +1,10 @@
 #ifndef VALUE_H
 #define VALUE_H
 
+#include <stdint.h>
+
 #include "basic.h"
+#include "op.h"
 
 typedef enum {
     VALUE_NIL,
@@ -47,6 +50,20 @@ typedef struct {
 
 #define values_push da_push
 #define values_free da_free
+
+typedef struct {
+    uint8_t *data;
+    size_t last;
+    size_t count;
+    size_t capacity;
+
+    Values constants;
+} Chunk;
+
+void chunk_free(Chunk *chunk);
+void chunk_push_op(Chunk *chunk, Op op);
+void chunk_push_op_int(Chunk *chunk, Op op, size_t value);
+void chunk_push_op_value(Chunk *chunk, Op op, Value value);
 
 typedef struct {
     Object meta;
