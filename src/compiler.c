@@ -12,7 +12,7 @@ typedef enum {
     POWER_PRE
 } Power;
 
-static_assert(COUNT_TOKENS == 30, "Update token_type_powers[]");
+static_assert(COUNT_TOKENS == 31, "Update token_type_powers[]");
 const Power token_type_powers[COUNT_TOKENS] = {
     [TOKEN_ADD] = POWER_ADD,
     [TOKEN_SUB] = POWER_ADD,
@@ -109,7 +109,7 @@ static void compile_expect_inplace(Compiler *compiler, TokenType type) {
     }
 }
 
-static_assert(COUNT_TOKENS == 30, "Update compile_synchronize()");
+static_assert(COUNT_TOKENS == 31, "Update compile_synchronize()");
 static void compile_synchronize(Compiler *compiler) {
     if (compiler->lexer.quiet) {
         compiler->lexer.quiet = false;
@@ -121,6 +121,8 @@ static void compile_synchronize(Compiler *compiler) {
 
             switch (compiler->current.type) {
             case TOKEN_IF:
+            case TOKEN_WHILE:
+
             case TOKEN_VAR:
             case TOKEN_PRINT:
                 return;
@@ -154,7 +156,11 @@ static void compile_jump_patch(Compiler *compiler, size_t addr) {
         compiler->chunk->count - 1 - sizeof(size_t) - addr;
 }
 
-static_assert(COUNT_TOKENS == 30, "Update compile_expr()");
+static void compile_jump_direct(Compiler *compiler, Op op, size_t addr) {
+    chunk_push_int(compiler->chunk, op, addr - compiler->chunk->count - 1 - sizeof(size_t));
+}
+
+static_assert(COUNT_TOKENS == 31, "Update compile_expr()");
 static void compile_expr(Compiler *compiler, Power mbp) {
     compile_advance(compiler);
 
@@ -324,7 +330,7 @@ static void compile_expr(Compiler *compiler, Power mbp) {
     }
 }
 
-static_assert(COUNT_TOKENS == 30, "Update compile_stmt()");
+static_assert(COUNT_TOKENS == 31, "Update compile_stmt()");
 static void compile_stmt(Compiler *compiler) {
     switch (compiler->current.type) {
     case TOKEN_LBRACE:
@@ -370,6 +376,24 @@ static void compile_stmt(Compiler *compiler) {
             compile_stmt(compiler);
         }
         compile_jump_patch(compiler, else_addr);
+    } break;
+
+    case TOKEN_WHILE: {
+        compile_advance(compiler);
+
+        const size_t cond_addr = compiler->chunk->count;
+        compile_expr(compiler, POWER_SET);
+
+        const size_t loop_addr = compile_jump_start(compiler, OP_ELSE);
+        chunk_push_op(compiler->chunk, OP_DROP);
+
+        compile_expect_inplace(compiler, TOKEN_LBRACE);
+        compile_stmt(compiler);
+
+        compile_jump_direct(compiler, OP_JUMP, cond_addr);
+
+        compile_jump_patch(compiler, loop_addr);
+        chunk_push_op(compiler->chunk, OP_DROP);
     } break;
 
     case TOKEN_VAR: {

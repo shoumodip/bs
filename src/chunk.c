@@ -11,7 +11,7 @@ static void chunk_print_op_int(Chunk *chunk, size_t *offset, const char *name) {
     const size_t slot = *(size_t *)&chunk->data[*offset];
     *offset += sizeof(slot);
 
-    printf("%-16s %4zu\n", name, slot);
+    printf("%-16s %4ld\n", name, slot);
 }
 
 static void chunk_print_op_value(Chunk *chunk, size_t *offset, const char *name) {
