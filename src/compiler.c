@@ -10,7 +10,7 @@ typedef enum {
     POWER_PRE
 } Power;
 
-static_assert(COUNT_TOKENS == 18, "Update token_type_powers[]");
+static_assert(COUNT_TOKENS == 20, "Update token_type_powers[]");
 const Power token_type_powers[COUNT_TOKENS] = {
     [TOKEN_ADD] = POWER_ADD,
     [TOKEN_SUB] = POWER_ADD,
@@ -75,7 +75,7 @@ static void compile_expect(Compiler *compiler, TokenType type) {
     compile_error(compiler);
 }
 
-static_assert(COUNT_TOKENS == 18, "Update compile_synchronize()");
+static_assert(COUNT_TOKENS == 20, "Update compile_synchronize()");
 static void compile_synchronize(Compiler *compiler) {
     if (compiler->lexer.quiet) {
         compiler->lexer.quiet = false;
@@ -122,7 +122,7 @@ static void compile_scope_init(Compiler *compiler, Scope *scope) {
 }
 
 static_assert(COUNT_OPS == 19, "Update compile_expr()");
-static_assert(COUNT_TOKENS == 18, "Update compile_expr()");
+static_assert(COUNT_TOKENS == 20, "Update compile_expr()");
 static void compile_expr(Compiler *compiler, Power mbp) {
     compile_advance(compiler);
 
@@ -161,6 +161,11 @@ static void compile_expr(Compiler *compiler, Power mbp) {
                 compiler->chunk, OP_GGET, compile_ident_const(compiler, compiler->previous.sv));
         }
     } break;
+
+    case TOKEN_LPAREN:
+        compile_expr(compiler, POWER_SET);
+        compile_expect(compiler, TOKEN_RPAREN);
+        break;
 
     case TOKEN_SUB:
         compile_expr(compiler, POWER_PRE);
@@ -240,7 +245,7 @@ static void compile_expr(Compiler *compiler, Power mbp) {
 }
 
 static_assert(COUNT_OPS == 19, "Update compile_expr()");
-static_assert(COUNT_TOKENS == 18, "Update compile_stmt()");
+static_assert(COUNT_TOKENS == 20, "Update compile_stmt()");
 static void compile_stmt(Compiler *compiler) {
     switch (compiler->current.type) {
     case TOKEN_LBRACE:
