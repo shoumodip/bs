@@ -44,7 +44,24 @@ void vm_free(VM *vm) {
     }
 }
 
-static_assert(COUNT_OPS == 19, "Update vm_run()");
+static bool vm_binary_op(VM *vm, Value *a, Value *b, const char *op) {
+    *b = vm_pop(vm);
+    *a = vm_pop(vm);
+
+    if (a->type != VALUE_NUM || b->type != VALUE_NUM) {
+        fprintf(
+            stderr,
+            "error: invalid operands to binary (%s): %s, %s\n",
+            op,
+            value_type_name(a->type),
+            value_type_name(b->type));
+        return false;
+    }
+
+    return true;
+}
+
+static_assert(COUNT_OPS == 25, "Update vm_run()");
 bool vm_run(VM *vm, Chunk *chunk) {
     vm->chunk = chunk;
     vm->ip = vm->chunk->data;
@@ -80,15 +97,8 @@ bool vm_run(VM *vm, Chunk *chunk) {
             break;
 
         case OP_ADD: {
-            const Value b = vm_pop(vm);
-            const Value a = vm_pop(vm);
-
-            if (a.type != VALUE_NUM || b.type != VALUE_NUM) {
-                fprintf(
-                    stderr,
-                    "error: invalid operands to binary (+): %s, %s\n",
-                    value_type_name(a.type),
-                    value_type_name(b.type));
+            Value a, b;
+            if (!vm_binary_op(vm, &a, &b, "+")) {
                 return false;
             }
 
@@ -96,15 +106,8 @@ bool vm_run(VM *vm, Chunk *chunk) {
         } break;
 
         case OP_SUB: {
-            const Value b = vm_pop(vm);
-            const Value a = vm_pop(vm);
-
-            if (a.type != VALUE_NUM || b.type != VALUE_NUM) {
-                fprintf(
-                    stderr,
-                    "error: invalid operands to binary (-): %s, %s\n",
-                    value_type_name(a.type),
-                    value_type_name(b.type));
+            Value a, b;
+            if (!vm_binary_op(vm, &a, &b, "-")) {
                 return false;
             }
 
@@ -112,15 +115,8 @@ bool vm_run(VM *vm, Chunk *chunk) {
         } break;
 
         case OP_MUL: {
-            const Value b = vm_pop(vm);
-            const Value a = vm_pop(vm);
-
-            if (a.type != VALUE_NUM || b.type != VALUE_NUM) {
-                fprintf(
-                    stderr,
-                    "error: invalid operands to binary (*): %s, %s\n",
-                    value_type_name(a.type),
-                    value_type_name(b.type));
+            Value a, b;
+            if (!vm_binary_op(vm, &a, &b, "*")) {
                 return false;
             }
 
@@ -128,15 +124,8 @@ bool vm_run(VM *vm, Chunk *chunk) {
         } break;
 
         case OP_DIV: {
-            const Value b = vm_pop(vm);
-            const Value a = vm_pop(vm);
-
-            if (a.type != VALUE_NUM || b.type != VALUE_NUM) {
-                fprintf(
-                    stderr,
-                    "error: invalid operands to binary (/): %s, %s\n",
-                    value_type_name(a.type),
-                    value_type_name(b.type));
+            Value a, b;
+            if (!vm_binary_op(vm, &a, &b, "/")) {
                 return false;
             }
 
@@ -157,6 +146,60 @@ bool vm_run(VM *vm, Chunk *chunk) {
         case OP_NOT:
             vm_push(vm, value_bool(value_is_falsey(vm_pop(vm))));
             break;
+
+        case OP_GT: {
+            Value a, b;
+            if (!vm_binary_op(vm, &a, &b, ">")) {
+                return false;
+            }
+
+            vm_push(vm, value_bool(a.as.number > b.as.number));
+        } break;
+
+        case OP_GE: {
+            Value a, b;
+            if (!vm_binary_op(vm, &a, &b, ">=")) {
+                return false;
+            }
+
+            vm_push(vm, value_bool(a.as.number >= b.as.number));
+        } break;
+
+        case OP_LT: {
+            Value a, b;
+            if (!vm_binary_op(vm, &a, &b, "<")) {
+                return false;
+            }
+
+            vm_push(vm, value_bool(a.as.number < b.as.number));
+        } break;
+
+        case OP_LE: {
+            Value a, b;
+            if (!vm_binary_op(vm, &a, &b, "<=")) {
+                return false;
+            }
+
+            vm_push(vm, value_bool(a.as.number <= b.as.number));
+        } break;
+
+        case OP_EQ: {
+            Value a, b;
+            if (!vm_binary_op(vm, &a, &b, "==")) {
+                return false;
+            }
+
+            vm_push(vm, value_bool(a.as.number == b.as.number));
+        } break;
+
+        case OP_NE: {
+            Value a, b;
+            if (!vm_binary_op(vm, &a, &b, "!=")) {
+                return false;
+            }
+
+            vm_push(vm, value_bool(a.as.number != b.as.number));
+        } break;
 
         case OP_GDEF:
             table_set(

@@ -22,6 +22,13 @@ typedef enum {
     OP_NEG,
     OP_NOT,
 
+    OP_GT,
+    OP_GE,
+    OP_LT,
+    OP_LE,
+    OP_EQ,
+    OP_NE,
+
     OP_GDEF,
     OP_GGET,
     OP_GSET,

@@ -23,7 +23,7 @@ static void chunk_print_op_value(Chunk *chunk, size_t *offset, const char *name)
     printf("'\n");
 }
 
-static_assert(COUNT_OPS == 19, "Update chunk_print()");
+static_assert(COUNT_OPS == 25, "Update chunk_print()");
 void chunk_print(Chunk *chunk) {
     size_t i = 0;
     while (i < chunk->count) {
@@ -81,6 +81,30 @@ void chunk_print(Chunk *chunk) {
 
         case OP_NOT:
             printf("OP_NOT\n");
+            break;
+
+        case OP_GT:
+            printf("OP_GT\n");
+            break;
+
+        case OP_GE:
+            printf("OP_GE\n");
+            break;
+
+        case OP_LT:
+            printf("OP_LT\n");
+            break;
+
+        case OP_LE:
+            printf("OP_LE\n");
+            break;
+
+        case OP_EQ:
+            printf("OP_EQ\n");
+            break;
+
+        case OP_NE:
+            printf("OP_NE\n");
             break;
 
         case OP_GDEF:
