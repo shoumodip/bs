@@ -23,7 +23,7 @@ static void chunk_print_op_value(Chunk *chunk, size_t *offset, const char *name)
     printf("'\n");
 }
 
-static_assert(COUNT_OPS == 27, "Update chunk_print_op()");
+static_assert(COUNT_OPS == 28, "Update chunk_print_op()");
 void chunk_print_op(Chunk *chunk, size_t *offset) {
     printf("%04zu ", *offset);
 
@@ -131,6 +131,10 @@ void chunk_print_op(Chunk *chunk, size_t *offset) {
 
     case OP_ELSE:
         chunk_print_op_int(chunk, offset, "OP_ELSE");
+        break;
+
+    case OP_THEN:
+        chunk_print_op_int(chunk, offset, "OP_THEN");
         break;
 
     case OP_PRINT:

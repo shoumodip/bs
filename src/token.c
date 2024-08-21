@@ -1,6 +1,6 @@
 #include "token.h"
 
-static_assert(COUNT_TOKENS == 28, "Update token_type_name()");
+static_assert(COUNT_TOKENS == 30, "Update token_type_name()");
 const char *token_type_name(TokenType type) {
     switch (type) {
     case TOKEN_EOF:
@@ -48,6 +48,12 @@ const char *token_type_name(TokenType type) {
 
     case TOKEN_DIV:
         return "'/'";
+
+    case TOKEN_OR:
+        return "'or'";
+
+    case TOKEN_AND:
+        return "'and'";
 
     case TOKEN_NOT:
         return "'!'";

@@ -5,19 +5,23 @@
 typedef enum {
     POWER_NIL,
     POWER_SET,
+    POWER_AND,
     POWER_CMP,
     POWER_ADD,
     POWER_MUL,
     POWER_PRE
 } Power;
 
-static_assert(COUNT_TOKENS == 28, "Update token_type_powers[]");
+static_assert(COUNT_TOKENS == 30, "Update token_type_powers[]");
 const Power token_type_powers[COUNT_TOKENS] = {
     [TOKEN_ADD] = POWER_ADD,
     [TOKEN_SUB] = POWER_ADD,
 
     [TOKEN_MUL] = POWER_MUL,
     [TOKEN_DIV] = POWER_MUL,
+
+    [TOKEN_OR] = POWER_AND,
+    [TOKEN_AND] = POWER_AND,
 
     [TOKEN_GT] = POWER_CMP,
     [TOKEN_GE] = POWER_CMP,
@@ -105,7 +109,7 @@ static void compile_expect_inplace(Compiler *compiler, TokenType type) {
     }
 }
 
-static_assert(COUNT_TOKENS == 28, "Update compile_synchronize()");
+static_assert(COUNT_TOKENS == 30, "Update compile_synchronize()");
 static void compile_synchronize(Compiler *compiler) {
     if (compiler->lexer.quiet) {
         compiler->lexer.quiet = false;
@@ -150,8 +154,7 @@ static void compile_jump_patch(Compiler *compiler, size_t addr) {
         compiler->chunk->count - 1 - sizeof(size_t) - addr;
 }
 
-static_assert(COUNT_OPS == 27, "Update compile_expr()");
-static_assert(COUNT_TOKENS == 28, "Update compile_expr()");
+static_assert(COUNT_TOKENS == 30, "Update compile_expr()");
 static void compile_expr(Compiler *compiler, Power mbp) {
     compile_advance(compiler);
 
@@ -239,6 +242,24 @@ static void compile_expr(Compiler *compiler, Power mbp) {
             chunk_push_op(compiler->chunk, OP_DIV);
             break;
 
+        case TOKEN_OR: {
+            const size_t addr = compile_jump_start(compiler, OP_THEN);
+
+            chunk_push_op(compiler->chunk, OP_DROP);
+            compile_expr(compiler, lbp);
+
+            compile_jump_patch(compiler, addr);
+        } break;
+
+        case TOKEN_AND: {
+            const size_t addr = compile_jump_start(compiler, OP_ELSE);
+
+            chunk_push_op(compiler->chunk, OP_DROP);
+            compile_expr(compiler, lbp);
+
+            compile_jump_patch(compiler, addr);
+        } break;
+
         case TOKEN_GT:
             compile_expr(compiler, lbp);
             chunk_push_op(compiler->chunk, OP_GT);
@@ -303,8 +324,7 @@ static void compile_expr(Compiler *compiler, Power mbp) {
     }
 }
 
-static_assert(COUNT_OPS == 27, "Update compile_expr()");
-static_assert(COUNT_TOKENS == 28, "Update compile_stmt()");
+static_assert(COUNT_TOKENS == 30, "Update compile_stmt()");
 static void compile_stmt(Compiler *compiler) {
     switch (compiler->current.type) {
     case TOKEN_LBRACE:

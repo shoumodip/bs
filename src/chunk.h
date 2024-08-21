@@ -37,6 +37,7 @@ typedef enum {
 
     OP_JUMP,
     OP_ELSE,
+    OP_THEN,
 
     OP_PRINT,
     COUNT_OPS,

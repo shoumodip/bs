@@ -35,6 +35,8 @@ typedef enum {
     TOKEN_MUL,
     TOKEN_DIV,
 
+    TOKEN_OR,
+    TOKEN_AND,
     TOKEN_NOT,
 
     TOKEN_GT,

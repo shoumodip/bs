@@ -61,7 +61,7 @@ static bool vm_binary_op(VM *vm, Value *a, Value *b, const char *op) {
     return true;
 }
 
-static_assert(COUNT_OPS == 27, "Update vm_run()");
+static_assert(COUNT_OPS == 28, "Update vm_run()");
 bool vm_run(VM *vm, Chunk *chunk, bool step) {
     vm->chunk = chunk;
     vm->ip = vm->chunk->data;
@@ -261,6 +261,13 @@ bool vm_run(VM *vm, Chunk *chunk, bool step) {
         case OP_ELSE: {
             const size_t offset = vm_read_int(vm);
             if (value_is_falsey(vm_peek(vm, 0))) {
+                vm->ip += offset;
+            }
+        } break;
+
+        case OP_THEN: {
+            const size_t offset = vm_read_int(vm);
+            if (!value_is_falsey(vm_peek(vm, 0))) {
                 vm->ip += offset;
             }
         } break;
