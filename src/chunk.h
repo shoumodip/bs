@@ -43,6 +43,8 @@ typedef enum {
     COUNT_OPS,
 } Op;
 
+Op op_get_to_set(Op op);
+
 typedef struct {
     uint8_t *data;
     size_t last;

@@ -120,6 +120,8 @@ static void compile_synchronize(Compiler *compiler) {
             }
 
             switch (compiler->current.type) {
+            case TOKEN_LBRACE:
+
             case TOKEN_IF:
             case TOKEN_FOR:
             case TOKEN_WHILE:
@@ -318,33 +320,24 @@ static void compile_expr(Compiler *compiler, Power mbp) {
             chunk_push_op(compiler->chunk, OP_NE);
             break;
 
-        case TOKEN_SET:
+        case TOKEN_SET: {
             if (compiler->chunk->count <= compiler->chunk->last) {
-                return;
-            }
-
-            switch (compiler->chunk->data[compiler->chunk->last]) {
-            case OP_GGET: {
-                const size_t index = *(size_t *)&compiler->chunk->data[compiler->chunk->last + 1];
-                compiler->chunk->count = compiler->chunk->last;
-
-                compile_expr(compiler, lbp);
-                chunk_push_int(compiler->chunk, OP_GSET, index);
-            } break;
-
-            case OP_LGET: {
-                const size_t index = *(size_t *)&compiler->chunk->data[compiler->chunk->last + 1];
-                compiler->chunk->count = compiler->chunk->last;
-
-                compile_expr(compiler, lbp);
-                chunk_push_int(compiler->chunk, OP_LSET, index);
-            } break;
-
-            default:
                 compile_error_unexpected(compiler, &compiler->previous);
                 return;
             }
-            break;
+
+            const Op op = op_get_to_set(compiler->chunk->data[compiler->chunk->last]);
+            if (op == OP_HALT) {
+                compile_error_unexpected(compiler, &compiler->previous);
+                return;
+            }
+
+            const size_t index = *(size_t *)&compiler->chunk->data[compiler->chunk->last + 1];
+            compiler->chunk->count = compiler->chunk->last;
+
+            compile_expr(compiler, lbp);
+            chunk_push_int(compiler->chunk, op, index);
+        } break;
 
         default:
             assert(false && "Unreachable");
