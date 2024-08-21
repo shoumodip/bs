@@ -34,6 +34,7 @@ typedef enum {
 
 typedef struct {
     uint8_t *data;
+    size_t last;
     size_t count;
     size_t capacity;
 
@@ -42,5 +43,9 @@ typedef struct {
 
 void chunk_free(Chunk *chunk);
 void chunk_print(Chunk *chunk);
+
+void chunk_push_op(Chunk *chunk, Op op);
+void chunk_push_int(Chunk *chunk, Op op, size_t value);
+void chunk_push_value(Chunk *chunk, Op op, Value value);
 
 #endif // CHUNK_H

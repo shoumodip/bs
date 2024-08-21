@@ -22,7 +22,6 @@ typedef struct {
 
     GC *gc;
     Chunk *chunk;
-    size_t last_op;
 
     Token current;
     Token previous;
