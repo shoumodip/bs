@@ -12,7 +12,7 @@ typedef enum {
     POWER_PRE
 } Power;
 
-static_assert(COUNT_TOKENS == 31, "Update token_type_powers[]");
+static_assert(COUNT_TOKENS == 32, "Update token_type_powers[]");
 const Power token_type_powers[COUNT_TOKENS] = {
     [TOKEN_ADD] = POWER_ADD,
     [TOKEN_SUB] = POWER_ADD,
@@ -109,7 +109,7 @@ static void compile_expect_inplace(Compiler *compiler, TokenType type) {
     }
 }
 
-static_assert(COUNT_TOKENS == 31, "Update compile_synchronize()");
+static_assert(COUNT_TOKENS == 32, "Update compile_synchronize()");
 static void compile_synchronize(Compiler *compiler) {
     if (compiler->lexer.quiet) {
         compiler->lexer.quiet = false;
@@ -121,6 +121,7 @@ static void compile_synchronize(Compiler *compiler) {
 
             switch (compiler->current.type) {
             case TOKEN_IF:
+            case TOKEN_FOR:
             case TOKEN_WHILE:
 
             case TOKEN_VAR:
@@ -146,6 +147,27 @@ static void compile_scope_init(Compiler *compiler, Scope *scope) {
     compiler->scope = scope;
 }
 
+static void compile_scope_begin(Compiler *compiler) {
+    compiler->scope->depth++;
+}
+
+static void compile_scope_end(Compiler *compiler) {
+    compiler->scope->depth--;
+
+    size_t drops = 0;
+    while (compiler->scope->count &&
+           compiler->scope->data[compiler->scope->count - 1].depth > compiler->scope->depth) {
+        drops++;
+        compiler->scope->count--;
+    }
+
+    if (drops == 1) {
+        chunk_push_op(compiler->chunk, OP_DROP);
+    } else if (drops) {
+        chunk_push_int(compiler->chunk, OP_DROPS, drops);
+    }
+}
+
 static size_t compile_jump_start(Compiler *compiler, Op op) {
     chunk_push_int(compiler->chunk, op, 0);
     return compiler->chunk->count - 1 - sizeof(size_t);
@@ -160,7 +182,7 @@ static void compile_jump_direct(Compiler *compiler, Op op, size_t addr) {
     chunk_push_int(compiler->chunk, op, addr - compiler->chunk->count - 1 - sizeof(size_t));
 }
 
-static_assert(COUNT_TOKENS == 31, "Update compile_expr()");
+static_assert(COUNT_TOKENS == 32, "Update compile_expr()");
 static void compile_expr(Compiler *compiler, Power mbp) {
     compile_advance(compiler);
 
@@ -330,30 +352,18 @@ static void compile_expr(Compiler *compiler, Power mbp) {
     }
 }
 
-static_assert(COUNT_TOKENS == 31, "Update compile_stmt()");
+static_assert(COUNT_TOKENS == 32, "Update compile_stmt()");
 static void compile_stmt(Compiler *compiler) {
     switch (compiler->current.type) {
     case TOKEN_LBRACE:
         compile_advance(compiler);
 
-        compiler->scope->depth++;
+        compile_scope_begin(compiler);
         while (compiler->current.type != TOKEN_RBRACE && compiler->current.type != TOKEN_EOF) {
             compile_stmt(compiler);
         }
-        compiler->scope->depth--;
+        compile_scope_end(compiler);
 
-        size_t drops = 0;
-        while (compiler->scope->count &&
-               compiler->scope->data[compiler->scope->count - 1].depth > compiler->scope->depth) {
-            drops++;
-            compiler->scope->count--;
-        }
-
-        if (drops == 1) {
-            chunk_push_op(compiler->chunk, OP_DROP);
-        } else if (drops) {
-            chunk_push_int(compiler->chunk, OP_DROPS, drops);
-        }
         compile_expect(compiler, TOKEN_RBRACE);
         break;
 
@@ -378,6 +388,41 @@ static void compile_stmt(Compiler *compiler) {
         compile_jump_patch(compiler, else_addr);
     } break;
 
+    case TOKEN_FOR: {
+        compile_advance(compiler);
+
+        compile_scope_begin(compiler);
+        if (compiler->current.type == TOKEN_VAR) {
+            compile_stmt(compiler);
+        } else {
+            compile_expr(compiler, POWER_NIL);
+            compile_expect(compiler, TOKEN_EOL);
+        }
+
+        const size_t cond_addr = compiler->chunk->count;
+        compile_expr(compiler, POWER_SET);
+        compile_expect(compiler, TOKEN_EOL);
+
+        const size_t loop_addr = compile_jump_start(compiler, OP_ELSE);
+        chunk_push_op(compiler->chunk, OP_DROP);
+
+        const size_t iter_addr = compile_jump_start(compiler, OP_JUMP);
+        compile_expr(compiler, POWER_NIL);
+        chunk_push_op(compiler->chunk, OP_DROP);
+        compile_jump_direct(compiler, OP_JUMP, cond_addr);
+        compile_jump_patch(compiler, iter_addr);
+
+        compile_expect_inplace(compiler, TOKEN_LBRACE);
+        compile_stmt(compiler);
+        compile_jump_direct(compiler, OP_JUMP, iter_addr + 1 + sizeof(size_t));
+
+        compile_jump_direct(compiler, OP_JUMP, cond_addr);
+        compile_jump_patch(compiler, loop_addr);
+        chunk_push_op(compiler->chunk, OP_DROP);
+
+        compile_scope_end(compiler);
+    } break;
+
     case TOKEN_WHILE: {
         compile_advance(compiler);
 
@@ -391,7 +436,6 @@ static void compile_stmt(Compiler *compiler) {
         compile_stmt(compiler);
 
         compile_jump_direct(compiler, OP_JUMP, cond_addr);
-
         compile_jump_patch(compiler, loop_addr);
         chunk_push_op(compiler->chunk, OP_DROP);
     } break;

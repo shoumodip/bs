@@ -39,7 +39,7 @@ Lexer lexer_new(const char *path, SV sv) {
     };
 }
 
-static_assert(COUNT_TOKENS == 31, "Update lexer_next()");
+static_assert(COUNT_TOKENS == 32, "Update lexer_next()");
 bool lexer_next(Lexer *lexer, Token *token) {
     while (lexer->sv.size > 0) {
         if (isspace(*lexer->sv.data)) {
@@ -194,6 +194,8 @@ bool lexer_next(Lexer *lexer, Token *token) {
             token->type = TOKEN_IF;
         } else if (sv_eq(token->sv, SVStatic("else"))) {
             token->type = TOKEN_ELSE;
+        } else if (sv_eq(token->sv, SVStatic("for"))) {
+            token->type = TOKEN_FOR;
         } else if (sv_eq(token->sv, SVStatic("while"))) {
             token->type = TOKEN_WHILE;
         } else if (sv_eq(token->sv, SVStatic("var"))) {
