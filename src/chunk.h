@@ -35,6 +35,9 @@ typedef enum {
     OP_LGET,
     OP_LSET,
 
+    OP_JUMP,
+    OP_ELSE,
+
     OP_PRINT,
     COUNT_OPS,
 } Op;
@@ -49,6 +52,7 @@ typedef struct {
 } Chunk;
 
 void chunk_free(Chunk *chunk);
+void chunk_print_op(Chunk *chunk, size_t *offset);
 void chunk_print(Chunk *chunk);
 
 void chunk_push_op(Chunk *chunk, Op op);

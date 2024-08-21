@@ -11,7 +11,7 @@ typedef enum {
     POWER_PRE
 } Power;
 
-static_assert(COUNT_TOKENS == 26, "Update token_type_powers[]");
+static_assert(COUNT_TOKENS == 28, "Update token_type_powers[]");
 const Power token_type_powers[COUNT_TOKENS] = {
     [TOKEN_ADD] = POWER_ADD,
     [TOKEN_SUB] = POWER_ADD,
@@ -45,6 +45,31 @@ static void compile_error(Compiler *compiler) {
     compiler->lexer.quiet = true;
 }
 
+static void compile_error_expected(Compiler *compiler, const Token *token, TokenType type) {
+    if (!compiler->lexer.quiet) {
+        fprintf(
+            stderr,
+            PosFmt "error: expected %s, got %s\n",
+            PosArg(token->pos),
+            token_type_name(type),
+            token_type_name(token->type));
+    }
+
+    compile_error(compiler);
+}
+
+static void compile_error_unexpected(Compiler *compiler, const Token *token) {
+    if (!compiler->lexer.quiet) {
+        fprintf(
+            stderr,
+            PosFmt "error: unexpected %s\n",
+            PosArg(token->pos),
+            token_type_name(token->type));
+    }
+
+    compile_error(compiler);
+}
+
 static void compile_advance(Compiler *compiler) {
     compiler->previous = compiler->current;
 
@@ -71,19 +96,16 @@ static void compile_expect(Compiler *compiler, TokenType type) {
         return;
     }
 
-    if (!compiler->lexer.quiet) {
-        fprintf(
-            stderr,
-            PosFmt "error: expected %s, got %s\n",
-            PosArg(compiler->current.pos),
-            token_type_name(type),
-            token_type_name(compiler->current.type));
-    }
-
-    compile_error(compiler);
+    compile_error_expected(compiler, &compiler->current, type);
 }
 
-static_assert(COUNT_TOKENS == 26, "Update compile_synchronize()");
+static void compile_expect_inplace(Compiler *compiler, TokenType type) {
+    if (compiler->current.type != type) {
+        compile_error_expected(compiler, &compiler->current, type);
+    }
+}
+
+static_assert(COUNT_TOKENS == 28, "Update compile_synchronize()");
 static void compile_synchronize(Compiler *compiler) {
     if (compiler->lexer.quiet) {
         compiler->lexer.quiet = false;
@@ -94,6 +116,7 @@ static void compile_synchronize(Compiler *compiler) {
             }
 
             switch (compiler->current.type) {
+            case TOKEN_IF:
             case TOKEN_VAR:
             case TOKEN_PRINT:
                 return;
@@ -107,18 +130,6 @@ static void compile_synchronize(Compiler *compiler) {
     }
 }
 
-static void compile_unexpected(Compiler *compiler) {
-    if (!compiler->lexer.quiet) {
-        fprintf(
-            stderr,
-            PosFmt "error: unexpected %s\n",
-            PosArg(compiler->previous.pos),
-            token_type_name(compiler->previous.type));
-    }
-
-    compile_error(compiler);
-}
-
 static Value compile_ident_const(Compiler *compiler, SV name) {
     return value_object(gc_new_object_str(compiler->gc, name.data, name.size));
 }
@@ -129,8 +140,18 @@ static void compile_scope_init(Compiler *compiler, Scope *scope) {
     compiler->scope = scope;
 }
 
-static_assert(COUNT_OPS == 25, "Update compile_expr()");
-static_assert(COUNT_TOKENS == 26, "Update compile_expr()");
+static size_t compile_jump_start(Compiler *compiler, Op op) {
+    chunk_push_int(compiler->chunk, op, 0);
+    return compiler->chunk->count - 1 - sizeof(size_t);
+}
+
+static void compile_jump_patch(Compiler *compiler, size_t addr) {
+    *(size_t *)&compiler->chunk->data[addr + 1] =
+        compiler->chunk->count - 1 - sizeof(size_t) - addr;
+}
+
+static_assert(COUNT_OPS == 27, "Update compile_expr()");
+static_assert(COUNT_TOKENS == 28, "Update compile_expr()");
 static void compile_expr(Compiler *compiler, Power mbp) {
     compile_advance(compiler);
 
@@ -186,7 +207,7 @@ static void compile_expr(Compiler *compiler, Power mbp) {
         break;
 
     default:
-        compile_unexpected(compiler);
+        compile_error_unexpected(compiler, &compiler->previous);
         return;
     }
 
@@ -271,7 +292,7 @@ static void compile_expr(Compiler *compiler, Power mbp) {
             } break;
 
             default:
-                compile_unexpected(compiler);
+                compile_error_unexpected(compiler, &compiler->previous);
                 return;
             }
             break;
@@ -282,8 +303,8 @@ static void compile_expr(Compiler *compiler, Power mbp) {
     }
 }
 
-static_assert(COUNT_OPS == 25, "Update compile_expr()");
-static_assert(COUNT_TOKENS == 26, "Update compile_stmt()");
+static_assert(COUNT_OPS == 27, "Update compile_expr()");
+static_assert(COUNT_TOKENS == 28, "Update compile_stmt()");
 static void compile_stmt(Compiler *compiler) {
     switch (compiler->current.type) {
     case TOKEN_LBRACE:
@@ -309,6 +330,27 @@ static void compile_stmt(Compiler *compiler) {
         }
         compile_expect(compiler, TOKEN_RBRACE);
         break;
+
+    case TOKEN_IF: {
+        compile_advance(compiler);
+        compile_expr(compiler, POWER_SET);
+
+        const size_t then_addr = compile_jump_start(compiler, OP_ELSE);
+        chunk_push_op(compiler->chunk, OP_DROP);
+
+        compile_expect_inplace(compiler, TOKEN_LBRACE);
+        compile_stmt(compiler);
+
+        const size_t else_addr = compile_jump_start(compiler, OP_JUMP);
+        compile_jump_patch(compiler, then_addr);
+        chunk_push_op(compiler->chunk, OP_DROP);
+
+        if (compile_match(compiler, TOKEN_ELSE)) {
+            compile_expect_inplace(compiler, TOKEN_LBRACE);
+            compile_stmt(compiler);
+        }
+        compile_jump_patch(compiler, else_addr);
+    } break;
 
     case TOKEN_VAR: {
         compile_advance(compiler);

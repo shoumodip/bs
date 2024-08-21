@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
         return_defer(1);
     }
 
-    if (!vm_run(&vm, &chunk)) {
+    if (!vm_run(&vm, &chunk, false)) {
         return_defer(1);
     }
 

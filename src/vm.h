@@ -14,6 +14,6 @@ typedef struct {
 } VM;
 
 void vm_free(VM *vm);
-bool vm_run(VM *vm, Chunk *chunk);
+bool vm_run(VM *vm, Chunk *chunk, bool step);
 
 #endif // VM_H

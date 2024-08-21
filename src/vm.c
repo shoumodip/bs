@@ -61,13 +61,30 @@ static bool vm_binary_op(VM *vm, Value *a, Value *b, const char *op) {
     return true;
 }
 
-static_assert(COUNT_OPS == 25, "Update vm_run()");
-bool vm_run(VM *vm, Chunk *chunk) {
+static_assert(COUNT_OPS == 27, "Update vm_run()");
+bool vm_run(VM *vm, Chunk *chunk, bool step) {
     vm->chunk = chunk;
     vm->ip = vm->chunk->data;
 
     while (true) {
+        if (step) {
+            printf("----------------------------------------\n");
+            printf("Stack:\n");
+            for (size_t i = 0; i < vm->stack.count; i++) {
+                printf("    ");
+                value_print(vm->stack.data[i]);
+                printf("\n");
+            }
+            printf("\n");
+
+            size_t offset = vm->ip - vm->chunk->data;
+            chunk_print_op(vm->chunk, &offset);
+            printf("----------------------------------------\n");
+            getchar();
+        }
+
         const Op op = *vm->ip++;
+
         switch (op) {
         case OP_HALT:
             return true;
@@ -236,6 +253,17 @@ bool vm_run(VM *vm, Chunk *chunk) {
         case OP_LSET:
             vm->stack.data[vm_read_int(vm)] = vm_peek(vm, 0);
             break;
+
+        case OP_JUMP:
+            vm->ip += vm_read_int(vm);
+            break;
+
+        case OP_ELSE: {
+            const size_t offset = vm_read_int(vm);
+            if (value_is_falsey(vm_peek(vm, 0))) {
+                vm->ip += offset;
+            }
+        } break;
 
         case OP_PRINT:
             value_print(vm_pop(vm));
