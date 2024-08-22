@@ -9,11 +9,14 @@ typedef enum {
     POWER_CMP,
     POWER_ADD,
     POWER_MUL,
-    POWER_PRE
+    POWER_PRE,
+    POWER_CALL,
 } Power;
 
-static_assert(COUNT_TOKENS == 32, "Update token_type_powers[]");
+static_assert(COUNT_TOKENS == 35, "Update token_type_powers[]");
 const Power token_type_powers[COUNT_TOKENS] = {
+    [TOKEN_LPAREN] = POWER_CALL,
+
     [TOKEN_ADD] = POWER_ADD,
     [TOKEN_SUB] = POWER_ADD,
 
@@ -109,7 +112,7 @@ static void compile_expect_inplace(Compiler *compiler, TokenType type) {
     }
 }
 
-static_assert(COUNT_TOKENS == 32, "Update compile_synchronize()");
+static_assert(COUNT_TOKENS == 35, "Update compile_synchronize()");
 static void compile_synchronize(Compiler *compiler) {
     if (compiler->lexer.quiet) {
         compiler->lexer.quiet = false;
@@ -126,7 +129,10 @@ static void compile_synchronize(Compiler *compiler) {
             case TOKEN_FOR:
             case TOKEN_WHILE:
 
+            case TOKEN_FN:
             case TOKEN_VAR:
+            case TOKEN_RETURN:
+
             case TOKEN_PRINT:
                 return;
 
@@ -143,17 +149,39 @@ static Value compile_ident_const(Compiler *compiler, SV name) {
     return value_object(gc_new_object_str(compiler->gc, name.data, name.size));
 }
 
+#define current_fn (compiler->scope->fn)
+#define current_chunk (current_fn->chunk)
+
 static void compile_scope_init(Compiler *compiler, Scope *scope) {
-    scope->count = 0;
-    scope->depth = 0;
+    scope->fn = gc_new_object_fn(compiler->gc);
+
+    if (compiler->scope) {
+        scope->fn->name =
+            gc_new_object_str(compiler->gc, compiler->previous.sv.data, compiler->previous.sv.size);
+    }
+
+    scope->outer = compiler->scope;
     compiler->scope = scope;
+    scope_push(scope, (Local){0});
 }
 
-static void compile_scope_begin(Compiler *compiler) {
+static ObjectFn *compile_scope_end(Compiler *compiler) {
+    chunk_push_op(&current_chunk, OP_NIL);
+    chunk_push_op(&current_chunk, OP_RET);
+    ObjectFn *fn = current_fn;
+
+    Scope *outer = compiler->scope->outer;
+    scope_free(compiler->scope);
+
+    compiler->scope = outer;
+    return fn;
+}
+
+static void compile_body_begin(Compiler *compiler) {
     compiler->scope->depth++;
 }
 
-static void compile_scope_end(Compiler *compiler) {
+static void compile_body_end(Compiler *compiler) {
     compiler->scope->depth--;
 
     size_t drops = 0;
@@ -164,38 +192,37 @@ static void compile_scope_end(Compiler *compiler) {
     }
 
     if (drops == 1) {
-        chunk_push_op(compiler->chunk, OP_DROP);
+        chunk_push_op(&current_chunk, OP_DROP);
     } else if (drops) {
-        chunk_push_op_int(compiler->chunk, OP_DROPS, drops);
+        chunk_push_op_int(&current_chunk, OP_DROPS, drops);
     }
 }
 
 static size_t compile_jump_start(Compiler *compiler, Op op) {
-    chunk_push_op_int(compiler->chunk, op, 0);
-    return compiler->chunk->count - 1 - sizeof(size_t);
+    chunk_push_op_int(&current_chunk, op, 0);
+    return current_chunk.count - 1 - sizeof(size_t);
 }
 
 static void compile_jump_patch(Compiler *compiler, size_t addr) {
-    *(size_t *)&compiler->chunk->data[addr + 1] =
-        compiler->chunk->count - 1 - sizeof(size_t) - addr;
+    *(size_t *)&current_chunk.data[addr + 1] = current_chunk.count - 1 - sizeof(size_t) - addr;
 }
 
 static void compile_jump_direct(Compiler *compiler, Op op, size_t addr) {
-    chunk_push_op_int(compiler->chunk, op, addr - compiler->chunk->count - 1 - sizeof(size_t));
+    chunk_push_op_int(&current_chunk, op, addr - current_chunk.count - 1 - sizeof(size_t));
 }
 
-static_assert(COUNT_TOKENS == 32, "Update compile_expr()");
+static_assert(COUNT_TOKENS == 35, "Update compile_expr()");
 static void compile_expr(Compiler *compiler, Power mbp) {
     compile_advance(compiler);
 
     switch (compiler->previous.type) {
     case TOKEN_NIL:
-        chunk_push_op(compiler->chunk, OP_NIL);
+        chunk_push_op(&current_chunk, OP_NIL);
         break;
 
     case TOKEN_STR:
         chunk_push_op_value(
-            compiler->chunk,
+            &current_chunk,
             OP_CONST,
             value_object(gc_new_object_str(
                 compiler->gc, compiler->previous.sv.data + 1, compiler->previous.sv.size - 2)));
@@ -203,24 +230,24 @@ static void compile_expr(Compiler *compiler, Power mbp) {
 
     case TOKEN_NUM:
         chunk_push_op_value(
-            compiler->chunk, OP_CONST, value_num(strtod(compiler->previous.sv.data, NULL)));
+            &current_chunk, OP_CONST, value_num(strtod(compiler->previous.sv.data, NULL)));
         break;
 
     case TOKEN_TRUE:
-        chunk_push_op(compiler->chunk, OP_TRUE);
+        chunk_push_op(&current_chunk, OP_TRUE);
         break;
 
     case TOKEN_FALSE:
-        chunk_push_op(compiler->chunk, OP_FALSE);
+        chunk_push_op(&current_chunk, OP_FALSE);
         break;
 
     case TOKEN_IDENT: {
         size_t local_index;
         if (scope_find(compiler->scope, compiler->previous.sv, &local_index)) {
-            chunk_push_op_int(compiler->chunk, OP_LGET, local_index);
+            chunk_push_op_int(&current_chunk, OP_LGET, local_index);
         } else {
             chunk_push_op_value(
-                compiler->chunk, OP_GGET, compile_ident_const(compiler, compiler->previous.sv));
+                &current_chunk, OP_GGET, compile_ident_const(compiler, compiler->previous.sv));
         }
     } break;
 
@@ -231,12 +258,12 @@ static void compile_expr(Compiler *compiler, Power mbp) {
 
     case TOKEN_SUB:
         compile_expr(compiler, POWER_PRE);
-        chunk_push_op(compiler->chunk, OP_NEG);
+        chunk_push_op(&current_chunk, OP_NEG);
         break;
 
     case TOKEN_NOT:
         compile_expr(compiler, POWER_PRE);
-        chunk_push_op(compiler->chunk, OP_NOT);
+        chunk_push_op(&current_chunk, OP_NOT);
         break;
 
     default:
@@ -254,28 +281,28 @@ static void compile_expr(Compiler *compiler, Power mbp) {
         switch (compiler->previous.type) {
         case TOKEN_ADD:
             compile_expr(compiler, lbp);
-            chunk_push_op(compiler->chunk, OP_ADD);
+            chunk_push_op(&current_chunk, OP_ADD);
             break;
 
         case TOKEN_SUB:
             compile_expr(compiler, lbp);
-            chunk_push_op(compiler->chunk, OP_SUB);
+            chunk_push_op(&current_chunk, OP_SUB);
             break;
 
         case TOKEN_MUL:
             compile_expr(compiler, lbp);
-            chunk_push_op(compiler->chunk, OP_MUL);
+            chunk_push_op(&current_chunk, OP_MUL);
             break;
 
         case TOKEN_DIV:
             compile_expr(compiler, lbp);
-            chunk_push_op(compiler->chunk, OP_DIV);
+            chunk_push_op(&current_chunk, OP_DIV);
             break;
 
         case TOKEN_OR: {
             const size_t addr = compile_jump_start(compiler, OP_THEN);
 
-            chunk_push_op(compiler->chunk, OP_DROP);
+            chunk_push_op(&current_chunk, OP_DROP);
             compile_expr(compiler, lbp);
 
             compile_jump_patch(compiler, addr);
@@ -284,7 +311,7 @@ static void compile_expr(Compiler *compiler, Power mbp) {
         case TOKEN_AND: {
             const size_t addr = compile_jump_start(compiler, OP_ELSE);
 
-            chunk_push_op(compiler->chunk, OP_DROP);
+            chunk_push_op(&current_chunk, OP_DROP);
             compile_expr(compiler, lbp);
 
             compile_jump_patch(compiler, addr);
@@ -292,51 +319,78 @@ static void compile_expr(Compiler *compiler, Power mbp) {
 
         case TOKEN_GT:
             compile_expr(compiler, lbp);
-            chunk_push_op(compiler->chunk, OP_GT);
+            chunk_push_op(&current_chunk, OP_GT);
             break;
 
         case TOKEN_GE:
             compile_expr(compiler, lbp);
-            chunk_push_op(compiler->chunk, OP_GE);
+            chunk_push_op(&current_chunk, OP_GE);
             break;
 
         case TOKEN_LT:
             compile_expr(compiler, lbp);
-            chunk_push_op(compiler->chunk, OP_LT);
+            chunk_push_op(&current_chunk, OP_LT);
             break;
 
         case TOKEN_LE:
             compile_expr(compiler, lbp);
-            chunk_push_op(compiler->chunk, OP_LE);
+            chunk_push_op(&current_chunk, OP_LE);
             break;
 
         case TOKEN_EQ:
             compile_expr(compiler, lbp);
-            chunk_push_op(compiler->chunk, OP_EQ);
+            chunk_push_op(&current_chunk, OP_EQ);
             break;
 
         case TOKEN_NE:
             compile_expr(compiler, lbp);
-            chunk_push_op(compiler->chunk, OP_NE);
+            chunk_push_op(&current_chunk, OP_NE);
             break;
 
+        case TOKEN_LPAREN: {
+            if (current_chunk.count <= current_chunk.last) {
+                compile_error_unexpected(compiler, &compiler->previous);
+                return;
+            }
+
+            const Op op = op_get_to_set(current_chunk.data[current_chunk.last]);
+            if (op == OP_RET && current_chunk.data[current_chunk.last] != OP_CALL) {
+                compile_error_unexpected(compiler, &compiler->previous);
+                return;
+            }
+
+            size_t arity = 0;
+            while (compiler->current.type != TOKEN_RPAREN && compiler->current.type != TOKEN_EOF) {
+                compile_expr(compiler, POWER_SET);
+                arity++;
+
+                if (compiler->current.type != TOKEN_COMMA) {
+                    break;
+                }
+                compile_advance(compiler);
+            }
+            compile_expect(compiler, TOKEN_RPAREN);
+
+            chunk_push_op_int(&current_chunk, OP_CALL, arity);
+        } break;
+
         case TOKEN_SET: {
-            if (compiler->chunk->count <= compiler->chunk->last) {
+            if (current_chunk.count <= current_chunk.last) {
                 compile_error_unexpected(compiler, &compiler->previous);
                 return;
             }
 
-            const Op op = op_get_to_set(compiler->chunk->data[compiler->chunk->last]);
-            if (op == OP_HALT) {
+            const Op op = op_get_to_set(current_chunk.data[current_chunk.last]);
+            if (op == OP_RET) {
                 compile_error_unexpected(compiler, &compiler->previous);
                 return;
             }
 
-            const size_t index = *(size_t *)&compiler->chunk->data[compiler->chunk->last + 1];
-            compiler->chunk->count = compiler->chunk->last;
+            const size_t index = *(size_t *)&current_chunk.data[current_chunk.last + 1];
+            current_chunk.count = current_chunk.last;
 
             compile_expr(compiler, lbp);
-            chunk_push_op_int(compiler->chunk, op, index);
+            chunk_push_op_int(&current_chunk, op, index);
         } break;
 
         default:
@@ -345,17 +399,17 @@ static void compile_expr(Compiler *compiler, Power mbp) {
     }
 }
 
-static_assert(COUNT_TOKENS == 32, "Update compile_stmt()");
+static_assert(COUNT_TOKENS == 35, "Update compile_stmt()");
 static void compile_stmt(Compiler *compiler) {
     switch (compiler->current.type) {
     case TOKEN_LBRACE:
         compile_advance(compiler);
 
-        compile_scope_begin(compiler);
+        compile_body_begin(compiler);
         while (compiler->current.type != TOKEN_RBRACE && compiler->current.type != TOKEN_EOF) {
             compile_stmt(compiler);
         }
-        compile_scope_end(compiler);
+        compile_body_end(compiler);
 
         compile_expect(compiler, TOKEN_RBRACE);
         break;
@@ -365,14 +419,14 @@ static void compile_stmt(Compiler *compiler) {
         compile_expr(compiler, POWER_SET);
 
         const size_t then_addr = compile_jump_start(compiler, OP_ELSE);
-        chunk_push_op(compiler->chunk, OP_DROP);
+        chunk_push_op(&current_chunk, OP_DROP);
 
         compile_expect_inplace(compiler, TOKEN_LBRACE);
         compile_stmt(compiler);
 
         const size_t else_addr = compile_jump_start(compiler, OP_JUMP);
         compile_jump_patch(compiler, then_addr);
-        chunk_push_op(compiler->chunk, OP_DROP);
+        chunk_push_op(&current_chunk, OP_DROP);
 
         if (compile_match(compiler, TOKEN_ELSE)) {
             compile_expect_inplace(compiler, TOKEN_LBRACE);
@@ -384,7 +438,7 @@ static void compile_stmt(Compiler *compiler) {
     case TOKEN_FOR: {
         compile_advance(compiler);
 
-        compile_scope_begin(compiler);
+        compile_body_begin(compiler);
         if (compiler->current.type == TOKEN_VAR) {
             compile_stmt(compiler);
         } else {
@@ -392,16 +446,16 @@ static void compile_stmt(Compiler *compiler) {
             compile_expect(compiler, TOKEN_EOL);
         }
 
-        const size_t cond_addr = compiler->chunk->count;
+        const size_t cond_addr = current_chunk.count;
         compile_expr(compiler, POWER_SET);
         compile_expect(compiler, TOKEN_EOL);
 
         const size_t loop_addr = compile_jump_start(compiler, OP_ELSE);
-        chunk_push_op(compiler->chunk, OP_DROP);
+        chunk_push_op(&current_chunk, OP_DROP);
 
         const size_t iter_addr = compile_jump_start(compiler, OP_JUMP);
         compile_expr(compiler, POWER_NIL);
-        chunk_push_op(compiler->chunk, OP_DROP);
+        chunk_push_op(&current_chunk, OP_DROP);
         compile_jump_direct(compiler, OP_JUMP, cond_addr);
         compile_jump_patch(compiler, iter_addr);
 
@@ -411,26 +465,68 @@ static void compile_stmt(Compiler *compiler) {
 
         compile_jump_direct(compiler, OP_JUMP, cond_addr);
         compile_jump_patch(compiler, loop_addr);
-        chunk_push_op(compiler->chunk, OP_DROP);
+        chunk_push_op(&current_chunk, OP_DROP);
 
-        compile_scope_end(compiler);
+        compile_body_end(compiler);
     } break;
 
     case TOKEN_WHILE: {
         compile_advance(compiler);
 
-        const size_t cond_addr = compiler->chunk->count;
+        const size_t cond_addr = current_chunk.count;
         compile_expr(compiler, POWER_SET);
 
         const size_t loop_addr = compile_jump_start(compiler, OP_ELSE);
-        chunk_push_op(compiler->chunk, OP_DROP);
+        chunk_push_op(&current_chunk, OP_DROP);
 
         compile_expect_inplace(compiler, TOKEN_LBRACE);
         compile_stmt(compiler);
 
         compile_jump_direct(compiler, OP_JUMP, cond_addr);
         compile_jump_patch(compiler, loop_addr);
-        chunk_push_op(compiler->chunk, OP_DROP);
+        chunk_push_op(&current_chunk, OP_DROP);
+    } break;
+
+    case TOKEN_FN: {
+        compile_advance(compiler);
+        compile_expect(compiler, TOKEN_IDENT);
+
+        const Token name = compiler->previous;
+        if (compiler->scope->depth) {
+            da_push(
+                compiler->scope,
+                ((Local){.token = compiler->previous, .depth = compiler->scope->depth}));
+        }
+
+        Scope scope = {0};
+        compile_scope_init(compiler, &scope);
+        compile_body_begin(compiler);
+
+        compile_expect(compiler, TOKEN_LPAREN);
+        while (compiler->current.type == TOKEN_IDENT) {
+            current_fn->arity++;
+
+            compile_expect(compiler, TOKEN_IDENT);
+            da_push(
+                compiler->scope,
+                ((Local){.token = compiler->previous, .depth = compiler->scope->depth}));
+
+            if (compiler->current.type != TOKEN_COMMA) {
+                break;
+            }
+            compile_advance(compiler);
+        }
+        compile_expect(compiler, TOKEN_RPAREN);
+
+        compile_expect_inplace(compiler, TOKEN_LBRACE);
+        compile_stmt(compiler);
+
+        ObjectFn *fn = compile_scope_end(compiler);
+
+        chunk_push_op_value(&current_chunk, OP_CONST, value_object(fn));
+        if (!compiler->scope->depth) {
+            chunk_push_op_value(&current_chunk, OP_GDEF, compile_ident_const(compiler, name.sv));
+        }
     } break;
 
     case TOKEN_VAR: {
@@ -446,45 +542,55 @@ static void compile_stmt(Compiler *compiler) {
         if (compile_match(compiler, TOKEN_SET)) {
             compile_expr(compiler, POWER_SET);
         } else {
-            chunk_push_op(compiler->chunk, OP_NIL);
+            chunk_push_op(&current_chunk, OP_NIL);
         }
         compile_expect(compiler, TOKEN_EOL);
 
         if (compiler->scope->depth) {
             compiler->scope->data[index].token = name;
         } else {
-            chunk_push_op_value(compiler->chunk, OP_GDEF, compile_ident_const(compiler, name.sv));
+            chunk_push_op_value(&current_chunk, OP_GDEF, compile_ident_const(compiler, name.sv));
         }
     } break;
+
+    case TOKEN_RETURN:
+        compile_advance(compiler);
+
+        if (compiler->current.type == TOKEN_EOL) {
+            chunk_push_op(&current_chunk, OP_NIL);
+        } else {
+            compile_expr(compiler, POWER_SET);
+        }
+
+        compile_expect(compiler, TOKEN_EOL);
+        chunk_push_op(&current_chunk, OP_RET);
+        break;
 
     case TOKEN_PRINT:
         compile_advance(compiler);
         compile_expr(compiler, POWER_SET);
         compile_expect(compiler, TOKEN_EOL);
-        chunk_push_op(compiler->chunk, OP_PRINT);
+        chunk_push_op(&current_chunk, OP_PRINT);
         break;
 
     default:
         compile_expr(compiler, POWER_NIL);
         compile_expect(compiler, TOKEN_EOL);
-        chunk_push_op(compiler->chunk, OP_DROP);
+        chunk_push_op(&current_chunk, OP_DROP);
     }
 
     compile_synchronize(compiler);
 }
 
-bool compile(Compiler *compiler, Chunk *chunk) {
+ObjectFn *compile(Compiler *compiler) {
     Scope scope = {0};
     compile_scope_init(compiler, &scope);
-
-    compiler->chunk = chunk;
 
     compile_advance(compiler);
     while (compiler->current.type != TOKEN_EOF) {
         compile_stmt(compiler);
     }
-    chunk_push_op(compiler->chunk, OP_HALT);
 
-    da_free(&scope);
-    return !compiler->error;
+    ObjectFn *fn = compile_scope_end(compiler);
+    return compiler->error ? NULL : fn;
 }

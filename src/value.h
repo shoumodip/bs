@@ -16,7 +16,9 @@ typedef enum {
 const char *value_type_name(ValueType type);
 
 typedef enum {
+    OBJECT_FN,
     OBJECT_STR,
+    COUNT_OBJECTS
 } ObjectType;
 
 typedef struct Object Object;
@@ -74,6 +76,13 @@ typedef struct {
 bool object_str_eq(ObjectStr *a, ObjectStr *b);
 
 typedef struct {
+    Object meta;
+    size_t arity;
+    Chunk chunk;
+    ObjectStr *name;
+} ObjectFn;
+
+typedef struct {
     ObjectStr *key;
     Value value;
 } Entry;
@@ -101,5 +110,6 @@ bool table_get(Table *table, ObjectStr *key, Value *value);
 bool table_set(Table *table, GC *gc, ObjectStr *key, Value value);
 
 ObjectStr *gc_new_object_str(GC *gc, const char *data, size_t size);
+ObjectFn *gc_new_object_fn(GC *gc);
 
 #endif // VALUE_H

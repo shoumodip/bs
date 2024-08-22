@@ -3,7 +3,7 @@
 
 #include "value.h"
 
-void debug_chunk(Chunk *chunk);
-void debug_op(Chunk *chunk, size_t *offset);
+void debug_chunk(const Chunk *chunk);
+void debug_op(const Chunk *chunk, size_t *offset);
 
 #endif // DEBUG_H

@@ -39,7 +39,7 @@ Lexer lexer_new(const char *path, SV sv) {
     };
 }
 
-static_assert(COUNT_TOKENS == 32, "Update lexer_next()");
+static_assert(COUNT_TOKENS == 35, "Update lexer_next()");
 bool lexer_next(Lexer *lexer, Token *token) {
     while (lexer->sv.size > 0) {
         if (isspace(*lexer->sv.data)) {
@@ -96,6 +96,10 @@ bool lexer_next(Lexer *lexer, Token *token) {
         switch (lexer_consume(lexer)) {
         case ';':
             token->type = TOKEN_EOL;
+            break;
+
+        case ',':
+            token->type = TOKEN_COMMA;
             break;
 
         case '(':
@@ -198,8 +202,12 @@ bool lexer_next(Lexer *lexer, Token *token) {
             token->type = TOKEN_FOR;
         } else if (sv_eq(token->sv, SVStatic("while"))) {
             token->type = TOKEN_WHILE;
+        } else if (sv_eq(token->sv, SVStatic("fn"))) {
+            token->type = TOKEN_FN;
         } else if (sv_eq(token->sv, SVStatic("var"))) {
             token->type = TOKEN_VAR;
+        } else if (sv_eq(token->sv, SVStatic("return"))) {
+            token->type = TOKEN_RETURN;
         } else if (sv_eq(token->sv, SVStatic("print"))) {
             token->type = TOKEN_PRINT;
         }

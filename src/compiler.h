@@ -9,19 +9,27 @@ typedef struct {
     size_t depth;
 } Local;
 
-typedef struct {
+typedef struct Scope Scope;
+
+struct Scope {
+    Scope *outer;
+
     Local *data;
     size_t count;
     size_t depth;
     size_t capacity;
-} Scope;
+
+    ObjectFn *fn;
+};
+
+#define scope_free da_free
+#define scope_push da_push
 
 typedef struct {
     Lexer lexer;
     bool error;
 
     GC *gc;
-    Chunk *chunk;
 
     Token current;
     Token previous;
@@ -29,6 +37,6 @@ typedef struct {
     Scope *scope;
 } Compiler;
 
-bool compile(Compiler *compiler, Chunk *chunk);
+ObjectFn *compile(Compiler *compiler);
 
 #endif // COMPILER_H

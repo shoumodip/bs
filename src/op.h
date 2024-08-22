@@ -2,7 +2,9 @@
 #define CHUNK_H
 
 typedef enum {
-    OP_HALT,
+    OP_RET,
+    OP_CALL,
+
     OP_DROP,
     OP_DROPS,
 

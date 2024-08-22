@@ -21,24 +21,23 @@ int main(int argc, char **argv) {
     }
 
     VM vm = {0};
-    Chunk chunk = {0};
     Compiler compiler = {
         .lexer = lexer_new(path, (SV){contents, size}),
         .gc = &vm.gc,
     };
 
-    if (!compile(&compiler, &chunk)) {
+    const ObjectFn *fn = compile(&compiler);
+    if (!fn) {
         return_defer(1);
     }
 
-    if (!vm_run(&vm, &chunk, false)) {
+    if (!vm_run(&vm, fn, false)) {
+        vm_trace(&vm);
         return_defer(1);
     }
 
 defer:
     vm_free(&vm);
-    chunk_free(&chunk);
-
     free(contents);
     return result;
 }

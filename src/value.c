@@ -6,7 +6,7 @@
 // TODO: Lazy hash strings
 static uint32_t hash_string(const char *data, size_t size) {
     uint32_t hash = 2166136261u;
-    for (int i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         hash ^= (uint8_t)data[i];
         hash *= 16777619;
     }
@@ -26,6 +26,9 @@ const char *value_type_name(ValueType type) {
 
     case VALUE_OBJECT:
         return "object";
+
+    default:
+        assert(false && "unreachable");
     }
 }
 
@@ -65,11 +68,24 @@ bool object_str_eq(ObjectStr *a, ObjectStr *b) {
     return a->size == b->size && !memcmp(a->data, b->data, b->size);
 }
 
-static void object_print(Object *object) {
+static_assert(COUNT_OBJECTS == 2, "Update object_print()");
+static void object_print(const Object *object) {
     switch (object->type) {
+    case OBJECT_FN: {
+        const ObjectFn *fn = (const ObjectFn *)object;
+        if (fn->name) {
+            printf("fn " SVFmt "()", SVArg(*fn->name));
+        } else {
+            printf("fn ()");
+        }
+    } break;
+
     case OBJECT_STR:
-        printf(SVFmt, SVArg(*(ObjectStr *)object));
+        printf(SVFmt, SVArg(*(const ObjectStr *)object));
         break;
+
+    default:
+        assert(false && "unreachable");
     }
 }
 
@@ -218,4 +234,12 @@ ObjectStr *gc_new_object_str(GC *gc, const char *data, size_t size) {
     memcpy(str->data, data, size);
     str->size = size;
     return str;
+}
+
+ObjectFn *gc_new_object_fn(GC *gc) {
+    ObjectFn *fn = (ObjectFn *)gc_new_object(gc, OBJECT_FN, sizeof(ObjectFn));
+    fn->arity = 0;
+    fn->name = NULL;
+    fn->chunk = (Chunk){0};
+    return fn;
 }

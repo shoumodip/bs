@@ -17,6 +17,7 @@ typedef struct {
 typedef enum {
     TOKEN_EOF,
     TOKEN_EOL,
+    TOKEN_COMMA,
 
     TOKEN_NIL,
     TOKEN_NUM,
@@ -53,7 +54,9 @@ typedef enum {
     TOKEN_FOR,
     TOKEN_WHILE,
 
+    TOKEN_FN,
     TOKEN_VAR,
+    TOKEN_RETURN,
 
     TOKEN_PRINT,
     COUNT_TOKENS
