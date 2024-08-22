@@ -69,19 +69,19 @@ bool object_str_eq(ObjectStr *a, ObjectStr *b) {
 }
 
 static_assert(COUNT_OBJECTS == 2, "Update object_print()");
-static void object_print(const Object *object) {
+static void object_print(FILE *file, const Object *object) {
     switch (object->type) {
     case OBJECT_FN: {
         const ObjectFn *fn = (const ObjectFn *)object;
         if (fn->name) {
-            printf("fn " SVFmt "()", SVArg(*fn->name));
+            fprintf(file, "fn " SVFmt "()", SVArg(*fn->name));
         } else {
-            printf("fn ()");
+            fprintf(file, "fn ()");
         }
     } break;
 
     case OBJECT_STR:
-        printf(SVFmt, SVArg(*(const ObjectStr *)object));
+        fprintf(file, SVFmt, SVArg(*(const ObjectStr *)object));
         break;
 
     default:
@@ -89,25 +89,72 @@ static void object_print(const Object *object) {
     }
 }
 
-void value_print(Value value) {
+void value_print(FILE *file, Value value) {
     switch (value.type) {
     case VALUE_NIL:
-        printf("nil");
+        fprintf(file, "nil");
         break;
 
     case VALUE_NUM:
-        printf("%g", value.as.number);
+        fprintf(file, "%g", value.as.number);
         break;
 
     case VALUE_BOOL:
-        printf("%s", value.as.boolean ? "true" : "false");
+        fprintf(file, "%s", value.as.boolean ? "true" : "false");
         break;
 
     case VALUE_OBJECT:
-        object_print(value.as.object);
+        object_print(file, value.as.object);
         break;
+
+    default:
+        assert(false && "unreachable");
     }
 }
+
+static_assert(COUNT_OBJECTS == 2, "Update object_equal()");
+static bool object_equal(const Object *a, const Object *b) {
+    if (a->type != b->type) {
+        return false;
+    }
+
+    switch (a->type) {
+    case OBJECT_FN:
+        return a == b;
+
+    case OBJECT_STR: {
+        const ObjectStr *a_str = (const ObjectStr *)a;
+        const ObjectStr *b_str = (const ObjectStr *)b;
+        return a_str->size == b_str->size && !memcmp(a_str->data, b_str->data, b_str->size);
+    };
+
+    default:
+        assert(false && "unreachable");
+    }
+}
+
+bool value_equal(Value a, Value b) {
+    if (a.type != b.type) {
+        return false;
+    }
+
+    switch (a.type) {
+    case VALUE_NIL:
+        return true;
+
+    case VALUE_NUM:
+        return a.as.number == b.as.number;
+
+    case VALUE_BOOL:
+        return a.as.boolean == b.as.boolean;
+
+    case VALUE_OBJECT:
+        return object_equal(a.as.object, b.as.object);
+
+    default:
+        assert(false && "unreachable");
+    }
+};
 
 void *gc_realloc(GC *gc, void *previous, size_t old_size, size_t new_size) {
     if (!new_size) {

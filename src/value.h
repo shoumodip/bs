@@ -2,6 +2,7 @@
 #define VALUE_H
 
 #include <stdint.h>
+#include <stdio.h>
 
 #include "basic.h"
 #include "op.h"
@@ -95,7 +96,8 @@ typedef struct {
     size_t capacity;
 } Table;
 
-void value_print(Value value);
+void value_print(FILE *file, Value value);
+bool value_equal(Value a, Value b);
 
 typedef struct {
     Object *objects;

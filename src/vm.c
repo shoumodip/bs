@@ -103,7 +103,7 @@ bool vm_run(VM *vm, const ObjectFn *fn, bool debug) {
             printf("Stack:\n");
             for (size_t i = 0; i < vm->stack.count; i++) {
                 printf("    ");
-                value_print(vm->stack.data[i]);
+                value_print(stdout, vm->stack.data[i]);
                 printf("\n");
             }
             printf("\n");
@@ -272,21 +272,15 @@ bool vm_run(VM *vm, const ObjectFn *fn, bool debug) {
         } break;
 
         case OP_EQ: {
-            Value a, b;
-            if (!vm_binary_op(vm, &a, &b, "==")) {
-                return false;
-            }
-
-            vm_push(vm, value_bool(a.as.number == b.as.number));
+            const Value b = vm_pop(vm);
+            const Value a = vm_pop(vm);
+            vm_push(vm, value_bool(value_equal(a, b)));
         } break;
 
         case OP_NE: {
-            Value a, b;
-            if (!vm_binary_op(vm, &a, &b, "!=")) {
-                return false;
-            }
-
-            vm_push(vm, value_bool(a.as.number != b.as.number));
+            const Value b = vm_pop(vm);
+            const Value a = vm_pop(vm);
+            vm_push(vm, value_bool(!value_equal(a, b)));
         } break;
 
         case OP_GDEF:
@@ -344,7 +338,7 @@ bool vm_run(VM *vm, const ObjectFn *fn, bool debug) {
         } break;
 
         case OP_PRINT:
-            value_print(vm_pop(vm));
+            value_print(stdout, vm_pop(vm));
             printf("\n");
             break;
 
@@ -363,8 +357,8 @@ void vm_trace(VM *vm) {
     for (size_t i = vm->frames.count; i > 0; i--) {
         const Frame *frame = &vm->frames.data[i - 1];
         const ObjectFn *fn = frame->fn;
-        value_print(value_object(fn));
-        printf("\n");
+        value_print(stderr, value_object(fn));
+        fprintf(stderr, "\n");
     }
 
     vm->stack.count = 0;

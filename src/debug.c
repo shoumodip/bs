@@ -14,7 +14,7 @@ static void debug_op_value(const Chunk *chunk, size_t *offset, const char *name)
     *offset += sizeof(constant);
 
     printf("%-16s %4zu '", name, constant);
-    value_print(chunk->constants.data[constant]);
+    value_print(stdout, chunk->constants.data[constant]);
     printf("'\n");
 }
 
