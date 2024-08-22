@@ -4,9 +4,10 @@
 typedef enum {
     OP_RET,
     OP_CALL,
+    OP_CLOSURE,
 
     OP_DROP,
-    OP_DROPS,
+    OP_UCLOSE,
 
     OP_NIL,
     OP_TRUE,
@@ -32,6 +33,8 @@ typedef enum {
     OP_GSET,
     OP_LGET,
     OP_LSET,
+    OP_UGET,
+    OP_USET,
 
     OP_JUMP,
     OP_ELSE,

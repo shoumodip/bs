@@ -4,7 +4,7 @@
 #include "value.h"
 
 typedef struct {
-    const ObjectFn *fn;
+    const ObjectClosure *closure;
     const uint8_t *ip;
     size_t base;
 } Frame;
@@ -26,6 +26,7 @@ typedef struct {
     Frames frames;
 
     Table globals;
+    ObjectUpvalue *upvalues;
 } VM;
 
 void vm_free(VM *vm);

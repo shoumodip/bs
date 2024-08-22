@@ -36,12 +36,51 @@ const Power token_type_powers[COUNT_TOKENS] = {
     [TOKEN_SET] = POWER_SET,
 };
 
-static bool scope_find(Scope *scope, SV name, size_t *index) {
+static void scope_free(Scope *scope) {
+    upvalues_free(&scope->upvalues);
+    da_free(scope);
+}
+
+static bool scope_find_local(Scope *scope, SV name, size_t *index) {
     for (size_t i = scope->count; i > 0; i--) {
         if (sv_eq(scope->data[i - 1].token.sv, name)) {
             *index = i - 1;
             return true;
         }
+    }
+
+    return false;
+}
+
+static void scope_add_upvalue(Scope *scope, size_t *index, bool local) {
+    for (size_t i = 0; i < scope->fn->upvalues; i++) {
+        const Upvalue *upvalue = &scope->upvalues.data[i];
+        if (upvalue->index == *index && upvalue->local == local) {
+            *index = i;
+            return;
+        }
+    }
+
+    const Upvalue upvalue = {.local = local, .index = *index};
+    upvalues_push(&scope->upvalues, upvalue);
+
+    *index = scope->fn->upvalues++;
+}
+
+static bool scope_find_upvalue(Scope *scope, SV name, size_t *index) {
+    if (!scope->outer) {
+        return false;
+    }
+
+    if (scope_find_local(scope->outer, name, index)) {
+        scope->outer->data[*index].captured = true;
+        scope_add_upvalue(scope, index, true);
+        return true;
+    }
+
+    if (scope_find_upvalue(scope->outer, name, index)) {
+        scope_add_upvalue(scope, index, false);
+        return true;
     }
 
     return false;
@@ -171,8 +210,6 @@ static ObjectFn *compile_scope_end(Compiler *compiler) {
     ObjectFn *fn = current_fn;
 
     Scope *outer = compiler->scope->outer;
-    scope_free(compiler->scope);
-
     compiler->scope = outer;
     return fn;
 }
@@ -184,17 +221,16 @@ static void compile_body_begin(Compiler *compiler) {
 static void compile_body_end(Compiler *compiler) {
     compiler->scope->depth--;
 
-    size_t drops = 0;
     while (compiler->scope->count &&
            compiler->scope->data[compiler->scope->count - 1].depth > compiler->scope->depth) {
-        drops++;
-        compiler->scope->count--;
-    }
 
-    if (drops == 1) {
-        chunk_push_op(&current_chunk, OP_DROP);
-    } else if (drops) {
-        chunk_push_op_int(&current_chunk, OP_DROPS, drops);
+        if (compiler->scope->data[compiler->scope->count - 1].captured) {
+            chunk_push_op(&current_chunk, OP_UCLOSE);
+        } else {
+            chunk_push_op(&current_chunk, OP_DROP);
+        }
+
+        compiler->scope->count--;
     }
 }
 
@@ -242,9 +278,12 @@ static void compile_expr(Compiler *compiler, Power mbp) {
         break;
 
     case TOKEN_IDENT: {
-        size_t local_index;
-        if (scope_find(compiler->scope, compiler->previous.sv, &local_index)) {
-            chunk_push_op_int(&current_chunk, OP_LGET, local_index);
+        size_t index;
+        if (scope_find_local(compiler->scope, compiler->previous.sv, &index)) {
+            chunk_push_op_int(&current_chunk, OP_LGET, index);
+        } else if (scope_find_upvalue(compiler->scope, compiler->previous.sv, &index)) {
+            const Upvalue upvalue = compiler->scope->upvalues.data[index];
+            chunk_push_op_int(&current_chunk, OP_UGET, index);
         } else {
             chunk_push_op_value(
                 &current_chunk, OP_GGET, compile_ident_const(compiler, compiler->previous.sv));
@@ -522,8 +561,14 @@ static void compile_stmt(Compiler *compiler) {
         compile_stmt(compiler);
 
         ObjectFn *fn = compile_scope_end(compiler);
+        chunk_push_op_value(&current_chunk, OP_CLOSURE, value_object(fn));
 
-        chunk_push_op_value(&current_chunk, OP_CONST, value_object(fn));
+        for (size_t i = 0; i < scope.fn->upvalues; i++) {
+            chunk_push_op_int(
+                &current_chunk, scope.upvalues.data[i].local ? 1 : 0, scope.upvalues.data[i].index);
+        }
+
+        scope_free(&scope);
         if (!compiler->scope->depth) {
             chunk_push_op_value(&current_chunk, OP_GDEF, compile_ident_const(compiler, name.sv));
         }
@@ -592,5 +637,6 @@ ObjectFn *compile(Compiler *compiler) {
     }
 
     ObjectFn *fn = compile_scope_end(compiler);
+    scope_free(&scope);
     return compiler->error ? NULL : fn;
 }

@@ -19,6 +19,8 @@ const char *value_type_name(ValueType type);
 typedef enum {
     OBJECT_FN,
     OBJECT_STR,
+    OBJECT_UPVALUE,
+    OBJECT_CLOSURE,
     COUNT_OBJECTS
 } ObjectType;
 
@@ -78,10 +80,31 @@ bool object_str_eq(ObjectStr *a, ObjectStr *b);
 
 typedef struct {
     Object meta;
-    size_t arity;
     Chunk chunk;
+    size_t arity;
+    size_t upvalues;
     ObjectStr *name;
 } ObjectFn;
+
+typedef struct ObjectUpvalue ObjectUpvalue;
+
+struct ObjectUpvalue {
+    Object meta;
+    bool closed;
+    union {
+        size_t index;
+        Value value;
+    };
+    ObjectUpvalue *next;
+};
+
+typedef struct {
+    Object meta;
+    const ObjectFn *fn;
+
+    size_t upvalues;
+    ObjectUpvalue *data[];
+} ObjectClosure;
 
 typedef struct {
     ObjectStr *key;
@@ -111,7 +134,9 @@ bool table_remove(Table *table, ObjectStr *key);
 bool table_get(Table *table, ObjectStr *key, Value *value);
 bool table_set(Table *table, GC *gc, ObjectStr *key, Value value);
 
-ObjectStr *gc_new_object_str(GC *gc, const char *data, size_t size);
 ObjectFn *gc_new_object_fn(GC *gc);
+ObjectStr *gc_new_object_str(GC *gc, const char *data, size_t size);
+ObjectUpvalue *gc_new_object_upvalue(GC *gc, size_t index);
+ObjectClosure *gc_new_object_closure(GC *gc, const ObjectFn *fn);
 
 #endif // VALUE_H

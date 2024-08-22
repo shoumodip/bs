@@ -18,7 +18,7 @@ static void debug_op_value(const Chunk *chunk, size_t *offset, const char *name)
     printf("'\n");
 }
 
-static_assert(COUNT_OPS == 29, "Update debug_op()");
+static_assert(COUNT_OPS == 32, "Update debug_op()");
 void debug_op(const Chunk *chunk, size_t *offset) {
     printf("%04zu ", *offset);
 
@@ -32,12 +32,35 @@ void debug_op(const Chunk *chunk, size_t *offset) {
         debug_op_int(chunk, offset, "OP_CALL");
         break;
 
+    case OP_CLOSURE: {
+        const size_t constant = *(const size_t *)&chunk->data[*offset];
+        *offset += sizeof(constant);
+
+        const Value value = chunk->constants.data[constant];
+        printf("%-16s %4zu '", "OP_CLOSURE", constant);
+        value_print(stdout, value);
+        printf("'\n");
+
+        const ObjectFn *fn = (const ObjectFn *)value.as.object;
+        for (size_t i = 0; i < fn->upvalues; i++) {
+            const bool local = chunk->data[(*offset)++];
+            const size_t index = *(const size_t *)&chunk->data[*offset];
+            *offset += sizeof(index);
+
+            printf(
+                "%04zu      |                     %s %zu\n",
+                *offset - 1 - sizeof(index),
+                local ? "local" : "upvalue",
+                index);
+        }
+    } break;
+
     case OP_DROP:
         printf("OP_DROP\n");
         break;
 
-    case OP_DROPS:
-        debug_op_int(chunk, offset, "OP_DROPS");
+    case OP_UCLOSE:
+        debug_op_int(chunk, offset, "OP_UCLOSE");
         break;
 
     case OP_NIL:
@@ -124,6 +147,14 @@ void debug_op(const Chunk *chunk, size_t *offset) {
         debug_op_int(chunk, offset, "OP_LSET");
         break;
 
+    case OP_UGET:
+        debug_op_int(chunk, offset, "OP_UGET");
+        break;
+
+    case OP_USET:
+        debug_op_int(chunk, offset, "OP_USET");
+        break;
+
     case OP_JUMP:
         debug_op_int(chunk, offset, "OP_JUMP");
         break;
@@ -150,5 +181,24 @@ void debug_chunk(const Chunk *chunk) {
     size_t i = 0;
     while (i < chunk->count) {
         debug_op(chunk, &i);
+    }
+}
+
+void debug_chunks(const Object *objects) {
+    const Object *object = objects;
+    while (object) {
+        if (object->type == OBJECT_FN) {
+            const ObjectFn *fn = (const ObjectFn *)object;
+
+            if (fn->name) {
+                printf("==== fn " SVFmt "() ====\n", SVArg(*fn->name));
+            } else {
+                printf("==== fn () ====\n");
+            }
+
+            debug_chunk(&fn->chunk);
+            printf("\n");
+        }
+        object = object->next;
     }
 }

@@ -22,21 +22,30 @@ static size_t vm_read_int(VM *vm) {
 }
 
 static Value *vm_read_const(VM *vm) {
-    return &vm->frame->fn->chunk.constants.data[vm_read_int(vm)];
+    return &vm->frame->closure->fn->chunk.constants.data[vm_read_int(vm)];
 }
 
-static_assert(COUNT_OBJECTS == 2, "Update gc_free_object()");
+static_assert(COUNT_OBJECTS == 4, "Update gc_free_object()");
 static void gc_free_object(GC *gc, Object *object) {
     switch (object->type) {
     case OBJECT_FN: {
         ObjectFn *fn = (ObjectFn *)object;
         chunk_free(&fn->chunk);
-        gc_realloc(gc, object, sizeof(*fn), 0);
+        gc_realloc(gc, fn, sizeof(*fn), 0);
     } break;
 
     case OBJECT_STR: {
         ObjectStr *str = (ObjectStr *)object;
-        gc_realloc(gc, object, sizeof(*str) + str->size, 0);
+        gc_realloc(gc, str, sizeof(*str) + str->size, 0);
+    } break;
+
+    case OBJECT_UPVALUE:
+        gc_realloc(gc, object, sizeof(ObjectUpvalue), 0);
+        break;
+
+    case OBJECT_CLOSURE: {
+        ObjectClosure *closure = (ObjectClosure *)object;
+        gc_realloc(gc, closure, sizeof(*closure) + sizeof(ObjectUpvalue *) * closure->upvalues, 0);
     } break;
 
     default:
@@ -74,15 +83,15 @@ static bool vm_binary_op(VM *vm, Value *a, Value *b, const char *op) {
     return true;
 }
 
-static bool vm_call(VM *vm, const ObjectFn *fn, size_t arity) {
-    if (arity != fn->arity) {
-        fprintf(stderr, "error: expected %zu arguments, got %zu\n", fn->arity, arity);
+static bool vm_call(VM *vm, const ObjectClosure *closure, size_t arity) {
+    if (arity != closure->fn->arity) {
+        fprintf(stderr, "error: expected %zu arguments, got %zu\n", closure->fn->arity, arity);
         return false;
     }
 
     const Frame frame = {
-        .fn = fn,
-        .ip = fn->chunk.data,
+        .closure = closure,
+        .ip = closure->fn->chunk.data,
         .base = vm->stack.count - arity - 1,
     };
 
@@ -92,10 +101,52 @@ static bool vm_call(VM *vm, const ObjectFn *fn, size_t arity) {
     return true;
 }
 
-static_assert(COUNT_OPS == 29, "Update vm_run()");
+static ObjectUpvalue *vm_capture_upvalue(VM *vm, size_t index) {
+    ObjectUpvalue *previous = NULL;
+    ObjectUpvalue *upvalue = vm->upvalues;
+    while (upvalue && upvalue->index > index) {
+        previous = upvalue;
+        upvalue = upvalue->next;
+    }
+
+    if (upvalue && upvalue->index == index) {
+        return upvalue;
+    }
+
+    ObjectUpvalue *created = gc_new_object_upvalue(&vm->gc, index);
+    created->next = upvalue;
+
+    if (previous) {
+        previous->next = created;
+    } else {
+        vm->upvalues = created;
+    }
+
+    return created;
+}
+
+static void vm_close_upvalues(VM *vm, size_t index) {
+    while (vm->upvalues && vm->upvalues->index >= index) {
+        ObjectUpvalue *upvalue = vm->upvalues;
+        upvalue->closed = true;
+        upvalue->value = vm->stack.data[upvalue->index];
+        vm->upvalues = upvalue->next;
+    }
+}
+
+static_assert(COUNT_OPS == 32, "Update vm_run()");
 bool vm_run(VM *vm, const ObjectFn *fn, bool debug) {
+    if (debug) {
+        debug_chunks(vm->gc.objects);
+    }
+
     vm_push(vm, value_object(fn));
-    vm_call(vm, fn, 0);
+
+    ObjectClosure *closure = gc_new_object_closure(&vm->gc, fn);
+    vm_pop(vm);
+
+    vm_push(vm, value_object(closure));
+    vm_call(vm, closure, 0);
 
     while (true) {
         if (debug) {
@@ -108,8 +159,8 @@ bool vm_run(VM *vm, const ObjectFn *fn, bool debug) {
             }
             printf("\n");
 
-            size_t offset = vm->frame->ip - vm->frame->fn->chunk.data;
-            debug_op(&vm->frame->fn->chunk, &offset);
+            size_t offset = vm->frame->ip - vm->frame->closure->fn->chunk.data;
+            debug_op(&vm->frame->closure->fn->chunk, &offset);
             printf("----------------------------------------\n");
             getchar();
         }
@@ -118,6 +169,7 @@ bool vm_run(VM *vm, const ObjectFn *fn, bool debug) {
         switch (op) {
         case OP_RET: {
             const Value result = vm_pop(vm);
+            vm_close_upvalues(vm, vm->frame->base);
             vm->frames.count--;
 
             if (!vm->frames.count) {
@@ -141,10 +193,10 @@ bool vm_run(VM *vm, const ObjectFn *fn, bool debug) {
                 return false;
             }
 
-            static_assert(COUNT_OBJECTS == 2, "Update vm_run()");
+            static_assert(COUNT_OBJECTS == 4, "Update vm_run()");
             switch (value.as.object->type) {
-            case OBJECT_FN:
-                if (!vm_call(vm, (const ObjectFn *)value.as.object, arity)) {
+            case OBJECT_CLOSURE:
+                if (!vm_call(vm, (const ObjectClosure *)value.as.object, arity)) {
                     return false;
                 }
                 break;
@@ -160,12 +212,30 @@ bool vm_run(VM *vm, const ObjectFn *fn, bool debug) {
             vm->frame = &vm->frames.data[vm->frames.count - 1];
         } break;
 
+        case OP_CLOSURE: {
+            ObjectFn *fn = (ObjectFn *)vm_read_const(vm)->as.object;
+            ObjectClosure *closure = gc_new_object_closure(&vm->gc, fn);
+            vm_push(vm, value_object(closure));
+
+            for (size_t i = 0; i < closure->upvalues; i++) {
+                const bool local = *vm->frame->ip++;
+                const size_t index = vm_read_int(vm);
+
+                if (local) {
+                    closure->data[i] = vm_capture_upvalue(vm, vm->frame->base + index);
+                } else {
+                    closure->data[i] = vm->frame->closure->data[index];
+                }
+            }
+        } break;
+
         case OP_DROP:
             vm_pop(vm);
             break;
 
-        case OP_DROPS:
-            vm->stack.count -= vm_read_int(vm);
+        case OP_UCLOSE:
+            vm_close_upvalues(vm, vm->stack.count - 1);
+            vm_pop(vm);
             break;
 
         case OP_NIL:
@@ -319,6 +389,25 @@ bool vm_run(VM *vm, const ObjectFn *fn, bool debug) {
             vm->stack.data[vm->frame->base + vm_read_int(vm)] = vm_peek(vm, 0);
             break;
 
+        case OP_UGET: {
+            ObjectUpvalue *upvalue = vm->frame->closure->data[vm_read_int(vm)];
+            if (upvalue->closed) {
+                vm_push(vm, upvalue->value);
+            } else {
+                vm_push(vm, vm->stack.data[upvalue->index]);
+            }
+        } break;
+
+        case OP_USET: {
+            const Value value = vm_peek(vm, 0);
+            ObjectUpvalue *upvalue = vm->frame->closure->data[vm_read_int(vm)];
+            if (upvalue->closed) {
+                upvalue->value = value;
+            } else {
+                vm->stack.data[upvalue->index] = value;
+            }
+        } break;
+
         case OP_JUMP:
             vm->frame->ip += vm_read_int(vm);
             break;
@@ -347,7 +436,7 @@ bool vm_run(VM *vm, const ObjectFn *fn, bool debug) {
                 stderr,
                 "error: invalid op %d at offset %zu\n",
                 op,
-                vm->frame->ip - vm->frame->fn->chunk.data);
+                vm->frame->ip - vm->frame->closure->fn->chunk.data);
             return false;
         }
     }
@@ -356,7 +445,7 @@ bool vm_run(VM *vm, const ObjectFn *fn, bool debug) {
 void vm_trace(VM *vm) {
     for (size_t i = vm->frames.count; i > 0; i--) {
         const Frame *frame = &vm->frames.data[i - 1];
-        const ObjectFn *fn = frame->fn;
+        const ObjectFn *fn = frame->closure->fn;
         value_print(stderr, value_object(fn));
         fprintf(stderr, "\n");
     }

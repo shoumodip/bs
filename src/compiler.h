@@ -7,7 +7,22 @@
 typedef struct {
     Token token;
     size_t depth;
+    bool captured;
 } Local;
+
+typedef struct {
+    bool local;
+    size_t index;
+} Upvalue;
+
+typedef struct {
+    Upvalue *data;
+    size_t count;
+    size_t capacity;
+} Upvalues;
+
+#define upvalues_free da_free
+#define upvalues_push da_push
 
 typedef struct Scope Scope;
 
@@ -20,9 +35,9 @@ struct Scope {
     size_t capacity;
 
     ObjectFn *fn;
+    Upvalues upvalues;
 };
 
-#define scope_free da_free
 #define scope_push da_push
 
 typedef struct {

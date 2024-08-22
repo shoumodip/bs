@@ -68,7 +68,7 @@ bool object_str_eq(ObjectStr *a, ObjectStr *b) {
     return a->size == b->size && !memcmp(a->data, b->data, b->size);
 }
 
-static_assert(COUNT_OBJECTS == 2, "Update object_print()");
+static_assert(COUNT_OBJECTS == 4, "Update object_print()");
 static void object_print(FILE *file, const Object *object) {
     switch (object->type) {
     case OBJECT_FN: {
@@ -83,6 +83,15 @@ static void object_print(FILE *file, const Object *object) {
     case OBJECT_STR:
         fprintf(file, SVFmt, SVArg(*(const ObjectStr *)object));
         break;
+
+    case OBJECT_CLOSURE: {
+        const ObjectFn *fn = ((const ObjectClosure *)object)->fn;
+        if (fn->name) {
+            fprintf(file, "fn " SVFmt "()", SVArg(*fn->name));
+        } else {
+            fprintf(file, "fn ()");
+        }
+    } break;
 
     default:
         assert(false && "unreachable");
@@ -112,21 +121,21 @@ void value_print(FILE *file, Value value) {
     }
 }
 
-static_assert(COUNT_OBJECTS == 2, "Update object_equal()");
+static_assert(COUNT_OBJECTS == 4, "Update object_equal()");
 static bool object_equal(const Object *a, const Object *b) {
     if (a->type != b->type) {
         return false;
     }
 
     switch (a->type) {
-    case OBJECT_FN:
-        return a == b;
-
     case OBJECT_STR: {
         const ObjectStr *a_str = (const ObjectStr *)a;
         const ObjectStr *b_str = (const ObjectStr *)b;
         return a_str->size == b_str->size && !memcmp(a_str->data, b_str->data, b_str->size);
     };
+
+    case OBJECT_CLOSURE:
+        return a == b;
 
     default:
         assert(false && "unreachable");
@@ -276,6 +285,15 @@ static Object *gc_new_object(GC *gc, ObjectType type, size_t size) {
     return object;
 }
 
+ObjectFn *gc_new_object_fn(GC *gc) {
+    ObjectFn *fn = (ObjectFn *)gc_new_object(gc, OBJECT_FN, sizeof(ObjectFn));
+    fn->name = NULL;
+    fn->chunk = (Chunk){0};
+    fn->arity = 0;
+    fn->upvalues = 0;
+    return fn;
+}
+
 ObjectStr *gc_new_object_str(GC *gc, const char *data, size_t size) {
     ObjectStr *str = (ObjectStr *)gc_new_object(gc, OBJECT_STR, sizeof(ObjectStr) + size);
     memcpy(str->data, data, size);
@@ -283,10 +301,23 @@ ObjectStr *gc_new_object_str(GC *gc, const char *data, size_t size) {
     return str;
 }
 
-ObjectFn *gc_new_object_fn(GC *gc) {
-    ObjectFn *fn = (ObjectFn *)gc_new_object(gc, OBJECT_FN, sizeof(ObjectFn));
-    fn->arity = 0;
-    fn->name = NULL;
-    fn->chunk = (Chunk){0};
-    return fn;
+ObjectUpvalue *gc_new_object_upvalue(GC *gc, size_t index) {
+    ObjectUpvalue *upvalue =
+        (ObjectUpvalue *)gc_new_object(gc, OBJECT_UPVALUE, sizeof(ObjectUpvalue));
+
+    upvalue->closed = false;
+    upvalue->index = index;
+    upvalue->next = NULL;
+    return upvalue;
+}
+
+ObjectClosure *gc_new_object_closure(GC *gc, const ObjectFn *fn) {
+    const size_t upvalues = sizeof(ObjectUpvalue *) * fn->upvalues;
+    ObjectClosure *closure =
+        (ObjectClosure *)gc_new_object(gc, OBJECT_CLOSURE, sizeof(ObjectClosure) + upvalues);
+
+    closure->fn = fn;
+    closure->upvalues = fn->upvalues;
+    memset(closure->data, 0, upvalues);
+    return closure;
 }
