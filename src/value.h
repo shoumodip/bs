@@ -29,6 +29,7 @@ typedef struct Object Object;
 struct Object {
     ObjectType type;
     Object *next;
+    bool marked;
 };
 
 typedef struct {

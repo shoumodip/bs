@@ -91,15 +91,16 @@ static Value compile_ident_const(Bs *bs, SV name) {
 }
 
 static void compile_scope_init(Bs *bs, Scope *scope, const Token *token) {
+    Compiler *c = &bs->compiler;
+
     scope->fn = bs_new_object_fn(bs);
+    scope->outer = c->scope;
+    c->scope = scope;
 
     if (token) {
         scope->fn->name = bs_new_object_str(bs, token->sv.data, token->sv.size);
     }
 
-    Compiler *c = &bs->compiler;
-    scope->outer = c->scope;
-    c->scope = scope;
     c->chunk = &c->scope->fn->chunk;
     scope_push(scope, (Local){0});
 }
@@ -149,6 +150,19 @@ static void compile_jump_patch(Compiler *c, size_t addr) {
 
 static void compile_jump_direct(Compiler *c, Op op, size_t addr) {
     chunk_push_op_int(c->chunk, op, addr - c->chunk->count - 1 - sizeof(size_t));
+}
+
+static size_t compile_name(Bs *bs, Token *name) {
+    Compiler *c = &bs->compiler;
+    *name = lexer_expect(&c->lexer, TOKEN_IDENT);
+
+    if (c->scope->depth) {
+        da_push(c->scope, ((Local){.token = *name, .depth = c->scope->depth}));
+        return 0;
+    }
+
+    values_push(&c->chunk->constants, compile_ident_const(bs, name->sv));
+    return c->chunk->constants.count - 1;
 }
 
 static_assert(COUNT_TOKENS == 35, "Update compile_expr()");
@@ -429,13 +443,10 @@ static void compile_stmt(Bs *bs) {
     } break;
 
     case TOKEN_FN: {
-        const Token name = lexer_expect(&c->lexer, TOKEN_IDENT);
-        if (c->scope->depth) {
-            da_push(c->scope, ((Local){.token = name, .depth = c->scope->depth}));
-        }
+        const size_t const_index = compile_name(bs, &token);
 
         Scope scope = {0};
-        compile_scope_init(bs, &scope, &name);
+        compile_scope_init(bs, &scope, &token);
         compile_body_begin(c);
 
         lexer_expect(&c->lexer, TOKEN_LPAREN);
@@ -466,16 +477,16 @@ static void compile_stmt(Bs *bs) {
 
         scope_free(&scope);
         if (!c->scope->depth) {
-            chunk_push_op_value(c->chunk, OP_GDEF, compile_ident_const(bs, name.sv));
+            chunk_push_op_int(c->chunk, OP_GDEF, const_index);
         }
     } break;
 
     case TOKEN_VAR: {
-        const Token name = lexer_expect(&c->lexer, TOKEN_IDENT);
+        const size_t scope_index = c->scope->count;
+        const size_t const_index = compile_name(bs, &token);
 
-        const size_t index = c->scope->count;
         if (c->scope->depth) {
-            da_push(c->scope, ((Local){.depth = c->scope->depth}));
+            c->scope->data[scope_index].token = (Token){0};
         }
 
         if (lexer_read(&c->lexer, TOKEN_SET)) {
@@ -486,9 +497,9 @@ static void compile_stmt(Bs *bs) {
         lexer_expect(&c->lexer, TOKEN_EOL);
 
         if (c->scope->depth) {
-            c->scope->data[index].token = name;
+            c->scope->data[scope_index].token = token;
         } else {
-            chunk_push_op_value(c->chunk, OP_GDEF, compile_ident_const(bs, name.sv));
+            chunk_push_op_int(c->chunk, OP_GDEF, const_index);
         }
     } break;
 

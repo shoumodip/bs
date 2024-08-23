@@ -51,6 +51,10 @@ static void object_print(const Object *o, FILE *f) {
         }
     } break;
 
+    case OBJECT_UPVALUE:
+        fprintf(f, "<upvalue>");
+        break;
+
     default:
         assert(false && "unreachable");
     }

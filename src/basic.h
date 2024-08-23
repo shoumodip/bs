@@ -42,7 +42,8 @@ bool sv_eq(SV a, SV b);
             assert((l)->data);                                                                     \
         }                                                                                          \
                                                                                                    \
-        (l)->data[(l)->count++] = (v);                                                             \
+        (l)->data[(l)->count] = (v);                                                               \
+        (l)->count++;                                                                              \
     } while (0)
 
 #define da_push_many(l, v, c)                                                                      \
@@ -68,5 +69,8 @@ bool sv_eq(SV a, SV b);
 
 // File IO
 char *read_file(const char *path, size_t *size);
+
+// Arithmetic
+#define max(a, b) ((a) > (b) ? (a) : (b))
 
 #endif // BASIC_H

@@ -51,8 +51,8 @@ typedef struct {
 
 // Memory
 typedef struct {
-    const ObjectClosure *closure;
     const uint8_t *ip;
+    ObjectClosure *closure;
     size_t base;
 } Frame;
 
@@ -75,6 +75,8 @@ typedef struct {
     ObjectUpvalue *upvalues;
 
     Object *objects;
+    size_t gc;
+    size_t allocated;
 } Memory;
 
 // Bs

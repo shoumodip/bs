@@ -42,7 +42,7 @@ static bool vm_binary_op(Memory *m, Value *a, Value *b, const char *op) {
     return true;
 }
 
-static bool vm_call(Memory *m, const ObjectClosure *closure, size_t arity) {
+static bool vm_call(Memory *m, ObjectClosure *closure, size_t arity) {
     if (arity != closure->fn->arity) {
         fprintf(stderr, "error: expected %zu arguments, got %zu\n", closure->fn->arity, arity);
         return false;
@@ -158,7 +158,7 @@ bool bs_interpret(Bs *bs, const ObjectFn *fn, bool debug) {
             static_assert(COUNT_OBJECTS == 4, "Update bs_interpret()");
             switch (value.as.object->type) {
             case OBJECT_CLOSURE:
-                if (!vm_call(m, (const ObjectClosure *)value.as.object, arity)) {
+                if (!vm_call(m, (ObjectClosure *)value.as.object, arity)) {
                     return false;
                 }
                 break;

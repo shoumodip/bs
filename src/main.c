@@ -17,7 +17,10 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    Bs bs = {.compiler.lexer = lexer_new(path, (SV){contents, size})};
+    Bs bs = {
+        .memory.gc = 1024 * 1024,
+        .compiler.lexer = lexer_new(path, (SV){contents, size}),
+    };
 
     const ObjectFn *fn = bs_compile(&bs);
     free(contents);

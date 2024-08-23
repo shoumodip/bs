@@ -1,5 +1,10 @@
 #include "bs.h"
 
+// #define GC_DEBUG_LOG
+// #define GC_DEBUG_STRESS
+#define GC_GROW_FACTOR 2
+#define TABLE_MAX_LOAD 0.75
+
 bool object_str_eq(ObjectStr *a, ObjectStr *b) {
     if (!a || !b) {
         return false;
@@ -9,6 +14,11 @@ bool object_str_eq(ObjectStr *a, ObjectStr *b) {
 
 static_assert(COUNT_OBJECTS == 4, "Update bs_free_object()");
 static void bs_free_object(Bs *bs, Object *object) {
+
+#ifdef GC_DEBUG_LOG
+    printf("[GC] Free %p; Type: %d\n", object, object->type);
+#endif // GC_DEBUG_LOG
+
     switch (object->type) {
     case OBJECT_FN: {
         ObjectFn *fn = (ObjectFn *)object;
@@ -35,6 +45,148 @@ static void bs_free_object(Bs *bs, Object *object) {
     }
 }
 
+static_assert(COUNT_OBJECTS == 4, "Update object_mark()");
+static void object_mark(Object *o, Memory *m) {
+    if (!o || o->marked) {
+        return;
+    }
+    o->marked = true;
+
+#ifdef GC_DEBUG_LOG
+    printf("[GC] Mark %p ", o);
+    value_print(value_object(o), stdout);
+    printf("\n");
+#endif // GC_DEBUG_LOG
+
+    switch (o->type) {
+    case OBJECT_FN: {
+        ObjectFn *fn = (ObjectFn *)o;
+        object_mark((Object *)fn->name, m);
+
+        for (size_t i = 0; i < fn->chunk.constants.count; i++) {
+            const Value value = fn->chunk.constants.data[i];
+            if (value.type == VALUE_OBJECT) {
+                object_mark(value.as.object, m);
+            }
+        }
+    } break;
+
+    case OBJECT_STR:
+        break;
+
+    case OBJECT_CLOSURE: {
+        ObjectClosure *closure = (ObjectClosure *)o;
+        object_mark((Object *)closure->fn, m);
+
+        for (size_t i = 0; i < closure->upvalues; i++) {
+            object_mark((Object *)closure->data[i], m);
+        }
+    } break;
+
+    case OBJECT_UPVALUE: {
+        ObjectUpvalue *upvalue = (ObjectUpvalue *)o;
+        if (upvalue->closed) {
+            if (upvalue->value.type == VALUE_OBJECT) {
+                object_mark(upvalue->value.as.object, m);
+            }
+        }
+    } break;
+
+    default:
+        assert(false && "unreachable");
+    }
+}
+
+static void table_mark(Table *t, Memory *m) {
+    for (size_t i = 0; i < t->capacity; i++) {
+        Entry *entry = &t->data[i];
+        object_mark((Object *)entry->key, m);
+
+        if (entry->value.type == VALUE_OBJECT) {
+            object_mark(entry->value.as.object, m);
+        }
+    }
+}
+
+void bs_collect(Bs *bs) {
+    Memory *m = &bs->memory;
+
+#ifdef GC_DEBUG_LOG
+    printf("\n-------- GC Begin --------\n");
+    const size_t before = m->allocated;
+#endif // GC_DEBUG_LOG
+
+    // Mark
+    for (size_t i = 0; i < m->stack.count; i++) {
+        const Value value = m->stack.data[i];
+        if (value.type == VALUE_OBJECT) {
+            object_mark(value.as.object, m);
+        }
+    }
+
+    for (size_t i = 0; i < m->frames.count; i++) {
+        object_mark((Object *)m->frames.data[i].closure, m);
+    }
+
+    for (ObjectUpvalue *upvalue = m->upvalues; upvalue; upvalue = upvalue->next) {
+        object_mark((Object *)upvalue, m);
+    }
+
+    for (Scope *scope = bs->compiler.scope; scope; scope = scope->outer) {
+        object_mark((Object *)scope->fn, m);
+    }
+
+    table_mark(&m->globals, m);
+
+    // Sweep
+    Object *previous = NULL;
+    Object *object = m->objects;
+
+#ifdef GC_DEBUG_LOG
+    printf("\nObjects:\n");
+#endif // GC_DEBUG_LOG
+
+    while (object) {
+
+#ifdef GC_DEBUG_LOG
+        printf("    ");
+        value_print(value_object(object), stdout);
+        printf(": %s\n", object->marked ? "marked" : "not marked");
+#endif // GC_DEBUG_LOG
+
+        if (object->marked) {
+            object->marked = false;
+            previous = object;
+            object = object->next;
+        } else {
+            Object *lost = object;
+            object = object->next;
+            if (previous) {
+                previous->next = object;
+            } else {
+                m->objects = object;
+            }
+
+            bs_free_object(bs, lost);
+        }
+    }
+
+    m->gc = max(m->gc, m->allocated * GC_GROW_FACTOR);
+
+#ifdef GC_DEBUG_LOG
+    if (before != m->allocated) {
+        printf(
+            "\n[GC] Collected %zu bytes (%zu -> %zu) next at %zu\n",
+            before - m->allocated,
+            before,
+            m->allocated,
+            m->gc);
+    }
+
+    printf("-------- GC End ----------\n\n");
+#endif // GC_DEBUG_LOG
+}
+
 void bs_free(Bs *bs) {
     Memory *m = &bs->memory;
 
@@ -51,6 +203,18 @@ void bs_free(Bs *bs) {
 }
 
 void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size) {
+    bs->memory.allocated += new_size - old_size;
+
+    if (new_size > old_size) {
+#ifdef GC_DEBUG_STRESS
+        bs_collect(bs);
+#endif // GC_DEBUG_STRESS
+
+        if (bs->memory.allocated > bs->memory.gc) {
+            bs_collect(bs);
+        }
+    }
+
     if (!new_size) {
         free(ptr);
         return NULL;
@@ -156,8 +320,6 @@ static void table_grow(Table *t, Bs *bs, size_t capacity) {
     t->capacity = capacity;
 }
 
-#define TABLE_MAX_LOAD 0.75
-
 bool table_set(Table *t, Bs *bs, ObjectStr *key, Value value) {
     if (t->count >= t->capacity * TABLE_MAX_LOAD) {
         table_grow(t, bs, t->capacity ? t->capacity * 2 : DA_INIT_CAP);
@@ -178,7 +340,13 @@ static Object *bs_new_object(Bs *bs, ObjectType type, size_t size) {
     Object *object = bs_realloc(bs, NULL, 0, size);
     object->type = type;
     object->next = bs->memory.objects;
+    object->marked = false;
     bs->memory.objects = object;
+
+#ifdef GC_DEBUG_LOG
+    printf("[GC] Allocate %p (%zu bytes); Type: %d\n", object, size, type);
+#endif // GC_DEBUG_LOG
+
     return object;
 }
 
