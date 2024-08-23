@@ -1,7 +1,4 @@
-#include <stdio.h>
-
-#include "compiler.h"
-#include "vm.h"
+#include "bs.h"
 
 int main(int argc, char **argv) {
     int result = 0;
@@ -20,24 +17,21 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    VM vm = {0};
-    Compiler compiler = {
-        .gc = &vm.gc,
-        .lexer = lexer_new(path, (SV){contents, size}),
-    };
+    Bs bs = {.compiler.lexer = lexer_new(path, (SV){contents, size})};
 
-    const ObjectFn *fn = compile(&compiler);
+    const ObjectFn *fn = bs_compile(&bs);
+    free(contents);
+
     if (!fn) {
         return_defer(1);
     }
 
-    if (!vm_run(&vm, fn, false)) {
-        vm_trace(&vm);
+    if (!bs_interpret(&bs, fn, false)) {
+        bs_trace(&bs);
         return_defer(1);
     }
 
 defer:
-    vm_free(&vm);
-    free(contents);
+    bs_free(&bs);
     return result;
 }

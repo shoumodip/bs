@@ -78,8 +78,6 @@ typedef struct {
     char data[];
 } ObjectStr;
 
-bool object_str_eq(ObjectStr *a, ObjectStr *b);
-
 typedef struct {
     Object meta;
     Chunk chunk;
@@ -113,29 +111,10 @@ typedef struct {
     Value value;
 } Entry;
 
-#define TABLE_MAX_LOAD 0.75
-
 typedef struct {
     Entry *data;
     size_t count;
     size_t capacity;
 } Table;
-
-typedef struct {
-    Object *objects;
-} GC;
-
-void *gc_realloc(GC *gc, void *previous, size_t old_size, size_t new_size);
-
-void table_free(Table *table, GC *gc);
-bool table_remove(Table *table, ObjectStr *key);
-
-bool table_get(Table *table, ObjectStr *key, Value *value);
-bool table_set(Table *table, GC *gc, ObjectStr *key, Value value);
-
-ObjectFn *gc_new_object_fn(GC *gc);
-ObjectStr *gc_new_object_str(GC *gc, const char *data, size_t size);
-ObjectUpvalue *gc_new_object_upvalue(GC *gc, size_t index);
-ObjectClosure *gc_new_object_closure(GC *gc, const ObjectFn *fn);
 
 #endif // VALUE_H
