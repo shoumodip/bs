@@ -22,8 +22,8 @@ int main(int argc, char **argv) {
 
     VM vm = {0};
     Compiler compiler = {
-        .lexer = lexer_new(path, (SV){contents, size}),
         .gc = &vm.gc,
+        .lexer = lexer_new(path, (SV){contents, size}),
     };
 
     const ObjectFn *fn = compile(&compiler);

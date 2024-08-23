@@ -42,13 +42,9 @@ struct Scope {
 
 typedef struct {
     Lexer lexer;
-    bool error;
-
     GC *gc;
 
-    Token current;
-    Token previous;
-
+    Chunk *chunk;
     Scope *scope;
 } Compiler;
 

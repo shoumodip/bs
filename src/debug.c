@@ -2,49 +2,49 @@
 
 #include "debug.h"
 
-static void debug_op_int(const Chunk *chunk, size_t *offset, const char *name) {
-    const size_t slot = *(const size_t *)&chunk->data[*offset];
+static void debug_op_int(const Chunk *c, size_t *offset, const char *name) {
+    const size_t slot = *(const size_t *)&c->data[*offset];
     *offset += sizeof(slot);
 
     printf("%-16s %4ld\n", name, slot);
 }
 
-static void debug_op_value(const Chunk *chunk, size_t *offset, const char *name) {
-    const size_t constant = *(const size_t *)&chunk->data[*offset];
+static void debug_op_value(const Chunk *c, size_t *offset, const char *name) {
+    const size_t constant = *(const size_t *)&c->data[*offset];
     *offset += sizeof(constant);
 
     printf("%-16s %4zu '", name, constant);
-    value_print(stdout, chunk->constants.data[constant]);
+    value_print(c->constants.data[constant], stdout);
     printf("'\n");
 }
 
 static_assert(COUNT_OPS == 32, "Update debug_op()");
-void debug_op(const Chunk *chunk, size_t *offset) {
+void debug_op(const Chunk *c, size_t *offset) {
     printf("%04zu ", *offset);
 
-    const Op op = chunk->data[(*offset)++];
+    const Op op = c->data[(*offset)++];
     switch (op) {
     case OP_RET:
         printf("OP_RET\n");
         break;
 
     case OP_CALL:
-        debug_op_int(chunk, offset, "OP_CALL");
+        debug_op_int(c, offset, "OP_CALL");
         break;
 
     case OP_CLOSURE: {
-        const size_t constant = *(const size_t *)&chunk->data[*offset];
+        const size_t constant = *(const size_t *)&c->data[*offset];
         *offset += sizeof(constant);
 
-        const Value value = chunk->constants.data[constant];
+        const Value value = c->constants.data[constant];
         printf("%-16s %4zu '", "OP_CLOSURE", constant);
-        value_print(stdout, value);
+        value_print(value, stdout);
         printf("'\n");
 
         const ObjectFn *fn = (const ObjectFn *)value.as.object;
         for (size_t i = 0; i < fn->upvalues; i++) {
-            const bool local = chunk->data[(*offset)++];
-            const size_t index = *(const size_t *)&chunk->data[*offset];
+            const bool local = c->data[(*offset)++];
+            const size_t index = *(const size_t *)&c->data[*offset];
             *offset += sizeof(index);
 
             printf(
@@ -60,7 +60,7 @@ void debug_op(const Chunk *chunk, size_t *offset) {
         break;
 
     case OP_UCLOSE:
-        debug_op_int(chunk, offset, "OP_UCLOSE");
+        debug_op_int(c, offset, "OP_UCLOSE");
         break;
 
     case OP_NIL:
@@ -76,7 +76,7 @@ void debug_op(const Chunk *chunk, size_t *offset) {
         break;
 
     case OP_CONST:
-        debug_op_value(chunk, offset, "OP_CONST");
+        debug_op_value(c, offset, "OP_CONST");
         break;
 
     case OP_ADD:
@@ -128,43 +128,43 @@ void debug_op(const Chunk *chunk, size_t *offset) {
         break;
 
     case OP_GDEF:
-        debug_op_value(chunk, offset, "OP_GDEF");
+        debug_op_value(c, offset, "OP_GDEF");
         break;
 
     case OP_GGET:
-        debug_op_value(chunk, offset, "OP_GGET");
+        debug_op_value(c, offset, "OP_GGET");
         break;
 
     case OP_GSET:
-        debug_op_value(chunk, offset, "OP_GSET");
+        debug_op_value(c, offset, "OP_GSET");
         break;
 
     case OP_LGET:
-        debug_op_int(chunk, offset, "OP_LGET");
+        debug_op_int(c, offset, "OP_LGET");
         break;
 
     case OP_LSET:
-        debug_op_int(chunk, offset, "OP_LSET");
+        debug_op_int(c, offset, "OP_LSET");
         break;
 
     case OP_UGET:
-        debug_op_int(chunk, offset, "OP_UGET");
+        debug_op_int(c, offset, "OP_UGET");
         break;
 
     case OP_USET:
-        debug_op_int(chunk, offset, "OP_USET");
+        debug_op_int(c, offset, "OP_USET");
         break;
 
     case OP_JUMP:
-        debug_op_int(chunk, offset, "OP_JUMP");
+        debug_op_int(c, offset, "OP_JUMP");
         break;
 
     case OP_ELSE:
-        debug_op_int(chunk, offset, "OP_ELSE");
+        debug_op_int(c, offset, "OP_ELSE");
         break;
 
     case OP_THEN:
-        debug_op_int(chunk, offset, "OP_THEN");
+        debug_op_int(c, offset, "OP_THEN");
         break;
 
     case OP_PRINT:
@@ -177,10 +177,10 @@ void debug_op(const Chunk *chunk, size_t *offset) {
     }
 }
 
-void debug_chunk(const Chunk *chunk) {
+void debug_chunk(const Chunk *c) {
     size_t i = 0;
-    while (i < chunk->count) {
-        debug_op(chunk, &i);
+    while (i < c->count) {
+        debug_op(c, &i);
     }
 }
 

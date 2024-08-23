@@ -46,6 +46,8 @@ typedef struct {
 #define value_object(v) ((Value){VALUE_OBJECT, .as.object = (Object *)(v)})
 
 bool value_is_falsey(Value value);
+void value_print(Value value, FILE *file);
+bool value_equal(Value a, Value b);
 
 typedef struct {
     Value *data;
@@ -118,9 +120,6 @@ typedef struct {
     size_t count;
     size_t capacity;
 } Table;
-
-void value_print(FILE *file, Value value);
-bool value_equal(Value a, Value b);
 
 typedef struct {
     Object *objects;

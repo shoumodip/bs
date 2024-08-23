@@ -3,16 +3,6 @@
 
 #include "value.h"
 
-// TODO: Lazy hash strings
-static uint32_t hash_string(const char *data, size_t size) {
-    uint32_t hash = 2166136261u;
-    for (size_t i = 0; i < size; i++) {
-        hash ^= (uint8_t)data[i];
-        hash *= 16777619;
-    }
-    return hash;
-}
-
 const char *value_type_name(ValueType type) {
     switch (type) {
     case VALUE_NIL:
@@ -32,64 +22,32 @@ const char *value_type_name(ValueType type) {
     }
 }
 
-bool value_is_falsey(Value value) {
-    return value.type == VALUE_NIL || (value.type == VALUE_BOOL && !value.as.boolean);
-}
-
-void chunk_free(Chunk *chunk) {
-    values_free(&chunk->constants);
-    da_free(chunk);
-}
-
-void chunk_push_op(Chunk *chunk, Op op) {
-    chunk->last = chunk->count;
-    da_push(chunk, op);
-}
-
-void chunk_push_op_int(Chunk *chunk, Op op, size_t value) {
-    const size_t bytes = sizeof(value);
-    chunk_push_op(chunk, op);
-    da_push_many(chunk, &value, bytes);
-}
-
-void chunk_push_op_value(Chunk *chunk, Op op, Value value) {
-    const size_t index = chunk->constants.count;
-    const size_t bytes = sizeof(index);
-    values_push(&chunk->constants, value);
-
-    chunk_push_op(chunk, op);
-    da_push_many(chunk, &index, bytes);
-}
-
-bool object_str_eq(ObjectStr *a, ObjectStr *b) {
-    if (!a || !b) {
-        return false;
-    }
-    return a->size == b->size && !memcmp(a->data, b->data, b->size);
+bool value_is_falsey(Value v) {
+    return v.type == VALUE_NIL || (v.type == VALUE_BOOL && !v.as.boolean);
 }
 
 static_assert(COUNT_OBJECTS == 4, "Update object_print()");
-static void object_print(FILE *file, const Object *object) {
-    switch (object->type) {
+static void object_print(const Object *o, FILE *f) {
+    switch (o->type) {
     case OBJECT_FN: {
-        const ObjectFn *fn = (const ObjectFn *)object;
+        const ObjectFn *fn = (const ObjectFn *)o;
         if (fn->name) {
-            fprintf(file, "fn " SVFmt "()", SVArg(*fn->name));
+            fprintf(f, "fn " SVFmt "()", SVArg(*fn->name));
         } else {
-            fprintf(file, "fn ()");
+            fprintf(f, "fn ()");
         }
     } break;
 
     case OBJECT_STR:
-        fprintf(file, SVFmt, SVArg(*(const ObjectStr *)object));
+        fprintf(f, SVFmt, SVArg(*(const ObjectStr *)o));
         break;
 
     case OBJECT_CLOSURE: {
-        const ObjectFn *fn = ((const ObjectClosure *)object)->fn;
+        const ObjectFn *fn = ((const ObjectClosure *)o)->fn;
         if (fn->name) {
-            fprintf(file, "fn " SVFmt "()", SVArg(*fn->name));
+            fprintf(f, "fn " SVFmt "()", SVArg(*fn->name));
         } else {
-            fprintf(file, "fn ()");
+            fprintf(f, "fn ()");
         }
     } break;
 
@@ -98,22 +56,22 @@ static void object_print(FILE *file, const Object *object) {
     }
 }
 
-void value_print(FILE *file, Value value) {
-    switch (value.type) {
+void value_print(Value v, FILE *f) {
+    switch (v.type) {
     case VALUE_NIL:
-        fprintf(file, "nil");
+        fprintf(f, "nil");
         break;
 
     case VALUE_NUM:
-        fprintf(file, "%g", value.as.number);
+        fprintf(f, "%g", v.as.number);
         break;
 
     case VALUE_BOOL:
-        fprintf(file, "%s", value.as.boolean ? "true" : "false");
+        fprintf(f, "%s", v.as.boolean ? "true" : "false");
         break;
 
     case VALUE_OBJECT:
-        object_print(file, value.as.object);
+        object_print(v.as.object, f);
         break;
 
     default:
@@ -129,9 +87,9 @@ static bool object_equal(const Object *a, const Object *b) {
 
     switch (a->type) {
     case OBJECT_STR: {
-        const ObjectStr *a_str = (const ObjectStr *)a;
-        const ObjectStr *b_str = (const ObjectStr *)b;
-        return a_str->size == b_str->size && !memcmp(a_str->data, b_str->data, b_str->size);
+        const ObjectStr *as = (const ObjectStr *)a;
+        const ObjectStr *bs = (const ObjectStr *)b;
+        return as->size == bs->size && !memcmp(as->data, bs->data, bs->size);
     };
 
     case OBJECT_CLOSURE:
@@ -165,13 +123,55 @@ bool value_equal(Value a, Value b) {
     }
 };
 
-void *gc_realloc(GC *gc, void *previous, size_t old_size, size_t new_size) {
+void chunk_free(Chunk *c) {
+    values_free(&c->constants);
+    da_free(c);
+}
+
+void chunk_push_op(Chunk *c, Op op) {
+    c->last = c->count;
+    da_push(c, op);
+}
+
+void chunk_push_op_int(Chunk *c, Op op, size_t value) {
+    const size_t bytes = sizeof(value);
+    chunk_push_op(c, op);
+    da_push_many(c, &value, bytes);
+}
+
+void chunk_push_op_value(Chunk *c, Op op, Value value) {
+    const size_t index = c->constants.count;
+    const size_t bytes = sizeof(index);
+    values_push(&c->constants, value);
+
+    chunk_push_op(c, op);
+    da_push_many(c, &index, bytes);
+}
+
+bool object_str_eq(ObjectStr *a, ObjectStr *b) {
+    if (!a || !b) {
+        return false;
+    }
+    return a->size == b->size && !memcmp(a->data, b->data, b->size);
+}
+
+void *gc_realloc(GC *gc, void *ptr, size_t old_size, size_t new_size) {
     if (!new_size) {
-        free(previous);
+        free(ptr);
         return NULL;
     }
 
-    return realloc(previous, new_size);
+    return realloc(ptr, new_size);
+}
+
+// TODO: Lazy hash strings
+static uint32_t hash_string(const char *data, size_t size) {
+    uint32_t hash = 2166136261u;
+    for (size_t i = 0; i < size; i++) {
+        hash ^= (uint8_t)data[i];
+        hash *= 16777619;
+    }
+    return hash;
 }
 
 static Entry *entries_find(Entry *entries, size_t capacity, ObjectStr *key) {
@@ -198,42 +198,17 @@ static Entry *entries_find(Entry *entries, size_t capacity, ObjectStr *key) {
     }
 }
 
-void table_free(Table *table, GC *gc) {
-    gc_realloc(gc, table->data, sizeof(*table->data) * table->capacity, 0);
-    memset(table, 0, sizeof(*table));
+void table_free(Table *t, GC *gc) {
+    gc_realloc(gc, t->data, sizeof(*t->data) * t->capacity, 0);
+    memset(t, 0, sizeof(*t));
 }
 
-static void table_grow(Table *table, GC *gc, size_t capacity) {
-    const size_t size = sizeof(Entry) * capacity;
-
-    Entry *entries = gc_realloc(gc, NULL, 0, size);
-    memset(entries, 0, size);
-
-    size_t count = 0;
-    for (size_t i = 0; i < table->capacity; i++) {
-        Entry *src = &table->data[i];
-        if (!src->key) {
-            continue;
-        }
-
-        Entry *dst = entries_find(entries, capacity, src->key);
-        dst->key = src->key;
-        dst->value = src->value;
-        count++;
-    }
-
-    table_free(table, gc);
-    table->data = entries;
-    table->count = count;
-    table->capacity = capacity;
-}
-
-bool table_remove(Table *table, ObjectStr *key) {
-    if (!table->count) {
+bool table_remove(Table *t, ObjectStr *key) {
+    if (!t->count) {
         return false;
     }
 
-    Entry *entry = entries_find(table->data, table->capacity, key);
+    Entry *entry = entries_find(t->data, t->capacity, key);
     if (!entry) {
         return false;
     }
@@ -247,12 +222,12 @@ bool table_remove(Table *table, ObjectStr *key) {
     return true;
 }
 
-bool table_get(Table *table, ObjectStr *key, Value *value) {
-    if (!table->count) {
+bool table_get(Table *t, ObjectStr *key, Value *value) {
+    if (!t->count) {
         return false;
     }
 
-    Entry *entry = entries_find(table->data, table->capacity, key);
+    Entry *entry = entries_find(t->data, t->capacity, key);
     if (!entry->key) {
         return false;
     }
@@ -261,15 +236,40 @@ bool table_get(Table *table, ObjectStr *key, Value *value) {
     return true;
 }
 
-bool table_set(Table *table, GC *gc, ObjectStr *key, Value value) {
-    if (table->count >= table->capacity * TABLE_MAX_LOAD) {
-        table_grow(table, gc, table->capacity ? table->capacity * 2 : DA_INIT_CAP);
+static void table_grow(Table *t, GC *gc, size_t capacity) {
+    const size_t size = sizeof(Entry) * capacity;
+
+    Entry *entries = gc_realloc(gc, NULL, 0, size);
+    memset(entries, 0, size);
+
+    size_t count = 0;
+    for (size_t i = 0; i < t->capacity; i++) {
+        Entry *src = &t->data[i];
+        if (!src->key) {
+            continue;
+        }
+
+        Entry *dst = entries_find(entries, capacity, src->key);
+        dst->key = src->key;
+        dst->value = src->value;
+        count++;
     }
-    Entry *entry = entries_find(table->data, table->capacity, key);
+
+    table_free(t, gc);
+    t->data = entries;
+    t->count = count;
+    t->capacity = capacity;
+}
+
+bool table_set(Table *t, GC *gc, ObjectStr *key, Value value) {
+    if (t->count >= t->capacity * TABLE_MAX_LOAD) {
+        table_grow(t, gc, t->capacity ? t->capacity * 2 : DA_INIT_CAP);
+    }
+    Entry *entry = entries_find(t->data, t->capacity, key);
 
     bool is_new = !entry->key;
     if (is_new && entry->value.type == VALUE_NIL) {
-        table->count++;
+        t->count++;
     }
 
     entry->key = key;

@@ -36,14 +36,16 @@ const Power token_type_powers[COUNT_TOKENS] = {
     [TOKEN_SET] = POWER_SET,
 };
 
-static void scope_free(Scope *scope) {
-    upvalues_free(&scope->upvalues);
-    da_free(scope);
+static void scope_free(Scope *s) {
+    if (s) {
+        upvalues_free(&s->upvalues);
+        da_free(s);
+    }
 }
 
-static bool scope_find_local(Scope *scope, SV name, size_t *index) {
-    for (size_t i = scope->count; i > 0; i--) {
-        if (sv_eq(scope->data[i - 1].token.sv, name)) {
+static bool scope_find_local(Scope *s, SV name, size_t *index) {
+    for (size_t i = s->count; i > 0; i--) {
+        if (sv_eq(s->data[i - 1].token.sv, name)) {
             *index = i - 1;
             return true;
         }
@@ -52,9 +54,9 @@ static bool scope_find_local(Scope *scope, SV name, size_t *index) {
     return false;
 }
 
-static void scope_add_upvalue(Scope *scope, size_t *index, bool local) {
-    for (size_t i = 0; i < scope->fn->upvalues; i++) {
-        const Upvalue *upvalue = &scope->upvalues.data[i];
+static void scope_add_upvalue(Scope *s, size_t *index, bool local) {
+    for (size_t i = 0; i < s->fn->upvalues; i++) {
+        const Upvalue *upvalue = &s->upvalues.data[i];
         if (upvalue->index == *index && upvalue->local == local) {
             *index = i;
             return;
@@ -62,374 +64,278 @@ static void scope_add_upvalue(Scope *scope, size_t *index, bool local) {
     }
 
     const Upvalue upvalue = {.local = local, .index = *index};
-    upvalues_push(&scope->upvalues, upvalue);
+    upvalues_push(&s->upvalues, upvalue);
 
-    *index = scope->fn->upvalues++;
+    *index = s->fn->upvalues++;
 }
 
-static bool scope_find_upvalue(Scope *scope, SV name, size_t *index) {
-    if (!scope->outer) {
+static bool scope_find_upvalue(Scope *s, SV name, size_t *index) {
+    if (!s->outer) {
         return false;
     }
 
-    if (scope_find_local(scope->outer, name, index)) {
-        scope->outer->data[*index].captured = true;
-        scope_add_upvalue(scope, index, true);
+    if (scope_find_local(s->outer, name, index)) {
+        s->outer->data[*index].captured = true;
+        scope_add_upvalue(s, index, true);
         return true;
     }
 
-    if (scope_find_upvalue(scope->outer, name, index)) {
-        scope_add_upvalue(scope, index, false);
-        return true;
-    }
-
-    return false;
-}
-
-static void compile_error(Compiler *compiler) {
-    compiler->error = true;
-    compiler->lexer.quiet = true;
-}
-
-static void compile_error_expected(Compiler *compiler, const Token *token, TokenType type) {
-    if (!compiler->lexer.quiet) {
-        fprintf(
-            stderr,
-            PosFmt "error: expected %s, got %s\n",
-            PosArg(token->pos),
-            token_type_name(type),
-            token_type_name(token->type));
-    }
-
-    compile_error(compiler);
-}
-
-static void compile_error_unexpected(Compiler *compiler, const Token *token) {
-    if (!compiler->lexer.quiet) {
-        fprintf(
-            stderr,
-            PosFmt "error: unexpected %s\n",
-            PosArg(token->pos),
-            token_type_name(token->type));
-    }
-
-    compile_error(compiler);
-}
-
-static void compile_advance(Compiler *compiler) {
-    compiler->previous = compiler->current;
-
-    while (true) {
-        if (lexer_next(&compiler->lexer, &compiler->current)) {
-            break;
-        }
-
-        compile_error(compiler);
-    }
-}
-
-static bool compile_match(Compiler *compiler, TokenType type) {
-    if (compiler->current.type == type) {
-        compile_advance(compiler);
+    if (scope_find_upvalue(s->outer, name, index)) {
+        scope_add_upvalue(s, index, false);
         return true;
     }
 
     return false;
 }
 
-static void compile_expect(Compiler *compiler, TokenType type) {
-    if (compile_match(compiler, type)) {
-        return;
-    }
-
-    compile_error_expected(compiler, &compiler->current, type);
+static Value compile_ident_const(Compiler *c, SV name) {
+    return value_object(gc_new_object_str(c->gc, name.data, name.size));
 }
 
-static void compile_expect_inplace(Compiler *compiler, TokenType type) {
-    if (compiler->current.type != type) {
-        compile_error_expected(compiler, &compiler->current, type);
-    }
-}
+static void compile_scope_init(Compiler *c, Scope *scope, const Token *token) {
+    scope->fn = gc_new_object_fn(c->gc);
 
-static_assert(COUNT_TOKENS == 35, "Update compile_synchronize()");
-static void compile_synchronize(Compiler *compiler) {
-    if (compiler->lexer.quiet) {
-        compiler->lexer.quiet = false;
-
-        while (compiler->current.type != TOKEN_EOF) {
-            if (compiler->previous.type == TOKEN_EOL) {
-                return;
-            }
-
-            switch (compiler->current.type) {
-            case TOKEN_LBRACE:
-
-            case TOKEN_IF:
-            case TOKEN_FOR:
-            case TOKEN_WHILE:
-
-            case TOKEN_FN:
-            case TOKEN_VAR:
-            case TOKEN_RETURN:
-
-            case TOKEN_PRINT:
-                return;
-
-            default:
-                break;
-            }
-
-            compile_advance(compiler);
-        }
-    }
-}
-
-static Value compile_ident_const(Compiler *compiler, SV name) {
-    return value_object(gc_new_object_str(compiler->gc, name.data, name.size));
-}
-
-#define current_fn (compiler->scope->fn)
-#define current_chunk (current_fn->chunk)
-
-static void compile_scope_init(Compiler *compiler, Scope *scope) {
-    scope->fn = gc_new_object_fn(compiler->gc);
-
-    if (compiler->scope) {
-        scope->fn->name =
-            gc_new_object_str(compiler->gc, compiler->previous.sv.data, compiler->previous.sv.size);
+    if (token) {
+        scope->fn->name = gc_new_object_str(c->gc, token->sv.data, token->sv.size);
     }
 
-    scope->outer = compiler->scope;
-    compiler->scope = scope;
+    scope->outer = c->scope;
+    c->scope = scope;
+    c->chunk = &c->scope->fn->chunk;
     scope_push(scope, (Local){0});
 }
 
-static ObjectFn *compile_scope_end(Compiler *compiler) {
-    chunk_push_op(&current_chunk, OP_NIL);
-    chunk_push_op(&current_chunk, OP_RET);
-    ObjectFn *fn = current_fn;
+static ObjectFn *compile_scope_end(Compiler *c) {
+    chunk_push_op(c->chunk, OP_NIL);
+    chunk_push_op(c->chunk, OP_RET);
+    ObjectFn *fn = c->scope->fn;
 
-    Scope *outer = compiler->scope->outer;
-    compiler->scope = outer;
+    Scope *outer = c->scope->outer;
+    c->scope = outer;
+
+    if (c->scope) {
+        c->chunk = &c->scope->fn->chunk;
+    } else {
+        c->chunk = NULL;
+    }
     return fn;
 }
 
-static void compile_body_begin(Compiler *compiler) {
-    compiler->scope->depth++;
+static void compile_body_begin(Compiler *c) {
+    c->scope->depth++;
 }
 
-static void compile_body_end(Compiler *compiler) {
-    compiler->scope->depth--;
+static void compile_body_end(Compiler *c) {
+    c->scope->depth--;
 
-    while (compiler->scope->count &&
-           compiler->scope->data[compiler->scope->count - 1].depth > compiler->scope->depth) {
-
-        if (compiler->scope->data[compiler->scope->count - 1].captured) {
-            chunk_push_op(&current_chunk, OP_UCLOSE);
+    while (c->scope->count && c->scope->data[c->scope->count - 1].depth > c->scope->depth) {
+        if (c->scope->data[c->scope->count - 1].captured) {
+            chunk_push_op(c->chunk, OP_UCLOSE);
         } else {
-            chunk_push_op(&current_chunk, OP_DROP);
+            chunk_push_op(c->chunk, OP_DROP);
         }
 
-        compiler->scope->count--;
+        c->scope->count--;
     }
 }
 
-static size_t compile_jump_start(Compiler *compiler, Op op) {
-    chunk_push_op_int(&current_chunk, op, 0);
-    return current_chunk.count - 1 - sizeof(size_t);
+static size_t compile_jump_start(Compiler *c, Op op) {
+    chunk_push_op_int(c->chunk, op, 0);
+    return c->chunk->count - 1 - sizeof(size_t);
 }
 
-static void compile_jump_patch(Compiler *compiler, size_t addr) {
-    *(size_t *)&current_chunk.data[addr + 1] = current_chunk.count - 1 - sizeof(size_t) - addr;
+static void compile_jump_patch(Compiler *c, size_t addr) {
+    *(size_t *)&c->chunk->data[addr + 1] = c->chunk->count - 1 - sizeof(size_t) - addr;
 }
 
-static void compile_jump_direct(Compiler *compiler, Op op, size_t addr) {
-    chunk_push_op_int(&current_chunk, op, addr - current_chunk.count - 1 - sizeof(size_t));
+static void compile_jump_direct(Compiler *c, Op op, size_t addr) {
+    chunk_push_op_int(c->chunk, op, addr - c->chunk->count - 1 - sizeof(size_t));
 }
 
 static_assert(COUNT_TOKENS == 35, "Update compile_expr()");
-static void compile_expr(Compiler *compiler, Power mbp) {
-    compile_advance(compiler);
+static void compile_expr(Compiler *c, Power mbp) {
+    Token token = lexer_next(&c->lexer);
 
-    switch (compiler->previous.type) {
+    switch (token.type) {
     case TOKEN_NIL:
-        chunk_push_op(&current_chunk, OP_NIL);
+        chunk_push_op(c->chunk, OP_NIL);
         break;
 
     case TOKEN_STR:
         chunk_push_op_value(
-            &current_chunk,
+            c->chunk,
             OP_CONST,
-            value_object(gc_new_object_str(
-                compiler->gc, compiler->previous.sv.data + 1, compiler->previous.sv.size - 2)));
+            value_object(gc_new_object_str(c->gc, token.sv.data + 1, token.sv.size - 2)));
         break;
 
     case TOKEN_NUM:
-        chunk_push_op_value(
-            &current_chunk, OP_CONST, value_num(strtod(compiler->previous.sv.data, NULL)));
+        chunk_push_op_value(c->chunk, OP_CONST, value_num(strtod(token.sv.data, NULL)));
         break;
 
     case TOKEN_TRUE:
-        chunk_push_op(&current_chunk, OP_TRUE);
+        chunk_push_op(c->chunk, OP_TRUE);
         break;
 
     case TOKEN_FALSE:
-        chunk_push_op(&current_chunk, OP_FALSE);
+        chunk_push_op(c->chunk, OP_FALSE);
         break;
 
     case TOKEN_IDENT: {
         size_t index;
-        if (scope_find_local(compiler->scope, compiler->previous.sv, &index)) {
-            chunk_push_op_int(&current_chunk, OP_LGET, index);
-        } else if (scope_find_upvalue(compiler->scope, compiler->previous.sv, &index)) {
-            const Upvalue upvalue = compiler->scope->upvalues.data[index];
-            chunk_push_op_int(&current_chunk, OP_UGET, index);
+        if (scope_find_local(c->scope, token.sv, &index)) {
+            chunk_push_op_int(c->chunk, OP_LGET, index);
+        } else if (scope_find_upvalue(c->scope, token.sv, &index)) {
+            chunk_push_op_int(c->chunk, OP_UGET, index);
         } else {
-            chunk_push_op_value(
-                &current_chunk, OP_GGET, compile_ident_const(compiler, compiler->previous.sv));
+            chunk_push_op_value(c->chunk, OP_GGET, compile_ident_const(c, token.sv));
         }
     } break;
 
     case TOKEN_LPAREN:
-        compile_expr(compiler, POWER_SET);
-        compile_expect(compiler, TOKEN_RPAREN);
+        compile_expr(c, POWER_SET);
+        lexer_expect(&c->lexer, TOKEN_RPAREN);
         break;
 
     case TOKEN_SUB:
-        compile_expr(compiler, POWER_PRE);
-        chunk_push_op(&current_chunk, OP_NEG);
+        compile_expr(c, POWER_PRE);
+        chunk_push_op(c->chunk, OP_NEG);
         break;
 
     case TOKEN_NOT:
-        compile_expr(compiler, POWER_PRE);
-        chunk_push_op(&current_chunk, OP_NOT);
+        compile_expr(c, POWER_PRE);
+        chunk_push_op(c->chunk, OP_NOT);
         break;
 
     default:
-        compile_error_unexpected(compiler, &compiler->previous);
+        fprintf(
+            stderr,
+            PosFmt "error: unexpected %s\n",
+            PosArg(token.pos),
+            token_type_name(token.type));
+
+        lexer_error(&c->lexer);
         return;
     }
 
     while (true) {
-        const Power lbp = token_type_powers[compiler->current.type];
+        token = lexer_peek(&c->lexer);
+
+        const Power lbp = token_type_powers[token.type];
         if (lbp <= mbp) {
             break;
         }
-        compile_advance(compiler);
+        c->lexer.peeked = false;
 
-        switch (compiler->previous.type) {
+        switch (token.type) {
         case TOKEN_ADD:
-            compile_expr(compiler, lbp);
-            chunk_push_op(&current_chunk, OP_ADD);
+            compile_expr(c, lbp);
+            chunk_push_op(c->chunk, OP_ADD);
             break;
 
         case TOKEN_SUB:
-            compile_expr(compiler, lbp);
-            chunk_push_op(&current_chunk, OP_SUB);
+            compile_expr(c, lbp);
+            chunk_push_op(c->chunk, OP_SUB);
             break;
 
         case TOKEN_MUL:
-            compile_expr(compiler, lbp);
-            chunk_push_op(&current_chunk, OP_MUL);
+            compile_expr(c, lbp);
+            chunk_push_op(c->chunk, OP_MUL);
             break;
 
         case TOKEN_DIV:
-            compile_expr(compiler, lbp);
-            chunk_push_op(&current_chunk, OP_DIV);
+            compile_expr(c, lbp);
+            chunk_push_op(c->chunk, OP_DIV);
             break;
 
         case TOKEN_OR: {
-            const size_t addr = compile_jump_start(compiler, OP_THEN);
+            const size_t addr = compile_jump_start(c, OP_THEN);
 
-            chunk_push_op(&current_chunk, OP_DROP);
-            compile_expr(compiler, lbp);
+            chunk_push_op(c->chunk, OP_DROP);
+            compile_expr(c, lbp);
 
-            compile_jump_patch(compiler, addr);
+            compile_jump_patch(c, addr);
         } break;
 
         case TOKEN_AND: {
-            const size_t addr = compile_jump_start(compiler, OP_ELSE);
+            const size_t addr = compile_jump_start(c, OP_ELSE);
 
-            chunk_push_op(&current_chunk, OP_DROP);
-            compile_expr(compiler, lbp);
+            chunk_push_op(c->chunk, OP_DROP);
+            compile_expr(c, lbp);
 
-            compile_jump_patch(compiler, addr);
+            compile_jump_patch(c, addr);
         } break;
 
         case TOKEN_GT:
-            compile_expr(compiler, lbp);
-            chunk_push_op(&current_chunk, OP_GT);
+            compile_expr(c, lbp);
+            chunk_push_op(c->chunk, OP_GT);
             break;
 
         case TOKEN_GE:
-            compile_expr(compiler, lbp);
-            chunk_push_op(&current_chunk, OP_GE);
+            compile_expr(c, lbp);
+            chunk_push_op(c->chunk, OP_GE);
             break;
 
         case TOKEN_LT:
-            compile_expr(compiler, lbp);
-            chunk_push_op(&current_chunk, OP_LT);
+            compile_expr(c, lbp);
+            chunk_push_op(c->chunk, OP_LT);
             break;
 
         case TOKEN_LE:
-            compile_expr(compiler, lbp);
-            chunk_push_op(&current_chunk, OP_LE);
+            compile_expr(c, lbp);
+            chunk_push_op(c->chunk, OP_LE);
             break;
 
         case TOKEN_EQ:
-            compile_expr(compiler, lbp);
-            chunk_push_op(&current_chunk, OP_EQ);
+            compile_expr(c, lbp);
+            chunk_push_op(c->chunk, OP_EQ);
             break;
 
         case TOKEN_NE:
-            compile_expr(compiler, lbp);
-            chunk_push_op(&current_chunk, OP_NE);
+            compile_expr(c, lbp);
+            chunk_push_op(c->chunk, OP_NE);
             break;
 
         case TOKEN_LPAREN: {
-            if (current_chunk.count <= current_chunk.last) {
-                compile_error_unexpected(compiler, &compiler->previous);
+            if (c->chunk->count <= c->chunk->last) {
                 return;
             }
 
-            const Op op = op_get_to_set(current_chunk.data[current_chunk.last]);
-            if (op == OP_RET && current_chunk.data[current_chunk.last] != OP_CALL) {
-                compile_error_unexpected(compiler, &compiler->previous);
+            const Op op = op_get_to_set(c->chunk->data[c->chunk->last]);
+            if (op == OP_RET && c->chunk->data[c->chunk->last] != OP_CALL) {
                 return;
             }
 
             size_t arity = 0;
-            while (compiler->current.type != TOKEN_RPAREN && compiler->current.type != TOKEN_EOF) {
-                compile_expr(compiler, POWER_SET);
+            while (!lexer_read(&c->lexer, TOKEN_RPAREN)) {
+                compile_expr(c, POWER_SET);
                 arity++;
 
-                if (compiler->current.type != TOKEN_COMMA) {
+                token = lexer_peek(&c->lexer);
+                if (token.type != TOKEN_COMMA) {
+                    lexer_expect(&c->lexer, TOKEN_RPAREN);
                     break;
                 }
-                compile_advance(compiler);
+                c->lexer.peeked = false;
             }
-            compile_expect(compiler, TOKEN_RPAREN);
 
-            chunk_push_op_int(&current_chunk, OP_CALL, arity);
+            chunk_push_op_int(c->chunk, OP_CALL, arity);
         } break;
 
         case TOKEN_SET: {
-            if (current_chunk.count <= current_chunk.last) {
-                compile_error_unexpected(compiler, &compiler->previous);
+            if (c->chunk->count <= c->chunk->last) {
                 return;
             }
 
-            const Op op = op_get_to_set(current_chunk.data[current_chunk.last]);
+            const Op op = op_get_to_set(c->chunk->data[c->chunk->last]);
             if (op == OP_RET) {
-                compile_error_unexpected(compiler, &compiler->previous);
                 return;
             }
 
-            const size_t index = *(size_t *)&current_chunk.data[current_chunk.last + 1];
-            current_chunk.count = current_chunk.last;
+            const size_t index = *(size_t *)&c->chunk->data[c->chunk->last + 1];
+            c->chunk->count = c->chunk->last;
 
-            compile_expr(compiler, lbp);
-            chunk_push_op_int(&current_chunk, op, index);
+            compile_expr(c, lbp);
+            chunk_push_op_int(c->chunk, op, index);
         } break;
 
         default:
@@ -439,204 +345,201 @@ static void compile_expr(Compiler *compiler, Power mbp) {
 }
 
 static_assert(COUNT_TOKENS == 35, "Update compile_stmt()");
-static void compile_stmt(Compiler *compiler) {
-    switch (compiler->current.type) {
+static void compile_stmt(Compiler *c) {
+    Token token = lexer_next(&c->lexer);
+
+    switch (token.type) {
     case TOKEN_LBRACE:
-        compile_advance(compiler);
-
-        compile_body_begin(compiler);
-        while (compiler->current.type != TOKEN_RBRACE && compiler->current.type != TOKEN_EOF) {
-            compile_stmt(compiler);
+        compile_body_begin(c);
+        while (!lexer_read(&c->lexer, TOKEN_RBRACE)) {
+            compile_stmt(c);
         }
-        compile_body_end(compiler);
-
-        compile_expect(compiler, TOKEN_RBRACE);
+        compile_body_end(c);
         break;
 
     case TOKEN_IF: {
-        compile_advance(compiler);
-        compile_expr(compiler, POWER_SET);
+        compile_expr(c, POWER_SET);
 
-        const size_t then_addr = compile_jump_start(compiler, OP_ELSE);
-        chunk_push_op(&current_chunk, OP_DROP);
+        const size_t then_addr = compile_jump_start(c, OP_ELSE);
+        chunk_push_op(c->chunk, OP_DROP);
 
-        compile_expect_inplace(compiler, TOKEN_LBRACE);
-        compile_stmt(compiler);
+        lexer_buffer(&c->lexer, lexer_expect(&c->lexer, TOKEN_LBRACE));
+        compile_stmt(c);
 
-        const size_t else_addr = compile_jump_start(compiler, OP_JUMP);
-        compile_jump_patch(compiler, then_addr);
-        chunk_push_op(&current_chunk, OP_DROP);
+        const size_t else_addr = compile_jump_start(c, OP_JUMP);
+        compile_jump_patch(c, then_addr);
+        chunk_push_op(c->chunk, OP_DROP);
 
-        if (compile_match(compiler, TOKEN_ELSE)) {
-            compile_expect_inplace(compiler, TOKEN_LBRACE);
-            compile_stmt(compiler);
+        if (lexer_read(&c->lexer, TOKEN_ELSE)) {
+            lexer_buffer(&c->lexer, lexer_expect(&c->lexer, TOKEN_LBRACE));
+            compile_stmt(c);
         }
-        compile_jump_patch(compiler, else_addr);
+        compile_jump_patch(c, else_addr);
     } break;
 
     case TOKEN_FOR: {
-        compile_advance(compiler);
+        compile_body_begin(c);
 
-        compile_body_begin(compiler);
-        if (compiler->current.type == TOKEN_VAR) {
-            compile_stmt(compiler);
+        token = lexer_peek(&c->lexer);
+        if (token.type == TOKEN_VAR) {
+            compile_stmt(c);
         } else {
-            compile_expr(compiler, POWER_NIL);
-            compile_expect(compiler, TOKEN_EOL);
+            compile_expr(c, POWER_NIL);
+            lexer_expect(&c->lexer, TOKEN_EOL);
         }
 
-        const size_t cond_addr = current_chunk.count;
-        compile_expr(compiler, POWER_SET);
-        compile_expect(compiler, TOKEN_EOL);
+        const size_t cond_addr = c->chunk->count;
+        compile_expr(c, POWER_SET);
+        lexer_expect(&c->lexer, TOKEN_EOL);
 
-        const size_t loop_addr = compile_jump_start(compiler, OP_ELSE);
-        chunk_push_op(&current_chunk, OP_DROP);
+        const size_t loop_addr = compile_jump_start(c, OP_ELSE);
+        chunk_push_op(c->chunk, OP_DROP);
 
-        const size_t iter_addr = compile_jump_start(compiler, OP_JUMP);
-        compile_expr(compiler, POWER_NIL);
-        chunk_push_op(&current_chunk, OP_DROP);
-        compile_jump_direct(compiler, OP_JUMP, cond_addr);
-        compile_jump_patch(compiler, iter_addr);
+        const size_t iter_addr = compile_jump_start(c, OP_JUMP);
+        compile_expr(c, POWER_NIL);
+        chunk_push_op(c->chunk, OP_DROP);
+        compile_jump_direct(c, OP_JUMP, cond_addr);
+        compile_jump_patch(c, iter_addr);
 
-        compile_expect_inplace(compiler, TOKEN_LBRACE);
-        compile_stmt(compiler);
-        compile_jump_direct(compiler, OP_JUMP, iter_addr + 1 + sizeof(size_t));
+        lexer_buffer(&c->lexer, lexer_expect(&c->lexer, TOKEN_LBRACE));
+        compile_stmt(c);
+        compile_jump_direct(c, OP_JUMP, iter_addr + 1 + sizeof(size_t));
 
-        compile_jump_direct(compiler, OP_JUMP, cond_addr);
-        compile_jump_patch(compiler, loop_addr);
-        chunk_push_op(&current_chunk, OP_DROP);
+        compile_jump_direct(c, OP_JUMP, cond_addr);
+        compile_jump_patch(c, loop_addr);
+        chunk_push_op(c->chunk, OP_DROP);
 
-        compile_body_end(compiler);
+        compile_body_end(c);
     } break;
 
     case TOKEN_WHILE: {
-        compile_advance(compiler);
+        const size_t cond_addr = c->chunk->count;
+        compile_expr(c, POWER_SET);
 
-        const size_t cond_addr = current_chunk.count;
-        compile_expr(compiler, POWER_SET);
+        const size_t loop_addr = compile_jump_start(c, OP_ELSE);
+        chunk_push_op(c->chunk, OP_DROP);
 
-        const size_t loop_addr = compile_jump_start(compiler, OP_ELSE);
-        chunk_push_op(&current_chunk, OP_DROP);
+        lexer_buffer(&c->lexer, lexer_expect(&c->lexer, TOKEN_LBRACE));
+        compile_stmt(c);
 
-        compile_expect_inplace(compiler, TOKEN_LBRACE);
-        compile_stmt(compiler);
-
-        compile_jump_direct(compiler, OP_JUMP, cond_addr);
-        compile_jump_patch(compiler, loop_addr);
-        chunk_push_op(&current_chunk, OP_DROP);
+        compile_jump_direct(c, OP_JUMP, cond_addr);
+        compile_jump_patch(c, loop_addr);
+        chunk_push_op(c->chunk, OP_DROP);
     } break;
 
     case TOKEN_FN: {
-        compile_advance(compiler);
-        compile_expect(compiler, TOKEN_IDENT);
-
-        const Token name = compiler->previous;
-        if (compiler->scope->depth) {
-            da_push(
-                compiler->scope,
-                ((Local){.token = compiler->previous, .depth = compiler->scope->depth}));
+        const Token name = lexer_expect(&c->lexer, TOKEN_IDENT);
+        if (c->scope->depth) {
+            da_push(c->scope, ((Local){.token = name, .depth = c->scope->depth}));
         }
 
         Scope scope = {0};
-        compile_scope_init(compiler, &scope);
-        compile_body_begin(compiler);
+        compile_scope_init(c, &scope, &name);
+        compile_body_begin(c);
 
-        compile_expect(compiler, TOKEN_LPAREN);
-        while (compiler->current.type == TOKEN_IDENT) {
-            current_fn->arity++;
+        lexer_expect(&c->lexer, TOKEN_LPAREN);
+        while (!lexer_read(&c->lexer, TOKEN_RPAREN)) {
+            c->scope->fn->arity++;
 
-            compile_expect(compiler, TOKEN_IDENT);
-            da_push(
-                compiler->scope,
-                ((Local){.token = compiler->previous, .depth = compiler->scope->depth}));
+            const Token arg = lexer_expect(&c->lexer, TOKEN_IDENT);
+            da_push(c->scope, ((Local){.token = arg, .depth = c->scope->depth}));
 
-            if (compiler->current.type != TOKEN_COMMA) {
+            token = lexer_peek(&c->lexer);
+            if (token.type != TOKEN_COMMA) {
+                lexer_expect(&c->lexer, TOKEN_RPAREN);
                 break;
             }
-            compile_advance(compiler);
+            c->lexer.peeked = false;
         }
-        compile_expect(compiler, TOKEN_RPAREN);
 
-        compile_expect_inplace(compiler, TOKEN_LBRACE);
-        compile_stmt(compiler);
+        lexer_buffer(&c->lexer, lexer_expect(&c->lexer, TOKEN_LBRACE));
+        compile_stmt(c);
 
-        ObjectFn *fn = compile_scope_end(compiler);
-        chunk_push_op_value(&current_chunk, OP_CLOSURE, value_object(fn));
+        ObjectFn *fn = compile_scope_end(c);
+        chunk_push_op_value(c->chunk, OP_CLOSURE, value_object(fn));
 
         for (size_t i = 0; i < scope.fn->upvalues; i++) {
             chunk_push_op_int(
-                &current_chunk, scope.upvalues.data[i].local ? 1 : 0, scope.upvalues.data[i].index);
+                c->chunk, scope.upvalues.data[i].local ? 1 : 0, scope.upvalues.data[i].index);
         }
 
         scope_free(&scope);
-        if (!compiler->scope->depth) {
-            chunk_push_op_value(&current_chunk, OP_GDEF, compile_ident_const(compiler, name.sv));
+        if (!c->scope->depth) {
+            chunk_push_op_value(c->chunk, OP_GDEF, compile_ident_const(c, name.sv));
         }
     } break;
 
     case TOKEN_VAR: {
-        compile_advance(compiler);
-        compile_expect(compiler, TOKEN_IDENT);
+        const Token name = lexer_expect(&c->lexer, TOKEN_IDENT);
 
-        const Token name = compiler->previous;
-        const size_t index = compiler->scope->count;
-        if (compiler->scope->depth) {
-            da_push(compiler->scope, ((Local){.depth = compiler->scope->depth}));
+        const size_t index = c->scope->count;
+        if (c->scope->depth) {
+            da_push(c->scope, ((Local){.depth = c->scope->depth}));
         }
 
-        if (compile_match(compiler, TOKEN_SET)) {
-            compile_expr(compiler, POWER_SET);
+        if (lexer_read(&c->lexer, TOKEN_SET)) {
+            compile_expr(c, POWER_SET);
         } else {
-            chunk_push_op(&current_chunk, OP_NIL);
+            chunk_push_op(c->chunk, OP_NIL);
         }
-        compile_expect(compiler, TOKEN_EOL);
+        lexer_expect(&c->lexer, TOKEN_EOL);
 
-        if (compiler->scope->depth) {
-            compiler->scope->data[index].token = name;
+        if (c->scope->depth) {
+            c->scope->data[index].token = name;
         } else {
-            chunk_push_op_value(&current_chunk, OP_GDEF, compile_ident_const(compiler, name.sv));
+            chunk_push_op_value(c->chunk, OP_GDEF, compile_ident_const(c, name.sv));
         }
     } break;
 
     case TOKEN_RETURN:
-        compile_advance(compiler);
+        token = lexer_peek(&c->lexer);
 
-        if (compiler->current.type == TOKEN_EOL) {
-            chunk_push_op(&current_chunk, OP_NIL);
+        if (token.type == TOKEN_EOL) {
+            chunk_push_op(c->chunk, OP_NIL);
         } else {
-            compile_expr(compiler, POWER_SET);
+            compile_expr(c, POWER_SET);
         }
 
-        compile_expect(compiler, TOKEN_EOL);
-        chunk_push_op(&current_chunk, OP_RET);
+        lexer_expect(&c->lexer, TOKEN_EOL);
+        chunk_push_op(c->chunk, OP_RET);
         break;
 
     case TOKEN_PRINT:
-        compile_advance(compiler);
-        compile_expr(compiler, POWER_SET);
-        compile_expect(compiler, TOKEN_EOL);
-        chunk_push_op(&current_chunk, OP_PRINT);
+        compile_expr(c, POWER_SET);
+        lexer_expect(&c->lexer, TOKEN_EOL);
+        chunk_push_op(c->chunk, OP_PRINT);
         break;
 
     default:
-        compile_expr(compiler, POWER_NIL);
-        compile_expect(compiler, TOKEN_EOL);
-        chunk_push_op(&current_chunk, OP_DROP);
+        lexer_buffer(&c->lexer, token);
+        compile_expr(c, POWER_NIL);
+        lexer_expect(&c->lexer, TOKEN_EOL);
+        chunk_push_op(c->chunk, OP_DROP);
     }
-
-    compile_synchronize(compiler);
 }
 
-ObjectFn *compile(Compiler *compiler) {
+ObjectFn *compile(Compiler *c) {
     Scope scope = {0};
-    compile_scope_init(compiler, &scope);
+    compile_scope_init(c, &scope, NULL);
 
-    compile_advance(compiler);
-    while (compiler->current.type != TOKEN_EOF) {
-        compile_stmt(compiler);
+    if (setjmp(c->lexer.error)) {
+        Scope *scope = c->scope;
+        while (scope) {
+            Scope *outer = scope->outer;
+            scope_free(scope);
+            scope = outer;
+        }
+
+        c->scope = NULL;
+        c->chunk = NULL;
+        return NULL;
     }
 
-    ObjectFn *fn = compile_scope_end(compiler);
+    while (!lexer_read(&c->lexer, TOKEN_EOF)) {
+        compile_stmt(c);
+    }
+
+    ObjectFn *fn = compile_scope_end(c);
     scope_free(&scope);
-    return compiler->error ? NULL : fn;
+    return fn;
 }

@@ -154,7 +154,7 @@ bool vm_run(VM *vm, const ObjectFn *fn, bool debug) {
             printf("Stack:\n");
             for (size_t i = 0; i < vm->stack.count; i++) {
                 printf("    ");
-                value_print(stdout, vm->stack.data[i]);
+                value_print(vm->stack.data[i], stdout);
                 printf("\n");
             }
             printf("\n");
@@ -427,7 +427,7 @@ bool vm_run(VM *vm, const ObjectFn *fn, bool debug) {
         } break;
 
         case OP_PRINT:
-            value_print(stdout, vm_pop(vm));
+            value_print(vm_pop(vm), stdout);
             printf("\n");
             break;
 
@@ -446,7 +446,7 @@ void vm_trace(VM *vm) {
     for (size_t i = vm->frames.count; i > 0; i--) {
         const Frame *frame = &vm->frames.data[i - 1];
         const ObjectFn *fn = frame->closure->fn;
-        value_print(stderr, value_object(fn));
+        value_print(value_object(fn), stderr);
         fprintf(stderr, "\n");
     }
 
