@@ -95,7 +95,7 @@ static void vm_close_upvalues(Memory *m, size_t index) {
     }
 }
 
-static_assert(COUNT_OPS == 32, "Update bs_interpret()");
+static_assert(COUNT_OPS == 35, "Update bs_interpret()");
 bool bs_interpret(Bs *bs, const ObjectFn *fn, bool debug) {
     Memory *m = &bs->memory;
 
@@ -155,7 +155,7 @@ bool bs_interpret(Bs *bs, const ObjectFn *fn, bool debug) {
                 return false;
             }
 
-            static_assert(COUNT_OBJECTS == 4, "Update bs_interpret()");
+            static_assert(COUNT_OBJECTS == 5, "Update bs_interpret()");
             switch (value.as.object->type) {
             case OBJECT_CLOSURE:
                 if (!vm_call(m, (ObjectClosure *)value.as.object, arity)) {
@@ -163,12 +163,9 @@ bool bs_interpret(Bs *bs, const ObjectFn *fn, bool debug) {
                 }
                 break;
 
-            case OBJECT_STR:
+            default:
                 fprintf(stderr, "error: cannot call %s value\n", value_type_name(value.type));
                 return false;
-
-            default:
-                assert(false && "unreachable");
             }
 
             m->frame = &m->frames.data[m->frames.count - 1];
@@ -210,6 +207,10 @@ bool bs_interpret(Bs *bs, const ObjectFn *fn, bool debug) {
 
         case OP_FALSE:
             vm_push(m, value_bool(false));
+            break;
+
+        case OP_ARRAY:
+            vm_push(m, value_object(bs_new_object_array(bs)));
             break;
 
         case OP_CONST:
@@ -367,6 +368,61 @@ bool bs_interpret(Bs *bs, const ObjectFn *fn, bool debug) {
             } else {
                 m->stack.data[upvalue->index] = value;
             }
+        } break;
+
+        case OP_AGET: {
+            const Value index = vm_peek(m, 0);
+            if (index.type != VALUE_NUM) {
+                fprintf(stderr, "error: cannot index with %s value\n", value_type_name(index.type));
+                return false;
+            }
+
+            if (index.as.number != (long)index.as.number) {
+                fprintf(stderr, "error: cannot index with fractional value\n");
+                return false;
+            }
+
+            const Value array = vm_peek(m, 1);
+            if (array.type != VALUE_OBJECT || array.as.object->type != OBJECT_ARRAY) {
+                fprintf(stderr, "error: cannot index into %s value\n", value_type_name(array.type));
+                return false;
+            }
+
+            Value value;
+            if (!array_get((ObjectArray *)array.as.object, index.as.number, &value)) {
+                fprintf(
+                    stderr,
+                    "error: cannot get value at index %zu in array of length %zu\n",
+                    (size_t)index.as.number,
+                    ((ObjectArray *)array.as.object)->count);
+                return false;
+            }
+
+            m->stack.count -= 2;
+            vm_push(m, value);
+        } break;
+
+        case OP_ASET: {
+            const Value value = vm_peek(m, 0);
+            const Value index = vm_peek(m, 1);
+            if (index.type != VALUE_NUM) {
+                fprintf(stderr, "error: cannot index with %s value\n", value_type_name(index.type));
+                return false;
+            }
+
+            if (index.as.number != (long)index.as.number) {
+                fprintf(stderr, "error: cannot index with fractional value\n");
+                return false;
+            }
+
+            const Value array = vm_peek(m, 2);
+            if (array.type != VALUE_OBJECT || array.as.object->type != OBJECT_ARRAY) {
+                fprintf(stderr, "error: cannot index into %s value\n", value_type_name(array.type));
+                return false;
+            }
+
+            array_set((ObjectArray *)array.as.object, bs, index.as.number, value);
+            m->stack.count -= 2;
         } break;
 
         case OP_JUMP:

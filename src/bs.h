@@ -88,6 +88,9 @@ typedef struct {
 void bs_free(Bs *bs);
 void *bs_realloc(Bs *bs, void *previous, size_t old_size, size_t new_size);
 
+bool array_get(ObjectArray *array, size_t index, Value *value);
+void array_set(ObjectArray *array, Bs *bs, size_t index, Value value);
+
 void table_free(Table *table, Bs *bs);
 bool table_remove(Table *table, ObjectStr *key);
 
@@ -96,6 +99,7 @@ bool table_set(Table *table, Bs *bs, ObjectStr *key, Value value);
 
 ObjectFn *bs_new_object_fn(Bs *bs);
 ObjectStr *bs_new_object_str(Bs *bs, const char *data, size_t size);
+ObjectArray *bs_new_object_array(Bs *bs);
 ObjectUpvalue *bs_new_object_upvalue(Bs *bs, size_t index);
 ObjectClosure *bs_new_object_closure(Bs *bs, const ObjectFn *fn);
 

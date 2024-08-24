@@ -19,6 +19,7 @@ const char *value_type_name(ValueType type);
 typedef enum {
     OBJECT_FN,
     OBJECT_STR,
+    OBJECT_ARRAY,
     OBJECT_UPVALUE,
     OBJECT_CLOSURE,
     COUNT_OBJECTS
@@ -86,6 +87,13 @@ typedef struct {
     size_t upvalues;
     ObjectStr *name;
 } ObjectFn;
+
+typedef struct {
+    Object meta;
+    Value *data;
+    size_t count;
+    size_t capacity;
+} ObjectArray;
 
 typedef struct ObjectUpvalue ObjectUpvalue;
 

@@ -11,9 +11,10 @@ typedef enum {
     POWER_CALL,
 } Power;
 
-static_assert(COUNT_TOKENS == 35, "Update token_type_powers[]");
+static_assert(COUNT_TOKENS == 37, "Update token_type_powers[]");
 const Power token_type_powers[COUNT_TOKENS] = {
     [TOKEN_LPAREN] = POWER_CALL,
+    [TOKEN_LBRACKET] = POWER_CALL,
 
     [TOKEN_ADD] = POWER_ADD,
     [TOKEN_SUB] = POWER_ADD,
@@ -172,7 +173,7 @@ static void compile_error_unexpected(Compiler *c, const Token *token) {
     lexer_error(&c->lexer);
 }
 
-static_assert(COUNT_TOKENS == 35, "Update compile_expr()");
+static_assert(COUNT_TOKENS == 37, "Update compile_expr()");
 static void compile_expr(Bs *bs, Power mbp) {
     Compiler *c = &bs->compiler;
     Token token = lexer_next(&c->lexer);
@@ -216,6 +217,26 @@ static void compile_expr(Bs *bs, Power mbp) {
         compile_expr(bs, POWER_SET);
         lexer_expect(&c->lexer, TOKEN_RPAREN);
         break;
+
+    case TOKEN_LBRACKET: {
+        chunk_push_op(c->chunk, OP_ARRAY);
+
+        size_t index = 0;
+        while (!lexer_read(&c->lexer, TOKEN_RBRACKET)) {
+            chunk_push_op_value(c->chunk, OP_CONST, value_num(index));
+            compile_expr(bs, POWER_SET);
+            index++;
+
+            chunk_push_op(c->chunk, OP_ASET);
+
+            token = lexer_peek(&c->lexer);
+            if (token.type != TOKEN_COMMA) {
+                lexer_expect(&c->lexer, TOKEN_RBRACKET);
+                break;
+            }
+            c->lexer.peeked = false;
+        }
+    } break;
 
     case TOKEN_SUB:
         compile_expr(bs, POWER_PRE);
@@ -311,12 +332,9 @@ static void compile_expr(Bs *bs, Power mbp) {
             break;
 
         case TOKEN_LPAREN: {
-            if (c->chunk->count <= c->chunk->last) {
-                compile_error_unexpected(c, &token);
-            }
-
-            const Op op = op_get_to_set(c->chunk->data[c->chunk->last]);
-            if (op == OP_RET) {
+            const Op op_get = c->chunk->data[c->chunk->last];
+            const Op op_set = op_get_to_set(op_get);
+            if (op_set == OP_RET && op_get != OP_CALL) {
                 compile_error_unexpected(c, &token);
             }
 
@@ -336,30 +354,47 @@ static void compile_expr(Bs *bs, Power mbp) {
             chunk_push_op_int(c->chunk, OP_CALL, arity);
         } break;
 
+        case TOKEN_LBRACKET: {
+            const Op op_get = c->chunk->data[c->chunk->last];
+            const Op op_set = op_get_to_set(op_get);
+            if (op_set == OP_RET && op_get != OP_CALL) {
+                compile_error_unexpected(c, &token);
+            }
+
+            compile_expr(bs, POWER_SET);
+            lexer_expect(&c->lexer, TOKEN_RBRACKET);
+
+            chunk_push_op(c->chunk, OP_AGET);
+        } break;
+
         case TOKEN_SET: {
-            if (c->chunk->count <= c->chunk->last) {
-                compile_error_unexpected(c, &token);
-            }
-
             const Op op = op_get_to_set(c->chunk->data[c->chunk->last]);
-            if (op == OP_RET || op == OP_CALL) {
+            if (op == OP_RET) {
                 compile_error_unexpected(c, &token);
             }
 
-            const size_t index = *(size_t *)&c->chunk->data[c->chunk->last + 1];
+            size_t index;
+            if (op == OP_GSET || op == OP_LSET || op == OP_USET) {
+                index = *(size_t *)&c->chunk->data[c->chunk->last + 1];
+            }
             c->chunk->count = c->chunk->last;
 
             compile_expr(bs, lbp);
-            chunk_push_op_int(c->chunk, op, index);
+
+            if (op == OP_GSET || op == OP_LSET || op == OP_USET) {
+                chunk_push_op_int(c->chunk, op, index);
+            } else {
+                chunk_push_op(c->chunk, op);
+            }
         } break;
 
         default:
-            assert(false && "Unreachable");
+            assert(false && "unreachable");
         }
     }
 }
 
-static_assert(COUNT_TOKENS == 35, "Update compile_stmt()");
+static_assert(COUNT_TOKENS == 37, "Update compile_stmt()");
 static void compile_stmt(Bs *bs) {
     Compiler *c = &bs->compiler;
     Token token = lexer_next(&c->lexer);

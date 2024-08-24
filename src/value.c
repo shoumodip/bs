@@ -26,7 +26,7 @@ bool value_is_falsey(Value v) {
     return v.type == VALUE_NIL || (v.type == VALUE_BOOL && !v.as.boolean);
 }
 
-static_assert(COUNT_OBJECTS == 4, "Update object_print()");
+static_assert(COUNT_OBJECTS == 5, "Update object_print()");
 static void object_print(const Object *o, FILE *f) {
     switch (o->type) {
     case OBJECT_FN: {
@@ -41,6 +41,19 @@ static void object_print(const Object *o, FILE *f) {
     case OBJECT_STR:
         fprintf(f, SVFmt, SVArg(*(const ObjectStr *)o));
         break;
+
+    case OBJECT_ARRAY: {
+        const ObjectArray *array = (const ObjectArray *)o;
+
+        fprintf(f, "[");
+        for (size_t i = 0; i < array->count; i++) {
+            if (i) {
+                fprintf(f, ", ");
+            }
+            value_print(array->data[i], f);
+        }
+        fprintf(f, "]");
+    } break;
 
     case OBJECT_CLOSURE: {
         const ObjectFn *fn = ((const ObjectClosure *)o)->fn;
@@ -83,7 +96,7 @@ void value_print(Value v, FILE *f) {
     }
 }
 
-static_assert(COUNT_OBJECTS == 4, "Update object_equal()");
+static_assert(COUNT_OBJECTS == 5, "Update object_equal()");
 static bool object_equal(const Object *a, const Object *b) {
     if (a->type != b->type) {
         return false;
@@ -91,10 +104,27 @@ static bool object_equal(const Object *a, const Object *b) {
 
     switch (a->type) {
     case OBJECT_STR: {
-        const ObjectStr *as = (const ObjectStr *)a;
-        const ObjectStr *bs = (const ObjectStr *)b;
-        return as->size == bs->size && !memcmp(as->data, bs->data, bs->size);
+        const ObjectStr *a1 = (const ObjectStr *)a;
+        const ObjectStr *b1 = (const ObjectStr *)b;
+        return a1->size == b1->size && !memcmp(a1->data, b1->data, b1->size);
     };
+
+    case OBJECT_ARRAY: {
+        const ObjectArray *a1 = (const ObjectArray *)a;
+        const ObjectArray *b1 = (const ObjectArray *)b;
+
+        if (a1->count != b1->count) {
+            return false;
+        }
+
+        for (size_t i = 0; i < a1->count; i++) {
+            if (!value_equal(a1->data[i], b1->data[i])) {
+                return false;
+            }
+        }
+
+        return true;
+    } break;
 
     case OBJECT_CLOSURE:
         return a == b;

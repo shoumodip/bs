@@ -12,7 +12,7 @@ bool object_str_eq(ObjectStr *a, ObjectStr *b) {
     return a->size == b->size && !memcmp(a->data, b->data, b->size);
 }
 
-static_assert(COUNT_OBJECTS == 4, "Update bs_free_object()");
+static_assert(COUNT_OBJECTS == 5, "Update bs_free_object()");
 static void bs_free_object(Bs *bs, Object *object) {
 
 #ifdef GC_DEBUG_LOG
@@ -31,6 +31,12 @@ static void bs_free_object(Bs *bs, Object *object) {
         bs_realloc(bs, str, sizeof(*str) + str->size, 0);
     } break;
 
+    case OBJECT_ARRAY: {
+        ObjectArray *array = (ObjectArray *)object;
+        bs_realloc(bs, array->data, sizeof(*array->data) * array->capacity, 0);
+        bs_realloc(bs, array, sizeof(*array), 0);
+    } break;
+
     case OBJECT_UPVALUE:
         bs_realloc(bs, object, sizeof(ObjectUpvalue), 0);
         break;
@@ -45,7 +51,7 @@ static void bs_free_object(Bs *bs, Object *object) {
     }
 }
 
-static_assert(COUNT_OBJECTS == 4, "Update object_mark()");
+static_assert(COUNT_OBJECTS == 5, "Update object_mark()");
 static void object_mark(Object *o, Memory *m) {
     if (!o || o->marked) {
         return;
@@ -73,6 +79,16 @@ static void object_mark(Object *o, Memory *m) {
 
     case OBJECT_STR:
         break;
+
+    case OBJECT_ARRAY: {
+        ObjectArray *array = (ObjectArray *)o;
+        for (size_t i = 0; i < array->count; i++) {
+            const Value value = array->data[i];
+            if (value.type == VALUE_OBJECT) {
+                object_mark(value.as.object, m);
+            }
+        }
+    } break;
 
     case OBJECT_CLOSURE: {
         ObjectClosure *closure = (ObjectClosure *)o;
@@ -142,18 +158,7 @@ void bs_collect(Bs *bs) {
     Object *previous = NULL;
     Object *object = m->objects;
 
-#ifdef GC_DEBUG_LOG
-    printf("\nObjects:\n");
-#endif // GC_DEBUG_LOG
-
     while (object) {
-
-#ifdef GC_DEBUG_LOG
-        printf("    ");
-        value_print(value_object(object), stdout);
-        printf(": %s\n", object->marked ? "marked" : "not marked");
-#endif // GC_DEBUG_LOG
-
         if (object->marked) {
             object->marked = false;
             previous = object;
@@ -176,7 +181,7 @@ void bs_collect(Bs *bs) {
 #ifdef GC_DEBUG_LOG
     if (before != m->allocated) {
         printf(
-            "\n[GC] Collected %zu bytes (%zu -> %zu) next at %zu\n",
+            "\n[GC] Collected %zu bytes (%zu -> %zu); Next run at %zu bytes\n",
             before - m->allocated,
             before,
             m->allocated,
@@ -221,6 +226,39 @@ void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size) {
     }
 
     return realloc(ptr, new_size);
+}
+
+bool array_get(ObjectArray *array, size_t index, Value *value) {
+    if (index >= array->count) {
+        return false;
+    }
+
+    *value = array->data[index];
+    return true;
+}
+
+void array_set(ObjectArray *a, Bs *bs, size_t index, Value value) {
+    if (index >= a->count) {
+        if (index >= a->capacity) {
+            const size_t old = a->capacity;
+
+            if (!a->capacity) {
+                a->capacity = DA_INIT_CAP;
+            }
+
+            while (index >= a->capacity) {
+                a->capacity *= 2;
+            }
+
+            a->data =
+                bs_realloc(bs, a->data, old * sizeof(*a->data), a->capacity * sizeof(*a->data));
+        }
+
+        memset(&a->data[a->count], 0, (index - a->count) * sizeof(*a->data));
+    }
+
+    a->data[index] = value;
+    a->count = max(a->count, index + 1);
 }
 
 // TODO: Lazy hash strings
@@ -364,6 +402,14 @@ ObjectStr *bs_new_object_str(Bs *bs, const char *data, size_t size) {
     memcpy(str->data, data, size);
     str->size = size;
     return str;
+}
+
+ObjectArray *bs_new_object_array(Bs *bs) {
+    ObjectArray *array = (ObjectArray *)bs_new_object(bs, OBJECT_ARRAY, sizeof(ObjectArray));
+    array->data = NULL;
+    array->count = 0;
+    array->capacity = 0;
+    return array;
 }
 
 ObjectUpvalue *bs_new_object_upvalue(Bs *bs, size_t index) {
