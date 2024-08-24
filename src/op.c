@@ -14,6 +14,9 @@ Op op_get_to_set(Op op) {
     case OP_UGET:
         return OP_USET;
 
+    case OP_CALL:
+        return OP_CALL;
+
     default:
         return OP_RET;
     }

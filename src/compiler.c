@@ -165,6 +165,13 @@ static size_t compile_name(Bs *bs, Token *name) {
     return c->chunk->constants.count - 1;
 }
 
+static void compile_error_unexpected(Compiler *c, const Token *token) {
+    fprintf(
+        stderr, PosFmt "error: unexpected %s\n", PosArg(token->pos), token_type_name(token->type));
+
+    lexer_error(&c->lexer);
+}
+
 static_assert(COUNT_TOKENS == 35, "Update compile_expr()");
 static void compile_expr(Bs *bs, Power mbp) {
     Compiler *c = &bs->compiler;
@@ -221,13 +228,7 @@ static void compile_expr(Bs *bs, Power mbp) {
         break;
 
     default:
-        fprintf(
-            stderr,
-            PosFmt "error: unexpected %s\n",
-            PosArg(token.pos),
-            token_type_name(token.type));
-
-        lexer_error(&c->lexer);
+        compile_error_unexpected(c, &token);
         return;
     }
 
@@ -311,12 +312,12 @@ static void compile_expr(Bs *bs, Power mbp) {
 
         case TOKEN_LPAREN: {
             if (c->chunk->count <= c->chunk->last) {
-                return;
+                compile_error_unexpected(c, &token);
             }
 
             const Op op = op_get_to_set(c->chunk->data[c->chunk->last]);
-            if (op == OP_RET && c->chunk->data[c->chunk->last] != OP_CALL) {
-                return;
+            if (op == OP_RET) {
+                compile_error_unexpected(c, &token);
             }
 
             size_t arity = 0;
@@ -337,12 +338,12 @@ static void compile_expr(Bs *bs, Power mbp) {
 
         case TOKEN_SET: {
             if (c->chunk->count <= c->chunk->last) {
-                return;
+                compile_error_unexpected(c, &token);
             }
 
             const Op op = op_get_to_set(c->chunk->data[c->chunk->last]);
-            if (op == OP_RET) {
-                return;
+            if (op == OP_RET || op == OP_CALL) {
+                compile_error_unexpected(c, &token);
             }
 
             const size_t index = *(size_t *)&c->chunk->data[c->chunk->last + 1];
