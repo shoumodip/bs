@@ -17,24 +17,27 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    Bs bs = {
-        .memory.gc = 1024 * 1024,
-        .compiler.lexer = lexer_new(path, (SV){contents, size}),
-    };
+    Vm vm = {0};
+    Compiler compiler = {0};
 
-    const ObjectFn *fn = bs_compile(&bs);
+    vm.gc_max = 1024 * 1024;
+    vm.compiler = &compiler;
+    compiler.vm = &vm;
+    compiler.lexer = lexer_new(path, (SV){contents, size});
+
+    const ObjectFn *fn = compile(&compiler);
     free(contents);
 
     if (!fn) {
         return_defer(1);
     }
 
-    if (!bs_interpret(&bs, fn, false)) {
-        bs_trace(&bs);
+    if (!vm_interpret(&vm, fn, false)) {
+        vm_trace(&vm, stderr);
         return_defer(1);
     }
 
 defer:
-    bs_free(&bs);
+    vm_free(&vm);
     return result;
 }

@@ -1,7 +1,7 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#include "value.h"
+#include "object.h"
 
 void debug_op(const Chunk *chunk, size_t *offset);
 void debug_chunk(const Chunk *chunk);

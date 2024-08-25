@@ -1,4 +1,4 @@
-#include "bs.h"
+#include "compiler.h"
 
 typedef enum {
     POWER_NIL,
@@ -87,61 +87,8 @@ static bool scope_find_upvalue(Scope *s, SV name, size_t *index) {
     return false;
 }
 
-static Value compile_ident_const(Bs *bs, SV name) {
-    return value_object(bs_new_object_str(bs, name.data, name.size));
-}
-
-static void compile_scope_init(Bs *bs, Scope *scope, const Token *token) {
-    Compiler *c = &bs->compiler;
-
-    scope->fn = bs_new_object_fn(bs);
-    scope->outer = c->scope;
-    c->scope = scope;
-
-    if (token) {
-        scope->fn->name = bs_new_object_str(bs, token->sv.data, token->sv.size);
-    }
-
-    c->chunk = &c->scope->fn->chunk;
-    scope_push(scope, (Local){0});
-}
-
-static ObjectFn *compile_scope_end(Compiler *c) {
-    chunk_push_op(c->chunk, OP_NIL);
-    chunk_push_op(c->chunk, OP_RET);
-    ObjectFn *fn = c->scope->fn;
-
-    Scope *outer = c->scope->outer;
-    c->scope = outer;
-
-    if (c->scope) {
-        c->chunk = &c->scope->fn->chunk;
-    } else {
-        c->chunk = NULL;
-    }
-    return fn;
-}
-
-static void compile_body_begin(Compiler *c) {
-    c->scope->depth++;
-}
-
-static void compile_body_end(Compiler *c) {
-    c->scope->depth--;
-
-    while (c->scope->count && c->scope->data[c->scope->count - 1].depth > c->scope->depth) {
-        if (c->scope->data[c->scope->count - 1].captured) {
-            chunk_push_op(c->chunk, OP_UCLOSE);
-        } else {
-            chunk_push_op(c->chunk, OP_DROP);
-        }
-
-        c->scope->count--;
-    }
-}
-
 static size_t compile_jump_start(Compiler *c, Op op) {
-    chunk_push_op_int(c->chunk, op, 0);
+    chunk_push_op_int(c->vm, c->chunk, op, 0);
     return c->chunk->count - 1 - sizeof(size_t);
 }
 
@@ -150,20 +97,7 @@ static void compile_jump_patch(Compiler *c, size_t addr) {
 }
 
 static void compile_jump_direct(Compiler *c, Op op, size_t addr) {
-    chunk_push_op_int(c->chunk, op, addr - c->chunk->count - 1 - sizeof(size_t));
-}
-
-static size_t compile_name(Bs *bs, Token *name) {
-    Compiler *c = &bs->compiler;
-    *name = lexer_expect(&c->lexer, TOKEN_IDENT);
-
-    if (c->scope->depth) {
-        da_push(c->scope, ((Local){.token = *name, .depth = c->scope->depth}));
-        return 0;
-    }
-
-    values_push(&c->chunk->constants, compile_ident_const(bs, name->sv));
-    return c->chunk->constants.count - 1;
+    chunk_push_op_int(c->vm, c->chunk, op, addr - c->chunk->count - 1 - sizeof(size_t));
 }
 
 static void compile_error_unexpected(Compiler *c, const Token *token) {
@@ -174,60 +108,64 @@ static void compile_error_unexpected(Compiler *c, const Token *token) {
 }
 
 static_assert(COUNT_TOKENS == 37, "Update compile_expr()");
-static void compile_expr(Bs *bs, Power mbp) {
-    Compiler *c = &bs->compiler;
+static void compile_expr(Compiler *c, Power mbp) {
     Token token = lexer_next(&c->lexer);
 
     switch (token.type) {
     case TOKEN_NIL:
-        chunk_push_op(c->chunk, OP_NIL);
+        chunk_push_op(c->vm, c->chunk, OP_NIL);
         break;
 
     case TOKEN_STR:
         chunk_push_op_value(
+            c->vm,
             c->chunk,
             OP_CONST,
-            value_object(bs_new_object_str(bs, token.sv.data + 1, token.sv.size - 2)));
+            value_object(object_str_new(c->vm, token.sv.data + 1, token.sv.size - 2)));
         break;
 
     case TOKEN_NUM:
-        chunk_push_op_value(c->chunk, OP_CONST, value_num(strtod(token.sv.data, NULL)));
+        chunk_push_op_value(c->vm, c->chunk, OP_CONST, value_num(strtod(token.sv.data, NULL)));
         break;
 
     case TOKEN_TRUE:
-        chunk_push_op(c->chunk, OP_TRUE);
+        chunk_push_op(c->vm, c->chunk, OP_TRUE);
         break;
 
     case TOKEN_FALSE:
-        chunk_push_op(c->chunk, OP_FALSE);
+        chunk_push_op(c->vm, c->chunk, OP_FALSE);
         break;
 
     case TOKEN_IDENT: {
         size_t index;
         if (scope_find_local(c->scope, token.sv, &index)) {
-            chunk_push_op_int(c->chunk, OP_LGET, index);
+            chunk_push_op_int(c->vm, c->chunk, OP_LGET, index);
         } else if (scope_find_upvalue(c->scope, token.sv, &index)) {
-            chunk_push_op_int(c->chunk, OP_UGET, index);
+            chunk_push_op_int(c->vm, c->chunk, OP_UGET, index);
         } else {
-            chunk_push_op_value(c->chunk, OP_GGET, compile_ident_const(bs, token.sv));
+            chunk_push_op_value(
+                c->vm,
+                c->chunk,
+                OP_GGET,
+                value_object(object_str_new(c->vm, token.sv.data, token.sv.size)));
         }
     } break;
 
     case TOKEN_LPAREN:
-        compile_expr(bs, POWER_SET);
+        compile_expr(c, POWER_SET);
         lexer_expect(&c->lexer, TOKEN_RPAREN);
         break;
 
     case TOKEN_LBRACKET: {
-        chunk_push_op(c->chunk, OP_ARRAY);
+        chunk_push_op(c->vm, c->chunk, OP_ARRAY);
 
         size_t index = 0;
         while (!lexer_read(&c->lexer, TOKEN_RBRACKET)) {
-            chunk_push_op_value(c->chunk, OP_CONST, value_num(index));
-            compile_expr(bs, POWER_SET);
+            chunk_push_op_value(c->vm, c->chunk, OP_CONST, value_num(index));
+            compile_expr(c, POWER_SET);
             index++;
 
-            chunk_push_op(c->chunk, OP_ASET);
+            chunk_push_op(c->vm, c->chunk, OP_ASET);
 
             token = lexer_peek(&c->lexer);
             if (token.type != TOKEN_COMMA) {
@@ -239,13 +177,13 @@ static void compile_expr(Bs *bs, Power mbp) {
     } break;
 
     case TOKEN_SUB:
-        compile_expr(bs, POWER_PRE);
-        chunk_push_op(c->chunk, OP_NEG);
+        compile_expr(c, POWER_PRE);
+        chunk_push_op(c->vm, c->chunk, OP_NEG);
         break;
 
     case TOKEN_NOT:
-        compile_expr(bs, POWER_PRE);
-        chunk_push_op(c->chunk, OP_NOT);
+        compile_expr(c, POWER_PRE);
+        chunk_push_op(c->vm, c->chunk, OP_NOT);
         break;
 
     default:
@@ -264,30 +202,30 @@ static void compile_expr(Bs *bs, Power mbp) {
 
         switch (token.type) {
         case TOKEN_ADD:
-            compile_expr(bs, lbp);
-            chunk_push_op(c->chunk, OP_ADD);
+            compile_expr(c, lbp);
+            chunk_push_op(c->vm, c->chunk, OP_ADD);
             break;
 
         case TOKEN_SUB:
-            compile_expr(bs, lbp);
-            chunk_push_op(c->chunk, OP_SUB);
+            compile_expr(c, lbp);
+            chunk_push_op(c->vm, c->chunk, OP_SUB);
             break;
 
         case TOKEN_MUL:
-            compile_expr(bs, lbp);
-            chunk_push_op(c->chunk, OP_MUL);
+            compile_expr(c, lbp);
+            chunk_push_op(c->vm, c->chunk, OP_MUL);
             break;
 
         case TOKEN_DIV:
-            compile_expr(bs, lbp);
-            chunk_push_op(c->chunk, OP_DIV);
+            compile_expr(c, lbp);
+            chunk_push_op(c->vm, c->chunk, OP_DIV);
             break;
 
         case TOKEN_OR: {
             const size_t addr = compile_jump_start(c, OP_THEN);
 
-            chunk_push_op(c->chunk, OP_DROP);
-            compile_expr(bs, lbp);
+            chunk_push_op(c->vm, c->chunk, OP_DROP);
+            compile_expr(c, lbp);
 
             compile_jump_patch(c, addr);
         } break;
@@ -295,40 +233,40 @@ static void compile_expr(Bs *bs, Power mbp) {
         case TOKEN_AND: {
             const size_t addr = compile_jump_start(c, OP_ELSE);
 
-            chunk_push_op(c->chunk, OP_DROP);
-            compile_expr(bs, lbp);
+            chunk_push_op(c->vm, c->chunk, OP_DROP);
+            compile_expr(c, lbp);
 
             compile_jump_patch(c, addr);
         } break;
 
         case TOKEN_GT:
-            compile_expr(bs, lbp);
-            chunk_push_op(c->chunk, OP_GT);
+            compile_expr(c, lbp);
+            chunk_push_op(c->vm, c->chunk, OP_GT);
             break;
 
         case TOKEN_GE:
-            compile_expr(bs, lbp);
-            chunk_push_op(c->chunk, OP_GE);
+            compile_expr(c, lbp);
+            chunk_push_op(c->vm, c->chunk, OP_GE);
             break;
 
         case TOKEN_LT:
-            compile_expr(bs, lbp);
-            chunk_push_op(c->chunk, OP_LT);
+            compile_expr(c, lbp);
+            chunk_push_op(c->vm, c->chunk, OP_LT);
             break;
 
         case TOKEN_LE:
-            compile_expr(bs, lbp);
-            chunk_push_op(c->chunk, OP_LE);
+            compile_expr(c, lbp);
+            chunk_push_op(c->vm, c->chunk, OP_LE);
             break;
 
         case TOKEN_EQ:
-            compile_expr(bs, lbp);
-            chunk_push_op(c->chunk, OP_EQ);
+            compile_expr(c, lbp);
+            chunk_push_op(c->vm, c->chunk, OP_EQ);
             break;
 
         case TOKEN_NE:
-            compile_expr(bs, lbp);
-            chunk_push_op(c->chunk, OP_NE);
+            compile_expr(c, lbp);
+            chunk_push_op(c->vm, c->chunk, OP_NE);
             break;
 
         case TOKEN_LPAREN: {
@@ -340,7 +278,7 @@ static void compile_expr(Bs *bs, Power mbp) {
 
             size_t arity = 0;
             while (!lexer_read(&c->lexer, TOKEN_RPAREN)) {
-                compile_expr(bs, POWER_SET);
+                compile_expr(c, POWER_SET);
                 arity++;
 
                 token = lexer_peek(&c->lexer);
@@ -351,7 +289,7 @@ static void compile_expr(Bs *bs, Power mbp) {
                 c->lexer.peeked = false;
             }
 
-            chunk_push_op_int(c->chunk, OP_CALL, arity);
+            chunk_push_op_int(c->vm, c->chunk, OP_CALL, arity);
         } break;
 
         case TOKEN_LBRACKET: {
@@ -361,10 +299,10 @@ static void compile_expr(Bs *bs, Power mbp) {
                 compile_error_unexpected(c, &token);
             }
 
-            compile_expr(bs, POWER_SET);
+            compile_expr(c, POWER_SET);
             lexer_expect(&c->lexer, TOKEN_RBRACKET);
 
-            chunk_push_op(c->chunk, OP_AGET);
+            chunk_push_op(c->vm, c->chunk, OP_AGET);
         } break;
 
         case TOKEN_SET: {
@@ -379,12 +317,12 @@ static void compile_expr(Bs *bs, Power mbp) {
             }
             c->chunk->count = c->chunk->last;
 
-            compile_expr(bs, lbp);
+            compile_expr(c, lbp);
 
             if (op == OP_GSET || op == OP_LSET || op == OP_USET) {
-                chunk_push_op_int(c->chunk, op, index);
+                chunk_push_op_int(c->vm, c->chunk, op, index);
             } else {
-                chunk_push_op(c->chunk, op);
+                chunk_push_op(c->vm, c->chunk, op);
             }
         } break;
 
@@ -394,96 +332,156 @@ static void compile_expr(Bs *bs, Power mbp) {
     }
 }
 
+static void compile_block_init(Compiler *c) {
+    c->scope->depth++;
+}
+
+static void compile_block_end(Compiler *c) {
+    c->scope->depth--;
+
+    while (c->scope->count && c->scope->data[c->scope->count - 1].depth > c->scope->depth) {
+        if (c->scope->data[c->scope->count - 1].captured) {
+            chunk_push_op(c->vm, c->chunk, OP_UCLOSE);
+        } else {
+            chunk_push_op(c->vm, c->chunk, OP_DROP);
+        }
+
+        c->scope->count--;
+    }
+}
+
+static void compile_scope_init(Compiler *c, Scope *scope, const Token *token) {
+    scope->fn = object_fn_new(c->vm);
+    scope->outer = c->scope;
+    c->scope = scope;
+
+    if (token) {
+        scope->fn->name = object_str_new(c->vm, token->sv.data, token->sv.size);
+    }
+
+    c->chunk = &c->scope->fn->chunk;
+    scope_push(scope, (Local){0});
+}
+
+static ObjectFn *compile_scope_end(Compiler *c) {
+    chunk_push_op(c->vm, c->chunk, OP_NIL);
+    chunk_push_op(c->vm, c->chunk, OP_RET);
+    ObjectFn *fn = c->scope->fn;
+
+    Scope *outer = c->scope->outer;
+    c->scope = outer;
+
+    if (c->scope) {
+        c->chunk = &c->scope->fn->chunk;
+    } else {
+        c->chunk = NULL;
+    }
+    return fn;
+}
+
+static size_t compile_definition(Compiler *c, Token *name) {
+    *name = lexer_expect(&c->lexer, TOKEN_IDENT);
+
+    if (c->scope->depth) {
+        da_push(c->scope, ((Local){.token = *name, .depth = c->scope->depth}));
+        return 0;
+    }
+
+    values_push(
+        &c->chunk->constants, value_object(object_str_new(c->vm, name->sv.data, name->sv.size)));
+
+    return c->chunk->constants.count - 1;
+}
+
 static_assert(COUNT_TOKENS == 37, "Update compile_stmt()");
-static void compile_stmt(Bs *bs) {
-    Compiler *c = &bs->compiler;
+static void compile_stmt(Compiler *c) {
     Token token = lexer_next(&c->lexer);
 
     switch (token.type) {
     case TOKEN_LBRACE:
-        compile_body_begin(c);
+        compile_block_init(c);
         while (!lexer_read(&c->lexer, TOKEN_RBRACE)) {
-            compile_stmt(bs);
+            compile_stmt(c);
         }
-        compile_body_end(c);
+        compile_block_end(c);
         break;
 
     case TOKEN_IF: {
-        compile_expr(bs, POWER_SET);
+        compile_expr(c, POWER_SET);
 
         const size_t then_addr = compile_jump_start(c, OP_ELSE);
-        chunk_push_op(c->chunk, OP_DROP);
+        chunk_push_op(c->vm, c->chunk, OP_DROP);
 
         lexer_buffer(&c->lexer, lexer_expect(&c->lexer, TOKEN_LBRACE));
-        compile_stmt(bs);
+        compile_stmt(c);
 
         const size_t else_addr = compile_jump_start(c, OP_JUMP);
         compile_jump_patch(c, then_addr);
-        chunk_push_op(c->chunk, OP_DROP);
+        chunk_push_op(c->vm, c->chunk, OP_DROP);
 
         if (lexer_read(&c->lexer, TOKEN_ELSE)) {
             lexer_buffer(&c->lexer, lexer_expect(&c->lexer, TOKEN_LBRACE));
-            compile_stmt(bs);
+            compile_stmt(c);
         }
         compile_jump_patch(c, else_addr);
     } break;
 
     case TOKEN_FOR: {
-        compile_body_begin(c);
+        compile_block_init(c);
 
         token = lexer_peek(&c->lexer);
         if (token.type == TOKEN_VAR) {
-            compile_stmt(bs);
+            compile_stmt(c);
         } else {
-            compile_expr(bs, POWER_NIL);
+            compile_expr(c, POWER_NIL);
             lexer_expect(&c->lexer, TOKEN_EOL);
         }
 
         const size_t cond_addr = c->chunk->count;
-        compile_expr(bs, POWER_SET);
+        compile_expr(c, POWER_SET);
         lexer_expect(&c->lexer, TOKEN_EOL);
 
         const size_t loop_addr = compile_jump_start(c, OP_ELSE);
-        chunk_push_op(c->chunk, OP_DROP);
+        chunk_push_op(c->vm, c->chunk, OP_DROP);
 
         const size_t iter_addr = compile_jump_start(c, OP_JUMP);
-        compile_expr(bs, POWER_NIL);
-        chunk_push_op(c->chunk, OP_DROP);
+        compile_expr(c, POWER_NIL);
+        chunk_push_op(c->vm, c->chunk, OP_DROP);
         compile_jump_direct(c, OP_JUMP, cond_addr);
         compile_jump_patch(c, iter_addr);
 
         lexer_buffer(&c->lexer, lexer_expect(&c->lexer, TOKEN_LBRACE));
-        compile_stmt(bs);
+        compile_stmt(c);
         compile_jump_direct(c, OP_JUMP, iter_addr + 1 + sizeof(size_t));
 
         compile_jump_direct(c, OP_JUMP, cond_addr);
         compile_jump_patch(c, loop_addr);
-        chunk_push_op(c->chunk, OP_DROP);
+        chunk_push_op(c->vm, c->chunk, OP_DROP);
 
-        compile_body_end(c);
+        compile_block_end(c);
     } break;
 
     case TOKEN_WHILE: {
         const size_t cond_addr = c->chunk->count;
-        compile_expr(bs, POWER_SET);
+        compile_expr(c, POWER_SET);
 
         const size_t loop_addr = compile_jump_start(c, OP_ELSE);
-        chunk_push_op(c->chunk, OP_DROP);
+        chunk_push_op(c->vm, c->chunk, OP_DROP);
 
         lexer_buffer(&c->lexer, lexer_expect(&c->lexer, TOKEN_LBRACE));
-        compile_stmt(bs);
+        compile_stmt(c);
 
         compile_jump_direct(c, OP_JUMP, cond_addr);
         compile_jump_patch(c, loop_addr);
-        chunk_push_op(c->chunk, OP_DROP);
+        chunk_push_op(c->vm, c->chunk, OP_DROP);
     } break;
 
     case TOKEN_FN: {
-        const size_t const_index = compile_name(bs, &token);
+        const size_t const_index = compile_definition(c, &token);
 
         Scope scope = {0};
-        compile_scope_init(bs, &scope, &token);
-        compile_body_begin(c);
+        compile_scope_init(c, &scope, &token);
+        compile_block_init(c);
 
         lexer_expect(&c->lexer, TOKEN_LPAREN);
         while (!lexer_read(&c->lexer, TOKEN_RPAREN)) {
@@ -501,41 +499,44 @@ static void compile_stmt(Bs *bs) {
         }
 
         lexer_buffer(&c->lexer, lexer_expect(&c->lexer, TOKEN_LBRACE));
-        compile_stmt(bs);
+        compile_stmt(c);
 
         ObjectFn *fn = compile_scope_end(c);
-        chunk_push_op_value(c->chunk, OP_CLOSURE, value_object(fn));
+        chunk_push_op_value(c->vm, c->chunk, OP_CLOSURE, value_object(fn));
 
         for (size_t i = 0; i < scope.fn->upvalues; i++) {
             chunk_push_op_int(
-                c->chunk, scope.upvalues.data[i].local ? 1 : 0, scope.upvalues.data[i].index);
+                c->vm,
+                c->chunk,
+                scope.upvalues.data[i].local ? 1 : 0,
+                scope.upvalues.data[i].index);
         }
 
         scope_free(&scope);
         if (!c->scope->depth) {
-            chunk_push_op_int(c->chunk, OP_GDEF, const_index);
+            chunk_push_op_int(c->vm, c->chunk, OP_GDEF, const_index);
         }
     } break;
 
     case TOKEN_VAR: {
         const size_t scope_index = c->scope->count;
-        const size_t const_index = compile_name(bs, &token);
+        const size_t const_index = compile_definition(c, &token);
 
         if (c->scope->depth) {
             c->scope->data[scope_index].token = (Token){0};
         }
 
         if (lexer_read(&c->lexer, TOKEN_SET)) {
-            compile_expr(bs, POWER_SET);
+            compile_expr(c, POWER_SET);
         } else {
-            chunk_push_op(c->chunk, OP_NIL);
+            chunk_push_op(c->vm, c->chunk, OP_NIL);
         }
         lexer_expect(&c->lexer, TOKEN_EOL);
 
         if (c->scope->depth) {
             c->scope->data[scope_index].token = token;
         } else {
-            chunk_push_op_int(c->chunk, OP_GDEF, const_index);
+            chunk_push_op_int(c->vm, c->chunk, OP_GDEF, const_index);
         }
     } break;
 
@@ -543,34 +544,33 @@ static void compile_stmt(Bs *bs) {
         token = lexer_peek(&c->lexer);
 
         if (token.type == TOKEN_EOL) {
-            chunk_push_op(c->chunk, OP_NIL);
+            chunk_push_op(c->vm, c->chunk, OP_NIL);
         } else {
-            compile_expr(bs, POWER_SET);
+            compile_expr(c, POWER_SET);
         }
 
         lexer_expect(&c->lexer, TOKEN_EOL);
-        chunk_push_op(c->chunk, OP_RET);
+        chunk_push_op(c->vm, c->chunk, OP_RET);
         break;
 
     case TOKEN_PRINT:
-        compile_expr(bs, POWER_SET);
+        compile_expr(c, POWER_SET);
         lexer_expect(&c->lexer, TOKEN_EOL);
-        chunk_push_op(c->chunk, OP_PRINT);
+        chunk_push_op(c->vm, c->chunk, OP_PRINT);
         break;
 
     default:
         lexer_buffer(&c->lexer, token);
-        compile_expr(bs, POWER_NIL);
+        compile_expr(c, POWER_NIL);
         lexer_expect(&c->lexer, TOKEN_EOL);
-        chunk_push_op(c->chunk, OP_DROP);
+        chunk_push_op(c->vm, c->chunk, OP_DROP);
     }
 }
 
-ObjectFn *bs_compile(Bs *bs) {
+ObjectFn *compile(Compiler *c) {
     Scope scope = {0};
-    compile_scope_init(bs, &scope, NULL);
+    compile_scope_init(c, &scope, NULL);
 
-    Compiler *c = &bs->compiler;
     if (setjmp(c->lexer.error)) {
         Scope *scope = c->scope;
         while (scope) {
@@ -585,7 +585,7 @@ ObjectFn *bs_compile(Bs *bs) {
     }
 
     while (!lexer_read(&c->lexer, TOKEN_EOF)) {
-        compile_stmt(bs);
+        compile_stmt(c);
     }
 
     ObjectFn *fn = compile_scope_end(c);

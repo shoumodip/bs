@@ -1,0 +1,226 @@
+#include "object.h"
+
+#define TABLE_MAX_LOAD 0.75
+
+// TODO: use vm_realloc
+void chunk_free(Vm *vm, Chunk *c) {
+    values_free(&c->constants);
+    da_free(c);
+}
+
+void chunk_push_op(Vm *vm, Chunk *c, Op op) {
+    c->last = c->count;
+    da_push(c, op);
+}
+
+void chunk_push_op_int(Vm *vm, Chunk *c, Op op, size_t value) {
+    const size_t bytes = sizeof(value);
+    chunk_push_op(vm, c, op);
+    da_push_many(c, &value, bytes);
+}
+
+void chunk_push_op_value(Vm *vm, Chunk *c, Op op, Value value) {
+    const size_t index = c->constants.count;
+    const size_t bytes = sizeof(index);
+    values_push(&c->constants, value);
+
+    chunk_push_op(vm, c, op);
+    da_push_many(c, &index, bytes);
+}
+
+ObjectFn *object_fn_new(Vm *vm) {
+    ObjectFn *fn = (ObjectFn *)object_new(vm, OBJECT_FN, sizeof(ObjectFn));
+    fn->name = NULL;
+    fn->chunk = (Chunk){0};
+    fn->arity = 0;
+    fn->upvalues = 0;
+    return fn;
+}
+
+ObjectStr *object_str_new(Vm *vm, const char *data, size_t size) {
+    ObjectStr *str = (ObjectStr *)object_new(vm, OBJECT_STR, sizeof(ObjectStr) + size);
+    memcpy(str->data, data, size);
+    str->size = size;
+    return str;
+}
+
+bool object_str_eq(ObjectStr *a, ObjectStr *b) {
+    if (!a || !b) {
+        return false;
+    }
+    return a->size == b->size && !memcmp(a->data, b->data, b->size);
+}
+
+ObjectArray *object_array_new(Vm *vm) {
+    ObjectArray *array = (ObjectArray *)object_new(vm, OBJECT_ARRAY, sizeof(ObjectArray));
+    array->data = NULL;
+    array->count = 0;
+    array->capacity = 0;
+    return array;
+}
+
+bool object_array_get(Vm *vm, ObjectArray *a, size_t index, Value *value) {
+    if (index >= a->count) {
+        return false;
+    }
+
+    *value = a->data[index];
+    return true;
+}
+
+void object_array_set(Vm *vm, ObjectArray *a, size_t index, Value value) {
+    if (index >= a->count) {
+        if (index >= a->capacity) {
+            const size_t old = a->capacity;
+
+            if (!a->capacity) {
+                a->capacity = DA_INIT_CAP;
+            }
+
+            while (index >= a->capacity) {
+                a->capacity *= 2;
+            }
+
+            a->data =
+                vm_realloc(vm, a->data, old * sizeof(*a->data), a->capacity * sizeof(*a->data));
+        }
+
+        memset(&a->data[a->count], 0, (index - a->count) * sizeof(*a->data));
+    }
+
+    a->data[index] = value;
+    a->count = max(a->count, index + 1);
+}
+
+void table_free(Vm *vm, Table *t) {
+    vm_realloc(vm, t->data, sizeof(*t->data) * t->capacity, 0);
+    memset(t, 0, sizeof(*t));
+}
+
+// TODO: Lazy hash strings
+static uint32_t hash_string(const char *data, size_t size) {
+    uint32_t hash = 2166136261u;
+    for (size_t i = 0; i < size; i++) {
+        hash ^= (uint8_t)data[i];
+        hash *= 16777619;
+    }
+    return hash;
+}
+
+static Entry *entries_find(Entry *entries, size_t capacity, ObjectStr *key) {
+    uint32_t index = hash_string(key->data, key->size) % capacity;
+    Entry *tombstone = NULL;
+
+    while (true) {
+        Entry *entry = &entries[index];
+        if (object_str_eq(entry->key, key)) {
+            return entry;
+        }
+
+        if (!entry->key) {
+            if (entry->value.type == VALUE_NIL) {
+                return tombstone ? tombstone : entry;
+            }
+
+            if (!tombstone) {
+                tombstone = entry;
+            }
+        }
+
+        index = (index + 1) % capacity;
+    }
+}
+
+bool table_remove(Vm *vm, Table *t, ObjectStr *key) {
+    if (!t->count) {
+        return false;
+    }
+
+    Entry *entry = entries_find(t->data, t->capacity, key);
+    if (!entry) {
+        return false;
+    }
+
+    if (!entry->key && entry->value.type == VALUE_BOOL && entry->value.as.boolean == true) {
+        return false;
+    }
+
+    entry->key = NULL;
+    entry->value = value_bool(true);
+    return true;
+}
+
+bool table_get(Vm *vm, Table *t, ObjectStr *key, Value *value) {
+    if (!t->count) {
+        return false;
+    }
+
+    Entry *entry = entries_find(t->data, t->capacity, key);
+    if (!entry->key) {
+        return false;
+    }
+
+    *value = entry->value;
+    return true;
+}
+
+static void table_grow(Vm *vm, Table *t, size_t capacity) {
+    const size_t size = sizeof(Entry) * capacity;
+
+    Entry *entries = vm_realloc(vm, NULL, 0, size);
+    memset(entries, 0, size);
+
+    size_t count = 0;
+    for (size_t i = 0; i < t->capacity; i++) {
+        Entry *src = &t->data[i];
+        if (!src->key) {
+            continue;
+        }
+
+        Entry *dst = entries_find(entries, capacity, src->key);
+        dst->key = src->key;
+        dst->value = src->value;
+        count++;
+    }
+
+    table_free(vm, t);
+    t->data = entries;
+    t->count = count;
+    t->capacity = capacity;
+}
+
+bool table_set(Vm *vm, Table *t, ObjectStr *key, Value value) {
+    if (t->count >= t->capacity * TABLE_MAX_LOAD) {
+        table_grow(vm, t, t->capacity ? t->capacity * 2 : DA_INIT_CAP);
+    }
+    Entry *entry = entries_find(t->data, t->capacity, key);
+
+    bool is_new = !entry->key;
+    if (is_new && entry->value.type == VALUE_NIL) {
+        t->count++;
+    }
+
+    entry->key = key;
+    entry->value = value;
+    return is_new;
+}
+
+ObjectClosure *object_closure_new(Vm *vm, const ObjectFn *fn) {
+    const size_t upvalues = sizeof(ObjectUpvalue *) * fn->upvalues;
+    ObjectClosure *closure =
+        (ObjectClosure *)object_new(vm, OBJECT_CLOSURE, sizeof(ObjectClosure) + upvalues);
+
+    closure->fn = fn;
+    closure->upvalues = fn->upvalues;
+    memset(closure->data, 0, upvalues);
+    return closure;
+}
+
+ObjectUpvalue *object_upvalue_new(Vm *vm, size_t index) {
+    ObjectUpvalue *upvalue = (ObjectUpvalue *)object_new(vm, OBJECT_UPVALUE, sizeof(ObjectUpvalue));
+
+    upvalue->closed = false;
+    upvalue->index = index;
+    upvalue->next = NULL;
+    return upvalue;
+}
