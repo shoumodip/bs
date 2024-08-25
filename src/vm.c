@@ -105,6 +105,7 @@ static void object_mark(Vm *vm, Object *object) {
 
     case OBJECT_TABLE: {
         ObjectTable *table = (ObjectTable *)object;
+
         for (size_t i = 0; i < table->capacity; i++) {
             Entry *entry = &table->data[i];
             object_mark(vm, (Object *)entry->key);
@@ -160,6 +161,7 @@ static void vm_collect(Vm *vm) {
         object_mark(vm, (Object *)upvalue);
     }
 
+    vm->globals.meta.marked = false;
     object_mark(vm, (Object *)&vm->globals);
 
     // Sweep
@@ -208,9 +210,12 @@ void vm_free(Vm *vm) {
         object = next;
     }
 
-    values_free(vm, &vm->stack);
+    free(vm->stack.data);
+    memset(&vm->stack, 0, sizeof(vm->stack));
+
     frames_free(vm, &vm->frames);
     object_table_free(vm, &vm->globals);
+    object_table_free(vm, &vm->strings);
 }
 
 void *vm_realloc(Vm *vm, void *ptr, size_t old_size, size_t new_size) {
@@ -235,7 +240,14 @@ void *vm_realloc(Vm *vm, void *ptr, size_t old_size, size_t new_size) {
 }
 
 static void vm_push(Vm *vm, Value value) {
-    values_push(vm, &vm->stack, value);
+    // Do not trigger garbage collection in the stack
+    if (vm->stack.count >= vm->stack.capacity) {
+        vm->stack.capacity = vm->stack.capacity ? vm->stack.capacity * 2 : DA_INIT_CAP;
+        vm->stack.data = realloc(vm->stack.data, vm->stack.capacity * sizeof(*vm->stack.data));
+        assert(vm->stack.data);
+    }
+
+    vm->stack.data[vm->stack.count++] = value;
 }
 
 static Value vm_pop(Vm *vm) {

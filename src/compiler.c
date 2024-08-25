@@ -126,7 +126,7 @@ static void compile_expr(Compiler *c, Power mbp) {
             c->vm,
             c->chunk,
             OP_CONST,
-            value_object(object_str_new(c->vm, token.sv.data + 1, token.sv.size - 2)));
+            value_object(object_str_const(c->vm, token.sv.data + 1, token.sv.size - 2)));
         break;
 
     case TOKEN_NUM:
@@ -152,7 +152,7 @@ static void compile_expr(Compiler *c, Power mbp) {
                 c->vm,
                 c->chunk,
                 OP_GGET,
-                value_object(object_str_new(c->vm, token.sv.data, token.sv.size)));
+                value_object(object_str_const(c->vm, token.sv.data, token.sv.size)));
         }
     } break;
 
@@ -176,7 +176,7 @@ static void compile_expr(Compiler *c, Power mbp) {
                     c->vm,
                     c->chunk,
                     OP_CONST,
-                    value_object(object_str_new(c->vm, token.sv.data, token.sv.size)));
+                    value_object(object_str_const(c->vm, token.sv.data, token.sv.size)));
             }
 
             lexer_expect(&c->lexer, TOKEN_SET);
@@ -254,7 +254,7 @@ static void compile_expr(Compiler *c, Power mbp) {
                 c->vm,
                 c->chunk,
                 OP_CONST,
-                value_object(object_str_new(c->vm, token.sv.data, token.sv.size)));
+                value_object(object_str_const(c->vm, token.sv.data, token.sv.size)));
 
             chunk_push_op(c->vm, c->chunk, OP_IGET);
         } break;
@@ -414,7 +414,7 @@ static void compile_scope_init(Compiler *c, Scope *scope, const Token *token) {
     c->scope = scope;
 
     if (token) {
-        scope->fn->name = object_str_new(c->vm, token->sv.data, token->sv.size);
+        scope->fn->name = object_str_const(c->vm, token->sv.data, token->sv.size);
     }
 
     c->chunk = &c->scope->fn->chunk;
@@ -448,7 +448,7 @@ static size_t compile_definition(Compiler *c, Token *name) {
     values_push(
         c->vm,
         &c->chunk->constants,
-        value_object(object_str_new(c->vm, name->sv.data, name->sv.size)));
+        value_object(object_str_const(c->vm, name->sv.data, name->sv.size)));
 
     return c->chunk->constants.count - 1;
 }

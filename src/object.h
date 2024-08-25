@@ -52,11 +52,16 @@ ObjectFn *object_fn_new(Vm *vm);
 
 struct ObjectStr {
     Object meta;
+
+    bool hashed;
+    uint32_t hash;
+
     size_t size;
     char data[];
 };
 
 ObjectStr *object_str_new(Vm *vm, const char *data, size_t size);
+ObjectStr *object_str_const(Vm *vm, const char *data, size_t size);
 bool object_str_eq(const ObjectStr *a, const ObjectStr *b);
 
 struct ObjectArray {

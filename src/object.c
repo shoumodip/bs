@@ -1,4 +1,4 @@
-#include "basic.h"
+#include "bs.h"
 #include "hash.h"
 
 #define TABLE_MAX_LOAD 0.75
@@ -39,8 +39,22 @@ ObjectFn *object_fn_new(Vm *vm) {
 
 ObjectStr *object_str_new(Vm *vm, const char *data, size_t size) {
     ObjectStr *str = (ObjectStr *)object_new(vm, OBJECT_STR, sizeof(ObjectStr) + size);
+    str->hashed = false;
+
     memcpy(str->data, data, size);
     str->size = size;
+    return str;
+}
+
+ObjectStr *object_str_const(Vm *vm, const char *data, size_t size) {
+    Entry *entry = entries_find_sv(vm->strings.data, vm->strings.capacity, (SV){data, size}, NULL);
+    if (entry && entry->key) {
+        return entry->key;
+    }
+
+    ObjectStr *str = object_str_new(vm, data, size);
+    object_table_set(vm, &vm->strings, str, value_nil);
+
     return str;
 }
 
@@ -92,13 +106,6 @@ void object_array_set(Vm *vm, ObjectArray *a, size_t index, Value value) {
     a->count = max(a->count, index + 1);
 }
 
-void object_table_free(Vm *vm, ObjectTable *t) {
-    vm_realloc(vm, t->data, sizeof(*t->data) * t->capacity, 0);
-    t->data = NULL;
-    t->count = 0;
-    t->capacity = 0;
-}
-
 ObjectTable *object_table_new(Vm *vm) {
     ObjectTable *table = (ObjectTable *)object_new(vm, OBJECT_TABLE, sizeof(ObjectTable));
     table->data = NULL;
@@ -108,12 +115,19 @@ ObjectTable *object_table_new(Vm *vm) {
     return table;
 }
 
+void object_table_free(Vm *vm, ObjectTable *t) {
+    vm_realloc(vm, t->data, sizeof(*t->data) * t->capacity, 0);
+    t->data = NULL;
+    t->count = 0;
+    t->capacity = 0;
+}
+
 bool object_table_remove(Vm *vm, ObjectTable *t, ObjectStr *key) {
     if (!t->count) {
         return false;
     }
 
-    Entry *entry = entries_find(t->data, t->capacity, key);
+    Entry *entry = entries_find_str(t->data, t->capacity, key);
     if (!entry) {
         return false;
     }
@@ -133,7 +147,7 @@ bool object_table_get(Vm *vm, ObjectTable *t, ObjectStr *key, Value *value) {
         return false;
     }
 
-    Entry *entry = entries_find(t->data, t->capacity, key);
+    Entry *entry = entries_find_str(t->data, t->capacity, key);
     if (!entry->key) {
         return false;
     }
@@ -155,7 +169,7 @@ static void object_table_grow(Vm *vm, ObjectTable *t, size_t capacity) {
             continue;
         }
 
-        Entry *dst = entries_find(entries, capacity, src->key);
+        Entry *dst = entries_find_str(entries, capacity, src->key);
         dst->key = src->key;
         dst->value = src->value;
         count++;
@@ -171,7 +185,7 @@ bool object_table_set(Vm *vm, ObjectTable *t, ObjectStr *key, Value value) {
     if (t->count >= t->capacity * TABLE_MAX_LOAD) {
         object_table_grow(vm, t, t->capacity ? t->capacity * 2 : DA_INIT_CAP);
     }
-    Entry *entry = entries_find(t->data, t->capacity, key);
+    Entry *entry = entries_find_str(t->data, t->capacity, key);
 
     bool is_new = !entry->key;
     if (is_new && entry->value.type == VALUE_NIL) {

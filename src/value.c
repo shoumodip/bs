@@ -176,13 +176,13 @@ static bool object_equal(const Object *a, const Object *b) {
             return false;
         }
 
-        for (size_t i = 0; i < a1->count; i++) {
+        for (size_t i = 0; i < a1->capacity; i++) {
             const Entry *a2 = &a1->data[i];
             if (!a2->key) {
                 continue;
             }
 
-            const Entry *b2 = entries_find(b1->data, b1->capacity, a2->key);
+            const Entry *b2 = entries_find_str(b1->data, b1->capacity, a2->key);
             if (!b2->key) {
                 return false;
             }

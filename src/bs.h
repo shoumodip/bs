@@ -26,6 +26,7 @@ struct Vm {
     Frames frames;
 
     ObjectTable globals;
+    ObjectTable strings;
     ObjectUpvalue *upvalues;
 
     bool gc_on;
