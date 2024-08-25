@@ -12,8 +12,8 @@ typedef struct {
     size_t capacity;
 } Values;
 
-#define values_push da_push
 #define values_free da_free
+#define values_push da_push
 
 typedef struct {
     uint8_t *data;

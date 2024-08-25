@@ -1,7 +1,7 @@
 #ifndef BS_H
 #define BS_H
 
-#include "compiler.h"
+#include "object.h"
 
 typedef struct {
     size_t base;
@@ -28,11 +28,10 @@ struct Vm {
     Table globals;
     ObjectUpvalue *upvalues;
 
-    Object *objects;
+    bool gc_on;
     size_t gc_max;
-    size_t allocated;
-
-    Compiler *compiler;
+    size_t gc_bytes;
+    Object *objects;
 };
 
 // The duplicate type definition is to appease the LSP unused include warnings

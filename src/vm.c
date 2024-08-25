@@ -1,3 +1,4 @@
+#include "basic.h"
 #include "bs.h"
 #include "debug.h"
 
@@ -123,7 +124,7 @@ static void object_mark(Vm *vm, Object *object) {
 static void vm_collect(Vm *vm) {
 #ifdef GC_DEBUG_LOG
     printf("\n-------- GC Begin --------\n");
-    const size_t before = vm->allocated;
+    const size_t before = vm->gc_bytes;
 #endif // GC_DEBUG_LOG
 
     // Mark
@@ -140,10 +141,6 @@ static void vm_collect(Vm *vm) {
 
     for (ObjectUpvalue *upvalue = vm->upvalues; upvalue; upvalue = upvalue->next) {
         object_mark(vm, (Object *)upvalue);
-    }
-
-    for (Scope *scope = vm->compiler->scope; scope; scope = scope->outer) {
-        object_mark(vm, (Object *)scope->fn);
     }
 
     for (size_t i = 0; i < vm->globals.capacity; i++) {
@@ -177,16 +174,16 @@ static void vm_collect(Vm *vm) {
         }
     }
 
-    vm->gc_max = max(vm->gc_max, vm->allocated * GC_GROW_FACTOR);
+    vm->gc_max = max(vm->gc_max, vm->gc_bytes * GC_GROW_FACTOR);
 
 #ifdef GC_DEBUG_LOG
-    if (before != vm->allocated) {
+    if (before != vm->gc_bytes) {
         printf(
             "\n[GC] Collected %zu bytes (%zu -> %zu); Next run at %zu bytes\n",
-            before - vm->allocated,
+            before - vm->gc_bytes,
             before,
-            vm->allocated,
-            vm->gc);
+            vm->gc_bytes,
+            vm->gc_max);
     }
 
     printf("-------- GC End ----------\n\n");
@@ -207,16 +204,16 @@ void vm_free(Vm *vm) {
 }
 
 void *vm_realloc(Vm *vm, void *ptr, size_t old_size, size_t new_size) {
-    vm->allocated += new_size - old_size;
+    vm->gc_bytes += new_size - old_size;
 
-    if (new_size > old_size) {
+    if (vm->gc_on && new_size > old_size) {
 #ifdef GC_DEBUG_STRESS
         vm_collect(vm);
-#endif // GC_DEBUG_STRESS
-
-        if (vm->allocated > vm->gc_max) {
+#else
+        if (vm->gc_bytes > vm->gc_max) {
             vm_collect(vm);
         }
+#endif // GC_DEBUG_STRESS
     }
 
     if (!new_size) {
@@ -338,13 +335,11 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
         debug_chunks(vm->objects);
     }
 
-    vm_push(vm, value_object(fn));
     ObjectClosure *closure = object_closure_new(vm, fn);
-    vm_pop(vm);
-
     vm_push(vm, value_object(closure));
     vm_call(vm, closure, 0);
 
+    vm->gc_on = true;
     while (true) {
         if (debug) {
             printf("----------------------------------------\n");
@@ -400,8 +395,6 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
                 fprintf(stderr, "error: cannot call %s value\n", value_type_name(value));
                 return_defer(false);
             }
-
-            vm->frame = &vm->frames.data[vm->frames.count - 1];
         } break;
 
         case OP_CLOSURE: {
@@ -698,6 +691,6 @@ defer:
     vm->frames.count = 0;
 
     vm->upvalues = NULL;
-    vm->compiler = NULL;
+    vm->gc_on = false;
     return result;
 }

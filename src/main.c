@@ -1,4 +1,5 @@
 #include "bs.h"
+#include "compiler.h"
 
 int main(int argc, char **argv) {
     int result = 0;
@@ -21,7 +22,6 @@ int main(int argc, char **argv) {
     Compiler compiler = {0};
 
     vm.gc_max = 1024 * 1024;
-    vm.compiler = &compiler;
     compiler.vm = &vm;
     compiler.lexer = lexer_new(path, (SV){contents, size});
 
