@@ -109,6 +109,8 @@ static void compile_error_unexpected(Compiler *c, const Token *token) {
     lexer_error(&c->lexer);
 }
 
+static void compile_function(Compiler *c, const Token *name);
+
 static_assert(COUNT_TOKENS == 37, "Update compile_expr()");
 static void compile_expr(Compiler *c, Power mbp) {
     Token token = lexer_next(&c->lexer);
@@ -186,6 +188,10 @@ static void compile_expr(Compiler *c, Power mbp) {
     case TOKEN_NOT:
         compile_expr(c, POWER_PRE);
         chunk_push_op(c->vm, c->chunk, OP_NOT);
+        break;
+
+    case TOKEN_FN:
+        compile_function(c, NULL);
         break;
 
     default:
@@ -274,7 +280,7 @@ static void compile_expr(Compiler *c, Power mbp) {
         case TOKEN_LPAREN: {
             const Op op_get = c->chunk->data[c->chunk->last];
             const Op op_set = op_get_to_set(op_get);
-            if (op_set == OP_RET && op_get != OP_CALL) {
+            if (op_set == OP_RET && op_get != OP_CALL && op_get != OP_CLOSURE) {
                 compile_error_unexpected(c, &token);
             }
 
@@ -397,6 +403,42 @@ static size_t compile_definition(Compiler *c, Token *name) {
     return c->chunk->constants.count - 1;
 }
 
+static void compile_stmt(Compiler *c);
+
+static void compile_function(Compiler *c, const Token *name) {
+    Scope scope = {0};
+    compile_scope_init(c, &scope, name);
+    compile_block_init(c);
+
+    lexer_expect(&c->lexer, TOKEN_LPAREN);
+    while (!lexer_read(&c->lexer, TOKEN_RPAREN)) {
+        c->scope->fn->arity++;
+
+        const Token arg = lexer_expect(&c->lexer, TOKEN_IDENT);
+        da_push(c->vm, c->scope, ((Local){.token = arg, .depth = c->scope->depth}));
+
+        const Token token = lexer_peek(&c->lexer);
+        if (token.type != TOKEN_COMMA) {
+            lexer_expect(&c->lexer, TOKEN_RPAREN);
+            break;
+        }
+        c->lexer.peeked = false;
+    }
+
+    lexer_buffer(&c->lexer, lexer_expect(&c->lexer, TOKEN_LBRACE));
+    compile_stmt(c);
+
+    ObjectFn *fn = compile_scope_end(c);
+    chunk_push_op_value(c->vm, c->chunk, OP_CLOSURE, value_object(fn));
+
+    for (size_t i = 0; i < scope.fn->upvalues; i++) {
+        chunk_push_op_int(
+            c->vm, c->chunk, scope.upvalues.data[i].local ? 1 : 0, scope.upvalues.data[i].index);
+    }
+
+    scope_free(c->vm, &scope);
+}
+
 static_assert(COUNT_TOKENS == 37, "Update compile_stmt()");
 static void compile_stmt(Compiler *c) {
     Token token = lexer_next(&c->lexer);
@@ -482,41 +524,8 @@ static void compile_stmt(Compiler *c) {
 
     case TOKEN_FN: {
         const size_t const_index = compile_definition(c, &token);
+        compile_function(c, &token);
 
-        Scope scope = {0};
-        compile_scope_init(c, &scope, &token);
-        compile_block_init(c);
-
-        lexer_expect(&c->lexer, TOKEN_LPAREN);
-        while (!lexer_read(&c->lexer, TOKEN_RPAREN)) {
-            c->scope->fn->arity++;
-
-            const Token arg = lexer_expect(&c->lexer, TOKEN_IDENT);
-            da_push(c->vm, c->scope, ((Local){.token = arg, .depth = c->scope->depth}));
-
-            token = lexer_peek(&c->lexer);
-            if (token.type != TOKEN_COMMA) {
-                lexer_expect(&c->lexer, TOKEN_RPAREN);
-                break;
-            }
-            c->lexer.peeked = false;
-        }
-
-        lexer_buffer(&c->lexer, lexer_expect(&c->lexer, TOKEN_LBRACE));
-        compile_stmt(c);
-
-        ObjectFn *fn = compile_scope_end(c);
-        chunk_push_op_value(c->vm, c->chunk, OP_CLOSURE, value_object(fn));
-
-        for (size_t i = 0; i < scope.fn->upvalues; i++) {
-            chunk_push_op_int(
-                c->vm,
-                c->chunk,
-                scope.upvalues.data[i].local ? 1 : 0,
-                scope.upvalues.data[i].index);
-        }
-
-        scope_free(c->vm, &scope);
         if (!c->scope->depth) {
             chunk_push_op_int(c->vm, c->chunk, OP_GDEF, const_index);
         }
