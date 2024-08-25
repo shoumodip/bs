@@ -1,10 +1,8 @@
 #ifndef BASIC_H
 #define BASIC_H
 
-#include <assert.h>
 #include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stddef.h>
 
 // String View
 typedef struct {
@@ -23,48 +21,6 @@ bool sv_eq(SV a, SV b);
     do {                                                                                           \
         result = (value);                                                                          \
         goto defer;                                                                                \
-    } while (0)
-
-// Dynamic Array
-#define DA_INIT_CAP 128
-
-#define da_free(l)                                                                                 \
-    do {                                                                                           \
-        free((l)->data);                                                                           \
-        memset((l), 0, sizeof(*(l)));                                                              \
-    } while (0)
-
-#define da_push(l, v)                                                                              \
-    do {                                                                                           \
-        if ((l)->count >= (l)->capacity) {                                                         \
-            (l)->capacity = (l)->capacity == 0 ? DA_INIT_CAP : (l)->capacity * 2;                  \
-            (l)->data = realloc((l)->data, (l)->capacity * sizeof(*(l)->data));                    \
-            assert((l)->data);                                                                     \
-        }                                                                                          \
-                                                                                                   \
-        (l)->data[(l)->count] = (v);                                                               \
-        (l)->count++;                                                                              \
-    } while (0)
-
-#define da_push_many(l, v, c)                                                                      \
-    do {                                                                                           \
-        if ((l)->count + (c) > (l)->capacity) {                                                    \
-            if ((l)->capacity == 0) {                                                              \
-                (l)->capacity = DA_INIT_CAP;                                                       \
-            }                                                                                      \
-                                                                                                   \
-            while ((l)->count + (c) > (l)->capacity) {                                             \
-                (l)->capacity *= 2;                                                                \
-            }                                                                                      \
-                                                                                                   \
-            (l)->data = realloc((l)->data, (l)->capacity * sizeof(*(l)->data));                    \
-            assert((l)->data);                                                                     \
-        }                                                                                          \
-                                                                                                   \
-        if ((v)) {                                                                                 \
-            memcpy((l)->data + (l)->count, (v), (c) * sizeof(*(l)->data));                         \
-            (l)->count += (c);                                                                     \
-        }                                                                                          \
     } while (0)
 
 // File IO

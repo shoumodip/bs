@@ -201,8 +201,8 @@ void vm_free(Vm *vm) {
         object = next;
     }
 
-    values_free(&vm->stack);
-    frames_free(&vm->frames);
+    values_free(vm, &vm->stack);
+    frames_free(vm, &vm->frames);
     table_free(vm, &vm->globals);
 }
 
@@ -240,7 +240,7 @@ void vm_trace(Vm *vm, FILE *file) {
 }
 
 static void vm_push(Vm *vm, Value value) {
-    values_push(&vm->stack, value);
+    values_push(vm, &vm->stack, value);
 }
 
 static Value vm_pop(Vm *vm) {
@@ -291,7 +291,7 @@ static bool vm_call(Vm *vm, ObjectClosure *closure, size_t arity) {
         .base = vm->stack.count - arity - 1,
     };
 
-    frames_push(&vm->frames, frame);
+    frames_push(vm, &vm->frames, frame);
     vm->frame = &vm->frames.data[vm->frames.count - 1];
 
     return true;

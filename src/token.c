@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "token.h"
 
 static_assert(COUNT_TOKENS == 37, "Update token_type_name()");

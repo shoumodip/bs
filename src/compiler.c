@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "compiler.h"
 
 typedef enum {
@@ -35,10 +37,10 @@ const Power token_type_powers[COUNT_TOKENS] = {
     [TOKEN_SET] = POWER_SET,
 };
 
-static void scope_free(Scope *s) {
+static void scope_free(Vm *vm, Scope *s) {
     if (s) {
-        upvalues_free(&s->upvalues);
-        da_free(s);
+        upvalues_free(vm, &s->upvalues);
+        da_free(vm, s);
     }
 }
 
@@ -53,7 +55,7 @@ static bool scope_find_local(Scope *s, SV name, size_t *index) {
     return false;
 }
 
-static void scope_add_upvalue(Scope *s, size_t *index, bool local) {
+static void scope_add_upvalue(Vm *vm, Scope *s, size_t *index, bool local) {
     for (size_t i = 0; i < s->fn->upvalues; i++) {
         const Upvalue *upvalue = &s->upvalues.data[i];
         if (upvalue->index == *index && upvalue->local == local) {
@@ -63,24 +65,24 @@ static void scope_add_upvalue(Scope *s, size_t *index, bool local) {
     }
 
     const Upvalue upvalue = {.local = local, .index = *index};
-    upvalues_push(&s->upvalues, upvalue);
+    upvalues_push(vm, &s->upvalues, upvalue);
 
     *index = s->fn->upvalues++;
 }
 
-static bool scope_find_upvalue(Scope *s, SV name, size_t *index) {
+static bool scope_find_upvalue(Vm *vm, Scope *s, SV name, size_t *index) {
     if (!s->outer) {
         return false;
     }
 
     if (scope_find_local(s->outer, name, index)) {
         s->outer->data[*index].captured = true;
-        scope_add_upvalue(s, index, true);
+        scope_add_upvalue(vm, s, index, true);
         return true;
     }
 
-    if (scope_find_upvalue(s->outer, name, index)) {
-        scope_add_upvalue(s, index, false);
+    if (scope_find_upvalue(vm, s->outer, name, index)) {
+        scope_add_upvalue(vm, s, index, false);
         return true;
     }
 
@@ -140,7 +142,7 @@ static void compile_expr(Compiler *c, Power mbp) {
         size_t index;
         if (scope_find_local(c->scope, token.sv, &index)) {
             chunk_push_op_int(c->vm, c->chunk, OP_LGET, index);
-        } else if (scope_find_upvalue(c->scope, token.sv, &index)) {
+        } else if (scope_find_upvalue(c->vm, c->scope, token.sv, &index)) {
             chunk_push_op_int(c->vm, c->chunk, OP_UGET, index);
         } else {
             chunk_push_op_value(
@@ -360,7 +362,7 @@ static void compile_scope_init(Compiler *c, Scope *scope, const Token *token) {
     }
 
     c->chunk = &c->scope->fn->chunk;
-    scope_push(scope, (Local){0});
+    scope_push(c->vm, scope, (Local){0});
 }
 
 static ObjectFn *compile_scope_end(Compiler *c) {
@@ -383,12 +385,14 @@ static size_t compile_definition(Compiler *c, Token *name) {
     *name = lexer_expect(&c->lexer, TOKEN_IDENT);
 
     if (c->scope->depth) {
-        da_push(c->scope, ((Local){.token = *name, .depth = c->scope->depth}));
+        da_push(c->vm, c->scope, ((Local){.token = *name, .depth = c->scope->depth}));
         return 0;
     }
 
     values_push(
-        &c->chunk->constants, value_object(object_str_new(c->vm, name->sv.data, name->sv.size)));
+        c->vm,
+        &c->chunk->constants,
+        value_object(object_str_new(c->vm, name->sv.data, name->sv.size)));
 
     return c->chunk->constants.count - 1;
 }
@@ -488,7 +492,7 @@ static void compile_stmt(Compiler *c) {
             c->scope->fn->arity++;
 
             const Token arg = lexer_expect(&c->lexer, TOKEN_IDENT);
-            da_push(c->scope, ((Local){.token = arg, .depth = c->scope->depth}));
+            da_push(c->vm, c->scope, ((Local){.token = arg, .depth = c->scope->depth}));
 
             token = lexer_peek(&c->lexer);
             if (token.type != TOKEN_COMMA) {
@@ -512,7 +516,7 @@ static void compile_stmt(Compiler *c) {
                 scope.upvalues.data[i].index);
         }
 
-        scope_free(&scope);
+        scope_free(c->vm, &scope);
         if (!c->scope->depth) {
             chunk_push_op_int(c->vm, c->chunk, OP_GDEF, const_index);
         }
@@ -575,7 +579,7 @@ ObjectFn *compile(Compiler *c) {
         Scope *scope = c->scope;
         while (scope) {
             Scope *outer = scope->outer;
-            scope_free(scope);
+            scope_free(c->vm, scope);
             scope = outer;
         }
 
@@ -589,6 +593,6 @@ ObjectFn *compile(Compiler *c) {
     }
 
     ObjectFn *fn = compile_scope_end(c);
-    scope_free(&scope);
+    scope_free(c->vm, &scope);
     return fn;
 }

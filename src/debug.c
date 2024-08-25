@@ -1,3 +1,6 @@
+#include <assert.h>
+
+#include "basic.h"
 #include "debug.h"
 
 static void debug_op_int(const Chunk *c, size_t *offset, const char *name) {

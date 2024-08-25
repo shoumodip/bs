@@ -1,6 +1,7 @@
 #ifndef VALUE_H
 #define VALUE_H
 
+#include <stdbool.h>
 #include <stdio.h>
 
 typedef enum {

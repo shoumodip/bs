@@ -1,31 +1,31 @@
 #include "object.h"
+#include "basic.h"
 
 #define TABLE_MAX_LOAD 0.75
 
-// TODO: use vm_realloc
 void chunk_free(Vm *vm, Chunk *c) {
-    values_free(&c->constants);
-    da_free(c);
+    values_free(vm, &c->constants);
+    da_free(vm, c);
 }
 
 void chunk_push_op(Vm *vm, Chunk *c, Op op) {
     c->last = c->count;
-    da_push(c, op);
+    da_push(vm, c, op);
 }
 
 void chunk_push_op_int(Vm *vm, Chunk *c, Op op, size_t value) {
     const size_t bytes = sizeof(value);
     chunk_push_op(vm, c, op);
-    da_push_many(c, &value, bytes);
+    da_push_many(vm, c, &value, bytes);
 }
 
 void chunk_push_op_value(Vm *vm, Chunk *c, Op op, Value value) {
     const size_t index = c->constants.count;
     const size_t bytes = sizeof(index);
-    values_push(&c->constants, value);
+    values_push(vm, &c->constants, value);
 
     chunk_push_op(vm, c, op);
-    da_push_many(c, &index, bytes);
+    da_push_many(vm, c, &index, bytes);
 }
 
 ObjectFn *object_fn_new(Vm *vm) {

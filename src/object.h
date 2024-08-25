@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-#include "basic.h"
 #include "op.h"
 #include "vm.h"
 
