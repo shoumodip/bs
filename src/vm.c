@@ -272,6 +272,7 @@ static bool vm_binary_op(Vm *vm, Value *a, Value *b, const char *op) {
             op,
             value_type_name(*a),
             value_type_name(*b));
+
         return false;
     }
 
@@ -331,6 +332,8 @@ static void vm_close_upvalues(Vm *vm, size_t index) {
 
 static_assert(COUNT_OPS == 35, "Update vm_interpret()");
 bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
+    bool result = true;
+
     if (debug) {
         debug_chunks(vm->objects);
     }
@@ -362,18 +365,16 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
         const Op op = *vm->frame->ip++;
         switch (op) {
         case OP_RET: {
-            const Value result = vm_pop(vm);
+            const Value value = vm_pop(vm);
             vm_close_upvalues(vm, vm->frame->base);
             vm->frames.count--;
 
             if (!vm->frames.count) {
-                vm->frame = NULL;
-                vm->stack.count = 0;
-                return true;
+                return_defer(true);
             }
 
             vm->stack.count = vm->frame->base;
-            vm_push(vm, result);
+            vm_push(vm, value);
 
             vm->frame = &vm->frames.data[vm->frames.count - 1];
         } break;
@@ -384,20 +385,20 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
 
             if (value.type != VALUE_OBJECT) {
                 fprintf(stderr, "error: cannot call %s value\n", value_type_name(value));
-                return false;
+                return_defer(false);
             }
 
             static_assert(COUNT_OBJECTS == 5, "Update vm_interpret()");
             switch (value.as.object->type) {
             case OBJECT_CLOSURE:
                 if (!vm_call(vm, (ObjectClosure *)value.as.object, arity)) {
-                    return false;
+                    return_defer(false);
                 }
                 break;
 
             default:
                 fprintf(stderr, "error: cannot call %s value\n", value_type_name(value));
-                return false;
+                return_defer(false);
             }
 
             vm->frame = &vm->frames.data[vm->frames.count - 1];
@@ -452,7 +453,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
         case OP_ADD: {
             Value a, b;
             if (!vm_binary_op(vm, &a, &b, "+")) {
-                return false;
+                return_defer(false);
             }
 
             vm_push(vm, value_num(a.as.number + b.as.number));
@@ -461,7 +462,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
         case OP_SUB: {
             Value a, b;
             if (!vm_binary_op(vm, &a, &b, "-")) {
-                return false;
+                return_defer(false);
             }
 
             vm_push(vm, value_num(a.as.number - b.as.number));
@@ -470,7 +471,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
         case OP_MUL: {
             Value a, b;
             if (!vm_binary_op(vm, &a, &b, "*")) {
-                return false;
+                return_defer(false);
             }
 
             vm_push(vm, value_num(a.as.number * b.as.number));
@@ -479,7 +480,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
         case OP_DIV: {
             Value a, b;
             if (!vm_binary_op(vm, &a, &b, "/")) {
-                return false;
+                return_defer(false);
             }
 
             vm_push(vm, value_num(a.as.number / b.as.number));
@@ -489,7 +490,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
             const Value a = vm_pop(vm);
             if (a.type != VALUE_NUM) {
                 fprintf(stderr, "error: invalid operand to unary (-): %s\n", value_type_name(a));
-                return false;
+                return_defer(false);
             }
 
             vm_push(vm, value_num(-a.as.number));
@@ -502,7 +503,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
         case OP_GT: {
             Value a, b;
             if (!vm_binary_op(vm, &a, &b, ">")) {
-                return false;
+                return_defer(false);
             }
 
             vm_push(vm, value_bool(a.as.number > b.as.number));
@@ -511,7 +512,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
         case OP_GE: {
             Value a, b;
             if (!vm_binary_op(vm, &a, &b, ">=")) {
-                return false;
+                return_defer(false);
             }
 
             vm_push(vm, value_bool(a.as.number >= b.as.number));
@@ -520,7 +521,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
         case OP_LT: {
             Value a, b;
             if (!vm_binary_op(vm, &a, &b, "<")) {
-                return false;
+                return_defer(false);
             }
 
             vm_push(vm, value_bool(a.as.number < b.as.number));
@@ -529,7 +530,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
         case OP_LE: {
             Value a, b;
             if (!vm_binary_op(vm, &a, &b, "<=")) {
-                return false;
+                return_defer(false);
             }
 
             vm_push(vm, value_bool(a.as.number <= b.as.number));
@@ -558,7 +559,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
             Value value;
             if (!table_get(vm, &vm->globals, name, &value)) {
                 fprintf(stderr, "error: undefined variable '" SVFmt "'\n", SVArg(*name));
-                return false;
+                return_defer(false);
             }
 
             vm_push(vm, value);
@@ -570,7 +571,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
             if (table_set(vm, &vm->globals, name, vm_peek(vm, 0))) {
                 table_remove(vm, &vm->globals, name);
                 fprintf(stderr, "error: undefined variable '" SVFmt "'\n", SVArg(*name));
-                return false;
+                return_defer(false);
             }
         } break;
 
@@ -605,18 +606,18 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
             const Value index = vm_peek(vm, 0);
             if (index.type != VALUE_NUM) {
                 fprintf(stderr, "error: cannot index with %s value\n", value_type_name(index));
-                return false;
+                return_defer(false);
             }
 
             if (index.as.number != (long)index.as.number) {
                 fprintf(stderr, "error: cannot index with fractional value\n");
-                return false;
+                return_defer(false);
             }
 
             const Value array = vm_peek(vm, 1);
             if (array.type != VALUE_OBJECT || array.as.object->type != OBJECT_ARRAY) {
                 fprintf(stderr, "error: cannot index into %s value\n", value_type_name(array));
-                return false;
+                return_defer(false);
             }
 
             Value value;
@@ -626,7 +627,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
                     "error: cannot get value at index %zu in array of length %zu\n",
                     (size_t)index.as.number,
                     ((ObjectArray *)array.as.object)->count);
-                return false;
+                return_defer(false);
             }
 
             vm->stack.count -= 2;
@@ -638,18 +639,18 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
             const Value index = vm_peek(vm, 1);
             if (index.type != VALUE_NUM) {
                 fprintf(stderr, "error: cannot index with %s value\n", value_type_name(index));
-                return false;
+                return_defer(false);
             }
 
             if (index.as.number != (long)index.as.number) {
                 fprintf(stderr, "error: cannot index with fractional value\n");
-                return false;
+                return_defer(false);
             }
 
             const Value array = vm_peek(vm, 2);
             if (array.type != VALUE_OBJECT || array.as.object->type != OBJECT_ARRAY) {
                 fprintf(stderr, "error: cannot index into %s value\n", value_type_name(array));
-                return false;
+                return_defer(false);
             }
 
             object_array_set(vm, (ObjectArray *)array.as.object, index.as.number, value);
@@ -685,7 +686,18 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
                 "error: invalid op %d at offset %zu\n",
                 op,
                 vm->frame->ip - vm->frame->closure->fn->chunk.data);
-            return false;
+
+            return_defer(false);
         }
     }
+
+defer:
+    vm->stack.count = 0;
+
+    vm->frame = NULL;
+    vm->frames.count = 0;
+
+    vm->upvalues = NULL;
+    vm->compiler = NULL;
+    return result;
 }
