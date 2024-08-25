@@ -19,7 +19,7 @@ static void debug_op_value(const Chunk *c, size_t *offset, const char *name) {
     printf("'\n");
 }
 
-static_assert(COUNT_OPS == 35, "Update debug_op()");
+static_assert(COUNT_OPS == 36, "Update debug_op()");
 void debug_op(const Chunk *c, size_t *offset) {
     printf("%04zu ", *offset);
 
@@ -78,6 +78,10 @@ void debug_op(const Chunk *c, size_t *offset) {
 
     case OP_ARRAY:
         printf("OP_ARRAY\n");
+        break;
+
+    case OP_TABLE:
+        printf("OP_TABLE\n");
         break;
 
     case OP_CONST:
@@ -160,11 +164,11 @@ void debug_op(const Chunk *c, size_t *offset) {
         debug_op_int(c, offset, "OP_USET");
         break;
 
-    case OP_AGET:
+    case OP_IGET:
         printf("OP_AGET\n");
         break;
 
-    case OP_ASET:
+    case OP_ISET:
         printf("OP_ASET\n");
         break;
 

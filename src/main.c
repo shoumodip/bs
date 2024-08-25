@@ -33,7 +33,6 @@ int main(int argc, char **argv) {
     }
 
     if (!vm_interpret(&vm, fn, false)) {
-        vm_trace(&vm, stderr);
         return_defer(1);
     }
 

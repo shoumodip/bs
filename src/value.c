@@ -1,11 +1,11 @@
 #include "basic.h"
-#include "object.h"
+#include "hash.h"
 
 bool value_is_falsey(Value v) {
     return v.type == VALUE_NIL || (v.type == VALUE_BOOL && !v.as.boolean);
 }
 
-static_assert(COUNT_OBJECTS == 5, "Update value_type_name()");
+static_assert(COUNT_OBJECTS == 6, "Update value_type_name()");
 const char *value_type_name(Value v) {
     switch (v.type) {
     case VALUE_NIL:
@@ -28,6 +28,9 @@ const char *value_type_name(Value v) {
         case OBJECT_ARRAY:
             return "array";
 
+        case OBJECT_TABLE:
+            return "table";
+
         case OBJECT_CLOSURE:
             return "closure";
 
@@ -43,7 +46,7 @@ const char *value_type_name(Value v) {
     }
 }
 
-static_assert(COUNT_OBJECTS == 5, "Update object_print()");
+static_assert(COUNT_OBJECTS == 6, "Update object_print()");
 static void object_print(const Object *o, FILE *file) {
     switch (o->type) {
     case OBJECT_FN: {
@@ -70,6 +73,28 @@ static void object_print(const Object *o, FILE *file) {
             value_print(array->data[i], file);
         }
         fprintf(file, "]");
+    } break;
+
+    case OBJECT_TABLE: {
+        ObjectTable *table = (ObjectTable *)o;
+
+        fprintf(file, "{");
+        for (size_t i = 0, count = 0; i < table->capacity; i++) {
+            Entry *entry = &table->data[i];
+            if (!entry->key) {
+                continue;
+            }
+
+            if (count) {
+                fprintf(file, ", ");
+            }
+
+            object_print((const Object *)entry->key, file);
+            fprintf(file, " = ");
+            value_print(entry->value, file);
+            count++;
+        }
+        fprintf(file, "}");
     } break;
 
     case OBJECT_CLOSURE: {
@@ -113,7 +138,7 @@ void value_print(Value v, FILE *file) {
     }
 }
 
-static_assert(COUNT_OBJECTS == 5, "Update object_equal()");
+static_assert(COUNT_OBJECTS == 6, "Update object_equal()");
 static bool object_equal(const Object *a, const Object *b) {
     if (a->type != b->type) {
         return false;
@@ -123,7 +148,7 @@ static bool object_equal(const Object *a, const Object *b) {
     case OBJECT_STR: {
         const ObjectStr *a1 = (const ObjectStr *)a;
         const ObjectStr *b1 = (const ObjectStr *)b;
-        return a1->size == b1->size && !memcmp(a1->data, b1->data, b1->size);
+        return object_str_eq(a1, b1);
     };
 
     case OBJECT_ARRAY: {
@@ -136,6 +161,29 @@ static bool object_equal(const Object *a, const Object *b) {
 
         for (size_t i = 0; i < a1->count; i++) {
             if (!value_equal(a1->data[i], b1->data[i])) {
+                return false;
+            }
+        }
+
+        return true;
+    } break;
+
+    case OBJECT_TABLE: {
+        const ObjectTable *a1 = (const ObjectTable *)a;
+        const ObjectTable *b1 = (const ObjectTable *)b;
+
+        if (a1->real_count != b1->real_count) {
+            return false;
+        }
+
+        for (size_t i = 0; i < a1->count; i++) {
+            const Entry *a2 = &a1->data[i];
+            if (!a2->key) {
+                continue;
+            }
+
+            const Entry *b2 = entries_find(b1->data, b1->capacity, a2->key);
+            if (!b2->key) {
                 return false;
             }
         }

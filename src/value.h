@@ -15,6 +15,7 @@ typedef enum {
     OBJECT_FN,
     OBJECT_STR,
     OBJECT_ARRAY,
+    OBJECT_TABLE,
     OBJECT_CLOSURE,
     OBJECT_UPVALUE,
     COUNT_OBJECTS
@@ -24,6 +25,7 @@ typedef struct Object Object;
 typedef struct ObjectFn ObjectFn;
 typedef struct ObjectStr ObjectStr;
 typedef struct ObjectArray ObjectArray;
+typedef struct ObjectTable ObjectTable;
 typedef struct ObjectClosure ObjectClosure;
 typedef struct ObjectUpvalue ObjectUpvalue;
 

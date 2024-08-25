@@ -10,13 +10,14 @@ typedef enum {
     POWER_ADD,
     POWER_MUL,
     POWER_PRE,
-    POWER_CALL,
+    POWER_DOT,
 } Power;
 
-static_assert(COUNT_TOKENS == 37, "Update token_type_powers[]");
+static_assert(COUNT_TOKENS == 38, "Update token_type_powers[]");
 const Power token_type_powers[COUNT_TOKENS] = {
-    [TOKEN_LPAREN] = POWER_CALL,
-    [TOKEN_LBRACKET] = POWER_CALL,
+    [TOKEN_DOT] = POWER_DOT,
+    [TOKEN_LPAREN] = POWER_DOT,
+    [TOKEN_LBRACKET] = POWER_DOT,
 
     [TOKEN_ADD] = POWER_ADD,
     [TOKEN_SUB] = POWER_ADD,
@@ -111,7 +112,7 @@ static void compile_error_unexpected(Compiler *c, const Token *token) {
 
 static void compile_function(Compiler *c, const Token *name);
 
-static_assert(COUNT_TOKENS == 37, "Update compile_expr()");
+static_assert(COUNT_TOKENS == 38, "Update compile_expr()");
 static void compile_expr(Compiler *c, Power mbp) {
     Token token = lexer_next(&c->lexer);
 
@@ -160,6 +161,38 @@ static void compile_expr(Compiler *c, Power mbp) {
         lexer_expect(&c->lexer, TOKEN_RPAREN);
         break;
 
+    case TOKEN_LBRACE: {
+        chunk_push_op(c->vm, c->chunk, OP_TABLE);
+
+        while (!lexer_read(&c->lexer, TOKEN_RBRACE)) {
+            token = lexer_peek(&c->lexer);
+            if (token.type == TOKEN_LBRACKET) {
+                c->lexer.peeked = false;
+                compile_expr(c, POWER_SET);
+                lexer_expect(&c->lexer, TOKEN_RBRACKET);
+            } else {
+                token = lexer_expect(&c->lexer, TOKEN_IDENT);
+                chunk_push_op_value(
+                    c->vm,
+                    c->chunk,
+                    OP_CONST,
+                    value_object(object_str_new(c->vm, token.sv.data, token.sv.size)));
+            }
+
+            lexer_expect(&c->lexer, TOKEN_SET);
+            compile_expr(c, POWER_SET);
+
+            chunk_push_op(c->vm, c->chunk, OP_ISET);
+
+            token = lexer_peek(&c->lexer);
+            if (token.type != TOKEN_COMMA) {
+                lexer_expect(&c->lexer, TOKEN_RBRACE);
+                break;
+            }
+            c->lexer.peeked = false;
+        }
+    } break;
+
     case TOKEN_LBRACKET: {
         chunk_push_op(c->vm, c->chunk, OP_ARRAY);
 
@@ -169,7 +202,7 @@ static void compile_expr(Compiler *c, Power mbp) {
             compile_expr(c, POWER_SET);
             index++;
 
-            chunk_push_op(c->vm, c->chunk, OP_ASET);
+            chunk_push_op(c->vm, c->chunk, OP_ISET);
 
             token = lexer_peek(&c->lexer);
             if (token.type != TOKEN_COMMA) {
@@ -209,6 +242,23 @@ static void compile_expr(Compiler *c, Power mbp) {
         c->lexer.peeked = false;
 
         switch (token.type) {
+        case TOKEN_DOT: {
+            const Op op_get = c->chunk->data[c->chunk->last];
+            const Op op_set = op_get_to_set(op_get);
+            if (op_set == OP_RET && op_get != OP_CALL) {
+                compile_error_unexpected(c, &token);
+            }
+
+            token = lexer_expect(&c->lexer, TOKEN_IDENT);
+            chunk_push_op_value(
+                c->vm,
+                c->chunk,
+                OP_CONST,
+                value_object(object_str_new(c->vm, token.sv.data, token.sv.size)));
+
+            chunk_push_op(c->vm, c->chunk, OP_IGET);
+        } break;
+
         case TOKEN_ADD:
             compile_expr(c, lbp);
             chunk_push_op(c->vm, c->chunk, OP_ADD);
@@ -310,7 +360,7 @@ static void compile_expr(Compiler *c, Power mbp) {
             compile_expr(c, POWER_SET);
             lexer_expect(&c->lexer, TOKEN_RBRACKET);
 
-            chunk_push_op(c->vm, c->chunk, OP_AGET);
+            chunk_push_op(c->vm, c->chunk, OP_IGET);
         } break;
 
         case TOKEN_SET: {
@@ -320,17 +370,17 @@ static void compile_expr(Compiler *c, Power mbp) {
             }
 
             size_t index;
-            if (op == OP_GSET || op == OP_LSET || op == OP_USET) {
+            if (op != OP_ISET) {
                 index = *(size_t *)&c->chunk->data[c->chunk->last + 1];
             }
             c->chunk->count = c->chunk->last;
 
             compile_expr(c, lbp);
 
-            if (op == OP_GSET || op == OP_LSET || op == OP_USET) {
-                chunk_push_op_int(c->vm, c->chunk, op, index);
-            } else {
+            if (op == OP_ISET) {
                 chunk_push_op(c->vm, c->chunk, op);
+            } else {
+                chunk_push_op_int(c->vm, c->chunk, op, index);
             }
         } break;
 
@@ -439,7 +489,7 @@ static void compile_function(Compiler *c, const Token *name) {
     scope_free(c->vm, &scope);
 }
 
-static_assert(COUNT_TOKENS == 37, "Update compile_stmt()");
+static_assert(COUNT_TOKENS == 38, "Update compile_stmt()");
 static void compile_stmt(Compiler *c) {
     Token token = lexer_next(&c->lexer);
 

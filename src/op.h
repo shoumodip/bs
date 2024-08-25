@@ -13,6 +13,7 @@ typedef enum {
     OP_TRUE,
     OP_FALSE,
     OP_ARRAY,
+    OP_TABLE,
     OP_CONST,
 
     OP_ADD,
@@ -36,8 +37,8 @@ typedef enum {
     OP_LSET,
     OP_UGET,
     OP_USET,
-    OP_AGET,
-    OP_ASET,
+    OP_IGET,
+    OP_ISET,
 
     OP_JUMP,
     OP_ELSE,

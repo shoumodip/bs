@@ -57,7 +57,7 @@ struct ObjectStr {
 };
 
 ObjectStr *object_str_new(Vm *vm, const char *data, size_t size);
-bool object_str_eq(ObjectStr *a, ObjectStr *b);
+bool object_str_eq(const ObjectStr *a, const ObjectStr *b);
 
 struct ObjectArray {
     Object meta;
@@ -75,17 +75,21 @@ typedef struct {
     Value value;
 } Entry;
 
-typedef struct {
+struct ObjectTable {
+    Object meta;
     Entry *data;
     size_t count;
     size_t capacity;
-} Table;
+    size_t real_count;
+};
 
-void table_free(Vm *vm, Table *table);
-bool table_remove(Vm *vm, Table *table, ObjectStr *key);
+ObjectTable *object_table_new(Vm *vm);
 
-bool table_get(Vm *vm, Table *table, ObjectStr *key, Value *value);
-bool table_set(Vm *vm, Table *table, ObjectStr *key, Value value);
+void object_table_free(Vm *vm, ObjectTable *table);
+bool object_table_remove(Vm *vm, ObjectTable *table, ObjectStr *key);
+
+bool object_table_get(Vm *vm, ObjectTable *table, ObjectStr *key, Value *value);
+bool object_table_set(Vm *vm, ObjectTable *table, ObjectStr *key, Value value);
 
 struct ObjectClosure {
     Object meta;
