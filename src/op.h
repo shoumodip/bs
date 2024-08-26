@@ -30,6 +30,7 @@ typedef enum {
     OP_EQ,
     OP_NE,
 
+    OP_LEN,
     OP_JOIN,
 
     OP_GDEF,

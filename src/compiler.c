@@ -13,7 +13,7 @@ typedef enum {
     POWER_DOT,
 } Power;
 
-static_assert(COUNT_TOKENS == 39, "Update token_type_powers[]");
+static_assert(COUNT_TOKENS == 40, "Update token_type_powers[]");
 const Power token_type_powers[COUNT_TOKENS] = {
     [TOKEN_DOT] = POWER_DOT,
     [TOKEN_LPAREN] = POWER_DOT,
@@ -114,7 +114,7 @@ static void compile_error_unexpected(Compiler *c, const Token *token) {
 
 static void compile_function(Compiler *c, const Token *name);
 
-static_assert(COUNT_TOKENS == 39, "Update compile_expr()");
+static_assert(COUNT_TOKENS == 40, "Update compile_expr()");
 static void compile_expr(Compiler *c, Power mbp) {
     Token token = lexer_next(&c->lexer);
     Loc loc = token.loc;
@@ -229,6 +229,15 @@ static void compile_expr(Compiler *c, Power mbp) {
     case TOKEN_NOT:
         compile_expr(c, POWER_PRE);
         chunk_push_op(c->vm, c->chunk, OP_NOT);
+        break;
+
+    case TOKEN_LEN:
+        lexer_expect(&c->lexer, TOKEN_LPAREN);
+        compile_expr(c, POWER_SET);
+        lexer_expect(&c->lexer, TOKEN_RPAREN);
+
+        chunk_push_op_loc(c->vm, c->chunk, loc);
+        chunk_push_op(c->vm, c->chunk, OP_LEN);
         break;
 
     case TOKEN_FN:
@@ -517,7 +526,7 @@ static void compile_function(Compiler *c, const Token *name) {
     scope_free(c->vm, &scope);
 }
 
-static_assert(COUNT_TOKENS == 39, "Update compile_stmt()");
+static_assert(COUNT_TOKENS == 40, "Update compile_stmt()");
 static void compile_stmt(Compiler *c) {
     Token token = lexer_next(&c->lexer);
 

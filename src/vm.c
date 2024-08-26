@@ -399,7 +399,7 @@ static void vm_writer_file_fmt(Writer *w, const char *fmt, ...) {
     va_end(args);
 }
 
-static_assert(COUNT_OPS == 37, "Update vm_interpret()");
+static_assert(COUNT_OPS == 38, "Update vm_interpret()");
 bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
     vm->writer_str = (WriterStr){.meta.fmt = vm_writer_str_fmt, .vm = vm};
     vm->writer_stdout = (WriterFile){.meta.fmt = vm_writer_file_fmt, .file = stdout};
@@ -622,6 +622,38 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
             const Value b = vm_pop(vm);
             const Value a = vm_pop(vm);
             vm_push(vm, value_bool(!value_equal(a, b)));
+        } break;
+
+        case OP_LEN: {
+            const Value a = vm_peek(vm, 0);
+            if (a.type != VALUE_OBJECT) {
+                vm_runtime_error(
+                    vm, op_index, "cannot get length of %s value\n", value_type_name(a));
+                return_defer(false);
+            }
+
+            size_t size;
+            switch (a.as.object->type) {
+            case OBJECT_STR:
+                size = ((ObjectStr *)a.as.object)->size;
+                break;
+
+            case OBJECT_ARRAY:
+                size = ((ObjectArray *)a.as.object)->count;
+                break;
+
+            case OBJECT_TABLE:
+                size = ((ObjectTable *)a.as.object)->real_count;
+                break;
+
+            default:
+                vm_runtime_error(
+                    vm, op_index, "cannot get length of %s value\n", value_type_name(a));
+                return_defer(false);
+            }
+
+            vm_pop(vm);
+            vm_push(vm, value_num(size));
         } break;
 
         case OP_JOIN: {

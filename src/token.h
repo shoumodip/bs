@@ -50,6 +50,7 @@ typedef enum {
     TOKEN_EQ,
     TOKEN_NE,
 
+    TOKEN_LEN,
     TOKEN_JOIN,
 
     TOKEN_SET,
