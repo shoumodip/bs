@@ -19,6 +19,11 @@ typedef struct {
 #define frames_free da_free
 #define frames_push da_push
 
+typedef struct {
+    Writer meta;
+    FILE *file;
+} WriterFile;
+
 struct Vm {
     Values stack;
 
@@ -33,6 +38,9 @@ struct Vm {
     size_t gc_max;
     size_t gc_bytes;
     Object *objects;
+
+    WriterFile writer_stdout;
+    WriterFile writer_stderr;
 };
 
 // The duplicate type definition is to appease the LSP unused include warnings

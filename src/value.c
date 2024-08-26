@@ -47,38 +47,38 @@ const char *value_type_name(Value v) {
 }
 
 static_assert(COUNT_OBJECTS == 6, "Update object_print()");
-static void object_print(const Object *o, FILE *file) {
+static void object_print(const Object *o, Writer *w) {
     switch (o->type) {
     case OBJECT_FN: {
         const ObjectFn *fn = (const ObjectFn *)o;
         if (fn->name) {
-            fprintf(file, "fn " SVFmt "()", SVArg(*fn->name));
+            w->fmt(w, "fn " SVFmt "()", SVArg(*fn->name));
         } else {
-            fprintf(file, "fn ()");
+            w->fmt(w, "fn ()");
         }
     } break;
 
     case OBJECT_STR:
-        fprintf(file, SVFmt, SVArg(*(const ObjectStr *)o));
+        w->fmt(w, SVFmt, SVArg(*(const ObjectStr *)o));
         break;
 
     case OBJECT_ARRAY: {
         const ObjectArray *array = (const ObjectArray *)o;
 
-        fprintf(file, "[");
+        w->fmt(w, "[");
         for (size_t i = 0; i < array->count; i++) {
             if (i) {
-                fprintf(file, ", ");
+                w->fmt(w, ", ");
             }
-            value_print(array->data[i], file);
+            value_print(array->data[i], w);
         }
-        fprintf(file, "]");
+        w->fmt(w, "]");
     } break;
 
     case OBJECT_TABLE: {
         ObjectTable *table = (ObjectTable *)o;
 
-        fprintf(file, "{");
+        w->fmt(w, "{");
         for (size_t i = 0, count = 0; i < table->capacity; i++) {
             Entry *entry = &table->data[i];
             if (!entry->key) {
@@ -86,28 +86,28 @@ static void object_print(const Object *o, FILE *file) {
             }
 
             if (count) {
-                fprintf(file, ", ");
+                w->fmt(w, ", ");
             }
 
-            object_print((const Object *)entry->key, file);
-            fprintf(file, " = ");
-            value_print(entry->value, file);
+            object_print((const Object *)entry->key, w);
+            w->fmt(w, " = ");
+            value_print(entry->value, w);
             count++;
         }
-        fprintf(file, "}");
+        w->fmt(w, "}");
     } break;
 
     case OBJECT_CLOSURE: {
         const ObjectFn *fn = ((const ObjectClosure *)o)->fn;
         if (fn->name) {
-            fprintf(file, "fn " SVFmt "()", SVArg(*fn->name));
+            w->fmt(w, "fn " SVFmt "()", SVArg(*fn->name));
         } else {
-            fprintf(file, "fn ()");
+            w->fmt(w, "fn ()");
         }
     } break;
 
     case OBJECT_UPVALUE:
-        fprintf(file, "<upvalue>");
+        w->fmt(w, "<upvalue>");
         break;
 
     default:
@@ -115,22 +115,22 @@ static void object_print(const Object *o, FILE *file) {
     }
 }
 
-void value_print(Value v, FILE *file) {
+void value_print(Value v, Writer *w) {
     switch (v.type) {
     case VALUE_NIL:
-        fprintf(file, "nil");
+        w->fmt(w, "nil");
         break;
 
     case VALUE_NUM:
-        fprintf(file, "%g", v.as.number);
+        w->fmt(w, "%g", v.as.number);
         break;
 
     case VALUE_BOOL:
-        fprintf(file, "%s", v.as.boolean ? "true" : "false");
+        w->fmt(w, "%s", v.as.boolean ? "true" : "false");
         break;
 
     case VALUE_OBJECT:
-        object_print(v.as.object, file);
+        object_print(v.as.object, w);
         break;
 
     default:
@@ -220,4 +220,4 @@ bool value_equal(Value a, Value b) {
     default:
         assert(false && "unreachable");
     }
-};
+}

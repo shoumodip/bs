@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#include "basic.h"
+
 typedef enum {
     VALUE_NIL,
     VALUE_NUM,
@@ -46,7 +48,7 @@ typedef struct {
 bool value_is_falsey(Value value);
 const char *value_type_name(Value value);
 
-void value_print(Value value, FILE *file);
+void value_print(Value value, Writer *writer);
 bool value_equal(Value a, Value b);
 
 #endif // VALUE_H

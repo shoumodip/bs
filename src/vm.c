@@ -75,7 +75,7 @@ static void object_mark(Vm *vm, Object *object) {
 
 #ifdef GC_DEBUG_LOG
     printf("[GC] Mark %p ", object);
-    value_print(value_object(object), stdout);
+    value_print(value_object(object), (Writer *)&vm->writer_stdout);
     printf("\n");
 #endif // GC_DEBUG_LOG
 
@@ -281,6 +281,8 @@ static Loc chunk_get_loc(const Chunk *c, size_t op_index) {
 }
 
 static void vm_runtime_error(Vm *vm, size_t op_index, const char *fmt, ...) {
+    fflush(stdout);
+
     Loc loc = chunk_get_loc(&vm->frame->closure->fn->chunk, op_index);
     fprintf(stderr, LocFmt "error: ", LocArg(loc));
 
@@ -295,7 +297,7 @@ static void vm_runtime_error(Vm *vm, size_t op_index, const char *fmt, ...) {
 
         loc = chunk_get_loc(&fn->chunk, frame->ip - fn->chunk.data - 1 - sizeof(size_t));
         fprintf(stderr, LocFmt "in ", LocArg(loc));
-        value_print(value_object(fn), stderr);
+        value_print(value_object(fn), (Writer *)&vm->writer_stderr);
         fprintf(stderr, "\n");
     }
 }
@@ -371,12 +373,22 @@ static void vm_close_upvalues(Vm *vm, size_t index) {
     }
 }
 
+static void vm_writer_file_fmt(Writer *w, const char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    vfprintf(((WriterFile *)w)->file, fmt, args);
+    va_end(args);
+}
+
 static_assert(COUNT_OPS == 36, "Update vm_interpret()");
 bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
+    vm->writer_stdout = (WriterFile){.meta.fmt = vm_writer_file_fmt, .file = stdout};
+    vm->writer_stderr = (WriterFile){.meta.fmt = vm_writer_file_fmt, .file = stderr};
+
     bool result = true;
 
     if (debug) {
-        debug_chunks(vm->objects);
+        debug_chunks((Writer *)&vm->writer_stdout, vm->objects);
     }
 
     ObjectClosure *closure = object_closure_new(vm, fn);
@@ -391,13 +403,13 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
             printf("Stack:\n");
             for (size_t i = 0; i < vm->stack.count; i++) {
                 printf("    ");
-                value_print(vm->stack.data[i], stdout);
+                value_print(vm->stack.data[i], (Writer *)&vm->writer_stdout);
                 printf("\n");
             }
             printf("\n");
 
             size_t offset = vm->frame->ip - vm->frame->closure->fn->chunk.data;
-            debug_op(&vm->frame->closure->fn->chunk, &offset);
+            debug_op((Writer *)&vm->writer_stdout, &vm->frame->closure->fn->chunk, &offset);
             printf("----------------------------------------\n");
             getchar();
         }
@@ -775,7 +787,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
         } break;
 
         case OP_PRINT:
-            value_print(vm_pop(vm), stdout);
+            value_print(vm_pop(vm), (Writer *)&vm->writer_stdout);
             printf("\n");
             break;
 

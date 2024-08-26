@@ -16,6 +16,13 @@ typedef struct {
 
 bool sv_eq(SV a, SV b);
 
+// Writer
+typedef struct Writer Writer;
+
+struct Writer {
+    void (*fmt)(Writer *writer, const char *fmt, ...);
+};
+
 // Defer
 #define return_defer(value)                                                                        \
     do {                                                                                           \
