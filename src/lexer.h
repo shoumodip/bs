@@ -6,7 +6,7 @@
 
 typedef struct {
     SV sv;
-    Pos pos;
+    Loc loc;
 
     bool peeked;
     Token buffer;

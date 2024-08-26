@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "op.h"
+#include "token.h"
 #include "vm.h"
 
 typedef struct {
@@ -16,16 +17,32 @@ typedef struct {
 #define values_push da_push
 
 typedef struct {
+    Loc loc;
+    size_t index;
+} OpLoc;
+
+typedef struct {
+    OpLoc *data;
+    size_t count;
+    size_t capacity;
+} OpLocs;
+
+#define op_locs_free da_free
+#define op_locs_push da_push
+
+typedef struct {
     uint8_t *data;
     size_t last;
     size_t count;
     size_t capacity;
 
     Values constants;
+    OpLocs locations;
 } Chunk;
 
 void chunk_free(Vm *vm, Chunk *chunk);
 void chunk_push_op(Vm *vm, Chunk *chunk, Op op);
+void chunk_push_op_loc(Vm *vm, Chunk *c, Loc loc);
 void chunk_push_op_int(Vm *vm, Chunk *chunk, Op op, size_t value);
 void chunk_push_op_value(Vm *vm, Chunk *chunk, Op op, Value value);
 

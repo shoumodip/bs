@@ -7,11 +7,11 @@
 static void lexer_advance(Lexer *l) {
     if (*l->sv.data == '\n') {
         if (l->sv.size > 1) {
-            l->pos.row += 1;
-            l->pos.col = 1;
+            l->loc.row += 1;
+            l->loc.col = 1;
         }
     } else {
-        l->pos.col += 1;
+        l->loc.col += 1;
     }
 
     l->sv.data += 1;
@@ -34,9 +34,9 @@ static bool lexer_match(Lexer *l, char ch) {
 Lexer lexer_new(const char *path, SV sv) {
     return (Lexer){
         .sv = sv,
-        .pos.path = path,
-        .pos.row = 1,
-        .pos.col = 1,
+        .loc.path = path,
+        .loc.row = 1,
+        .loc.col = 1,
     };
 }
 
@@ -68,7 +68,7 @@ Token lexer_next(Lexer *l) {
         }
     }
 
-    Token token = {.sv = l->sv, .pos = l->pos};
+    Token token = {.sv = l->sv, .loc = l->loc};
 
     if (l->sv.size == 0) {
         token.type = TOKEN_EOF;
@@ -95,7 +95,7 @@ Token lexer_next(Lexer *l) {
         }
 
         if (l->sv.size == 0) {
-            fprintf(stderr, PosFmt "error: unterminated string\n", PosArg(token.pos));
+            fprintf(stderr, LocFmt "error: unterminated string\n", LocArg(token.loc));
             lexer_error(l);
         }
 
@@ -190,8 +190,8 @@ Token lexer_next(Lexer *l) {
         default:
             fprintf(
                 stderr,
-                PosFmt "error: invalid character '%c'\n",
-                PosArg(token.pos),
+                LocFmt "error: invalid character '%c'\n",
+                LocArg(token.loc),
                 *token.sv.data);
 
             lexer_error(l);
@@ -250,8 +250,8 @@ Token lexer_expect(Lexer *l, TokenType type) {
     if (token.type != type) {
         fprintf(
             stderr,
-            PosFmt "error: expected %s, got %s\n",
-            PosArg(token.pos),
+            LocFmt "error: expected %s, got %s\n",
+            LocArg(token.loc),
             token_type_name(type),
             token_type_name(token.type));
 

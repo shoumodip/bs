@@ -9,10 +9,10 @@ typedef struct {
     const char *path;
     size_t row;
     size_t col;
-} Pos;
+} Loc;
 
-#define PosFmt "%s:%zu:%zu: "
-#define PosArg(p) (p).path, (p).row, (p).col
+#define LocFmt "%s:%zu:%zu: "
+#define LocArg(p) (p).path, (p).row, (p).col
 
 typedef enum {
     TOKEN_EOF,
@@ -70,7 +70,7 @@ const char *token_type_name(TokenType type);
 typedef struct {
     TokenType type;
     SV sv;
-    Pos pos;
+    Loc loc;
 } Token;
 
 #endif // TOKEN_H

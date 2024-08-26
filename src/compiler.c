@@ -105,7 +105,7 @@ static void compile_jump_direct(Compiler *c, Op op, size_t addr) {
 
 static void compile_error_unexpected(Compiler *c, const Token *token) {
     fprintf(
-        stderr, PosFmt "error: unexpected %s\n", PosArg(token->pos), token_type_name(token->type));
+        stderr, LocFmt "error: unexpected %s\n", LocArg(token->loc), token_type_name(token->type));
 
     lexer_error(&c->lexer);
 }
@@ -115,6 +115,7 @@ static void compile_function(Compiler *c, const Token *name);
 static_assert(COUNT_TOKENS == 38, "Update compile_expr()");
 static void compile_expr(Compiler *c, Power mbp) {
     Token token = lexer_next(&c->lexer);
+    Loc loc = token.loc;
 
     switch (token.type) {
     case TOKEN_NIL:
@@ -148,6 +149,7 @@ static void compile_expr(Compiler *c, Power mbp) {
         } else if (scope_find_upvalue(c->vm, c->scope, token.sv, &index)) {
             chunk_push_op_int(c->vm, c->chunk, OP_UGET, index);
         } else {
+            chunk_push_op_loc(c->vm, c->chunk, loc);
             chunk_push_op_value(
                 c->vm,
                 c->chunk,
@@ -166,6 +168,8 @@ static void compile_expr(Compiler *c, Power mbp) {
 
         while (!lexer_read(&c->lexer, TOKEN_RBRACE)) {
             token = lexer_peek(&c->lexer);
+            loc = token.loc;
+
             if (token.type == TOKEN_LBRACKET) {
                 c->lexer.peeked = false;
                 compile_expr(c, POWER_SET);
@@ -182,6 +186,7 @@ static void compile_expr(Compiler *c, Power mbp) {
             lexer_expect(&c->lexer, TOKEN_SET);
             compile_expr(c, POWER_SET);
 
+            chunk_push_op_loc(c->vm, c->chunk, loc);
             chunk_push_op(c->vm, c->chunk, OP_ISET);
 
             token = lexer_peek(&c->lexer);
@@ -215,6 +220,7 @@ static void compile_expr(Compiler *c, Power mbp) {
 
     case TOKEN_SUB:
         compile_expr(c, POWER_PRE);
+        chunk_push_op_loc(c->vm, c->chunk, loc);
         chunk_push_op(c->vm, c->chunk, OP_NEG);
         break;
 
@@ -241,6 +247,7 @@ static void compile_expr(Compiler *c, Power mbp) {
         }
         c->lexer.peeked = false;
 
+        loc = token.loc;
         switch (token.type) {
         case TOKEN_DOT: {
             const Op op_get = c->chunk->data[c->chunk->last];
@@ -256,26 +263,31 @@ static void compile_expr(Compiler *c, Power mbp) {
                 OP_CONST,
                 value_object(object_str_const(c->vm, token.sv.data, token.sv.size)));
 
+            chunk_push_op_loc(c->vm, c->chunk, loc);
             chunk_push_op(c->vm, c->chunk, OP_IGET);
         } break;
 
         case TOKEN_ADD:
             compile_expr(c, lbp);
+            chunk_push_op_loc(c->vm, c->chunk, loc);
             chunk_push_op(c->vm, c->chunk, OP_ADD);
             break;
 
         case TOKEN_SUB:
             compile_expr(c, lbp);
+            chunk_push_op_loc(c->vm, c->chunk, loc);
             chunk_push_op(c->vm, c->chunk, OP_SUB);
             break;
 
         case TOKEN_MUL:
             compile_expr(c, lbp);
+            chunk_push_op_loc(c->vm, c->chunk, loc);
             chunk_push_op(c->vm, c->chunk, OP_MUL);
             break;
 
         case TOKEN_DIV:
             compile_expr(c, lbp);
+            chunk_push_op_loc(c->vm, c->chunk, loc);
             chunk_push_op(c->vm, c->chunk, OP_DIV);
             break;
 
@@ -299,31 +311,37 @@ static void compile_expr(Compiler *c, Power mbp) {
 
         case TOKEN_GT:
             compile_expr(c, lbp);
+            chunk_push_op_loc(c->vm, c->chunk, loc);
             chunk_push_op(c->vm, c->chunk, OP_GT);
             break;
 
         case TOKEN_GE:
             compile_expr(c, lbp);
+            chunk_push_op_loc(c->vm, c->chunk, loc);
             chunk_push_op(c->vm, c->chunk, OP_GE);
             break;
 
         case TOKEN_LT:
             compile_expr(c, lbp);
+            chunk_push_op_loc(c->vm, c->chunk, loc);
             chunk_push_op(c->vm, c->chunk, OP_LT);
             break;
 
         case TOKEN_LE:
             compile_expr(c, lbp);
+            chunk_push_op_loc(c->vm, c->chunk, loc);
             chunk_push_op(c->vm, c->chunk, OP_LE);
             break;
 
         case TOKEN_EQ:
             compile_expr(c, lbp);
+            chunk_push_op_loc(c->vm, c->chunk, loc);
             chunk_push_op(c->vm, c->chunk, OP_EQ);
             break;
 
         case TOKEN_NE:
             compile_expr(c, lbp);
+            chunk_push_op_loc(c->vm, c->chunk, loc);
             chunk_push_op(c->vm, c->chunk, OP_NE);
             break;
 
@@ -347,6 +365,7 @@ static void compile_expr(Compiler *c, Power mbp) {
                 c->lexer.peeked = false;
             }
 
+            chunk_push_op_loc(c->vm, c->chunk, loc);
             chunk_push_op_int(c->vm, c->chunk, OP_CALL, arity);
         } break;
 
@@ -360,6 +379,7 @@ static void compile_expr(Compiler *c, Power mbp) {
             compile_expr(c, POWER_SET);
             lexer_expect(&c->lexer, TOKEN_RBRACKET);
 
+            chunk_push_op_loc(c->vm, c->chunk, loc);
             chunk_push_op(c->vm, c->chunk, OP_IGET);
         } break;
 
@@ -377,6 +397,7 @@ static void compile_expr(Compiler *c, Power mbp) {
 
             compile_expr(c, lbp);
 
+            chunk_push_op_loc(c->vm, c->chunk, loc);
             if (op == OP_ISET) {
                 chunk_push_op(c->vm, c->chunk, op);
             } else {

@@ -5,12 +5,17 @@
 
 void chunk_free(Vm *vm, Chunk *c) {
     values_free(vm, &c->constants);
+    op_locs_free(vm, &c->locations);
     da_free(vm, c);
 }
 
 void chunk_push_op(Vm *vm, Chunk *c, Op op) {
     c->last = c->count;
     da_push(vm, c, op);
+}
+
+void chunk_push_op_loc(Vm *vm, Chunk *c, Loc loc) {
+    op_locs_push(vm, &c->locations, ((OpLoc){.loc = loc, .index = c->count}));
 }
 
 void chunk_push_op_int(Vm *vm, Chunk *c, Op op, size_t value) {
