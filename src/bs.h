@@ -21,6 +21,17 @@ typedef struct {
 
 typedef struct {
     Writer meta;
+
+    Vm *vm;
+    char *data;
+    size_t count;
+    size_t capacity;
+} WriterStr;
+
+#define writer_str_free da_free
+
+typedef struct {
+    Writer meta;
     FILE *file;
 } WriterFile;
 
@@ -39,6 +50,7 @@ struct Vm {
     size_t gc_bytes;
     Object *objects;
 
+    WriterStr writer_str;
     WriterFile writer_stdout;
     WriterFile writer_stderr;
 };

@@ -46,8 +46,8 @@ const char *value_type_name(Value v) {
     }
 }
 
-static_assert(COUNT_OBJECTS == 6, "Update object_print()");
-static void object_print(const Object *o, Writer *w) {
+static_assert(COUNT_OBJECTS == 6, "Update object_write()");
+static void object_write(const Object *o, Writer *w) {
     switch (o->type) {
     case OBJECT_FN: {
         const ObjectFn *fn = (const ObjectFn *)o;
@@ -70,7 +70,7 @@ static void object_print(const Object *o, Writer *w) {
             if (i) {
                 w->fmt(w, ", ");
             }
-            value_print(array->data[i], w);
+            value_write(array->data[i], w);
         }
         w->fmt(w, "]");
     } break;
@@ -89,9 +89,9 @@ static void object_print(const Object *o, Writer *w) {
                 w->fmt(w, ", ");
             }
 
-            object_print((const Object *)entry->key, w);
+            object_write((const Object *)entry->key, w);
             w->fmt(w, " = ");
-            value_print(entry->value, w);
+            value_write(entry->value, w);
             count++;
         }
         w->fmt(w, "}");
@@ -115,7 +115,7 @@ static void object_print(const Object *o, Writer *w) {
     }
 }
 
-void value_print(Value v, Writer *w) {
+void value_write(Value v, Writer *w) {
     switch (v.type) {
     case VALUE_NIL:
         w->fmt(w, "nil");
@@ -130,7 +130,7 @@ void value_print(Value v, Writer *w) {
         break;
 
     case VALUE_OBJECT:
-        object_print(v.as.object, w);
+        object_write(v.as.object, w);
         break;
 
     default:

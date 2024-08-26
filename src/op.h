@@ -30,6 +30,8 @@ typedef enum {
     OP_EQ,
     OP_NE,
 
+    OP_JOIN,
+
     OP_GDEF,
     OP_GGET,
     OP_GSET,

@@ -15,11 +15,11 @@ static void debug_op_value(Writer *w, const Chunk *c, size_t *offset, const char
     *offset += sizeof(constant);
 
     w->fmt(w, "%-16s %4zu '", name, constant);
-    value_print(c->constants.data[constant], w);
+    value_write(c->constants.data[constant], w);
     w->fmt(w, "'\n");
 }
 
-static_assert(COUNT_OPS == 36, "Update debug_op()");
+static_assert(COUNT_OPS == 37, "Update debug_op()");
 void debug_op(Writer *w, const Chunk *c, size_t *offset) {
     w->fmt(w, "%04zu ", *offset);
 
@@ -39,7 +39,7 @@ void debug_op(Writer *w, const Chunk *c, size_t *offset) {
 
         const Value value = c->constants.data[constant];
         w->fmt(w, "%-16s %4zu '", "OP_CLOSURE", constant);
-        value_print(value, w);
+        value_write(value, w);
         w->fmt(w, "'\n");
 
         const ObjectFn *fn = (const ObjectFn *)value.as.object;
@@ -135,6 +135,10 @@ void debug_op(Writer *w, const Chunk *c, size_t *offset) {
 
     case OP_NE:
         w->fmt(w, "OP_NE\n");
+        break;
+
+    case OP_JOIN:
+        w->fmt(w, "OP_JOIN\n");
         break;
 
     case OP_GDEF:

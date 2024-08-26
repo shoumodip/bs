@@ -2,7 +2,7 @@
 
 #include "token.h"
 
-static_assert(COUNT_TOKENS == 38, "Update token_type_name()");
+static_assert(COUNT_TOKENS == 39, "Update token_type_name()");
 const char *token_type_name(TokenType type) {
     switch (type) {
     case TOKEN_EOF:
@@ -89,6 +89,9 @@ const char *token_type_name(TokenType type) {
 
     case TOKEN_NE:
         return "'!='";
+
+    case TOKEN_JOIN:
+        return "'..'";
 
     case TOKEN_SET:
         return "'='";

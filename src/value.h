@@ -48,7 +48,7 @@ typedef struct {
 bool value_is_falsey(Value value);
 const char *value_type_name(Value value);
 
-void value_print(Value value, Writer *writer);
+void value_write(Value value, Writer *writer);
 bool value_equal(Value a, Value b);
 
 #endif // VALUE_H

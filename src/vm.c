@@ -75,7 +75,7 @@ static void object_mark(Vm *vm, Object *object) {
 
 #ifdef GC_DEBUG_LOG
     printf("[GC] Mark %p ", object);
-    value_print(value_object(object), (Writer *)&vm->writer_stdout);
+    value_write(value_object(object), (Writer *)&vm->writer_stdout);
     printf("\n");
 #endif // GC_DEBUG_LOG
 
@@ -216,6 +216,8 @@ void vm_free(Vm *vm) {
     memset(&vm->stack, 0, sizeof(vm->stack));
 
     frames_free(vm, &vm->frames);
+    writer_str_free(vm, &vm->writer_str);
+
     object_table_free(vm, &vm->globals);
     object_table_free(vm, &vm->strings);
 }
@@ -297,7 +299,7 @@ static void vm_runtime_error(Vm *vm, size_t op_index, const char *fmt, ...) {
 
         loc = chunk_get_loc(&fn->chunk, frame->ip - fn->chunk.data - 1 - sizeof(size_t));
         fprintf(stderr, LocFmt "in ", LocArg(loc));
-        value_print(value_object(fn), (Writer *)&vm->writer_stderr);
+        value_write(value_object(fn), (Writer *)&vm->writer_stderr);
         fprintf(stderr, "\n");
     }
 }
@@ -373,6 +375,23 @@ static void vm_close_upvalues(Vm *vm, size_t index) {
     }
 }
 
+static void vm_writer_str_fmt(Writer *w, const char *fmt, ...) {
+    WriterStr *w1 = (WriterStr *)w;
+
+    va_list args;
+    va_start(args, fmt);
+    int count = vsnprintf(NULL, 0, fmt, args);
+    assert(count >= 0);
+    va_end(args);
+
+    da_push_many(w1->vm, w1, NULL, count + 1);
+    va_start(args, fmt);
+    vsnprintf(w1->data + w1->count, count + 1, fmt, args);
+    va_end(args);
+
+    w1->count += count;
+}
+
 static void vm_writer_file_fmt(Writer *w, const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
@@ -380,8 +399,9 @@ static void vm_writer_file_fmt(Writer *w, const char *fmt, ...) {
     va_end(args);
 }
 
-static_assert(COUNT_OPS == 36, "Update vm_interpret()");
+static_assert(COUNT_OPS == 37, "Update vm_interpret()");
 bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
+    vm->writer_str = (WriterStr){.meta.fmt = vm_writer_str_fmt, .vm = vm};
     vm->writer_stdout = (WriterFile){.meta.fmt = vm_writer_file_fmt, .file = stdout};
     vm->writer_stderr = (WriterFile){.meta.fmt = vm_writer_file_fmt, .file = stderr};
 
@@ -403,7 +423,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
             printf("Stack:\n");
             for (size_t i = 0; i < vm->stack.count; i++) {
                 printf("    ");
-                value_print(vm->stack.data[i], (Writer *)&vm->writer_stdout);
+                value_write(vm->stack.data[i], (Writer *)&vm->writer_stdout);
                 printf("\n");
             }
             printf("\n");
@@ -604,6 +624,26 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
             vm_push(vm, value_bool(!value_equal(a, b)));
         } break;
 
+        case OP_JOIN: {
+            const bool gc_on = vm->gc_on;
+            const size_t start = vm->writer_str.count;
+
+            vm->gc_on = false;
+
+            const Value b = vm_pop(vm);
+            const Value a = vm_pop(vm);
+            value_write(a, (Writer *)&vm->writer_str);
+            value_write(b, (Writer *)&vm->writer_str);
+
+            vm_push(
+                vm,
+                value_object(
+                    object_str_new(vm, vm->writer_str.data + start, vm->writer_str.count - start)));
+
+            vm->writer_str.count = start;
+            vm->gc_on = gc_on;
+        } break;
+
         case OP_GDEF:
             object_table_set(
                 vm, &vm->globals, (ObjectStr *)vm_read_const(vm)->as.object, vm_peek(vm, 0));
@@ -787,7 +827,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
         } break;
 
         case OP_PRINT:
-            value_print(vm_pop(vm), (Writer *)&vm->writer_stdout);
+            value_write(vm_pop(vm), (Writer *)&vm->writer_stdout);
             printf("\n");
             break;
 
