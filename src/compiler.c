@@ -320,7 +320,7 @@ static void compile_expr(Compiler *c, Power mbp) {
         case TOKEN_DOT: {
             const Op op_get = c->chunk->data[c->chunk->last];
             const Op op_set = op_get_to_set(op_get);
-            if (op_set == OP_RET && op_get != OP_CALL) {
+            if (op_set == OP_RET && op_get != OP_CALL && op_get != OP_IMPORT) {
                 compile_error_unexpected(c, &token);
             }
 
@@ -440,7 +440,7 @@ static void compile_expr(Compiler *c, Power mbp) {
         case TOKEN_LBRACKET: {
             const Op op_get = c->chunk->data[c->chunk->last];
             const Op op_set = op_get_to_set(op_get);
-            if (op_set == OP_RET && op_get != OP_CALL) {
+            if (op_set == OP_RET && op_get != OP_CALL && op_get != OP_IMPORT) {
                 compile_error_unexpected(c, &token);
             }
 
