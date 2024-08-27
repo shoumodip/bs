@@ -1,6 +1,7 @@
 #include <assert.h>
 
 #include "compiler.h"
+#include "lexer.h"
 
 typedef enum {
     POWER_NIL,
@@ -39,6 +40,42 @@ const Power token_type_powers[COUNT_TOKENS] = {
 
     [TOKEN_SET] = POWER_SET,
 };
+
+typedef struct {
+    Token token;
+    size_t depth;
+    bool captured;
+} Local;
+
+typedef struct {
+    bool local;
+    size_t index;
+} Upvalue;
+
+typedef struct {
+    Upvalue *data;
+    size_t count;
+    size_t capacity;
+} Upvalues;
+
+#define upvalues_free da_free
+#define upvalues_push da_push
+
+typedef struct Scope Scope;
+
+struct Scope {
+    Scope *outer;
+
+    Local *data;
+    size_t count;
+    size_t depth;
+    size_t capacity;
+
+    ObjectFn *fn;
+    Upvalues upvalues;
+};
+
+#define scope_push da_push
 
 static void scope_free(Vm *vm, Scope *s) {
     if (s) {
@@ -91,6 +128,14 @@ static bool scope_find_upvalue(Vm *vm, Scope *s, SV name, size_t *index) {
 
     return false;
 }
+
+typedef struct {
+    Lexer lexer;
+    Scope *scope;
+
+    Vm *vm;
+    Chunk *chunk;
+} Compiler;
 
 static size_t compile_jump_start(Compiler *c, Op op) {
     chunk_push_op_int(c->vm, c->chunk, op, 0);
@@ -458,10 +503,10 @@ static void compile_scope_init(Compiler *c, Scope *scope, const Token *token) {
     scope_push(c->vm, scope, (Local){0});
 }
 
-static ObjectFn *compile_scope_end(Compiler *c) {
+static const ObjectFn *compile_scope_end(Compiler *c) {
     chunk_push_op(c->vm, c->chunk, OP_NIL);
     chunk_push_op(c->vm, c->chunk, OP_RET);
-    ObjectFn *fn = c->scope->fn;
+    const ObjectFn *fn = c->scope->fn;
 
     Scope *outer = c->scope->outer;
     c->scope = outer;
@@ -515,7 +560,7 @@ static void compile_function(Compiler *c, const Token *name) {
     lexer_buffer(&c->lexer, lexer_expect(&c->lexer, TOKEN_LBRACE));
     compile_stmt(c);
 
-    ObjectFn *fn = compile_scope_end(c);
+    const ObjectFn *fn = compile_scope_end(c);
     chunk_push_op_value(c->vm, c->chunk, OP_CLOSURE, value_object(fn));
 
     for (size_t i = 0; i < scope.fn->upvalues; i++) {
@@ -667,28 +712,31 @@ static void compile_stmt(Compiler *c) {
     }
 }
 
-ObjectFn *compile(Compiler *c) {
-    Scope scope = {0};
-    compile_scope_init(c, &scope, NULL);
+const ObjectFn *compile(Vm *vm, const char *path, SV sv) {
+    Compiler compiler = {.vm = vm, .lexer = lexer_new(path, sv)};
 
-    if (setjmp(c->lexer.error)) {
-        Scope *scope = c->scope;
+    Scope scope = {0};
+    compile_scope_init(&compiler, &scope, NULL);
+
+    if (setjmp(compiler.lexer.error)) {
+        Scope *scope = compiler.scope;
         while (scope) {
             Scope *outer = scope->outer;
-            scope_free(c->vm, scope);
+            scope_free(compiler.vm, scope);
             scope = outer;
         }
 
-        c->scope = NULL;
-        c->chunk = NULL;
+        compiler.scope = NULL;
+        compiler.chunk = NULL;
         return NULL;
     }
 
-    while (!lexer_read(&c->lexer, TOKEN_EOF)) {
-        compile_stmt(c);
+    while (!lexer_read(&compiler.lexer, TOKEN_EOF)) {
+        compile_stmt(&compiler);
     }
 
-    ObjectFn *fn = compile_scope_end(c);
-    scope_free(c->vm, &scope);
+    const ObjectFn *fn = compile_scope_end(&compiler);
+    scope_free(compiler.vm, &scope);
+
     return fn;
 }

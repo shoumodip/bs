@@ -1,5 +1,4 @@
 #include "compiler.h"
-#include "vm.h"
 
 int main(int argc, char **argv) {
     int result = 0;
@@ -19,12 +18,7 @@ int main(int argc, char **argv) {
     }
 
     Vm *vm = vm_new();
-    Compiler compiler = {
-        .vm = vm,
-        .lexer = lexer_new(path, (SV){contents, size}),
-    };
-
-    const ObjectFn *fn = compile(&compiler);
+    const ObjectFn *fn = compile(vm, path, (SV){contents, size});
     free(contents);
 
     if (!fn) {
