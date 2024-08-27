@@ -19,7 +19,7 @@ static void debug_op_value(Writer *w, const Chunk *c, size_t *offset, const char
     w->fmt(w, "'\n");
 }
 
-static_assert(COUNT_OPS == 39, "Update debug_op()");
+static_assert(COUNT_OPS == 40, "Update debug_op()");
 void debug_op(Writer *w, const Chunk *c, size_t *offset) {
     w->fmt(w, "%04zu ", *offset);
 
@@ -178,11 +178,15 @@ void debug_op(Writer *w, const Chunk *c, size_t *offset) {
         break;
 
     case OP_IGET:
-        w->fmt(w, "OP_AGET\n");
+        w->fmt(w, "OP_IGET\n");
         break;
 
     case OP_ISET:
-        w->fmt(w, "OP_ASET\n");
+        w->fmt(w, "OP_ISET\n");
+        break;
+
+    case OP_ILIT:
+        w->fmt(w, "OP_ILIT\n");
         break;
 
     case OP_JUMP:

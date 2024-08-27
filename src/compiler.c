@@ -237,7 +237,7 @@ static void compile_expr(Compiler *c, Power mbp) {
             compile_expr(c, POWER_SET);
 
             chunk_push_op_loc(c->vm, c->chunk, loc);
-            chunk_push_op(c->vm, c->chunk, OP_ISET);
+            chunk_push_op(c->vm, c->chunk, OP_ILIT);
 
             token = lexer_peek(&c->lexer);
             if (token.type != TOKEN_COMMA) {
@@ -257,7 +257,7 @@ static void compile_expr(Compiler *c, Power mbp) {
             compile_expr(c, POWER_SET);
             index++;
 
-            chunk_push_op(c->vm, c->chunk, OP_ISET);
+            chunk_push_op(c->vm, c->chunk, OP_ILIT);
 
             token = lexer_peek(&c->lexer);
             if (token.type != TOKEN_COMMA) {
@@ -320,7 +320,7 @@ static void compile_expr(Compiler *c, Power mbp) {
         case TOKEN_DOT: {
             const Op op_get = c->chunk->data[c->chunk->last];
             const Op op_set = op_get_to_set(op_get);
-            if (op_set == OP_RET && op_get != OP_CALL && op_get != OP_IMPORT) {
+            if (op_set == OP_RET && op_get != OP_CALL && op_get != OP_IMPORT && op_get != OP_ILIT) {
                 compile_error_unexpected(c, &token);
             }
 
@@ -440,7 +440,7 @@ static void compile_expr(Compiler *c, Power mbp) {
         case TOKEN_LBRACKET: {
             const Op op_get = c->chunk->data[c->chunk->last];
             const Op op_set = op_get_to_set(op_get);
-            if (op_set == OP_RET && op_get != OP_CALL && op_get != OP_IMPORT) {
+            if (op_set == OP_RET && op_get != OP_CALL && op_get != OP_IMPORT && op_get != OP_ILIT) {
                 compile_error_unexpected(c, &token);
             }
 

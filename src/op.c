@@ -2,7 +2,7 @@
 
 #include "op.h"
 
-static_assert(COUNT_OPS == 39, "Update op_get_to_set()");
+static_assert(COUNT_OPS == 40, "Update op_get_to_set()");
 Op op_get_to_set(Op op) {
     switch (op) {
     case OP_GGET:

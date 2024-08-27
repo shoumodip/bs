@@ -518,7 +518,7 @@ static void vm_close_upvalues(Vm *vm, size_t index) {
     }
 }
 
-static_assert(COUNT_OPS == 39, "Update vm_interpret()");
+static_assert(COUNT_OPS == 40, "Update vm_interpret()");
 bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
     bool result = true;
 
@@ -980,7 +980,8 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
             vm_push(vm, value);
         } break;
 
-        case OP_ISET: {
+        case OP_ISET:
+        case OP_ILIT: {
             const Value container = vm_peek(vm, 2);
             if (container.type != VALUE_OBJECT) {
                 vm_runtime_error(

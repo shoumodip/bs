@@ -43,6 +43,7 @@ typedef enum {
     OP_USET,
     OP_IGET,
     OP_ISET,
+    OP_ILIT,
 
     OP_JUMP,
     OP_ELSE,
