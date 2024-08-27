@@ -1,26 +1,87 @@
 #include <stdarg.h>
 
-#include "basic.h"
-#include "bs.h"
 #include "debug.h"
+#include "hash.h"
 
 // #define GC_DEBUG_LOG
 // #define GC_DEBUG_STRESS
 #define GC_GROW_FACTOR 2
 
-Object *object_new(Vm *vm, ObjectType type, size_t size) {
-    Object *object = vm_realloc(vm, NULL, 0, size);
-    object->type = type;
-    object->next = vm->objects;
-    object->marked = false;
-    vm->objects = object;
+typedef struct {
+    size_t base;
+    ObjectClosure *closure;
 
-#ifdef GC_DEBUG_LOG
-    printf("[GC] Allocate %p (%zu bytes); Type: %d\n", object, size, type);
-#endif // GC_DEBUG_LOG
+    const uint8_t *ip;
+} Frame;
 
-    return object;
+typedef struct {
+    Frame *data;
+    size_t count;
+    size_t capacity;
+} Frames;
+
+#define frames_free da_free
+#define frames_push da_push
+
+typedef struct {
+    Writer meta;
+
+    Vm *vm;
+    char *data;
+    size_t count;
+    size_t capacity;
+} WriterStr;
+
+#define writer_str_free da_free
+
+static void vm_writer_str_fmt(Writer *w, const char *fmt, ...) {
+    WriterStr *w1 = (WriterStr *)w;
+
+    va_list args;
+    va_start(args, fmt);
+    int count = vsnprintf(NULL, 0, fmt, args);
+    assert(count >= 0);
+    va_end(args);
+
+    da_push_many(w1->vm, w1, NULL, count + 1);
+    va_start(args, fmt);
+    vsnprintf(w1->data + w1->count, count + 1, fmt, args);
+    va_end(args);
+
+    w1->count += count;
 }
+
+typedef struct {
+    Writer meta;
+    FILE *file;
+} WriterFile;
+
+static void vm_writer_file_fmt(Writer *w, const char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    vfprintf(((WriterFile *)w)->file, fmt, args);
+    va_end(args);
+}
+
+struct Vm {
+    Values stack;
+
+    Frame *frame;
+    Frames frames;
+
+    ObjectTable globals;
+    ObjectTable strings;
+    ObjectUpvalue *upvalues;
+
+    bool gc_on;
+    size_t gc_max;
+    size_t gc_bytes;
+    Object *objects;
+
+    WriterStr writer_str;
+    WriterFile writer_stdout;
+    WriterFile writer_stderr;
+};
 
 static_assert(COUNT_OBJECTS == 6, "Update object_free()");
 static void object_free(Vm *vm, Object *object) {
@@ -204,6 +265,17 @@ static void vm_collect(Vm *vm) {
 #endif // GC_DEBUG_LOG
 }
 
+Vm *vm_new(void) {
+    Vm *vm = calloc(1, sizeof(Vm));
+    vm->gc_max = 1024 * 1024;
+    vm->globals.meta.type = OBJECT_TABLE;
+
+    vm->writer_str = (WriterStr){.meta.fmt = vm_writer_str_fmt, .vm = vm};
+    vm->writer_stdout = (WriterFile){.meta.fmt = vm_writer_file_fmt, .file = stdout};
+    vm->writer_stderr = (WriterFile){.meta.fmt = vm_writer_file_fmt, .file = stderr};
+    return vm;
+}
+
 void vm_free(Vm *vm) {
     Object *object = vm->objects;
     while (object) {
@@ -220,6 +292,8 @@ void vm_free(Vm *vm) {
 
     object_table_free(vm, &vm->globals);
     object_table_free(vm, &vm->strings);
+
+    free(vm);
 }
 
 void *vm_realloc(Vm *vm, void *ptr, size_t old_size, size_t new_size) {
@@ -375,36 +449,8 @@ static void vm_close_upvalues(Vm *vm, size_t index) {
     }
 }
 
-static void vm_writer_str_fmt(Writer *w, const char *fmt, ...) {
-    WriterStr *w1 = (WriterStr *)w;
-
-    va_list args;
-    va_start(args, fmt);
-    int count = vsnprintf(NULL, 0, fmt, args);
-    assert(count >= 0);
-    va_end(args);
-
-    da_push_many(w1->vm, w1, NULL, count + 1);
-    va_start(args, fmt);
-    vsnprintf(w1->data + w1->count, count + 1, fmt, args);
-    va_end(args);
-
-    w1->count += count;
-}
-
-static void vm_writer_file_fmt(Writer *w, const char *fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-    vfprintf(((WriterFile *)w)->file, fmt, args);
-    va_end(args);
-}
-
 static_assert(COUNT_OPS == 38, "Update vm_interpret()");
 bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
-    vm->writer_str = (WriterStr){.meta.fmt = vm_writer_str_fmt, .vm = vm};
-    vm->writer_stdout = (WriterFile){.meta.fmt = vm_writer_file_fmt, .file = stdout};
-    vm->writer_stderr = (WriterFile){.meta.fmt = vm_writer_file_fmt, .file = stderr};
-
     bool result = true;
 
     if (debug) {
@@ -416,7 +462,6 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
     vm_call(vm, closure, 0, 0);
 
     vm->gc_on = true;
-    vm->globals.meta.type = OBJECT_TABLE;
     while (true) {
         if (debug) {
             printf("----------------------------------------\n");
@@ -878,4 +923,30 @@ defer:
     vm->upvalues = NULL;
     vm->gc_on = false;
     return result;
+}
+
+Object *object_new(Vm *vm, ObjectType type, size_t size) {
+    Object *object = vm_realloc(vm, NULL, 0, size);
+    object->type = type;
+    object->next = vm->objects;
+    object->marked = false;
+    vm->objects = object;
+
+#ifdef GC_DEBUG_LOG
+    printf("[GC] Allocate %p (%zu bytes); Type: %d\n", object, size, type);
+#endif // GC_DEBUG_LOG
+
+    return object;
+}
+
+ObjectStr *object_str_const(Vm *vm, const char *data, size_t size) {
+    Entry *entry = entries_find_sv(vm->strings.data, vm->strings.capacity, (SV){data, size}, NULL);
+    if (entry && entry->key) {
+        return entry->key;
+    }
+
+    ObjectStr *str = object_str_new(vm, data, size);
+    object_table_set(vm, &vm->strings, str, value_nil);
+
+    return str;
 }

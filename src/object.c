@@ -1,4 +1,3 @@
-#include "bs.h"
 #include "hash.h"
 
 #define TABLE_MAX_LOAD 0.75
@@ -48,18 +47,6 @@ ObjectStr *object_str_new(Vm *vm, const char *data, size_t size) {
 
     memcpy(str->data, data, size);
     str->size = size;
-    return str;
-}
-
-ObjectStr *object_str_const(Vm *vm, const char *data, size_t size) {
-    Entry *entry = entries_find_sv(vm->strings.data, vm->strings.capacity, (SV){data, size}, NULL);
-    if (entry && entry->key) {
-        return entry->key;
-    }
-
-    ObjectStr *str = object_str_new(vm, data, size);
-    object_table_set(vm, &vm->strings, str, value_nil);
-
     return str;
 }
 

@@ -78,7 +78,6 @@ struct ObjectStr {
 };
 
 ObjectStr *object_str_new(Vm *vm, const char *data, size_t size);
-ObjectStr *object_str_const(Vm *vm, const char *data, size_t size);
 bool object_str_eq(const ObjectStr *a, const ObjectStr *b);
 
 struct ObjectArray {

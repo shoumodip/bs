@@ -9,12 +9,13 @@
 
 typedef struct Vm Vm;
 
-Object *object_new(Vm *vm, ObjectType type, size_t size);
-
+Vm *vm_new(void);
 void vm_free(Vm *vm);
 void *vm_realloc(Vm *vm, void *ptr, size_t old_size, size_t new_size);
-
 bool vm_interpret(Vm *vm, const ObjectFn *fn, bool step);
+
+Object *object_new(Vm *vm, ObjectType type, size_t size);
+ObjectStr *object_str_const(Vm *vm, const char *data, size_t size);
 
 // Dynamic Array
 #define DA_INIT_CAP 128

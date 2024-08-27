@@ -1,5 +1,5 @@
-#include "bs.h"
 #include "compiler.h"
+#include "vm.h"
 
 int main(int argc, char **argv) {
     int result = 0;
@@ -18,12 +18,11 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    Vm vm = {0};
-    Compiler compiler = {0};
-
-    vm.gc_max = 1024 * 1024;
-    compiler.vm = &vm;
-    compiler.lexer = lexer_new(path, (SV){contents, size});
+    Vm *vm = vm_new();
+    Compiler compiler = {
+        .vm = vm,
+        .lexer = lexer_new(path, (SV){contents, size}),
+    };
 
     const ObjectFn *fn = compile(&compiler);
     free(contents);
@@ -32,11 +31,11 @@ int main(int argc, char **argv) {
         return_defer(1);
     }
 
-    if (!vm_interpret(&vm, fn, false)) {
+    if (!vm_interpret(vm, fn, false)) {
         return_defer(1);
     }
 
 defer:
-    vm_free(&vm);
+    vm_free(vm);
     return result;
 }
