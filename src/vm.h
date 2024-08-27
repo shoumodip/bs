@@ -14,6 +14,8 @@ void vm_free(Vm *vm);
 void *vm_realloc(Vm *vm, void *ptr, size_t old_size, size_t new_size);
 bool vm_interpret(Vm *vm, const ObjectFn *fn, bool step);
 
+size_t vm_modules_push(Vm *vm, ObjectStr *name);
+
 Object *object_new(Vm *vm, ObjectType type, size_t size);
 ObjectStr *object_str_const(Vm *vm, const char *data, size_t size);
 

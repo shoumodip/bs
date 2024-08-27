@@ -59,6 +59,7 @@ struct ObjectFn {
     Object meta;
 
     Chunk chunk;
+    size_t module;
     ObjectStr *name;
 
     size_t arity;

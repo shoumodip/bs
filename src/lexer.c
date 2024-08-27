@@ -49,7 +49,7 @@ void lexer_buffer(Lexer *l, Token token) {
     l->buffer = token;
 }
 
-static_assert(COUNT_TOKENS == 40, "Update lexer_next()");
+static_assert(COUNT_TOKENS == 41, "Update lexer_next()");
 Token lexer_next(Lexer *l) {
     if (l->peeked) {
         l->peeked = false;
@@ -216,6 +216,8 @@ Token lexer_next(Lexer *l) {
             token.type = TOKEN_AND;
         } else if (sv_eq(token.sv, SVStatic("len"))) {
             token.type = TOKEN_LEN;
+        } else if (sv_eq(token.sv, SVStatic("import"))) {
+            token.type = TOKEN_IMPORT;
         } else if (sv_eq(token.sv, SVStatic("if"))) {
             token.type = TOKEN_IF;
         } else if (sv_eq(token.sv, SVStatic("else"))) {

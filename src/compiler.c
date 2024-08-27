@@ -14,7 +14,7 @@ typedef enum {
     POWER_DOT,
 } Power;
 
-static_assert(COUNT_TOKENS == 40, "Update token_type_powers[]");
+static_assert(COUNT_TOKENS == 41, "Update token_type_powers[]");
 const Power token_type_powers[COUNT_TOKENS] = {
     [TOKEN_DOT] = POWER_DOT,
     [TOKEN_LPAREN] = POWER_DOT,
@@ -159,7 +159,7 @@ static void compile_error_unexpected(Compiler *c, const Token *token) {
 
 static void compile_function(Compiler *c, const Token *name);
 
-static_assert(COUNT_TOKENS == 40, "Update compile_expr()");
+static_assert(COUNT_TOKENS == 41, "Update compile_expr()");
 static void compile_expr(Compiler *c, Power mbp) {
     Token token = lexer_next(&c->lexer);
     Loc loc = token.loc;
@@ -283,6 +283,15 @@ static void compile_expr(Compiler *c, Power mbp) {
 
         chunk_push_op_loc(c->vm, c->chunk, loc);
         chunk_push_op(c->vm, c->chunk, OP_LEN);
+        break;
+
+    case TOKEN_IMPORT:
+        lexer_expect(&c->lexer, TOKEN_LPAREN);
+        compile_expr(c, POWER_SET);
+        lexer_expect(&c->lexer, TOKEN_RPAREN);
+
+        chunk_push_op_loc(c->vm, c->chunk, loc);
+        chunk_push_op(c->vm, c->chunk, OP_IMPORT);
         break;
 
     case TOKEN_FN:
@@ -490,23 +499,23 @@ static void compile_block_end(Compiler *c) {
     }
 }
 
-static void compile_scope_init(Compiler *c, Scope *scope, const Token *token) {
+static void compile_scope_init(Compiler *c, Scope *scope, SV name) {
     scope->fn = object_fn_new(c->vm);
     scope->outer = c->scope;
     c->scope = scope;
 
-    if (token) {
-        scope->fn->name = object_str_const(c->vm, token->sv.data, token->sv.size);
+    if (name.size) {
+        scope->fn->name = object_str_const(c->vm, name.data, name.size);
     }
 
     c->chunk = &c->scope->fn->chunk;
     scope_push(c->vm, scope, (Local){0});
 }
 
-static const ObjectFn *compile_scope_end(Compiler *c) {
+static ObjectFn *compile_scope_end(Compiler *c) {
     chunk_push_op(c->vm, c->chunk, OP_NIL);
     chunk_push_op(c->vm, c->chunk, OP_RET);
-    const ObjectFn *fn = c->scope->fn;
+    ObjectFn *fn = c->scope->fn;
 
     Scope *outer = c->scope->outer;
     c->scope = outer;
@@ -539,7 +548,7 @@ static void compile_stmt(Compiler *c);
 
 static void compile_function(Compiler *c, const Token *name) {
     Scope scope = {0};
-    compile_scope_init(c, &scope, name);
+    compile_scope_init(c, &scope, name ? name->sv : (SV){0});
     compile_block_init(c);
 
     lexer_expect(&c->lexer, TOKEN_LPAREN);
@@ -571,7 +580,7 @@ static void compile_function(Compiler *c, const Token *name) {
     scope_free(c->vm, &scope);
 }
 
-static_assert(COUNT_TOKENS == 40, "Update compile_stmt()");
+static_assert(COUNT_TOKENS == 41, "Update compile_stmt()");
 static void compile_stmt(Compiler *c) {
     Token token = lexer_next(&c->lexer);
 
@@ -716,7 +725,8 @@ const ObjectFn *compile(Vm *vm, const char *path, SV sv) {
     Compiler compiler = {.vm = vm, .lexer = lexer_new(path, sv)};
 
     Scope scope = {0};
-    compile_scope_init(&compiler, &scope, NULL);
+    compile_scope_init(&compiler, &scope, (SV){path, strlen(path)});
+    scope.fn->module = vm_modules_push(vm, scope.fn->name);
 
     if (setjmp(compiler.lexer.error)) {
         Scope *scope = compiler.scope;
@@ -735,7 +745,7 @@ const ObjectFn *compile(Vm *vm, const char *path, SV sv) {
         compile_stmt(&compiler);
     }
 
-    const ObjectFn *fn = compile_scope_end(&compiler);
+    ObjectFn *fn = compile_scope_end(&compiler);
     scope_free(compiler.vm, &scope);
 
     return fn;

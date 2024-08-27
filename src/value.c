@@ -51,7 +51,9 @@ static void object_write(const Object *o, Writer *w) {
     switch (o->type) {
     case OBJECT_FN: {
         const ObjectFn *fn = (const ObjectFn *)o;
-        if (fn->name) {
+        if (fn->module) {
+            w->fmt(w, "file '" SVFmt "'", SVArg(*fn->name));
+        } else if (fn->name) {
             w->fmt(w, "fn " SVFmt "()", SVArg(*fn->name));
         } else {
             w->fmt(w, "fn ()");
@@ -97,14 +99,9 @@ static void object_write(const Object *o, Writer *w) {
         w->fmt(w, "}");
     } break;
 
-    case OBJECT_CLOSURE: {
-        const ObjectFn *fn = ((const ObjectClosure *)o)->fn;
-        if (fn->name) {
-            w->fmt(w, "fn " SVFmt "()", SVArg(*fn->name));
-        } else {
-            w->fmt(w, "fn ()");
-        }
-    } break;
+    case OBJECT_CLOSURE:
+        object_write((Object *)((const ObjectClosure *)o)->fn, w);
+        break;
 
     case OBJECT_UPVALUE:
         w->fmt(w, "<upvalue>");

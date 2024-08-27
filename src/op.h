@@ -32,6 +32,7 @@ typedef enum {
 
     OP_LEN,
     OP_JOIN,
+    OP_IMPORT,
 
     OP_GDEF,
     OP_GGET,

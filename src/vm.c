@@ -1,5 +1,6 @@
 #include <stdarg.h>
 
+#include "compiler.h"
 #include "debug.h"
 #include "hash.h"
 
@@ -63,13 +64,58 @@ static void vm_writer_file_fmt(Writer *w, const char *fmt, ...) {
     va_end(args);
 }
 
+typedef struct {
+    bool done;
+    ObjectStr *name;
+
+    Value result;
+} Module;
+
+typedef struct {
+    Module *data;
+    size_t count;
+    size_t capacity;
+} Modules;
+
+#define modules_free da_free
+
+static bool modules_find(Modules *m, ObjectStr *name, size_t *index) {
+    for (size_t i = 0; i < m->count; i++) {
+        if (object_str_eq(m->data[i].name, name)) {
+            *index = i;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+typedef struct {
+    ObjectTable *data;
+    size_t count;
+    size_t capacity;
+
+    ObjectTable *current;
+} Globals;
+
+void globals_free(Vm *vm, Globals *globals) {
+    for (size_t i = 0; i < globals->count; i++) {
+        object_table_free(vm, &globals->data[i]);
+    }
+    da_free(vm, globals);
+}
+
+#define globals_push da_push
+
 struct Vm {
     Values stack;
 
     Frame *frame;
     Frames frames;
 
-    ObjectTable globals;
+    Modules modules;
+    Globals globals;
+
     ObjectTable strings;
     ObjectUpvalue *upvalues;
 
@@ -220,12 +266,24 @@ static void vm_collect(Vm *vm) {
         object_mark(vm, (Object *)vm->frames.data[i].closure);
     }
 
+    for (size_t i = 0; i < vm->modules.count; i++) {
+        Module *m = &vm->modules.data[i];
+
+        object_mark(vm, (Object *)m->name);
+        if (m->result.type == VALUE_OBJECT) {
+            object_mark(vm, (Object *)m->result.as.object);
+        }
+    }
+
+    for (size_t i = 0; i < vm->globals.count; i++) {
+        ObjectTable *g = &vm->globals.data[i];
+        g->meta.marked = false;
+        object_mark(vm, (Object *)g);
+    }
+
     for (ObjectUpvalue *upvalue = vm->upvalues; upvalue; upvalue = upvalue->next) {
         object_mark(vm, (Object *)upvalue);
     }
-
-    vm->globals.meta.marked = false;
-    object_mark(vm, (Object *)&vm->globals);
 
     // Sweep
     Object *previous = NULL;
@@ -268,7 +326,6 @@ static void vm_collect(Vm *vm) {
 Vm *vm_new(void) {
     Vm *vm = calloc(1, sizeof(Vm));
     vm->gc_max = 1024 * 1024;
-    vm->globals.meta.type = OBJECT_TABLE;
 
     vm->writer_str = (WriterStr){.meta.fmt = vm_writer_str_fmt, .vm = vm};
     vm->writer_stdout = (WriterFile){.meta.fmt = vm_writer_file_fmt, .file = stdout};
@@ -277,6 +334,14 @@ Vm *vm_new(void) {
 }
 
 void vm_free(Vm *vm) {
+    free(vm->stack.data);
+    memset(&vm->stack, 0, sizeof(vm->stack));
+
+    frames_free(vm, &vm->frames);
+    modules_free(vm, &vm->modules);
+    globals_free(vm, &vm->globals);
+    object_table_free(vm, &vm->strings);
+
     Object *object = vm->objects;
     while (object) {
         Object *next = object->next;
@@ -284,15 +349,7 @@ void vm_free(Vm *vm) {
         object = next;
     }
 
-    free(vm->stack.data);
-    memset(&vm->stack, 0, sizeof(vm->stack));
-
-    frames_free(vm, &vm->frames);
     writer_str_free(vm, &vm->writer_str);
-
-    object_table_free(vm, &vm->globals);
-    object_table_free(vm, &vm->strings);
-
     free(vm);
 }
 
@@ -368,12 +425,19 @@ static void vm_runtime_error(Vm *vm, size_t op_index, const char *fmt, ...) {
     va_end(args);
 
     for (size_t i = vm->frames.count; i > 1; i--) {
-        const Frame *frame = &vm->frames.data[i - 2];
-        const ObjectFn *fn = frame->closure->fn;
+        const Frame *callee = &vm->frames.data[i - 1];
+        const Frame *caller = &vm->frames.data[i - 2];
+        const ObjectFn *fn = caller->closure->fn;
 
-        loc = chunk_get_loc(&fn->chunk, frame->ip - fn->chunk.data - 1 - sizeof(size_t));
+        size_t op_index = caller->ip - fn->chunk.data - 1;
+        if (!callee->closure->fn->module) {
+            op_index -= sizeof(size_t);
+        }
+
+        loc = chunk_get_loc(&fn->chunk, op_index);
         fprintf(stderr, LocFmt "in ", LocArg(loc));
-        value_write(value_object(fn), (Writer *)&vm->writer_stderr);
+
+        value_write(value_object(callee->closure->fn), (Writer *)&vm->writer_stderr);
         fprintf(stderr, "\n");
     }
 }
@@ -413,6 +477,11 @@ static bool vm_call(Vm *vm, ObjectClosure *closure, size_t arity, size_t op_inde
     frames_push(vm, &vm->frames, frame);
     vm->frame = &vm->frames.data[vm->frames.count - 1];
 
+    if (closure->fn->module) {
+        globals_push(vm, &vm->globals, (ObjectTable){.meta.type = OBJECT_TABLE});
+        vm->globals.current = &vm->globals.data[vm->globals.count - 1];
+    }
+
     return true;
 }
 
@@ -449,7 +518,7 @@ static void vm_close_upvalues(Vm *vm, size_t index) {
     }
 }
 
-static_assert(COUNT_OPS == 38, "Update vm_interpret()");
+static_assert(COUNT_OPS == 39, "Update vm_interpret()");
 bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
     bool result = true;
 
@@ -465,6 +534,19 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
     while (true) {
         if (debug) {
             printf("----------------------------------------\n");
+            printf("Globals:\n");
+            for (size_t i = 0; i < vm->globals.count; i++) {
+                printf("    ");
+                value_write(value_object(&vm->globals.data[i]), (Writer *)&vm->writer_stdout);
+                printf("\n");
+            }
+            printf("\n");
+
+            printf("Current Globals:\n");
+            printf("    ");
+            value_write(value_object(vm->globals.current), (Writer *)&vm->writer_stdout);
+            printf("\n\n");
+
             printf("Stack:\n");
             for (size_t i = 0; i < vm->stack.count; i++) {
                 printf("    ");
@@ -491,10 +573,20 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
                 return_defer(true);
             }
 
+            const Frame *frame = &vm->frames.data[vm->frames.count];
             vm->stack.count = vm->frame->base;
             vm_push(vm, value);
 
             vm->frame = &vm->frames.data[vm->frames.count - 1];
+
+            if (frame->closure->fn->module) {
+                Module *m = &vm->modules.data[frame->closure->fn->module - 1];
+                m->done = true;
+                m->result = value;
+
+                object_table_free(vm, &vm->globals.data[--vm->globals.count]);
+                vm->globals.current = &vm->globals.data[vm->globals.count - 1];
+            }
         } break;
 
         case OP_CALL: {
@@ -704,7 +796,6 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
         case OP_JOIN: {
             const bool gc_on = vm->gc_on;
             const size_t start = vm->writer_str.count;
-
             vm->gc_on = false;
 
             const Value b = vm_pop(vm);
@@ -721,9 +812,64 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
             vm->gc_on = gc_on;
         } break;
 
+        case OP_IMPORT: {
+            const Value a = vm_pop(vm);
+            if (a.type != VALUE_OBJECT || a.as.object->type != OBJECT_STR) {
+                vm_runtime_error(
+                    vm, op_index, "invalid operand to builtin import(): %s\n", value_type_name(a));
+                return_defer(false);
+            }
+            ObjectStr *name = (ObjectStr *)a.as.object;
+
+            if (!name->size) {
+                vm_runtime_error(
+                    vm, op_index, "invalid operand to builtin import(): empty string\n");
+                return_defer(false);
+            }
+
+            size_t index;
+            if (modules_find(&vm->modules, name, &index)) {
+                const Module *m = &vm->modules.data[index];
+                if (!m->done) {
+                    vm_runtime_error(vm, op_index, "import loop detected\n");
+                    return_defer(false);
+                }
+
+                vm_push(vm, m->result);
+            } else {
+                const bool gc_on = vm->gc_on;
+                const size_t start = vm->writer_str.count;
+                vm->gc_on = false;
+
+                value_write(a, (Writer *)&vm->writer_str);
+                const char *path = vm->writer_str.data + start;
+
+                size_t size = 0;
+                char *contents = read_file(path, &size);
+                if (!contents) {
+                    vm_runtime_error(vm, op_index, "could not read file '%s'\n", path);
+                    return_defer(false);
+                }
+
+                const ObjectFn *fn = compile(vm, path, (SV){contents, size});
+                free(contents);
+
+                if (!fn) {
+                    return_defer(false);
+                }
+
+                ObjectClosure *closure = object_closure_new(vm, fn);
+                vm_push(vm, value_object(closure));
+                vm_call(vm, closure, 0, op_index);
+
+                vm->writer_str.count = start;
+                vm->gc_on = gc_on;
+            }
+        } break;
+
         case OP_GDEF:
             object_table_set(
-                vm, &vm->globals, (ObjectStr *)vm_read_const(vm)->as.object, vm_peek(vm, 0));
+                vm, vm->globals.current, (ObjectStr *)vm_read_const(vm)->as.object, vm_peek(vm, 0));
 
             vm_pop(vm);
             break;
@@ -732,7 +878,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
             ObjectStr *name = (ObjectStr *)vm_read_const(vm)->as.object;
 
             Value value;
-            if (!object_table_get(vm, &vm->globals, name, &value)) {
+            if (!object_table_get(vm, vm->globals.current, name, &value)) {
                 vm_runtime_error(vm, op_index, "undefined variable '" SVFmt "'\n", SVArg(*name));
                 return_defer(false);
             }
@@ -743,8 +889,8 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
         case OP_GSET: {
             ObjectStr *name = (ObjectStr *)vm_read_const(vm)->as.object;
 
-            if (object_table_set(vm, &vm->globals, name, vm_peek(vm, 0))) {
-                object_table_remove(vm, &vm->globals, name);
+            if (object_table_set(vm, vm->globals.current, name, vm_peek(vm, 0))) {
+                object_table_remove(vm, vm->globals.current, name);
                 vm_runtime_error(vm, op_index, "undefined variable '" SVFmt "'\n", SVArg(*name));
                 return_defer(false);
             }
@@ -923,6 +1069,11 @@ defer:
     vm->upvalues = NULL;
     vm->gc_on = false;
     return result;
+}
+
+size_t vm_modules_push(Vm *vm, ObjectStr *name) {
+    da_push(vm, &vm->modules, (Module){.name = name});
+    return vm->modules.count;
 }
 
 Object *object_new(Vm *vm, ObjectType type, size_t size) {

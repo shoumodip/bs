@@ -34,8 +34,10 @@ void chunk_push_op_value(Vm *vm, Chunk *c, Op op, Value value) {
 
 ObjectFn *object_fn_new(Vm *vm) {
     ObjectFn *fn = (ObjectFn *)object_new(vm, OBJECT_FN, sizeof(ObjectFn));
-    fn->name = NULL;
     fn->chunk = (Chunk){0};
+    fn->module = 0;
+    fn->name = NULL;
+
     fn->arity = 0;
     fn->upvalues = 0;
     return fn;

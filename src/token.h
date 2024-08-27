@@ -52,6 +52,7 @@ typedef enum {
 
     TOKEN_LEN,
     TOKEN_JOIN,
+    TOKEN_IMPORT,
 
     TOKEN_SET,
 
