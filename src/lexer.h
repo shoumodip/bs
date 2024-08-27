@@ -11,6 +11,7 @@ typedef struct {
     bool peeked;
     Token buffer;
 
+    bool extended;
     jmp_buf error;
 } Lexer;
 

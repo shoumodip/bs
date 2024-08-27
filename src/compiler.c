@@ -152,7 +152,10 @@ static void compile_jump_direct(Compiler *c, Op op, size_t addr) {
 
 static void compile_error_unexpected(Compiler *c, const Token *token) {
     fprintf(
-        stderr, LocFmt "error: unexpected %s\n", LocArg(token->loc), token_type_name(token->type));
+        stderr,
+        LocFmt "error: unexpected %s\n",
+        LocArg(token->loc),
+        token_type_name(token->type, c->lexer.extended));
 
     lexer_error(&c->lexer);
 }
@@ -723,9 +726,13 @@ static void compile_stmt(Compiler *c) {
 
 const ObjectFn *compile(Vm *vm, const char *path, SV sv) {
     Compiler compiler = {.vm = vm, .lexer = lexer_new(path, sv)};
+    const SV path_sv = (SV){path, strlen(path)};
+    if (sv_suffix(path_sv, SVStatic(".bsx"))) {
+        compiler.lexer.extended = true;
+    }
 
     Scope scope = {0};
-    compile_scope_init(&compiler, &scope, (SV){path, strlen(path)});
+    compile_scope_init(&compiler, &scope, path_sv);
     scope.fn->module = vm_modules_push(vm, scope.fn->name);
 
     if (setjmp(compiler.lexer.error)) {

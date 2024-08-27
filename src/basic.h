@@ -15,6 +15,7 @@ typedef struct {
 #define SVStatic(s) ((SV){s, sizeof(s) - 1})
 
 bool sv_eq(SV a, SV b);
+bool sv_suffix(SV a, SV b);
 
 // Writer
 typedef struct Writer Writer;

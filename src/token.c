@@ -3,13 +3,13 @@
 #include "token.h"
 
 static_assert(COUNT_TOKENS == 41, "Update token_type_name()");
-const char *token_type_name(TokenType type) {
+const char *token_type_name(TokenType type, bool extended) {
     switch (type) {
     case TOKEN_EOF:
         return "end of file";
 
     case TOKEN_EOL:
-        return "';'";
+        return extended ? "'fr'" : "';'";
 
     case TOKEN_DOT:
         return "'.'";
@@ -18,7 +18,7 @@ const char *token_type_name(TokenType type) {
         return "','";
 
     case TOKEN_NIL:
-        return "'nil'";
+        return extended ? "'bruh'" : "'nil'";
 
     case TOKEN_NUM:
         return "number";
@@ -27,8 +27,10 @@ const char *token_type_name(TokenType type) {
         return "string";
 
     case TOKEN_TRUE:
+        return extended ? "'nocap'" : "'true'";
+
     case TOKEN_FALSE:
-        return "boolean";
+        return extended ? "'cap'" : "'false'";
 
     case TOKEN_IDENT:
         return "identifier";
@@ -70,7 +72,7 @@ const char *token_type_name(TokenType type) {
         return "'and'";
 
     case TOKEN_NOT:
-        return "'!'";
+        return extended ? "'nah'" : "'!'";
 
     case TOKEN_GT:
         return "'>'";
@@ -85,46 +87,46 @@ const char *token_type_name(TokenType type) {
         return "'<='";
 
     case TOKEN_EQ:
-        return "'=='";
+        return extended ? "'is'" : "'=='";
 
     case TOKEN_NE:
-        return "'!='";
+        return extended ? "'isnt'" : "'!='";
 
     case TOKEN_LEN:
-        return "'len'";
+        return extended ? "'thicc'" : "'len'";
 
     case TOKEN_JOIN:
         return "'..'";
 
     case TOKEN_IMPORT:
-        return "'import'";
+        return extended ? "'redpill'" : "'import'";
 
     case TOKEN_SET:
-        return "'='";
+        return extended ? "'be'" : "'='";
 
     case TOKEN_IF:
-        return "'if'";
+        return extended ? "'ayo'" : "'if'";
 
     case TOKEN_ELSE:
-        return "'else'";
+        return extended ? "'sike'" : "'else'";
 
     case TOKEN_FOR:
-        return "'for'";
+        return extended ? "'yall'" : "'for'";
 
     case TOKEN_WHILE:
-        return "'while'";
+        return extended ? "'yolo'" : "'while'";
 
     case TOKEN_FN:
-        return "'fn'";
+        return extended ? "'lit'" : "'fn'";
 
     case TOKEN_VAR:
-        return "'var'";
+        return extended ? "'mf'" : "'var'";
 
     case TOKEN_RETURN:
-        return "'return'";
+        return extended ? "'bet'" : "'return'";
 
     case TOKEN_PRINT:
-        return "'print'";
+        return extended ? "'yap'" : "'print'";
 
     default:
         assert(false && "unreachable");

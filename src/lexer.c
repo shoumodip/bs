@@ -72,7 +72,10 @@ Token lexer_next(Lexer *l) {
 
     if (l->sv.size == 0) {
         token.type = TOKEN_EOF;
-    } else if (isdigit(*l->sv.data)) {
+        return token;
+    }
+
+    if (isdigit(*l->sv.data)) {
         token.type = TOKEN_NUM;
         while (l->sv.size > 0 && isdigit(*l->sv.data)) {
             lexer_advance(l);
@@ -84,12 +87,98 @@ Token lexer_next(Lexer *l) {
                 lexer_advance(l);
             }
         }
-    } else if (isalpha(*l->sv.data) || *l->sv.data == '_') {
+
+        token.sv.size -= l->sv.size;
+        return token;
+    }
+
+    if (isalpha(*l->sv.data) || *l->sv.data == '_') {
         token.type = TOKEN_IDENT;
         while (l->sv.size > 0 && (isalnum(*l->sv.data) || *l->sv.data == '_')) {
             lexer_advance(l);
         }
-    } else if (lexer_match(l, '"')) {
+        token.sv.size -= l->sv.size;
+
+        if (l->extended) {
+            if (sv_eq(token.sv, SVStatic("fr"))) {
+                token.type = TOKEN_EOL;
+            } else if (sv_eq(token.sv, SVStatic("bruh"))) {
+                token.type = TOKEN_NIL;
+            } else if (sv_eq(token.sv, SVStatic("nocap"))) {
+                token.type = TOKEN_TRUE;
+            } else if (sv_eq(token.sv, SVStatic("cap"))) {
+                token.type = TOKEN_FALSE;
+            } else if (sv_eq(token.sv, SVStatic("or"))) {
+                token.type = TOKEN_OR;
+            } else if (sv_eq(token.sv, SVStatic("and"))) {
+                token.type = TOKEN_AND;
+            } else if (sv_eq(token.sv, SVStatic("nah"))) {
+                token.type = TOKEN_NOT;
+            } else if (sv_eq(token.sv, SVStatic("is"))) {
+                token.type = TOKEN_EQ;
+            } else if (sv_eq(token.sv, SVStatic("isnt"))) {
+                token.type = TOKEN_NE;
+            } else if (sv_eq(token.sv, SVStatic("thicc"))) {
+                token.type = TOKEN_LEN;
+            } else if (sv_eq(token.sv, SVStatic("redpill"))) {
+                token.type = TOKEN_IMPORT;
+            } else if (sv_eq(token.sv, SVStatic("be"))) {
+                token.type = TOKEN_SET;
+            } else if (sv_eq(token.sv, SVStatic("ayo"))) {
+                token.type = TOKEN_IF;
+            } else if (sv_eq(token.sv, SVStatic("sike"))) {
+                token.type = TOKEN_ELSE;
+            } else if (sv_eq(token.sv, SVStatic("yall"))) {
+                token.type = TOKEN_FOR;
+            } else if (sv_eq(token.sv, SVStatic("yolo"))) {
+                token.type = TOKEN_WHILE;
+            } else if (sv_eq(token.sv, SVStatic("lit"))) {
+                token.type = TOKEN_FN;
+            } else if (sv_eq(token.sv, SVStatic("mf"))) {
+                token.type = TOKEN_VAR;
+            } else if (sv_eq(token.sv, SVStatic("bet"))) {
+                token.type = TOKEN_RETURN;
+            } else if (sv_eq(token.sv, SVStatic("yap"))) {
+                token.type = TOKEN_PRINT;
+            }
+        } else {
+            if (sv_eq(token.sv, SVStatic("nil"))) {
+                token.type = TOKEN_NIL;
+            } else if (sv_eq(token.sv, SVStatic("true"))) {
+                token.type = TOKEN_TRUE;
+            } else if (sv_eq(token.sv, SVStatic("false"))) {
+                token.type = TOKEN_FALSE;
+            } else if (sv_eq(token.sv, SVStatic("or"))) {
+                token.type = TOKEN_OR;
+            } else if (sv_eq(token.sv, SVStatic("and"))) {
+                token.type = TOKEN_AND;
+            } else if (sv_eq(token.sv, SVStatic("len"))) {
+                token.type = TOKEN_LEN;
+            } else if (sv_eq(token.sv, SVStatic("import"))) {
+                token.type = TOKEN_IMPORT;
+            } else if (sv_eq(token.sv, SVStatic("if"))) {
+                token.type = TOKEN_IF;
+            } else if (sv_eq(token.sv, SVStatic("else"))) {
+                token.type = TOKEN_ELSE;
+            } else if (sv_eq(token.sv, SVStatic("for"))) {
+                token.type = TOKEN_FOR;
+            } else if (sv_eq(token.sv, SVStatic("while"))) {
+                token.type = TOKEN_WHILE;
+            } else if (sv_eq(token.sv, SVStatic("fn"))) {
+                token.type = TOKEN_FN;
+            } else if (sv_eq(token.sv, SVStatic("var"))) {
+                token.type = TOKEN_VAR;
+            } else if (sv_eq(token.sv, SVStatic("return"))) {
+                token.type = TOKEN_RETURN;
+            } else if (sv_eq(token.sv, SVStatic("print"))) {
+                token.type = TOKEN_PRINT;
+            }
+        }
+
+        return token;
+    }
+
+    if (lexer_match(l, '"')) {
         while (l->sv.size > 0 && *l->sv.data != '"') {
             lexer_advance(l);
         }
@@ -101,142 +190,115 @@ Token lexer_next(Lexer *l) {
 
         token.type = TOKEN_STR;
         lexer_advance(l);
-    } else {
-        switch (lexer_consume(l)) {
-        case ';':
+
+        token.sv.size -= l->sv.size;
+        return token;
+    }
+
+    switch (lexer_consume(l)) {
+    case ';':
+        if (!l->extended) {
             token.type = TOKEN_EOL;
-            break;
+        }
+        break;
 
-        case '.':
-            if (lexer_match(l, '.')) {
-                token.type = TOKEN_JOIN;
-            } else {
-                token.type = TOKEN_DOT;
-            }
-            break;
+    case '.':
+        if (lexer_match(l, '.')) {
+            token.type = TOKEN_JOIN;
+        } else {
+            token.type = TOKEN_DOT;
+        }
+        break;
 
-        case ',':
-            token.type = TOKEN_COMMA;
-            break;
+    case ',':
+        token.type = TOKEN_COMMA;
+        break;
 
-        case '(':
-            token.type = TOKEN_LPAREN;
-            break;
+    case '(':
+        token.type = TOKEN_LPAREN;
+        break;
 
-        case ')':
-            token.type = TOKEN_RPAREN;
-            break;
+    case ')':
+        token.type = TOKEN_RPAREN;
+        break;
 
-        case '{':
-            token.type = TOKEN_LBRACE;
-            break;
+    case '{':
+        token.type = TOKEN_LBRACE;
+        break;
 
-        case '}':
-            token.type = TOKEN_RBRACE;
-            break;
+    case '}':
+        token.type = TOKEN_RBRACE;
+        break;
 
-        case '[':
-            token.type = TOKEN_LBRACKET;
-            break;
+    case '[':
+        token.type = TOKEN_LBRACKET;
+        break;
 
-        case ']':
-            token.type = TOKEN_RBRACKET;
-            break;
+    case ']':
+        token.type = TOKEN_RBRACKET;
+        break;
 
-        case '+':
-            token.type = TOKEN_ADD;
-            break;
+    case '+':
+        token.type = TOKEN_ADD;
+        break;
 
-        case '-':
-            token.type = TOKEN_SUB;
-            break;
+    case '-':
+        token.type = TOKEN_SUB;
+        break;
 
-        case '*':
-            token.type = TOKEN_MUL;
-            break;
+    case '*':
+        token.type = TOKEN_MUL;
+        break;
 
-        case '/':
-            token.type = TOKEN_DIV;
-            break;
+    case '/':
+        token.type = TOKEN_DIV;
+        break;
 
-        case '!':
+    case '!':
+        if (!l->extended) {
             if (lexer_match(l, '=')) {
                 token.type = TOKEN_NE;
             } else {
                 token.type = TOKEN_NOT;
             }
-            break;
+        }
+        break;
 
-        case '>':
-            if (lexer_match(l, '=')) {
-                token.type = TOKEN_GE;
-            } else {
-                token.type = TOKEN_GT;
-            }
-            break;
+    case '>':
+        if (lexer_match(l, '=')) {
+            token.type = TOKEN_GE;
+        } else {
+            token.type = TOKEN_GT;
+        }
+        break;
 
-        case '<':
-            if (lexer_match(l, '=')) {
-                token.type = TOKEN_LE;
-            } else {
-                token.type = TOKEN_LT;
-            }
-            break;
+    case '<':
+        if (lexer_match(l, '=')) {
+            token.type = TOKEN_LE;
+        } else {
+            token.type = TOKEN_LT;
+        }
+        break;
 
-        case '=':
+    case '=':
+        if (!l->extended) {
             if (lexer_match(l, '=')) {
                 token.type = TOKEN_EQ;
             } else {
                 token.type = TOKEN_SET;
             }
-            break;
-
-        default:
-            fprintf(
-                stderr,
-                LocFmt "error: invalid character '%c'\n",
-                LocArg(token.loc),
-                *token.sv.data);
-
-            lexer_error(l);
         }
+        break;
+    }
+
+    if (token.type == TOKEN_EOF) {
+        fprintf(
+            stderr, LocFmt "error: invalid character '%c'\n", LocArg(token.loc), *token.sv.data);
+
+        lexer_error(l);
     }
 
     token.sv.size -= l->sv.size;
-    if (token.type == TOKEN_IDENT) {
-        if (sv_eq(token.sv, SVStatic("nil"))) {
-            token.type = TOKEN_NIL;
-        } else if (sv_eq(token.sv, SVStatic("true"))) {
-            token.type = TOKEN_TRUE;
-        } else if (sv_eq(token.sv, SVStatic("false"))) {
-            token.type = TOKEN_FALSE;
-        } else if (sv_eq(token.sv, SVStatic("or"))) {
-            token.type = TOKEN_OR;
-        } else if (sv_eq(token.sv, SVStatic("and"))) {
-            token.type = TOKEN_AND;
-        } else if (sv_eq(token.sv, SVStatic("len"))) {
-            token.type = TOKEN_LEN;
-        } else if (sv_eq(token.sv, SVStatic("import"))) {
-            token.type = TOKEN_IMPORT;
-        } else if (sv_eq(token.sv, SVStatic("if"))) {
-            token.type = TOKEN_IF;
-        } else if (sv_eq(token.sv, SVStatic("else"))) {
-            token.type = TOKEN_ELSE;
-        } else if (sv_eq(token.sv, SVStatic("for"))) {
-            token.type = TOKEN_FOR;
-        } else if (sv_eq(token.sv, SVStatic("while"))) {
-            token.type = TOKEN_WHILE;
-        } else if (sv_eq(token.sv, SVStatic("fn"))) {
-            token.type = TOKEN_FN;
-        } else if (sv_eq(token.sv, SVStatic("var"))) {
-            token.type = TOKEN_VAR;
-        } else if (sv_eq(token.sv, SVStatic("return"))) {
-            token.type = TOKEN_RETURN;
-        } else if (sv_eq(token.sv, SVStatic("print"))) {
-            token.type = TOKEN_PRINT;
-        }
-    }
-
     return token;
 }
 
@@ -260,8 +322,8 @@ Token lexer_expect(Lexer *l, TokenType type) {
             stderr,
             LocFmt "error: expected %s, got %s\n",
             LocArg(token.loc),
-            token_type_name(type),
-            token_type_name(token.type));
+            token_type_name(type, l->extended),
+            token_type_name(token.type, l->extended));
 
         lexer_error(l);
     }

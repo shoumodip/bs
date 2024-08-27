@@ -5,7 +5,11 @@
 #include "basic.h"
 
 bool sv_eq(SV a, SV b) {
-    return a.size == b.size && memcmp(a.data, b.data, b.size) == 0;
+    return a.size == b.size && !memcmp(a.data, b.data, b.size);
+}
+
+bool sv_suffix(SV a, SV b) {
+    return a.size >= b.size && !memcmp(a.data + a.size - b.size, b.data, b.size);
 }
 
 char *read_file(const char *path, size_t *size) {

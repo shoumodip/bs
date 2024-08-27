@@ -69,7 +69,7 @@ typedef enum {
     COUNT_TOKENS
 } TokenType;
 
-const char *token_type_name(TokenType type);
+const char *token_type_name(TokenType type, bool extended);
 
 typedef struct {
     TokenType type;
