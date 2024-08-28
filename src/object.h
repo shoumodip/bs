@@ -140,8 +140,9 @@ typedef bool (*NativeFn)(Vm *vm, Value *args, size_t args_count, Value *result);
 struct ObjectNativeFn {
     Object meta;
     NativeFn fn;
+    size_t arity;
 };
 
-ObjectNativeFn *object_native_fn_new(Vm *vm, NativeFn fn);
+ObjectNativeFn *object_native_fn_new(Vm *vm, NativeFn fn, size_t arity);
 
 #endif // OBJECT_H

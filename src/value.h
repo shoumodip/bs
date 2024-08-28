@@ -24,6 +24,8 @@ typedef enum {
     COUNT_OBJECTS
 } ObjectType;
 
+const char *object_type_name(ObjectType type);
+
 typedef struct Object Object;
 typedef struct ObjectFn ObjectFn;
 typedef struct ObjectStr ObjectStr;
@@ -48,7 +50,7 @@ typedef struct {
 #define value_object(v) ((Value){VALUE_OBJECT, .as.object = (Object *)(v)})
 
 bool value_is_falsey(Value value);
-const char *value_type_name(Value value);
+const char *value_get_type_name(Value value);
 
 void value_write(Value value, Writer *writer);
 bool value_equal(Value a, Value b);

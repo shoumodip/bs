@@ -460,6 +460,47 @@ void vm_error(Vm *vm, const char *fmt, ...) {
     }
 }
 
+bool vm_check_value_type(Vm *vm, Value value, ValueType expected, const char *label) {
+    if (value.type != expected) {
+        vm_error(
+            vm,
+            "expected %s to be %s, got %s",
+            label,
+            value_get_type_name((Value){.type = expected}),
+            value_get_type_name(value));
+        return false;
+    }
+
+    return true;
+}
+
+bool vm_check_object_type(Vm *vm, Value value, ObjectType expected, const char *label) {
+    if (value.type != VALUE_OBJECT || value.as.object->type != expected) {
+        vm_error(
+            vm,
+            "expected %s to be %s, got %s",
+            label,
+            object_type_name(expected),
+            value_get_type_name(value));
+        return false;
+    }
+
+    return true;
+}
+
+bool vm_check_whole_number(Vm *vm, Value value, const char *label) {
+    if (!vm_check_value_type(vm, value, VALUE_NUM, label)) {
+        return false;
+    }
+
+    if (value.as.number < 0 || value.as.number != (long)value.as.number) {
+        vm_error(vm, "expected %s to be positive whole number, got %g", label, value.as.number);
+        return false;
+    }
+
+    return true;
+}
+
 static bool vm_binary_op(Vm *vm, Value *a, Value *b, const char *op) {
     *b = vm_pop(vm);
     *a = vm_pop(vm);
@@ -469,8 +510,8 @@ static bool vm_binary_op(Vm *vm, Value *a, Value *b, const char *op) {
             vm,
             "invalid operands to binary (%s): %s, %s",
             op,
-            value_type_name(*a),
-            value_type_name(*b));
+            value_get_type_name(*a),
+            value_get_type_name(*b));
 
         return false;
     }
@@ -542,9 +583,11 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
         debug_chunks((Writer *)&vm->writer_stdout, vm->objects);
     }
 
-    ObjectClosure *closure = object_closure_new(vm, fn);
-    vm_push(vm, value_object(closure));
-    vm_call(vm, closure, 0);
+    {
+        ObjectClosure *closure = object_closure_new(vm, fn);
+        vm_push(vm, value_object(closure));
+        vm_call(vm, closure, 0);
+    }
 
     vm->gc_on = true;
     while (true) {
@@ -610,7 +653,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
             const Value value = vm_peek(vm, arity);
 
             if (value.type != VALUE_OBJECT) {
-                vm_error(vm, "cannot call %s value", value_type_name(value));
+                vm_error(vm, "cannot call %s value", value_get_type_name(value));
                 return_defer(false);
             }
 
@@ -623,12 +666,17 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
                 break;
 
             case OBJECT_NATIVE_FN: {
+                const ObjectNativeFn *native = (ObjectNativeFn *)value.as.object;
+                if (arity != native->arity) {
+                    vm_error(vm, "expected %zu arguments, got %zu", native->arity, arity);
+                    return_defer(false);
+                }
+
                 const bool gc_on = vm->gc_on;
                 vm->gc_on = false;
 
-                const NativeFn fn = ((ObjectNativeFn *)value.as.object)->fn;
                 Value value = value_nil;
-                if (!fn(vm, &vm->stack.data[vm->stack.count - arity], arity, &value)) {
+                if (!native->fn(vm, &vm->stack.data[vm->stack.count - arity], arity, &value)) {
                     return_defer(false);
                 }
 
@@ -639,7 +687,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
             } break;
 
             default:
-                vm_error(vm, "cannot call %s value", value_type_name(value));
+                vm_error(vm, "cannot call %s value", value_get_type_name(value));
                 return_defer(false);
             }
         } break;
@@ -733,7 +781,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
         case OP_NEG: {
             const Value a = vm_pop(vm);
             if (a.type != VALUE_NUM) {
-                vm_error(vm, "invalid operand to unary (-): %s", value_type_name(a));
+                vm_error(vm, "invalid operand to unary (-): %s", value_get_type_name(a));
                 return_defer(false);
             }
 
@@ -795,7 +843,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
         case OP_LEN: {
             const Value a = vm_peek(vm, 0);
             if (a.type != VALUE_OBJECT) {
-                vm_error(vm, "cannot get length of %s value", value_type_name(a));
+                vm_error(vm, "cannot get length of %s value", value_get_type_name(a));
                 return_defer(false);
             }
 
@@ -814,7 +862,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
                 break;
 
             default:
-                vm_error(vm, "cannot get length of %s value", value_type_name(a));
+                vm_error(vm, "cannot get length of %s value", value_get_type_name(a));
                 return_defer(false);
             }
 
@@ -843,14 +891,13 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
 
         case OP_IMPORT: {
             const Value a = vm_pop(vm);
-            if (a.type != VALUE_OBJECT || a.as.object->type != OBJECT_STR) {
-                vm_error(vm, "invalid operand to builtin import(): %s", value_type_name(a));
+            if (!vm_check_object_type(vm, a, OBJECT_STR, "import path")) {
                 return_defer(false);
             }
             ObjectStr *name = (ObjectStr *)a.as.object;
 
             if (!name->size) {
-                vm_error(vm, "invalid operand to builtin import(): empty string");
+                vm_error(vm, "import path cannot be empty");
                 return_defer(false);
             }
 
@@ -968,37 +1015,28 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
 
             const Value container = vm_peek(vm, 1);
             if (container.type != VALUE_OBJECT) {
-                vm_error(vm, "cannot index into %s value", value_type_name(container));
+                vm_error(vm, "cannot index into %s value", value_get_type_name(container));
                 return_defer(false);
             }
 
             const Value index = vm_peek(vm, 0);
             if (container.as.object->type == OBJECT_ARRAY) {
-                if (index.type != VALUE_NUM) {
-                    vm_error(vm, "cannot index array with %s value", value_type_name(index));
-
+                if (!vm_check_whole_number(vm, index, "array index")) {
                     return_defer(false);
                 }
 
-                if (index.as.number != (long)index.as.number) {
-                    vm_error(vm, "cannot index array with fractional value");
-                    return_defer(false);
-                }
-
-                if (!object_array_get(
-                        vm, (ObjectArray *)container.as.object, index.as.number, &value)) {
+                ObjectArray *array = (ObjectArray *)container.as.object;
+                if (!object_array_get(vm, array, index.as.number, &value)) {
                     vm_error(
                         vm,
                         "cannot get value at index %zu in array of length %zu",
                         (size_t)index.as.number,
-                        ((ObjectArray *)container.as.object)->count);
+                        array->count);
 
                     return_defer(false);
                 }
             } else if (container.as.object->type == OBJECT_TABLE) {
-                if (index.type != VALUE_OBJECT || index.as.object->type != OBJECT_STR) {
-                    vm_error(vm, "cannot index table with %s value", value_type_name(index));
-
+                if (!vm_check_object_type(vm, index, OBJECT_STR, "table key")) {
                     return_defer(false);
                 }
 
@@ -1007,7 +1045,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
                     value = value_nil;
                 }
             } else {
-                vm_error(vm, "cannot index into %s value", value_type_name(container));
+                vm_error(vm, "cannot index into %s value", value_get_type_name(container));
                 return_defer(false);
             }
 
@@ -1019,7 +1057,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
         case OP_ILIT: {
             const Value container = vm_peek(vm, 2);
             if (container.type != VALUE_OBJECT) {
-                vm_error(vm, "cannot index into %s value", value_type_name(container));
+                vm_error(vm, "cannot index into %s value", value_get_type_name(container));
                 return_defer(false);
             }
 
@@ -1027,36 +1065,24 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
             const Value index = vm_peek(vm, 1);
 
             if (container.as.object->type == OBJECT_ARRAY) {
-                if (index.type != VALUE_NUM) {
-                    vm_error(vm, "cannot index with %s value", value_type_name(index));
-                    return_defer(false);
-                }
-
-                if (index.as.number != (long)index.as.number) {
-                    vm_error(vm, "cannot index with fractional value");
+                if (!vm_check_whole_number(vm, index, "array index")) {
                     return_defer(false);
                 }
 
                 object_array_set(vm, (ObjectArray *)container.as.object, index.as.number, value);
             } else if (container.as.object->type == OBJECT_TABLE) {
-                if (index.type != VALUE_OBJECT || index.as.object->type != OBJECT_STR) {
-                    vm_error(vm, "cannot index table with %s value", value_type_name(index));
-
+                if (!vm_check_object_type(vm, index, OBJECT_STR, "table key")) {
                     return_defer(false);
                 }
 
+                ObjectTable *table = (ObjectTable *)container.as.object;
                 if (value.type == VALUE_NIL) {
-                    object_table_remove(
-                        vm, (ObjectTable *)container.as.object, (ObjectStr *)index.as.object);
+                    object_table_remove(vm, table, (ObjectStr *)index.as.object);
                 } else {
-                    object_table_set(
-                        vm,
-                        (ObjectTable *)container.as.object,
-                        (ObjectStr *)index.as.object,
-                        value);
+                    object_table_set(vm, table, (ObjectStr *)index.as.object, value);
                 }
             } else {
-                vm_error(vm, "cannot index into %s value", value_type_name(container));
+                vm_error(vm, "cannot index into %s value", value_get_type_name(container));
                 return_defer(false);
             }
 

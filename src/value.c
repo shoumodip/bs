@@ -5,8 +5,36 @@ bool value_is_falsey(Value v) {
     return v.type == VALUE_NIL || (v.type == VALUE_BOOL && !v.as.boolean);
 }
 
-static_assert(COUNT_OBJECTS == 7, "Update value_type_name()");
-const char *value_type_name(Value v) {
+static_assert(COUNT_OBJECTS == 7, "Update object_type_name()");
+const char *object_type_name(ObjectType type) {
+    switch (type) {
+    case OBJECT_FN:
+        return "function";
+
+    case OBJECT_STR:
+        return "string";
+
+    case OBJECT_ARRAY:
+        return "array";
+
+    case OBJECT_TABLE:
+        return "table";
+
+    case OBJECT_CLOSURE:
+        return "closure";
+
+    case OBJECT_UPVALUE:
+        return "upvalue";
+
+    case OBJECT_NATIVE_FN:
+        return "native function";
+
+    default:
+        assert(false && "unreachable");
+    }
+}
+
+const char *value_get_type_name(Value v) {
     switch (v.type) {
     case VALUE_NIL:
         return "nil";
@@ -18,31 +46,7 @@ const char *value_type_name(Value v) {
         return "boolean";
 
     case VALUE_OBJECT:
-        switch (v.as.object->type) {
-        case OBJECT_FN:
-            return "function";
-
-        case OBJECT_STR:
-            return "string";
-
-        case OBJECT_ARRAY:
-            return "array";
-
-        case OBJECT_TABLE:
-            return "table";
-
-        case OBJECT_CLOSURE:
-            return "closure";
-
-        case OBJECT_UPVALUE:
-            return "upvalue";
-
-        case OBJECT_NATIVE_FN:
-            return "native function";
-
-        default:
-            assert(false && "unreachable");
-        }
+        return object_type_name(v.as.object->type);
 
     default:
         assert(false && "unreachable");

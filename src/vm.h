@@ -14,6 +14,11 @@ void vm_free(Vm *vm);
 void *vm_realloc(Vm *vm, void *ptr, size_t old_size, size_t new_size);
 
 void vm_error(Vm *vm, const char *fmt, ...);
+
+bool vm_check_value_type(Vm *vm, Value value, ValueType expected, const char *label);
+bool vm_check_object_type(Vm *vm, Value value, ObjectType expected, const char *label);
+bool vm_check_whole_number(Vm *vm, Value value, const char *label);
+
 bool vm_interpret(Vm *vm, const ObjectFn *fn, bool step);
 
 size_t vm_modules_push(Vm *vm, ObjectStr *name);

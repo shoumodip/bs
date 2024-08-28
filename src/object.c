@@ -212,10 +212,11 @@ ObjectUpvalue *object_upvalue_new(Vm *vm, size_t index) {
     return upvalue;
 }
 
-ObjectNativeFn *object_native_fn_new(Vm *vm, NativeFn fn) {
+ObjectNativeFn *object_native_fn_new(Vm *vm, NativeFn fn, size_t arity) {
     ObjectNativeFn *native =
         (ObjectNativeFn *)object_new(vm, OBJECT_NATIVE_FN, sizeof(ObjectNativeFn));
 
     native->fn = fn;
+    native->arity = arity;
     return native;
 }

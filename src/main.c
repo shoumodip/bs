@@ -1,43 +1,15 @@
 #include "compiler.h"
 
 static bool string_slice(Vm *vm, Value *args, size_t count, Value *result) {
-    if (count != 3) {
-        vm_error(vm, "expected 3 arguments, got %zu", count);
+    if (!vm_check_object_type(vm, args[0], OBJECT_STR, "argument #1")) {
         return false;
     }
 
-    if (args[0].type != VALUE_OBJECT || args[0].as.object->type != OBJECT_STR) {
-        vm_error(vm, "expected argument #1 to be string, got %s", value_type_name(args[0]));
+    if (!vm_check_whole_number(vm, args[1], "argument #2")) {
         return false;
     }
 
-    if (args[1].type != VALUE_NUM) {
-        vm_error(vm, "expected argument #2 to be number, got %s", value_type_name(args[1]));
-        return false;
-    }
-
-    if (args[1].as.number != (long)args[1].as.number) {
-        vm_error(vm, "expected argument #2 to be whole number, got fractional value");
-        return false;
-    }
-
-    if (args[2].type != VALUE_NUM) {
-        vm_error(vm, "expected argument #3 to be number, got %s", value_type_name(args[2]));
-        return false;
-    }
-
-    if (args[2].as.number != (long)args[2].as.number) {
-        vm_error(vm, "expected argument #3 to be whole number, got fractional value");
-        return false;
-    }
-
-    if (args[1].as.number < 0) {
-        vm_error(vm, "expected argument #2 to be positive number, got negative value");
-        return false;
-    }
-
-    if (args[2].as.number < 0) {
-        vm_error(vm, "expected argument #3 to be positive number, got negative value");
+    if (!vm_check_whole_number(vm, args[2], "argument #3")) {
         return false;
     }
 
@@ -78,7 +50,7 @@ int main(int argc, char **argv) {
         vm,
         string,
         object_str_const(vm, "slice", 5),
-        value_object(object_native_fn_new(vm, string_slice)));
+        value_object(object_native_fn_new(vm, string_slice, 3)));
 
     vm_native_define(vm, SVStatic("string"), value_object(string));
 
