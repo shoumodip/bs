@@ -90,10 +90,10 @@ const char *token_type_name(TokenType type, bool extended) {
         return "'<='";
 
     case TOKEN_EQ:
-        return extended ? "'is'" : "'=='";
+        return "'=='";
 
     case TOKEN_NE:
-        return extended ? "'isnt'" : "'!='";
+        return "'!='";
 
     case TOKEN_LEN:
         return extended ? "'thicc'" : "'len'";

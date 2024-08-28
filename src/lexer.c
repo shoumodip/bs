@@ -114,10 +114,6 @@ Token lexer_next(Lexer *l) {
                 token.type = TOKEN_AND;
             } else if (sv_eq(token.sv, SVStatic("nah"))) {
                 token.type = TOKEN_NOT;
-            } else if (sv_eq(token.sv, SVStatic("is"))) {
-                token.type = TOKEN_EQ;
-            } else if (sv_eq(token.sv, SVStatic("isnt"))) {
-                token.type = TOKEN_NE;
             } else if (sv_eq(token.sv, SVStatic("thicc"))) {
                 token.type = TOKEN_LEN;
             } else if (sv_eq(token.sv, SVStatic("redpill"))) {
@@ -259,12 +255,10 @@ Token lexer_next(Lexer *l) {
         break;
 
     case '!':
-        if (!l->extended) {
-            if (lexer_match(l, '=')) {
-                token.type = TOKEN_NE;
-            } else {
-                token.type = TOKEN_NOT;
-            }
+        if (lexer_match(l, '=')) {
+            token.type = TOKEN_NE;
+        } else if (!l->extended) {
+            token.type = TOKEN_NOT;
         }
         break;
 
@@ -285,12 +279,10 @@ Token lexer_next(Lexer *l) {
         break;
 
     case '=':
-        if (!l->extended) {
-            if (lexer_match(l, '=')) {
-                token.type = TOKEN_EQ;
-            } else {
-                token.type = TOKEN_SET;
-            }
+        if (lexer_match(l, '=')) {
+            token.type = TOKEN_EQ;
+        } else if (!l->extended) {
+            token.type = TOKEN_SET;
         }
         break;
     }
