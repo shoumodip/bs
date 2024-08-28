@@ -26,6 +26,7 @@ typedef enum {
     TOKEN_TRUE,
     TOKEN_FALSE,
     TOKEN_IDENT,
+    TOKEN_NATIVE,
 
     TOKEN_LPAREN,
     TOKEN_RPAREN,

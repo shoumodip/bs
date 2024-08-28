@@ -14,7 +14,7 @@ typedef enum {
     POWER_DOT,
 } Power;
 
-static_assert(COUNT_TOKENS == 41, "Update token_type_powers[]");
+static_assert(COUNT_TOKENS == 42, "Update token_type_powers[]");
 const Power token_type_powers[COUNT_TOKENS] = {
     [TOKEN_DOT] = POWER_DOT,
     [TOKEN_LPAREN] = POWER_DOT,
@@ -162,7 +162,7 @@ static void compile_error_unexpected(Compiler *c, const Token *token) {
 
 static void compile_function(Compiler *c, const Token *name);
 
-static_assert(COUNT_TOKENS == 41, "Update compile_expr()");
+static_assert(COUNT_TOKENS == 42, "Update compile_expr()");
 static void compile_expr(Compiler *c, Power mbp) {
     Token token = lexer_next(&c->lexer);
     Loc loc = token.loc;
@@ -207,6 +207,17 @@ static void compile_expr(Compiler *c, Power mbp) {
                 value_object(object_str_const(c->vm, token.sv.data, token.sv.size)));
         }
     } break;
+
+    case TOKEN_NATIVE:
+        token = lexer_expect(&c->lexer, TOKEN_IDENT);
+
+        chunk_push_op_loc(c->vm, c->chunk, token.loc);
+        chunk_push_op_value(
+            c->vm,
+            c->chunk,
+            OP_NGET,
+            value_object(object_str_const(c->vm, token.sv.data, token.sv.size)));
+        break;
 
     case TOKEN_LPAREN:
         compile_expr(c, POWER_SET);
@@ -320,7 +331,8 @@ static void compile_expr(Compiler *c, Power mbp) {
         case TOKEN_DOT: {
             const Op op_get = c->chunk->data[c->chunk->last];
             const Op op_set = op_get_to_set(op_get);
-            if (op_set == OP_RET && op_get != OP_CALL && op_get != OP_IMPORT && op_get != OP_ILIT) {
+            if (op_set == OP_RET && op_get != OP_CALL && op_get != OP_IMPORT && op_get != OP_ILIT &&
+                op_get != OP_NGET) {
                 compile_error_unexpected(c, &token);
             }
 
@@ -416,7 +428,8 @@ static void compile_expr(Compiler *c, Power mbp) {
         case TOKEN_LPAREN: {
             const Op op_get = c->chunk->data[c->chunk->last];
             const Op op_set = op_get_to_set(op_get);
-            if (op_set == OP_RET && op_get != OP_CALL && op_get != OP_CLOSURE) {
+            if (op_set == OP_RET && op_get != OP_CALL && op_get != OP_CLOSURE &&
+                op_get != OP_NGET) {
                 compile_error_unexpected(c, &token);
             }
 
@@ -439,7 +452,7 @@ static void compile_expr(Compiler *c, Power mbp) {
 
         case TOKEN_LBRACKET: {
             const Op op_get = c->chunk->data[c->chunk->last];
-            const Op op_set = op_get_to_set(op_get);
+            const Op op_set = op_get_to_set(op_get && op_get != OP_NGET);
             if (op_set == OP_RET && op_get != OP_CALL && op_get != OP_IMPORT && op_get != OP_ILIT) {
                 compile_error_unexpected(c, &token);
             }
@@ -583,7 +596,7 @@ static void compile_function(Compiler *c, const Token *name) {
     scope_free(c->vm, &scope);
 }
 
-static_assert(COUNT_TOKENS == 41, "Update compile_stmt()");
+static_assert(COUNT_TOKENS == 42, "Update compile_stmt()");
 static void compile_stmt(Compiler *c) {
     Token token = lexer_next(&c->lexer);
 

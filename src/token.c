@@ -2,7 +2,7 @@
 
 #include "token.h"
 
-static_assert(COUNT_TOKENS == 41, "Update token_type_name()");
+static_assert(COUNT_TOKENS == 42, "Update token_type_name()");
 const char *token_type_name(TokenType type, bool extended) {
     switch (type) {
     case TOKEN_EOF:
@@ -34,6 +34,9 @@ const char *token_type_name(TokenType type, bool extended) {
 
     case TOKEN_IDENT:
         return "identifier";
+
+    case TOKEN_NATIVE:
+        return "'@'";
 
     case TOKEN_LPAREN:
         return "'('";

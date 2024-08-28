@@ -35,6 +35,7 @@ struct Writer {
 char *read_file(const char *path, size_t *size);
 
 // Arithmetic
+#define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 #endif // BASIC_H

@@ -49,7 +49,7 @@ void lexer_buffer(Lexer *l, Token token) {
     l->buffer = token;
 }
 
-static_assert(COUNT_TOKENS == 41, "Update lexer_next()");
+static_assert(COUNT_TOKENS == 42, "Update lexer_next()");
 Token lexer_next(Lexer *l) {
     if (l->peeked) {
         l->peeked = false;
@@ -212,6 +212,10 @@ Token lexer_next(Lexer *l) {
 
     case ',':
         token.type = TOKEN_COMMA;
+        break;
+
+    case '@':
+        token.type = TOKEN_NATIVE;
         break;
 
     case '(':

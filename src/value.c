@@ -5,7 +5,7 @@ bool value_is_falsey(Value v) {
     return v.type == VALUE_NIL || (v.type == VALUE_BOOL && !v.as.boolean);
 }
 
-static_assert(COUNT_OBJECTS == 6, "Update value_type_name()");
+static_assert(COUNT_OBJECTS == 7, "Update value_type_name()");
 const char *value_type_name(Value v) {
     switch (v.type) {
     case VALUE_NIL:
@@ -37,6 +37,9 @@ const char *value_type_name(Value v) {
         case OBJECT_UPVALUE:
             return "upvalue";
 
+        case OBJECT_NATIVE_FN:
+            return "native function";
+
         default:
             assert(false && "unreachable");
         }
@@ -46,7 +49,7 @@ const char *value_type_name(Value v) {
     }
 }
 
-static_assert(COUNT_OBJECTS == 6, "Update object_write()");
+static_assert(COUNT_OBJECTS == 7, "Update object_write()");
 static void object_write(const Object *o, Writer *w) {
     switch (o->type) {
     case OBJECT_FN: {
@@ -103,6 +106,10 @@ static void object_write(const Object *o, Writer *w) {
         object_write((Object *)((const ObjectClosure *)o)->fn, w);
         break;
 
+    case OBJECT_NATIVE_FN:
+        w->fmt(w, "native fn ()");
+        break;
+
     case OBJECT_UPVALUE:
         w->fmt(w, "<upvalue>");
         break;
@@ -135,7 +142,7 @@ void value_write(Value v, Writer *w) {
     }
 }
 
-static_assert(COUNT_OBJECTS == 6, "Update object_equal()");
+static_assert(COUNT_OBJECTS == 7, "Update object_equal()");
 static bool object_equal(const Object *a, const Object *b) {
     if (a->type != b->type) {
         return false;
@@ -190,6 +197,9 @@ static bool object_equal(const Object *a, const Object *b) {
 
     case OBJECT_CLOSURE:
         return a == b;
+
+    case OBJECT_NATIVE_FN:
+        return ((ObjectNativeFn *)a)->fn == ((ObjectNativeFn *)b)->fn;
 
     default:
         assert(false && "unreachable");

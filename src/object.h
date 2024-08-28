@@ -135,4 +135,13 @@ struct ObjectUpvalue {
 
 ObjectUpvalue *object_upvalue_new(Vm *vm, size_t index);
 
+typedef bool (*NativeFn)(Vm *vm, Value *args, size_t args_count, Value *result);
+
+struct ObjectNativeFn {
+    Object meta;
+    NativeFn fn;
+};
+
+ObjectNativeFn *object_native_fn_new(Vm *vm, NativeFn fn);
+
 #endif // OBJECT_H

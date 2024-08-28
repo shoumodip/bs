@@ -12,9 +12,12 @@ typedef struct Vm Vm;
 Vm *vm_new(void);
 void vm_free(Vm *vm);
 void *vm_realloc(Vm *vm, void *ptr, size_t old_size, size_t new_size);
+
+void vm_error(Vm *vm, const char *fmt, ...);
 bool vm_interpret(Vm *vm, const ObjectFn *fn, bool step);
 
 size_t vm_modules_push(Vm *vm, ObjectStr *name);
+void vm_native_define(Vm *vm, SV name, Value value);
 
 Object *object_new(Vm *vm, ObjectType type, size_t size);
 ObjectStr *object_str_const(Vm *vm, const char *data, size_t size);
