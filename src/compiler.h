@@ -3,6 +3,6 @@
 
 #include "object.h"
 
-const ObjectFn *compile(Vm *vm, const char *path, SV sv);
+ObjectFn *compile(Vm *vm, const char *path, SV sv);
 
 #endif // COMPILER_H

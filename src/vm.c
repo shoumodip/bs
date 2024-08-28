@@ -613,15 +613,23 @@ static void vm_close_upvalues(Vm *vm, size_t index) {
     }
 }
 
-static_assert(COUNT_OPS == 41, "Update vm_interpret()");
-bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
+static_assert(COUNT_OPS == 41, "Update vm_run()");
+bool vm_run(Vm *vm, const char *path, SV sv, bool step) {
     bool result = true;
 
-    if (debug) {
+    if (step) {
         debug_chunks((Writer *)&vm->writer_stdout, vm->objects);
     }
 
     {
+        ObjectFn *fn = compile(vm, path, sv);
+        if (!fn) {
+            return_defer(false);
+        }
+
+        da_push(vm, &vm->modules, (Module){.name = fn->name});
+        fn->module = vm->modules.count;
+
         ObjectClosure *closure = object_closure_new(vm, fn);
         vm_push(vm, value_object(closure));
         vm_call(vm, closure, 0);
@@ -629,7 +637,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
 
     vm->gc_on = true;
     while (true) {
-        if (debug) {
+        if (step) {
             printf("----------------------------------------\n");
             printf("Globals:\n");
             for (size_t i = 0; i < vm->globals.count; i++) {
@@ -695,7 +703,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
                 return_defer(false);
             }
 
-            static_assert(COUNT_OBJECTS == 8, "Update vm_interpret()");
+            static_assert(COUNT_OBJECTS == 8, "Update vm_run()");
             switch (value.as.object->type) {
             case OBJECT_CLOSURE:
                 if (!vm_call(vm, (ObjectClosure *)value.as.object, arity)) {
@@ -981,12 +989,14 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
                     return_defer(false);
                 }
 
-                const ObjectFn *fn = compile(vm, path, (SV){contents, size});
+                ObjectFn *fn = compile(vm, path, (SV){contents, size});
                 free(contents);
 
                 if (!fn) {
                     return_defer(false);
                 }
+                da_push(vm, &vm->modules, (Module){.name = fn->name});
+                fn->module = vm->modules.count;
 
                 ObjectClosure *closure = object_closure_new(vm, fn);
                 vm_push(vm, value_object(closure));
@@ -1183,11 +1193,6 @@ defer:
     vm->upvalues = NULL;
     vm->gc_on = false;
     return result;
-}
-
-size_t vm_modules_push(Vm *vm, ObjectStr *name) {
-    da_push(vm, &vm->modules, (Module){.name = name});
-    return vm->modules.count;
 }
 
 void vm_native_define(Vm *vm, SV name, Value value) {

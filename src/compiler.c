@@ -428,8 +428,8 @@ static void compile_expr(Compiler *c, Power mbp) {
         case TOKEN_LPAREN: {
             const Op op_get = c->chunk->data[c->chunk->last];
             const Op op_set = op_get_to_set(op_get);
-            if (op_set == OP_RET && op_get != OP_CALL && op_get != OP_CLOSURE &&
-                op_get != OP_NGET) {
+            if (op_set == OP_RET && op_get != OP_CALL && op_get != OP_IMPORT &&
+                op_get != OP_CLOSURE && op_get != OP_NGET) {
                 compile_error_unexpected(c, &token);
             }
 
@@ -452,8 +452,9 @@ static void compile_expr(Compiler *c, Power mbp) {
 
         case TOKEN_LBRACKET: {
             const Op op_get = c->chunk->data[c->chunk->last];
-            const Op op_set = op_get_to_set(op_get && op_get != OP_NGET);
-            if (op_set == OP_RET && op_get != OP_CALL && op_get != OP_IMPORT && op_get != OP_ILIT) {
+            const Op op_set = op_get_to_set(op_get);
+            if (op_set == OP_RET && op_get != OP_CALL && op_get != OP_IMPORT && op_get != OP_ILIT &&
+                op_get != OP_NGET) {
                 compile_error_unexpected(c, &token);
             }
 
@@ -737,7 +738,7 @@ static void compile_stmt(Compiler *c) {
     }
 }
 
-const ObjectFn *compile(Vm *vm, const char *path, SV sv) {
+ObjectFn *compile(Vm *vm, const char *path, SV sv) {
     Compiler compiler = {.vm = vm, .lexer = lexer_new(path, sv)};
     const SV path_sv = (SV){path, strlen(path)};
     if (sv_suffix(path_sv, SVStatic(".bsx"))) {
@@ -746,7 +747,6 @@ const ObjectFn *compile(Vm *vm, const char *path, SV sv) {
 
     Scope scope = {0};
     compile_scope_init(&compiler, &scope, path_sv);
-    scope.fn->module = vm_modules_push(vm, scope.fn->name);
 
     if (setjmp(compiler.lexer.error)) {
         Scope *scope = compiler.scope;
@@ -767,6 +767,5 @@ const ObjectFn *compile(Vm *vm, const char *path, SV sv) {
 
     ObjectFn *fn = compile_scope_end(&compiler);
     scope_free(compiler.vm, &scope);
-
     return fn;
 }

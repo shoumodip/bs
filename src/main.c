@@ -165,18 +165,12 @@ int main(int argc, char **argv) {
 
     vm_native_define(vm, SVStatic("io"), value_object(io));
 
-    const ObjectFn *fn = compile(vm, path, (SV){contents, size});
-    free(contents);
-
-    if (!fn) {
-        return_defer(1);
-    }
-
-    if (!vm_interpret(vm, fn, false)) {
+    if (!vm_run(vm, path, (SV){contents, size}, false)) {
         return_defer(1);
     }
 
 defer:
     vm_free(vm);
+    free(contents);
     return result;
 }
