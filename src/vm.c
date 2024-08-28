@@ -743,8 +743,26 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
             break;
 
         case OP_ADD: {
-            Value a, b;
-            if (!vm_binary_op(vm, &a, &b, "+")) {
+            const Value b = vm_pop(vm);
+            const Value a = vm_pop(vm);
+
+            if (a.type != VALUE_NUM || b.type != VALUE_NUM) {
+                if ((a.type == VALUE_OBJECT && a.as.object->type == OBJECT_STR) ||
+                    (b.type == VALUE_OBJECT && b.as.object->type == OBJECT_STR)) {
+                    vm_error(
+                        vm,
+                        "invalid operands to binary (+): %s, %s; use (..) for string "
+                        "concatenation",
+                        value_get_type_name(a),
+                        value_get_type_name(b));
+                } else {
+                    vm_error(
+                        vm,
+                        "invalid operands to binary (+): %s, %s",
+                        value_get_type_name(a),
+                        value_get_type_name(b));
+                }
+
                 return_defer(false);
             }
 
