@@ -21,6 +21,7 @@ typedef enum {
     OBJECT_CLOSURE,
     OBJECT_UPVALUE,
     OBJECT_NATIVE_FN,
+    OBJECT_NATIVE_DATA,
     COUNT_OBJECTS
 } ObjectType;
 
@@ -34,6 +35,7 @@ typedef struct ObjectTable ObjectTable;
 typedef struct ObjectClosure ObjectClosure;
 typedef struct ObjectUpvalue ObjectUpvalue;
 typedef struct ObjectNativeFn ObjectNativeFn;
+typedef struct ObjectNativeData ObjectNativeData;
 
 typedef struct {
     ValueType type;

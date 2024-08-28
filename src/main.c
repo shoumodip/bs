@@ -26,6 +26,96 @@ static bool string_slice(Vm *vm, Value *args, size_t count, Value *result) {
     return true;
 }
 
+typedef struct {
+    FILE *file;
+    const ObjectStr *path;
+} FileData;
+
+static void file_data_free(Vm *vm, void *data) {
+    if (data) {
+        fclose(((FileData *)data)->file);
+        free(data);
+    }
+}
+
+static void file_data_write(Writer *w, const void *data) {
+    if (data) {
+        w->fmt(w, "file<" SVFmt ">", SVArg(*((const FileData *)data)->path));
+    } else {
+        w->fmt(w, "file<>");
+    }
+}
+
+static const NativeSpec file_spec = {
+    .name = SVStatic("file"),
+    .free = file_data_free,
+    .write = file_data_write,
+};
+
+static bool io_open(Vm *vm, Value *args, size_t count, Value *result) {
+    if (!vm_check_object_type(vm, args[0], OBJECT_STR, "argument #1")) {
+        return false;
+    }
+
+    if (!vm_check_value_type(vm, args[1], VALUE_BOOL, "argument #2")) {
+        return false;
+    }
+
+    const ObjectStr *path = (ObjectStr *)args[0].as.object;
+    const bool write = args[1].as.boolean;
+
+    size_t start;
+    Writer *w = vm_writer_str_begin(vm, &start);
+    w->fmt(w, SVFmt, SVArg(*path));
+
+    SV path_native = vm_writer_str_end(vm, start);
+    FILE *file = fopen(path_native.data, write ? "w" : "r");
+    if (file) {
+        FileData *data = malloc(sizeof(FileData));
+        data->file = file;
+        data->path = path;
+        *result = value_object(object_native_data_new(vm, data, &file_spec));
+    }
+
+    return true;
+}
+
+static bool io_close(Vm *vm, Value *args, size_t count, Value *result) {
+    if (!vm_check_object_native_type(vm, args[0], &file_spec, "argument #1")) {
+        return false;
+    }
+
+    ObjectNativeData *native = (ObjectNativeData *)args[0].as.object;
+    if (native->data) {
+        file_data_free(vm, native->data);
+        native->data = NULL;
+    }
+
+    return true;
+}
+
+static bool io_write(Vm *vm, Value *args, size_t count, Value *result) {
+    if (!vm_check_object_native_type(vm, args[0], &file_spec, "argument #1")) {
+        return false;
+    }
+
+    if (!vm_check_object_type(vm, args[1], OBJECT_STR, "argument #2")) {
+        return false;
+    }
+
+    ObjectNativeData *native = (ObjectNativeData *)args[0].as.object;
+    if (!native->data) {
+        vm_error(vm, "cannot write into closed file");
+        return false;
+    }
+
+    ObjectStr *bytes = (ObjectStr *)args[1].as.object;
+    fwrite(bytes->data, bytes->size, 1, ((FileData *)native->data)->file);
+    *result = value_bool(!ferror(native->data));
+
+    return true;
+}
+
 int main(int argc, char **argv) {
     int result = 0;
 
@@ -53,6 +143,27 @@ int main(int argc, char **argv) {
         value_object(object_native_fn_new(vm, string_slice, 3)));
 
     vm_native_define(vm, SVStatic("string"), value_object(string));
+
+    ObjectTable *io = object_table_new(vm);
+    object_table_set(
+        vm,
+        io,
+        object_str_const(vm, "open", 4),
+        value_object(object_native_fn_new(vm, io_open, 2)));
+
+    object_table_set(
+        vm,
+        io,
+        object_str_const(vm, "close", 5),
+        value_object(object_native_fn_new(vm, io_close, 1)));
+
+    object_table_set(
+        vm,
+        io,
+        object_str_const(vm, "write", 5),
+        value_object(object_native_fn_new(vm, io_write, 2)));
+
+    vm_native_define(vm, SVStatic("io"), value_object(io));
 
     const ObjectFn *fn = compile(vm, path, (SV){contents, size});
     free(contents);

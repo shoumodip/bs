@@ -9,6 +9,12 @@
 
 typedef struct Vm Vm;
 
+typedef struct {
+    SV name;
+    void (*free)(Vm *vm, void *data);
+    void (*write)(Writer *writer, const void *data);
+} NativeSpec;
+
 Vm *vm_new(void);
 void vm_free(Vm *vm);
 void *vm_realloc(Vm *vm, void *ptr, size_t old_size, size_t new_size);
@@ -17,12 +23,16 @@ void vm_error(Vm *vm, const char *fmt, ...);
 
 bool vm_check_value_type(Vm *vm, Value value, ValueType expected, const char *label);
 bool vm_check_object_type(Vm *vm, Value value, ObjectType expected, const char *label);
+bool vm_check_object_native_type(Vm *vm, Value value, const NativeSpec *spec, const char *label);
 bool vm_check_whole_number(Vm *vm, Value value, const char *label);
 
 bool vm_interpret(Vm *vm, const ObjectFn *fn, bool step);
 
 size_t vm_modules_push(Vm *vm, ObjectStr *name);
 void vm_native_define(Vm *vm, SV name, Value value);
+
+Writer *vm_writer_str_begin(Vm *vm, size_t *start);
+SV vm_writer_str_end(Vm *vm, size_t start);
 
 Object *object_new(Vm *vm, ObjectType type, size_t size);
 ObjectStr *object_str_const(Vm *vm, const char *data, size_t size);

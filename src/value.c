@@ -5,7 +5,7 @@ bool value_is_falsey(Value v) {
     return v.type == VALUE_NIL || (v.type == VALUE_BOOL && !v.as.boolean);
 }
 
-static_assert(COUNT_OBJECTS == 7, "Update object_type_name()");
+static_assert(COUNT_OBJECTS == 8, "Update object_type_name()");
 const char *object_type_name(ObjectType type) {
     switch (type) {
     case OBJECT_FN:
@@ -28,6 +28,9 @@ const char *object_type_name(ObjectType type) {
 
     case OBJECT_NATIVE_FN:
         return "native function";
+
+    case OBJECT_NATIVE_DATA:
+        return "native object";
 
     default:
         assert(false && "unreachable");
@@ -53,7 +56,7 @@ const char *value_get_type_name(Value v) {
     }
 }
 
-static_assert(COUNT_OBJECTS == 7, "Update object_write()");
+static_assert(COUNT_OBJECTS == 8, "Update object_write()");
 static void object_write(const Object *o, Writer *w) {
     switch (o->type) {
     case OBJECT_FN: {
@@ -110,13 +113,22 @@ static void object_write(const Object *o, Writer *w) {
         object_write((Object *)((const ObjectClosure *)o)->fn, w);
         break;
 
+    case OBJECT_UPVALUE:
+        w->fmt(w, "<upvalue>");
+        break;
+
     case OBJECT_NATIVE_FN:
         w->fmt(w, "native fn ()");
         break;
 
-    case OBJECT_UPVALUE:
-        w->fmt(w, "<upvalue>");
-        break;
+    case OBJECT_NATIVE_DATA: {
+        const ObjectNativeData *native = (const ObjectNativeData *)o;
+        if (native->spec->write) {
+            native->spec->write(w, native->data);
+        } else {
+            w->fmt(w, "<native " SVFmt " object>", SVArg(native->spec->name));
+        }
+    } break;
 
     default:
         assert(false && "unreachable");
@@ -146,7 +158,7 @@ void value_write(Value v, Writer *w) {
     }
 }
 
-static_assert(COUNT_OBJECTS == 7, "Update object_equal()");
+static_assert(COUNT_OBJECTS == 8, "Update object_equal()");
 static bool object_equal(const Object *a, const Object *b) {
     if (a->type != b->type) {
         return false;
@@ -203,7 +215,10 @@ static bool object_equal(const Object *a, const Object *b) {
         return a == b;
 
     case OBJECT_NATIVE_FN:
-        return ((ObjectNativeFn *)a)->fn == ((ObjectNativeFn *)b)->fn;
+        return ((const ObjectNativeFn *)a)->fn == ((const ObjectNativeFn *)b)->fn;
+
+    case OBJECT_NATIVE_DATA:
+        return a == b;
 
     default:
         assert(false && "unreachable");

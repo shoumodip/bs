@@ -145,4 +145,12 @@ struct ObjectNativeFn {
 
 ObjectNativeFn *object_native_fn_new(Vm *vm, NativeFn fn, size_t arity);
 
+struct ObjectNativeData {
+    Object meta;
+    void *data;
+    const NativeSpec *spec;
+};
+
+ObjectNativeData *object_native_data_new(Vm *vm, void *data, const NativeSpec *spec);
+
 #endif // OBJECT_H

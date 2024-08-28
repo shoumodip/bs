@@ -220,3 +220,12 @@ ObjectNativeFn *object_native_fn_new(Vm *vm, NativeFn fn, size_t arity) {
     native->arity = arity;
     return native;
 }
+
+ObjectNativeData *object_native_data_new(Vm *vm, void *data, const NativeSpec *spec) {
+    ObjectNativeData *native =
+        (ObjectNativeData *)object_new(vm, OBJECT_NATIVE_DATA, sizeof(ObjectNativeData));
+
+    native->data = data;
+    native->spec = spec;
+    return native;
+}

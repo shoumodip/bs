@@ -132,7 +132,7 @@ struct Vm {
     size_t op_index;
 };
 
-static_assert(COUNT_OBJECTS == 7, "Update object_free()");
+static_assert(COUNT_OBJECTS == 8, "Update object_free()");
 static void object_free(Vm *vm, Object *object) {
 
 #ifdef GC_DEBUG_LOG
@@ -175,12 +175,21 @@ static void object_free(Vm *vm, Object *object) {
         vm_realloc(vm, object, sizeof(ObjectNativeFn), 0);
         break;
 
+    case OBJECT_NATIVE_DATA: {
+        ObjectNativeData *native = (ObjectNativeData *)object;
+        if (native->spec->free) {
+            native->spec->free(vm, native->data);
+        }
+
+        vm_realloc(vm, native, sizeof(*native), 0);
+    } break;
+
     default:
         assert(false && "unreachable");
     }
 }
 
-static_assert(COUNT_OBJECTS == 7, "Update object_mark()");
+static_assert(COUNT_OBJECTS == 8, "Update object_mark()");
 static void object_mark(Vm *vm, Object *object) {
     if (!object || object->marked) {
         return;
@@ -251,6 +260,7 @@ static void object_mark(Vm *vm, Object *object) {
     } break;
 
     case OBJECT_NATIVE_FN:
+    case OBJECT_NATIVE_DATA:
         break;
 
     default:
@@ -488,6 +498,34 @@ bool vm_check_object_type(Vm *vm, Value value, ObjectType expected, const char *
     return true;
 }
 
+bool vm_check_object_native_type(
+    Vm *vm, Value value, const NativeSpec *expected, const char *label) {
+    if (value.type != VALUE_OBJECT || value.as.object->type != OBJECT_NATIVE_DATA) {
+        vm_error(
+            vm,
+            "expected %s to be native " SVFmt " object, got %s",
+            label,
+            SVArg(expected->name),
+            value_get_type_name(value));
+
+        return false;
+    }
+
+    const ObjectNativeData *native = (const ObjectNativeData *)value.as.object;
+    if (native->spec != expected) {
+        vm_error(
+            vm,
+            "expected %s to be native " SVFmt " object, got native " SVFmt " object",
+            label,
+            SVArg(expected->name),
+            SVArg(native->spec->name));
+
+        return false;
+    }
+
+    return true;
+}
+
 bool vm_check_whole_number(Vm *vm, Value value, const char *label) {
     if (!vm_check_value_type(vm, value, VALUE_NUM, label)) {
         return false;
@@ -657,7 +695,7 @@ bool vm_interpret(Vm *vm, const ObjectFn *fn, bool debug) {
                 return_defer(false);
             }
 
-            static_assert(COUNT_OBJECTS == 7, "Update vm_interpret()");
+            static_assert(COUNT_OBJECTS == 8, "Update vm_interpret()");
             switch (value.as.object->type) {
             case OBJECT_CLOSURE:
                 if (!vm_call(vm, (ObjectClosure *)value.as.object, arity)) {
@@ -1154,6 +1192,17 @@ size_t vm_modules_push(Vm *vm, ObjectStr *name) {
 
 void vm_native_define(Vm *vm, SV name, Value value) {
     object_table_set(vm, &vm->natives, object_str_const(vm, name.data, name.size), value);
+}
+
+Writer *vm_writer_str_begin(Vm *vm, size_t *start) {
+    *start = vm->writer_str.count;
+    return (Writer *)&vm->writer_str;
+}
+
+SV vm_writer_str_end(Vm *vm, size_t start) {
+    const SV sv = {vm->writer_str.data + start, vm->writer_str.count - start};
+    vm->writer_str.count = start;
+    return sv;
 }
 
 Object *object_new(Vm *vm, ObjectType type, size_t size) {
