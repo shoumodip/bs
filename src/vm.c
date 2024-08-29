@@ -91,23 +91,6 @@ static bool modules_find(Modules *m, ObjectStr *name, size_t *index) {
     return false;
 }
 
-typedef struct {
-    ObjectTable *data;
-    size_t count;
-    size_t capacity;
-
-    ObjectTable *current;
-} Globals;
-
-void globals_free(Vm *vm, Globals *globals) {
-    for (size_t i = 0; i < globals->count; i++) {
-        object_table_free(vm, &globals->data[i]);
-    }
-    da_free(vm, globals);
-}
-
-#define globals_push da_push
-
 struct Vm {
     Values stack;
 
@@ -115,8 +98,8 @@ struct Vm {
     Frames frames;
 
     Modules modules;
-    Globals globals;
 
+    ObjectTable globals;
     ObjectTable natives;
     ObjectTable strings;
     ObjectUpvalue *upvalues;
@@ -127,6 +110,7 @@ struct Vm {
     Object *objects;
 
     WriterStr writer_str;
+    WriterStr writer_paths;
     WriterFile writer_stdout;
     WriterFile writer_stderr;
 
@@ -315,15 +299,12 @@ static void vm_collect(Vm *vm) {
         }
     }
 
-    for (size_t i = 0; i < vm->globals.count; i++) {
-        ObjectTable *g = &vm->globals.data[i];
-        g->meta.marked = false;
-        object_mark(vm, (Object *)g);
-    }
-
     for (ObjectUpvalue *upvalue = vm->upvalues; upvalue; upvalue = upvalue->next) {
         object_mark(vm, (Object *)upvalue);
     }
+
+    vm->globals.meta.marked = false;
+    object_mark(vm, (Object *)&vm->globals);
 
     vm->natives.meta.marked = false;
     object_mark(vm, (Object *)&vm->natives);
@@ -371,9 +352,11 @@ Vm *vm_new(void) {
     vm->gc_max = 1024 * 1024;
 
     vm->writer_str = (WriterStr){.meta.fmt = vm_writer_str_fmt, .vm = vm};
+    vm->writer_paths = (WriterStr){.meta.fmt = vm_writer_str_fmt, .vm = vm};
     vm->writer_stdout = (WriterFile){.meta.fmt = vm_writer_file_fmt, .file = stdout};
     vm->writer_stderr = (WriterFile){.meta.fmt = vm_writer_file_fmt, .file = stderr};
 
+    vm->globals.meta.type = OBJECT_TABLE;
     vm->natives.meta.type = OBJECT_TABLE;
     return vm;
 }
@@ -384,8 +367,8 @@ void vm_free(Vm *vm) {
 
     frames_free(vm, &vm->frames);
     modules_free(vm, &vm->modules);
-    globals_free(vm, &vm->globals);
 
+    object_table_free(vm, &vm->globals);
     object_table_free(vm, &vm->natives);
     object_table_free(vm, &vm->strings);
 
@@ -397,6 +380,7 @@ void vm_free(Vm *vm) {
     }
 
     writer_str_free(vm, &vm->writer_str);
+    writer_str_free(vm, &vm->writer_paths);
     free(vm);
 }
 
@@ -599,12 +583,6 @@ static bool vm_call(Vm *vm, ObjectClosure *closure, size_t arity) {
 
     frames_push(vm, &vm->frames, frame);
     vm->frame = &vm->frames.data[vm->frames.count - 1];
-
-    if (closure->fn->module) {
-        globals_push(vm, &vm->globals, (ObjectTable){.meta.type = OBJECT_TABLE});
-        vm->globals.current = &vm->globals.data[vm->globals.count - 1];
-    }
-
     return true;
 }
 
@@ -645,10 +623,6 @@ static_assert(COUNT_OPS == 41, "Update vm_run()");
 bool vm_run(Vm *vm, const char *path, SV sv, bool step) {
     bool result = true;
 
-    if (step) {
-        debug_chunks((Writer *)&vm->writer_stdout, vm->objects);
-    }
-
     {
         ObjectFn *fn = compile(vm, path, sv);
         if (!fn) {
@@ -667,17 +641,8 @@ bool vm_run(Vm *vm, const char *path, SV sv, bool step) {
     while (true) {
         if (step) {
             printf("----------------------------------------\n");
-            printf("Globals:\n");
-            for (size_t i = 0; i < vm->globals.count; i++) {
-                printf("    ");
-                value_write(value_object(&vm->globals.data[i]), (Writer *)&vm->writer_stdout);
-                printf("\n");
-            }
-            printf("\n");
-
-            printf("Current Globals:\n");
-            printf("    ");
-            value_write(value_object(vm->globals.current), (Writer *)&vm->writer_stdout);
+            printf("Globals: ");
+            value_write(value_object(&vm->globals), (Writer *)&vm->writer_stdout);
             printf("\n\n");
 
             printf("Stack:\n");
@@ -716,9 +681,6 @@ bool vm_run(Vm *vm, const char *path, SV sv, bool step) {
                 Module *m = &vm->modules.data[frame->closure->fn->module - 1];
                 m->done = true;
                 m->result = value;
-
-                object_table_free(vm, &vm->globals.data[--vm->globals.count]);
-                vm->globals.current = &vm->globals.data[vm->globals.count - 1];
             }
         } break;
 
@@ -999,11 +961,11 @@ bool vm_run(Vm *vm, const char *path, SV sv, bool step) {
                 vm_push(vm, m->result);
             } else {
                 const bool gc_on = vm->gc_on;
-                const size_t start = vm->writer_str.count;
                 vm->gc_on = false;
 
-                value_write(a, (Writer *)&vm->writer_str);
-                const char *path = vm->writer_str.data + start;
+                value_write(a, (Writer *)&vm->writer_paths);
+                vm->writer_paths.count++; // Account for the NULL terminator
+                const char *path = vm->writer_paths.data + vm->writer_paths.count - name->size - 1;
 
                 if (sv_suffix((SV){name->data, name->size}, SVStatic(".so"))) {
                     void *library = dlopen(path, RTLD_NOW);
@@ -1035,14 +997,13 @@ bool vm_run(Vm *vm, const char *path, SV sv, bool step) {
                     vm_call(vm, closure, 0);
                 }
 
-                vm->writer_str.count = start;
                 vm->gc_on = gc_on;
             }
         } break;
 
         case OP_GDEF:
             object_table_set(
-                vm, vm->globals.current, (ObjectStr *)vm_read_const(vm)->as.object, vm_peek(vm, 0));
+                vm, &vm->globals, (ObjectStr *)vm_read_const(vm)->as.object, vm_peek(vm, 0));
 
             vm_pop(vm);
             break;
@@ -1051,7 +1012,7 @@ bool vm_run(Vm *vm, const char *path, SV sv, bool step) {
             ObjectStr *name = (ObjectStr *)vm_read_const(vm)->as.object;
 
             Value value;
-            if (!object_table_get(vm, vm->globals.current, name, &value)) {
+            if (!object_table_get(vm, &vm->globals, name, &value)) {
                 vm_error(vm, "undefined variable '" SVFmt "'", SVArg(*name));
                 return_defer(false);
             }
@@ -1063,8 +1024,8 @@ bool vm_run(Vm *vm, const char *path, SV sv, bool step) {
             ObjectStr *name = (ObjectStr *)vm_read_const(vm)->as.object;
             const Value value = vm_peek(vm, 0);
 
-            if (object_table_set(vm, vm->globals.current, name, value)) {
-                object_table_remove(vm, vm->globals.current, name);
+            if (object_table_set(vm, &vm->globals, name, value)) {
+                object_table_remove(vm, &vm->globals, name);
                 vm_error(vm, "undefined variable '" SVFmt "'", SVArg(*name));
                 return_defer(false);
             }

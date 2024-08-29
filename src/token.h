@@ -63,6 +63,7 @@ typedef enum {
     TOKEN_WHILE,
 
     TOKEN_FN,
+    TOKEN_PUB,
     TOKEN_VAR,
     TOKEN_RETURN,
 

@@ -49,7 +49,7 @@ void lexer_buffer(Lexer *l, Token token) {
     l->buffer = token;
 }
 
-static_assert(COUNT_TOKENS == 42, "Update lexer_next()");
+static_assert(COUNT_TOKENS == 43, "Update lexer_next()");
 Token lexer_next(Lexer *l) {
     if (l->peeked) {
         l->peeked = false;
@@ -130,6 +130,8 @@ Token lexer_next(Lexer *l) {
                 token.type = TOKEN_WHILE;
             } else if (sv_eq(token.sv, SVStatic("lit"))) {
                 token.type = TOKEN_FN;
+            } else if (sv_eq(token.sv, SVStatic("fam"))) {
+                token.type = TOKEN_PUB;
             } else if (sv_eq(token.sv, SVStatic("mf"))) {
                 token.type = TOKEN_VAR;
             } else if (sv_eq(token.sv, SVStatic("bet"))) {
@@ -162,6 +164,8 @@ Token lexer_next(Lexer *l) {
                 token.type = TOKEN_WHILE;
             } else if (sv_eq(token.sv, SVStatic("fn"))) {
                 token.type = TOKEN_FN;
+            } else if (sv_eq(token.sv, SVStatic("pub"))) {
+                token.type = TOKEN_PUB;
             } else if (sv_eq(token.sv, SVStatic("var"))) {
                 token.type = TOKEN_VAR;
             } else if (sv_eq(token.sv, SVStatic("return"))) {

@@ -14,7 +14,7 @@ typedef enum {
     POWER_DOT,
 } Power;
 
-static_assert(COUNT_TOKENS == 42, "Update token_type_powers[]");
+static_assert(COUNT_TOKENS == 43, "Update token_type_powers[]");
 const Power token_type_powers[COUNT_TOKENS] = {
     [TOKEN_DOT] = POWER_DOT,
     [TOKEN_LPAREN] = POWER_DOT,
@@ -160,9 +160,9 @@ static void compile_error_unexpected(Compiler *c, const Token *token) {
     lexer_error(&c->lexer);
 }
 
-static void compile_function(Compiler *c, const Token *name);
+static void compile_lambda(Compiler *c, const Token *name);
 
-static_assert(COUNT_TOKENS == 42, "Update compile_expr()");
+static_assert(COUNT_TOKENS == 43, "Update compile_expr()");
 static void compile_expr(Compiler *c, Power mbp) {
     Token token = lexer_next(&c->lexer);
     Loc loc = token.loc;
@@ -309,7 +309,7 @@ static void compile_expr(Compiler *c, Power mbp) {
         break;
 
     case TOKEN_FN:
-        compile_function(c, NULL);
+        compile_lambda(c, NULL);
         break;
 
     default:
@@ -545,25 +545,25 @@ static ObjectFn *compile_scope_end(Compiler *c) {
     return fn;
 }
 
-static size_t compile_definition(Compiler *c, Token *name) {
+static size_t compile_definition(Compiler *c, Token *name, bool public) {
     *name = lexer_expect(&c->lexer, TOKEN_IDENT);
 
-    if (c->scope->depth) {
-        da_push(c->vm, c->scope, ((Local){.token = *name, .depth = c->scope->depth}));
-        return 0;
+    if (public) {
+        values_push(
+            c->vm,
+            &c->chunk->constants,
+            value_object(object_str_const(c->vm, name->sv.data, name->sv.size)));
+
+        return c->chunk->constants.count - 1;
     }
 
-    values_push(
-        c->vm,
-        &c->chunk->constants,
-        value_object(object_str_const(c->vm, name->sv.data, name->sv.size)));
-
-    return c->chunk->constants.count - 1;
+    da_push(c->vm, c->scope, ((Local){.token = *name, .depth = c->scope->depth}));
+    return 0;
 }
 
 static void compile_stmt(Compiler *c);
 
-static void compile_function(Compiler *c, const Token *name) {
+static void compile_lambda(Compiler *c, const Token *name) {
     Scope scope = {0};
     compile_scope_init(c, &scope, name ? name->sv : (SV){0});
     compile_block_init(c);
@@ -597,7 +597,31 @@ static void compile_function(Compiler *c, const Token *name) {
     scope_free(c->vm, &scope);
 }
 
-static_assert(COUNT_TOKENS == 42, "Update compile_stmt()");
+static void compile_variable(Compiler *c, bool public) {
+    Token token;
+
+    const size_t scope_index = c->scope->count;
+    const size_t const_index = compile_definition(c, &token, public);
+
+    if (!public) {
+        c->scope->data[scope_index].token = (Token){0};
+    }
+
+    if (lexer_read(&c->lexer, TOKEN_SET)) {
+        compile_expr(c, POWER_SET);
+    } else {
+        chunk_push_op(c->vm, c->chunk, OP_NIL);
+    }
+    lexer_expect(&c->lexer, TOKEN_EOL);
+
+    if (public) {
+        chunk_push_op_int(c->vm, c->chunk, OP_GDEF, const_index);
+    } else {
+        c->scope->data[scope_index].token = token;
+    }
+}
+
+static_assert(COUNT_TOKENS == 43, "Update compile_stmt()");
 static void compile_stmt(Compiler *c) {
     Token token = lexer_next(&c->lexer);
 
@@ -680,36 +704,42 @@ static void compile_stmt(Compiler *c) {
         chunk_push_op(c->vm, c->chunk, OP_DROP);
     } break;
 
-    case TOKEN_FN: {
-        const size_t const_index = compile_definition(c, &token);
-        compile_function(c, &token);
+    case TOKEN_FN:
+        compile_definition(c, &token, false);
+        compile_lambda(c, &token);
+        break;
 
-        if (!c->scope->depth) {
+    case TOKEN_PUB:
+        if (c->scope->depth != 1) {
+            fprintf(
+                stderr,
+                LocFmt "error: cannot define public values in local scope\n",
+                LocArg(token.loc));
+
+            lexer_error(&c->lexer);
+        }
+
+        token = lexer_next(&c->lexer);
+        if (token.type == TOKEN_FN) {
+            const size_t const_index = compile_definition(c, &token, true);
+            compile_lambda(c, &token);
             chunk_push_op_int(c->vm, c->chunk, OP_GDEF, const_index);
-        }
-    } break;
-
-    case TOKEN_VAR: {
-        const size_t scope_index = c->scope->count;
-        const size_t const_index = compile_definition(c, &token);
-
-        if (c->scope->depth) {
-            c->scope->data[scope_index].token = (Token){0};
-        }
-
-        if (lexer_read(&c->lexer, TOKEN_SET)) {
-            compile_expr(c, POWER_SET);
+        } else if (token.type == TOKEN_VAR) {
+            compile_variable(c, true);
         } else {
-            chunk_push_op(c->vm, c->chunk, OP_NIL);
-        }
-        lexer_expect(&c->lexer, TOKEN_EOL);
+            fprintf(
+                stderr,
+                LocFmt "error: expected 'fn' or 'var', got %s\n",
+                LocArg(token.loc),
+                token_type_name(token.type, c->lexer.extended));
 
-        if (c->scope->depth) {
-            c->scope->data[scope_index].token = token;
-        } else {
-            chunk_push_op_int(c->vm, c->chunk, OP_GDEF, const_index);
+            lexer_error(&c->lexer);
         }
-    } break;
+        break;
+
+    case TOKEN_VAR:
+        compile_variable(c, false);
+        break;
 
     case TOKEN_RETURN:
         token = lexer_peek(&c->lexer);
@@ -747,6 +777,7 @@ ObjectFn *compile(Vm *vm, const char *path, SV sv) {
 
     Scope scope = {0};
     compile_scope_init(&compiler, &scope, path_sv);
+    compile_block_init(&compiler);
 
     if (setjmp(compiler.lexer.error)) {
         Scope *scope = compiler.scope;
