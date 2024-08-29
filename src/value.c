@@ -5,7 +5,7 @@ bool value_is_falsey(Value v) {
     return v.type == VALUE_NIL || (v.type == VALUE_BOOL && !v.as.boolean);
 }
 
-static_assert(COUNT_OBJECTS == 8, "Update object_type_name()");
+static_assert(COUNT_OBJECTS == 9, "Update object_type_name()");
 const char *object_type_name(ObjectType type) {
     switch (type) {
     case OBJECT_FN:
@@ -32,6 +32,9 @@ const char *object_type_name(ObjectType type) {
     case OBJECT_NATIVE_DATA:
         return "native object";
 
+    case OBJECT_NATIVE_LIBRARY:
+        return "native library";
+
     default:
         assert(false && "unreachable");
     }
@@ -56,7 +59,7 @@ const char *value_get_type_name(Value v) {
     }
 }
 
-static_assert(COUNT_OBJECTS == 8, "Update object_write()");
+static_assert(COUNT_OBJECTS == 9, "Update object_write()");
 static void object_write(const Object *o, Writer *w) {
     switch (o->type) {
     case OBJECT_FN: {
@@ -130,6 +133,10 @@ static void object_write(const Object *o, Writer *w) {
         }
     } break;
 
+    case OBJECT_NATIVE_LIBRARY:
+        w->fmt(w, "<native library '" SVFmt "'>", SVArg(*((const ObjectNativeLibrary *)o)->path));
+        break;
+
     default:
         assert(false && "unreachable");
     }
@@ -158,7 +165,7 @@ void value_write(Value v, Writer *w) {
     }
 }
 
-static_assert(COUNT_OBJECTS == 8, "Update object_equal()");
+static_assert(COUNT_OBJECTS == 9, "Update object_equal()");
 static bool object_equal(const Object *a, const Object *b) {
     if (a->type != b->type) {
         return false;
@@ -218,6 +225,7 @@ static bool object_equal(const Object *a, const Object *b) {
         return ((const ObjectNativeFn *)a)->fn == ((const ObjectNativeFn *)b)->fn;
 
     case OBJECT_NATIVE_DATA:
+    case OBJECT_NATIVE_LIBRARY:
         return a == b;
 
     default:

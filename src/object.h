@@ -135,15 +135,15 @@ struct ObjectUpvalue {
 
 ObjectUpvalue *object_upvalue_new(Vm *vm, size_t index);
 
-typedef bool (*NativeFn)(Vm *vm, Value *args, size_t args_count, Value *result);
+typedef bool (*NativeFn)(Vm *vm, Value *args, size_t arity, Value *result);
 
 struct ObjectNativeFn {
     Object meta;
     NativeFn fn;
-    size_t arity;
+    ObjectNativeLibrary *library;
 };
 
-ObjectNativeFn *object_native_fn_new(Vm *vm, NativeFn fn, size_t arity);
+ObjectNativeFn *object_native_fn_new(Vm *vm, NativeFn fn);
 
 struct ObjectNativeData {
     Object meta;
@@ -152,5 +152,15 @@ struct ObjectNativeData {
 };
 
 ObjectNativeData *object_native_data_new(Vm *vm, void *data, const NativeSpec *spec);
+
+struct ObjectNativeLibrary {
+    Object meta;
+    void *data;
+    const ObjectStr *path;
+
+    ObjectTable functions;
+};
+
+ObjectNativeLibrary *object_native_library_new(Vm *vm, void *data, const ObjectStr *path);
 
 #endif // OBJECT_H

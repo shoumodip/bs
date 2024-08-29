@@ -1,3 +1,4 @@
+#include <dlfcn.h>
 #include <stdarg.h>
 
 #include "compiler.h"
@@ -132,7 +133,7 @@ struct Vm {
     size_t op_index;
 };
 
-static_assert(COUNT_OBJECTS == 8, "Update object_free()");
+static_assert(COUNT_OBJECTS == 9, "Update object_free()");
 static void object_free(Vm *vm, Object *object) {
 
 #ifdef GC_DEBUG_LOG
@@ -176,12 +177,20 @@ static void object_free(Vm *vm, Object *object) {
         break;
 
     case OBJECT_NATIVE_DATA: {
-        ObjectNativeData *native = (ObjectNativeData *)object;
-        if (native->spec->free) {
-            native->spec->free(vm, native->data);
+        ObjectNativeData *data = (ObjectNativeData *)object;
+        if (data->spec->free) {
+            data->spec->free(vm, data->data);
         }
 
-        vm_realloc(vm, native, sizeof(*native), 0);
+        vm_realloc(vm, data, sizeof(*data), 0);
+    } break;
+
+    case OBJECT_NATIVE_LIBRARY: {
+        ObjectNativeLibrary *library = (ObjectNativeLibrary *)object;
+        object_table_free(vm, &library->functions);
+
+        dlclose(library->data);
+        vm_realloc(vm, library, sizeof(*library), 0);
     } break;
 
     default:
@@ -189,7 +198,7 @@ static void object_free(Vm *vm, Object *object) {
     }
 }
 
-static_assert(COUNT_OBJECTS == 8, "Update object_mark()");
+static_assert(COUNT_OBJECTS == 9, "Update object_mark()");
 static void object_mark(Vm *vm, Object *object) {
     if (!object || object->marked) {
         return;
@@ -260,8 +269,19 @@ static void object_mark(Vm *vm, Object *object) {
     } break;
 
     case OBJECT_NATIVE_FN:
+        object_mark(vm, (Object *)((ObjectNativeFn *)object)->library);
+        break;
+
     case OBJECT_NATIVE_DATA:
         break;
+
+    case OBJECT_NATIVE_LIBRARY: {
+        ObjectNativeLibrary *library = ((ObjectNativeLibrary *)object);
+        object_mark(vm, (Object *)library->path);
+
+        library->functions.meta.marked = false;
+        object_mark(vm, (Object *)&library->functions);
+    } break;
 
     default:
         assert(false && "unreachable");
@@ -470,6 +490,15 @@ void vm_error(Vm *vm, const char *fmt, ...) {
     }
 }
 
+bool vm_check_arity(Vm *vm, size_t actual, size_t expected) {
+    if (actual != expected) {
+        vm_error(vm, "expected %zu arguments, got %zu", expected, actual);
+        return false;
+    }
+
+    return true;
+}
+
 bool vm_check_value_type(Vm *vm, Value value, ValueType expected, const char *label) {
     if (value.type != expected) {
         vm_error(
@@ -558,8 +587,7 @@ static bool vm_binary_op(Vm *vm, Value *a, Value *b, const char *op) {
 }
 
 static bool vm_call(Vm *vm, ObjectClosure *closure, size_t arity) {
-    if (arity != closure->fn->arity) {
-        vm_error(vm, "expected %zu arguments, got %zu", closure->fn->arity, arity);
+    if (!vm_check_arity(vm, closure->fn->arity, arity)) {
         return false;
     }
 
@@ -703,7 +731,7 @@ bool vm_run(Vm *vm, const char *path, SV sv, bool step) {
                 return_defer(false);
             }
 
-            static_assert(COUNT_OBJECTS == 8, "Update vm_run()");
+            static_assert(COUNT_OBJECTS == 9, "Update vm_run()");
             switch (value.as.object->type) {
             case OBJECT_CLOSURE:
                 if (!vm_call(vm, (ObjectClosure *)value.as.object, arity)) {
@@ -713,11 +741,6 @@ bool vm_run(Vm *vm, const char *path, SV sv, bool step) {
 
             case OBJECT_NATIVE_FN: {
                 const ObjectNativeFn *native = (ObjectNativeFn *)value.as.object;
-                if (arity != native->arity) {
-                    vm_error(vm, "expected %zu arguments, got %zu", native->arity, arity);
-                    return_defer(false);
-                }
-
                 const bool gc_on = vm->gc_on;
                 vm->gc_on = false;
 
@@ -982,25 +1005,35 @@ bool vm_run(Vm *vm, const char *path, SV sv, bool step) {
                 value_write(a, (Writer *)&vm->writer_str);
                 const char *path = vm->writer_str.data + start;
 
-                size_t size = 0;
-                char *contents = read_file(path, &size);
-                if (!contents) {
-                    vm_error(vm, "could not read file '%s'", path);
-                    return_defer(false);
+                if (sv_suffix((SV){name->data, name->size}, SVStatic(".so"))) {
+                    void *library = dlopen(path, RTLD_NOW);
+                    if (!library) {
+                        vm_error(vm, "could not load library '%s': %s", path, dlerror());
+                        return_defer(false);
+                    }
+
+                    vm_push(vm, value_object(object_native_library_new(vm, library, name)));
+                } else {
+                    size_t size = 0;
+                    char *contents = read_file(path, &size);
+                    if (!contents) {
+                        vm_error(vm, "could not read file '%s'", path);
+                        return_defer(false);
+                    }
+
+                    ObjectFn *fn = compile(vm, path, (SV){contents, size});
+                    free(contents);
+
+                    if (!fn) {
+                        return_defer(false);
+                    }
+                    da_push(vm, &vm->modules, (Module){.name = fn->name});
+                    fn->module = vm->modules.count;
+
+                    ObjectClosure *closure = object_closure_new(vm, fn);
+                    vm_push(vm, value_object(closure));
+                    vm_call(vm, closure, 0);
                 }
-
-                ObjectFn *fn = compile(vm, path, (SV){contents, size});
-                free(contents);
-
-                if (!fn) {
-                    return_defer(false);
-                }
-                da_push(vm, &vm->modules, (Module){.name = fn->name});
-                fn->module = vm->modules.count;
-
-                ObjectClosure *closure = object_closure_new(vm, fn);
-                vm_push(vm, value_object(closure));
-                vm_call(vm, closure, 0);
 
                 vm->writer_str.count = start;
                 vm->gc_on = gc_on;
@@ -1110,6 +1143,46 @@ bool vm_run(Vm *vm, const char *path, SV sv, bool step) {
                 if (!object_table_get(vm, (ObjectTable *)container.as.object, key, &value)) {
                     value = value_nil;
                 }
+            } else if (container.as.object->type == OBJECT_NATIVE_LIBRARY) {
+                ObjectNativeLibrary *library = (ObjectNativeLibrary *)container.as.object;
+
+                if (!vm_check_object_type(vm, index, OBJECT_STR, "library symbol name")) {
+                    return_defer(false);
+                }
+
+                ObjectStr *name = (ObjectStr *)index.as.object;
+                if (!name->size) {
+                    vm_error(vm, "library symbol name cannot be empty");
+                    return_defer(false);
+                }
+
+                if (!object_table_get(vm, &library->functions, name, &value)) {
+                    const bool gc_on = vm->gc_on;
+                    const size_t start = vm->writer_str.count;
+                    vm->gc_on = false;
+
+                    value_write(index, (Writer *)&vm->writer_str);
+
+                    NativeFn fn = dlsym(library->data, vm->writer_str.data + start);
+                    if (!fn) {
+                        vm_error(
+                            vm,
+                            "symbol '" SVFmt "' doesn't exist in native library '" SVFmt "'",
+                            SVArg(*name),
+                            SVArg(*library->path));
+
+                        return_defer(false);
+                    }
+
+                    ObjectNativeFn *fn_object = object_native_fn_new(vm, fn);
+                    fn_object->library = library;
+
+                    value = value_object(fn_object);
+                    object_table_set(vm, &library->functions, name, value);
+
+                    vm->gc_on = gc_on;
+                    vm->writer_str.count = start;
+                }
             } else {
                 vm_error(vm, "cannot index into %s value", value_get_type_name(container));
                 return_defer(false);
@@ -1147,6 +1220,9 @@ bool vm_run(Vm *vm, const char *path, SV sv, bool step) {
                 } else {
                     object_table_set(vm, table, (ObjectStr *)index.as.object, value);
                 }
+            } else if (container.as.object->type == OBJECT_NATIVE_LIBRARY) {
+                vm_error(vm, "cannot modify %s value", value_get_type_name(container));
+                return_defer(false);
             } else {
                 vm_error(vm, "cannot index into %s value", value_get_type_name(container));
                 return_defer(false);

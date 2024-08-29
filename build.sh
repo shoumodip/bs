@@ -1,2 +1,2 @@
 #!/bin/sh
-cc -o bs src/*.c
+cc -o bs src/*.c -Wl,-rpath=./

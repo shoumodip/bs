@@ -1,6 +1,10 @@
-#include "compiler.h"
+#include "object.h"
 
-static bool string_slice(Vm *vm, Value *args, size_t count, Value *result) {
+static bool string_slice(Vm *vm, Value *args, size_t arity, Value *result) {
+    if (!vm_check_arity(vm, arity, 3)) {
+        return false;
+    }
+
     if (!vm_check_object_type(vm, args[0], OBJECT_STR, "argument #1")) {
         return false;
     }
@@ -52,7 +56,11 @@ static const NativeSpec file_spec = {
     .write = file_data_write,
 };
 
-static bool io_open(Vm *vm, Value *args, size_t count, Value *result) {
+static bool io_open(Vm *vm, Value *args, size_t arity, Value *result) {
+    if (!vm_check_arity(vm, arity, 2)) {
+        return false;
+    }
+
     if (!vm_check_object_type(vm, args[0], OBJECT_STR, "argument #1")) {
         return false;
     }
@@ -80,7 +88,11 @@ static bool io_open(Vm *vm, Value *args, size_t count, Value *result) {
     return true;
 }
 
-static bool io_close(Vm *vm, Value *args, size_t count, Value *result) {
+static bool io_close(Vm *vm, Value *args, size_t arity, Value *result) {
+    if (!vm_check_arity(vm, arity, 1)) {
+        return false;
+    }
+
     if (!vm_check_object_native_type(vm, args[0], &file_spec, "argument #1")) {
         return false;
     }
@@ -94,7 +106,11 @@ static bool io_close(Vm *vm, Value *args, size_t count, Value *result) {
     return true;
 }
 
-static bool io_write(Vm *vm, Value *args, size_t count, Value *result) {
+static bool io_write(Vm *vm, Value *args, size_t arity, Value *result) {
+    if (!vm_check_arity(vm, arity, 2)) {
+        return false;
+    }
+
     if (!vm_check_object_native_type(vm, args[0], &file_spec, "argument #1")) {
         return false;
     }
@@ -140,28 +156,19 @@ int main(int argc, char **argv) {
         vm,
         string,
         object_str_const(vm, "slice", 5),
-        value_object(object_native_fn_new(vm, string_slice, 3)));
+        value_object(object_native_fn_new(vm, string_slice)));
 
     vm_native_define(vm, SVStatic("string"), value_object(string));
 
     ObjectTable *io = object_table_new(vm);
     object_table_set(
-        vm,
-        io,
-        object_str_const(vm, "open", 4),
-        value_object(object_native_fn_new(vm, io_open, 2)));
+        vm, io, object_str_const(vm, "open", 4), value_object(object_native_fn_new(vm, io_open)));
 
     object_table_set(
-        vm,
-        io,
-        object_str_const(vm, "close", 5),
-        value_object(object_native_fn_new(vm, io_close, 1)));
+        vm, io, object_str_const(vm, "close", 5), value_object(object_native_fn_new(vm, io_close)));
 
     object_table_set(
-        vm,
-        io,
-        object_str_const(vm, "write", 5),
-        value_object(object_native_fn_new(vm, io_write, 2)));
+        vm, io, object_str_const(vm, "write", 5), value_object(object_native_fn_new(vm, io_write)));
 
     vm_native_define(vm, SVStatic("io"), value_object(io));
 

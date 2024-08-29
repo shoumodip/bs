@@ -212,12 +212,12 @@ ObjectUpvalue *object_upvalue_new(Vm *vm, size_t index) {
     return upvalue;
 }
 
-ObjectNativeFn *object_native_fn_new(Vm *vm, NativeFn fn, size_t arity) {
+ObjectNativeFn *object_native_fn_new(Vm *vm, NativeFn fn) {
     ObjectNativeFn *native =
         (ObjectNativeFn *)object_new(vm, OBJECT_NATIVE_FN, sizeof(ObjectNativeFn));
 
     native->fn = fn;
-    native->arity = arity;
+    native->library = NULL;
     return native;
 }
 
@@ -227,5 +227,17 @@ ObjectNativeData *object_native_data_new(Vm *vm, void *data, const NativeSpec *s
 
     native->data = data;
     native->spec = spec;
+    return native;
+}
+
+ObjectNativeLibrary *object_native_library_new(Vm *vm, void *data, const ObjectStr *path) {
+    ObjectNativeLibrary *native =
+        (ObjectNativeLibrary *)object_new(vm, OBJECT_NATIVE_LIBRARY, sizeof(ObjectNativeLibrary));
+
+    native->data = data;
+    native->path = path;
+
+    memset(&native->functions, 0, sizeof(native->functions));
+    native->functions.meta.type = OBJECT_TABLE;
     return native;
 }
