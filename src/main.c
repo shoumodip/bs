@@ -172,7 +172,7 @@ int main(int argc, char **argv) {
 
     vm_native_define(vm, SVStatic("io"), value_object(io));
 
-    if (!vm_run(vm, path, (SV){contents, size}, false)) {
+    if (!vm_run(vm, path, sv_from_parts(contents, size), false)) {
         return_defer(1);
     }
 

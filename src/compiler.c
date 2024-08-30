@@ -770,7 +770,7 @@ static void compile_stmt(Compiler *c) {
 
 ObjectFn *compile(Vm *vm, const char *path, SV sv) {
     Compiler compiler = {.vm = vm, .lexer = lexer_new(path, sv)};
-    const SV path_sv = (SV){path, strlen(path)};
+    const SV path_sv = sv_from_cstr(path);
     if (sv_suffix(path_sv, SVStatic(".bsx"))) {
         compiler.lexer.extended = true;
     }

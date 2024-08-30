@@ -967,7 +967,7 @@ bool vm_run(Vm *vm, const char *path, SV sv, bool step) {
                 vm->writer_paths.count++; // Account for the NULL terminator
                 const char *path = vm->writer_paths.data + vm->writer_paths.count - name->size - 1;
 
-                if (sv_suffix((SV){name->data, name->size}, SVStatic(".so"))) {
+                if (sv_suffix(sv_from_parts(name->data, name->size), SVStatic(".so"))) {
                     void *library = dlopen(path, RTLD_NOW);
                     if (!library) {
                         vm_error(vm, "could not load library '%s': %s", path, dlerror());
@@ -983,7 +983,7 @@ bool vm_run(Vm *vm, const char *path, SV sv, bool step) {
                         return_defer(false);
                     }
 
-                    ObjectFn *fn = compile(vm, path, (SV){contents, size});
+                    ObjectFn *fn = compile(vm, path, sv_from_parts(contents, size));
                     free(contents);
 
                     if (!fn) {
@@ -1262,7 +1262,8 @@ Object *object_new(Vm *vm, ObjectType type, size_t size) {
 }
 
 ObjectStr *object_str_const(Vm *vm, const char *data, size_t size) {
-    Entry *entry = entries_find_sv(vm->strings.data, vm->strings.capacity, (SV){data, size}, NULL);
+    Entry *entry =
+        entries_find_sv(vm->strings.data, vm->strings.capacity, sv_from_parts(data, size), NULL);
     if (entry && entry->key) {
         return entry->key;
     }

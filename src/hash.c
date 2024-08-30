@@ -20,7 +20,7 @@ Entry *entries_find_sv(Entry *entries, size_t capacity, SV key, uint32_t *hash) 
     while (true) {
         Entry *entry = &entries[index];
         if (entry->key) {
-            if (sv_eq((SV){entry->key->data, entry->key->size}, key)) {
+            if (sv_eq(sv_from_parts(entry->key->data, entry->key->size), key)) {
                 return entry;
             }
         } else {
@@ -43,5 +43,5 @@ Entry *entries_find_str(Entry *entries, size_t capacity, ObjectStr *str) {
         str->hash = hash_string(str->data, str->size);
     }
 
-    return entries_find_sv(entries, capacity, (SV){str->data, str->size}, &str->hash);
+    return entries_find_sv(entries, capacity, sv_from_parts(str->data, str->size), &str->hash);
 }

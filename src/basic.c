@@ -4,6 +4,14 @@
 
 #include "basic.h"
 
+SV sv_from_cstr(const char *data) {
+    return (SV){data, strlen(data)};
+}
+
+SV sv_from_parts(const char *data, size_t size) {
+    return (SV){data, size};
+}
+
 bool sv_eq(SV a, SV b) {
     return a.size == b.size && !memcmp(a.data, b.data, b.size);
 }

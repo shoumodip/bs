@@ -14,6 +14,9 @@ typedef struct {
 #define SVArg(s) (int)(s).size, (s).data
 #define SVStatic(s) ((SV){s, sizeof(s) - 1})
 
+SV sv_from_cstr(const char *data);
+SV sv_from_parts(const char *data, size_t size);
+
 bool sv_eq(SV a, SV b);
 bool sv_suffix(SV a, SV b);
 
