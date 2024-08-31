@@ -1,6 +1,6 @@
 #include <assert.h>
 
-#include "token.h"
+#include "bs/token.h"
 
 static_assert(BS_COUNT_TOKENS == 43, "Update bs_token_type_name()");
 const char *bs_token_type_name(Bs_Token_Type type, bool extended) {

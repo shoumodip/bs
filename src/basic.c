@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "basic.h"
+#include "bs/basic.h"
 
 Bs_Sv bs_sv_from_cstr(const char *data) {
     return (Bs_Sv){data, strlen(data)};

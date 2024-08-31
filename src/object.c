@@ -1,4 +1,4 @@
-#include "hash.h"
+#include "bs/hash.h"
 
 #define BS_TABLE_MAX_LOAD 0.75
 

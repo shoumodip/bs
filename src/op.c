@@ -1,6 +1,6 @@
 #include <assert.h>
 
-#include "op.h"
+#include "bs/op.h"
 
 static_assert(BS_COUNT_OPS == 41, "Update bs_op_get_to_set()");
 Bs_Op bs_op_get_to_set(Bs_Op op) {

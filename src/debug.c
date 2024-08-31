@@ -1,4 +1,4 @@
-#include "debug.h"
+#include "bs/debug.h"
 
 static void bs_debug_op_int(Bs_Writer *w, const Bs_Chunk *c, size_t *offset, const char *name) {
     const size_t slot = *(const size_t *)&c->data[*offset];

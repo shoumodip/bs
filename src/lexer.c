@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <ctype.h>
 
-#include "lexer.h"
+#include "bs/lexer.h"
 
 static void bs_lexer_advance(Bs_Lexer *l) {
     if (*l->sv.data == '\n') {

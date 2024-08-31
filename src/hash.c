@@ -1,4 +1,4 @@
-#include "hash.h"
+#include "bs/hash.h"
 
 static uint32_t bs_hash_string(const char *data, size_t size) {
     uint32_t hash = 2166136261u;

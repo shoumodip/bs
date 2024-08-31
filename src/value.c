@@ -1,4 +1,4 @@
-#include "hash.h"
+#include "bs/hash.h"
 
 bool bs_value_is_falsey(Bs_Value v) {
     return v.type == BS_VALUE_NIL || (v.type == BS_VALUE_BOOL && !v.as.boolean);

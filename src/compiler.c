@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include "compiler.h"
-#include "lexer.h"
+#include "bs/compiler.h"
+#include "bs/lexer.h"
 
 typedef enum {
     POWER_NIL,

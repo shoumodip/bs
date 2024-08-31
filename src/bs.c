@@ -1,9 +1,9 @@
 #include <dlfcn.h>
 #include <stdio.h>
 
-#include "compiler.h"
-#include "debug.h"
-#include "hash.h"
+#include "bs/compiler.h"
+#include "bs/debug.h"
+#include "bs/hash.h"
 
 // #define BS_GC_DEBUG_LOG
 // #define BS_GC_DEBUG_STRESS

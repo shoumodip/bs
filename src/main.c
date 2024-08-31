@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "object.h"
+#include "bs/object.h"
 
 static bool string_slice(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
     if (!bs_check_arity(bs, arity, 3)) {
