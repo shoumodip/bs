@@ -2,22 +2,22 @@
 
 #include "op.h"
 
-static_assert(COUNT_OPS == 41, "Update op_get_to_set()");
-Op op_get_to_set(Op op) {
+static_assert(BS_COUNT_OPS == 41, "Update bs_op_get_to_set()");
+Bs_Op bs_op_get_to_set(Bs_Op op) {
     switch (op) {
-    case OP_GGET:
-        return OP_GSET;
+    case BS_OP_GGET:
+        return BS_OP_GSET;
 
-    case OP_LGET:
-        return OP_LSET;
+    case BS_OP_LGET:
+        return BS_OP_LSET;
 
-    case OP_UGET:
-        return OP_USET;
+    case BS_OP_UGET:
+        return BS_OP_USET;
 
-    case OP_IGET:
-        return OP_ISET;
+    case BS_OP_IGET:
+        return BS_OP_ISET;
 
     default:
-        return OP_RET;
+        return BS_OP_RET;
     }
 }

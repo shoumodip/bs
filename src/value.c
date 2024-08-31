@@ -1,99 +1,98 @@
-#include "basic.h"
 #include "hash.h"
 
-bool value_is_falsey(Value v) {
-    return v.type == VALUE_NIL || (v.type == VALUE_BOOL && !v.as.boolean);
+bool bs_value_is_falsey(Bs_Value v) {
+    return v.type == BS_VALUE_NIL || (v.type == BS_VALUE_BOOL && !v.as.boolean);
 }
 
-static_assert(COUNT_OBJECTS == 9, "Update object_type_name()");
-const char *object_type_name(ObjectType type) {
+static_assert(BS_COUNT_OBJECTS == 9, "Update bs_object_type_name()");
+const char *bs_object_type_name(Bs_Object_Type type) {
     switch (type) {
-    case OBJECT_FN:
+    case BS_OBJECT_FN:
         return "function";
 
-    case OBJECT_STR:
+    case BS_OBJECT_STR:
         return "string";
 
-    case OBJECT_ARRAY:
+    case BS_OBJECT_ARRAY:
         return "array";
 
-    case OBJECT_TABLE:
+    case BS_OBJECT_TABLE:
         return "table";
 
-    case OBJECT_CLOSURE:
+    case BS_OBJECT_CLOSURE:
         return "closure";
 
-    case OBJECT_UPVALUE:
+    case BS_OBJECT_UPVALUE:
         return "upvalue";
 
-    case OBJECT_NATIVE_FN:
+    case BS_OBJECT_C_FN:
         return "native function";
 
-    case OBJECT_NATIVE_DATA:
-        return "native object";
-
-    case OBJECT_NATIVE_LIBRARY:
+    case BS_OBJECT_C_LIB:
         return "native library";
 
+    case BS_OBJECT_C_DATA:
+        return "native object";
+
     default:
         assert(false && "unreachable");
     }
 }
 
-const char *value_get_type_name(Value v) {
+const char *bs_value_type_name(Bs_Value v) {
     switch (v.type) {
-    case VALUE_NIL:
+    case BS_VALUE_NIL:
         return "nil";
 
-    case VALUE_NUM:
+    case BS_VALUE_NUM:
         return "number";
 
-    case VALUE_BOOL:
+    case BS_VALUE_BOOL:
         return "boolean";
 
-    case VALUE_OBJECT:
-        return object_type_name(v.as.object->type);
+    case BS_VALUE_OBJECT:
+        return bs_object_type_name(v.as.object->type);
 
     default:
         assert(false && "unreachable");
     }
 }
 
-static_assert(COUNT_OBJECTS == 9, "Update object_write()");
-static void object_write(const Object *o, Writer *w) {
+static_assert(BS_COUNT_OBJECTS == 9, "Update bs_object_write()");
+static void bs_object_write(Bs_Writer *w, const Bs_Object *o) {
     switch (o->type) {
-    case OBJECT_FN: {
-        const ObjectFn *fn = (const ObjectFn *)o;
+    case BS_OBJECT_FN: {
+        const Bs_Fn *fn = (const Bs_Fn *)o;
         if (fn->module) {
-            w->fmt(w, "file '" SVFmt "'", SVArg(*fn->name));
+            bs_write(w, "file '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*fn->name));
         } else if (fn->name) {
-            w->fmt(w, "fn " SVFmt "()", SVArg(*fn->name));
+            bs_write(w, "fn " Bs_Sv_Fmt "()", Bs_Sv_Arg(*fn->name));
         } else {
-            w->fmt(w, "fn ()");
+            bs_write(w, "fn ()");
         }
     } break;
 
-    case OBJECT_STR:
-        w->fmt(w, SVFmt, SVArg(*(const ObjectStr *)o));
+    case BS_OBJECT_STR:
+        bs_write(w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)o));
         break;
 
-    case OBJECT_ARRAY: {
-        const ObjectArray *array = (const ObjectArray *)o;
+    case BS_OBJECT_ARRAY: {
+        const Bs_Array *array = (const Bs_Array *)o;
 
-        w->fmt(w, "[");
+        bs_write(w, "[");
         for (size_t i = 0; i < array->count; i++) {
             if (i) {
-                w->fmt(w, ", ");
+                bs_write(w, ", ");
             }
-            value_write(array->data[i], w);
+            bs_value_write(w, array->data[i]);
         }
-        w->fmt(w, "]");
+        bs_write(w, "]");
     } break;
 
-    case OBJECT_TABLE: {
-        ObjectTable *table = (ObjectTable *)o;
+    case BS_OBJECT_TABLE: {
+        Bs_Table *table = (Bs_Table *)o;
 
-        w->fmt(w, "{");
+        bs_write(w, "{");
         for (size_t i = 0, count = 0; i < table->capacity; i++) {
             Entry *entry = &table->data[i];
             if (!entry->key) {
@@ -101,63 +100,63 @@ static void object_write(const Object *o, Writer *w) {
             }
 
             if (count) {
-                w->fmt(w, ", ");
+                bs_write(w, ", ");
             }
 
-            object_write((const Object *)entry->key, w);
-            w->fmt(w, " = ");
-            value_write(entry->value, w);
+            bs_object_write(w, (const Bs_Object *)entry->key);
+            bs_write(w, " = ");
+            bs_value_write(w, entry->value);
             count++;
         }
-        w->fmt(w, "}");
+        bs_write(w, "}");
     } break;
 
-    case OBJECT_CLOSURE:
-        object_write((Object *)((const ObjectClosure *)o)->fn, w);
+    case BS_OBJECT_CLOSURE:
+        bs_object_write(w, (Bs_Object *)((const Bs_Closure *)o)->fn);
         break;
 
-    case OBJECT_UPVALUE:
-        w->fmt(w, "<upvalue>");
+    case BS_OBJECT_UPVALUE:
+        bs_write(w, "<upvalue>");
         break;
 
-    case OBJECT_NATIVE_FN:
-        w->fmt(w, "native fn ()");
+    case BS_OBJECT_C_FN:
+        bs_write(w, "native fn ()");
         break;
 
-    case OBJECT_NATIVE_DATA: {
-        const ObjectNativeData *native = (const ObjectNativeData *)o;
+    case BS_OBJECT_C_LIB:
+        bs_write(w, "<native library '" Bs_Sv_Fmt "'>", Bs_Sv_Arg(*((const Bs_C_Lib *)o)->path));
+        break;
+
+    case BS_OBJECT_C_DATA: {
+        const Bs_C_Data *native = (const Bs_C_Data *)o;
         if (native->spec->write) {
             native->spec->write(w, native->data);
         } else {
-            w->fmt(w, "<native " SVFmt " object>", SVArg(native->spec->name));
+            bs_write(w, "<native " Bs_Sv_Fmt " object>", Bs_Sv_Arg(native->spec->name));
         }
     } break;
 
-    case OBJECT_NATIVE_LIBRARY:
-        w->fmt(w, "<native library '" SVFmt "'>", SVArg(*((const ObjectNativeLibrary *)o)->path));
-        break;
-
     default:
         assert(false && "unreachable");
     }
 }
 
-void value_write(Value v, Writer *w) {
+void bs_value_write(Bs_Writer *w, Bs_Value v) {
     switch (v.type) {
-    case VALUE_NIL:
-        w->fmt(w, "nil");
+    case BS_VALUE_NIL:
+        bs_write(w, "nil");
         break;
 
-    case VALUE_NUM:
-        w->fmt(w, "%g", v.as.number);
+    case BS_VALUE_NUM:
+        bs_write(w, "%g", v.as.number);
         break;
 
-    case VALUE_BOOL:
-        w->fmt(w, "%s", v.as.boolean ? "true" : "false");
+    case BS_VALUE_BOOL:
+        bs_write(w, "%s", v.as.boolean ? "true" : "false");
         break;
 
-    case VALUE_OBJECT:
-        object_write(v.as.object, w);
+    case BS_VALUE_OBJECT:
+        bs_object_write(w, v.as.object);
         break;
 
     default:
@@ -165,29 +164,29 @@ void value_write(Value v, Writer *w) {
     }
 }
 
-static_assert(COUNT_OBJECTS == 9, "Update object_equal()");
-static bool object_equal(const Object *a, const Object *b) {
+static_assert(BS_COUNT_OBJECTS == 9, "Update bs_object_equal()");
+static bool bs_object_equal(const Bs_Object *a, const Bs_Object *b) {
     if (a->type != b->type) {
         return false;
     }
 
     switch (a->type) {
-    case OBJECT_STR: {
-        const ObjectStr *a1 = (const ObjectStr *)a;
-        const ObjectStr *b1 = (const ObjectStr *)b;
-        return object_str_eq(a1, b1);
+    case BS_OBJECT_STR: {
+        const Bs_Str *a1 = (const Bs_Str *)a;
+        const Bs_Str *b1 = (const Bs_Str *)b;
+        return bs_str_eq(a1, b1);
     };
 
-    case OBJECT_ARRAY: {
-        const ObjectArray *a1 = (const ObjectArray *)a;
-        const ObjectArray *b1 = (const ObjectArray *)b;
+    case BS_OBJECT_ARRAY: {
+        const Bs_Array *a1 = (const Bs_Array *)a;
+        const Bs_Array *b1 = (const Bs_Array *)b;
 
         if (a1->count != b1->count) {
             return false;
         }
 
         for (size_t i = 0; i < a1->count; i++) {
-            if (!value_equal(a1->data[i], b1->data[i])) {
+            if (!bs_value_equal(a1->data[i], b1->data[i])) {
                 return false;
             }
         }
@@ -195,9 +194,9 @@ static bool object_equal(const Object *a, const Object *b) {
         return true;
     } break;
 
-    case OBJECT_TABLE: {
-        const ObjectTable *a1 = (const ObjectTable *)a;
-        const ObjectTable *b1 = (const ObjectTable *)b;
+    case BS_OBJECT_TABLE: {
+        const Bs_Table *a1 = (const Bs_Table *)a;
+        const Bs_Table *b1 = (const Bs_Table *)b;
 
         if (a1->real_count != b1->real_count) {
             return false;
@@ -209,7 +208,7 @@ static bool object_equal(const Object *a, const Object *b) {
                 continue;
             }
 
-            const Entry *b2 = entries_find_str(b1->data, b1->capacity, a2->key);
+            const Entry *b2 = bs_entries_find_str(b1->data, b1->capacity, a2->key);
             if (!b2->key) {
                 return false;
             }
@@ -218,14 +217,14 @@ static bool object_equal(const Object *a, const Object *b) {
         return true;
     } break;
 
-    case OBJECT_CLOSURE:
+    case BS_OBJECT_CLOSURE:
         return a == b;
 
-    case OBJECT_NATIVE_FN:
-        return ((const ObjectNativeFn *)a)->fn == ((const ObjectNativeFn *)b)->fn;
+    case BS_OBJECT_C_FN:
+        return ((const Bs_C_Fn *)a)->fn == ((const Bs_C_Fn *)b)->fn;
 
-    case OBJECT_NATIVE_DATA:
-    case OBJECT_NATIVE_LIBRARY:
+    case BS_OBJECT_C_LIB:
+    case BS_OBJECT_C_DATA:
         return a == b;
 
     default:
@@ -233,23 +232,23 @@ static bool object_equal(const Object *a, const Object *b) {
     }
 }
 
-bool value_equal(Value a, Value b) {
+bool bs_value_equal(Bs_Value a, Bs_Value b) {
     if (a.type != b.type) {
         return false;
     }
 
     switch (a.type) {
-    case VALUE_NIL:
+    case BS_VALUE_NIL:
         return true;
 
-    case VALUE_NUM:
+    case BS_VALUE_NUM:
         return a.as.number == b.as.number;
 
-    case VALUE_BOOL:
+    case BS_VALUE_BOOL:
         return a.as.boolean == b.as.boolean;
 
-    case VALUE_OBJECT:
-        return object_equal(a.as.object, b.as.object);
+    case BS_VALUE_OBJECT:
+        return bs_object_equal(a.as.object, b.as.object);
 
     default:
         assert(false && "unreachable");

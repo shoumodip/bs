@@ -1,10 +1,9 @@
 #include <assert.h>
 #include <ctype.h>
-#include <stdio.h>
 
 #include "lexer.h"
 
-static void lexer_advance(Lexer *l) {
+static void bs_lexer_advance(Bs_Lexer *l) {
     if (*l->sv.data == '\n') {
         if (l->sv.size > 1) {
             l->loc.row += 1;
@@ -18,39 +17,40 @@ static void lexer_advance(Lexer *l) {
     l->sv.size -= 1;
 }
 
-static char lexer_consume(Lexer *l) {
-    lexer_advance(l);
+static char bs_lexer_consume(Bs_Lexer *l) {
+    bs_lexer_advance(l);
     return l->sv.data[-1];
 }
 
-static bool lexer_match(Lexer *l, char ch) {
+static bool bs_lexer_match(Bs_Lexer *l, char ch) {
     if (l->sv.size > 0 && *l->sv.data == ch) {
-        lexer_advance(l);
+        bs_lexer_advance(l);
         return true;
     }
     return false;
 }
 
-Lexer lexer_new(const char *path, SV sv) {
-    return (Lexer){
-        .sv = sv,
+Bs_Lexer bs_lexer_new(const char *path, Bs_Sv input, Bs_Writer *error) {
+    return (Bs_Lexer){
+        .sv = input,
         .loc.path = path,
         .loc.row = 1,
         .loc.col = 1,
+        .error = error,
     };
 }
 
-void lexer_error(Lexer *l) {
-    longjmp(l->error, 1);
+void bs_lexer_error(Bs_Lexer *l) {
+    longjmp(l->unwind, 1);
 }
 
-void lexer_buffer(Lexer *l, Token token) {
+void bs_lexer_buffer(Bs_Lexer *l, Bs_Token token) {
     l->peeked = true;
     l->buffer = token;
 }
 
-static_assert(COUNT_TOKENS == 43, "Update lexer_next()");
-Token lexer_next(Lexer *l) {
+static_assert(BS_COUNT_TOKENS == 43, "Update bs_lexer_next()");
+Bs_Token bs_lexer_next(Bs_Lexer *l) {
     if (l->peeked) {
         l->peeked = false;
         return l->buffer;
@@ -58,33 +58,33 @@ Token lexer_next(Lexer *l) {
 
     while (l->sv.size > 0) {
         if (isspace(*l->sv.data)) {
-            lexer_advance(l);
+            bs_lexer_advance(l);
         } else if (*l->sv.data == '#') {
             while (l->sv.size > 0 && *l->sv.data != '\n') {
-                lexer_advance(l);
+                bs_lexer_advance(l);
             }
         } else {
             break;
         }
     }
 
-    Token token = {.sv = l->sv, .loc = l->loc};
+    Bs_Token token = {.sv = l->sv, .loc = l->loc};
 
     if (l->sv.size == 0) {
-        token.type = TOKEN_EOF;
+        token.type = BS_TOKEN_EOF;
         return token;
     }
 
     if (isdigit(*l->sv.data)) {
-        token.type = TOKEN_NUM;
+        token.type = BS_TOKEN_NUM;
         while (l->sv.size > 0 && isdigit(*l->sv.data)) {
-            lexer_advance(l);
+            bs_lexer_advance(l);
         }
 
         if (l->sv.size >= 2 && l->sv.data[0] == '.' && isdigit(l->sv.data[1])) {
-            lexer_advance(l);
+            bs_lexer_advance(l);
             while (l->sv.size > 0 && isdigit(*l->sv.data)) {
-                lexer_advance(l);
+                bs_lexer_advance(l);
             }
         }
 
@@ -93,239 +93,242 @@ Token lexer_next(Lexer *l) {
     }
 
     if (isalpha(*l->sv.data) || *l->sv.data == '_') {
-        token.type = TOKEN_IDENT;
+        token.type = BS_TOKEN_IDENT;
         while (l->sv.size > 0 && (isalnum(*l->sv.data) || *l->sv.data == '_')) {
-            lexer_advance(l);
+            bs_lexer_advance(l);
         }
         token.sv.size -= l->sv.size;
 
         if (l->extended) {
-            if (sv_eq(token.sv, SVStatic("fr"))) {
-                token.type = TOKEN_EOL;
-            } else if (sv_eq(token.sv, SVStatic("bruh"))) {
-                token.type = TOKEN_NIL;
-            } else if (sv_eq(token.sv, SVStatic("nocap"))) {
-                token.type = TOKEN_TRUE;
-            } else if (sv_eq(token.sv, SVStatic("cap"))) {
-                token.type = TOKEN_FALSE;
-            } else if (sv_eq(token.sv, SVStatic("or"))) {
-                token.type = TOKEN_OR;
-            } else if (sv_eq(token.sv, SVStatic("and"))) {
-                token.type = TOKEN_AND;
-            } else if (sv_eq(token.sv, SVStatic("nah"))) {
-                token.type = TOKEN_NOT;
-            } else if (sv_eq(token.sv, SVStatic("thicc"))) {
-                token.type = TOKEN_LEN;
-            } else if (sv_eq(token.sv, SVStatic("redpill"))) {
-                token.type = TOKEN_IMPORT;
-            } else if (sv_eq(token.sv, SVStatic("be"))) {
-                token.type = TOKEN_SET;
-            } else if (sv_eq(token.sv, SVStatic("ayo"))) {
-                token.type = TOKEN_IF;
-            } else if (sv_eq(token.sv, SVStatic("sike"))) {
-                token.type = TOKEN_ELSE;
-            } else if (sv_eq(token.sv, SVStatic("yall"))) {
-                token.type = TOKEN_FOR;
-            } else if (sv_eq(token.sv, SVStatic("yolo"))) {
-                token.type = TOKEN_WHILE;
-            } else if (sv_eq(token.sv, SVStatic("lit"))) {
-                token.type = TOKEN_FN;
-            } else if (sv_eq(token.sv, SVStatic("fam"))) {
-                token.type = TOKEN_PUB;
-            } else if (sv_eq(token.sv, SVStatic("mf"))) {
-                token.type = TOKEN_VAR;
-            } else if (sv_eq(token.sv, SVStatic("bet"))) {
-                token.type = TOKEN_RETURN;
-            } else if (sv_eq(token.sv, SVStatic("yap"))) {
-                token.type = TOKEN_PRINT;
+            if (bs_sv_eq(token.sv, Bs_Sv_Static("fr"))) {
+                token.type = BS_TOKEN_EOL;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("bruh"))) {
+                token.type = BS_TOKEN_NIL;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("nocap"))) {
+                token.type = BS_TOKEN_TRUE;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("cap"))) {
+                token.type = BS_TOKEN_FALSE;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("or"))) {
+                token.type = BS_TOKEN_OR;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("and"))) {
+                token.type = BS_TOKEN_AND;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("nah"))) {
+                token.type = BS_TOKEN_NOT;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("thicc"))) {
+                token.type = BS_TOKEN_LEN;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("redpill"))) {
+                token.type = BS_TOKEN_IMPORT;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("be"))) {
+                token.type = BS_TOKEN_SET;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("ayo"))) {
+                token.type = BS_TOKEN_IF;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("sike"))) {
+                token.type = BS_TOKEN_ELSE;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("yall"))) {
+                token.type = BS_TOKEN_FOR;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("yolo"))) {
+                token.type = BS_TOKEN_WHILE;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("lit"))) {
+                token.type = BS_TOKEN_FN;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("fam"))) {
+                token.type = BS_TOKEN_PUB;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("mf"))) {
+                token.type = BS_TOKEN_VAR;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("bet"))) {
+                token.type = BS_TOKEN_RETURN;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("yap"))) {
+                token.type = BS_TOKEN_PRINT;
             }
         } else {
-            if (sv_eq(token.sv, SVStatic("nil"))) {
-                token.type = TOKEN_NIL;
-            } else if (sv_eq(token.sv, SVStatic("true"))) {
-                token.type = TOKEN_TRUE;
-            } else if (sv_eq(token.sv, SVStatic("false"))) {
-                token.type = TOKEN_FALSE;
-            } else if (sv_eq(token.sv, SVStatic("or"))) {
-                token.type = TOKEN_OR;
-            } else if (sv_eq(token.sv, SVStatic("and"))) {
-                token.type = TOKEN_AND;
-            } else if (sv_eq(token.sv, SVStatic("len"))) {
-                token.type = TOKEN_LEN;
-            } else if (sv_eq(token.sv, SVStatic("import"))) {
-                token.type = TOKEN_IMPORT;
-            } else if (sv_eq(token.sv, SVStatic("if"))) {
-                token.type = TOKEN_IF;
-            } else if (sv_eq(token.sv, SVStatic("else"))) {
-                token.type = TOKEN_ELSE;
-            } else if (sv_eq(token.sv, SVStatic("for"))) {
-                token.type = TOKEN_FOR;
-            } else if (sv_eq(token.sv, SVStatic("while"))) {
-                token.type = TOKEN_WHILE;
-            } else if (sv_eq(token.sv, SVStatic("fn"))) {
-                token.type = TOKEN_FN;
-            } else if (sv_eq(token.sv, SVStatic("pub"))) {
-                token.type = TOKEN_PUB;
-            } else if (sv_eq(token.sv, SVStatic("var"))) {
-                token.type = TOKEN_VAR;
-            } else if (sv_eq(token.sv, SVStatic("return"))) {
-                token.type = TOKEN_RETURN;
-            } else if (sv_eq(token.sv, SVStatic("print"))) {
-                token.type = TOKEN_PRINT;
+            if (bs_sv_eq(token.sv, Bs_Sv_Static("nil"))) {
+                token.type = BS_TOKEN_NIL;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("true"))) {
+                token.type = BS_TOKEN_TRUE;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("false"))) {
+                token.type = BS_TOKEN_FALSE;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("or"))) {
+                token.type = BS_TOKEN_OR;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("and"))) {
+                token.type = BS_TOKEN_AND;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("len"))) {
+                token.type = BS_TOKEN_LEN;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("import"))) {
+                token.type = BS_TOKEN_IMPORT;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("if"))) {
+                token.type = BS_TOKEN_IF;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("else"))) {
+                token.type = BS_TOKEN_ELSE;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("for"))) {
+                token.type = BS_TOKEN_FOR;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("while"))) {
+                token.type = BS_TOKEN_WHILE;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("fn"))) {
+                token.type = BS_TOKEN_FN;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("pub"))) {
+                token.type = BS_TOKEN_PUB;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("var"))) {
+                token.type = BS_TOKEN_VAR;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("return"))) {
+                token.type = BS_TOKEN_RETURN;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("print"))) {
+                token.type = BS_TOKEN_PRINT;
             }
         }
 
         return token;
     }
 
-    if (lexer_match(l, '"')) {
+    if (bs_lexer_match(l, '"')) {
         while (l->sv.size > 0 && *l->sv.data != '"') {
-            lexer_advance(l);
+            bs_lexer_advance(l);
         }
 
         if (l->sv.size == 0) {
-            fprintf(stderr, LocFmt "error: unterminated string\n", LocArg(token.loc));
-            lexer_error(l);
+            bs_write(l->error, Bs_Loc_Fmt "error: unterminated string\n", Bs_Loc_Arg(token.loc));
+            bs_lexer_error(l);
         }
 
-        token.type = TOKEN_STR;
-        lexer_advance(l);
+        token.type = BS_TOKEN_STR;
+        bs_lexer_advance(l);
 
         token.sv.size -= l->sv.size;
         return token;
     }
 
-    switch (lexer_consume(l)) {
+    switch (bs_lexer_consume(l)) {
     case ';':
         if (!l->extended) {
-            token.type = TOKEN_EOL;
+            token.type = BS_TOKEN_EOL;
         }
         break;
 
     case '.':
-        if (lexer_match(l, '.')) {
-            token.type = TOKEN_JOIN;
+        if (bs_lexer_match(l, '.')) {
+            token.type = BS_TOKEN_JOIN;
         } else {
-            token.type = TOKEN_DOT;
+            token.type = BS_TOKEN_DOT;
         }
         break;
 
     case ',':
-        token.type = TOKEN_COMMA;
+        token.type = BS_TOKEN_COMMA;
         break;
 
     case '@':
-        token.type = TOKEN_NATIVE;
+        token.type = BS_TOKEN_CORE;
         break;
 
     case '(':
-        token.type = TOKEN_LPAREN;
+        token.type = BS_TOKEN_LPAREN;
         break;
 
     case ')':
-        token.type = TOKEN_RPAREN;
+        token.type = BS_TOKEN_RPAREN;
         break;
 
     case '{':
-        token.type = TOKEN_LBRACE;
+        token.type = BS_TOKEN_LBRACE;
         break;
 
     case '}':
-        token.type = TOKEN_RBRACE;
+        token.type = BS_TOKEN_RBRACE;
         break;
 
     case '[':
-        token.type = TOKEN_LBRACKET;
+        token.type = BS_TOKEN_LBRACKET;
         break;
 
     case ']':
-        token.type = TOKEN_RBRACKET;
+        token.type = BS_TOKEN_RBRACKET;
         break;
 
     case '+':
-        token.type = TOKEN_ADD;
+        token.type = BS_TOKEN_ADD;
         break;
 
     case '-':
-        token.type = TOKEN_SUB;
+        token.type = BS_TOKEN_SUB;
         break;
 
     case '*':
-        token.type = TOKEN_MUL;
+        token.type = BS_TOKEN_MUL;
         break;
 
     case '/':
-        token.type = TOKEN_DIV;
+        token.type = BS_TOKEN_DIV;
         break;
 
     case '!':
-        if (lexer_match(l, '=')) {
-            token.type = TOKEN_NE;
+        if (bs_lexer_match(l, '=')) {
+            token.type = BS_TOKEN_NE;
         } else if (!l->extended) {
-            token.type = TOKEN_NOT;
+            token.type = BS_TOKEN_NOT;
         }
         break;
 
     case '>':
-        if (lexer_match(l, '=')) {
-            token.type = TOKEN_GE;
+        if (bs_lexer_match(l, '=')) {
+            token.type = BS_TOKEN_GE;
         } else {
-            token.type = TOKEN_GT;
+            token.type = BS_TOKEN_GT;
         }
         break;
 
     case '<':
-        if (lexer_match(l, '=')) {
-            token.type = TOKEN_LE;
+        if (bs_lexer_match(l, '=')) {
+            token.type = BS_TOKEN_LE;
         } else {
-            token.type = TOKEN_LT;
+            token.type = BS_TOKEN_LT;
         }
         break;
 
     case '=':
-        if (lexer_match(l, '=')) {
-            token.type = TOKEN_EQ;
+        if (bs_lexer_match(l, '=')) {
+            token.type = BS_TOKEN_EQ;
         } else if (!l->extended) {
-            token.type = TOKEN_SET;
+            token.type = BS_TOKEN_SET;
         }
         break;
     }
 
-    if (token.type == TOKEN_EOF) {
-        fprintf(
-            stderr, LocFmt "error: invalid character '%c'\n", LocArg(token.loc), *token.sv.data);
+    if (token.type == BS_TOKEN_EOF) {
+        bs_write(
+            l->error,
+            Bs_Loc_Fmt "error: invalid character '%c'\n",
+            Bs_Loc_Arg(token.loc),
+            *token.sv.data);
 
-        lexer_error(l);
+        bs_lexer_error(l);
     }
 
     token.sv.size -= l->sv.size;
     return token;
 }
 
-Token lexer_peek(Lexer *l) {
+Bs_Token bs_lexer_peek(Bs_Lexer *l) {
     if (!l->peeked) {
-        lexer_buffer(l, lexer_next(l));
+        bs_lexer_buffer(l, bs_lexer_next(l));
     }
     return l->buffer;
 }
 
-bool lexer_read(Lexer *l, TokenType type) {
-    lexer_peek(l);
+bool bs_lexer_read(Bs_Lexer *l, Bs_Token_Type type) {
+    bs_lexer_peek(l);
     l->peeked = l->buffer.type != type;
     return !l->peeked;
 }
 
-Token lexer_expect(Lexer *l, TokenType type) {
-    const Token token = lexer_next(l);
+Bs_Token bs_lexer_expect(Bs_Lexer *l, Bs_Token_Type type) {
+    const Bs_Token token = bs_lexer_next(l);
     if (token.type != type) {
-        fprintf(
-            stderr,
-            LocFmt "error: expected %s, got %s\n",
-            LocArg(token.loc),
-            token_type_name(type, l->extended),
-            token_type_name(token.type, l->extended));
+        bs_write(
+            l->error,
+            Bs_Loc_Fmt "error: expected %s, got %s\n",
+            Bs_Loc_Arg(token.loc),
+            bs_token_type_name(type, l->extended),
+            bs_token_type_name(token.type, l->extended));
 
-        lexer_error(l);
+        bs_lexer_error(l);
     }
     return token;
 }

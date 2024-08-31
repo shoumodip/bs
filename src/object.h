@@ -1,34 +1,34 @@
-#ifndef OBJECT_H
-#define OBJECT_H
+#ifndef BS_OBJECT_H
+#define BS_OBJECT_H
 
 #include <stdint.h>
 
+#include "bs.h"
 #include "op.h"
 #include "token.h"
-#include "vm.h"
 
 typedef struct {
-    Value *data;
+    Bs_Value *data;
     size_t count;
     size_t capacity;
-} Values;
+} Bs_Values;
 
-#define values_free da_free
-#define values_push da_push
+#define bs_values_free bs_da_free
+#define bs_values_push bs_da_push
 
 typedef struct {
-    Loc loc;
+    Bs_Loc loc;
     size_t index;
-} OpLoc;
+} Bs_Op_Loc;
 
 typedef struct {
-    OpLoc *data;
+    Bs_Op_Loc *data;
     size_t count;
     size_t capacity;
-} OpLocs;
+} Bs_Op_Locs;
 
-#define op_locs_free da_free
-#define op_locs_push da_push
+#define bs_op_locs_free bs_da_free
+#define bs_op_locs_push bs_da_push
 
 typedef struct {
     uint8_t *data;
@@ -36,40 +36,37 @@ typedef struct {
     size_t count;
     size_t capacity;
 
-    Values constants;
-    OpLocs locations;
-} Chunk;
+    Bs_Values constants;
+    Bs_Op_Locs locations;
+} Bs_Chunk;
 
-void chunk_free(Vm *vm, Chunk *chunk);
-void chunk_push_op(Vm *vm, Chunk *chunk, Op op);
-void chunk_push_op_loc(Vm *vm, Chunk *c, Loc loc);
-void chunk_push_op_int(Vm *vm, Chunk *chunk, Op op, size_t value);
-void chunk_push_op_value(Vm *vm, Chunk *chunk, Op op, Value value);
+void bs_chunk_free(Bs *bs, Bs_Chunk *chunk);
+void bs_chunk_push_op(Bs *bs, Bs_Chunk *chunk, Bs_Op op);
+void bs_chunk_push_op_loc(Bs *bs, Bs_Chunk *c, Bs_Loc loc);
+void bs_chunk_push_op_int(Bs *bs, Bs_Chunk *chunk, Bs_Op op, size_t value);
+void bs_chunk_push_op_value(Bs *bs, Bs_Chunk *chunk, Bs_Op op, Bs_Value value);
 
-struct Object {
-    ObjectType type;
-    Object *next;
+struct Bs_Object {
+    Bs_Object_Type type;
+    Bs_Object *next;
     bool marked;
 };
 
-// The duplicate type definition is to appease the LSP unused include warnings
-typedef struct Object Object;
+struct Bs_Fn {
+    Bs_Object meta;
 
-struct ObjectFn {
-    Object meta;
-
-    Chunk chunk;
+    Bs_Chunk chunk;
     size_t module;
-    ObjectStr *name;
+    Bs_Str *name;
 
     size_t arity;
     size_t upvalues;
 };
 
-ObjectFn *object_fn_new(Vm *vm);
+Bs_Fn *bs_fn_new(Bs *bs);
 
-struct ObjectStr {
-    Object meta;
+struct Bs_Str {
+    Bs_Object meta;
 
     bool hashed;
     uint32_t hash;
@@ -78,89 +75,89 @@ struct ObjectStr {
     char data[];
 };
 
-ObjectStr *object_str_new(Vm *vm, const char *data, size_t size);
-bool object_str_eq(const ObjectStr *a, const ObjectStr *b);
+Bs_Str *bs_str_new(Bs *bs, Bs_Sv sv);
+bool bs_str_eq(const Bs_Str *a, const Bs_Str *b);
 
-struct ObjectArray {
-    Object meta;
-    Value *data;
+struct Bs_Array {
+    Bs_Object meta;
+    Bs_Value *data;
     size_t count;
     size_t capacity;
 };
 
-ObjectArray *object_array_new(Vm *vm);
-bool object_array_get(Vm *vm, ObjectArray *array, size_t index, Value *value);
-void object_array_set(Vm *vm, ObjectArray *array, size_t index, Value value);
+Bs_Array *bs_array_new(Bs *bs);
+bool bs_array_get(Bs *bs, Bs_Array *array, size_t index, Bs_Value *value);
+void bs_array_set(Bs *bs, Bs_Array *array, size_t index, Bs_Value value);
 
 typedef struct {
-    ObjectStr *key;
-    Value value;
+    Bs_Str *key;
+    Bs_Value value;
 } Entry;
 
-struct ObjectTable {
-    Object meta;
+struct Bs_Table {
+    Bs_Object meta;
     Entry *data;
     size_t count;
     size_t capacity;
     size_t real_count;
 };
 
-ObjectTable *object_table_new(Vm *vm);
+Bs_Table *bs_table_new(Bs *bs);
 
-void object_table_free(Vm *vm, ObjectTable *table);
-bool object_table_remove(Vm *vm, ObjectTable *table, ObjectStr *key);
+void bs_table_free(Bs *bs, Bs_Table *table);
+bool bs_table_remove(Bs *bs, Bs_Table *table, Bs_Str *key);
 
-bool object_table_get(Vm *vm, ObjectTable *table, ObjectStr *key, Value *value);
-bool object_table_set(Vm *vm, ObjectTable *table, ObjectStr *key, Value value);
+bool bs_table_get(Bs *bs, Bs_Table *table, Bs_Str *key, Bs_Value *value);
+bool bs_table_set(Bs *bs, Bs_Table *table, Bs_Str *key, Bs_Value value);
 
-struct ObjectClosure {
-    Object meta;
-    const ObjectFn *fn;
+struct Bs_Closure {
+    Bs_Object meta;
+    const Bs_Fn *fn;
 
     size_t upvalues;
-    ObjectUpvalue *data[];
+    Bs_Upvalue *data[];
 };
 
-ObjectClosure *object_closure_new(Vm *vm, const ObjectFn *fn);
+Bs_Closure *bs_closure_new(Bs *bs, const Bs_Fn *fn);
 
-struct ObjectUpvalue {
-    Object meta;
+struct Bs_Upvalue {
+    Bs_Object meta;
     bool closed;
     union {
         size_t index;
-        Value value;
+        Bs_Value value;
     };
-    ObjectUpvalue *next;
+    Bs_Upvalue *next;
 };
 
-ObjectUpvalue *object_upvalue_new(Vm *vm, size_t index);
+Bs_Upvalue *bs_upvalue_new(Bs *bs, size_t index);
 
-typedef bool (*NativeFn)(Vm *vm, Value *args, size_t arity, Value *result);
+typedef bool (*Bs_C_Fn_Ptr)(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result);
 
-struct ObjectNativeFn {
-    Object meta;
-    NativeFn fn;
-    ObjectNativeLibrary *library;
+struct Bs_C_Fn {
+    Bs_Object meta;
+    Bs_C_Fn_Ptr fn;
+    Bs_C_Lib *library;
 };
 
-ObjectNativeFn *object_native_fn_new(Vm *vm, NativeFn fn);
+Bs_C_Fn *bs_c_fn_new(Bs *bs, Bs_C_Fn_Ptr ptr);
 
-struct ObjectNativeData {
-    Object meta;
+struct Bs_C_Lib {
+    Bs_Object meta;
     void *data;
-    const NativeSpec *spec;
+    const Bs_Str *path;
+
+    Bs_Table functions;
 };
 
-ObjectNativeData *object_native_data_new(Vm *vm, void *data, const NativeSpec *spec);
+Bs_C_Lib *bs_c_lib_new(Bs *bs, void *data, const Bs_Str *path);
 
-struct ObjectNativeLibrary {
-    Object meta;
+struct Bs_C_Data {
+    Bs_Object meta;
     void *data;
-    const ObjectStr *path;
-
-    ObjectTable functions;
+    const Bs_C_Data_Spec *spec;
 };
 
-ObjectNativeLibrary *object_native_library_new(Vm *vm, void *data, const ObjectStr *path);
+Bs_C_Data *bs_c_data_new(Bs *bs, void *data, const Bs_C_Data_Spec *spec);
 
-#endif // OBJECT_H
+#endif // BS_OBJECT_H

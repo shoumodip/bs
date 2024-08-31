@@ -1,133 +1,118 @@
+#include <stdio.h>
+
 #include "object.h"
 
-static bool string_slice(Vm *vm, Value *args, size_t arity, Value *result) {
-    if (!vm_check_arity(vm, arity, 3)) {
+static bool string_slice(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
+    if (!bs_check_arity(bs, arity, 3)) {
         return false;
     }
 
-    if (!vm_check_object_type(vm, args[0], OBJECT_STR, "argument #1")) {
+    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
         return false;
     }
 
-    if (!vm_check_whole_number(vm, args[1], "argument #2")) {
+    if (!bs_check_whole_number(bs, args[1], "argument #2")) {
         return false;
     }
 
-    if (!vm_check_whole_number(vm, args[2], "argument #3")) {
+    if (!bs_check_whole_number(bs, args[2], "argument #3")) {
         return false;
     }
 
-    ObjectStr *str = (ObjectStr *)args[0].as.object;
-    const size_t begin = min(args[1].as.number, args[2].as.number);
-    const size_t end = max(args[1].as.number, args[2].as.number);
+    Bs_Str *str = (Bs_Str *)args[0].as.object;
+    const size_t begin = bs_min(args[1].as.number, args[2].as.number);
+    const size_t end = bs_max(args[1].as.number, args[2].as.number);
 
     if (begin >= str->size || end > str->size) {
-        vm_error(vm, "cannot slice string of length %zu from %zu to %zu", str->size, begin, end);
+        bs_error(bs, "cannot slice string of length %zu from %zu to %zu", str->size, begin, end);
         return false;
     }
 
-    *result = value_object(object_str_new(vm, str->data + begin, end - begin));
+    *result = bs_value_object(bs_str_new(bs, bs_sv_from_parts(str->data + begin, end - begin)));
+
     return true;
 }
 
-typedef struct {
-    FILE *file;
-    const ObjectStr *path;
-} FileData;
-
-static void file_data_free(Vm *vm, void *data) {
+static void file_data_free(Bs *bs, void *data) {
     if (data) {
-        fclose(((FileData *)data)->file);
-        free(data);
+        fclose(data);
     }
 }
 
-static void file_data_write(Writer *w, const void *data) {
-    if (data) {
-        w->fmt(w, "file<" SVFmt ">", SVArg(*((const FileData *)data)->path));
-    } else {
-        w->fmt(w, "file<>");
-    }
-}
-
-static const NativeSpec file_spec = {
-    .name = SVStatic("file"),
+static const Bs_C_Data_Spec file_spec = {
+    .name = Bs_Sv_Static("file"),
     .free = file_data_free,
-    .write = file_data_write,
 };
 
-static bool io_open(Vm *vm, Value *args, size_t arity, Value *result) {
-    if (!vm_check_arity(vm, arity, 2)) {
+static bool io_open(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
+    if (!bs_check_arity(bs, arity, 2)) {
         return false;
     }
 
-    if (!vm_check_object_type(vm, args[0], OBJECT_STR, "argument #1")) {
+    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
         return false;
     }
 
-    if (!vm_check_value_type(vm, args[1], VALUE_BOOL, "argument #2")) {
+    if (!bs_check_value_type(bs, args[1], BS_VALUE_BOOL, "argument #2")) {
         return false;
     }
 
-    const ObjectStr *path = (ObjectStr *)args[0].as.object;
+    const Bs_Str *path = (Bs_Str *)args[0].as.object;
     const bool write = args[1].as.boolean;
 
     size_t start;
-    Writer *w = vm_writer_str_begin(vm, &start);
-    w->fmt(w, SVFmt, SVArg(*path));
+    Bs_Writer *w = bs_str_writer_init(bs, &start);
+    bs_write(w, Bs_Sv_Fmt, Bs_Sv_Arg(*path));
 
-    SV path_native = vm_writer_str_end(vm, start);
+    Bs_Sv path_native = bs_str_writer_end(bs, start);
     FILE *file = fopen(path_native.data, write ? "w" : "r");
     if (file) {
-        FileData *data = malloc(sizeof(FileData));
-        data->file = file;
-        data->path = path;
-        *result = value_object(object_native_data_new(vm, data, &file_spec));
+        *result = bs_value_object(bs_c_data_new(bs, file, &file_spec));
     }
 
     return true;
 }
 
-static bool io_close(Vm *vm, Value *args, size_t arity, Value *result) {
-    if (!vm_check_arity(vm, arity, 1)) {
+static bool io_close(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
+    if (!bs_check_arity(bs, arity, 1)) {
         return false;
     }
 
-    if (!vm_check_object_native_type(vm, args[0], &file_spec, "argument #1")) {
+    if (!bs_check_object_c_type(bs, args[0], &file_spec, "argument #1")) {
         return false;
     }
 
-    ObjectNativeData *native = (ObjectNativeData *)args[0].as.object;
+    Bs_C_Data *native = (Bs_C_Data *)args[0].as.object;
     if (native->data) {
-        file_data_free(vm, native->data);
+        file_data_free(bs, native->data);
         native->data = NULL;
     }
 
     return true;
 }
 
-static bool io_write(Vm *vm, Value *args, size_t arity, Value *result) {
-    if (!vm_check_arity(vm, arity, 2)) {
+static bool io_write(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
+    if (!bs_check_arity(bs, arity, 2)) {
         return false;
     }
 
-    if (!vm_check_object_native_type(vm, args[0], &file_spec, "argument #1")) {
+    if (!bs_check_object_c_type(bs, args[0], &file_spec, "argument #1")) {
         return false;
     }
 
-    if (!vm_check_object_type(vm, args[1], OBJECT_STR, "argument #2")) {
+    if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
         return false;
     }
 
-    ObjectNativeData *native = (ObjectNativeData *)args[0].as.object;
+    Bs_C_Data *native = (Bs_C_Data *)args[0].as.object;
     if (!native->data) {
-        vm_error(vm, "cannot write into closed file");
+        bs_error(bs, "cannot write into closed file");
         return false;
     }
 
-    ObjectStr *bytes = (ObjectStr *)args[1].as.object;
-    fwrite(bytes->data, bytes->size, 1, ((FileData *)native->data)->file);
-    *result = value_bool(!ferror(native->data));
+    Bs_Str *bytes = (Bs_Str *)args[1].as.object;
+    fwrite(bytes->data, bytes->size, 1, native->data);
+    *result = bs_value_bool(!ferror(native->data));
 
     return true;
 }
@@ -143,41 +128,50 @@ int main(int argc, char **argv) {
     const char *path = argv[1];
 
     size_t size = 0;
-    char *contents = read_file(path, &size);
+    char *contents = bs_read_file(path, &size);
     if (!contents) {
         fprintf(stderr, "error: could not read file '%s'\n", path);
         exit(1);
     }
 
-    Vm *vm = vm_new();
+    Bs *bs = bs_new();
 
-    ObjectTable *string = object_table_new(vm);
-    object_table_set(
-        vm,
+    Bs_Table *string = bs_table_new(bs);
+    bs_table_set(
+        bs,
         string,
-        object_str_const(vm, "slice", 5),
-        value_object(object_native_fn_new(vm, string_slice)));
+        bs_object_str_const(bs, Bs_Sv_Static("slice")),
+        bs_value_object(bs_c_fn_new(bs, string_slice)));
 
-    vm_native_define(vm, SVStatic("string"), value_object(string));
+    bs_core_set(bs, Bs_Sv_Static("string"), bs_value_object(string));
 
-    ObjectTable *io = object_table_new(vm);
-    object_table_set(
-        vm, io, object_str_const(vm, "open", 4), value_object(object_native_fn_new(vm, io_open)));
+    Bs_Table *io = bs_table_new(bs);
+    bs_table_set(
+        bs,
+        io,
+        bs_object_str_const(bs, Bs_Sv_Static("open")),
+        bs_value_object(bs_c_fn_new(bs, io_open)));
 
-    object_table_set(
-        vm, io, object_str_const(vm, "close", 5), value_object(object_native_fn_new(vm, io_close)));
+    bs_table_set(
+        bs,
+        io,
+        bs_object_str_const(bs, Bs_Sv_Static("close")),
+        bs_value_object(bs_c_fn_new(bs, io_close)));
 
-    object_table_set(
-        vm, io, object_str_const(vm, "write", 5), value_object(object_native_fn_new(vm, io_write)));
+    bs_table_set(
+        bs,
+        io,
+        bs_object_str_const(bs, Bs_Sv_Static("write")),
+        bs_value_object(bs_c_fn_new(bs, io_write)));
 
-    vm_native_define(vm, SVStatic("io"), value_object(io));
+    bs_core_set(bs, Bs_Sv_Static("io"), bs_value_object(io));
 
-    if (!vm_run(vm, path, sv_from_parts(contents, size), false)) {
-        return_defer(1);
+    if (!bs_run(bs, path, bs_sv_from_parts(contents, size), false)) {
+        bs_return_defer(1);
     }
 
 defer:
-    vm_free(vm);
+    bs_free(bs);
     free(contents);
     return result;
 }

@@ -1,5 +1,5 @@
-#ifndef VM_H
-#define VM_H
+#ifndef BS_H
+#define BS_H
 
 #include <assert.h>
 #include <stdlib.h>
@@ -7,51 +7,56 @@
 
 #include "value.h"
 
-typedef struct Vm Vm;
+typedef struct Bs Bs;
 
+Bs *bs_new(void);
+void bs_free(Bs *bs);
+void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size);
+
+void bs_core_set(Bs *bs, Bs_Sv name, Bs_Value value);
+
+Bs_Writer *bs_str_writer_init(Bs *bs, size_t *start);
+Bs_Sv bs_str_writer_end(Bs *bs, size_t start);
+
+Bs_Writer *bs_stdout_writer(Bs *bs);
+Bs_Writer *bs_stderr_writer(Bs *bs);
+
+Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size);
+Bs_Str *bs_object_str_const(Bs *bs, Bs_Sv sv);
+
+// Errors
 typedef struct {
-    SV name;
-    void (*free)(Vm *vm, void *data);
-    void (*write)(Writer *writer, const void *data);
-} NativeSpec;
+    Bs_Sv name;
+    void (*free)(Bs *bs, void *data);
+    void (*write)(Bs_Writer *writer, const void *data);
+} Bs_C_Data_Spec;
 
-Vm *vm_new(void);
-void vm_free(Vm *vm);
-void *vm_realloc(Vm *vm, void *ptr, size_t old_size, size_t new_size);
+void bs_error(Bs *bs, const char *fmt, ...);
+bool bs_check_arity(Bs *bs, size_t actual, size_t expected);
+bool bs_check_value_type(Bs *bs, Bs_Value value, Bs_Value_Type expected, const char *label);
+bool bs_check_object_type(Bs *bs, Bs_Value value, Bs_Object_Type expected, const char *label);
+bool bs_check_object_c_type(Bs *bs, Bs_Value value, const Bs_C_Data_Spec *spec, const char *label);
+bool bs_check_whole_number(Bs *bs, Bs_Value value, const char *label);
 
-void vm_error(Vm *vm, const char *fmt, ...);
-
-bool vm_check_arity(Vm *vm, size_t actual, size_t expected);
-bool vm_check_value_type(Vm *vm, Value value, ValueType expected, const char *label);
-bool vm_check_object_type(Vm *vm, Value value, ObjectType expected, const char *label);
-bool vm_check_object_native_type(Vm *vm, Value value, const NativeSpec *spec, const char *label);
-bool vm_check_whole_number(Vm *vm, Value value, const char *label);
-
-bool vm_run(Vm *vm, const char *path, SV sv, bool step);
-void vm_native_define(Vm *vm, SV name, Value value);
-
-Writer *vm_writer_str_begin(Vm *vm, size_t *start);
-SV vm_writer_str_end(Vm *vm, size_t start);
-
-Object *object_new(Vm *vm, ObjectType type, size_t size);
-ObjectStr *object_str_const(Vm *vm, const char *data, size_t size);
+// Interpreter
+bool bs_run(Bs *bs, const char *path, Bs_Sv input, bool step);
 
 // Dynamic Array
-#define DA_INIT_CAP 128
+#define BS_DA_INIT_CAP 128
 
-#define da_free(vm, l)                                                                             \
+#define bs_da_free(bs, l)                                                                          \
     do {                                                                                           \
-        vm_realloc((vm), (l)->data, (l)->capacity * sizeof(*(l)->data), 0);                        \
+        bs_realloc((bs), (l)->data, (l)->capacity * sizeof(*(l)->data), 0);                        \
         memset((l), 0, sizeof(*(l)));                                                              \
     } while (0)
 
-#define da_push(vm, l, v)                                                                          \
+#define bs_da_push(bs, l, v)                                                                       \
     do {                                                                                           \
         if ((l)->count >= (l)->capacity) {                                                         \
-            const size_t new_capacity = (l)->capacity == 0 ? DA_INIT_CAP : (l)->capacity * 2;      \
+            const size_t new_capacity = (l)->capacity == 0 ? BS_DA_INIT_CAP : (l)->capacity * 2;   \
                                                                                                    \
-            (l)->data = vm_realloc(                                                                \
-                (vm),                                                                              \
+            (l)->data = bs_realloc(                                                                \
+                (bs),                                                                              \
                 (l)->data,                                                                         \
                 (l)->capacity * sizeof(*(l)->data),                                                \
                 new_capacity * sizeof(*(l)->data));                                                \
@@ -64,16 +69,16 @@ ObjectStr *object_str_const(Vm *vm, const char *data, size_t size);
         (l)->count++;                                                                              \
     } while (0)
 
-#define da_push_many(vm, l, v, c)                                                                  \
+#define bs_da_push_many(bs, l, v, c)                                                               \
     do {                                                                                           \
         if ((l)->count + (c) > (l)->capacity) {                                                    \
-            size_t new_capacity = (l)->capacity ? (l)->capacity : DA_INIT_CAP;                     \
+            size_t new_capacity = (l)->capacity ? (l)->capacity : BS_DA_INIT_CAP;                  \
             while ((l)->count + (c) > new_capacity) {                                              \
                 new_capacity *= 2;                                                                 \
             }                                                                                      \
                                                                                                    \
-            (l)->data = vm_realloc(                                                                \
-                (vm),                                                                              \
+            (l)->data = bs_realloc(                                                                \
+                (bs),                                                                              \
                 (l)->data,                                                                         \
                 (l)->capacity * sizeof(*(l)->data),                                                \
                 new_capacity * sizeof(*(l)->data));                                                \
@@ -88,4 +93,4 @@ ObjectStr *object_str_const(Vm *vm, const char *data, size_t size);
         }                                                                                          \
     } while (0)
 
-#endif // VM_H
+#endif // BS_H

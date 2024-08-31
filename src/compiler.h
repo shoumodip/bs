@@ -1,8 +1,8 @@
-#ifndef COMPILER_H
-#define COMPILER_H
+#ifndef BS_COMPILER_H
+#define BS_COMPILER_H
 
 #include "object.h"
 
-ObjectFn *compile(Vm *vm, const char *path, SV sv);
+Bs_Fn *bs_compile(Bs *bs, const char *path, Bs_Sv input);
 
-#endif // COMPILER_H
+#endif // BS_COMPILER_H

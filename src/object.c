@@ -1,40 +1,40 @@
 #include "hash.h"
 
-#define TABLE_MAX_LOAD 0.75
+#define BS_TABLE_MAX_LOAD 0.75
 
-void chunk_free(Vm *vm, Chunk *c) {
-    values_free(vm, &c->constants);
-    op_locs_free(vm, &c->locations);
-    da_free(vm, c);
+void bs_chunk_free(Bs *bs, Bs_Chunk *c) {
+    bs_values_free(bs, &c->constants);
+    bs_op_locs_free(bs, &c->locations);
+    bs_da_free(bs, c);
 }
 
-void chunk_push_op(Vm *vm, Chunk *c, Op op) {
+void bs_chunk_push_op(Bs *bs, Bs_Chunk *c, Bs_Op op) {
     c->last = c->count;
-    da_push(vm, c, op);
+    bs_da_push(bs, c, op);
 }
 
-void chunk_push_op_loc(Vm *vm, Chunk *c, Loc loc) {
-    op_locs_push(vm, &c->locations, ((OpLoc){.loc = loc, .index = c->count}));
+void bs_chunk_push_op_loc(Bs *bs, Bs_Chunk *c, Bs_Loc loc) {
+    bs_op_locs_push(bs, &c->locations, ((Bs_Op_Loc){.loc = loc, .index = c->count}));
 }
 
-void chunk_push_op_int(Vm *vm, Chunk *c, Op op, size_t value) {
+void bs_chunk_push_op_int(Bs *bs, Bs_Chunk *c, Bs_Op op, size_t value) {
     const size_t bytes = sizeof(value);
-    chunk_push_op(vm, c, op);
-    da_push_many(vm, c, &value, bytes);
+    bs_chunk_push_op(bs, c, op);
+    bs_da_push_many(bs, c, &value, bytes);
 }
 
-void chunk_push_op_value(Vm *vm, Chunk *c, Op op, Value value) {
+void bs_chunk_push_op_value(Bs *bs, Bs_Chunk *c, Bs_Op op, Bs_Value value) {
     const size_t index = c->constants.count;
     const size_t bytes = sizeof(index);
-    values_push(vm, &c->constants, value);
+    bs_values_push(bs, &c->constants, value);
 
-    chunk_push_op(vm, c, op);
-    da_push_many(vm, c, &index, bytes);
+    bs_chunk_push_op(bs, c, op);
+    bs_da_push_many(bs, c, &index, bytes);
 }
 
-ObjectFn *object_fn_new(Vm *vm) {
-    ObjectFn *fn = (ObjectFn *)object_new(vm, OBJECT_FN, sizeof(ObjectFn));
-    fn->chunk = (Chunk){0};
+Bs_Fn *bs_fn_new(Bs *bs) {
+    Bs_Fn *fn = (Bs_Fn *)bs_object_new(bs, BS_OBJECT_FN, sizeof(Bs_Fn));
+    fn->chunk = (Bs_Chunk){0};
     fn->module = 0;
     fn->name = NULL;
 
@@ -43,31 +43,31 @@ ObjectFn *object_fn_new(Vm *vm) {
     return fn;
 }
 
-ObjectStr *object_str_new(Vm *vm, const char *data, size_t size) {
-    ObjectStr *str = (ObjectStr *)object_new(vm, OBJECT_STR, sizeof(ObjectStr) + size);
+Bs_Str *bs_str_new(Bs *bs, Bs_Sv sv) {
+    Bs_Str *str = (Bs_Str *)bs_object_new(bs, BS_OBJECT_STR, sizeof(Bs_Str) + sv.size);
     str->hashed = false;
 
-    memcpy(str->data, data, size);
-    str->size = size;
+    memcpy(str->data, sv.data, sv.size);
+    str->size = sv.size;
     return str;
 }
 
-bool object_str_eq(const ObjectStr *a, const ObjectStr *b) {
+bool bs_str_eq(const Bs_Str *a, const Bs_Str *b) {
     if (!a || !b) {
         return false;
     }
     return a->size == b->size && !memcmp(a->data, b->data, b->size);
 }
 
-ObjectArray *object_array_new(Vm *vm) {
-    ObjectArray *array = (ObjectArray *)object_new(vm, OBJECT_ARRAY, sizeof(ObjectArray));
+Bs_Array *bs_array_new(Bs *bs) {
+    Bs_Array *array = (Bs_Array *)bs_object_new(bs, BS_OBJECT_ARRAY, sizeof(Bs_Array));
     array->data = NULL;
     array->count = 0;
     array->capacity = 0;
     return array;
 }
 
-bool object_array_get(Vm *vm, ObjectArray *a, size_t index, Value *value) {
+bool bs_array_get(Bs *bs, Bs_Array *a, size_t index, Bs_Value *value) {
     if (index >= a->count) {
         return false;
     }
@@ -76,13 +76,13 @@ bool object_array_get(Vm *vm, ObjectArray *a, size_t index, Value *value) {
     return true;
 }
 
-void object_array_set(Vm *vm, ObjectArray *a, size_t index, Value value) {
+void bs_array_set(Bs *bs, Bs_Array *a, size_t index, Bs_Value value) {
     if (index >= a->count) {
         if (index >= a->capacity) {
             const size_t old = a->capacity;
 
             if (!a->capacity) {
-                a->capacity = DA_INIT_CAP;
+                a->capacity = BS_DA_INIT_CAP;
             }
 
             while (index >= a->capacity) {
@@ -90,18 +90,18 @@ void object_array_set(Vm *vm, ObjectArray *a, size_t index, Value value) {
             }
 
             a->data =
-                vm_realloc(vm, a->data, old * sizeof(*a->data), a->capacity * sizeof(*a->data));
+                bs_realloc(bs, a->data, old * sizeof(*a->data), a->capacity * sizeof(*a->data));
         }
 
         memset(&a->data[a->count], 0, (index - a->count) * sizeof(*a->data));
     }
 
     a->data[index] = value;
-    a->count = max(a->count, index + 1);
+    a->count = bs_max(a->count, index + 1);
 }
 
-ObjectTable *object_table_new(Vm *vm) {
-    ObjectTable *table = (ObjectTable *)object_new(vm, OBJECT_TABLE, sizeof(ObjectTable));
+Bs_Table *bs_table_new(Bs *bs) {
+    Bs_Table *table = (Bs_Table *)bs_object_new(bs, BS_OBJECT_TABLE, sizeof(Bs_Table));
     table->data = NULL;
     table->count = 0;
     table->capacity = 0;
@@ -109,39 +109,39 @@ ObjectTable *object_table_new(Vm *vm) {
     return table;
 }
 
-void object_table_free(Vm *vm, ObjectTable *t) {
-    vm_realloc(vm, t->data, sizeof(*t->data) * t->capacity, 0);
+void bs_table_free(Bs *bs, Bs_Table *t) {
+    bs_realloc(bs, t->data, sizeof(*t->data) * t->capacity, 0);
     t->data = NULL;
     t->count = 0;
     t->capacity = 0;
 }
 
-bool object_table_remove(Vm *vm, ObjectTable *t, ObjectStr *key) {
+bool bs_table_remove(Bs *bs, Bs_Table *t, Bs_Str *key) {
     if (!t->count) {
         return false;
     }
 
-    Entry *entry = entries_find_str(t->data, t->capacity, key);
+    Entry *entry = bs_entries_find_str(t->data, t->capacity, key);
     if (!entry) {
         return false;
     }
 
-    if (!entry->key && entry->value.type == VALUE_BOOL && entry->value.as.boolean == true) {
+    if (!entry->key && entry->value.type == BS_VALUE_BOOL && entry->value.as.boolean == true) {
         return false;
     }
 
     t->real_count--;
     entry->key = NULL;
-    entry->value = value_bool(true);
+    entry->value = bs_value_bool(true);
     return true;
 }
 
-bool object_table_get(Vm *vm, ObjectTable *t, ObjectStr *key, Value *value) {
+bool bs_table_get(Bs *bs, Bs_Table *t, Bs_Str *key, Bs_Value *value) {
     if (!t->count) {
         return false;
     }
 
-    Entry *entry = entries_find_str(t->data, t->capacity, key);
+    Entry *entry = bs_entries_find_str(t->data, t->capacity, key);
     if (!entry->key) {
         return false;
     }
@@ -150,10 +150,10 @@ bool object_table_get(Vm *vm, ObjectTable *t, ObjectStr *key, Value *value) {
     return true;
 }
 
-static void object_table_grow(Vm *vm, ObjectTable *t, size_t capacity) {
+static void bs_table_grow(Bs *bs, Bs_Table *t, size_t capacity) {
     const size_t size = sizeof(Entry) * capacity;
 
-    Entry *entries = vm_realloc(vm, NULL, 0, size);
+    Entry *entries = bs_realloc(bs, NULL, 0, size);
     memset(entries, 0, size);
 
     size_t count = 0;
@@ -163,26 +163,26 @@ static void object_table_grow(Vm *vm, ObjectTable *t, size_t capacity) {
             continue;
         }
 
-        Entry *dst = entries_find_str(entries, capacity, src->key);
+        Entry *dst = bs_entries_find_str(entries, capacity, src->key);
         dst->key = src->key;
         dst->value = src->value;
         count++;
     }
 
-    object_table_free(vm, t);
+    bs_table_free(bs, t);
     t->data = entries;
     t->count = count;
     t->capacity = capacity;
 }
 
-bool object_table_set(Vm *vm, ObjectTable *t, ObjectStr *key, Value value) {
-    if (t->count >= t->capacity * TABLE_MAX_LOAD) {
-        object_table_grow(vm, t, t->capacity ? t->capacity * 2 : DA_INIT_CAP);
+bool bs_table_set(Bs *bs, Bs_Table *t, Bs_Str *key, Bs_Value value) {
+    if (t->count >= t->capacity * BS_TABLE_MAX_LOAD) {
+        bs_table_grow(bs, t, t->capacity ? t->capacity * 2 : BS_DA_INIT_CAP);
     }
-    Entry *entry = entries_find_str(t->data, t->capacity, key);
+    Entry *entry = bs_entries_find_str(t->data, t->capacity, key);
 
     bool is_new = !entry->key;
-    if (is_new && entry->value.type == VALUE_NIL) {
+    if (is_new && entry->value.type == BS_VALUE_NIL) {
         t->count++;
         t->real_count++;
     }
@@ -192,10 +192,10 @@ bool object_table_set(Vm *vm, ObjectTable *t, ObjectStr *key, Value value) {
     return is_new;
 }
 
-ObjectClosure *object_closure_new(Vm *vm, const ObjectFn *fn) {
-    const size_t upvalues = sizeof(ObjectUpvalue *) * fn->upvalues;
-    ObjectClosure *closure =
-        (ObjectClosure *)object_new(vm, OBJECT_CLOSURE, sizeof(ObjectClosure) + upvalues);
+Bs_Closure *bs_closure_new(Bs *bs, const Bs_Fn *fn) {
+    const size_t upvalues = sizeof(Bs_Upvalue *) * fn->upvalues;
+    Bs_Closure *closure =
+        (Bs_Closure *)bs_object_new(bs, BS_OBJECT_CLOSURE, sizeof(Bs_Closure) + upvalues);
 
     closure->fn = fn;
     closure->upvalues = fn->upvalues;
@@ -203,8 +203,8 @@ ObjectClosure *object_closure_new(Vm *vm, const ObjectFn *fn) {
     return closure;
 }
 
-ObjectUpvalue *object_upvalue_new(Vm *vm, size_t index) {
-    ObjectUpvalue *upvalue = (ObjectUpvalue *)object_new(vm, OBJECT_UPVALUE, sizeof(ObjectUpvalue));
+Bs_Upvalue *bs_upvalue_new(Bs *bs, size_t index) {
+    Bs_Upvalue *upvalue = (Bs_Upvalue *)bs_object_new(bs, BS_OBJECT_UPVALUE, sizeof(Bs_Upvalue));
 
     upvalue->closed = false;
     upvalue->index = index;
@@ -212,32 +212,26 @@ ObjectUpvalue *object_upvalue_new(Vm *vm, size_t index) {
     return upvalue;
 }
 
-ObjectNativeFn *object_native_fn_new(Vm *vm, NativeFn fn) {
-    ObjectNativeFn *native =
-        (ObjectNativeFn *)object_new(vm, OBJECT_NATIVE_FN, sizeof(ObjectNativeFn));
-
-    native->fn = fn;
-    native->library = NULL;
-    return native;
+Bs_C_Fn *bs_c_fn_new(Bs *bs, Bs_C_Fn_Ptr fn) {
+    Bs_C_Fn *c = (Bs_C_Fn *)bs_object_new(bs, BS_OBJECT_C_FN, sizeof(Bs_C_Fn));
+    c->fn = fn;
+    c->library = NULL;
+    return c;
 }
 
-ObjectNativeData *object_native_data_new(Vm *vm, void *data, const NativeSpec *spec) {
-    ObjectNativeData *native =
-        (ObjectNativeData *)object_new(vm, OBJECT_NATIVE_DATA, sizeof(ObjectNativeData));
+Bs_C_Lib *bs_c_lib_new(Bs *bs, void *data, const Bs_Str *path) {
+    Bs_C_Lib *c = (Bs_C_Lib *)bs_object_new(bs, BS_OBJECT_C_LIB, sizeof(Bs_C_Lib));
+    c->data = data;
+    c->path = path;
 
-    native->data = data;
-    native->spec = spec;
-    return native;
+    memset(&c->functions, 0, sizeof(c->functions));
+    c->functions.meta.type = BS_OBJECT_TABLE;
+    return c;
 }
 
-ObjectNativeLibrary *object_native_library_new(Vm *vm, void *data, const ObjectStr *path) {
-    ObjectNativeLibrary *native =
-        (ObjectNativeLibrary *)object_new(vm, OBJECT_NATIVE_LIBRARY, sizeof(ObjectNativeLibrary));
-
-    native->data = data;
-    native->path = path;
-
-    memset(&native->functions, 0, sizeof(native->functions));
-    native->functions.meta.type = OBJECT_TABLE;
-    return native;
+Bs_C_Data *bs_c_data_new(Bs *bs, void *data, const Bs_C_Data_Spec *spec) {
+    Bs_C_Data *c = (Bs_C_Data *)bs_object_new(bs, BS_OBJECT_C_DATA, sizeof(Bs_C_Data));
+    c->data = data;
+    c->spec = spec;
+    return c;
 }

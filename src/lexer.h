@@ -1,28 +1,31 @@
-#ifndef LEXER_H
-#define LEXER_H
+#ifndef BS_LEXER_H
+#define BS_LEXER_H
 
-#include "token.h"
 #include <setjmp.h>
 
+#include "token.h"
+
 typedef struct {
-    SV sv;
-    Loc loc;
+    Bs_Sv sv;
+    Bs_Loc loc;
 
     bool peeked;
-    Token buffer;
+    Bs_Token buffer;
 
     bool extended;
-    jmp_buf error;
-} Lexer;
+    jmp_buf unwind;
 
-Lexer lexer_new(const char *path, SV sv);
-void lexer_error(Lexer *lexer);
-void lexer_buffer(Lexer *lexer, Token token);
+    Bs_Writer *error;
+} Bs_Lexer;
 
-Token lexer_next(Lexer *lexer);
-Token lexer_peek(Lexer *lexer);
+Bs_Lexer bs_lexer_new(const char *path, Bs_Sv input, Bs_Writer *error);
+void bs_lexer_error(Bs_Lexer *lexer);
+void bs_lexer_buffer(Bs_Lexer *lexer, Bs_Token token);
 
-bool lexer_read(Lexer *lexer, TokenType type);
-Token lexer_expect(Lexer *lexer, TokenType type);
+Bs_Token bs_lexer_next(Bs_Lexer *lexer);
+Bs_Token bs_lexer_peek(Bs_Lexer *lexer);
 
-#endif // LEXER_H
+bool bs_lexer_read(Bs_Lexer *lexer, Bs_Token_Type type);
+Bs_Token bs_lexer_expect(Bs_Lexer *lexer, Bs_Token_Type type);
+
+#endif // BS_LEXER_H

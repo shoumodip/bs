@@ -2,136 +2,136 @@
 
 #include "token.h"
 
-static_assert(COUNT_TOKENS == 43, "Update token_type_name()");
-const char *token_type_name(TokenType type, bool extended) {
+static_assert(BS_COUNT_TOKENS == 43, "Update bs_token_type_name()");
+const char *bs_token_type_name(Bs_Token_Type type, bool extended) {
     switch (type) {
-    case TOKEN_EOF:
+    case BS_TOKEN_EOF:
         return "end of file";
 
-    case TOKEN_EOL:
+    case BS_TOKEN_EOL:
         return extended ? "'fr'" : "';'";
 
-    case TOKEN_DOT:
+    case BS_TOKEN_DOT:
         return "'.'";
 
-    case TOKEN_COMMA:
+    case BS_TOKEN_COMMA:
         return "','";
 
-    case TOKEN_NIL:
+    case BS_TOKEN_NIL:
         return extended ? "'bruh'" : "'nil'";
 
-    case TOKEN_NUM:
+    case BS_TOKEN_NUM:
         return "number";
 
-    case TOKEN_STR:
+    case BS_TOKEN_STR:
         return "string";
 
-    case TOKEN_TRUE:
-        return extended ? "'nocap'" : "'true'";
-
-    case TOKEN_FALSE:
-        return extended ? "'cap'" : "'false'";
-
-    case TOKEN_IDENT:
-        return "identifier";
-
-    case TOKEN_NATIVE:
+    case BS_TOKEN_CORE:
         return "'@'";
 
-    case TOKEN_LPAREN:
+    case BS_TOKEN_TRUE:
+        return extended ? "'nocap'" : "'true'";
+
+    case BS_TOKEN_FALSE:
+        return extended ? "'cap'" : "'false'";
+
+    case BS_TOKEN_IDENT:
+        return "identifier";
+
+    case BS_TOKEN_LPAREN:
         return "'('";
 
-    case TOKEN_RPAREN:
+    case BS_TOKEN_RPAREN:
         return "')'";
 
-    case TOKEN_LBRACE:
+    case BS_TOKEN_LBRACE:
         return "'{'";
 
-    case TOKEN_RBRACE:
+    case BS_TOKEN_RBRACE:
         return "'}'";
 
-    case TOKEN_LBRACKET:
+    case BS_TOKEN_LBRACKET:
         return "'['";
 
-    case TOKEN_RBRACKET:
+    case BS_TOKEN_RBRACKET:
         return "']'";
 
-    case TOKEN_ADD:
+    case BS_TOKEN_ADD:
         return "'+'";
 
-    case TOKEN_SUB:
+    case BS_TOKEN_SUB:
         return "'-'";
 
-    case TOKEN_MUL:
+    case BS_TOKEN_MUL:
         return "'*'";
 
-    case TOKEN_DIV:
+    case BS_TOKEN_DIV:
         return "'/'";
 
-    case TOKEN_OR:
+    case BS_TOKEN_OR:
         return "'or'";
 
-    case TOKEN_AND:
+    case BS_TOKEN_AND:
         return "'and'";
 
-    case TOKEN_NOT:
+    case BS_TOKEN_NOT:
         return extended ? "'nah'" : "'!'";
 
-    case TOKEN_GT:
+    case BS_TOKEN_GT:
         return "'>'";
 
-    case TOKEN_GE:
+    case BS_TOKEN_GE:
         return "'>='";
 
-    case TOKEN_LT:
+    case BS_TOKEN_LT:
         return "'<'";
 
-    case TOKEN_LE:
+    case BS_TOKEN_LE:
         return "'<='";
 
-    case TOKEN_EQ:
+    case BS_TOKEN_EQ:
         return "'=='";
 
-    case TOKEN_NE:
+    case BS_TOKEN_NE:
         return "'!='";
 
-    case TOKEN_LEN:
+    case BS_TOKEN_LEN:
         return extended ? "'thicc'" : "'len'";
 
-    case TOKEN_JOIN:
+    case BS_TOKEN_JOIN:
         return "'..'";
 
-    case TOKEN_IMPORT:
+    case BS_TOKEN_IMPORT:
         return extended ? "'redpill'" : "'import'";
 
-    case TOKEN_SET:
+    case BS_TOKEN_SET:
         return extended ? "'be'" : "'='";
 
-    case TOKEN_IF:
+    case BS_TOKEN_IF:
         return extended ? "'ayo'" : "'if'";
 
-    case TOKEN_ELSE:
+    case BS_TOKEN_ELSE:
         return extended ? "'sike'" : "'else'";
 
-    case TOKEN_FOR:
+    case BS_TOKEN_FOR:
         return extended ? "'yall'" : "'for'";
 
-    case TOKEN_WHILE:
+    case BS_TOKEN_WHILE:
         return extended ? "'yolo'" : "'while'";
 
-    case TOKEN_FN:
+    case BS_TOKEN_FN:
         return extended ? "'lit'" : "'fn'";
 
-    case TOKEN_PUB:
+    case BS_TOKEN_PUB:
         return extended ? "'fam'" : "'pub'";
 
-    case TOKEN_VAR:
+    case BS_TOKEN_VAR:
         return extended ? "'mf'" : "'var'";
 
-    case TOKEN_RETURN:
+    case BS_TOKEN_RETURN:
         return extended ? "'bet'" : "'return'";
 
-    case TOKEN_PRINT:
+    case BS_TOKEN_PRINT:
         return extended ? "'yap'" : "'print'";
 
     default:

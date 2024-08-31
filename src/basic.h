@@ -1,6 +1,7 @@
-#ifndef BASIC_H
-#define BASIC_H
+#ifndef BS_BASIC_H
+#define BS_BASIC_H
 
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -8,37 +9,39 @@
 typedef struct {
     const char *data;
     size_t size;
-} SV;
+} Bs_Sv;
 
-#define SVFmt "%.*s"
-#define SVArg(s) (int)(s).size, (s).data
-#define SVStatic(s) ((SV){s, sizeof(s) - 1})
+#define Bs_Sv_Fmt "%.*s"
+#define Bs_Sv_Arg(s) (int)(s).size, (s).data
+#define Bs_Sv_Static(s) ((Bs_Sv){s, sizeof(s) - 1})
 
-SV sv_from_cstr(const char *data);
-SV sv_from_parts(const char *data, size_t size);
+Bs_Sv bs_sv_from_cstr(const char *data);
+Bs_Sv bs_sv_from_parts(const char *data, size_t size);
 
-bool sv_eq(SV a, SV b);
-bool sv_suffix(SV a, SV b);
+bool bs_sv_eq(Bs_Sv a, Bs_Sv b);
+bool bs_sv_suffix(Bs_Sv a, Bs_Sv b);
 
 // Writer
-typedef struct Writer Writer;
+typedef struct Bs_Writer Bs_Writer;
 
-struct Writer {
-    void (*fmt)(Writer *writer, const char *fmt, ...);
+struct Bs_Writer {
+    void (*fmt)(Bs_Writer *writer, const char *fmt, va_list args);
 };
 
+void bs_write(Bs_Writer *writer, const char *fmt, ...);
+
 // Defer
-#define return_defer(value)                                                                        \
+#define bs_return_defer(value)                                                                     \
     do {                                                                                           \
         result = (value);                                                                          \
         goto defer;                                                                                \
     } while (0)
 
 // File IO
-char *read_file(const char *path, size_t *size);
+char *bs_read_file(const char *path, size_t *size);
 
 // Arithmetic
-#define min(a, b) ((a) < (b) ? (a) : (b))
-#define max(a, b) ((a) > (b) ? (a) : (b))
+#define bs_min(a, b) ((a) < (b) ? (a) : (b))
+#define bs_max(a, b) ((a) > (b) ? (a) : (b))
 
-#endif // BASIC_H
+#endif // BS_BASIC_H
