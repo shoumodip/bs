@@ -140,28 +140,25 @@ int main(int argc, char **argv) {
     bs_table_set(
         bs,
         string,
-        bs_object_str_const(bs, Bs_Sv_Static("slice")),
+        bs_str_const(bs, Bs_Sv_Static("slice")),
         bs_value_object(bs_c_fn_new(bs, string_slice)));
 
     bs_core_set(bs, Bs_Sv_Static("string"), bs_value_object(string));
 
     Bs_Table *io = bs_table_new(bs);
     bs_table_set(
-        bs,
-        io,
-        bs_object_str_const(bs, Bs_Sv_Static("open")),
-        bs_value_object(bs_c_fn_new(bs, io_open)));
+        bs, io, bs_str_const(bs, Bs_Sv_Static("open")), bs_value_object(bs_c_fn_new(bs, io_open)));
 
     bs_table_set(
         bs,
         io,
-        bs_object_str_const(bs, Bs_Sv_Static("close")),
+        bs_str_const(bs, Bs_Sv_Static("close")),
         bs_value_object(bs_c_fn_new(bs, io_close)));
 
     bs_table_set(
         bs,
         io,
-        bs_object_str_const(bs, Bs_Sv_Static("write")),
+        bs_str_const(bs, Bs_Sv_Static("write")),
         bs_value_object(bs_c_fn_new(bs, io_write)));
 
     bs_core_set(bs, Bs_Sv_Static("io"), bs_value_object(io));

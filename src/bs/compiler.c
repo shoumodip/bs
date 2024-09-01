@@ -189,8 +189,8 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             c->bs,
             c->chunk,
             BS_OP_CONST,
-            bs_value_object(bs_object_str_const(
-                c->bs, bs_sv_from_parts(token.sv.data + 1, token.sv.size - 2))));
+            bs_value_object(
+                bs_str_const(c->bs, bs_sv_from_parts(token.sv.data + 1, token.sv.size - 2))));
         break;
 
     case BS_TOKEN_NUM:
@@ -203,7 +203,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
         bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
         bs_chunk_push_op_value(
-            c->bs, c->chunk, BS_OP_CGET, bs_value_object(bs_object_str_const(c->bs, token.sv)));
+            c->bs, c->chunk, BS_OP_CGET, bs_value_object(bs_str_const(c->bs, token.sv)));
         break;
 
     case BS_TOKEN_TRUE:
@@ -223,7 +223,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         } else {
             bs_chunk_push_op_loc(c->bs, c->chunk, loc);
             bs_chunk_push_op_value(
-                c->bs, c->chunk, BS_OP_GGET, bs_value_object(bs_object_str_const(c->bs, token.sv)));
+                c->bs, c->chunk, BS_OP_GGET, bs_value_object(bs_str_const(c->bs, token.sv)));
         }
     } break;
 
@@ -246,10 +246,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             } else {
                 token = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
                 bs_chunk_push_op_value(
-                    c->bs,
-                    c->chunk,
-                    BS_OP_CONST,
-                    bs_value_object(bs_object_str_const(c->bs, token.sv)));
+                    c->bs, c->chunk, BS_OP_CONST, bs_value_object(bs_str_const(c->bs, token.sv)));
             }
 
             bs_lexer_expect(&c->lexer, BS_TOKEN_SET);
@@ -346,10 +343,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
             token = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
             bs_chunk_push_op_value(
-                c->bs,
-                c->chunk,
-                BS_OP_CONST,
-                bs_value_object(bs_object_str_const(c->bs, token.sv)));
+                c->bs, c->chunk, BS_OP_CONST, bs_value_object(bs_str_const(c->bs, token.sv)));
 
             bs_chunk_push_op_loc(c->bs, c->chunk, loc);
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_IGET);
@@ -530,7 +524,7 @@ static void bs_compile_scope_init(Bs_Compiler *c, Bs_Scope *scope, Bs_Sv name) {
     c->scope = scope;
 
     if (name.size) {
-        scope->fn->name = bs_object_str_const(c->bs, name);
+        scope->fn->name = bs_str_const(c->bs, name);
     }
 
     c->chunk = &c->scope->fn->chunk;
@@ -557,8 +551,7 @@ static size_t bs_compile_definition(Bs_Compiler *c, Bs_Token *name, bool public)
     *name = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
 
     if (public) {
-        bs_values_push(
-            c->bs, &c->chunk->constants, bs_value_object(bs_object_str_const(c->bs, name->sv)));
+        bs_values_push(c->bs, &c->chunk->constants, bs_value_object(bs_str_const(c->bs, name->sv)));
         return c->chunk->constants.count - 1;
     }
 

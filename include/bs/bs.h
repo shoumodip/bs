@@ -7,6 +7,7 @@
 
 #include "value.h"
 
+// Specs
 typedef struct Bs Bs;
 
 Bs *bs_new(void);
@@ -22,7 +23,7 @@ Bs_Writer *bs_stdout_writer(Bs *bs);
 Bs_Writer *bs_stderr_writer(Bs *bs);
 
 Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size);
-Bs_Str *bs_object_str_const(Bs *bs, Bs_Sv sv);
+Bs_Str *bs_str_const(Bs *bs, Bs_Sv sv);
 
 // Errors
 typedef struct {
@@ -37,6 +38,16 @@ bool bs_check_value_type(Bs *bs, Bs_Value value, Bs_Value_Type expected, const c
 bool bs_check_object_type(Bs *bs, Bs_Value value, Bs_Object_Type expected, const char *label);
 bool bs_check_object_c_type(Bs *bs, Bs_Value value, const Bs_C_Data_Spec *spec, const char *label);
 bool bs_check_whole_number(Bs *bs, Bs_Value value, const char *label);
+
+// FFI
+typedef bool (*Bs_C_Fn_Ptr)(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result);
+
+typedef struct {
+    const char *name;
+    Bs_C_Fn_Ptr fn;
+} Bs_FFI;
+
+bool bs_ffi(Bs *bs, Bs_FFI *ffi, size_t count, Bs_C_Lib *library);
 
 // Interpreter
 bool bs_run(Bs *bs, const char *path, Bs_Sv input, bool step);

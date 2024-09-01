@@ -132,8 +132,6 @@ struct Bs_Upvalue {
 
 Bs_Upvalue *bs_upvalue_new(Bs *bs, size_t index);
 
-typedef bool (*Bs_C_Fn_Ptr)(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result);
-
 struct Bs_C_Fn {
     Bs_Object meta;
     Bs_C_Fn_Ptr fn;

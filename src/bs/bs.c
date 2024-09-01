@@ -415,7 +415,7 @@ void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size) {
 
 // Helpers
 void bs_core_set(Bs *bs, Bs_Sv name, Bs_Value value) {
-    bs_table_set(bs, &bs->core, bs_object_str_const(bs, name), value);
+    bs_table_set(bs, &bs->core, bs_str_const(bs, name), value);
 }
 
 Bs_Writer *bs_str_writer_init(Bs *bs, size_t *start) {
@@ -451,7 +451,7 @@ Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size) {
     return object;
 }
 
-Bs_Str *bs_object_str_const(Bs *bs, Bs_Sv sv) {
+Bs_Str *bs_str_const(Bs *bs, Bs_Sv sv) {
     Entry *entry = bs_entries_find_sv(bs->strings.data, bs->strings.capacity, sv, NULL);
     if (entry && entry->key) {
         return entry->key;
@@ -577,6 +577,38 @@ bool bs_check_whole_number(Bs *bs, Bs_Value value, const char *label) {
     if (value.as.number < 0 || value.as.number != (long)value.as.number) {
         bs_error(bs, "expected %s to be positive whole number, got %g", label, value.as.number);
         return false;
+    }
+
+    return true;
+}
+
+// FFI
+bool bs_ffi(Bs *bs, Bs_FFI *ffi, size_t count, Bs_C_Lib *library) {
+    for (size_t i = 0; i < count; i++) {
+        const Bs_FFI f = ffi[i];
+        if (!f.fn) {
+            bs_error(bs, "function pointer is NULL in FFI #%zu", i + 1);
+            return false;
+        }
+
+        if (!f.name) {
+            bs_error(bs, "function name is NULL in FFI #%zu", i + 1);
+            return false;
+        }
+
+        const Bs_Sv name = bs_sv_from_cstr(f.name);
+        if (!name.size) {
+            bs_error(bs, "function name is empty in FFI #%zu", i + 1);
+            return false;
+        }
+
+        Bs_C_Fn *fn = bs_c_fn_new(bs, f.fn);
+        fn->library = library;
+
+        if (!bs_table_set(bs, &library->functions, bs_str_const(bs, name), bs_value_object(fn))) {
+            bs_error(bs, "redefinition of function '" Bs_Sv_Fmt "' in FFI", Bs_Sv_Arg(name));
+            return false;
+        }
     }
 
     return true;
@@ -1028,13 +1060,46 @@ bool bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                 const char *path = bs->paths_writer.data + bs->paths_writer.count - name->size - 1;
 
                 if (bs_sv_suffix(bs_sv_from_parts(name->data, name->size), Bs_Sv_Static(".so"))) {
-                    void *library = dlopen(path, RTLD_NOW);
-                    if (!library) {
+                    void *data = dlopen(path, RTLD_NOW);
+                    if (!data) {
                         bs_error(bs, "could not load library '%s': %s", path, dlerror());
                         bs_return_defer(false);
                     }
 
-                    bs_stack_push(bs, bs_value_object(bs_c_lib_new(bs, library, name)));
+                    Bs_C_Lib *c = bs_c_lib_new(bs, data, name);
+
+                    const bool (*init)(Bs *bs, Bs_C_Lib *library) = dlsym(data, "bs_init");
+                    if (!init) {
+                        bs_error(
+                            bs,
+                            "invalid native library '" Bs_Sv_Fmt "'\n\n"
+                            "A BS native library should define the 'bs_init' function:\n\n"
+                            "bool bs_init(Bs *bs, Bs_C_Lib *library) {\n"
+                            "    Bs_FFI ffi[] = {\n"
+                            "        {\"function1_name\", function1_ptr},\n"
+                            "        {\"function2_name\", function2_ptr},\n"
+                            "        /* ... */\n"
+                            "    };\n\n"
+                            "    return bs_ffi(bs, ffi, sizeof(ffi) / sizeof(*ffi), library);\n"
+                            "}%s",
+
+                            Bs_Sv_Arg(*name),
+                            bs->frames.count > 1 ? "\n" : "");
+
+                        bs_return_defer(false);
+                    }
+
+                    if (!init(bs, c)) {
+                        bs_return_defer(false);
+                    }
+
+                    const Bs_Value value = bs_value_object(c);
+                    bs_da_push(
+                        bs,
+                        &bs->modules,
+                        ((Bs_Module){.done = true, .name = name, .result = value}));
+
+                    bs_stack_push(bs, value);
                 } else {
                     size_t size = 0;
                     char *contents = bs_read_file(path, &size);
@@ -1168,8 +1233,6 @@ bool bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                     value = bs_value_nil;
                 }
             } else if (container.as.object->type == BS_OBJECT_C_LIB) {
-                Bs_C_Lib *library = (Bs_C_Lib *)container.as.object;
-
                 if (!bs_check_object_type(bs, index, BS_OBJECT_STR, "library symbol name")) {
                     bs_return_defer(false);
                 }
@@ -1180,33 +1243,15 @@ bool bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                     bs_return_defer(false);
                 }
 
-                if (!bs_table_get(bs, &library->functions, name, &value)) {
-                    const bool gc_on = bs->gc_on;
-                    bs->gc_on = false;
+                Bs_C_Lib *c = (Bs_C_Lib *)container.as.object;
+                if (!bs_table_get(bs, &c->functions, name, &value)) {
+                    bs_error(
+                        bs,
+                        "symbol '" Bs_Sv_Fmt "' doesn't exist in native library '" Bs_Sv_Fmt "'",
+                        Bs_Sv_Arg(*name),
+                        Bs_Sv_Arg(*c->path));
 
-                    size_t start;
-                    Bs_Writer *w = bs_str_writer_init(bs, &start);
-                    bs_value_write(w, index);
-
-                    Bs_C_Fn_Ptr fn = dlsym(library->data, bs_str_writer_end(bs, start).data);
-                    if (!fn) {
-                        bs_error(
-                            bs,
-                            "symbol '" Bs_Sv_Fmt "' doesn't exist in native library '" Bs_Sv_Fmt
-                            "'",
-                            Bs_Sv_Arg(*name),
-                            Bs_Sv_Arg(*library->path));
-
-                        bs_return_defer(false);
-                    }
-
-                    Bs_C_Fn *fn_object = bs_c_fn_new(bs, fn);
-                    fn_object->library = library;
-
-                    value = bs_value_object(fn_object);
-                    bs_table_set(bs, &library->functions, name, value);
-
-                    bs->gc_on = gc_on;
+                    bs_return_defer(false);
                 }
             } else {
                 bs_error(bs, "cannot index into %s value", bs_value_type_name(container));
