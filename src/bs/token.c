@@ -2,7 +2,7 @@
 
 #include "bs/token.h"
 
-static_assert(BS_COUNT_TOKENS == 42, "Update bs_token_type_name()");
+static_assert(BS_COUNT_TOKENS == 41, "Update bs_token_type_name()");
 const char *bs_token_type_name(Bs_Token_Type type, bool extended) {
     switch (type) {
     case BS_TOKEN_EOF:
@@ -127,9 +127,6 @@ const char *bs_token_type_name(Bs_Token_Type type, bool extended) {
 
     case BS_TOKEN_RETURN:
         return extended ? "'bet'" : "'return'";
-
-    case BS_TOKEN_PRINT:
-        return extended ? "'yap'" : "'print'";
 
     default:
         assert(false && "unreachable");

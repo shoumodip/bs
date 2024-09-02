@@ -16,7 +16,7 @@ static void bs_debug_op_value(Bs_Writer *w, const Bs_Chunk *c, size_t *offset, c
     bs_fmt(w, "'\n");
 }
 
-static_assert(BS_COUNT_OPS == 40, "Update bs_debug_op()");
+static_assert(BS_COUNT_OPS == 39, "Update bs_debug_op()");
 void bs_debug_op(Bs_Writer *w, const Bs_Chunk *c, size_t *offset) {
     bs_fmt(w, "%04zu ", *offset);
 
@@ -196,10 +196,6 @@ void bs_debug_op(Bs_Writer *w, const Bs_Chunk *c, size_t *offset) {
 
     case BS_OP_THEN:
         bs_debug_op_int(w, c, offset, "OP_THEN");
-        break;
-
-    case BS_OP_PRINT:
-        bs_fmt(w, "OP_PRINT\n");
         break;
 
     default:

@@ -3,6 +3,7 @@
 #include "bs/core.h"
 #include "bs/object.h"
 
+// IO
 static void file_data_free(Bs *bs, void *data) {
     if (data && fileno(data) > 2) {
         fclose(data);
@@ -157,6 +158,53 @@ static Bs_Value io_close(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
+static Bs_Value io_print(Bs *bs, Bs_Value *args, size_t arity) {
+    Bs_Writer *w = bs_stdout_writer(bs);
+    for (size_t i = 0; i < arity; i++) {
+        if (i) {
+            bs_fmt(w, " ");
+        }
+        bs_value_write(w, args[i]);
+    }
+    return bs_value_nil;
+}
+
+static Bs_Value io_eprint(Bs *bs, Bs_Value *args, size_t arity) {
+    Bs_Writer *w = bs_stderr_writer(bs);
+    for (size_t i = 0; i < arity; i++) {
+        if (i) {
+            bs_fmt(w, " ");
+        }
+        bs_value_write(w, args[i]);
+    }
+    return bs_value_nil;
+}
+
+static Bs_Value io_println(Bs *bs, Bs_Value *args, size_t arity) {
+    Bs_Writer *w = bs_stdout_writer(bs);
+    for (size_t i = 0; i < arity; i++) {
+        if (i) {
+            bs_fmt(w, " ");
+        }
+        bs_value_write(w, args[i]);
+    }
+    bs_fmt(w, "\n");
+    return bs_value_nil;
+}
+
+static Bs_Value io_eprintln(Bs *bs, Bs_Value *args, size_t arity) {
+    Bs_Writer *w = bs_stderr_writer(bs);
+    for (size_t i = 0; i < arity; i++) {
+        if (i) {
+            bs_fmt(w, " ");
+        }
+        bs_value_write(w, args[i]);
+    }
+    bs_fmt(w, "\n");
+    return bs_value_nil;
+}
+
+// OS
 static Bs_Value os_exit(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 1)) {
         return bs_value_error;
@@ -248,6 +296,7 @@ static Bs_Value os_execute(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_num(WEXITSTATUS(system(command)));
 }
 
+// String
 static Bs_Value string_slice(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 3)) {
         return bs_value_error;
@@ -282,6 +331,7 @@ static void bs_table_set_fn(Bs *bs, Bs_Table *table, const char *name, Bs_C_Fn_P
         bs, table, bs_str_const(bs, bs_sv_from_cstr(name)), bs_value_object(bs_c_fn_new(bs, fn)));
 }
 
+// Main
 void bs_core_init(Bs *bs, int argc, char **argv) {
     {
         Bs_Table *io = bs_table_new(bs);
@@ -290,6 +340,10 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_table_set_fn(bs, io, "write", io_write);
         bs_table_set_fn(bs, io, "flush", io_flush);
         bs_table_set_fn(bs, io, "close", io_close);
+        bs_table_set_fn(bs, io, "print", io_print);
+        bs_table_set_fn(bs, io, "eprint", io_eprint);
+        bs_table_set_fn(bs, io, "println", io_println);
+        bs_table_set_fn(bs, io, "eprintln", io_eprintln);
 
         bs_table_set(
             bs,

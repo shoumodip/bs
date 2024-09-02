@@ -49,7 +49,7 @@ void bs_lexer_buffer(Bs_Lexer *l, Bs_Token token) {
     l->buffer = token;
 }
 
-static_assert(BS_COUNT_TOKENS == 42, "Update bs_lexer_next()");
+static_assert(BS_COUNT_TOKENS == 41, "Update bs_lexer_next()");
 Bs_Token bs_lexer_next(Bs_Lexer *l) {
     if (l->peeked) {
         l->peeked = false;
@@ -132,8 +132,6 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
                 token.type = BS_TOKEN_VAR;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("bet"))) {
                 token.type = BS_TOKEN_RETURN;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("yap"))) {
-                token.type = BS_TOKEN_PRINT;
             }
         } else {
             if (bs_sv_eq(token.sv, Bs_Sv_Static("nil"))) {
@@ -164,8 +162,6 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
                 token.type = BS_TOKEN_VAR;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("return"))) {
                 token.type = BS_TOKEN_RETURN;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("print"))) {
-                token.type = BS_TOKEN_PRINT;
             }
         }
 

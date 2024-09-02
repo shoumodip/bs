@@ -724,7 +724,7 @@ static void bs_close_upvalues(Bs *bs, size_t index) {
 }
 
 // Halt
-static_assert(BS_COUNT_OPS == 40, "Update bs_run()");
+static_assert(BS_COUNT_OPS == 39, "Update bs_run()");
 int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
     int result = 0;
 
@@ -1302,12 +1302,6 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             if (!bs_value_is_falsey(bs_stack_peek(bs, 0))) {
                 bs->frame->ip += offset;
             }
-        } break;
-
-        case BS_OP_PRINT: {
-            Bs_Writer *w = bs_stdout_writer(bs);
-            bs_value_write(w, bs_stack_pop(bs));
-            bs_fmt(w, "\n");
         } break;
 
         default:

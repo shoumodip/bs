@@ -14,7 +14,7 @@ typedef enum {
     POWER_DOT,
 } Bs_Power;
 
-static_assert(BS_COUNT_TOKENS == 42, "Update bs_token_type_power()");
+static_assert(BS_COUNT_TOKENS == 41, "Update bs_token_type_power()");
 static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_DOT:
@@ -174,7 +174,7 @@ static void bs_compile_error_unexpected(Bs_Compiler *c, const Bs_Token *token) {
 
 static void bs_compile_lambda(Bs_Compiler *c, const Bs_Token *name);
 
-static_assert(BS_COUNT_TOKENS == 42, "Update bs_compile_expr()");
+static_assert(BS_COUNT_TOKENS == 41, "Update bs_compile_expr()");
 static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
     Bs_Loc loc = token.loc;
@@ -640,7 +640,7 @@ static void bs_compile_variable(Bs_Compiler *c, bool public) {
     }
 }
 
-static_assert(BS_COUNT_TOKENS == 42, "Update bs_compile_stmt()");
+static_assert(BS_COUNT_TOKENS == 41, "Update bs_compile_stmt()");
 static void bs_compile_stmt(Bs_Compiler *c) {
     Bs_Token token = bs_lexer_next(&c->lexer);
 
@@ -773,12 +773,6 @@ static void bs_compile_stmt(Bs_Compiler *c) {
 
         bs_lexer_expect(&c->lexer, BS_TOKEN_EOL);
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_RET);
-        break;
-
-    case BS_TOKEN_PRINT:
-        bs_compile_expr(c, POWER_SET);
-        bs_lexer_expect(&c->lexer, BS_TOKEN_EOL);
-        bs_chunk_push_op(c->bs, c->chunk, BS_OP_PRINT);
         break;
 
     default:
