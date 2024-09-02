@@ -14,7 +14,7 @@ typedef enum {
     POWER_DOT,
 } Bs_Power;
 
-static_assert(BS_COUNT_TOKENS == 43, "Update bs_token_type_power()");
+static_assert(BS_COUNT_TOKENS == 42, "Update bs_token_type_power()");
 static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_DOT:
@@ -174,7 +174,7 @@ static void bs_compile_error_unexpected(Bs_Compiler *c, const Bs_Token *token) {
 
 static void bs_compile_lambda(Bs_Compiler *c, const Bs_Token *name);
 
-static_assert(BS_COUNT_TOKENS == 43, "Update bs_compile_expr()");
+static_assert(BS_COUNT_TOKENS == 42, "Update bs_compile_expr()");
 static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
     Bs_Loc loc = token.loc;
@@ -196,14 +196,6 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     case BS_TOKEN_NUM:
         bs_chunk_push_op_value(
             c->bs, c->chunk, BS_OP_CONST, bs_value_num(strtod(token.sv.data, NULL)));
-        break;
-
-    case BS_TOKEN_CORE:
-        token = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
-
-        bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
-        bs_chunk_push_op_value(
-            c->bs, c->chunk, BS_OP_CGET, bs_value_object(bs_str_const(c->bs, token.sv)));
         break;
 
     case BS_TOKEN_TRUE:
@@ -337,7 +329,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             const Bs_Op op_get = c->chunk->data[c->chunk->last];
             const Bs_Op op_set = bs_op_get_to_set(op_get);
             if (op_set == BS_OP_RET && op_get != BS_OP_CALL && op_get != BS_OP_IMPORT &&
-                op_get != BS_OP_ILIT && op_get != BS_OP_CGET) {
+                op_get != BS_OP_ILIT) {
                 bs_compile_error_unexpected(c, &token);
             }
 
@@ -431,7 +423,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             const Bs_Op op_get = c->chunk->data[c->chunk->last];
             const Bs_Op op_set = bs_op_get_to_set(op_get);
             if (op_set == BS_OP_RET && op_get != BS_OP_CALL && op_get != BS_OP_IMPORT &&
-                op_get != BS_OP_CLOSURE && op_get != BS_OP_CGET) {
+                op_get != BS_OP_CLOSURE) {
                 bs_compile_error_unexpected(c, &token);
             }
 
@@ -456,7 +448,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             const Bs_Op op_get = c->chunk->data[c->chunk->last];
             const Bs_Op op_set = bs_op_get_to_set(op_get);
             if (op_set == BS_OP_RET && op_get != BS_OP_CALL && op_get != BS_OP_IMPORT &&
-                op_get != BS_OP_ILIT && op_get != BS_OP_CGET) {
+                op_get != BS_OP_ILIT) {
                 bs_compile_error_unexpected(c, &token);
             }
 
@@ -620,7 +612,7 @@ static void bs_compile_variable(Bs_Compiler *c, bool public) {
     }
 }
 
-static_assert(BS_COUNT_TOKENS == 43, "Update bs_compile_stmt()");
+static_assert(BS_COUNT_TOKENS == 42, "Update bs_compile_stmt()");
 static void bs_compile_stmt(Bs_Compiler *c) {
     Bs_Token token = bs_lexer_next(&c->lexer);
 

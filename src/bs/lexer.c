@@ -49,7 +49,7 @@ void bs_lexer_buffer(Bs_Lexer *l, Bs_Token token) {
     l->buffer = token;
 }
 
-static_assert(BS_COUNT_TOKENS == 43, "Update bs_lexer_next()");
+static_assert(BS_COUNT_TOKENS == 42, "Update bs_lexer_next()");
 Bs_Token bs_lexer_next(Bs_Lexer *l) {
     if (l->peeked) {
         l->peeked = false;
@@ -212,10 +212,6 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
 
     case ',':
         token.type = BS_TOKEN_COMMA;
-        break;
-
-    case '@':
-        token.type = BS_TOKEN_CORE;
         break;
 
     case '(':

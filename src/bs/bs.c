@@ -104,7 +104,6 @@ struct Bs {
 
     Bs_Modules modules;
 
-    Bs_Table core;
     Bs_Table globals;
     Bs_Table strings;
     Bs_Upvalue *upvalues;
@@ -312,9 +311,6 @@ static void bs_collect(Bs *bs) {
         bs_mark_object(bs, (Bs_Object *)upvalue);
     }
 
-    bs->core.meta.marked = false;
-    bs_mark_object(bs, (Bs_Object *)&bs->core);
-
     bs->globals.meta.marked = false;
     bs_mark_object(bs, (Bs_Object *)&bs->globals);
 
@@ -367,7 +363,6 @@ Bs *bs_new(void) {
     bs->stdout_writer = (Bs_File_Writer){.meta.fmt = bs_file_writer_fmt, .file = stdout};
     bs->stderr_writer = (Bs_File_Writer){.meta.fmt = bs_file_writer_fmt, .file = stderr};
 
-    bs->core.meta.type = BS_OBJECT_TABLE;
     bs->globals.meta.type = BS_OBJECT_TABLE;
     return bs;
 }
@@ -379,7 +374,6 @@ void bs_free(Bs *bs) {
     bs_frames_free(bs, &bs->frames);
     bs_modules_free(bs, &bs->modules);
 
-    bs_table_free(bs, &bs->core);
     bs_table_free(bs, &bs->globals);
     bs_table_free(bs, &bs->strings);
 
@@ -420,10 +414,6 @@ void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size) {
 void bs_exit_set(Bs *bs, int code) {
     bs->exit = code;
     bs->running = false;
-}
-
-void bs_core_set(Bs *bs, Bs_Sv name, Bs_Value value) {
-    bs_table_set(bs, &bs->core, bs_str_const(bs, name), value);
 }
 
 Bs_Writer *bs_str_writer_init(Bs *bs, size_t *start) {
@@ -480,6 +470,10 @@ Bs_Str *bs_str_const(Bs *bs, Bs_Sv sv) {
     Bs_Str *str = bs_str_new(bs, sv);
     bs_table_set(bs, &bs->strings, str, bs_value_nil);
     return str;
+}
+
+void bs_global_set(Bs *bs, Bs_Sv name, Bs_Value value) {
+    bs_table_set(bs, &bs->globals, bs_str_const(bs, name), value);
 }
 
 // Errors
@@ -746,7 +740,7 @@ static void bs_close_upvalues(Bs *bs, size_t index) {
         goto defer;                                                                                \
     } while (0)
 
-static_assert(BS_COUNT_OPS == 41, "Update bs_run()");
+static_assert(BS_COUNT_OPS == 40, "Update bs_run()");
 int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
     {
         Bs_Fn *fn = bs_compile(bs, path, input);
@@ -1178,18 +1172,6 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             }
         } break;
 
-        case BS_OP_CGET: {
-            Bs_Str *name = (Bs_Str *)bs_chunk_read_const(bs)->as.object;
-
-            Bs_Value value;
-            if (!bs_table_get(bs, &bs->core, name, &value)) {
-                bs_error(bs, "undefined native value '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*name));
-                bs_halt(bs, 1);
-            }
-
-            bs_stack_push(bs, value);
-        } break;
-
         case BS_OP_LGET:
             bs_stack_push(bs, bs->stack.data[bs->frame->base + bs_chunk_read_int(bs)]);
             break;
@@ -1285,7 +1267,8 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
         case BS_OP_ILIT: {
             const Bs_Value container = bs_stack_peek(bs, 2);
             if (container.type != BS_VALUE_OBJECT) {
-                bs_error(bs, "cannot index into %s value", bs_value_type_name(container));
+                bs_error(
+                    bs, "cannot take mutable index into %s value", bs_value_type_name(container));
                 bs_halt(bs, 1);
             }
 
@@ -1309,11 +1292,9 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                 } else {
                     bs_table_set(bs, table, (Bs_Str *)index.as.object, value);
                 }
-            } else if (container.as.object->type == BS_OBJECT_C_LIB) {
-                bs_error(bs, "cannot modify %s value", bs_value_type_name(container));
-                bs_halt(bs, 1);
             } else {
-                bs_error(bs, "cannot index into %s value", bs_value_type_name(container));
+                bs_error(
+                    bs, "cannot take mutable index into %s value", bs_value_type_name(container));
                 bs_halt(bs, 1);
             }
 

@@ -21,7 +21,6 @@ typedef enum {
     BS_TOKEN_NIL,
     BS_TOKEN_NUM,
     BS_TOKEN_STR,
-    BS_TOKEN_CORE,
     BS_TOKEN_TRUE,
     BS_TOKEN_FALSE,
     BS_TOKEN_IDENT,

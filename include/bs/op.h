@@ -37,7 +37,6 @@ typedef enum {
     BS_OP_GDEF,
     BS_OP_GGET,
     BS_OP_GSET,
-    BS_OP_CGET,
     BS_OP_LGET,
     BS_OP_LSET,
     BS_OP_UGET,

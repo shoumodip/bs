@@ -316,7 +316,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
             bs_str_const(bs, Bs_Sv_Static("stderr")),
             bs_value_object(bs_c_data_new(bs, stderr, &file_spec)));
 
-        bs_core_set(bs, Bs_Sv_Static("io"), bs_value_object(io));
+        bs_global_set(bs, Bs_Sv_Static("io"), bs_value_object(io));
     }
 
     {
@@ -332,12 +332,12 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         }
         bs_table_set(bs, os, bs_str_const(bs, Bs_Sv_Static("args")), bs_value_object(args));
 
-        bs_core_set(bs, Bs_Sv_Static("os"), bs_value_object(os));
+        bs_global_set(bs, Bs_Sv_Static("os"), bs_value_object(os));
     }
 
     {
         Bs_Table *string = bs_table_new(bs);
         bs_table_set_fn(bs, string, "slice", string_slice);
-        bs_core_set(bs, Bs_Sv_Static("string"), bs_value_object(string));
+        bs_global_set(bs, Bs_Sv_Static("string"), bs_value_object(string));
     }
 }

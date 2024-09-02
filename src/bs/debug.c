@@ -16,7 +16,7 @@ static void bs_debug_op_value(Bs_Writer *w, const Bs_Chunk *c, size_t *offset, c
     bs_fmt(w, "'\n");
 }
 
-static_assert(BS_COUNT_OPS == 41, "Update bs_debug_op()");
+static_assert(BS_COUNT_OPS == 40, "Update bs_debug_op()");
 void bs_debug_op(Bs_Writer *w, const Bs_Chunk *c, size_t *offset) {
     bs_fmt(w, "%04zu ", *offset);
 
@@ -156,10 +156,6 @@ void bs_debug_op(Bs_Writer *w, const Bs_Chunk *c, size_t *offset) {
 
     case BS_OP_GSET:
         bs_debug_op_value(w, c, offset, "OP_GSET");
-        break;
-
-    case BS_OP_CGET:
-        bs_debug_op_value(w, c, offset, "OP_NGET");
         break;
 
     case BS_OP_LGET:

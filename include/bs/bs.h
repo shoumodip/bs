@@ -15,7 +15,6 @@ void bs_free(Bs *bs);
 void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size);
 
 void bs_exit_set(Bs *bs, int code);
-void bs_core_set(Bs *bs, Bs_Sv name, Bs_Value value);
 
 Bs_Writer *bs_str_writer_init(Bs *bs, size_t *start);
 Bs_Sv bs_str_writer_end(Bs *bs, size_t start);
@@ -29,6 +28,7 @@ Bs_Writer *bs_stderr_writer(Bs *bs);
 
 Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size);
 Bs_Str *bs_str_const(Bs *bs, Bs_Sv sv);
+void bs_global_set(Bs *bs, Bs_Sv name, Bs_Value value);
 
 // FFI
 typedef bool (*Bs_C_Fn_Ptr)(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result);
