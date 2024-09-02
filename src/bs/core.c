@@ -326,12 +326,30 @@ static Bs_Value str_slice(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, bs_sv_from_parts(str->data + begin, end - begin)));
 }
 
+static Bs_Value str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!bs_check_arity(bs, arity, 1)) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
+        return bs_value_error;
+    }
+
+    Bs_Str *src = (Bs_Str *)args[0].as.object;
+    Bs_Str *dst = bs_str_new(bs, bs_sv_from_parts(NULL, src->size));
+    for (size_t i = 0; i < src->size; i++) {
+        dst->data[dst->size - i - 1] = src->data[i];
+    }
+
+    return bs_value_object(dst);
+}
+
+// Main
 static void bs_table_set_fn(Bs *bs, Bs_Table *table, const char *name, Bs_C_Fn_Ptr fn) {
     bs_table_set(
         bs, table, bs_str_const(bs, bs_sv_from_cstr(name)), bs_value_object(bs_c_fn_new(bs, fn)));
 }
 
-// Main
 void bs_core_init(Bs *bs, int argc, char **argv) {
     {
         Bs_Table *io = bs_table_new(bs);
@@ -385,6 +403,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     {
         Bs_Table *str = bs_table_new(bs);
         bs_table_set_fn(bs, str, "slice", str_slice);
+        bs_table_set_fn(bs, str, "reverse", str_reverse);
         bs_global_set(bs, Bs_Sv_Static("str"), bs_value_object(str));
     }
 }
