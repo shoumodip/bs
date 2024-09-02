@@ -319,10 +319,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         break;
 
     case BS_TOKEN_LEN:
-        bs_lexer_expect(&c->lexer, BS_TOKEN_LPAREN);
-        bs_compile_expr(c, POWER_SET);
-        bs_lexer_expect(&c->lexer, BS_TOKEN_RPAREN);
-
+        bs_compile_expr(c, POWER_PRE);
         bs_chunk_push_op_loc(c->bs, c->chunk, loc);
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_LEN);
         break;
