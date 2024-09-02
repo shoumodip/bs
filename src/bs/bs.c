@@ -118,8 +118,6 @@ struct Bs {
     Bs_File_Writer stdout_writer;
     Bs_File_Writer stderr_writer;
 
-    int exit;
-    bool running;
     size_t op_index;
 };
 
@@ -411,11 +409,6 @@ void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size) {
 }
 
 // Helpers
-void bs_exit_set(Bs *bs, int code) {
-    bs->exit = code;
-    bs->running = false;
-}
-
 Bs_Writer *bs_str_writer_init(Bs *bs, size_t *start) {
     *start = bs->str_writer.count;
     return (Bs_Writer *)&bs->str_writer;
@@ -681,11 +674,7 @@ static bool bs_call_value(Bs *bs, size_t arity) {
         const bool gc_on = bs->gc_on;
         bs->gc_on = false;
 
-        Bs_Value value = bs_value_nil;
-        if (!native->fn(bs, &bs->stack.data[bs->stack.count - arity], arity, &value)) {
-            return false;
-        }
-
+        const Bs_Value value = native->fn(bs, &bs->stack.data[bs->stack.count - arity], arity);
         bs->stack.count -= arity;
         bs->stack.data[bs->stack.count - 1] = value;
 
@@ -734,18 +723,14 @@ static void bs_close_upvalues(Bs *bs, size_t index) {
 }
 
 // Halt
-#define bs_halt(bs, value)                                                                         \
-    do {                                                                                           \
-        (bs)->exit = (value);                                                                      \
-        goto defer;                                                                                \
-    } while (0)
-
 static_assert(BS_COUNT_OPS == 40, "Update bs_run()");
 int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
+    int result = 0;
+
     {
         Bs_Fn *fn = bs_compile(bs, path, input);
         if (!fn) {
-            bs_halt(bs, 1);
+            bs_return_defer(1);
         }
 
         bs_da_push(bs, &bs->modules, (Bs_Module){.name = fn->name});
@@ -757,15 +742,9 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
     }
 
     bs->gc_on = true;
-    bs->running = true;
-    while (bs->running) {
+    while (true) {
         if (step) {
             Bs_Writer *w = bs_stdout_writer(bs);
-            bs_fmt(w, "----------------------------------------\n");
-            bs_fmt(w, "Globals: ");
-            bs_value_write(w, bs_value_object(&bs->globals));
-            bs_fmt(w, "\n\n");
-
             bs_fmt(w, "Stack:\n");
             for (size_t i = 0; i < bs->stack.count; i++) {
                 bs_fmt(w, "    ");
@@ -789,7 +768,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             bs->frames.count--;
 
             if (!bs->frames.count) {
-                bs_halt(bs, 0);
+                bs_return_defer(0);
             }
 
             const Bs_Frame *frame = &bs->frames.data[bs->frames.count];
@@ -805,11 +784,16 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             }
         } break;
 
-        case BS_OP_CALL:
+        case BS_OP_CALL: {
             if (!bs_call_value(bs, bs_chunk_read_int(bs))) {
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
-            break;
+
+            const Bs_Value top = bs_stack_peek(bs, 0);
+            if (top.type == BS_VALUE_HALT) {
+                bs_return_defer(top.as.number);
+            }
+        } break;
 
         case BS_OP_CLOSURE: {
             Bs_Fn *fn = (Bs_Fn *)bs_chunk_read_const(bs)->as.object;
@@ -882,7 +866,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                         bs_value_type_name(b));
                 }
 
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
 
             bs_stack_push(bs, bs_value_num(a.as.number + b.as.number));
@@ -891,7 +875,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
         case BS_OP_SUB: {
             Bs_Value a, b;
             if (!bs_binary_op(bs, &a, &b, "-")) {
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
 
             bs_stack_push(bs, bs_value_num(a.as.number - b.as.number));
@@ -900,7 +884,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
         case BS_OP_MUL: {
             Bs_Value a, b;
             if (!bs_binary_op(bs, &a, &b, "*")) {
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
 
             bs_stack_push(bs, bs_value_num(a.as.number * b.as.number));
@@ -909,7 +893,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
         case BS_OP_DIV: {
             Bs_Value a, b;
             if (!bs_binary_op(bs, &a, &b, "/")) {
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
 
             bs_stack_push(bs, bs_value_num(a.as.number / b.as.number));
@@ -919,7 +903,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             const Bs_Value a = bs_stack_pop(bs);
             if (a.type != BS_VALUE_NUM) {
                 bs_error(bs, "invalid operand to unary (-): %s", bs_value_type_name(a));
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
 
             bs_stack_push(bs, bs_value_num(-a.as.number));
@@ -932,7 +916,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
         case BS_OP_GT: {
             Bs_Value a, b;
             if (!bs_binary_op(bs, &a, &b, ">")) {
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
 
             bs_stack_push(bs, bs_value_bool(a.as.number > b.as.number));
@@ -941,7 +925,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
         case BS_OP_GE: {
             Bs_Value a, b;
             if (!bs_binary_op(bs, &a, &b, ">=")) {
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
 
             bs_stack_push(bs, bs_value_bool(a.as.number >= b.as.number));
@@ -950,7 +934,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
         case BS_OP_LT: {
             Bs_Value a, b;
             if (!bs_binary_op(bs, &a, &b, "<")) {
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
 
             bs_stack_push(bs, bs_value_bool(a.as.number < b.as.number));
@@ -959,7 +943,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
         case BS_OP_LE: {
             Bs_Value a, b;
             if (!bs_binary_op(bs, &a, &b, "<=")) {
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
 
             bs_stack_push(bs, bs_value_bool(a.as.number <= b.as.number));
@@ -981,7 +965,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             const Bs_Value a = bs_stack_peek(bs, 0);
             if (a.type != BS_VALUE_OBJECT) {
                 bs_error(bs, "cannot get length of %s value", bs_value_type_name(a));
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
 
             size_t size;
@@ -1000,7 +984,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
 
             default:
                 bs_error(bs, "cannot get length of %s value", bs_value_type_name(a));
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
 
             bs_stack_pop(bs);
@@ -1028,13 +1012,13 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
         case BS_OP_IMPORT: {
             const Bs_Value a = bs_stack_pop(bs);
             if (!bs_check_object_type(bs, a, BS_OBJECT_STR, "import path")) {
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
             Bs_Str *name = (Bs_Str *)a.as.object;
 
             if (!name->size) {
                 bs_error(bs, "import path cannot be empty");
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
 
             size_t index;
@@ -1042,7 +1026,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                 const Bs_Module *m = &bs->modules.data[index];
                 if (!m->done) {
                     bs_error(bs, "import loop detected");
-                    bs_halt(bs, 1);
+                    bs_return_defer(1);
                 }
 
                 bs_stack_push(bs, m->result);
@@ -1058,7 +1042,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                     void *data = dlopen(path, RTLD_NOW);
                     if (!data) {
                         bs_error(bs, "could not load library '%s': %s", path, dlerror());
-                        bs_halt(bs, 1);
+                        bs_return_defer(1);
                     }
 
                     Bs_C_Lib *library = bs_c_lib_new(bs, data, name);
@@ -1085,7 +1069,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                             Bs_Sv_Arg(*name),
                             bs->frames.count > 1 ? "\n" : "");
 
-                        bs_halt(bs, 1);
+                        bs_return_defer(1);
                     }
 
                     for (size_t i = 0; i < *exports_count; i++) {
@@ -1117,14 +1101,14 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                     char *contents = bs_read_file(path, &size);
                     if (!contents) {
                         bs_error(bs, "could not read file '%s'", path);
-                        bs_halt(bs, 1);
+                        bs_return_defer(1);
                     }
 
                     Bs_Fn *fn = bs_compile(bs, path, bs_sv_from_parts(contents, size));
                     free(contents);
 
                     if (!fn) {
-                        bs_halt(bs, 1);
+                        bs_return_defer(1);
                     }
                     bs_da_push(bs, &bs->modules, (Bs_Module){.name = fn->name});
                     fn->module = bs->modules.count;
@@ -1143,7 +1127,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
 
             if (!bs_table_set(bs, &bs->globals, name, bs_stack_peek(bs, 0))) {
                 bs_error(bs, "redefinition of global variable '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*name));
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
 
             bs_stack_pop(bs);
@@ -1155,7 +1139,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             Bs_Value value;
             if (!bs_table_get(bs, &bs->globals, name, &value)) {
                 bs_error(bs, "undefined variable '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*name));
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
 
             bs_stack_push(bs, value);
@@ -1168,7 +1152,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             if (bs_table_set(bs, &bs->globals, name, value)) {
                 bs_table_remove(bs, &bs->globals, name);
                 bs_error(bs, "undefined variable '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*name));
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
         } break;
 
@@ -1205,13 +1189,13 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             const Bs_Value container = bs_stack_peek(bs, 1);
             if (container.type != BS_VALUE_OBJECT) {
                 bs_error(bs, "cannot index into %s value", bs_value_type_name(container));
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
 
             const Bs_Value index = bs_stack_peek(bs, 0);
             if (container.as.object->type == BS_OBJECT_ARRAY) {
                 if (!bs_check_whole_number(bs, index, "array index")) {
-                    bs_halt(bs, 1);
+                    bs_return_defer(1);
                 }
 
                 Bs_Array *array = (Bs_Array *)container.as.object;
@@ -1222,11 +1206,11 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                         (size_t)index.as.number,
                         array->count);
 
-                    bs_halt(bs, 1);
+                    bs_return_defer(1);
                 }
             } else if (container.as.object->type == BS_OBJECT_TABLE) {
                 if (!bs_check_object_type(bs, index, BS_OBJECT_STR, "table key")) {
-                    bs_halt(bs, 1);
+                    bs_return_defer(1);
                 }
 
                 Bs_Str *key = (Bs_Str *)index.as.object;
@@ -1235,13 +1219,13 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                 }
             } else if (container.as.object->type == BS_OBJECT_C_LIB) {
                 if (!bs_check_object_type(bs, index, BS_OBJECT_STR, "library symbol name")) {
-                    bs_halt(bs, 1);
+                    bs_return_defer(1);
                 }
 
                 Bs_Str *name = (Bs_Str *)index.as.object;
                 if (!name->size) {
                     bs_error(bs, "library symbol name cannot be empty");
-                    bs_halt(bs, 1);
+                    bs_return_defer(1);
                 }
 
                 Bs_C_Lib *c = (Bs_C_Lib *)container.as.object;
@@ -1252,11 +1236,11 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                         Bs_Sv_Arg(*name),
                         Bs_Sv_Arg(*c->path));
 
-                    bs_halt(bs, 1);
+                    bs_return_defer(1);
                 }
             } else {
                 bs_error(bs, "cannot index into %s value", bs_value_type_name(container));
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
 
             bs->stack.count -= 2;
@@ -1269,7 +1253,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             if (container.type != BS_VALUE_OBJECT) {
                 bs_error(
                     bs, "cannot take mutable index into %s value", bs_value_type_name(container));
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
 
             const Bs_Value value = bs_stack_peek(bs, 0);
@@ -1277,13 +1261,13 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
 
             if (container.as.object->type == BS_OBJECT_ARRAY) {
                 if (!bs_check_whole_number(bs, index, "array index")) {
-                    bs_halt(bs, 1);
+                    bs_return_defer(1);
                 }
 
                 bs_array_set(bs, (Bs_Array *)container.as.object, index.as.number, value);
             } else if (container.as.object->type == BS_OBJECT_TABLE) {
                 if (!bs_check_object_type(bs, index, BS_OBJECT_STR, "table key")) {
-                    bs_halt(bs, 1);
+                    bs_return_defer(1);
                 }
 
                 Bs_Table *table = (Bs_Table *)container.as.object;
@@ -1295,7 +1279,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             } else {
                 bs_error(
                     bs, "cannot take mutable index into %s value", bs_value_type_name(container));
-                bs_halt(bs, 1);
+                bs_return_defer(1);
             }
 
             bs->stack.count -= 2;
@@ -1326,8 +1310,8 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
         } break;
 
         default:
-            bs_fmt(bs_stderr_writer(bs), "invalid op %d at offset %zu", op, bs->op_index);
-            bs_halt(bs, 1);
+            bs_fmt(bs_stderr_writer(bs), "error: invalid op %d at offset %zu\n", op, bs->op_index);
+            bs_return_defer(1);
         }
     }
 
@@ -1339,5 +1323,9 @@ defer:
 
     bs->upvalues = NULL;
     bs->gc_on = false;
-    return bs->exit;
+
+    if (step) {
+        bs_fmt(bs_stdout_writer(bs), "Stopping BS with exit code %d\n", result);
+    }
+    return result;
 }

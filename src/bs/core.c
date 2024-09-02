@@ -14,17 +14,17 @@ static const Bs_C_Data_Spec file_spec = {
     .free = file_data_free,
 };
 
-static bool io_open(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
+static Bs_Value io_open(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 2)) {
-        return false;
+        return bs_value_error;
     }
 
     if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
-        return false;
+        return bs_value_error;
     }
 
     if (!bs_check_value_type(bs, args[1], BS_VALUE_BOOL, "argument #2")) {
-        return false;
+        return bs_value_error;
     }
 
     size_t start;
@@ -34,49 +34,49 @@ static bool io_open(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
     const bool write = args[1].as.boolean;
     FILE *file = fopen(bs_str_writer_end(bs, start).data, write ? "w" : "r");
     if (file) {
-        *result = bs_value_object(bs_c_data_new(bs, file, &file_spec));
+        return bs_value_object(bs_c_data_new(bs, file, &file_spec));
     }
 
-    return true;
+    return bs_value_nil;
 }
 
-static bool io_read(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
+static Bs_Value io_read(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 2)) {
-        return false;
+        return bs_value_error;
     }
 
     if (!bs_check_object_c_type(bs, args[0], &file_spec, "argument #1")) {
-        return false;
+        return bs_value_error;
     }
 
     if (!bs_check_whole_number(bs, args[1], "argument #2")) {
-        return false;
+        return bs_value_error;
     }
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
     if (!c->data) {
         bs_error(bs, "cannot read from closed file");
-        return false;
+        return bs_value_error;
     }
 
     size_t count = args[1].as.number;
     if (!count) {
         const long start = ftell(c->data);
         if (start == -1) {
-            return true;
+            return bs_value_nil;
         }
 
         if (fseek(c->data, 0, SEEK_END) == -1) {
-            return true;
+            return bs_value_nil;
         }
 
         const long offset = ftell(c->data);
         if (offset == -1) {
-            return true;
+            return bs_value_nil;
         }
 
         if (fseek(c->data, start, SEEK_SET) == -1) {
-            return true;
+            return bs_value_nil;
         }
 
         count = offset;
@@ -86,66 +86,66 @@ static bool io_read(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
     assert(data);
 
     count = fread(data, sizeof(char), count, c->data);
+
+    Bs_Value result = bs_value_nil;
     if (!ferror(c->data)) {
-        *result = bs_value_object(bs_str_new(bs, (Bs_Sv){data, count}));
+        result = bs_value_object(bs_str_new(bs, (Bs_Sv){data, count}));
     }
 
     free(data);
-    return true;
+    return result;
 }
 
-static bool io_write(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
+static Bs_Value io_write(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 2)) {
-        return false;
+        return bs_value_error;
     }
 
     if (!bs_check_object_c_type(bs, args[0], &file_spec, "argument #1")) {
-        return false;
+        return bs_value_error;
     }
 
     if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
-        return false;
+        return bs_value_error;
     }
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
     if (!c->data) {
         bs_error(bs, "cannot write into closed file");
-        return false;
+        return bs_value_error;
     }
 
     Bs_Str *bytes = (Bs_Str *)args[1].as.object;
     fwrite(bytes->data, bytes->size, 1, c->data);
-    *result = bs_value_bool(!ferror(c->data));
-
-    return true;
+    return bs_value_bool(!ferror(c->data));
 }
 
-static bool io_flush(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
+static Bs_Value io_flush(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 1)) {
-        return false;
+        return bs_value_error;
     }
 
     if (!bs_check_object_c_type(bs, args[0], &file_spec, "argument #1")) {
-        return false;
+        return bs_value_error;
     }
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
     if (!c->data) {
         bs_error(bs, "cannot flush closed file");
-        return false;
+        return bs_value_error;
     }
 
     fflush(c->data);
-    return true;
+    return bs_value_nil;
 }
 
-static bool io_close(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
+static Bs_Value io_close(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 1)) {
-        return false;
+        return bs_value_error;
     }
 
     if (!bs_check_object_c_type(bs, args[0], &file_spec, "argument #1")) {
-        return false;
+        return bs_value_error;
     }
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
@@ -154,29 +154,28 @@ static bool io_close(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
         c->data = NULL;
     }
 
-    return true;
+    return bs_value_nil;
 }
 
-static bool os_exit(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
+static Bs_Value os_exit(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 1)) {
-        return false;
+        return bs_value_error;
     }
 
     if (!bs_check_whole_number(bs, args[0], "argument #1")) {
-        return false;
+        return bs_value_error;
     }
 
-    bs_exit_set(bs, args[0].as.number);
-    return true;
+    return bs_value_halt(args[0].as.number);
 }
 
-static bool os_getenv(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
+static Bs_Value os_getenv(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 1)) {
-        return false;
+        return bs_value_error;
     }
 
     if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
-        return false;
+        return bs_value_error;
     }
 
     {
@@ -188,26 +187,24 @@ static bool os_getenv(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
         const char *value = getenv(key);
 
         if (value) {
-            *result = bs_value_object(bs_str_new(bs, bs_sv_from_cstr(value)));
+            return bs_value_object(bs_str_new(bs, bs_sv_from_cstr(value)));
         } else {
-            *result = bs_value_nil;
+            return bs_value_nil;
         }
     }
-
-    return true;
 }
 
-static bool os_setenv(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
+static Bs_Value os_setenv(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 2)) {
-        return false;
+        return bs_value_error;
     }
 
     if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
-        return false;
+        return bs_value_error;
     }
 
     if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
-        return false;
+        return bs_value_error;
     }
 
     const char *key;
@@ -229,17 +226,16 @@ static bool os_setenv(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
         bs_str_writer_end(bs, start);
     }
 
-    *result = bs_value_bool(setenv(key, value, true) == 0);
-    return true;
+    return bs_value_bool(setenv(key, value, true) == 0);
 }
 
-static bool os_execute(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
+static Bs_Value os_execute(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 1)) {
-        return false;
+        return bs_value_error;
     }
 
     if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
-        return false;
+        return bs_value_error;
     }
 
     size_t start;
@@ -249,25 +245,24 @@ static bool os_execute(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
     }
     const char *command = bs_str_writer_end(bs, start).data;
 
-    *result = bs_value_num(WEXITSTATUS(system(command)));
-    return true;
+    return bs_value_num(WEXITSTATUS(system(command)));
 }
 
-static bool string_slice(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result) {
+static Bs_Value string_slice(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 3)) {
-        return false;
+        return bs_value_error;
     }
 
     if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
-        return false;
+        return bs_value_error;
     }
 
     if (!bs_check_whole_number(bs, args[1], "argument #2")) {
-        return false;
+        return bs_value_error;
     }
 
     if (!bs_check_whole_number(bs, args[2], "argument #3")) {
-        return false;
+        return bs_value_error;
     }
 
     Bs_Str *str = (Bs_Str *)args[0].as.object;
@@ -276,12 +271,10 @@ static bool string_slice(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result)
 
     if (begin >= str->size || end > str->size) {
         bs_error(bs, "cannot slice string of length %zu from %zu to %zu", str->size, begin, end);
-        return false;
+        return bs_value_error;
     }
 
-    *result = bs_value_object(bs_str_new(bs, bs_sv_from_parts(str->data + begin, end - begin)));
-
-    return true;
+    return bs_value_object(bs_str_new(bs, bs_sv_from_parts(str->data + begin, end - begin)));
 }
 
 static void bs_table_set_fn(Bs *bs, Bs_Table *table, const char *name, Bs_C_Fn_Ptr fn) {
