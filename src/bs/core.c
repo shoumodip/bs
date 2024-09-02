@@ -296,8 +296,8 @@ static Bs_Value os_execute(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_num(WEXITSTATUS(system(command)));
 }
 
-// String
-static Bs_Value string_slice(Bs *bs, Bs_Value *args, size_t arity) {
+// Str
+static Bs_Value str_slice(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 3)) {
         return bs_value_error;
     }
@@ -383,8 +383,8 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     }
 
     {
-        Bs_Table *string = bs_table_new(bs);
-        bs_table_set_fn(bs, string, "slice", string_slice);
-        bs_global_set(bs, Bs_Sv_Static("string"), bs_value_object(string));
+        Bs_Table *str = bs_table_new(bs);
+        bs_table_set_fn(bs, str, "slice", str_slice);
+        bs_global_set(bs, Bs_Sv_Static("str"), bs_value_object(str));
     }
 }
