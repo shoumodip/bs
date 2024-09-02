@@ -602,38 +602,6 @@ bool bs_check_whole_number(Bs *bs, Bs_Value value, const char *label) {
     return true;
 }
 
-// FFI
-bool bs_ffi(Bs *bs, Bs_FFI *ffi, size_t count, Bs_C_Lib *library) {
-    for (size_t i = 0; i < count; i++) {
-        const Bs_FFI f = ffi[i];
-        if (!f.fn) {
-            bs_error(bs, "function pointer is NULL in FFI #%zu", i + 1);
-            return false;
-        }
-
-        if (!f.name) {
-            bs_error(bs, "function name is NULL in FFI #%zu", i + 1);
-            return false;
-        }
-
-        const Bs_Sv name = bs_sv_from_cstr(f.name);
-        if (!name.size) {
-            bs_error(bs, "function name is empty in FFI #%zu", i + 1);
-            return false;
-        }
-
-        Bs_C_Fn *fn = bs_c_fn_new(bs, f.fn);
-        fn->library = library;
-
-        if (!bs_table_set(bs, &library->functions, bs_str_const(bs, name), bs_value_object(fn))) {
-            bs_error(bs, "redefinition of function '" Bs_Sv_Fmt "' in FFI", Bs_Sv_Arg(name));
-            return false;
-        }
-    }
-
-    return true;
-}
-
 // Interpreter
 static void bs_stack_push(Bs *bs, Bs_Value value) {
     // Do not trigger garbage collection in the stack
@@ -1099,22 +1067,26 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                         bs_halt(bs, 1);
                     }
 
-                    Bs_C_Lib *c = bs_c_lib_new(bs, data, name);
+                    Bs_C_Lib *library = bs_c_lib_new(bs, data, name);
 
-                    const bool (*init)(Bs *bs, Bs_C_Lib *library) = dlsym(data, "bs_init");
-                    if (!init) {
+                    const Bs_Export *exports = dlsym(data, "bs_exports");
+                    const size_t *exports_count = dlsym(data, "bs_exports_count");
+
+                    if (!exports || !exports_count) {
                         bs_error(
                             bs,
                             "invalid native library '" Bs_Sv_Fmt "'\n\n"
-                            "A BS native library should define the 'bs_init' function:\n\n"
-                            "bool bs_init(Bs *bs, Bs_C_Lib *library) {\n"
-                            "    Bs_FFI ffi[] = {\n"
-                            "        {\"function1_name\", function1_ptr},\n"
-                            "        {\"function2_name\", function2_ptr},\n"
-                            "        /* ... */\n"
-                            "    };\n\n"
-                            "    return bs_ffi(bs, ffi, sizeof(ffi) / sizeof(*ffi), library);\n"
-                            "}%s",
+                            "A BS native library should define 'bs_exports' and "
+                            "'bs_exports_count':\n\n"
+                            "```\n"
+                            "const Bs_Export bs_exports[] = {\n"
+                            "    {\"function1_name\", function1_ptr},\n"
+                            "    {\"function2_name\", function2_ptr},\n"
+                            "    /* ... */\n"
+                            "};\n\n"
+                            "const size_t bs_exports_count = sizeof(bs_exports) / "
+                            "sizeof(*bs_exports);\n"
+                            "```%s",
 
                             Bs_Sv_Arg(*name),
                             bs->frames.count > 1 ? "\n" : "");
@@ -1122,11 +1094,24 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                         bs_halt(bs, 1);
                     }
 
-                    if (!init(bs, c)) {
-                        bs_halt(bs, 1);
+                    for (size_t i = 0; i < *exports_count; i++) {
+                        const Bs_Export export = exports[i];
+
+                        Bs_C_Fn *fn = bs_c_fn_new(bs, export.fn);
+                        fn->library = library;
+
+                        if (!bs_table_set(
+                                bs,
+                                &library->functions,
+                                bs_str_const(bs, bs_sv_from_cstr(export.name)),
+                                bs_value_object(fn))) {
+
+                            bs_error(bs, "redefinition of function '%s' in FFI", export.name);
+                            return false;
+                        }
                     }
 
-                    const Bs_Value value = bs_value_object(c);
+                    const Bs_Value value = bs_value_object(library);
                     bs_da_push(
                         bs,
                         &bs->modules,

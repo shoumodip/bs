@@ -30,29 +30,27 @@ Bs_Writer *bs_stderr_writer(Bs *bs);
 Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size);
 Bs_Str *bs_str_const(Bs *bs, Bs_Sv sv);
 
-// Errors
-typedef struct {
-    Bs_Sv name;
-    void (*free)(Bs *bs, void *data);
-    void (*write)(Bs_Writer *writer, const void *data);
-} Bs_C_Data_Spec;
-
-void bs_error(Bs *bs, const char *fmt, ...);
-bool bs_check_arity(Bs *bs, size_t actual, size_t expected);
-bool bs_check_value_type(Bs *bs, Bs_Value value, Bs_Value_Type expected, const char *label);
-bool bs_check_object_type(Bs *bs, Bs_Value value, Bs_Object_Type expected, const char *label);
-bool bs_check_object_c_type(Bs *bs, Bs_Value value, const Bs_C_Data_Spec *spec, const char *label);
-bool bs_check_whole_number(Bs *bs, Bs_Value value, const char *label);
-
 // FFI
 typedef bool (*Bs_C_Fn_Ptr)(Bs *bs, Bs_Value *args, size_t arity, Bs_Value *result);
 
 typedef struct {
     const char *name;
     Bs_C_Fn_Ptr fn;
-} Bs_FFI;
+} Bs_Export;
 
-bool bs_ffi(Bs *bs, Bs_FFI *ffi, size_t count, Bs_C_Lib *library);
+typedef struct {
+    Bs_Sv name;
+    void (*free)(Bs *bs, void *data);
+    void (*write)(Bs_Writer *writer, const void *data);
+} Bs_C_Data_Spec;
+
+// Errors
+void bs_error(Bs *bs, const char *fmt, ...);
+bool bs_check_arity(Bs *bs, size_t actual, size_t expected);
+bool bs_check_value_type(Bs *bs, Bs_Value value, Bs_Value_Type expected, const char *label);
+bool bs_check_object_type(Bs *bs, Bs_Value value, Bs_Object_Type expected, const char *label);
+bool bs_check_object_c_type(Bs *bs, Bs_Value value, const Bs_C_Data_Spec *spec, const char *label);
+bool bs_check_whole_number(Bs *bs, Bs_Value value, const char *label);
 
 // Interpreter
 int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step);
