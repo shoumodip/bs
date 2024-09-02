@@ -117,8 +117,6 @@ struct Bs {
     Bs_Str_Writer paths_writer;
     Bs_File_Writer stdout_writer;
     Bs_File_Writer stderr_writer;
-
-    size_t op_index;
 };
 
 // Garbage collector
@@ -483,7 +481,8 @@ static Bs_Loc bs_chunk_get_loc(const Bs_Chunk *c, size_t op_index) {
 void bs_error(Bs *bs, const char *fmt, ...) {
     Bs_Writer *w = bs_stderr_writer(bs);
 
-    Bs_Loc loc = bs_chunk_get_loc(&bs->frame->closure->fn->chunk, bs->op_index);
+    Bs_Loc loc = bs_chunk_get_loc(
+        &bs->frame->closure->fn->chunk, bs->frame->ip - bs->frame->closure->fn->chunk.data);
     bs_fmt(w, Bs_Loc_Fmt "error: ", Bs_Loc_Arg(loc));
     {
         va_list args;
@@ -498,12 +497,7 @@ void bs_error(Bs *bs, const char *fmt, ...) {
         const Bs_Frame *caller = &bs->frames.data[i - 2];
         const Bs_Fn *fn = caller->closure->fn;
 
-        size_t op_index = caller->ip - fn->chunk.data - 1;
-        if (!callee->closure->fn->module) {
-            op_index -= sizeof(size_t);
-        }
-
-        loc = bs_chunk_get_loc(&fn->chunk, op_index);
+        loc = bs_chunk_get_loc(&fn->chunk, caller->ip - fn->chunk.data);
         bs_fmt(w, Bs_Loc_Fmt "in ", Bs_Loc_Arg(loc));
 
         bs_value_write(w, bs_value_object(callee->closure->fn));
@@ -723,7 +717,7 @@ static void bs_close_upvalues(Bs *bs, size_t index) {
     }
 }
 
-// Halt
+// Interpreter
 static_assert(BS_COUNT_OPS == 39, "Update bs_run()");
 int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
     int result = 0;
@@ -760,7 +754,6 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             getchar();
         }
 
-        bs->op_index = bs->frame->ip - bs->frame->closure->fn->chunk.data;
         const Bs_Op op = *bs->frame->ip++;
         switch (op) {
         case BS_OP_RET: {
@@ -1305,7 +1298,12 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
         } break;
 
         default:
-            bs_fmt(bs_stderr_writer(bs), "error: invalid op %d at offset %zu\n", op, bs->op_index);
+            bs_fmt(
+                bs_stderr_writer(bs),
+                "error: invalid op %d at offset %zu\n",
+                op,
+                bs->frame->ip - bs->frame->closure->fn->chunk.data - 1);
+
             bs_return_defer(1);
         }
     }
