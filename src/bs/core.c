@@ -4,7 +4,7 @@
 #include "bs/object.h"
 
 static void file_data_free(Bs *bs, void *data) {
-    if (data) {
+    if (data && fileno(data) > 2) {
         fclose(data);
     }
 }
