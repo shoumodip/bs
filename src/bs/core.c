@@ -215,7 +215,7 @@ static Bs_Value os_setenv(Bs *bs, Bs_Value *args, size_t arity) {
 
         const size_t key_pos = bs_str_writer_pos(bs);
         bs_fmt(w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
-        bs_str_writer_null(bs);
+        bs_str_writer_push(bs, '\0');
 
         const size_t value_pos = bs_str_writer_pos(bs);
         bs_fmt(w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[1].as.object));

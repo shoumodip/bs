@@ -17,7 +17,7 @@ void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size);
 Bs_Writer *bs_str_writer_init(Bs *bs, size_t *start);
 Bs_Sv bs_str_writer_end(Bs *bs, size_t start);
 
-void bs_str_writer_null(Bs *bs);
+void bs_str_writer_push(Bs *bs, char ch);
 size_t bs_str_writer_pos(Bs *bs);
 const char *bs_str_writer_get(Bs *bs, size_t pos);
 

@@ -184,14 +184,45 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
         break;
 
-    case BS_TOKEN_STR:
+    case BS_TOKEN_STR: {
+        const size_t start = bs_str_writer_pos(c->bs);
+        {
+            for (size_t i = 1; i + 1 < token.sv.size; i++) {
+                char ch = token.sv.data[i];
+                if (ch == '\\') {
+                    switch (token.sv.data[++i]) {
+                    case 'n':
+                        ch = '\n';
+                        break;
+
+                    case 't':
+                        ch = '\t';
+                        break;
+
+                    case '0':
+                        ch = '\0';
+                        break;
+
+                    case '"':
+                        ch = '\"';
+                        break;
+
+                    case '\\':
+                        ch = '\\';
+                        break;
+                    }
+                }
+
+                bs_str_writer_push(c->bs, ch);
+            }
+        }
+
         bs_chunk_push_op_value(
             c->bs,
             c->chunk,
             BS_OP_CONST,
-            bs_value_object(
-                bs_str_const(c->bs, bs_sv_from_parts(token.sv.data + 1, token.sv.size - 2))));
-        break;
+            bs_value_object(bs_str_const(c->bs, bs_str_writer_end(c->bs, start))));
+    } break;
 
     case BS_TOKEN_NUM:
         bs_chunk_push_op_value(

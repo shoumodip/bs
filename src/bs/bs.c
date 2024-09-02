@@ -420,8 +420,8 @@ Bs_Sv bs_str_writer_end(Bs *bs, size_t start) {
     return sv;
 }
 
-void bs_str_writer_null(Bs *bs) {
-    bs_da_push(bs, &bs->str_writer, '\0');
+void bs_str_writer_push(Bs *bs, char ch) {
+    bs_da_push(bs, &bs->str_writer, ch);
 }
 
 size_t bs_str_writer_pos(Bs *bs) {

@@ -180,10 +180,38 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
 
     if (bs_lexer_match(l, '"')) {
         while (l->sv.size > 0 && *l->sv.data != '"') {
+            char ch = *l->sv.data;
+            if (ch == '\\') {
+                if (l->sv.size <= 2) {
+                    bs_lexer_advance(l);
+                    bs_lexer_advance(l);
+                    break;
+                }
+
+                switch (l->sv.data[1]) {
+                case 'n':
+                case 't':
+                case '0':
+                case '"':
+                case '\\':
+                    break;
+
+                default:
+                    bs_fmt(
+                        l->error,
+                        Bs_Loc_Fmt "error: invalid escape character\n",
+                        Bs_Loc_Arg(l->loc));
+
+                    bs_lexer_error(l);
+                }
+
+                bs_lexer_advance(l);
+            }
+
             bs_lexer_advance(l);
         }
 
-        if (l->sv.size == 0) {
+        if (!l->sv.size) {
             bs_fmt(l->error, Bs_Loc_Fmt "error: unterminated string\n", Bs_Loc_Arg(token.loc));
             bs_lexer_error(l);
         }
