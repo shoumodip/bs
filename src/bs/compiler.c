@@ -163,7 +163,7 @@ static void bs_compile_jump_direct(Bs_Compiler *c, Bs_Op op, size_t addr) {
 }
 
 static void bs_compile_error_unexpected(Bs_Compiler *c, const Bs_Token *token) {
-    bs_write(
+    bs_fmt(
         c->lexer.error,
         Bs_Loc_Fmt "error: unexpected %s\n",
         Bs_Loc_Arg(token->loc),
@@ -709,7 +709,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
 
     case BS_TOKEN_PUB:
         if (c->scope->depth != 1) {
-            bs_write(
+            bs_fmt(
                 c->lexer.error,
                 Bs_Loc_Fmt "error: cannot define public values in local scope\n",
                 Bs_Loc_Arg(token.loc));
@@ -725,7 +725,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         } else if (token.type == BS_TOKEN_VAR) {
             bs_compile_variable(c, true);
         } else {
-            bs_write(
+            bs_fmt(
                 c->lexer.error,
                 Bs_Loc_Fmt "error: expected 'fn' or 'var', got %s\n",
                 Bs_Loc_Arg(token.loc),

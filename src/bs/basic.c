@@ -20,7 +20,7 @@ bool bs_sv_suffix(Bs_Sv a, Bs_Sv b) {
     return a.size >= b.size && !memcmp(a.data + a.size - b.size, b.data, b.size);
 }
 
-void bs_write(Bs_Writer *w, const char *fmt, ...) {
+void bs_fmt(Bs_Writer *w, const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
     w->fmt(w, fmt, args);

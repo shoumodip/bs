@@ -7,17 +7,22 @@
 
 #include "value.h"
 
-// Specs
+// Interface
 typedef struct Bs Bs;
 
 Bs *bs_new(void);
 void bs_free(Bs *bs);
 void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size);
 
+void bs_exit_set(Bs *bs, int code);
 void bs_core_set(Bs *bs, Bs_Sv name, Bs_Value value);
 
 Bs_Writer *bs_str_writer_init(Bs *bs, size_t *start);
 Bs_Sv bs_str_writer_end(Bs *bs, size_t start);
+
+void bs_str_writer_null(Bs *bs);
+size_t bs_str_writer_pos(Bs *bs);
+const char *bs_str_writer_get(Bs *bs, size_t pos);
 
 Bs_Writer *bs_stdout_writer(Bs *bs);
 Bs_Writer *bs_stderr_writer(Bs *bs);
@@ -50,7 +55,7 @@ typedef struct {
 bool bs_ffi(Bs *bs, Bs_FFI *ffi, size_t count, Bs_C_Lib *library);
 
 // Interpreter
-bool bs_run(Bs *bs, const char *path, Bs_Sv input, bool step);
+int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step);
 
 // Dynamic Array
 #define BS_DA_INIT_CAP 128

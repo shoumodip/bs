@@ -184,7 +184,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
         }
 
         if (l->sv.size == 0) {
-            bs_write(l->error, Bs_Loc_Fmt "error: unterminated string\n", Bs_Loc_Arg(token.loc));
+            bs_fmt(l->error, Bs_Loc_Fmt "error: unterminated string\n", Bs_Loc_Arg(token.loc));
             bs_lexer_error(l);
         }
 
@@ -292,7 +292,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
     }
 
     if (token.type == BS_TOKEN_EOF) {
-        bs_write(
+        bs_fmt(
             l->error,
             Bs_Loc_Fmt "error: invalid character '%c'\n",
             Bs_Loc_Arg(token.loc),
@@ -321,7 +321,7 @@ bool bs_lexer_read(Bs_Lexer *l, Bs_Token_Type type) {
 Bs_Token bs_lexer_expect(Bs_Lexer *l, Bs_Token_Type type) {
     const Bs_Token token = bs_lexer_next(l);
     if (token.type != type) {
-        bs_write(
+        bs_fmt(
             l->error,
             Bs_Loc_Fmt "error: expected %s, got %s\n",
             Bs_Loc_Arg(token.loc),

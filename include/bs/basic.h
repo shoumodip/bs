@@ -28,7 +28,7 @@ struct Bs_Writer {
     void (*fmt)(Bs_Writer *writer, const char *fmt, va_list args);
 };
 
-void bs_write(Bs_Writer *writer, const char *fmt, ...);
+void bs_fmt(Bs_Writer *writer, const char *fmt, ...);
 
 // Defer
 #define bs_return_defer(value)                                                                     \

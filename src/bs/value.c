@@ -64,35 +64,35 @@ static void bs_object_write(Bs_Writer *w, const Bs_Object *o) {
     case BS_OBJECT_FN: {
         const Bs_Fn *fn = (const Bs_Fn *)o;
         if (fn->module) {
-            bs_write(w, "file '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*fn->name));
+            bs_fmt(w, "file '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*fn->name));
         } else if (fn->name) {
-            bs_write(w, "fn " Bs_Sv_Fmt "()", Bs_Sv_Arg(*fn->name));
+            bs_fmt(w, "fn " Bs_Sv_Fmt "()", Bs_Sv_Arg(*fn->name));
         } else {
-            bs_write(w, "fn ()");
+            bs_fmt(w, "fn ()");
         }
     } break;
 
     case BS_OBJECT_STR:
-        bs_write(w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)o));
+        bs_fmt(w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)o));
         break;
 
     case BS_OBJECT_ARRAY: {
         const Bs_Array *array = (const Bs_Array *)o;
 
-        bs_write(w, "[");
+        bs_fmt(w, "[");
         for (size_t i = 0; i < array->count; i++) {
             if (i) {
-                bs_write(w, ", ");
+                bs_fmt(w, ", ");
             }
             bs_value_write(w, array->data[i]);
         }
-        bs_write(w, "]");
+        bs_fmt(w, "]");
     } break;
 
     case BS_OBJECT_TABLE: {
         Bs_Table *table = (Bs_Table *)o;
 
-        bs_write(w, "{");
+        bs_fmt(w, "{");
         for (size_t i = 0, count = 0; i < table->capacity; i++) {
             Entry *entry = &table->data[i];
             if (!entry->key) {
@@ -100,15 +100,15 @@ static void bs_object_write(Bs_Writer *w, const Bs_Object *o) {
             }
 
             if (count) {
-                bs_write(w, ", ");
+                bs_fmt(w, ", ");
             }
 
             bs_object_write(w, (const Bs_Object *)entry->key);
-            bs_write(w, " = ");
+            bs_fmt(w, " = ");
             bs_value_write(w, entry->value);
             count++;
         }
-        bs_write(w, "}");
+        bs_fmt(w, "}");
     } break;
 
     case BS_OBJECT_CLOSURE:
@@ -116,15 +116,15 @@ static void bs_object_write(Bs_Writer *w, const Bs_Object *o) {
         break;
 
     case BS_OBJECT_UPVALUE:
-        bs_write(w, "<upvalue>");
+        bs_fmt(w, "<upvalue>");
         break;
 
     case BS_OBJECT_C_FN:
-        bs_write(w, "native fn ()");
+        bs_fmt(w, "native fn ()");
         break;
 
     case BS_OBJECT_C_LIB:
-        bs_write(w, "<native library '" Bs_Sv_Fmt "'>", Bs_Sv_Arg(*((const Bs_C_Lib *)o)->path));
+        bs_fmt(w, "<native library '" Bs_Sv_Fmt "'>", Bs_Sv_Arg(*((const Bs_C_Lib *)o)->path));
         break;
 
     case BS_OBJECT_C_DATA: {
@@ -132,7 +132,7 @@ static void bs_object_write(Bs_Writer *w, const Bs_Object *o) {
         if (native->spec->write) {
             native->spec->write(w, native->data);
         } else {
-            bs_write(w, "<native " Bs_Sv_Fmt " object>", Bs_Sv_Arg(native->spec->name));
+            bs_fmt(w, "<native " Bs_Sv_Fmt " object>", Bs_Sv_Arg(native->spec->name));
         }
     } break;
 
@@ -144,15 +144,15 @@ static void bs_object_write(Bs_Writer *w, const Bs_Object *o) {
 void bs_value_write(Bs_Writer *w, Bs_Value v) {
     switch (v.type) {
     case BS_VALUE_NIL:
-        bs_write(w, "nil");
+        bs_fmt(w, "nil");
         break;
 
     case BS_VALUE_NUM:
-        bs_write(w, "%g", v.as.number);
+        bs_fmt(w, "%g", v.as.number);
         break;
 
     case BS_VALUE_BOOL:
-        bs_write(w, "%s", v.as.boolean ? "true" : "false");
+        bs_fmt(w, "%s", v.as.boolean ? "true" : "false");
         break;
 
     case BS_VALUE_OBJECT:
