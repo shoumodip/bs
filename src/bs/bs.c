@@ -513,7 +513,8 @@ void bs_error(Bs *bs, const char *fmt, ...) {
 
 bool bs_check_arity(Bs *bs, size_t actual, size_t expected) {
     if (actual != expected) {
-        bs_error(bs, "expected %zu arguments, got %zu", expected, actual);
+        bs_error(
+            bs, "expected %zu argument%s, got %zu", expected, expected == 1 ? "" : "s", actual);
         return false;
     }
 
@@ -638,7 +639,7 @@ static bool bs_binary_op(Bs *bs, Bs_Value *a, Bs_Value *b, const char *op) {
 }
 
 static bool bs_call_closure(Bs *bs, Bs_Closure *closure, size_t arity) {
-    if (!bs_check_arity(bs, closure->fn->arity, arity)) {
+    if (!bs_check_arity(bs, arity, closure->fn->arity)) {
         return false;
     }
 
