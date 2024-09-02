@@ -1159,15 +1159,16 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             }
         } break;
 
-        case BS_OP_GDEF:
-            bs_table_set(
-                bs,
-                &bs->globals,
-                (Bs_Str *)bs_chunk_read_const(bs)->as.object,
-                bs_stack_peek(bs, 0));
+        case BS_OP_GDEF: {
+            Bs_Str *name = (Bs_Str *)bs_chunk_read_const(bs)->as.object;
+
+            if (!bs_table_set(bs, &bs->globals, name, bs_stack_peek(bs, 0))) {
+                bs_error(bs, "redefinition of global variable '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*name));
+                bs_halt(bs, 1);
+            }
 
             bs_stack_pop(bs);
-            break;
+        } break;
 
         case BS_OP_GGET: {
             Bs_Str *name = (Bs_Str *)bs_chunk_read_const(bs)->as.object;

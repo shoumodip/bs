@@ -613,6 +613,7 @@ static void bs_compile_variable(Bs_Compiler *c, bool public) {
     bs_lexer_expect(&c->lexer, BS_TOKEN_EOL);
 
     if (public) {
+        bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
         bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_GDEF, const_index);
     } else {
         c->scope->data[scope_index].token = token;
@@ -721,6 +722,8 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         if (token.type == BS_TOKEN_FN) {
             const size_t const_index = bs_compile_definition(c, &token, true);
             bs_compile_lambda(c, &token);
+
+            bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
             bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_GDEF, const_index);
         } else if (token.type == BS_TOKEN_VAR) {
             bs_compile_variable(c, true);
