@@ -25,7 +25,8 @@ bool bs_sv_suffix(Bs_Sv a, Bs_Sv b);
 typedef struct Bs_Writer Bs_Writer;
 
 struct Bs_Writer {
-    void (*fmt)(Bs_Writer *writer, const char *fmt, va_list args);
+    void *data;
+    void (*write)(Bs_Writer *writer, Bs_Sv sv);
 };
 
 void bs_fmt(Bs_Writer *writer, const char *fmt, ...);

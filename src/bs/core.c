@@ -28,14 +28,35 @@ static Bs_Value io_open(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_error;
     }
 
-    size_t start;
-    Bs_Writer *w = bs_str_writer_init(bs, &start);
-    bs_fmt(w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
+    Bs_Buffer *b = bs_buffer_get(bs);
+    const size_t start = b->count;
+
+    Bs_Writer w = bs_buffer_writer(b);
+    bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
+    bs_buffer_push(b->bs, b, '\0');
 
     const bool write = args[1].as.boolean;
-    FILE *file = fopen(bs_str_writer_end(bs, start).data, write ? "w" : "r");
+    FILE *file = fopen(bs_buffer_reset(b, start).data, write ? "w" : "r");
     if (file) {
         return bs_value_object(bs_c_data_new(bs, file, &file_spec));
+    }
+
+    return bs_value_nil;
+}
+
+static Bs_Value io_close(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!bs_check_arity(bs, arity, 1)) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_c_type(bs, args[0], &file_spec, "argument #1")) {
+        return bs_value_error;
+    }
+
+    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
+    if (c->data) {
+        file_data_free(bs, c->data);
+        c->data = NULL;
     }
 
     return bs_value_nil;
@@ -97,30 +118,6 @@ static Bs_Value io_read(Bs *bs, Bs_Value *args, size_t arity) {
     return result;
 }
 
-static Bs_Value io_write(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 2)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_c_type(bs, args[0], &file_spec, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
-        return bs_value_error;
-    }
-
-    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
-    if (!c->data) {
-        bs_error(bs, "cannot write into closed file");
-        return bs_value_error;
-    }
-
-    Bs_Str *bytes = (Bs_Str *)args[1].as.object;
-    fwrite(bytes->data, bytes->size, 1, c->data);
-    return bs_value_bool(!ferror(c->data));
-}
-
 static Bs_Value io_flush(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 1)) {
         return bs_value_error;
@@ -140,8 +137,9 @@ static Bs_Value io_flush(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-static Bs_Value io_close(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 1)) {
+static Bs_Value io_write(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!arity) {
+        bs_error(bs, "expected at least 1 argument, got 0");
         return bs_value_error;
     }
 
@@ -150,16 +148,24 @@ static Bs_Value io_close(Bs *bs, Bs_Value *args, size_t arity) {
     }
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
-    if (c->data) {
-        file_data_free(bs, c->data);
-        c->data = NULL;
+    if (!c->data) {
+        bs_error(bs, "cannot write into closed file");
+        return bs_value_error;
     }
 
-    return bs_value_nil;
+    Bs_Writer w = bs_file_writer(c->data);
+    for (size_t i = 1; i < arity; i++) {
+        if (i > 1) {
+            bs_fmt(&w, " ");
+        }
+        bs_value_write(&w, args[i]);
+    }
+
+    return bs_value_bool(!ferror(c->data));
 }
 
 static Bs_Value io_print(Bs *bs, Bs_Value *args, size_t arity) {
-    Bs_Writer *w = bs_stdout_writer(bs);
+    Bs_Writer *w = bs_stdout_get(bs);
     for (size_t i = 0; i < arity; i++) {
         if (i) {
             bs_fmt(w, " ");
@@ -170,7 +176,7 @@ static Bs_Value io_print(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value io_eprint(Bs *bs, Bs_Value *args, size_t arity) {
-    Bs_Writer *w = bs_stderr_writer(bs);
+    Bs_Writer *w = bs_stderr_get(bs);
     for (size_t i = 0; i < arity; i++) {
         if (i) {
             bs_fmt(w, " ");
@@ -180,8 +186,36 @@ static Bs_Value io_eprint(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
+static Bs_Value io_writeln(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!arity) {
+        bs_error(bs, "expected at least 1 argument, got 0");
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_c_type(bs, args[0], &file_spec, "argument #1")) {
+        return bs_value_error;
+    }
+
+    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
+    if (!c->data) {
+        bs_error(bs, "cannot write into closed file");
+        return bs_value_error;
+    }
+
+    Bs_Writer w = bs_file_writer(c->data);
+    for (size_t i = 1; i < arity; i++) {
+        if (i > 1) {
+            bs_fmt(&w, " ");
+        }
+        bs_value_write(&w, args[i]);
+    }
+    bs_fmt(&w, "\n");
+
+    return bs_value_bool(!ferror(c->data));
+}
+
 static Bs_Value io_println(Bs *bs, Bs_Value *args, size_t arity) {
-    Bs_Writer *w = bs_stdout_writer(bs);
+    Bs_Writer *w = bs_stdout_get(bs);
     for (size_t i = 0; i < arity; i++) {
         if (i) {
             bs_fmt(w, " ");
@@ -193,7 +227,7 @@ static Bs_Value io_println(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value io_eprintln(Bs *bs, Bs_Value *args, size_t arity) {
-    Bs_Writer *w = bs_stderr_writer(bs);
+    Bs_Writer *w = bs_stderr_get(bs);
     for (size_t i = 0; i < arity; i++) {
         if (i) {
             bs_fmt(w, " ");
@@ -227,11 +261,14 @@ static Bs_Value os_getenv(Bs *bs, Bs_Value *args, size_t arity) {
     }
 
     {
-        size_t start;
-        Bs_Writer *w = bs_str_writer_init(bs, &start);
-        bs_fmt(w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
+        Bs_Buffer *b = bs_buffer_get(bs);
+        const size_t start = b->count;
 
-        const char *key = bs_str_writer_end(bs, start).data;
+        Bs_Writer w = bs_buffer_writer(b);
+        bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
+        bs_buffer_push(b->bs, b, '\0');
+
+        const char *key = bs_buffer_reset(b, start).data;
         const char *value = getenv(key);
 
         if (value) {
@@ -258,20 +295,23 @@ static Bs_Value os_setenv(Bs *bs, Bs_Value *args, size_t arity) {
     const char *key;
     const char *value;
     {
-        size_t start;
-        Bs_Writer *w = bs_str_writer_init(bs, &start);
+        Bs_Buffer *b = bs_buffer_get(bs);
+        const size_t start = b->count;
 
-        const size_t key_pos = bs_str_writer_pos(bs);
-        bs_fmt(w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
-        bs_str_writer_push(bs, '\0');
+        Bs_Writer w = bs_buffer_writer(b);
 
-        const size_t value_pos = bs_str_writer_pos(bs);
-        bs_fmt(w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[1].as.object));
+        const size_t key_pos = b->count;
+        bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
+        bs_buffer_push(b->bs, b, '\0');
 
-        key = bs_str_writer_get(bs, key_pos);
-        value = bs_str_writer_get(bs, value_pos);
+        const size_t value_pos = b->count;
+        bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[1].as.object));
+        bs_buffer_push(b->bs, b, '\0');
 
-        bs_str_writer_end(bs, start);
+        key = b->data + key_pos;
+        value = b->data + value_pos;
+
+        bs_buffer_reset(b, start);
     }
 
     return bs_value_bool(setenv(key, value, true) == 0);
@@ -286,12 +326,14 @@ static Bs_Value os_execute(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_error;
     }
 
-    size_t start;
-    {
-        Bs_Writer *w = bs_str_writer_init(bs, &start);
-        bs_fmt(w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
-    }
-    const char *command = bs_str_writer_end(bs, start).data;
+    Bs_Buffer *b = bs_buffer_get(bs);
+    const size_t start = b->count;
+
+    Bs_Writer w = bs_buffer_writer(b);
+    bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
+    bs_buffer_push(b->bs, b, '\0');
+
+    const char *command = bs_buffer_reset(b, start).data;
 
     return bs_value_num(WEXITSTATUS(system(command)));
 }
@@ -353,24 +395,26 @@ static Bs_Value str_format(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_error;
     }
 
-    size_t start;
-    Bs_Writer *w = bs_str_writer_init(bs, &start);
+    Bs_Buffer *b = bs_buffer_get(bs);
+    const size_t start = b->count;
+
+    Bs_Writer w = bs_buffer_writer(b);
 
     count = 0;
     for (size_t i = 0; i < fmt->size; i++) {
         if (fmt->data[i] == '$') {
             if (i + 1 < fmt->size && fmt->data[i + 1] == '$') {
-                bs_str_writer_push(bs, '$');
+                bs_buffer_push(b->bs, b, '$');
                 i++;
             } else {
-                bs_value_write(w, args[++count]);
+                bs_value_write(&w, args[++count]);
             }
         } else {
-            bs_str_writer_push(bs, fmt->data[i]);
+            bs_buffer_push(b->bs, b, fmt->data[i]);
         }
     }
 
-    return bs_value_object(bs_str_new(bs, bs_str_writer_end(bs, start)));
+    return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
 }
 
 static Bs_Value str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
@@ -401,12 +445,15 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     {
         Bs_Table *io = bs_table_new(bs);
         bs_table_set_fn(bs, io, "open", io_open);
-        bs_table_set_fn(bs, io, "read", io_read);
-        bs_table_set_fn(bs, io, "write", io_write);
-        bs_table_set_fn(bs, io, "flush", io_flush);
         bs_table_set_fn(bs, io, "close", io_close);
+        bs_table_set_fn(bs, io, "read", io_read);
+        bs_table_set_fn(bs, io, "flush", io_flush);
+
+        bs_table_set_fn(bs, io, "write", io_write);
         bs_table_set_fn(bs, io, "print", io_print);
         bs_table_set_fn(bs, io, "eprint", io_eprint);
+
+        bs_table_set_fn(bs, io, "writeln", io_writeln);
         bs_table_set_fn(bs, io, "println", io_println);
         bs_table_set_fn(bs, io, "eprintln", io_eprintln);
 

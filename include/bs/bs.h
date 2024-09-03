@@ -2,6 +2,7 @@
 #define BS_H
 
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -14,15 +15,19 @@ Bs *bs_new(void);
 void bs_free(Bs *bs);
 void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size);
 
-Bs_Writer *bs_str_writer_init(Bs *bs, size_t *start);
-Bs_Sv bs_str_writer_end(Bs *bs, size_t start);
+// Helpers
+typedef struct Bs_Buffer Bs_Buffer;
 
-void bs_str_writer_push(Bs *bs, char ch);
-size_t bs_str_writer_pos(Bs *bs);
-const char *bs_str_writer_get(Bs *bs, size_t pos);
+void bs_file_write(Bs_Writer *w, Bs_Sv sv);
+void bs_buffer_write(Bs_Writer *writer, Bs_Sv sv);
+Bs_Sv bs_buffer_reset(Bs_Buffer *buffer, size_t pos);
 
-Bs_Writer *bs_stdout_writer(Bs *bs);
-Bs_Writer *bs_stderr_writer(Bs *bs);
+Bs_Writer bs_file_writer(FILE *file);
+Bs_Writer bs_buffer_writer(Bs_Buffer *buffer);
+
+Bs_Writer *bs_stdout_get(Bs *bs);
+Bs_Writer *bs_stderr_get(Bs *bs);
+Bs_Buffer *bs_buffer_get(Bs *bs);
 
 Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size);
 Bs_Str *bs_str_const(Bs *bs, Bs_Sv sv);
@@ -104,5 +109,16 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step);
             (l)->count += (c);                                                                     \
         }                                                                                          \
     } while (0)
+
+// Buffer
+struct Bs_Buffer {
+    Bs *bs;
+    char *data;
+    size_t count;
+    size_t capacity;
+};
+
+#define bs_buffer_free bs_da_free
+#define bs_buffer_push bs_da_push
 
 #endif // BS_H

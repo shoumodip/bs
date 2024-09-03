@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,10 +22,15 @@ bool bs_sv_suffix(Bs_Sv a, Bs_Sv b) {
 }
 
 void bs_fmt(Bs_Writer *w, const char *fmt, ...) {
+    static char bs_fmt_buffer[1024];
+
     va_list args;
     va_start(args, fmt);
-    w->fmt(w, fmt, args);
+    const int count = vsnprintf(bs_fmt_buffer, sizeof(bs_fmt_buffer), fmt, args);
+    assert(count >= 0 && count + 1 < sizeof(bs_fmt_buffer));
     va_end(args);
+
+    w->write(w, bs_sv_from_parts(bs_fmt_buffer, count));
 }
 
 char *bs_read_file(const char *path, size_t *size) {

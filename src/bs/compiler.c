@@ -185,43 +185,44 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         break;
 
     case BS_TOKEN_STR: {
-        const size_t start = bs_str_writer_pos(c->bs);
-        {
-            for (size_t i = 1; i + 1 < token.sv.size; i++) {
-                char ch = token.sv.data[i];
-                if (ch == '\\') {
-                    switch (token.sv.data[++i]) {
-                    case 'n':
-                        ch = '\n';
-                        break;
+        Bs_Buffer *b = bs_buffer_get(c->bs);
+        const size_t start = b->count;
 
-                    case 't':
-                        ch = '\t';
-                        break;
+        Bs_Writer w = bs_buffer_writer(b);
+        for (size_t i = 1; i + 1 < token.sv.size; i++) {
+            char ch = token.sv.data[i];
+            if (ch == '\\') {
+                switch (token.sv.data[++i]) {
+                case 'n':
+                    ch = '\n';
+                    break;
 
-                    case '0':
-                        ch = '\0';
-                        break;
+                case 't':
+                    ch = '\t';
+                    break;
 
-                    case '"':
-                        ch = '\"';
-                        break;
+                case '0':
+                    ch = '\0';
+                    break;
 
-                    case '\\':
-                        ch = '\\';
-                        break;
-                    }
+                case '"':
+                    ch = '\"';
+                    break;
+
+                case '\\':
+                    ch = '\\';
+                    break;
                 }
-
-                bs_str_writer_push(c->bs, ch);
             }
+
+            bs_buffer_push(c->bs, b, ch);
         }
 
         bs_chunk_push_op_value(
             c->bs,
             c->chunk,
             BS_OP_CONST,
-            bs_value_object(bs_str_const(c->bs, bs_str_writer_end(c->bs, start))));
+            bs_value_object(bs_str_const(c->bs, bs_buffer_reset(b, start))));
     } break;
 
     case BS_TOKEN_NUM:
@@ -785,7 +786,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
 Bs_Fn *bs_compile(Bs *bs, const char *path, Bs_Sv input) {
     Bs_Compiler compiler = {
         .bs = bs,
-        .lexer = bs_lexer_new(path, input, bs_stderr_writer(bs)),
+        .lexer = bs_lexer_new(path, input, bs_stderr_get(bs)),
     };
 
     const Bs_Sv path_sv = bs_sv_from_cstr(path);

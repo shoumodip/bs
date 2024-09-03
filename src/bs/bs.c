@@ -1,5 +1,4 @@
 #include <dlfcn.h>
-#include <stdio.h>
 
 #include "bs/compiler.h"
 #include "bs/debug.h"
@@ -24,51 +23,6 @@ typedef struct {
 
 #define bs_frames_free bs_da_free
 #define bs_frames_push bs_da_push
-
-typedef struct {
-    Bs_Writer meta;
-
-    Bs *bs;
-    char *data;
-    size_t count;
-    size_t capacity;
-} Bs_Str_Writer;
-
-#define bs_str_writer_free bs_da_free
-
-static void bs_str_writer_fmt(Bs_Writer *w, const char *fmt, va_list args) {
-    Bs_Str_Writer *w1 = (Bs_Str_Writer *)w;
-
-    int count = 0;
-    {
-        va_list copy;
-        va_copy(copy, args);
-        count = vsnprintf(NULL, 0, fmt, copy);
-        assert(count >= 0);
-        va_end(copy);
-    }
-
-    bs_da_push_many(w1->bs, w1, NULL, count + 1);
-    {
-        va_list copy;
-        va_copy(copy, args);
-        vsnprintf(w1->data + w1->count, count + 1, fmt, copy);
-        va_end(copy);
-    }
-    w1->count += count;
-}
-
-typedef struct {
-    Bs_Writer meta;
-    FILE *file;
-} Bs_File_Writer;
-
-static void bs_file_writer_fmt(Bs_Writer *w, const char *fmt, va_list args) {
-    va_list copy;
-    va_copy(copy, args);
-    vfprintf(((Bs_File_Writer *)w)->file, fmt, copy);
-    va_end(copy);
-}
 
 typedef struct {
     bool done;
@@ -113,17 +67,18 @@ struct Bs {
     size_t gc_bytes;
     Bs_Object *objects;
 
-    Bs_Str_Writer str_writer;
-    Bs_Str_Writer paths_writer;
-    Bs_File_Writer stdout_writer;
-    Bs_File_Writer stderr_writer;
+    Bs_Buffer paths;
+    Bs_Buffer buffer;
+
+    Bs_Writer error;
+    Bs_Writer output;
 };
 
 // Garbage collector
 static_assert(BS_COUNT_OBJECTS == 9, "Update bs_free_object()");
 static void bs_free_object(Bs *bs, Bs_Object *object) {
 #ifdef BS_GC_DEBUG_LOG
-    bs_fmt(bs_stdout_writer(bs), "[GC] Free %p; Type: %d\n", object, object->type);
+    bs_fmt(bs_stdout_get(bs), "[GC] Free %p; Type: %d\n", object, object->type);
 #endif // BS_GC_DEBUG_LOG
 
     switch (object->type) {
@@ -192,7 +147,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
     object->marked = true;
 
 #ifdef BS_GC_DEBUG_LOG
-    Bs_Writer *w = bs_stdout_writer(bs);
+    Bs_Writer *w = bs_stdout_get(bs);
     bs_fmt(w, "[GC] Mark %p ", object);
     bs_value_write(w, bs_value_object(object));
     bs_fmt(w, "\n");
@@ -277,7 +232,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
 
 static void bs_collect(Bs *bs) {
 #ifdef BS_GC_DEBUG_LOG
-    Bs_Writer *w = bs_stdout_writer(bs);
+    Bs_Writer *w = bs_stdout_get(bs);
     bs_fmt(w, "\n-------- GC Begin --------\n");
     const size_t before = bs->gc_bytes;
 #endif // BS_GC_DEBUG_LOG
@@ -354,10 +309,11 @@ Bs *bs_new(void) {
     Bs *bs = calloc(1, sizeof(Bs));
     bs->gc_max = 1024 * 1024;
 
-    bs->str_writer = (Bs_Str_Writer){.meta.fmt = bs_str_writer_fmt, .bs = bs};
-    bs->paths_writer = (Bs_Str_Writer){.meta.fmt = bs_str_writer_fmt, .bs = bs};
-    bs->stdout_writer = (Bs_File_Writer){.meta.fmt = bs_file_writer_fmt, .file = stdout};
-    bs->stderr_writer = (Bs_File_Writer){.meta.fmt = bs_file_writer_fmt, .file = stderr};
+    bs->paths.bs = bs;
+    bs->buffer.bs = bs;
+
+    bs->error = (Bs_Writer){stderr, bs_file_write};
+    bs->output = (Bs_Writer){stdout, bs_file_write};
 
     bs->globals.meta.type = BS_OBJECT_TABLE;
     return bs;
@@ -380,8 +336,8 @@ void bs_free(Bs *bs) {
         object = next;
     }
 
-    bs_str_writer_free(bs, &bs->str_writer);
-    bs_str_writer_free(bs, &bs->paths_writer);
+    bs_buffer_free(bs, &bs->paths);
+    bs_buffer_free(bs, &bs->buffer);
     free(bs);
 }
 
@@ -407,35 +363,39 @@ void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size) {
 }
 
 // Helpers
-Bs_Writer *bs_str_writer_init(Bs *bs, size_t *start) {
-    *start = bs->str_writer.count;
-    return (Bs_Writer *)&bs->str_writer;
+void bs_file_write(Bs_Writer *w, Bs_Sv sv) {
+    fwrite(sv.data, sv.size, 1, w->data);
 }
 
-Bs_Sv bs_str_writer_end(Bs *bs, size_t start) {
-    const Bs_Sv sv = {bs->str_writer.data + start, bs->str_writer.count - start};
-    bs->str_writer.count = start;
+void bs_buffer_write(Bs_Writer *w, Bs_Sv sv) {
+    Bs_Buffer *b = w->data;
+    bs_da_push_many(b->bs, b, sv.data, sv.size);
+}
+
+Bs_Sv bs_buffer_reset(Bs_Buffer *b, size_t pos) {
+    const Bs_Sv sv = {b->data + pos, b->count - pos};
+    b->count = pos;
     return sv;
 }
 
-void bs_str_writer_push(Bs *bs, char ch) {
-    bs_da_push(bs, &bs->str_writer, ch);
+Bs_Writer bs_file_writer(FILE *file) {
+    return (Bs_Writer){file, bs_file_write};
 }
 
-size_t bs_str_writer_pos(Bs *bs) {
-    return bs->str_writer.count;
+Bs_Writer bs_buffer_writer(Bs_Buffer *buffer) {
+    return (Bs_Writer){buffer, bs_buffer_write};
 }
 
-const char *bs_str_writer_get(Bs *bs, size_t pos) {
-    return bs->str_writer.data + pos;
+Bs_Writer *bs_stdout_get(Bs *bs) {
+    return &bs->output;
 }
 
-Bs_Writer *bs_stdout_writer(Bs *bs) {
-    return (Bs_Writer *)&bs->stdout_writer;
+Bs_Writer *bs_stderr_get(Bs *bs) {
+    return &bs->error;
 }
 
-Bs_Writer *bs_stderr_writer(Bs *bs) {
-    return (Bs_Writer *)&bs->stderr_writer;
+Bs_Buffer *bs_buffer_get(Bs *bs) {
+    return &bs->buffer;
 }
 
 Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size) {
@@ -446,7 +406,7 @@ Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size) {
     bs->objects = object;
 
 #ifdef BS_GC_DEBUG_LOG
-    bs_fmt(bs_stdout_writer(bs), "[GC] Allocate %p (%zu bytes); Type: %d\n", object, size, type);
+    bs_fmt(bs_stdout_get(bs), "[GC] Allocate %p (%zu bytes); Type: %d\n", object, size, type);
 #endif // BS_GC_DEBUG_LOG
 
     return object;
@@ -479,16 +439,35 @@ static Bs_Loc bs_chunk_get_loc(const Bs_Chunk *c, size_t op_index) {
 }
 
 void bs_error(Bs *bs, const char *fmt, ...) {
-    Bs_Writer *w = bs_stderr_writer(bs);
+    Bs_Writer *w = bs_stderr_get(bs);
 
     Bs_Loc loc = bs_chunk_get_loc(
         &bs->frame->closure->fn->chunk, bs->frame->ip - bs->frame->closure->fn->chunk.data);
     bs_fmt(w, Bs_Loc_Fmt "error: ", Bs_Loc_Arg(loc));
     {
-        va_list args;
-        va_start(args, fmt);
-        w->fmt(w, fmt, args);
-        va_end(args);
+        Bs_Buffer *b = bs_buffer_get(bs);
+        const size_t start = b->count;
+
+        int count;
+        {
+            va_list args;
+            va_start(args, fmt);
+            count = vsnprintf(NULL, 0, fmt, args);
+            assert(count >= 0);
+            va_end(args);
+        }
+
+        bs_da_push_many(b->bs, b, NULL, count + 1);
+        {
+            va_list args;
+            va_start(args, fmt);
+            vsnprintf(b->data + b->count, count + 1, fmt, args);
+            va_end(args);
+        }
+        b->count += count;
+
+        Bs_Writer *w = bs_stderr_get(bs);
+        w->write(w, bs_buffer_reset(b, start));
     }
 
     if (fmt[strlen(fmt) - 1] != '\n' || bs->frames.count > 1) {
@@ -736,7 +715,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
         }
 
         if (step) {
-            bs_debug_chunk(bs_stdout_writer(bs), &fn->chunk);
+            bs_debug_chunk(bs_stdout_get(bs), &fn->chunk);
         }
 
         bs_da_push(bs, &bs->modules, (Bs_Module){.name = fn->name});
@@ -750,7 +729,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
     bs->gc_on = true;
     while (true) {
         if (step) {
-            Bs_Writer *w = bs_stdout_writer(bs);
+            Bs_Writer *w = bs_stdout_get(bs);
             bs_fmt(w, "\n----------------------------------------\n");
             bs_fmt(w, "Stack:\n");
             for (size_t i = 0; i < bs->stack.count; i++) {
@@ -1001,15 +980,17 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             const bool gc_on = bs->gc_on;
             bs->gc_on = false;
 
-            size_t start;
-            Bs_Writer *w = bs_str_writer_init(bs, &start);
+            Bs_Buffer *buffer = bs_buffer_get(bs);
+            const size_t start = buffer->count;
 
             const Bs_Value b = bs_stack_pop(bs);
             const Bs_Value a = bs_stack_pop(bs);
-            bs_value_write(w, a);
-            bs_value_write(w, b);
 
-            const Bs_Sv sv = bs_str_writer_end(bs, start);
+            Bs_Writer w = bs_buffer_writer(buffer);
+            bs_value_write(&w, a);
+            bs_value_write(&w, b);
+
+            const Bs_Sv sv = bs_buffer_reset(buffer, start);
             bs_stack_push(bs, bs_value_object(bs_str_new(bs, sv)));
 
             bs->gc_on = gc_on;
@@ -1040,11 +1021,15 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                 const bool gc_on = bs->gc_on;
                 bs->gc_on = false;
 
-                bs_value_write((Bs_Writer *)&bs->paths_writer, a);
-                bs->paths_writer.count++; // Account for the NULL terminator
-                const char *path = bs->paths_writer.data + bs->paths_writer.count - name->size - 1;
+                Bs_Buffer *b = &bs->paths;
+                Bs_Writer w = bs_buffer_writer(b);
 
-                if (bs_sv_suffix(bs_sv_from_parts(name->data, name->size), Bs_Sv_Static(".so"))) {
+                const Bs_Sv name_sv = bs_sv_from_parts(name->data, name->size);
+                bs_buffer_write(&w, name_sv);
+                bs_buffer_push(b->bs, b, '\0');
+
+                const char *path = b->data + b->count - name->size - 1;
+                if (bs_sv_suffix(name_sv, Bs_Sv_Static(".so"))) {
                     void *data = dlopen(path, RTLD_NOW);
                     if (!data) {
                         bs_error(bs, "could not load library '%s': %s", path, dlerror());
@@ -1312,7 +1297,6 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             const size_t offset = bs_chunk_read_int(bs);
 
             const Bs_Value key = bs_stack_peek(bs, 3);
-            const Bs_Value value = bs_stack_peek(bs, 2);
             const Bs_Value iterator = bs_stack_peek(bs, 1);
             const Bs_Value container = bs_stack_peek(bs, 0);
 
@@ -1368,7 +1352,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
 
         default:
             bs_fmt(
-                bs_stderr_writer(bs),
+                bs_stderr_get(bs),
                 "error: invalid op %d at offset %zu\n",
                 op,
                 bs->frame->ip - bs->frame->closure->fn->chunk.data - 1);
@@ -1387,7 +1371,7 @@ defer:
     bs->gc_on = false;
 
     if (step) {
-        bs_fmt(bs_stdout_writer(bs), "Stopping BS with exit code %d\n", result);
+        bs_fmt(bs_stdout_get(bs), "Stopping BS with exit code %d\n", result);
     }
     return result;
 }
