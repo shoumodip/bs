@@ -164,74 +164,6 @@ void bs_value_write(Bs_Writer *w, Bs_Value v) {
     }
 }
 
-static_assert(BS_COUNT_OBJECTS == 9, "Update bs_object_equal()");
-static bool bs_object_equal(const Bs_Object *a, const Bs_Object *b) {
-    if (a->type != b->type) {
-        return false;
-    }
-
-    switch (a->type) {
-    case BS_OBJECT_STR: {
-        const Bs_Str *a1 = (const Bs_Str *)a;
-        const Bs_Str *b1 = (const Bs_Str *)b;
-        return bs_str_eq(a1, b1);
-    };
-
-    case BS_OBJECT_ARRAY: {
-        const Bs_Array *a1 = (const Bs_Array *)a;
-        const Bs_Array *b1 = (const Bs_Array *)b;
-
-        if (a1->count != b1->count) {
-            return false;
-        }
-
-        for (size_t i = 0; i < a1->count; i++) {
-            if (!bs_value_equal(a1->data[i], b1->data[i])) {
-                return false;
-            }
-        }
-
-        return true;
-    } break;
-
-    case BS_OBJECT_TABLE: {
-        const Bs_Table *a1 = (const Bs_Table *)a;
-        const Bs_Table *b1 = (const Bs_Table *)b;
-
-        if (a1->real_count != b1->real_count) {
-            return false;
-        }
-
-        for (size_t i = 0; i < a1->capacity; i++) {
-            const Bs_Entry *a2 = &a1->data[i];
-            if (!a2->key) {
-                continue;
-            }
-
-            const Bs_Entry *b2 = bs_entries_find_str(b1->data, b1->capacity, a2->key);
-            if (!b2->key) {
-                return false;
-            }
-        }
-
-        return true;
-    } break;
-
-    case BS_OBJECT_CLOSURE:
-        return a == b;
-
-    case BS_OBJECT_C_FN:
-        return ((const Bs_C_Fn *)a)->fn == ((const Bs_C_Fn *)b)->fn;
-
-    case BS_OBJECT_C_LIB:
-    case BS_OBJECT_C_DATA:
-        return a == b;
-
-    default:
-        assert(false && "unreachable");
-    }
-}
-
 bool bs_value_equal(Bs_Value a, Bs_Value b) {
     if (a.type != b.type) {
         return false;
@@ -248,7 +180,15 @@ bool bs_value_equal(Bs_Value a, Bs_Value b) {
         return a.as.boolean == b.as.boolean;
 
     case BS_VALUE_OBJECT:
-        return bs_object_equal(a.as.object, b.as.object);
+        if (a.as.object->type != b.as.object->type) {
+            return false;
+        }
+
+        if (a.as.object->type == BS_OBJECT_STR) {
+            return bs_str_eq((const Bs_Str *)a.as.object, (const Bs_Str *)b.as.object);
+        }
+
+        return a.as.object == b.as.object;
 
     default:
         assert(false && "unreachable");

@@ -964,7 +964,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                 break;
 
             case BS_OBJECT_TABLE:
-                size = ((Bs_Table *)a.as.object)->real_count;
+                size = ((Bs_Table *)a.as.object)->length;
                 break;
 
             default:

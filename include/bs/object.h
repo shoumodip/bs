@@ -98,8 +98,8 @@ struct Bs_Table {
     Bs_Object meta;
     Bs_Entry *data;
     size_t count;
+    size_t length;
     size_t capacity;
-    size_t real_count;
 };
 
 Bs_Table *bs_table_new(Bs *bs);

@@ -58,6 +58,11 @@ bool bs_str_eq(const Bs_Str *a, const Bs_Str *b) {
     if (!a || !b) {
         return false;
     }
+
+    if (a == b) {
+        return true;
+    }
+
     return a->size == b->size && !memcmp(a->data, b->data, b->size);
 }
 
@@ -106,8 +111,8 @@ Bs_Table *bs_table_new(Bs *bs) {
     Bs_Table *table = (Bs_Table *)bs_object_new(bs, BS_OBJECT_TABLE, sizeof(Bs_Table));
     table->data = NULL;
     table->count = 0;
+    table->length = 0;
     table->capacity = 0;
-    table->real_count = 0;
     return table;
 }
 
@@ -132,7 +137,7 @@ bool bs_table_remove(Bs *bs, Bs_Table *t, Bs_Str *key) {
         return false;
     }
 
-    t->real_count--;
+    t->length--;
     entry->key = NULL;
     entry->value = bs_value_bool(true);
     return true;
@@ -186,7 +191,7 @@ bool bs_table_set(Bs *bs, Bs_Table *t, Bs_Str *key, Bs_Value value) {
     bool is_new = !entry->key;
     if (is_new && entry->value.type == BS_VALUE_NIL) {
         t->count++;
-        t->real_count++;
+        t->length++;
     }
 
     entry->key = key;
