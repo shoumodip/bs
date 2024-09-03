@@ -123,7 +123,7 @@ bool bs_table_remove(Bs *bs, Bs_Table *t, Bs_Str *key) {
         return false;
     }
 
-    Entry *entry = bs_entries_find_str(t->data, t->capacity, key);
+    Bs_Entry *entry = bs_entries_find_str(t->data, t->capacity, key);
     if (!entry) {
         return false;
     }
@@ -143,7 +143,7 @@ bool bs_table_get(Bs *bs, Bs_Table *t, Bs_Str *key, Bs_Value *value) {
         return false;
     }
 
-    Entry *entry = bs_entries_find_str(t->data, t->capacity, key);
+    Bs_Entry *entry = bs_entries_find_str(t->data, t->capacity, key);
     if (!entry->key) {
         return false;
     }
@@ -153,19 +153,19 @@ bool bs_table_get(Bs *bs, Bs_Table *t, Bs_Str *key, Bs_Value *value) {
 }
 
 static void bs_table_grow(Bs *bs, Bs_Table *t, size_t capacity) {
-    const size_t size = sizeof(Entry) * capacity;
+    const size_t size = sizeof(Bs_Entry) * capacity;
 
-    Entry *entries = bs_realloc(bs, NULL, 0, size);
+    Bs_Entry *entries = bs_realloc(bs, NULL, 0, size);
     memset(entries, 0, size);
 
     size_t count = 0;
     for (size_t i = 0; i < t->capacity; i++) {
-        Entry *src = &t->data[i];
+        Bs_Entry *src = &t->data[i];
         if (!src->key) {
             continue;
         }
 
-        Entry *dst = bs_entries_find_str(entries, capacity, src->key);
+        Bs_Entry *dst = bs_entries_find_str(entries, capacity, src->key);
         dst->key = src->key;
         dst->value = src->value;
         count++;
@@ -181,7 +181,7 @@ bool bs_table_set(Bs *bs, Bs_Table *t, Bs_Str *key, Bs_Value value) {
     if (t->count >= t->capacity * BS_TABLE_MAX_LOAD) {
         bs_table_grow(bs, t, t->capacity ? t->capacity * 2 : BS_DA_INIT_CAP);
     }
-    Entry *entry = bs_entries_find_str(t->data, t->capacity, key);
+    Bs_Entry *entry = bs_entries_find_str(t->data, t->capacity, key);
 
     bool is_new = !entry->key;
     if (is_new && entry->value.type == BS_VALUE_NIL) {

@@ -228,7 +228,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
         Bs_Table *table = (Bs_Table *)object;
 
         for (size_t i = 0; i < table->capacity; i++) {
-            Entry *entry = &table->data[i];
+            Bs_Entry *entry = &table->data[i];
             bs_mark_object(bs, (Bs_Object *)entry->key);
 
             if (entry->value.type == BS_VALUE_OBJECT) {
@@ -453,7 +453,7 @@ Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size) {
 }
 
 Bs_Str *bs_str_const(Bs *bs, Bs_Sv sv) {
-    Entry *entry = bs_entries_find_sv(bs->strings.data, bs->strings.capacity, sv, NULL);
+    Bs_Entry *entry = bs_entries_find_sv(bs->strings.data, bs->strings.capacity, sv, NULL);
     if (entry && entry->key) {
         return entry->key;
     }
@@ -604,6 +604,10 @@ static Bs_Value bs_stack_peek(Bs *bs, size_t offset) {
     return bs->stack.data[bs->stack.count - offset - 1];
 }
 
+static void bs_stack_set(Bs *bs, size_t offset, Bs_Value value) {
+    bs->stack.data[bs->stack.count - offset - 1] = value;
+}
+
 static size_t bs_chunk_read_int(Bs *bs) {
     const size_t index = *(size_t *)bs->frame->ip;
     bs->frame->ip += sizeof(index);
@@ -718,7 +722,7 @@ static void bs_close_upvalues(Bs *bs, size_t index) {
 }
 
 // Interpreter
-static_assert(BS_COUNT_OPS == 39, "Update bs_run()");
+static_assert(BS_COUNT_OPS == 40, "Update bs_run()");
 int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
     int result = 0;
 
@@ -726,6 +730,10 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
         Bs_Fn *fn = bs_compile(bs, path, input);
         if (!fn) {
             bs_return_defer(1);
+        }
+
+        if (step) {
+            bs_debug_chunk(bs_stdout_writer(bs), &fn->chunk);
         }
 
         bs_da_push(bs, &bs->modules, (Bs_Module){.name = fn->name});
@@ -740,6 +748,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
     while (true) {
         if (step) {
             Bs_Writer *w = bs_stdout_writer(bs);
+            bs_fmt(w, "\n----------------------------------------\n");
             bs_fmt(w, "Stack:\n");
             for (size_t i = 0; i < bs->stack.count; i++) {
                 bs_fmt(w, "    ");
@@ -1294,6 +1303,64 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             const size_t offset = bs_chunk_read_int(bs);
             if (!bs_value_is_falsey(bs_stack_peek(bs, 0))) {
                 bs->frame->ip += offset;
+            }
+        } break;
+
+        case BS_OP_ITER: {
+            const size_t offset = bs_chunk_read_int(bs);
+
+            const Bs_Value key = bs_stack_peek(bs, 3);
+            const Bs_Value value = bs_stack_peek(bs, 2);
+            const Bs_Value iterator = bs_stack_peek(bs, 1);
+            const Bs_Value container = bs_stack_peek(bs, 0);
+
+            if (container.type != BS_VALUE_OBJECT) {
+                bs_error(bs, "cannot iterate over %s value", bs_value_type_name(container));
+                bs_return_defer(1);
+            }
+
+            if (container.as.object->type == BS_OBJECT_ARRAY) {
+                const Bs_Array *array = (const Bs_Array *)container.as.object;
+
+                size_t index;
+                if (iterator.type == BS_VALUE_NIL) {
+                    index = 0;
+                } else {
+                    index = iterator.as.number + 1;
+                }
+
+                if (index >= array->count) {
+                    bs->frame->ip += offset;
+                } else {
+                    bs_stack_set(bs, 3, bs_value_num(index)); // Key
+                    bs_stack_set(bs, 2, array->data[index]);  // Value
+                    bs_stack_set(bs, 1, bs_value_num(index)); // Iterator
+                }
+            } else if (container.as.object->type == BS_OBJECT_TABLE) {
+                const Bs_Table *table = (const Bs_Table *)container.as.object;
+
+                size_t index;
+                if (key.type == BS_VALUE_NIL) {
+                    index = 0;
+                } else {
+                    index = iterator.as.number + 1;
+                }
+
+                while (index < table->capacity && !table->data[index].key) {
+                    index++;
+                }
+
+                if (index >= table->capacity) {
+                    bs->frame->ip += offset;
+                } else {
+                    const Bs_Entry entry = table->data[index];
+                    bs_stack_set(bs, 3, bs_value_object(entry.key)); // Key
+                    bs_stack_set(bs, 2, entry.value);                // Value
+                    bs_stack_set(bs, 1, bs_value_num(index));        // Iterator
+                }
+            } else {
+                bs_error(bs, "cannot iterate over %s value", bs_value_type_name(container));
+                bs_return_defer(1);
             }
         } break;
 

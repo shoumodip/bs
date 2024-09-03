@@ -56,6 +56,7 @@ typedef enum {
 
     BS_TOKEN_IF,
     BS_TOKEN_ELSE,
+    BS_TOKEN_IN,
     BS_TOKEN_FOR,
     BS_TOKEN_WHILE,
 

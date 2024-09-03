@@ -4,35 +4,35 @@
 #include "bs/lexer.h"
 
 typedef enum {
-    POWER_NIL,
-    POWER_SET,
-    POWER_AND,
-    POWER_CMP,
-    POWER_ADD,
-    POWER_MUL,
-    POWER_PRE,
-    POWER_DOT,
+    BS_POWER_NIL,
+    BS_POWER_SET,
+    BS_POWER_AND,
+    BS_POWER_CMP,
+    BS_POWER_ADD,
+    BS_POWER_MUL,
+    BS_POWER_PRE,
+    BS_POWER_DOT,
 } Bs_Power;
 
-static_assert(BS_COUNT_TOKENS == 41, "Update bs_token_type_power()");
+static_assert(BS_COUNT_TOKENS == 42, "Update bs_token_type_power()");
 static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_DOT:
     case BS_TOKEN_LPAREN:
     case BS_TOKEN_LBRACKET:
-        return POWER_DOT;
+        return BS_POWER_DOT;
 
     case BS_TOKEN_ADD:
     case BS_TOKEN_SUB:
-        return POWER_ADD;
+        return BS_POWER_ADD;
 
     case BS_TOKEN_MUL:
     case BS_TOKEN_DIV:
-        return POWER_MUL;
+        return BS_POWER_MUL;
 
     case BS_TOKEN_OR:
     case BS_TOKEN_AND:
-        return POWER_AND;
+        return BS_POWER_AND;
 
     case BS_TOKEN_GT:
     case BS_TOKEN_GE:
@@ -40,16 +40,16 @@ static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     case BS_TOKEN_LE:
     case BS_TOKEN_EQ:
     case BS_TOKEN_NE:
-        return POWER_CMP;
+        return BS_POWER_CMP;
 
     case BS_TOKEN_JOIN:
-        return POWER_ADD;
+        return BS_POWER_ADD;
 
     case BS_TOKEN_SET:
-        return POWER_SET;
+        return BS_POWER_SET;
 
     default:
-        return POWER_NIL;
+        return BS_POWER_NIL;
     }
 }
 
@@ -174,7 +174,7 @@ static void bs_compile_error_unexpected(Bs_Compiler *c, const Bs_Token *token) {
 
 static void bs_compile_lambda(Bs_Compiler *c, const Bs_Token *name);
 
-static_assert(BS_COUNT_TOKENS == 41, "Update bs_compile_expr()");
+static_assert(BS_COUNT_TOKENS == 42, "Update bs_compile_expr()");
 static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
     Bs_Loc loc = token.loc;
@@ -251,7 +251,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     } break;
 
     case BS_TOKEN_LPAREN:
-        bs_compile_expr(c, POWER_SET);
+        bs_compile_expr(c, BS_POWER_SET);
         bs_lexer_expect(&c->lexer, BS_TOKEN_RPAREN);
         break;
 
@@ -264,7 +264,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
             if (token.type == BS_TOKEN_LBRACKET) {
                 c->lexer.peeked = false;
-                bs_compile_expr(c, POWER_SET);
+                bs_compile_expr(c, BS_POWER_SET);
                 bs_lexer_expect(&c->lexer, BS_TOKEN_RBRACKET);
             } else {
                 token = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
@@ -273,7 +273,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             }
 
             bs_lexer_expect(&c->lexer, BS_TOKEN_SET);
-            bs_compile_expr(c, POWER_SET);
+            bs_compile_expr(c, BS_POWER_SET);
 
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_ILIT);
             bs_chunk_push_op_loc(c->bs, c->chunk, loc);
@@ -293,7 +293,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         size_t index = 0;
         while (!bs_lexer_read(&c->lexer, BS_TOKEN_RBRACKET)) {
             bs_chunk_push_op_value(c->bs, c->chunk, BS_OP_CONST, bs_value_num(index));
-            bs_compile_expr(c, POWER_SET);
+            bs_compile_expr(c, BS_POWER_SET);
             index++;
 
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_ILIT);
@@ -308,25 +308,25 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     } break;
 
     case BS_TOKEN_SUB:
-        bs_compile_expr(c, POWER_PRE);
+        bs_compile_expr(c, BS_POWER_PRE);
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_NEG);
         bs_chunk_push_op_loc(c->bs, c->chunk, loc);
         break;
 
     case BS_TOKEN_NOT:
-        bs_compile_expr(c, POWER_PRE);
+        bs_compile_expr(c, BS_POWER_PRE);
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_NOT);
         break;
 
     case BS_TOKEN_LEN:
-        bs_compile_expr(c, POWER_PRE);
+        bs_compile_expr(c, BS_POWER_PRE);
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_LEN);
         bs_chunk_push_op_loc(c->bs, c->chunk, loc);
         break;
 
     case BS_TOKEN_IMPORT:
         bs_lexer_expect(&c->lexer, BS_TOKEN_LPAREN);
-        bs_compile_expr(c, POWER_SET);
+        bs_compile_expr(c, BS_POWER_SET);
         bs_lexer_expect(&c->lexer, BS_TOKEN_RPAREN);
 
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_IMPORT);
@@ -457,7 +457,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
             size_t arity = 0;
             while (!bs_lexer_read(&c->lexer, BS_TOKEN_RPAREN)) {
-                bs_compile_expr(c, POWER_SET);
+                bs_compile_expr(c, BS_POWER_SET);
                 arity++;
 
                 token = bs_lexer_peek(&c->lexer);
@@ -480,7 +480,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
                 bs_compile_error_unexpected(c, &token);
             }
 
-            bs_compile_expr(c, POWER_SET);
+            bs_compile_expr(c, BS_POWER_SET);
             bs_lexer_expect(&c->lexer, BS_TOKEN_RBRACKET);
 
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_IGET);
@@ -626,7 +626,7 @@ static void bs_compile_variable(Bs_Compiler *c, bool public) {
     }
 
     if (bs_lexer_read(&c->lexer, BS_TOKEN_SET)) {
-        bs_compile_expr(c, POWER_SET);
+        bs_compile_expr(c, BS_POWER_SET);
     } else {
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
     }
@@ -640,7 +640,7 @@ static void bs_compile_variable(Bs_Compiler *c, bool public) {
     }
 }
 
-static_assert(BS_COUNT_TOKENS == 41, "Update bs_compile_stmt()");
+static_assert(BS_COUNT_TOKENS == 42, "Update bs_compile_stmt()");
 static void bs_compile_stmt(Bs_Compiler *c) {
     Bs_Token token = bs_lexer_next(&c->lexer);
 
@@ -654,7 +654,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         break;
 
     case BS_TOKEN_IF: {
-        bs_compile_expr(c, POWER_SET);
+        bs_compile_expr(c, BS_POWER_SET);
 
         const size_t then_addr = bs_compile_jump_start(c, BS_OP_ELSE);
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
@@ -676,41 +676,40 @@ static void bs_compile_stmt(Bs_Compiler *c) {
     case BS_TOKEN_FOR: {
         bs_compile_block_init(c);
 
-        token = bs_lexer_peek(&c->lexer);
-        if (token.type == BS_TOKEN_VAR) {
-            bs_compile_stmt(c);
-        } else {
-            bs_compile_expr(c, POWER_NIL);
-            bs_lexer_expect(&c->lexer, BS_TOKEN_EOL);
-        }
+        // Key
+        bs_compile_definition(c, &token, false);
+        bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
 
-        const size_t cond_addr = c->chunk->count;
-        bs_compile_expr(c, POWER_SET);
-        bs_lexer_expect(&c->lexer, BS_TOKEN_EOL);
+        bs_lexer_expect(&c->lexer, BS_TOKEN_COMMA);
 
-        const size_t loop_addr = bs_compile_jump_start(c, BS_OP_ELSE);
-        bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
+        // Value
+        bs_compile_definition(c, &token, false);
+        bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
 
-        const size_t iter_addr = bs_compile_jump_start(c, BS_OP_JUMP);
-        bs_compile_expr(c, POWER_NIL);
-        bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
-        bs_compile_jump_direct(c, BS_OP_JUMP, cond_addr);
-        bs_compile_jump_patch(c, iter_addr);
+        // Iterator
+        bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
+        bs_scope_push(c->bs, c->scope, (Bs_Local){.depth = c->scope->depth});
+
+        // Container
+        token = bs_lexer_expect(&c->lexer, BS_TOKEN_IN);
+        bs_compile_expr(c, BS_POWER_SET);
+        bs_scope_push(c->bs, c->scope, (Bs_Local){.depth = c->scope->depth});
+
+        const size_t loop_addr = bs_compile_jump_start(c, BS_OP_ITER);
+        bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
 
         bs_lexer_buffer(&c->lexer, bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE));
         bs_compile_stmt(c);
-        bs_compile_jump_direct(c, BS_OP_JUMP, iter_addr + 1 + sizeof(size_t));
 
-        bs_compile_jump_direct(c, BS_OP_JUMP, cond_addr);
+        bs_compile_jump_direct(c, BS_OP_JUMP, loop_addr);
         bs_compile_jump_patch(c, loop_addr);
-        bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
 
         bs_compile_block_end(c);
     } break;
 
     case BS_TOKEN_WHILE: {
         const size_t cond_addr = c->chunk->count;
-        bs_compile_expr(c, POWER_SET);
+        bs_compile_expr(c, BS_POWER_SET);
 
         const size_t loop_addr = bs_compile_jump_start(c, BS_OP_ELSE);
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
@@ -768,7 +767,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         if (token.type == BS_TOKEN_EOL) {
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
         } else {
-            bs_compile_expr(c, POWER_SET);
+            bs_compile_expr(c, BS_POWER_SET);
         }
 
         bs_lexer_expect(&c->lexer, BS_TOKEN_EOL);
@@ -777,7 +776,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
 
     default:
         bs_lexer_buffer(&c->lexer, token);
-        bs_compile_expr(c, POWER_NIL);
+        bs_compile_expr(c, BS_POWER_NIL);
         bs_lexer_expect(&c->lexer, BS_TOKEN_EOL);
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
     }

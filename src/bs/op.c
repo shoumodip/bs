@@ -2,7 +2,7 @@
 
 #include "bs/op.h"
 
-static_assert(BS_COUNT_OPS == 39, "Update bs_op_get_to_set()");
+static_assert(BS_COUNT_OPS == 40, "Update bs_op_get_to_set()");
 Bs_Op bs_op_get_to_set(Bs_Op op) {
     switch (op) {
     case BS_OP_GGET:

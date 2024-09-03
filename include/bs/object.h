@@ -92,11 +92,11 @@ void bs_array_set(Bs *bs, Bs_Array *array, size_t index, Bs_Value value);
 typedef struct {
     Bs_Str *key;
     Bs_Value value;
-} Entry;
+} Bs_Entry;
 
 struct Bs_Table {
     Bs_Object meta;
-    Entry *data;
+    Bs_Entry *data;
     size_t count;
     size_t capacity;
     size_t real_count;

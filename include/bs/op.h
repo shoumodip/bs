@@ -48,6 +48,7 @@ typedef enum {
     BS_OP_JUMP,
     BS_OP_ELSE,
     BS_OP_THEN,
+    BS_OP_ITER,
     BS_COUNT_OPS,
 } Bs_Op;
 

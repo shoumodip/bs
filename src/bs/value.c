@@ -94,7 +94,7 @@ static void bs_object_write(Bs_Writer *w, const Bs_Object *o) {
 
         bs_fmt(w, "{");
         for (size_t i = 0, count = 0; i < table->capacity; i++) {
-            Entry *entry = &table->data[i];
+            Bs_Entry *entry = &table->data[i];
             if (!entry->key) {
                 continue;
             }
@@ -203,12 +203,12 @@ static bool bs_object_equal(const Bs_Object *a, const Bs_Object *b) {
         }
 
         for (size_t i = 0; i < a1->capacity; i++) {
-            const Entry *a2 = &a1->data[i];
+            const Bs_Entry *a2 = &a1->data[i];
             if (!a2->key) {
                 continue;
             }
 
-            const Entry *b2 = bs_entries_find_str(b1->data, b1->capacity, a2->key);
+            const Bs_Entry *b2 = bs_entries_find_str(b1->data, b1->capacity, a2->key);
             if (!b2->key) {
                 return false;
             }
