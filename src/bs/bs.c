@@ -1129,7 +1129,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             Bs_Str *name = (Bs_Str *)bs_chunk_read_const(bs)->as.object;
 
             if (!bs_table_set(bs, &bs->globals, name, bs_stack_peek(bs, 0))) {
-                bs_error(bs, "redefinition of global variable '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*name));
+                bs_error(bs, "redefinition of global identifier '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*name));
                 bs_return_defer(1);
             }
 
@@ -1141,7 +1141,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
 
             Bs_Value value;
             if (!bs_table_get(bs, &bs->globals, name, &value)) {
-                bs_error(bs, "undefined variable '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*name));
+                bs_error(bs, "undefined identifier '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*name));
                 bs_return_defer(1);
             }
 
@@ -1154,7 +1154,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
 
             if (bs_table_set(bs, &bs->globals, name, value)) {
                 bs_table_remove(bs, &bs->globals, name);
-                bs_error(bs, "undefined variable '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*name));
+                bs_error(bs, "undefined identifier '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*name));
                 bs_return_defer(1);
             }
         } break;
