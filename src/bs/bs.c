@@ -490,7 +490,10 @@ void bs_error(Bs *bs, const char *fmt, ...) {
         w->fmt(w, fmt, args);
         va_end(args);
     }
-    bs_fmt(w, "\n");
+
+    if (fmt[strlen(fmt) - 1] != '\n' || bs->frames.count > 1) {
+        bs_fmt(w, "\n");
+    }
 
     for (size_t i = bs->frames.count; i > 1; i--) {
         const Bs_Frame *callee = &bs->frames.data[i - 1];
@@ -1067,10 +1070,9 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                             "};\n\n"
                             "const size_t bs_exports_count = sizeof(bs_exports) / "
                             "sizeof(*bs_exports);\n"
-                            "```%s",
+                            "```\n",
 
-                            Bs_Sv_Arg(*name),
-                            bs->frames.count > 1 ? "\n" : "");
+                            Bs_Sv_Arg(*name));
 
                         bs_return_defer(1);
                     }

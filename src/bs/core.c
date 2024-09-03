@@ -326,6 +326,53 @@ static Bs_Value str_slice(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, bs_sv_from_parts(str->data + begin, end - begin)));
 }
 
+static Bs_Value str_format(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!arity) {
+        bs_error(bs, "expected at least 1 argument, got 0");
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
+        return bs_value_error;
+    }
+
+    const Bs_Str *fmt = (const Bs_Str *)args[0].as.object;
+
+    size_t count = 0;
+    for (size_t i = 0; i < fmt->size; i++) {
+        if (fmt->data[i] == '$') {
+            if (i + 1 < fmt->size && fmt->data[i + 1] == '$') {
+                i++;
+            } else {
+                count++;
+            }
+        }
+    }
+
+    if (!bs_check_arity(bs, arity, count + 1)) {
+        return bs_value_error;
+    }
+
+    size_t start;
+    Bs_Writer *w = bs_str_writer_init(bs, &start);
+
+    count = 0;
+    for (size_t i = 0; i < fmt->size; i++) {
+        if (fmt->data[i] == '$') {
+            if (i + 1 < fmt->size && fmt->data[i + 1] == '$') {
+                bs_str_writer_push(bs, '$');
+                i++;
+            } else {
+                bs_value_write(w, args[++count]);
+            }
+        } else {
+            bs_str_writer_push(bs, fmt->data[i]);
+        }
+    }
+
+    return bs_value_object(bs_str_new(bs, bs_str_writer_end(bs, start)));
+}
+
 static Bs_Value str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 1)) {
         return bs_value_error;
@@ -403,6 +450,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     {
         Bs_Table *str = bs_table_new(bs);
         bs_table_set_fn(bs, str, "slice", str_slice);
+        bs_table_set_fn(bs, str, "format", str_format);
         bs_table_set_fn(bs, str, "reverse", str_reverse);
         bs_global_set(bs, Bs_Sv_Static("str"), bs_value_object(str));
     }
