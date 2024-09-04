@@ -1,7 +1,7 @@
 #include <stdio.h>
 
+#include "bs/compiler.h"
 #include "bs/core.h"
-#include "bs/object.h"
 
 // IO
 static void file_data_free(Bs *bs, void *data) {
@@ -473,7 +473,7 @@ static void bs_table_add(Bs *bs, Bs_Table *table, const char *name, Bs_Value val
     bs_table_set(bs, table, bs_value_object(bs_str_const(bs, bs_sv_from_cstr(name))), value);
 }
 
-void bs_core_init(Bs *bs, int argc, char **argv) {
+int bs_core_init(Bs *bs, int argc, char **argv) {
     {
         Bs_Table *io = bs_table_new(bs);
         bs_table_add(bs, io, "open", bs_value_object(bs_c_fn_new(bs, io_open)));
@@ -525,4 +525,37 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_table_add(bs, array, "join", bs_value_object(bs_c_fn_new(bs, array_join)));
         bs_global_set(bs, Bs_Sv_Static("array"), bs_value_object(array));
     }
+
+    return bs_run(
+        bs,
+        "",
+        Bs_Sv_Static("array.map = fn (a, f) {"
+                     "    var b = [];"
+                     "    for i, v in a {"
+                     "        b[i] = f(v);"
+                     "    }"
+                     "    return b;"
+                     "};"
+
+                     "array.filter = fn (a, f) {"
+                     "    var b = [];"
+                     "    for i, v in a {"
+                     "        if f(v) {"
+                     "            b[@b] = v;"
+                     "        }"
+                     "    }"
+                     "    return b;"
+                     "};"
+
+                     "array.reduce = fn (a, b, f) {"
+                     "    for i, v in a {"
+                     "        if b == nil {"
+                     "            b = v;"
+                     "        } else {"
+                     "            b = f(b, v);"
+                     "        }"
+                     "    }"
+                     "    return b;"
+                     "};"),
+        false);
 }

@@ -309,6 +309,10 @@ static void bs_collect(Bs *bs) {
 // Interface
 Bs *bs_new(void) {
     Bs *bs = calloc(1, sizeof(Bs));
+    if (!bs) {
+        return NULL;
+    }
+
     bs->gc_max = 1024 * 1024;
 
     bs->paths.bs = bs;
@@ -482,8 +486,11 @@ void bs_error(Bs *bs, const char *fmt, ...) {
         const Bs_Fn *fn = caller->closure->fn;
 
         loc = bs_chunk_get_loc(&fn->chunk, caller->ip - fn->chunk.data);
-        bs_fmt(w, Bs_Loc_Fmt "in ", Bs_Loc_Arg(loc));
+        if (*loc.path == '\0') {
+            continue;
+        }
 
+        bs_fmt(w, Bs_Loc_Fmt "in ", Bs_Loc_Arg(loc));
         bs_value_write(w, bs_value_object(callee->closure->fn));
         bs_fmt(w, "\n");
     }

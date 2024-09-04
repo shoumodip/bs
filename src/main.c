@@ -18,9 +18,17 @@ int main(int argc, char **argv) {
     }
 
     Bs *bs = bs_new();
-    bs_core_init(bs, argc - 1, argv + 1);
+    if (!bs) {
+        fprintf(stderr, "error: could not create BS instance\n");
+        exit(1);
+    }
 
-    const int result = bs_run(bs, path, bs_sv_from_parts(contents, size), false);
+    int result = bs_core_init(bs, argc - 1, argv + 1);
+    if (result) {
+        return result;
+    }
+
+    result = bs_run(bs, path, bs_sv_from_parts(contents, size), false);
 
     bs_free(bs);
     free(contents);
