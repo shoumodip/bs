@@ -435,6 +435,39 @@ static Bs_Value str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(dst);
 }
 
+// Array
+static Bs_Value array_join(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!bs_check_arity(bs, arity, 2)) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1")) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
+        return bs_value_error;
+    }
+
+    Bs_Buffer *b = bs_buffer_get(bs);
+    const size_t start = b->count;
+    {
+        Bs_Writer w = bs_buffer_writer(b);
+
+        const Bs_Array *array = (const Bs_Array *)args[0].as.object;
+        const Bs_Str *str = (const Bs_Str *)args[1].as.object;
+        const Bs_Sv separator = bs_sv_from_parts(str->data, str->size);
+
+        for (size_t i = 0; i < array->count; i++) {
+            if (i) {
+                w.write(&w, separator);
+            }
+            bs_value_write(&w, array->data[i]);
+        }
+    }
+    return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
+}
+
 // Main
 static void bs_table_add(Bs *bs, Bs_Table *table, const char *name, Bs_Value value) {
     bs_table_set(bs, table, bs_value_object(bs_str_const(bs, bs_sv_from_cstr(name))), value);
@@ -485,5 +518,11 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_table_add(bs, str, "format", bs_value_object(bs_c_fn_new(bs, str_format)));
         bs_table_add(bs, str, "reverse", bs_value_object(bs_c_fn_new(bs, str_reverse)));
         bs_global_set(bs, Bs_Sv_Static("str"), bs_value_object(str));
+    }
+
+    {
+        Bs_Table *array = bs_table_new(bs);
+        bs_table_add(bs, array, "join", bs_value_object(bs_c_fn_new(bs, array_join)));
+        bs_global_set(bs, Bs_Sv_Static("array"), bs_value_object(array));
     }
 }
