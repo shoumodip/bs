@@ -95,7 +95,7 @@ static void bs_object_write(Bs_Writer *w, const Bs_Object *o) {
         bs_fmt(w, "{");
         for (size_t i = 0, count = 0; i < table->capacity; i++) {
             Bs_Entry *entry = &table->data[i];
-            if (!entry->key) {
+            if (entry->key.type == BS_VALUE_NIL) {
                 continue;
             }
 
@@ -103,7 +103,7 @@ static void bs_object_write(Bs_Writer *w, const Bs_Object *o) {
                 bs_fmt(w, ", ");
             }
 
-            bs_object_write(w, (const Bs_Object *)entry->key);
+            bs_value_write(w, entry->key);
             bs_fmt(w, " = ");
             bs_value_write(w, entry->value);
             count++;

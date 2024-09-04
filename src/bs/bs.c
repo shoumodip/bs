@@ -184,7 +184,9 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
 
         for (size_t i = 0; i < table->capacity; i++) {
             Bs_Entry *entry = &table->data[i];
-            bs_mark_object(bs, (Bs_Object *)entry->key);
+            if (entry->key.type == BS_VALUE_OBJECT) {
+                bs_mark_object(bs, entry->key.as.object);
+            }
 
             if (entry->value.type == BS_VALUE_OBJECT) {
                 bs_mark_object(bs, entry->value.as.object);
@@ -413,18 +415,18 @@ Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size) {
 }
 
 Bs_Str *bs_str_const(Bs *bs, Bs_Sv sv) {
-    Bs_Entry *entry = bs_entries_find_sv(bs->strings.data, bs->strings.capacity, sv, NULL);
-    if (entry && entry->key) {
-        return entry->key;
+    Bs_Entry *entry = bs_entries_find_sv(bs->strings.data, bs->strings.capacity, sv);
+    if (entry && entry->key.type != BS_VALUE_NIL) {
+        return (Bs_Str *)entry->key.as.object;
     }
 
     Bs_Str *str = bs_str_new(bs, sv);
-    bs_table_set(bs, &bs->strings, str, bs_value_nil);
+    bs_table_set(bs, &bs->strings, bs_value_object(str), bs_value_nil);
     return str;
 }
 
 void bs_global_set(Bs *bs, Bs_Sv name, Bs_Value value) {
-    bs_table_set(bs, &bs->globals, bs_str_const(bs, name), value);
+    bs_table_set(bs, &bs->globals, bs_value_object(bs_str_const(bs, name)), value);
 }
 
 // Errors
@@ -596,8 +598,8 @@ static size_t bs_chunk_read_int(Bs *bs) {
     return index;
 }
 
-static Bs_Value *bs_chunk_read_const(Bs *bs) {
-    return &bs->frame->closure->fn->chunk.constants.data[bs_chunk_read_int(bs)];
+static Bs_Value bs_chunk_read_const(Bs *bs) {
+    return bs->frame->closure->fn->chunk.constants.data[bs_chunk_read_int(bs)];
 }
 
 static bool bs_binary_op(Bs *bs, Bs_Value *a, Bs_Value *b, const char *op) {
@@ -781,7 +783,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
         } break;
 
         case BS_OP_CLOSURE: {
-            Bs_Fn *fn = (Bs_Fn *)bs_chunk_read_const(bs)->as.object;
+            const Bs_Fn *fn = (const Bs_Fn *)bs_chunk_read_const(bs).as.object;
             Bs_Closure *closure = bs_closure_new(bs, fn);
             bs_stack_push(bs, bs_value_object(closure));
 
@@ -827,7 +829,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             break;
 
         case BS_OP_CONST:
-            bs_stack_push(bs, *bs_chunk_read_const(bs));
+            bs_stack_push(bs, bs_chunk_read_const(bs));
             break;
 
         case BS_OP_ADD: {
@@ -1071,7 +1073,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                         if (!bs_table_set(
                                 bs,
                                 &library->functions,
-                                bs_str_const(bs, bs_sv_from_cstr(export.name)),
+                                bs_value_object(bs_str_const(bs, bs_sv_from_cstr(export.name))),
                                 bs_value_object(fn))) {
 
                             bs_error(bs, "redefinition of function '%s' in FFI", export.name);
@@ -1113,10 +1115,14 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
         } break;
 
         case BS_OP_GDEF: {
-            Bs_Str *name = (Bs_Str *)bs_chunk_read_const(bs)->as.object;
+            const Bs_Value name = bs_chunk_read_const(bs);
 
             if (!bs_table_set(bs, &bs->globals, name, bs_stack_peek(bs, 0))) {
-                bs_error(bs, "redefinition of global identifier '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*name));
+                bs_error(
+                    bs,
+                    "redefinition of global identifier '" Bs_Sv_Fmt "'",
+                    Bs_Sv_Arg(*(const Bs_Str *)name.as.object));
+
                 bs_return_defer(1);
             }
 
@@ -1124,11 +1130,15 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
         } break;
 
         case BS_OP_GGET: {
-            Bs_Str *name = (Bs_Str *)bs_chunk_read_const(bs)->as.object;
+            const Bs_Value name = bs_chunk_read_const(bs);
 
             Bs_Value value;
             if (!bs_table_get(bs, &bs->globals, name, &value)) {
-                bs_error(bs, "undefined identifier '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*name));
+                bs_error(
+                    bs,
+                    "undefined identifier '" Bs_Sv_Fmt "'",
+                    Bs_Sv_Arg(*(const Bs_Str *)name.as.object));
+
                 bs_return_defer(1);
             }
 
@@ -1136,12 +1146,17 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
         } break;
 
         case BS_OP_GSET: {
-            Bs_Str *name = (Bs_Str *)bs_chunk_read_const(bs)->as.object;
+            const Bs_Value name = bs_chunk_read_const(bs);
             const Bs_Value value = bs_stack_peek(bs, 0);
 
             if (bs_table_set(bs, &bs->globals, name, value)) {
                 bs_table_remove(bs, &bs->globals, name);
-                bs_error(bs, "undefined identifier '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*name));
+
+                bs_error(
+                    bs,
+                    "undefined identifier '" Bs_Sv_Fmt "'",
+                    Bs_Sv_Arg(*(const Bs_Str *)name.as.object));
+
                 bs_return_defer(1);
             }
         } break;
@@ -1199,12 +1214,17 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                     bs_return_defer(1);
                 }
             } else if (container.as.object->type == BS_OBJECT_TABLE) {
-                if (!bs_check_object_type(bs, index, BS_OBJECT_STR, "table key")) {
+                if (index.type == BS_VALUE_NIL) {
+                    bs_error(bs, "cannot use 'nil' as table key");
                     bs_return_defer(1);
                 }
 
-                Bs_Str *key = (Bs_Str *)index.as.object;
-                if (!bs_table_get(bs, (Bs_Table *)container.as.object, key, &value)) {
+                if (bs_value_equal(container, index)) {
+                    bs_error(bs, "cannot use table itself as key");
+                    bs_return_defer(1);
+                }
+
+                if (!bs_table_get(bs, (Bs_Table *)container.as.object, index, &value)) {
                     value = bs_value_nil;
                 }
             } else if (container.as.object->type == BS_OBJECT_C_LIB) {
@@ -1219,7 +1239,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                 }
 
                 Bs_C_Lib *c = (Bs_C_Lib *)container.as.object;
-                if (!bs_table_get(bs, &c->functions, name, &value)) {
+                if (!bs_table_get(bs, &c->functions, index, &value)) {
                     bs_error(
                         bs,
                         "symbol '" Bs_Sv_Fmt "' doesn't exist in native library '" Bs_Sv_Fmt "'",
@@ -1256,15 +1276,21 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
 
                 bs_array_set(bs, (Bs_Array *)container.as.object, index.as.number, value);
             } else if (container.as.object->type == BS_OBJECT_TABLE) {
-                if (!bs_check_object_type(bs, index, BS_OBJECT_STR, "table key")) {
+                if (index.type == BS_VALUE_NIL) {
+                    bs_error(bs, "cannot use 'nil' as table key");
+                    bs_return_defer(1);
+                }
+
+                if (bs_value_equal(container, index)) {
+                    bs_error(bs, "cannot use table itself as key");
                     bs_return_defer(1);
                 }
 
                 Bs_Table *table = (Bs_Table *)container.as.object;
                 if (value.type == BS_VALUE_NIL) {
-                    bs_table_remove(bs, table, (Bs_Str *)index.as.object);
+                    bs_table_remove(bs, table, index);
                 } else {
-                    bs_table_set(bs, table, (Bs_Str *)index.as.object, value);
+                    bs_table_set(bs, table, index, value);
                 }
             } else {
                 bs_error(
@@ -1332,7 +1358,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                     index = iterator.as.number + 1;
                 }
 
-                while (index < table->capacity && !table->data[index].key) {
+                while (index < table->capacity && table->data[index].key.type == BS_VALUE_NIL) {
                     index++;
                 }
 
@@ -1340,9 +1366,9 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                     bs->frame->ip += offset;
                 } else {
                     const Bs_Entry entry = table->data[index];
-                    bs_stack_set(bs, 3, bs_value_object(entry.key)); // Key
-                    bs_stack_set(bs, 2, entry.value);                // Value
-                    bs_stack_set(bs, 1, bs_value_num(index));        // Iterator
+                    bs_stack_set(bs, 3, entry.key);           // Key
+                    bs_stack_set(bs, 2, entry.value);         // Value
+                    bs_stack_set(bs, 1, bs_value_num(index)); // Iterator
                 }
             } else {
                 bs_error(bs, "cannot iterate over %s value", bs_value_type_name(container));

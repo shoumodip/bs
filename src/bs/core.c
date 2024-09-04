@@ -436,69 +436,54 @@ static Bs_Value str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Main
-static void bs_table_set_fn(Bs *bs, Bs_Table *table, const char *name, Bs_C_Fn_Ptr fn) {
-    bs_table_set(
-        bs, table, bs_str_const(bs, bs_sv_from_cstr(name)), bs_value_object(bs_c_fn_new(bs, fn)));
+static void bs_table_add(Bs *bs, Bs_Table *table, const char *name, Bs_Value value) {
+    bs_table_set(bs, table, bs_value_object(bs_str_const(bs, bs_sv_from_cstr(name))), value);
 }
 
 void bs_core_init(Bs *bs, int argc, char **argv) {
     {
         Bs_Table *io = bs_table_new(bs);
-        bs_table_set_fn(bs, io, "open", io_open);
-        bs_table_set_fn(bs, io, "close", io_close);
-        bs_table_set_fn(bs, io, "read", io_read);
-        bs_table_set_fn(bs, io, "flush", io_flush);
+        bs_table_add(bs, io, "open", bs_value_object(bs_c_fn_new(bs, io_open)));
+        bs_table_add(bs, io, "close", bs_value_object(bs_c_fn_new(bs, io_close)));
+        bs_table_add(bs, io, "read", bs_value_object(bs_c_fn_new(bs, io_read)));
+        bs_table_add(bs, io, "flush", bs_value_object(bs_c_fn_new(bs, io_flush)));
 
-        bs_table_set_fn(bs, io, "write", io_write);
-        bs_table_set_fn(bs, io, "print", io_print);
-        bs_table_set_fn(bs, io, "eprint", io_eprint);
+        bs_table_add(bs, io, "write", bs_value_object(bs_c_fn_new(bs, io_write)));
+        bs_table_add(bs, io, "print", bs_value_object(bs_c_fn_new(bs, io_print)));
+        bs_table_add(bs, io, "eprint", bs_value_object(bs_c_fn_new(bs, io_eprint)));
 
-        bs_table_set_fn(bs, io, "writeln", io_writeln);
-        bs_table_set_fn(bs, io, "println", io_println);
-        bs_table_set_fn(bs, io, "eprintln", io_eprintln);
+        bs_table_add(bs, io, "writeln", bs_value_object(bs_c_fn_new(bs, io_writeln)));
+        bs_table_add(bs, io, "println", bs_value_object(bs_c_fn_new(bs, io_println)));
+        bs_table_add(bs, io, "eprintln", bs_value_object(bs_c_fn_new(bs, io_eprintln)));
 
-        bs_table_set(
-            bs,
-            io,
-            bs_str_const(bs, Bs_Sv_Static("stdin")),
-            bs_value_object(bs_c_data_new(bs, stdin, &file_spec)));
-
-        bs_table_set(
-            bs,
-            io,
-            bs_str_const(bs, Bs_Sv_Static("stdout")),
-            bs_value_object(bs_c_data_new(bs, stdout, &file_spec)));
-
-        bs_table_set(
-            bs,
-            io,
-            bs_str_const(bs, Bs_Sv_Static("stderr")),
-            bs_value_object(bs_c_data_new(bs, stderr, &file_spec)));
+        bs_table_add(bs, io, "stdin", bs_value_object(bs_c_data_new(bs, stdin, &file_spec)));
+        bs_table_add(bs, io, "stdout", bs_value_object(bs_c_data_new(bs, stdout, &file_spec)));
+        bs_table_add(bs, io, "stderr", bs_value_object(bs_c_data_new(bs, stderr, &file_spec)));
 
         bs_global_set(bs, Bs_Sv_Static("io"), bs_value_object(io));
     }
 
     {
         Bs_Table *os = bs_table_new(bs);
-        bs_table_set_fn(bs, os, "exit", os_exit);
-        bs_table_set_fn(bs, os, "getenv", os_getenv);
-        bs_table_set_fn(bs, os, "setenv", os_setenv);
-        bs_table_set_fn(bs, os, "execute", os_execute);
+        bs_table_add(bs, os, "exit", bs_value_object(bs_c_fn_new(bs, os_exit)));
+        bs_table_add(bs, os, "getenv", bs_value_object(bs_c_fn_new(bs, os_getenv)));
+        bs_table_add(bs, os, "setenv", bs_value_object(bs_c_fn_new(bs, os_setenv)));
+        bs_table_add(bs, os, "execute", bs_value_object(bs_c_fn_new(bs, os_execute)));
 
         Bs_Array *args = bs_array_new(bs);
         for (int i = 0; i < argc; i++) {
             bs_array_set(bs, args, i, bs_value_object(bs_str_const(bs, bs_sv_from_cstr(argv[i]))));
         }
-        bs_table_set(bs, os, bs_str_const(bs, Bs_Sv_Static("args")), bs_value_object(args));
+        bs_table_add(bs, os, "args", bs_value_object(args));
 
         bs_global_set(bs, Bs_Sv_Static("os"), bs_value_object(os));
     }
 
     {
         Bs_Table *str = bs_table_new(bs);
-        bs_table_set_fn(bs, str, "slice", str_slice);
-        bs_table_set_fn(bs, str, "format", str_format);
-        bs_table_set_fn(bs, str, "reverse", str_reverse);
+        bs_table_add(bs, str, "slice", bs_value_object(bs_c_fn_new(bs, str_slice)));
+        bs_table_add(bs, str, "format", bs_value_object(bs_c_fn_new(bs, str_format)));
+        bs_table_add(bs, str, "reverse", bs_value_object(bs_c_fn_new(bs, str_reverse)));
         bs_global_set(bs, Bs_Sv_Static("str"), bs_value_object(str));
     }
 }

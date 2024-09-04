@@ -90,7 +90,7 @@ bool bs_array_get(Bs *bs, Bs_Array *array, size_t index, Bs_Value *value);
 void bs_array_set(Bs *bs, Bs_Array *array, size_t index, Bs_Value value);
 
 typedef struct {
-    Bs_Str *key;
+    Bs_Value key;
     Bs_Value value;
 } Bs_Entry;
 
@@ -105,10 +105,10 @@ struct Bs_Table {
 Bs_Table *bs_table_new(Bs *bs);
 
 void bs_table_free(Bs *bs, Bs_Table *table);
-bool bs_table_remove(Bs *bs, Bs_Table *table, Bs_Str *key);
+bool bs_table_remove(Bs *bs, Bs_Table *table, Bs_Value key);
 
-bool bs_table_get(Bs *bs, Bs_Table *table, Bs_Str *key, Bs_Value *value);
-bool bs_table_set(Bs *bs, Bs_Table *table, Bs_Str *key, Bs_Value value);
+bool bs_table_get(Bs *bs, Bs_Table *table, Bs_Value key, Bs_Value *value);
+bool bs_table_set(Bs *bs, Bs_Table *table, Bs_Value key, Bs_Value value);
 
 struct Bs_Closure {
     Bs_Object meta;

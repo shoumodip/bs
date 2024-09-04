@@ -123,33 +123,34 @@ void bs_table_free(Bs *bs, Bs_Table *t) {
     t->capacity = 0;
 }
 
-bool bs_table_remove(Bs *bs, Bs_Table *t, Bs_Str *key) {
+bool bs_table_remove(Bs *bs, Bs_Table *t, Bs_Value key) {
     if (!t->count) {
         return false;
     }
 
-    Bs_Entry *entry = bs_entries_find_str(t->data, t->capacity, key);
+    Bs_Entry *entry = bs_entries_find(t->data, t->capacity, key);
     if (!entry) {
         return false;
     }
 
-    if (!entry->key && entry->value.type == BS_VALUE_BOOL && entry->value.as.boolean == true) {
+    if (entry->key.type == BS_VALUE_NIL && entry->value.type == BS_VALUE_BOOL &&
+        entry->value.as.boolean == true) {
         return false;
     }
 
     t->length--;
-    entry->key = NULL;
+    entry->key = bs_value_nil;
     entry->value = bs_value_bool(true);
     return true;
 }
 
-bool bs_table_get(Bs *bs, Bs_Table *t, Bs_Str *key, Bs_Value *value) {
+bool bs_table_get(Bs *bs, Bs_Table *t, Bs_Value key, Bs_Value *value) {
     if (!t->count) {
         return false;
     }
 
-    Bs_Entry *entry = bs_entries_find_str(t->data, t->capacity, key);
-    if (!entry->key) {
+    Bs_Entry *entry = bs_entries_find(t->data, t->capacity, key);
+    if (entry->key.type == BS_VALUE_NIL) {
         return false;
     }
 
@@ -166,11 +167,11 @@ static void bs_table_grow(Bs *bs, Bs_Table *t, size_t capacity) {
     size_t count = 0;
     for (size_t i = 0; i < t->capacity; i++) {
         Bs_Entry *src = &t->data[i];
-        if (!src->key) {
+        if (src->key.type == BS_VALUE_NIL) {
             continue;
         }
 
-        Bs_Entry *dst = bs_entries_find_str(entries, capacity, src->key);
+        Bs_Entry *dst = bs_entries_find(entries, capacity, src->key);
         dst->key = src->key;
         dst->value = src->value;
         count++;
@@ -182,13 +183,13 @@ static void bs_table_grow(Bs *bs, Bs_Table *t, size_t capacity) {
     t->capacity = capacity;
 }
 
-bool bs_table_set(Bs *bs, Bs_Table *t, Bs_Str *key, Bs_Value value) {
+bool bs_table_set(Bs *bs, Bs_Table *t, Bs_Value key, Bs_Value value) {
     if (t->count >= t->capacity * BS_TABLE_MAX_LOAD) {
         bs_table_grow(bs, t, t->capacity ? t->capacity * 2 : BS_DA_INIT_CAP);
     }
-    Bs_Entry *entry = bs_entries_find_str(t->data, t->capacity, key);
+    Bs_Entry *entry = bs_entries_find(t->data, t->capacity, key);
 
-    bool is_new = !entry->key;
+    bool is_new = entry->key.type == BS_VALUE_NIL;
     if (is_new && entry->value.type == BS_VALUE_NIL) {
         t->count++;
         t->length++;
