@@ -736,7 +736,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
     int result = 0;
 
     {
-        Bs_Fn *fn = bs_compile(bs, path, input);
+        Bs_Fn *fn = bs_compile(bs, path, input, true);
         if (!fn) {
             bs_return_defer(1);
         }
@@ -1121,7 +1121,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                         bs_return_defer(1);
                     }
 
-                    Bs_Fn *fn = bs_compile(bs, path, bs_sv_from_parts(contents, size));
+                    Bs_Fn *fn = bs_compile(bs, path, bs_sv_from_parts(contents, size), false);
                     free(contents);
 
                     if (!fn) {

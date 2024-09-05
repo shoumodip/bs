@@ -64,6 +64,8 @@ typedef enum {
     BS_TOKEN_PUB,
     BS_TOKEN_VAR,
     BS_TOKEN_RETURN,
+
+    BS_TOKEN_IS_MAIN_MODULE,
     BS_COUNT_TOKENS
 } Bs_Token_Type;
 

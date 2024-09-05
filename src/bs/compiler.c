@@ -14,7 +14,7 @@ typedef enum {
     BS_POWER_DOT,
 } Bs_Power;
 
-static_assert(BS_COUNT_TOKENS == 42, "Update bs_token_type_power()");
+static_assert(BS_COUNT_TOKENS == 43, "Update bs_token_type_power()");
 static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_DOT:
@@ -147,6 +147,8 @@ typedef struct {
 
     Bs *bs;
     Bs_Chunk *chunk;
+
+    bool is_main_module;
 } Bs_Compiler;
 
 static size_t bs_compile_jump_start(Bs_Compiler *c, Bs_Op op) {
@@ -174,7 +176,7 @@ static void bs_compile_error_unexpected(Bs_Compiler *c, const Bs_Token *token) {
 
 static void bs_compile_lambda(Bs_Compiler *c, const Bs_Token *name);
 
-static_assert(BS_COUNT_TOKENS == 42, "Update bs_compile_expr()");
+static_assert(BS_COUNT_TOKENS == 43, "Update bs_compile_expr()");
 static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
     Bs_Loc loc = token.loc;
@@ -336,6 +338,10 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
     case BS_TOKEN_FN:
         bs_compile_lambda(c, NULL);
+        break;
+
+    case BS_TOKEN_IS_MAIN_MODULE:
+        bs_chunk_push_op(c->bs, c->chunk, c->is_main_module ? BS_OP_TRUE : BS_OP_FALSE);
         break;
 
     default:
@@ -641,7 +647,7 @@ static void bs_compile_variable(Bs_Compiler *c, bool public) {
     }
 }
 
-static_assert(BS_COUNT_TOKENS == 42, "Update bs_compile_stmt()");
+static_assert(BS_COUNT_TOKENS == 43, "Update bs_compile_stmt()");
 static void bs_compile_stmt(Bs_Compiler *c) {
     Bs_Token token = bs_lexer_next(&c->lexer);
 
@@ -783,10 +789,11 @@ static void bs_compile_stmt(Bs_Compiler *c) {
     }
 }
 
-Bs_Fn *bs_compile(Bs *bs, const char *path, Bs_Sv input) {
+Bs_Fn *bs_compile(Bs *bs, const char *path, Bs_Sv input, bool is_main_module) {
     Bs_Compiler compiler = {
         .bs = bs,
         .lexer = bs_lexer_new(path, input, bs_stderr_get(bs)),
+        .is_main_module = is_main_module,
     };
 
     const Bs_Sv path_sv = bs_sv_from_cstr(path);
