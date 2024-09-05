@@ -1,4 +1,4 @@
-#include "bs/hash.h"
+#include "bs/object.h"
 
 bool bs_value_is_falsey(Bs_Value v) {
     return v.type == BS_VALUE_NIL || (v.type == BS_VALUE_BOOL && !v.as.boolean);
@@ -64,7 +64,11 @@ static void bs_object_write(Bs_Writer *w, const Bs_Object *o) {
     case BS_OBJECT_FN: {
         const Bs_Fn *fn = (const Bs_Fn *)o;
         if (fn->module) {
-            bs_fmt(w, "file '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*fn->name));
+            if (fn->name) {
+                bs_fmt(w, "<module '" Bs_Sv_Fmt "'>", Bs_Sv_Arg(*fn->name));
+            } else {
+                bs_fmt(w, "<module>");
+            }
         } else if (fn->name) {
             bs_fmt(w, "fn " Bs_Sv_Fmt "()", Bs_Sv_Arg(*fn->name));
         } else {
