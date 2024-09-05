@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #include "bs/core.h"
 #include "bs/object.h"
@@ -54,10 +56,13 @@ static Bs_Value bs_io_close(Bs *bs, Bs_Value *args, size_t arity) {
     }
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
-    if (c->data) {
-        bs_file_data_free(bs, c->data);
-        c->data = NULL;
+    if (!c->data) {
+        bs_error(bs, "cannot close already closed file");
+        return bs_value_error;
     }
+
+    bs_file_data_free(bs, c->data);
+    c->data = NULL;
 
     return bs_value_nil;
 }
@@ -317,24 +322,123 @@ static Bs_Value bs_os_setenv(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_bool(setenv(key, value, true) == 0);
 }
 
-static Bs_Value bs_os_execute(Bs *bs, Bs_Value *args, size_t arity) {
+// Process
+static const Bs_C_Data_Spec bs_process_data_spec = {
+    .name = Bs_Sv_Static("process"),
+};
+
+static Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!bs_check_arity(bs, arity, 2)) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_c_type(bs, args[0], &bs_process_data_spec, "argument #1")) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_whole_number(bs, args[1], "argument #2")) {
+        return bs_value_error;
+    }
+
+    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
+    if (!c->data) {
+        bs_error(bs, "cannot kill already terminated process");
+        return bs_value_error;
+    }
+
+    const pid_t pid = (uintptr_t)c->data;
+    c->data = NULL;
+
+    if (kill(pid, args[1].as.number) < 0) {
+        bs_error(bs, "could not kill process");
+        return bs_value_error;
+    }
+
+    return bs_value_nil;
+}
+
+static Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 1)) {
         return bs_value_error;
     }
 
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
+    if (!bs_check_object_c_type(bs, args[0], &bs_process_data_spec, "argument #1")) {
         return bs_value_error;
     }
 
-    Bs_Buffer *b = bs_buffer_get(bs);
-    const size_t start = b->count;
+    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
+    if (!c->data) {
+        bs_error(bs, "cannot wait for already terminated process");
+        return bs_value_error;
+    }
 
-    Bs_Writer w = bs_buffer_writer(b);
-    bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
-    bs_buffer_push(b->bs, b, '\0');
+    const pid_t pid = (uintptr_t)c->data;
+    c->data = NULL;
 
-    const char *command = bs_buffer_reset(b, start).data;
-    return bs_value_num(WEXITSTATUS(system(command)));
+    int status;
+    if (waitpid(pid, &status, 0) < 0) {
+        bs_error(bs, "could not wait for process");
+        return bs_value_error;
+    }
+
+    return WIFEXITED(status) ? bs_value_num(WEXITSTATUS(status)) : bs_value_nil;
+}
+
+static Bs_Value bs_process_spawn(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!bs_check_arity(bs, arity, 1)) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1")) {
+        return bs_value_error;
+    }
+
+    const Bs_Array *array = (const Bs_Array *)args[0].as.object;
+    if (!array->count) {
+        bs_error(bs, "cannot execute empty array as process");
+        return bs_value_error;
+    }
+
+    for (size_t i = 0; i < array->count; i++) {
+        if (!bs_check_object_type(bs, array->data[i], BS_OBJECT_STR, "command argument")) {
+            return bs_value_error;
+        }
+    }
+
+    const pid_t pid = fork();
+    if (pid < 0) {
+        bs_error(bs, "could not fork process");
+        return bs_value_error;
+    }
+
+    if (pid == 0) {
+        Bs_Buffer *b = bs_buffer_get(bs);
+        const size_t start = b->count;
+
+        char **cargv = malloc((array->count + 1) * sizeof(char *));
+        assert(cargv);
+
+        for (size_t i = 0; i < array->count; i++) {
+            // Store the offset instead of the actual pointer, because the buffer might be
+            // reallocated
+            cargv[i] = (char *)b->count;
+
+            const Bs_Str *str = (const Bs_Str *)array->data[i].as.object;
+            bs_da_push_many(bs, b, str->data, str->size);
+            bs_da_push(bs, b, '\0');
+        }
+
+        // Resolve the pointer offsets
+        for (size_t i = 0; i < array->count; i++) {
+            cargv[i] = b->data + (size_t)cargv[i];
+        }
+        cargv[array->count] = NULL;
+
+        execvp(*cargv, (char *const *)cargv);
+        exit(127);
+    }
+
+    return bs_value_object(bs_c_data_new(bs, (void *)(uintptr_t)pid, &bs_process_data_spec));
 }
 
 // Str
@@ -653,7 +757,6 @@ int bs_core_init(Bs *bs, int argc, char **argv) {
         bs_table_add(bs, os, "exit", bs_value_object(bs_c_fn_new(bs, bs_os_exit)));
         bs_table_add(bs, os, "getenv", bs_value_object(bs_c_fn_new(bs, bs_os_getenv)));
         bs_table_add(bs, os, "setenv", bs_value_object(bs_c_fn_new(bs, bs_os_setenv)));
-        bs_table_add(bs, os, "execute", bs_value_object(bs_c_fn_new(bs, bs_os_execute)));
 
         Bs_Array *args = bs_array_new(bs);
         for (int i = 0; i < argc; i++) {
@@ -662,6 +765,14 @@ int bs_core_init(Bs *bs, int argc, char **argv) {
         bs_table_add(bs, os, "args", bs_value_object(args));
 
         bs_global_set(bs, Bs_Sv_Static("os"), bs_value_object(os));
+    }
+
+    {
+        Bs_Table *process = bs_table_new(bs);
+        bs_table_add(bs, process, "kill", bs_value_object(bs_c_fn_new(bs, bs_process_kill)));
+        bs_table_add(bs, process, "wait", bs_value_object(bs_c_fn_new(bs, bs_process_wait)));
+        bs_table_add(bs, process, "spawn", bs_value_object(bs_c_fn_new(bs, bs_process_spawn)));
+        bs_global_set(bs, Bs_Sv_Static("process"), bs_value_object(process));
     }
 
     {
