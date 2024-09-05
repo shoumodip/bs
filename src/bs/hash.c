@@ -26,7 +26,7 @@ Bs_Entry *bs_entries_find(Bs_Entry *entries, size_t capacity, Bs_Value key) {
     } else {
         index = bs_hash_bytes(&key, sizeof(key));
     }
-    index = index % capacity;
+    index = index & (capacity - 1);
 
     Bs_Entry *tombstone = NULL;
     while (true) {
@@ -45,7 +45,7 @@ Bs_Entry *bs_entries_find(Bs_Entry *entries, size_t capacity, Bs_Value key) {
             }
         }
 
-        index = (index + 1) % capacity;
+        index = (index + 1) & (capacity - 1);
     }
 }
 
@@ -53,7 +53,7 @@ Bs_Entry *bs_entries_find_sv(Bs_Entry *entries, size_t capacity, Bs_Sv key) {
     if (!capacity) {
         return NULL;
     }
-    uint32_t index = bs_hash_bytes(key.data, key.size) % capacity;
+    uint32_t index = bs_hash_bytes(key.data, key.size) & (capacity - 1);
 
     Bs_Entry *tombstone = NULL;
     while (true) {
@@ -75,6 +75,6 @@ Bs_Entry *bs_entries_find_sv(Bs_Entry *entries, size_t capacity, Bs_Sv key) {
             }
         }
 
-        index = (index + 1) % capacity;
+        index = (index + 1) & (capacity - 1);
     }
 }
