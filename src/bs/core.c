@@ -564,9 +564,8 @@ static Bs_Value bytes_slice(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, bs_sv_from_parts(b->data + begin, end - begin)));
 }
 
-static Bs_Value bytes_write(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!arity) {
-        bs_error(bs, "expected at least 1 argument, got 0");
+static Bs_Value bytes_push(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!bs_check_arity(bs, arity, 2)) {
         return bs_value_error;
     }
 
@@ -574,22 +573,19 @@ static Bs_Value bytes_write(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_error;
     }
 
-    Bs_Buffer *b = ((Bs_C_Data *)args[0].as.object)->data;
-    Bs_Writer w = bs_buffer_writer(b);
-
-    for (size_t i = 1; i < arity; i++) {
-        if (i > 1) {
-            bs_fmt(&w, " ");
-        }
-        bs_value_write(&w, args[i]);
+    if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
+        return bs_value_error;
     }
+
+    Bs_Buffer *b = ((Bs_C_Data *)args[0].as.object)->data;
+    const Bs_Str *src = (const Bs_Str *)args[1].as.object;
+    bs_da_push_many(bs, b, src->data, src->size);
 
     return bs_value_nil;
 }
 
-static Bs_Value bytes_writeln(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!arity) {
-        bs_error(bs, "expected at least 1 argument, got 0");
+static Bs_Value bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!bs_check_arity(bs, arity, 3)) {
         return bs_value_error;
     }
 
@@ -597,16 +593,27 @@ static Bs_Value bytes_writeln(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_error;
     }
 
-    Bs_Buffer *b = ((Bs_C_Data *)args[0].as.object)->data;
-    Bs_Writer w = bs_buffer_writer(b);
-
-    for (size_t i = 1; i < arity; i++) {
-        if (i > 1) {
-            bs_fmt(&w, " ");
-        }
-        bs_value_write(&w, args[i]);
+    if (!bs_check_whole_number(bs, args[1], "argument #2")) {
+        return bs_value_error;
     }
-    bs_fmt(&w, "\n");
+
+    if (!bs_check_object_type(bs, args[2], BS_OBJECT_STR, "argument #3")) {
+        return bs_value_error;
+    }
+
+    Bs_Buffer *b = ((Bs_C_Data *)args[0].as.object)->data;
+    const size_t index = args[1].as.number;
+    const Bs_Str *src = (const Bs_Str *)args[2].as.object;
+
+    if (index > b->count) {
+        bs_error(bs, "cannot insert at %zu into bytes of length %zu", index, b->count);
+        return bs_value_error;
+    }
+
+    bs_da_push_many(bs, b, NULL, src->size);
+    memmove(b->data + index + src->size, b->data + index, b->count - index);
+    memcpy(b->data + index, src->data, src->size);
+    b->count += src->size;
 
     return bs_value_nil;
 }
@@ -675,8 +682,9 @@ int bs_core_init(Bs *bs, int argc, char **argv) {
         bs_table_add(bs, bytes, "len", bs_value_object(bs_c_fn_new(bs, bytes_len)));
         bs_table_add(bs, bytes, "reset", bs_value_object(bs_c_fn_new(bs, bytes_reset)));
         bs_table_add(bs, bytes, "slice", bs_value_object(bs_c_fn_new(bs, bytes_slice)));
-        bs_table_add(bs, bytes, "write", bs_value_object(bs_c_fn_new(bs, bytes_write)));
-        bs_table_add(bs, bytes, "writeln", bs_value_object(bs_c_fn_new(bs, bytes_writeln)));
+
+        bs_table_add(bs, bytes, "push", bs_value_object(bs_c_fn_new(bs, bytes_push)));
+        bs_table_add(bs, bytes, "insert", bs_value_object(bs_c_fn_new(bs, bytes_insert)));
         bs_global_set(bs, Bs_Sv_Static("bytes"), bs_value_object(bytes));
     }
 
