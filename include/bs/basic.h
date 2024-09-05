@@ -45,4 +45,6 @@ char *bs_read_file(const char *path, size_t *size);
 #define bs_min(a, b) ((a) < (b) ? (a) : (b))
 #define bs_max(a, b) ((a) > (b) ? (a) : (b))
 
+#define bs_c_array_size(a) (sizeof(a) / sizeof(*a))
+
 #endif // BS_BASIC_H

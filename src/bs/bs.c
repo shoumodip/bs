@@ -394,6 +394,10 @@ Bs_Writer bs_buffer_writer(Bs_Buffer *buffer) {
     return (Bs_Writer){buffer, bs_buffer_write};
 }
 
+Bs_Buffer *bs_paths_get(Bs *bs) {
+    return &bs->paths;
+}
+
 Bs_Buffer *bs_buffer_get(Bs *bs) {
     return &bs->buffer;
 }
@@ -1048,7 +1052,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                 const bool gc_on = bs->gc_on;
                 bs->gc_on = false;
 
-                Bs_Buffer *b = &bs->paths;
+                Bs_Buffer *b = bs_paths_get(bs);
                 Bs_Writer w = bs_buffer_writer(b);
 
                 const Bs_Sv name_sv = bs_sv_from_parts(name->data, name->size);

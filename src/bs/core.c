@@ -1,4 +1,6 @@
+#include <ctype.h>
 #include <errno.h>
+#include <regex.h>
 #include <stdio.h>
 #include <sys/wait.h>
 #include <time.h>
@@ -567,6 +569,323 @@ static Bs_Value bs_str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(dst);
 }
 
+static Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
+    if (arity != 2 && arity != 3) {
+        bs_error(bs, "expected 2 or 3 arguments, got %zu", arity);
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
+        return bs_value_error;
+    }
+
+    if (arity == 3) {
+        if (!bs_check_whole_number(bs, args[2], "argument #3")) {
+            return bs_value_error;
+        }
+    }
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
+
+    const size_t offset = arity == 3 ? args[2].as.number : 0;
+    if (offset > str->size) {
+        bs_error(bs, "cannot take offset of %zu in string of length %zu", offset, str->size);
+        return bs_value_error;
+    }
+
+    if (str->size < pattern->size + offset) {
+        return bs_value_nil;
+    }
+
+    const Bs_Sv pattern_sv = bs_sv_from_parts(pattern->data, pattern->size);
+    for (size_t i = offset; i + pattern->size <= str->size; i++) {
+        if (bs_sv_eq(bs_sv_from_parts(str->data + i, pattern->size), pattern_sv)) {
+            return bs_value_num(i);
+        }
+    }
+
+    return bs_value_nil;
+}
+
+static Bs_Value bs_str_find_regex(Bs *bs, Bs_Value *args, size_t arity) {
+    if (arity != 2 && arity != 3) {
+        bs_error(bs, "expected 2 or 3 arguments, got %zu", arity);
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
+        return bs_value_error;
+    }
+
+    if (arity == 3) {
+        if (!bs_check_whole_number(bs, args[2], "argument #3")) {
+            return bs_value_error;
+        }
+    }
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
+
+    const size_t offset = arity == 3 ? args[2].as.number : 0;
+    if (offset > str->size) {
+        bs_error(bs, "cannot take offset of %zu in string of length %zu", offset, str->size);
+        return bs_value_error;
+    }
+
+    Bs_Buffer *b = bs_buffer_get(bs);
+    const size_t start = b->count;
+
+    const size_t str_pos = b->count;
+    bs_da_push_many(bs, b, str->data + offset, str->size - offset);
+    bs_da_push(bs, b, '\0');
+
+    const size_t pattern_pos = b->count;
+    bs_da_push_many(bs, b, pattern->data, pattern->size);
+    bs_da_push(bs, b, '\0');
+
+    regex_t regex;
+    if (regcomp(&regex, b->data + pattern_pos, REG_EXTENDED)) {
+        bs_error(bs, "could not compile regex pattern");
+        return bs_value_error;
+    }
+
+    regmatch_t match;
+    Bs_Value result = bs_value_nil;
+    if (!regexec(&regex, b->data + str_pos, 1, &match, 0)) {
+        result = bs_value_num(offset + match.rm_so);
+    }
+    regfree(&regex);
+
+    bs_buffer_reset(b, start);
+    return result;
+}
+
+static Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!bs_check_arity(bs, arity, 2)) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
+        return bs_value_error;
+    }
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
+
+    Bs_Array *a = bs_array_new(bs);
+    const Bs_Sv pattern_sv = bs_sv_from_parts(pattern->data, pattern->size);
+
+    size_t i = 0, j = 0;
+    while (i + pattern->size <= str->size) {
+        if (bs_sv_eq(bs_sv_from_parts(str->data + i, pattern->size), pattern_sv)) {
+            bs_array_set(
+                bs,
+                a,
+                a->count,
+                bs_value_object(bs_str_new(bs, bs_sv_from_parts(str->data + j, i - j))));
+
+            i += pattern->size;
+            j = i;
+        } else {
+            i++;
+        }
+    }
+
+    if (j != str->size) {
+        bs_array_set(
+            bs,
+            a,
+            a->count,
+            bs_value_object(bs_str_new(bs, bs_sv_from_parts(str->data + j, str->size - j))));
+    }
+
+    return bs_value_object(a);
+}
+
+static Bs_Value bs_str_split_regex(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!bs_check_arity(bs, arity, 2)) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
+        return bs_value_error;
+    }
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
+
+    Bs_Buffer *b = bs_buffer_get(bs);
+    const size_t start = b->count;
+
+    const size_t str_pos = b->count;
+    bs_da_push_many(bs, b, str->data, str->size);
+    bs_da_push(bs, b, '\0');
+
+    const size_t pattern_pos = b->count;
+    bs_da_push_many(bs, b, pattern->data, pattern->size);
+    bs_da_push(bs, b, '\0');
+
+    Bs_Array *a = bs_array_new(bs);
+
+    regex_t regex;
+    if (regcomp(&regex, b->data + pattern_pos, REG_EXTENDED)) {
+        bs_error(bs, "could not compile regex pattern");
+        return bs_value_error;
+    }
+
+    regmatch_t match;
+    size_t j = 0;
+    while (!regexec(&regex, b->data + str_pos + j, 1, &match, 0)) {
+        bs_array_set(
+            bs,
+            a,
+            a->count,
+            bs_value_object(bs_str_new(bs, bs_sv_from_parts(b->data + str_pos + j, match.rm_so))));
+
+        j += match.rm_eo;
+    }
+
+    if (j != str->size) {
+        bs_array_set(
+            bs,
+            a,
+            a->count,
+            bs_value_object(bs_str_new(bs, bs_sv_from_parts(str->data + j, str->size - j))));
+    }
+
+    regfree(&regex);
+    bs_buffer_reset(b, start);
+    return bs_value_object(a);
+}
+
+static Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!bs_check_arity(bs, arity, 3)) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[2], BS_OBJECT_STR, "argument #3")) {
+        return bs_value_error;
+    }
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
+    const Bs_Str *replacement = (const Bs_Str *)args[2].as.object;
+
+    if (str->size < pattern->size) {
+        return bs_value_object(str);
+    }
+
+    Bs_Buffer *b = bs_buffer_get(bs);
+    const size_t start = b->count;
+
+    const Bs_Sv pattern_sv = bs_sv_from_parts(pattern->data, pattern->size);
+    for (size_t i = 0; i + pattern->size <= str->size; i++) {
+        if (bs_sv_eq(bs_sv_from_parts(str->data + i, pattern->size), pattern_sv)) {
+            bs_da_push_many(bs, b, replacement->data, replacement->size);
+            i += pattern->size - 1;
+        } else {
+            bs_da_push(bs, b, str->data[i]);
+        }
+    }
+
+    return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
+}
+
+static Bs_Value bs_str_replace_regex(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!bs_check_arity(bs, arity, 3)) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[2], BS_OBJECT_STR, "argument #3")) {
+        return bs_value_error;
+    }
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
+    const Bs_Str *replacement = (const Bs_Str *)args[2].as.object;
+
+    Bs_Buffer *b = bs_buffer_get(bs);
+    const size_t start = b->count;
+
+    const size_t str_pos = b->count;
+    bs_da_push_many(bs, b, str->data, str->size);
+    bs_da_push(bs, b, '\0');
+
+    const size_t pattern_pos = b->count;
+    bs_da_push_many(bs, b, pattern->data, pattern->size);
+    bs_da_push(bs, b, '\0');
+
+    regex_t regex;
+    if (regcomp(&regex, b->data + pattern_pos, REG_EXTENDED)) {
+        bs_error(bs, "could not compile regex pattern");
+        return bs_value_error;
+    }
+
+    Bs_Buffer *o = bs_paths_get(bs);
+    const size_t result_pos = o->count;
+
+    const char *cursor = b->data + str_pos;
+    regmatch_t matches[10];
+    while (!regexec(&regex, cursor, bs_c_array_size(matches), matches, 0)) {
+        bs_da_push_many(bs, o, cursor, matches[0].rm_so);
+
+        for (size_t i = 0; i < replacement->size; i++) {
+            if (replacement->data[i] == '\\' && isdigit(replacement->data[i + 1])) {
+                const size_t match_index = replacement->data[++i] - '0';
+                if (match_index < bs_c_array_size(matches) && matches[match_index].rm_so != -1) {
+                    bs_da_push_many(
+                        bs,
+                        o,
+                        cursor + matches[match_index].rm_so,
+                        matches[match_index].rm_eo - matches[match_index].rm_so);
+                }
+            } else {
+                bs_da_push(bs, o, replacement->data[i]);
+            }
+        }
+
+        cursor += matches[0].rm_eo;
+    }
+    bs_da_push_many(bs, o, cursor, strlen(cursor));
+
+    regfree(&regex);
+    bs_buffer_reset(b, start);
+    return bs_value_object(bs_str_new(bs, bs_buffer_reset(o, result_pos)));
+}
+
 // Array
 static Bs_Value bs_array_join(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 2)) {
@@ -810,6 +1129,17 @@ int bs_core_init(Bs *bs, int argc, char **argv) {
         bs_table_add(bs, str, "slice", bs_value_object(bs_c_fn_new(bs, bs_str_slice)));
         bs_table_add(bs, str, "format", bs_value_object(bs_c_fn_new(bs, bs_str_format)));
         bs_table_add(bs, str, "reverse", bs_value_object(bs_c_fn_new(bs, bs_str_reverse)));
+
+        bs_table_add(bs, str, "find", bs_value_object(bs_c_fn_new(bs, bs_str_find)));
+        bs_table_add(bs, str, "find_regex", bs_value_object(bs_c_fn_new(bs, bs_str_find_regex)));
+
+        bs_table_add(bs, str, "split", bs_value_object(bs_c_fn_new(bs, bs_str_split)));
+        bs_table_add(bs, str, "split_regex", bs_value_object(bs_c_fn_new(bs, bs_str_split_regex)));
+
+        bs_table_add(bs, str, "replace", bs_value_object(bs_c_fn_new(bs, bs_str_replace)));
+        bs_table_add(
+            bs, str, "replace_regex", bs_value_object(bs_c_fn_new(bs, bs_str_replace_regex)));
+
         bs_global_set(bs, Bs_Sv_Static("str"), bs_value_object(str));
     }
 

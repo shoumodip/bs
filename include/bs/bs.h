@@ -24,6 +24,8 @@ Bs_Sv bs_buffer_reset(Bs_Buffer *buffer, size_t pos);
 
 Bs_Writer bs_file_writer(FILE *file);
 Bs_Writer bs_buffer_writer(Bs_Buffer *buffer);
+
+Bs_Buffer *bs_paths_get(Bs *bs);
 Bs_Buffer *bs_buffer_get(Bs *bs);
 
 Bs_Writer *bs_stdout_get(Bs *bs);
