@@ -24,11 +24,9 @@ int main(int argc, char **argv) {
     }
 
     int result = bs_core_init(bs, argc - 1, argv + 1);
-    if (result) {
-        return result;
+    if (!result) {
+        result = bs_run(bs, path, bs_sv_from_parts(contents, size), false);
     }
-
-    result = bs_run(bs, path, bs_sv_from_parts(contents, size), false);
 
     bs_free(bs);
     free(contents);
