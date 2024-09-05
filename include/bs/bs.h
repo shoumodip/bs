@@ -24,10 +24,16 @@ Bs_Sv bs_buffer_reset(Bs_Buffer *buffer, size_t pos);
 
 Bs_Writer bs_file_writer(FILE *file);
 Bs_Writer bs_buffer_writer(Bs_Buffer *buffer);
+Bs_Buffer *bs_buffer_get(Bs *bs);
 
 Bs_Writer *bs_stdout_get(Bs *bs);
+void bs_stdout_set(Bs *bs, Bs_Writer writer);
+
 Bs_Writer *bs_stderr_get(Bs *bs);
-Bs_Buffer *bs_buffer_get(Bs *bs);
+void bs_stderr_set(Bs *bs, Bs_Writer writer);
+
+void *bs_userdata_get(Bs *bs);
+void bs_userdata_set(Bs *bs, void *data);
 
 Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size);
 Bs_Str *bs_str_const(Bs *bs, Bs_Sv sv);

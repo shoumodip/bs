@@ -72,6 +72,8 @@ struct Bs {
 
     Bs_Writer error;
     Bs_Writer output;
+
+    void *userdata;
 };
 
 // Garbage collector
@@ -392,16 +394,32 @@ Bs_Writer bs_buffer_writer(Bs_Buffer *buffer) {
     return (Bs_Writer){buffer, bs_buffer_write};
 }
 
+Bs_Buffer *bs_buffer_get(Bs *bs) {
+    return &bs->buffer;
+}
+
 Bs_Writer *bs_stdout_get(Bs *bs) {
     return &bs->output;
+}
+
+void bs_stdout_set(Bs *bs, Bs_Writer writer) {
+    bs->output = writer;
 }
 
 Bs_Writer *bs_stderr_get(Bs *bs) {
     return &bs->error;
 }
 
-Bs_Buffer *bs_buffer_get(Bs *bs) {
-    return &bs->buffer;
+void bs_stderr_set(Bs *bs, Bs_Writer writer) {
+    bs->error = writer;
+}
+
+void *bs_userdata_get(Bs *bs) {
+    return bs->userdata;
+}
+
+void bs_userdata_set(Bs *bs, void *data) {
+    bs->userdata = data;
 }
 
 Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size) {
