@@ -1,5 +1,7 @@
+#include <errno.h>
 #include <stdio.h>
 #include <sys/wait.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "bs/core.h"
@@ -254,6 +256,33 @@ static Bs_Value bs_os_exit(Bs *bs, Bs_Value *args, size_t arity) {
     }
 
     return bs_value_halt(args[0].as.number);
+}
+
+static Bs_Value bs_os_sleep(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!bs_check_arity(bs, arity, 1)) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1")) {
+        return bs_value_error;
+    }
+
+    const double seconds = args[0].as.number;
+
+    struct timespec req, rem;
+    req.tv_sec = (time_t)seconds;
+    req.tv_nsec = (long)((seconds - req.tv_sec) * 1e9);
+
+    while (nanosleep(&req, &rem) == -1) {
+        if (errno != EINTR) {
+            bs_error(bs, "could not sleep");
+            return bs_value_error;
+        }
+
+        req = rem;
+    }
+
+    return bs_value_nil;
 }
 
 static Bs_Value bs_os_getenv(Bs *bs, Bs_Value *args, size_t arity) {
@@ -755,6 +784,7 @@ int bs_core_init(Bs *bs, int argc, char **argv) {
     {
         Bs_Table *os = bs_table_new(bs);
         bs_table_add(bs, os, "exit", bs_value_object(bs_c_fn_new(bs, bs_os_exit)));
+        bs_table_add(bs, os, "sleep", bs_value_object(bs_c_fn_new(bs, bs_os_sleep)));
         bs_table_add(bs, os, "getenv", bs_value_object(bs_c_fn_new(bs, bs_os_getenv)));
         bs_table_add(bs, os, "setenv", bs_value_object(bs_c_fn_new(bs, bs_os_setenv)));
 
