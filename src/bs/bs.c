@@ -1351,9 +1351,8 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
         case BS_OP_ITER: {
             const size_t offset = bs_chunk_read_int(bs);
 
-            const Bs_Value key = bs_stack_peek(bs, 3);
-            const Bs_Value iterator = bs_stack_peek(bs, 1);
-            const Bs_Value container = bs_stack_peek(bs, 0);
+            const Bs_Value iterator = bs_stack_peek(bs, 0);
+            const Bs_Value container = bs_stack_peek(bs, 1);
 
             if (container.type != BS_VALUE_OBJECT) {
                 bs_error(bs, "cannot iterate over %s value", bs_value_type_name(container));
@@ -1373,15 +1372,15 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                 if (index >= array->count) {
                     bs->frame->ip += offset;
                 } else {
-                    bs_stack_set(bs, 3, bs_value_num(index)); // Key
-                    bs_stack_set(bs, 2, array->data[index]);  // Value
-                    bs_stack_set(bs, 1, bs_value_num(index)); // Iterator
+                    bs_stack_set(bs, 0, bs_value_num(index)); // Iterator
+                    bs_stack_push(bs, bs_value_num(index));   // Key
+                    bs_stack_push(bs, array->data[index]);    // Value
                 }
             } else if (container.as.object->type == BS_OBJECT_TABLE) {
                 const Bs_Table *table = (const Bs_Table *)container.as.object;
 
                 size_t index;
-                if (key.type == BS_VALUE_NIL) {
+                if (iterator.type == BS_VALUE_NIL) {
                     index = 0;
                 } else {
                     index = iterator.as.number + 1;
@@ -1395,9 +1394,9 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                     bs->frame->ip += offset;
                 } else {
                     const Bs_Entry entry = table->data[index];
-                    bs_stack_set(bs, 3, entry.key);           // Key
-                    bs_stack_set(bs, 2, entry.value);         // Value
-                    bs_stack_set(bs, 1, bs_value_num(index)); // Iterator
+                    bs_stack_set(bs, 0, bs_value_num(index)); // Iterator
+                    bs_stack_push(bs, entry.key);             // Key
+                    bs_stack_push(bs, entry.value);           // Value
                 }
             } else {
                 bs_error(bs, "cannot iterate over %s value", bs_value_type_name(container));

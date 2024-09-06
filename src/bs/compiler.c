@@ -698,24 +698,25 @@ static void bs_compile_stmt(Bs_Compiler *c) {
     case BS_TOKEN_FOR: {
         bs_compile_block_init(c);
 
-        // Key
-        bs_compile_definition(c, &token, false);
-        bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
-
+        const Bs_Token key = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
         bs_lexer_expect(&c->lexer, BS_TOKEN_COMMA);
 
-        // Value
-        bs_compile_definition(c, &token, false);
-        bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
+        const Bs_Token value = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
+        bs_lexer_expect(&c->lexer, BS_TOKEN_IN);
 
-        // Iterator
-        bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
+        bs_compile_expr(c, BS_POWER_SET); // Container
         bs_scope_push(c->bs, c->scope, (Bs_Local){.depth = c->scope->depth});
 
-        // Container
-        token = bs_lexer_expect(&c->lexer, BS_TOKEN_IN);
-        bs_compile_expr(c, BS_POWER_SET);
+        bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL); // Iterator
         bs_scope_push(c->bs, c->scope, (Bs_Local){.depth = c->scope->depth});
+
+        const Bs_Jumps jumps_save = c->scope->jumps;
+        c->scope->jumps.depth = c->scope->depth;
+
+        bs_compile_block_init(c);
+
+        bs_da_push(c->bs, c->scope, ((Bs_Local){.token = key, .depth = c->scope->depth}));
+        bs_da_push(c->bs, c->scope, ((Bs_Local){.token = value, .depth = c->scope->depth}));
 
         const size_t loop_addr = bs_compile_jump_start(c, BS_OP_ITER);
         bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
@@ -723,9 +724,12 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         bs_lexer_buffer(&c->lexer, bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE));
         bs_compile_stmt(c);
 
+        bs_compile_block_end(c);
+
         bs_compile_jump_direct(c, BS_OP_JUMP, loop_addr);
         bs_compile_jump_patch(c, loop_addr);
 
+        bs_compile_jumps_reset(c, &jumps_save);
         bs_compile_block_end(c);
     } break;
 
