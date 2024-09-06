@@ -59,7 +59,7 @@ void bs_debug_op(Bs_Writer *w, const Bs_Chunk *c, size_t *offset) {
         break;
 
     case BS_OP_UCLOSE:
-        bs_debug_op_int(w, c, offset, "OP_UCLOSE");
+        bs_fmt(w, "OP_UCLOSE\n");
         break;
 
     case BS_OP_NIL:

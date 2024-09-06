@@ -49,7 +49,7 @@ void bs_lexer_buffer(Bs_Lexer *l, Bs_Token token) {
     l->buffer = token;
 }
 
-static_assert(BS_COUNT_TOKENS == 43, "Update bs_lexer_next()");
+static_assert(BS_COUNT_TOKENS == 44, "Update bs_lexer_next()");
 Bs_Token bs_lexer_next(Bs_Lexer *l) {
     if (l->peeked) {
         l->peeked = false;
@@ -126,6 +126,8 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
                 token.type = BS_TOKEN_FOR;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("yolo"))) {
                 token.type = BS_TOKEN_WHILE;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("yeet"))) {
+                token.type = BS_TOKEN_BREAK;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("lit"))) {
                 token.type = BS_TOKEN_FN;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("fam"))) {
@@ -160,6 +162,8 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
                 token.type = BS_TOKEN_FOR;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("while"))) {
                 token.type = BS_TOKEN_WHILE;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("break"))) {
+                token.type = BS_TOKEN_BREAK;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("fn"))) {
                 token.type = BS_TOKEN_FN;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("pub"))) {

@@ -14,7 +14,7 @@ typedef enum {
     BS_POWER_DOT,
 } Bs_Power;
 
-static_assert(BS_COUNT_TOKENS == 43, "Update bs_token_type_power()");
+static_assert(BS_COUNT_TOKENS == 44, "Update bs_token_type_power()");
 static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_DOT:
@@ -54,6 +54,16 @@ static Bs_Power bs_token_type_power(Bs_Token_Type type) {
 }
 
 typedef struct {
+    size_t *data;
+    size_t count;
+    size_t depth;
+    size_t capacity;
+} Bs_Jumps;
+
+#define bs_jumps_free bs_da_free
+#define bs_jumps_push bs_da_push
+
+typedef struct {
     Bs_Token token;
     size_t depth;
     bool captured;
@@ -84,6 +94,7 @@ struct Bs_Scope {
     size_t capacity;
 
     Bs_Fn *fn;
+    Bs_Jumps jumps;
     Bs_Uplocals uplocals;
 };
 
@@ -91,6 +102,7 @@ struct Bs_Scope {
 
 static void bs_scope_free(Bs *bs, Bs_Scope *s) {
     if (s) {
+        bs_jumps_free(bs, &s->jumps);
         bs_uplocals_free(bs, &s->uplocals);
         bs_da_free(bs, s);
     }
@@ -176,7 +188,7 @@ static void bs_compile_error_unexpected(Bs_Compiler *c, const Bs_Token *token) {
 
 static void bs_compile_lambda(Bs_Compiler *c, const Bs_Token *name);
 
-static_assert(BS_COUNT_TOKENS == 43, "Update bs_compile_expr()");
+static_assert(BS_COUNT_TOKENS == 44, "Update bs_compile_expr()");
 static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
     Bs_Loc loc = token.loc;
@@ -523,18 +535,23 @@ static void bs_compile_block_init(Bs_Compiler *c) {
     c->scope->depth++;
 }
 
-static void bs_compile_block_end(Bs_Compiler *c) {
-    c->scope->depth--;
-
-    while (c->scope->count && c->scope->data[c->scope->count - 1].depth > c->scope->depth) {
-        if (c->scope->data[c->scope->count - 1].captured) {
+static size_t bs_compile_block_drop(Bs_Compiler *c, size_t depth) {
+    size_t scope_count = c->scope->count;
+    while (scope_count && c->scope->data[scope_count - 1].depth > depth) {
+        if (c->scope->data[scope_count - 1].captured) {
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_UCLOSE);
         } else {
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
         }
 
-        c->scope->count--;
+        scope_count--;
     }
+
+    return scope_count;
+}
+
+static void bs_compile_block_end(Bs_Compiler *c) {
+    c->scope->count = bs_compile_block_drop(c, --c->scope->depth);
 }
 
 static void bs_compile_scope_init(Bs_Compiler *c, Bs_Scope *scope, Bs_Sv name) {
@@ -636,7 +653,16 @@ static void bs_compile_variable(Bs_Compiler *c, bool public) {
     }
 }
 
-static_assert(BS_COUNT_TOKENS == 43, "Update bs_compile_stmt()");
+static void bs_compile_jumps_reset(Bs_Compiler *c, const Bs_Jumps *save) {
+    for (size_t i = save->count; i < c->scope->jumps.count; i++) {
+        bs_compile_jump_patch(c, c->scope->jumps.data[i]);
+    }
+
+    c->scope->jumps.count = save->count;
+    c->scope->jumps.depth = save->depth;
+}
+
+static_assert(BS_COUNT_TOKENS == 44, "Update bs_compile_stmt()");
 static void bs_compile_stmt(Bs_Compiler *c) {
     Bs_Token token = bs_lexer_next(&c->lexer);
 
@@ -710,12 +736,28 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         const size_t loop_addr = bs_compile_jump_start(c, BS_OP_ELSE);
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
 
+        const Bs_Jumps jumps_save = c->scope->jumps;
+        c->scope->jumps.depth = c->scope->depth;
+
         bs_lexer_buffer(&c->lexer, bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE));
         bs_compile_stmt(c);
 
         bs_compile_jump_direct(c, BS_OP_JUMP, cond_addr);
         bs_compile_jump_patch(c, loop_addr);
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
+
+        bs_compile_jumps_reset(c, &jumps_save);
+    } break;
+
+    case BS_TOKEN_BREAK: {
+        if (!c->scope->jumps.depth) {
+            bs_compile_error_unexpected(c, &token);
+        }
+        bs_lexer_expect(&c->lexer, BS_TOKEN_EOL);
+
+        bs_compile_block_drop(c, c->scope->jumps.depth);
+        bs_jumps_push(c->bs, &c->scope->jumps, c->chunk->count);
+        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_JUMP, 0);
     } break;
 
     case BS_TOKEN_FN:

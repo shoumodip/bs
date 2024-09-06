@@ -59,6 +59,7 @@ typedef enum {
     BS_TOKEN_IN,
     BS_TOKEN_FOR,
     BS_TOKEN_WHILE,
+    BS_TOKEN_BREAK,
 
     BS_TOKEN_FN,
     BS_TOKEN_PUB,
