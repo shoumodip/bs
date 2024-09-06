@@ -735,7 +735,7 @@ static void bs_close_upvalues(Bs *bs, size_t index) {
 }
 
 // Interpreter
-static_assert(BS_COUNT_OPS == 40, "Update bs_run()");
+static_assert(BS_COUNT_OPS == 41, "Update bs_run()");
 int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
     int result = 0;
 
@@ -1401,6 +1401,44 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             } else {
                 bs_error(bs, "cannot iterate over %s value", bs_value_type_name(container));
                 bs_return_defer(1);
+            }
+        } break;
+
+        case BS_OP_RANGE: {
+            const size_t offset = bs_chunk_read_int(bs);
+
+            Bs_Value step = bs_stack_peek(bs, 0);
+            if (step.type != BS_VALUE_NIL && step.type != BS_VALUE_NUM) {
+                bs_error(
+                    bs,
+                    "expected range step to be nil or number, got %s",
+                    bs_value_type_name(step));
+
+                bs_return_defer(1);
+            }
+
+            const Bs_Value end = bs_stack_peek(bs, 1);
+            if (!bs_check_value_type(bs, end, BS_VALUE_NUM, "range end")) {
+                bs_return_defer(1);
+            }
+
+            const Bs_Value start = bs_stack_peek(bs, 2);
+            if (!bs_check_value_type(bs, start, BS_VALUE_NUM, "range start")) {
+                bs_return_defer(1);
+            }
+
+            if (step.type == BS_VALUE_NIL) {
+                step = bs_value_num((end.as.number > start.as.number) ? 1 : -1);
+                bs_stack_set(bs, 0, step);
+            }
+
+            const bool over = step.as.number > 0 ? (start.as.number >= end.as.number)
+                                                 : (start.as.number <= end.as.number);
+            if (over) {
+                bs->frame->ip += offset;
+            } else {
+                bs_stack_set(bs, 2, bs_value_num(start.as.number + step.as.number));
+                bs_stack_push(bs, start);
             }
         } break;
 

@@ -707,25 +707,50 @@ static void bs_compile_stmt(Bs_Compiler *c) {
     case BS_TOKEN_FOR: {
         bs_compile_block_init(c);
 
-        const Bs_Token key = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
-        bs_lexer_expect(&c->lexer, BS_TOKEN_COMMA);
+        const Bs_Token a = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
+        Bs_Token b = bs_lexer_either(&c->lexer, BS_TOKEN_COMMA, BS_TOKEN_IN);
 
-        const Bs_Token value = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
-        bs_lexer_expect(&c->lexer, BS_TOKEN_IN);
+        if (b.type != BS_TOKEN_IN) {
+            b = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
+            bs_lexer_expect(&c->lexer, BS_TOKEN_IN);
+        }
 
-        bs_compile_expr(c, BS_POWER_SET); // Container
+        // Container / Start
+        bs_compile_expr(c, BS_POWER_SET);
         bs_scope_push(c->bs, c->scope, (Bs_Local){.depth = c->scope->depth});
 
-        bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL); // Iterator
+        if (b.type == BS_TOKEN_IN) {
+            // End
+            bs_lexer_expect(&c->lexer, BS_TOKEN_COMMA);
+            bs_compile_expr(c, BS_POWER_SET);
+            bs_scope_push(c->bs, c->scope, (Bs_Local){.depth = c->scope->depth});
+
+            // Step
+            if (bs_lexer_read(&c->lexer, BS_TOKEN_COMMA)) {
+                bs_compile_expr(c, BS_POWER_SET);
+            } else {
+                bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
+            }
+        } else {
+            // Iterator
+            bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
+        }
         bs_scope_push(c->bs, c->scope, (Bs_Local){.depth = c->scope->depth});
 
         const Bs_Jumps jumps_save = bs_compile_jumps_save(c, c->chunk->count);
         bs_compile_block_init(c);
 
-        bs_da_push(c->bs, c->scope, ((Bs_Local){.token = key, .depth = c->scope->depth}));
-        bs_da_push(c->bs, c->scope, ((Bs_Local){.token = value, .depth = c->scope->depth}));
+        // Key
+        bs_da_push(c->bs, c->scope, ((Bs_Local){.token = a, .depth = c->scope->depth}));
 
-        const size_t loop_addr = bs_compile_jump_start(c, BS_OP_ITER);
+        if (b.type != BS_TOKEN_IN) {
+            // Value
+            bs_da_push(c->bs, c->scope, ((Bs_Local){.token = b, .depth = c->scope->depth}));
+        }
+
+        const size_t loop_addr =
+            bs_compile_jump_start(c, b.type == BS_TOKEN_IN ? BS_OP_RANGE : BS_OP_ITER);
+
         bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
 
         bs_lexer_buffer(&c->lexer, bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE));
