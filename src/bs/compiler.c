@@ -262,15 +262,13 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_TABLE);
 
         while (!bs_lexer_read(&c->lexer, BS_TOKEN_RBRACE)) {
-            token = bs_lexer_peek(&c->lexer);
+            token = bs_lexer_either(&c->lexer, BS_TOKEN_IDENT, BS_TOKEN_LBRACKET);
             loc = token.loc;
 
             if (token.type == BS_TOKEN_LBRACKET) {
-                c->lexer.peeked = false;
                 bs_compile_expr(c, BS_POWER_SET);
                 bs_lexer_expect(&c->lexer, BS_TOKEN_RBRACKET);
             } else {
-                token = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
                 bs_chunk_push_op_value(
                     c->bs, c->chunk, BS_OP_CONST, bs_value_object(bs_str_const(c->bs, token.sv)));
             }
@@ -281,12 +279,10 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_ILIT);
             bs_chunk_push_op_loc(c->bs, c->chunk, loc);
 
-            token = bs_lexer_peek(&c->lexer);
-            if (token.type != BS_TOKEN_COMMA) {
-                bs_lexer_expect(&c->lexer, BS_TOKEN_RBRACE);
+            if (bs_lexer_either(&c->lexer, BS_TOKEN_COMMA, BS_TOKEN_RBRACE).type !=
+                BS_TOKEN_COMMA) {
                 break;
             }
-            c->lexer.peeked = false;
         }
     } break;
 
@@ -301,12 +297,10 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_ILIT);
 
-            token = bs_lexer_peek(&c->lexer);
-            if (token.type != BS_TOKEN_COMMA) {
-                bs_lexer_expect(&c->lexer, BS_TOKEN_RBRACKET);
+            if (bs_lexer_either(&c->lexer, BS_TOKEN_COMMA, BS_TOKEN_RBRACKET).type !=
+                BS_TOKEN_COMMA) {
                 break;
             }
-            c->lexer.peeked = false;
         }
     } break;
 
@@ -467,12 +461,10 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
                 bs_compile_expr(c, BS_POWER_SET);
                 arity++;
 
-                token = bs_lexer_peek(&c->lexer);
-                if (token.type != BS_TOKEN_COMMA) {
-                    bs_lexer_expect(&c->lexer, BS_TOKEN_RPAREN);
+                if (bs_lexer_either(&c->lexer, BS_TOKEN_COMMA, BS_TOKEN_RPAREN).type !=
+                    BS_TOKEN_COMMA) {
                     break;
                 }
-                c->lexer.peeked = false;
             }
 
             bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_CALL, arity);
@@ -600,12 +592,9 @@ static void bs_compile_lambda(Bs_Compiler *c, const Bs_Token *name) {
         const Bs_Token arg = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
         bs_da_push(c->bs, c->scope, ((Bs_Local){.token = arg, .depth = c->scope->depth}));
 
-        const Bs_Token token = bs_lexer_peek(&c->lexer);
-        if (token.type != BS_TOKEN_COMMA) {
-            bs_lexer_expect(&c->lexer, BS_TOKEN_RPAREN);
+        if (bs_lexer_either(&c->lexer, BS_TOKEN_COMMA, BS_TOKEN_RPAREN).type != BS_TOKEN_COMMA) {
             break;
         }
-        c->lexer.peeked = false;
     }
 
     bs_lexer_buffer(&c->lexer, bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE));
@@ -674,7 +663,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
 
         if (bs_lexer_read(&c->lexer, BS_TOKEN_ELSE)) {
-            bs_lexer_buffer(&c->lexer, bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE));
+            bs_lexer_buffer(&c->lexer, bs_lexer_either(&c->lexer, BS_TOKEN_LBRACE, BS_TOKEN_IF));
             bs_compile_stmt(c);
         }
         bs_compile_jump_patch(c, else_addr);

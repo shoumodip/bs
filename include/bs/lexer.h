@@ -27,5 +27,6 @@ Bs_Token bs_lexer_peek(Bs_Lexer *lexer);
 
 bool bs_lexer_read(Bs_Lexer *lexer, Bs_Token_Type type);
 Bs_Token bs_lexer_expect(Bs_Lexer *lexer, Bs_Token_Type type);
+Bs_Token bs_lexer_either(Bs_Lexer *lexer, Bs_Token_Type a, Bs_Token_Type b);
 
 #endif // BS_LEXER_H

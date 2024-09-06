@@ -358,3 +358,19 @@ Bs_Token bs_lexer_expect(Bs_Lexer *l, Bs_Token_Type type) {
     }
     return token;
 }
+
+Bs_Token bs_lexer_either(Bs_Lexer *l, Bs_Token_Type a, Bs_Token_Type b) {
+    const Bs_Token token = bs_lexer_next(l);
+    if (token.type != a && token.type != b) {
+        bs_fmt(
+            l->error,
+            Bs_Loc_Fmt "error: expected %s or %s, got %s\n",
+            Bs_Loc_Arg(token.loc),
+            bs_token_type_name(a, l->extended),
+            bs_token_type_name(b, l->extended),
+            bs_token_type_name(token.type, l->extended));
+
+        bs_lexer_error(l);
+    }
+    return token;
+}
