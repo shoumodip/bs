@@ -1,9 +1,10 @@
 #include <ctype.h>
 #include <errno.h>
-#include <regex.h>
 #include <stdio.h>
-#include <sys/wait.h>
 #include <time.h>
+
+#include <regex.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #include "bs/core.h"
@@ -1191,6 +1192,5 @@ int bs_core_init(Bs *bs, int argc, char **argv) {
                      "        }"
                      "    }"
                      "    return b;"
-                     "};"),
-        false);
+                     "};"));
 }

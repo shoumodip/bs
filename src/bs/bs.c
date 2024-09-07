@@ -10,7 +10,11 @@
 
 typedef struct {
     size_t base;
-    Bs_Closure *closure;
+
+    union {
+        Bs_Closure *closure;
+        const Bs_C_Fn *native;
+    };
 
     const uint8_t *ip;
 } Bs_Frame;
@@ -73,6 +77,7 @@ struct Bs {
     Bs_Writer error;
     Bs_Writer output;
 
+    bool step;
     void *userdata;
 };
 
@@ -309,7 +314,7 @@ static void bs_collect(Bs *bs) {
 }
 
 // Interface
-Bs *bs_new(void) {
+Bs *bs_new(bool step) {
     Bs *bs = calloc(1, sizeof(Bs));
     if (!bs) {
         return NULL;
@@ -324,6 +329,8 @@ Bs *bs_new(void) {
     bs->output = (Bs_Writer){stdout, bs_file_write};
 
     bs->globals.meta.type = BS_OBJECT_TABLE;
+
+    bs->step = step;
     return bs;
 }
 
@@ -469,9 +476,15 @@ static Bs_Loc bs_chunk_get_loc(const Bs_Chunk *c, size_t op_index) {
 void bs_error(Bs *bs, const char *fmt, ...) {
     Bs_Writer *w = bs_stderr_get(bs);
 
-    Bs_Loc loc = bs_chunk_get_loc(
-        &bs->frame->closure->fn->chunk, bs->frame->ip - bs->frame->closure->fn->chunk.data);
-    bs_fmt(w, Bs_Loc_Fmt "error: ", Bs_Loc_Arg(loc));
+    if (bs->frame->ip) {
+        const Bs_Loc loc = bs_chunk_get_loc(
+            &bs->frame->closure->fn->chunk, bs->frame->ip - bs->frame->closure->fn->chunk.data);
+        bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(loc));
+    } else {
+        bs_fmt(w, "[C]: ");
+    }
+
+    bs_fmt(w, "error: ");
     {
         Bs_Buffer *b = bs_buffer_get(bs);
         const size_t start = b->count;
@@ -505,15 +518,27 @@ void bs_error(Bs *bs, const char *fmt, ...) {
     for (size_t i = bs->frames.count; i > 1; i--) {
         const Bs_Frame *callee = &bs->frames.data[i - 1];
         const Bs_Frame *caller = &bs->frames.data[i - 2];
-        const Bs_Fn *fn = caller->closure->fn;
 
-        loc = bs_chunk_get_loc(&fn->chunk, caller->ip - fn->chunk.data);
-        if (*loc.path == '\0') {
-            continue;
+        if (caller->ip) {
+            const Bs_Fn *fn = caller->closure->fn;
+
+            const Bs_Loc loc = bs_chunk_get_loc(&fn->chunk, caller->ip - fn->chunk.data);
+            if (*loc.path == '\0') {
+                continue;
+            }
+
+            bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(loc));
+        } else {
+            bs_fmt(w, "[C]: ");
         }
 
-        bs_fmt(w, Bs_Loc_Fmt "in ", Bs_Loc_Arg(loc));
-        bs_value_write(w, bs_value_object(callee->closure->fn));
+        bs_fmt(w, "in ");
+        if (callee->ip) {
+            bs_value_write(w, bs_value_object(callee->closure->fn));
+        } else {
+            bs_value_write(w, bs_value_object(callee->native));
+        }
+
         bs_fmt(w, "\n");
     }
 }
@@ -649,22 +674,6 @@ static bool bs_binary_op(Bs *bs, Bs_Value *a, Bs_Value *b, const char *op) {
     return true;
 }
 
-static bool bs_call_closure(Bs *bs, Bs_Closure *closure, size_t arity) {
-    if (!bs_check_arity(bs, arity, closure->fn->arity)) {
-        return false;
-    }
-
-    const Bs_Frame frame = {
-        .closure = closure,
-        .ip = closure->fn->chunk.data,
-        .base = bs->stack.count - arity - 1,
-    };
-
-    bs_frames_push(bs, &bs->frames, frame);
-    bs->frame = &bs->frames.data[bs->frames.count - 1];
-    return true;
-}
-
 static_assert(BS_COUNT_OBJECTS == 9, "Update bs_call_value()");
 static bool bs_call_value(Bs *bs, size_t arity) {
     const Bs_Value value = bs_stack_peek(bs, arity);
@@ -675,18 +684,39 @@ static bool bs_call_value(Bs *bs, size_t arity) {
     }
 
     switch (value.as.object->type) {
-    case BS_OBJECT_CLOSURE:
-        if (!bs_call_closure(bs, (Bs_Closure *)value.as.object, arity)) {
+    case BS_OBJECT_CLOSURE: {
+        Bs_Closure *closure = (Bs_Closure *)value.as.object;
+        if (!bs_check_arity(bs, arity, closure->fn->arity)) {
             return false;
         }
-        break;
+
+        const Bs_Frame frame = {
+            .closure = closure,
+            .ip = closure->fn->chunk.data,
+            .base = bs->stack.count - arity - 1,
+        };
+
+        bs_frames_push(bs, &bs->frames, frame);
+        bs->frame = &bs->frames.data[bs->frames.count - 1];
+    } break;
 
     case BS_OBJECT_C_FN: {
         const Bs_C_Fn *native = (Bs_C_Fn *)value.as.object;
         const bool gc_on = bs->gc_on;
         bs->gc_on = false;
 
+        const Bs_Frame frame = {
+            .native = native,
+            .base = bs->stack.count - arity,
+        };
+
+        bs_frames_push(bs, &bs->frames, frame);
+        bs->frame = &bs->frames.data[bs->frames.count - 1];
+
         const Bs_Value value = native->fn(bs, &bs->stack.data[bs->stack.count - arity], arity);
+        bs->frames.count--;
+        bs->frame = &bs->frames.data[bs->frames.count - 1];
+
         bs->stack.count -= arity;
         bs->stack.data[bs->stack.count - 1] = value;
 
@@ -735,34 +765,31 @@ static void bs_close_upvalues(Bs *bs, size_t index) {
 }
 
 // Interpreter
-static_assert(BS_COUNT_OPS == 41, "Update bs_run()");
-int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
+static int bs_interpret(Bs *bs, Bs_Value *output) {
     int result = 0;
 
-    {
-        Bs_Fn *fn = bs_compile(bs, path, input, true);
-        if (!fn) {
-            bs_return_defer(1);
-        }
-
-        if (step) {
-            bs_debug_chunk(bs_stdout_get(bs), &fn->chunk);
-        }
-
-        bs_da_push(bs, &bs->modules, (Bs_Module){.name = fn->name});
-        fn->module = bs->modules.count;
-
-        Bs_Closure *closure = bs_closure_new(bs, fn);
-        bs_stack_push(bs, bs_value_object(closure));
-        bs_call_closure(bs, closure, 0);
-    }
+    const size_t frames_count_save = bs->frames.count;
+    const bool gc_on_save = bs->gc_on;
 
     bs->gc_on = true;
     while (true) {
-        if (step) {
+        if (bs->step) {
             Bs_Writer *w = bs_stdout_get(bs);
             bs_fmt(w, "\n----------------------------------------\n");
-            bs_fmt(w, "Stack:\n");
+            bs_fmt(w, "Frames:\n");
+            for (size_t i = 0; i < bs->frames.count; i++) {
+                const Bs_Frame *frame = &bs->frames.data[i];
+                bs_fmt(w, "    ");
+                if (frame->ip) {
+                    bs_value_write(w, bs_value_object(frame->closure));
+                } else {
+                    bs_fmt(w, "[C]");
+                }
+                bs_fmt(w, "\n");
+            }
+            bs_fmt(w, "\n");
+
+            bs_fmt(w, "Stack: %zu\n", bs->stack.count);
             for (size_t i = 0; i < bs->stack.count; i++) {
                 bs_fmt(w, "    ");
                 bs_value_write(w, bs->stack.data[i]);
@@ -783,7 +810,10 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             bs_close_upvalues(bs, bs->frame->base);
             bs->frames.count--;
 
-            if (!bs->frames.count) {
+            if (bs->frames.count + 1 == frames_count_save) {
+                if (output) {
+                    *output = value;
+                }
                 bs_return_defer(0);
             }
 
@@ -792,7 +822,6 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
             bs_stack_push(bs, value);
 
             bs->frame = &bs->frames.data[bs->frames.count - 1];
-
             if (frame->closure->fn->module) {
                 Bs_Module *m = &bs->modules.data[frame->closure->fn->module - 1];
                 m->done = true;
@@ -1134,9 +1163,8 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
                     bs_da_push(bs, &bs->modules, (Bs_Module){.name = fn->name});
                     fn->module = bs->modules.count;
 
-                    Bs_Closure *closure = bs_closure_new(bs, fn);
-                    bs_stack_push(bs, bs_value_object(closure));
-                    bs_call_closure(bs, closure, 0);
+                    bs_stack_push(bs, bs_value_object(bs_closure_new(bs, fn)));
+                    bs_call_value(bs, 0);
                 }
 
                 bs->gc_on = gc_on;
@@ -1454,6 +1482,29 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step) {
     }
 
 defer:
+    bs->gc_on = gc_on_save;
+    return result;
+}
+
+static_assert(BS_COUNT_OPS == 41, "Update bs_run()");
+int bs_run(Bs *bs, const char *path, Bs_Sv input) {
+    int result = 0;
+
+    Bs_Fn *fn = bs_compile(bs, path, input, true);
+    if (!fn) {
+        bs_return_defer(1);
+    }
+
+    if (bs->step) {
+        bs_debug_chunk(bs_stdout_get(bs), &fn->chunk);
+    }
+
+    bs_da_push(bs, &bs->modules, (Bs_Module){.name = fn->name});
+    fn->module = bs->modules.count;
+
+    result = bs_call(bs, bs_value_object(bs_closure_new(bs, fn)), NULL, 0, NULL);
+
+defer:
     bs->stack.count = 0;
 
     bs->frame = NULL;
@@ -1462,8 +1513,36 @@ defer:
     bs->upvalues = NULL;
     bs->gc_on = false;
 
-    if (step) {
+    if (bs->step) {
         bs_fmt(bs_stdout_get(bs), "Stopping BS with exit code %d\n", result);
     }
+    return result;
+}
+
+int bs_call(Bs *bs, Bs_Value fn, Bs_Value *args, size_t arity, Bs_Value *output) {
+    int result = 0;
+
+    const size_t stack_count_save = bs->stack.count;
+    const size_t frames_count_save = bs->frames.count;
+
+    bs_stack_push(bs, fn);
+    for (size_t i = 0; i < arity; i++) {
+        bs_stack_push(bs, args[i]);
+    }
+
+    if (!bs_call_value(bs, arity)) {
+        bs_return_defer(1);
+    }
+
+    if (fn.as.object->type == BS_OBJECT_C_FN) {
+        *output = bs_stack_peek(bs, 0);
+    } else {
+        result = bs_interpret(bs, output);
+    }
+
+defer:
+    bs->stack.count = stack_count_save;
+    bs->frames.count = frames_count_save;
+    bs->frame = bs->frames.count ? &bs->frames.data[bs->frames.count - 1] : NULL;
     return result;
 }

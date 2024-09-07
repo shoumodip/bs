@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    Bs *bs = bs_new();
+    Bs *bs = bs_new(false);
     if (!bs) {
         fprintf(stderr, "error: could not create BS instance\n");
         exit(1);
@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
 
     int result = bs_core_init(bs, argc - 1, argv + 1);
     if (!result) {
-        result = bs_run(bs, path, bs_sv_from_parts(contents, size), false);
+        result = bs_run(bs, path, bs_sv_from_parts(contents, size));
     }
 
     bs_free(bs);

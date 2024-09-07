@@ -11,7 +11,7 @@
 // Interface
 typedef struct Bs Bs;
 
-Bs *bs_new(void);
+Bs *bs_new(bool step);
 void bs_free(Bs *bs);
 void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size);
 
@@ -64,7 +64,8 @@ bool bs_check_object_c_type(Bs *bs, Bs_Value value, const Bs_C_Data_Spec *spec, 
 bool bs_check_whole_number(Bs *bs, Bs_Value value, const char *label);
 
 // Interpreter
-int bs_run(Bs *bs, const char *path, Bs_Sv input, bool step);
+int bs_run(Bs *bs, const char *path, Bs_Sv input);
+int bs_call(Bs *bs, Bs_Value fn, Bs_Value *args, size_t arity, Bs_Value *output);
 
 // Dynamic Array
 #define BS_DA_INIT_CAP 128
