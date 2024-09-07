@@ -561,7 +561,7 @@ static Bs_Value bs_str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_error;
     }
 
-    Bs_Str *src = (Bs_Str *)args[0].as.object;
+    const Bs_Str *src = (const Bs_Str *)args[0].as.object;
     Bs_Str *dst = bs_str_new(bs, bs_sv_from_parts(src->data, src->size));
     for (size_t i = 0; i < dst->size / 2; i++) {
         const char c = dst->data[i];
@@ -922,6 +922,24 @@ static Bs_Value bs_array_join(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
 }
 
+static Bs_Value bs_array_reverse(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!bs_check_arity(bs, arity, 1)) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1")) {
+        return bs_value_error;
+    }
+
+    const Bs_Array *src = (const Bs_Array *)args[0].as.object;
+    Bs_Array *dst = bs_array_new(bs);
+    for (size_t i = 0; i < src->count; i++) {
+        bs_array_set(bs, dst, i, src->data[src->count - i - 1]);
+    }
+
+    return bs_value_object(dst);
+}
+
 // Bytes
 static void bs_bytes_data_free(Bs *bs, void *data) {
     bs_da_free(bs, (Bs_Buffer *)data);
@@ -1149,6 +1167,7 @@ int bs_core_init(Bs *bs, int argc, char **argv) {
     {
         Bs_Table *array = bs_table_new(bs);
         bs_table_add(bs, array, "join", bs_value_object(bs_c_fn_new(bs, bs_array_join)));
+        bs_table_add(bs, array, "reverse", bs_value_object(bs_c_fn_new(bs, bs_array_reverse)));
         bs_global_set(bs, Bs_Sv_Static("array"), bs_value_object(array));
     }
 
