@@ -1022,6 +1022,62 @@ static Bs_Value bs_array_join(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
 }
 
+typedef struct {
+    Bs *bs;
+    Bs_Value fn;
+} Bs_Array_Sort_Context;
+
+static int bs_array_sort_compare(const void *a, const void *b) {
+    static Bs_Array_Sort_Context context;
+    if (!a) {
+        context = *(const Bs_Array_Sort_Context *)b;
+        return 0;
+    }
+
+    Bs_Value args[] = {
+        *(const Bs_Value *)a,
+        *(const Bs_Value *)b,
+    };
+
+    Bs_Value output;
+    const int result = bs_call(context.bs, context.fn, args, bs_c_array_size(args), &output);
+    assert(result == 0 && "The VM doesn't support jump based error handling yet");
+
+    return 1 - !bs_value_is_falsey(output);
+}
+
+static Bs_Value bs_array_sort(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!bs_check_arity(bs, arity, 2)) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1")) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_callable(bs, args[1], "argument #2")) {
+        return bs_value_error;
+    }
+
+    const Bs_Array *src = (const Bs_Array *)args[0].as.object;
+    const Bs_Value fn = args[1];
+
+    Bs_Array *dst = bs_array_new(bs);
+    for (size_t i = src->count; i > 0; i--) {
+        bs_array_set(bs, dst, i - 1, src->data[i - 1]);
+    }
+
+    // Prepare the context
+    const Bs_Array_Sort_Context context = {
+        .bs = bs,
+        .fn = fn,
+    };
+    bs_array_sort_compare(NULL, &context);
+
+    qsort(dst->data, dst->count, sizeof(*dst->data), bs_array_sort_compare);
+    return bs_value_object(dst);
+}
+
 static Bs_Value bs_array_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 1)) {
         return bs_value_error;
@@ -1271,6 +1327,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_table_add(bs, array, "reduce", bs_value_object(bs_c_fn_new(bs, bs_array_reduce)));
 
         bs_table_add(bs, array, "join", bs_value_object(bs_c_fn_new(bs, bs_array_join)));
+        bs_table_add(bs, array, "sort", bs_value_object(bs_c_fn_new(bs, bs_array_sort)));
         bs_table_add(bs, array, "reverse", bs_value_object(bs_c_fn_new(bs, bs_array_reverse)));
         bs_global_set(bs, Bs_Sv_Static("array"), bs_value_object(array));
     }

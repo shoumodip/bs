@@ -67,6 +67,12 @@ bool bs_check_whole_number(Bs *bs, Bs_Value value, const char *label);
 
 // Interpreter
 int bs_run(Bs *bs, const char *path, Bs_Sv input);
+
+// TODO: if a function calls exit(0), it doesn't exit the program like it's supposed to in the
+// checking logic in the callers of this function
+//
+// Even better eliminiate the choice of returning from the caller and longjump to a preset point
+// when any error occurs. Put longjmp() inside bs_error(), and setjmp() inside bs_run()
 int bs_call(Bs *bs, Bs_Value fn, Bs_Value *args, size_t arity, Bs_Value *output);
 
 // Dynamic Array

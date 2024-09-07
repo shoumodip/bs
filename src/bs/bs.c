@@ -778,6 +778,7 @@ static void bs_close_upvalues(Bs *bs, size_t index) {
 }
 
 // Interpreter
+static_assert(BS_COUNT_OPS == 41, "Update bs_interpret()");
 static int bs_interpret(Bs *bs, Bs_Value *output) {
     int result = 0;
 
@@ -1499,7 +1500,6 @@ defer:
     return result;
 }
 
-static_assert(BS_COUNT_OPS == 41, "Update bs_run()");
 int bs_run(Bs *bs, const char *path, Bs_Sv input) {
     int result = 0;
 
