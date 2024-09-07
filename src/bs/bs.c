@@ -606,8 +606,8 @@ void bs_check_object_c_type(
 }
 
 void bs_check_callable(Bs *bs, Bs_Value value, const char *label) {
-    bs_check_value_type(bs, value, BS_VALUE_OBJECT, label);
-    if (value.as.object->type != BS_OBJECT_CLOSURE && value.as.object->type != BS_OBJECT_C_FN) {
+    if (value.type != BS_VALUE_OBJECT ||
+        (value.as.object->type != BS_OBJECT_CLOSURE && value.as.object->type != BS_OBJECT_C_FN)) {
         bs_error(bs, "expected %s to be callable object, got %s", label, bs_value_type_name(value));
     }
 }
