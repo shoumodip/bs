@@ -61,6 +61,8 @@ bool bs_check_arity(Bs *bs, size_t actual, size_t expected);
 bool bs_check_value_type(Bs *bs, Bs_Value value, Bs_Value_Type expected, const char *label);
 bool bs_check_object_type(Bs *bs, Bs_Value value, Bs_Object_Type expected, const char *label);
 bool bs_check_object_c_type(Bs *bs, Bs_Value value, const Bs_C_Data_Spec *spec, const char *label);
+
+bool bs_check_callable(Bs *bs, Bs_Value value, const char *label);
 bool bs_check_whole_number(Bs *bs, Bs_Value value, const char *label);
 
 // Interpreter

@@ -609,6 +609,19 @@ bool bs_check_object_c_type(
     return true;
 }
 
+bool bs_check_callable(Bs *bs, Bs_Value value, const char *label) {
+    if (!bs_check_value_type(bs, value, BS_VALUE_OBJECT, label)) {
+        return false;
+    }
+
+    if (value.as.object->type != BS_OBJECT_CLOSURE && value.as.object->type != BS_OBJECT_C_FN) {
+        bs_error(bs, "expected %s to be callable object, got %s", label, bs_value_type_name(value));
+        return false;
+    }
+
+    return true;
+}
+
 bool bs_check_whole_number(Bs *bs, Bs_Value value, const char *label) {
     if (!bs_check_value_type(bs, value, BS_VALUE_NUM, label)) {
         return false;
@@ -1535,7 +1548,14 @@ int bs_call(Bs *bs, Bs_Value fn, Bs_Value *args, size_t arity, Bs_Value *output)
     }
 
     if (fn.as.object->type == BS_OBJECT_C_FN) {
-        *output = bs_stack_peek(bs, 0);
+        const Bs_Value value = bs_stack_peek(bs, 0);
+        if (value.type == BS_VALUE_HALT) {
+            bs_return_defer(value.as.number);
+        }
+
+        if (output) {
+            *output = value;
+        }
     } else {
         result = bs_interpret(bs, output);
     }

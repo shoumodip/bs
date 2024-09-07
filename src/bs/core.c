@@ -890,6 +890,38 @@ static Bs_Value bs_str_replace_regex(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Array
+static Bs_Value bs_array_map(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!bs_check_arity(bs, arity, 2)) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1")) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_callable(bs, args[1], "argument #2")) {
+        return bs_value_error;
+    }
+
+    const Bs_Array *src = (const Bs_Array *)args[0].as.object;
+    const Bs_Value fn = args[1];
+    Bs_Array *dst = bs_array_new(bs);
+
+    for (size_t i = 0; i < src->count; i++) {
+        Bs_Value input = src->data[i];
+        Bs_Value output;
+
+        const int result = bs_call(bs, fn, &input, 1, &output);
+        if (result) {
+            return bs_value_halt(result);
+        }
+
+        bs_array_set(bs, dst, i, output);
+    }
+
+    return bs_value_object(dst);
+}
+
 static Bs_Value bs_array_join(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 2)) {
         return bs_value_error;
@@ -934,7 +966,7 @@ static Bs_Value bs_array_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     const Bs_Array *src = (const Bs_Array *)args[0].as.object;
     Bs_Array *dst = bs_array_new(bs);
     for (size_t i = 0; i < src->count; i++) {
-        bs_array_set(bs, dst, i, src->data[src->count - i - 1]);
+        bs_array_set(bs, dst, src->count - i - 1, src->data[i]);
     }
 
     return bs_value_object(dst);
@@ -1166,6 +1198,8 @@ int bs_core_init(Bs *bs, int argc, char **argv) {
 
     {
         Bs_Table *array = bs_table_new(bs);
+        bs_table_add(bs, array, "map", bs_value_object(bs_c_fn_new(bs, bs_array_map)));
+
         bs_table_add(bs, array, "join", bs_value_object(bs_c_fn_new(bs, bs_array_join)));
         bs_table_add(bs, array, "reverse", bs_value_object(bs_c_fn_new(bs, bs_array_reverse)));
         bs_global_set(bs, Bs_Sv_Static("array"), bs_value_object(array));
@@ -1186,15 +1220,7 @@ int bs_core_init(Bs *bs, int argc, char **argv) {
     return bs_run(
         bs,
         "",
-        Bs_Sv_Static("array.map = fn (a, f) {"
-                     "    var b = [];"
-                     "    for i, v in a {"
-                     "        b[i] = f(v);"
-                     "    }"
-                     "    return b;"
-                     "};"
-
-                     "array.filter = fn (a, f) {"
+        Bs_Sv_Static("array.filter = fn (a, f) {"
                      "    var b = [];"
                      "    for i, v in a {"
                      "        if f(v) {"
