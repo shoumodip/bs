@@ -22,12 +22,9 @@ int main(int argc, char **argv) {
         fprintf(stderr, "error: could not create BS instance\n");
         exit(1);
     }
+    bs_core_init(bs, argc - 1, argv + 1);
 
-    int result = bs_core_init(bs, argc - 1, argv + 1);
-    if (!result) {
-        result = bs_run(bs, path, bs_sv_from_parts(contents, size));
-    }
-
+    const int result = bs_run(bs, path, bs_sv_from_parts(contents, size));
     bs_free(bs);
     free(contents);
     return result;

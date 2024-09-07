@@ -3,6 +3,6 @@
 
 #include "bs.h"
 
-int bs_core_init(Bs *bs, int argc, char **argv);
+void bs_core_init(Bs *bs, int argc, char **argv);
 
 #endif // BS_CORE_H

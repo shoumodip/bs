@@ -922,6 +922,74 @@ static Bs_Value bs_array_map(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(dst);
 }
 
+static Bs_Value bs_array_filter(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!bs_check_arity(bs, arity, 2)) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1")) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_callable(bs, args[1], "argument #2")) {
+        return bs_value_error;
+    }
+
+    const Bs_Array *src = (const Bs_Array *)args[0].as.object;
+    const Bs_Value fn = args[1];
+    Bs_Array *dst = bs_array_new(bs);
+
+    for (size_t i = 0; i < src->count; i++) {
+        Bs_Value input = src->data[i];
+        Bs_Value output;
+
+        const int result = bs_call(bs, fn, &input, 1, &output);
+        if (result) {
+            return bs_value_halt(result);
+        }
+
+        if (!bs_value_is_falsey(output)) {
+            bs_array_set(bs, dst, dst->count, input);
+        }
+    }
+
+    return bs_value_object(dst);
+}
+
+static Bs_Value bs_array_reduce(Bs *bs, Bs_Value *args, size_t arity) {
+    if (arity != 2 && arity != 3) {
+        bs_error(bs, "expected 2 or 3 arguments, got %zu", arity);
+        return bs_value_error;
+    }
+
+    if (!bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1")) {
+        return bs_value_error;
+    }
+
+    if (!bs_check_callable(bs, args[1], "argument #2")) {
+        return bs_value_error;
+    }
+
+    const Bs_Array *src = (const Bs_Array *)args[0].as.object;
+    const Bs_Value fn = args[1];
+    Bs_Value acc = arity == 3 ? args[2] : bs_value_nil;
+
+    for (size_t i = 0; i < src->count; i++) {
+        if (acc.type == BS_VALUE_NIL) {
+            acc = src->data[i];
+            continue;
+        }
+
+        Bs_Value input[] = {acc, src->data[i]};
+        const int result = bs_call(bs, fn, input, bs_c_array_size(input), &acc);
+        if (result) {
+            return bs_value_halt(result);
+        }
+    }
+
+    return acc;
+}
+
 static Bs_Value bs_array_join(Bs *bs, Bs_Value *args, size_t arity) {
     if (!bs_check_arity(bs, arity, 2)) {
         return bs_value_error;
@@ -1127,7 +1195,7 @@ static void bs_table_add(Bs *bs, Bs_Table *table, const char *name, Bs_Value val
     bs_table_set(bs, table, bs_value_object(bs_str_const(bs, bs_sv_from_cstr(name))), value);
 }
 
-int bs_core_init(Bs *bs, int argc, char **argv) {
+void bs_core_init(Bs *bs, int argc, char **argv) {
     {
         Bs_Table *io = bs_table_new(bs);
         bs_table_add(bs, io, "open", bs_value_object(bs_c_fn_new(bs, bs_io_open)));
@@ -1199,6 +1267,8 @@ int bs_core_init(Bs *bs, int argc, char **argv) {
     {
         Bs_Table *array = bs_table_new(bs);
         bs_table_add(bs, array, "map", bs_value_object(bs_c_fn_new(bs, bs_array_map)));
+        bs_table_add(bs, array, "filter", bs_value_object(bs_c_fn_new(bs, bs_array_filter)));
+        bs_table_add(bs, array, "reduce", bs_value_object(bs_c_fn_new(bs, bs_array_reduce)));
 
         bs_table_add(bs, array, "join", bs_value_object(bs_c_fn_new(bs, bs_array_join)));
         bs_table_add(bs, array, "reverse", bs_value_object(bs_c_fn_new(bs, bs_array_reverse)));
@@ -1216,28 +1286,4 @@ int bs_core_init(Bs *bs, int argc, char **argv) {
         bs_table_add(bs, bytes, "insert", bs_value_object(bs_c_fn_new(bs, bs_bytes_insert)));
         bs_global_set(bs, Bs_Sv_Static("bytes"), bs_value_object(bytes));
     }
-
-    return bs_run(
-        bs,
-        "",
-        Bs_Sv_Static("array.filter = fn (a, f) {"
-                     "    var b = [];"
-                     "    for i, v in a {"
-                     "        if f(v) {"
-                     "            b[@b] = v;"
-                     "        }"
-                     "    }"
-                     "    return b;"
-                     "};"
-
-                     "array.reduce = fn (a, b, f) {"
-                     "    for i, v in a {"
-                     "        if b == nil {"
-                     "            b = v;"
-                     "        } else {"
-                     "            b = f(b, v);"
-                     "        }"
-                     "    }"
-                     "    return b;"
-                     "};"));
 }
