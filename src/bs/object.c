@@ -47,9 +47,7 @@ Bs_Str *bs_str_new(Bs *bs, Bs_Sv sv) {
     Bs_Str *str = (Bs_Str *)bs_object_new(bs, BS_OBJECT_STR, sizeof(Bs_Str) + sv.size);
     str->hashed = false;
 
-    if (sv.data) {
-        memcpy(str->data, sv.data, sv.size);
-    }
+    memcpy(str->data, sv.data, sv.size);
     str->size = sv.size;
     return str;
 }

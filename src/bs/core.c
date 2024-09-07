@@ -562,9 +562,11 @@ static Bs_Value bs_str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     }
 
     Bs_Str *src = (Bs_Str *)args[0].as.object;
-    Bs_Str *dst = bs_str_new(bs, bs_sv_from_parts(NULL, src->size));
-    for (size_t i = 0; i < src->size; i++) {
-        dst->data[dst->size - i - 1] = src->data[i];
+    Bs_Str *dst = bs_str_new(bs, bs_sv_from_parts(src->data, src->size));
+    for (size_t i = 0; i < dst->size / 2; i++) {
+        const char c = dst->data[i];
+        dst->data[i] = dst->data[dst->size - i - 1];
+        dst->data[dst->size - i - 1] = c;
     }
 
     return bs_value_object(dst);
