@@ -23,17 +23,9 @@ static const Bs_C_Data_Spec bs_file_data_spec = {
 };
 
 static Bs_Value bs_io_open(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 2)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_value_type(bs, args[1], BS_VALUE_BOOL, "argument #2")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 2);
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_check_value_type(bs, args[1], BS_VALUE_BOOL, "argument #2");
 
     Bs_Buffer *b = bs_buffer_get(bs);
     const size_t start = b->count;
@@ -52,18 +44,12 @@ static Bs_Value bs_io_open(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_io_close(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 1)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 1);
+    bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1");
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
     if (!c->data) {
         bs_error(bs, "cannot close already closed file");
-        return bs_value_error;
     }
 
     bs_file_data_free(bs, c->data);
@@ -73,22 +59,13 @@ static Bs_Value bs_io_close(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_io_read(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 2)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_whole_number(bs, args[1], "argument #2")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 2);
+    bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1");
+    bs_check_whole_number(bs, args[1], "argument #2");
 
     FILE *f = ((Bs_C_Data *)args[0].as.object)->data;
     if (!f) {
         bs_error(bs, "cannot read from closed file");
-        return bs_value_error;
     }
 
     size_t count = args[1].as.number;
@@ -129,18 +106,12 @@ static Bs_Value bs_io_read(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_io_flush(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 1)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 1);
+    bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1");
 
     FILE *f = ((Bs_C_Data *)args[0].as.object)->data;
     if (!f) {
         bs_error(bs, "cannot flush closed file");
-        return bs_value_error;
     }
 
     fflush(f);
@@ -150,17 +121,13 @@ static Bs_Value bs_io_flush(Bs *bs, Bs_Value *args, size_t arity) {
 static Bs_Value bs_io_write(Bs *bs, Bs_Value *args, size_t arity) {
     if (!arity) {
         bs_error(bs, "expected at least 1 argument, got 0");
-        return bs_value_error;
     }
 
-    if (!bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1")) {
-        return bs_value_error;
-    }
+    bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1");
 
     FILE *f = ((Bs_C_Data *)args[0].as.object)->data;
     if (!f) {
         bs_error(bs, "cannot write into closed file");
-        return bs_value_error;
     }
 
     Bs_Writer w = bs_file_writer(f);
@@ -199,17 +166,13 @@ static Bs_Value bs_io_eprint(Bs *bs, Bs_Value *args, size_t arity) {
 static Bs_Value bs_io_writeln(Bs *bs, Bs_Value *args, size_t arity) {
     if (!arity) {
         bs_error(bs, "expected at least 1 argument, got 0");
-        return bs_value_error;
     }
 
-    if (!bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1")) {
-        return bs_value_error;
-    }
+    bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1");
 
     FILE *f = ((Bs_C_Data *)args[0].as.object)->data;
     if (!f) {
         bs_error(bs, "cannot write into closed file");
-        return bs_value_error;
     }
 
     Bs_Writer w = bs_file_writer(f);
@@ -250,25 +213,16 @@ static Bs_Value bs_io_eprintln(Bs *bs, Bs_Value *args, size_t arity) {
 
 // OS
 static Bs_Value bs_os_exit(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 1)) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 1);
+    bs_check_whole_number(bs, args[0], "argument #1");
 
-    if (!bs_check_whole_number(bs, args[0], "argument #1")) {
-        return bs_value_error;
-    }
-
-    return bs_value_halt(args[0].as.number);
+    bs_unwind(bs, args[0].as.number);
+    assert(false && "unreachable");
 }
 
 static Bs_Value bs_os_sleep(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 1)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 1);
+    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
 
     const double seconds = args[0].as.number;
 
@@ -279,7 +233,6 @@ static Bs_Value bs_os_sleep(Bs *bs, Bs_Value *args, size_t arity) {
     while (nanosleep(&req, &rem) == -1) {
         if (errno != EINTR) {
             bs_error(bs, "could not sleep");
-            return bs_value_error;
         }
 
         req = rem;
@@ -289,13 +242,8 @@ static Bs_Value bs_os_sleep(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_os_getenv(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 1)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 1);
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
 
     {
         Bs_Buffer *b = bs_buffer_get(bs);
@@ -317,17 +265,9 @@ static Bs_Value bs_os_getenv(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_os_setenv(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 2)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 2);
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
 
     const char *key;
     const char *value;
@@ -360,22 +300,13 @@ static const Bs_C_Data_Spec bs_process_data_spec = {
 };
 
 static Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 2)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_c_type(bs, args[0], &bs_process_data_spec, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_whole_number(bs, args[1], "argument #2")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 2);
+    bs_check_object_c_type(bs, args[0], &bs_process_data_spec, "argument #1");
+    bs_check_whole_number(bs, args[1], "argument #2");
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
     if (!c->data) {
         bs_error(bs, "cannot kill already terminated process");
-        return bs_value_error;
     }
 
     const pid_t pid = (uintptr_t)c->data;
@@ -383,25 +314,18 @@ static Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
 
     if (kill(pid, args[1].as.number) < 0) {
         bs_error(bs, "could not kill process");
-        return bs_value_error;
     }
 
     return bs_value_nil;
 }
 
 static Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 1)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_c_type(bs, args[0], &bs_process_data_spec, "argument #1")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 1);
+    bs_check_object_c_type(bs, args[0], &bs_process_data_spec, "argument #1");
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
     if (!c->data) {
         bs_error(bs, "cannot wait for already terminated process");
-        return bs_value_error;
     }
 
     const pid_t pid = (uintptr_t)c->data;
@@ -410,37 +334,27 @@ static Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
     int status;
     if (waitpid(pid, &status, 0) < 0) {
         bs_error(bs, "could not wait for process");
-        return bs_value_error;
     }
 
     return WIFEXITED(status) ? bs_value_num(WEXITSTATUS(status)) : bs_value_nil;
 }
 
 static Bs_Value bs_process_spawn(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 1)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 1);
+    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
 
     const Bs_Array *array = (const Bs_Array *)args[0].as.object;
     if (!array->count) {
         bs_error(bs, "cannot execute empty array as process");
-        return bs_value_error;
     }
 
     for (size_t i = 0; i < array->count; i++) {
-        if (!bs_check_object_type(bs, array->data[i], BS_OBJECT_STR, "command argument")) {
-            return bs_value_error;
-        }
+        bs_check_object_type(bs, array->data[i], BS_OBJECT_STR, "command argument");
     }
 
     const pid_t pid = fork();
     if (pid < 0) {
         bs_error(bs, "could not fork process");
-        return bs_value_error;
     }
 
     if (pid == 0) {
@@ -475,21 +389,10 @@ static Bs_Value bs_process_spawn(Bs *bs, Bs_Value *args, size_t arity) {
 
 // Str
 static Bs_Value bs_str_slice(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 3)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_whole_number(bs, args[1], "argument #2")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_whole_number(bs, args[2], "argument #3")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 3);
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_check_whole_number(bs, args[1], "argument #2");
+    bs_check_whole_number(bs, args[2], "argument #3");
 
     Bs_Str *str = (Bs_Str *)args[0].as.object;
     const size_t begin = bs_min(args[1].as.number, args[2].as.number);
@@ -497,7 +400,6 @@ static Bs_Value bs_str_slice(Bs *bs, Bs_Value *args, size_t arity) {
 
     if (begin >= str->size || end > str->size) {
         bs_error(bs, "cannot slice string of length %zu from %zu to %zu", str->size, begin, end);
-        return bs_value_error;
     }
 
     return bs_value_object(bs_str_new(bs, bs_sv_from_parts(str->data + begin, end - begin)));
@@ -506,12 +408,9 @@ static Bs_Value bs_str_slice(Bs *bs, Bs_Value *args, size_t arity) {
 static Bs_Value bs_str_format(Bs *bs, Bs_Value *args, size_t arity) {
     if (!arity) {
         bs_error(bs, "expected at least 1 argument, got 0");
-        return bs_value_error;
     }
 
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
-        return bs_value_error;
-    }
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
 
     const Bs_Str *fmt = (const Bs_Str *)args[0].as.object;
 
@@ -526,9 +425,7 @@ static Bs_Value bs_str_format(Bs *bs, Bs_Value *args, size_t arity) {
         }
     }
 
-    if (!bs_check_arity(bs, arity, count + 1)) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, count + 1);
 
     Bs_Buffer *b = bs_buffer_get(bs);
     const size_t start = b->count;
@@ -553,13 +450,8 @@ static Bs_Value bs_str_format(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 1)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 1);
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
 
     const Bs_Str *src = (const Bs_Str *)args[0].as.object;
     Bs_Str *dst = bs_str_new(bs, bs_sv_from_parts(src->data, src->size));
@@ -575,21 +467,13 @@ static Bs_Value bs_str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
 static Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
     if (arity != 2 && arity != 3) {
         bs_error(bs, "expected 2 or 3 arguments, got %zu", arity);
-        return bs_value_error;
     }
 
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
-        return bs_value_error;
-    }
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
 
     if (arity == 3) {
-        if (!bs_check_whole_number(bs, args[2], "argument #3")) {
-            return bs_value_error;
-        }
+        bs_check_whole_number(bs, args[2], "argument #3");
     }
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
@@ -598,7 +482,6 @@ static Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
     const size_t offset = arity == 3 ? args[2].as.number : 0;
     if (offset > str->size) {
         bs_error(bs, "cannot take offset of %zu in string of length %zu", offset, str->size);
-        return bs_value_error;
     }
 
     if (str->size < pattern->size + offset) {
@@ -618,21 +501,13 @@ static Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
 static Bs_Value bs_str_find_regex(Bs *bs, Bs_Value *args, size_t arity) {
     if (arity != 2 && arity != 3) {
         bs_error(bs, "expected 2 or 3 arguments, got %zu", arity);
-        return bs_value_error;
     }
 
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
-        return bs_value_error;
-    }
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
 
     if (arity == 3) {
-        if (!bs_check_whole_number(bs, args[2], "argument #3")) {
-            return bs_value_error;
-        }
+        bs_check_whole_number(bs, args[2], "argument #3");
     }
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
@@ -641,7 +516,6 @@ static Bs_Value bs_str_find_regex(Bs *bs, Bs_Value *args, size_t arity) {
     const size_t offset = arity == 3 ? args[2].as.number : 0;
     if (offset > str->size) {
         bs_error(bs, "cannot take offset of %zu in string of length %zu", offset, str->size);
-        return bs_value_error;
     }
 
     Bs_Buffer *b = bs_buffer_get(bs);
@@ -658,7 +532,6 @@ static Bs_Value bs_str_find_regex(Bs *bs, Bs_Value *args, size_t arity) {
     regex_t regex;
     if (regcomp(&regex, b->data + pattern_pos, REG_EXTENDED)) {
         bs_error(bs, "could not compile regex pattern");
-        return bs_value_error;
     }
 
     regmatch_t match;
@@ -673,17 +546,9 @@ static Bs_Value bs_str_find_regex(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 2)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 2);
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
@@ -719,17 +584,9 @@ static Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_str_split_regex(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 2)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 2);
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
@@ -750,7 +607,6 @@ static Bs_Value bs_str_split_regex(Bs *bs, Bs_Value *args, size_t arity) {
     regex_t regex;
     if (regcomp(&regex, b->data + pattern_pos, REG_EXTENDED)) {
         bs_error(bs, "could not compile regex pattern");
-        return bs_value_error;
     }
 
     regmatch_t match;
@@ -779,21 +635,10 @@ static Bs_Value bs_str_split_regex(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 3)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[2], BS_OBJECT_STR, "argument #3")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 3);
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
+    bs_check_object_type(bs, args[2], BS_OBJECT_STR, "argument #3");
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
@@ -820,21 +665,10 @@ static Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_str_replace_regex(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 3)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[2], BS_OBJECT_STR, "argument #3")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 3);
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
+    bs_check_object_type(bs, args[2], BS_OBJECT_STR, "argument #3");
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
@@ -854,7 +688,6 @@ static Bs_Value bs_str_replace_regex(Bs *bs, Bs_Value *args, size_t arity) {
     regex_t regex;
     if (regcomp(&regex, b->data + pattern_pos, REG_EXTENDED)) {
         bs_error(bs, "could not compile regex pattern");
-        return bs_value_error;
     }
 
     Bs_Buffer *o = bs_paths_get(bs);
@@ -891,31 +724,17 @@ static Bs_Value bs_str_replace_regex(Bs *bs, Bs_Value *args, size_t arity) {
 
 // Array
 static Bs_Value bs_array_map(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 2)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_callable(bs, args[1], "argument #2")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 2);
+    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
+    bs_check_callable(bs, args[1], "argument #2");
 
     const Bs_Array *src = (const Bs_Array *)args[0].as.object;
     const Bs_Value fn = args[1];
     Bs_Array *dst = bs_array_new(bs);
 
     for (size_t i = 0; i < src->count; i++) {
-        Bs_Value input = src->data[i];
-        Bs_Value output;
-
-        const int result = bs_call(bs, fn, &input, 1, &output);
-        if (result) {
-            return bs_value_halt(result);
-        }
-
+        const Bs_Value input = src->data[i];
+        const Bs_Value output = bs_call(bs, fn, &input, 1);
         bs_array_set(bs, dst, i, output);
     }
 
@@ -923,30 +742,17 @@ static Bs_Value bs_array_map(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_array_filter(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 2)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_callable(bs, args[1], "argument #2")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 2);
+    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
+    bs_check_callable(bs, args[1], "argument #2");
 
     const Bs_Array *src = (const Bs_Array *)args[0].as.object;
     const Bs_Value fn = args[1];
     Bs_Array *dst = bs_array_new(bs);
 
     for (size_t i = 0; i < src->count; i++) {
-        Bs_Value input = src->data[i];
-        Bs_Value output;
-
-        const int result = bs_call(bs, fn, &input, 1, &output);
-        if (result) {
-            return bs_value_halt(result);
-        }
+        const Bs_Value input = src->data[i];
+        const Bs_Value output = bs_call(bs, fn, &input, 1);
 
         if (!bs_value_is_falsey(output)) {
             bs_array_set(bs, dst, dst->count, input);
@@ -959,16 +765,10 @@ static Bs_Value bs_array_filter(Bs *bs, Bs_Value *args, size_t arity) {
 static Bs_Value bs_array_reduce(Bs *bs, Bs_Value *args, size_t arity) {
     if (arity != 2 && arity != 3) {
         bs_error(bs, "expected 2 or 3 arguments, got %zu", arity);
-        return bs_value_error;
     }
 
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_callable(bs, args[1], "argument #2")) {
-        return bs_value_error;
-    }
+    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
+    bs_check_callable(bs, args[1], "argument #2");
 
     const Bs_Array *src = (const Bs_Array *)args[0].as.object;
     const Bs_Value fn = args[1];
@@ -980,28 +780,17 @@ static Bs_Value bs_array_reduce(Bs *bs, Bs_Value *args, size_t arity) {
             continue;
         }
 
-        Bs_Value input[] = {acc, src->data[i]};
-        const int result = bs_call(bs, fn, input, bs_c_array_size(input), &acc);
-        if (result) {
-            return bs_value_halt(result);
-        }
+        const Bs_Value input[] = {acc, src->data[i]};
+        acc = bs_call(bs, fn, input, bs_c_array_size(input));
     }
 
     return acc;
 }
 
 static Bs_Value bs_array_join(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 2)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 2);
+    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
+    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
 
     Bs_Buffer *b = bs_buffer_get(bs);
     const size_t start = b->count;
@@ -1034,30 +823,19 @@ static int bs_array_sort_compare(const void *a, const void *b) {
         return 0;
     }
 
-    Bs_Value args[] = {
+    const Bs_Value args[] = {
         *(const Bs_Value *)a,
         *(const Bs_Value *)b,
     };
 
-    Bs_Value output;
-    const int result = bs_call(context.bs, context.fn, args, bs_c_array_size(args), &output);
-    assert(result == 0 && "The VM doesn't support jump based error handling yet");
-
+    const Bs_Value output = bs_call(context.bs, context.fn, args, bs_c_array_size(args));
     return 1 - !bs_value_is_falsey(output);
 }
 
 static Bs_Value bs_array_sort(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 2)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_callable(bs, args[1], "argument #2")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 2);
+    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
+    bs_check_callable(bs, args[1], "argument #2");
 
     const Bs_Array *src = (const Bs_Array *)args[0].as.object;
     const Bs_Value fn = args[1];
@@ -1079,13 +857,8 @@ static Bs_Value bs_array_sort(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_array_reverse(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 1)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 1);
+    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
 
     const Bs_Array *src = (const Bs_Array *)args[0].as.object;
     Bs_Array *dst = bs_array_new(bs);
@@ -1114,9 +887,7 @@ static const Bs_C_Data_Spec bs_bytes_data_spec = {
 };
 
 static Bs_Value bs_bytes_new(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 0)) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 0);
 
     Bs_Buffer *buffer = bs_realloc(bs, NULL, 0, sizeof(Bs_Buffer));
     memset(buffer, 0, sizeof(*buffer));
@@ -1126,37 +897,23 @@ static Bs_Value bs_bytes_new(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_bytes_len(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 1)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_c_type(bs, args[0], &bs_bytes_data_spec, "argument #1")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 1);
+    bs_check_object_c_type(bs, args[0], &bs_bytes_data_spec, "argument #1");
 
     const Bs_Buffer *b = ((Bs_C_Data *)args[0].as.object)->data;
     return bs_value_num(b->count);
 }
 
 static Bs_Value bs_bytes_reset(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 2)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_c_type(bs, args[0], &bs_bytes_data_spec, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_whole_number(bs, args[1], "argument #2")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 2);
+    bs_check_object_c_type(bs, args[0], &bs_bytes_data_spec, "argument #1");
+    bs_check_whole_number(bs, args[1], "argument #2");
 
     Bs_Buffer *b = ((Bs_C_Data *)args[0].as.object)->data;
     const size_t reset = args[1].as.number;
 
     if (reset > b->count) {
         bs_error(bs, "cannot reset bytes of length %zu to %zu", b->count, reset);
-        return bs_value_error;
     }
 
     b->count = args[1].as.number;
@@ -1164,21 +921,10 @@ static Bs_Value bs_bytes_reset(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_bytes_slice(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 3)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_c_type(bs, args[0], &bs_bytes_data_spec, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_whole_number(bs, args[1], "argument #2")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_whole_number(bs, args[2], "argument #3")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 3);
+    bs_check_object_c_type(bs, args[0], &bs_bytes_data_spec, "argument #1");
+    bs_check_whole_number(bs, args[1], "argument #2");
+    bs_check_whole_number(bs, args[2], "argument #3");
 
     const Bs_Buffer *b = ((Bs_C_Data *)args[0].as.object)->data;
     const size_t begin = bs_min(args[1].as.number, args[2].as.number);
@@ -1186,24 +932,15 @@ static Bs_Value bs_bytes_slice(Bs *bs, Bs_Value *args, size_t arity) {
 
     if (begin >= b->count || end > b->count) {
         bs_error(bs, "cannot slice bytes of length %zu from %zu to %zu", b->count, begin, end);
-        return bs_value_error;
     }
 
     return bs_value_object(bs_str_new(bs, bs_sv_from_parts(b->data + begin, end - begin)));
 }
 
 static Bs_Value bs_bytes_push(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 2)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_c_type(bs, args[0], &bs_bytes_data_spec, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 2);
+    bs_check_object_c_type(bs, args[0], &bs_bytes_data_spec, "argument #1");
+    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
 
     Bs_Buffer *b = ((Bs_C_Data *)args[0].as.object)->data;
     const Bs_Str *src = (const Bs_Str *)args[1].as.object;
@@ -1213,21 +950,10 @@ static Bs_Value bs_bytes_push(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!bs_check_arity(bs, arity, 3)) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_c_type(bs, args[0], &bs_bytes_data_spec, "argument #1")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_whole_number(bs, args[1], "argument #2")) {
-        return bs_value_error;
-    }
-
-    if (!bs_check_object_type(bs, args[2], BS_OBJECT_STR, "argument #3")) {
-        return bs_value_error;
-    }
+    bs_check_arity(bs, arity, 3);
+    bs_check_object_c_type(bs, args[0], &bs_bytes_data_spec, "argument #1");
+    bs_check_whole_number(bs, args[1], "argument #2");
+    bs_check_object_type(bs, args[2], BS_OBJECT_STR, "argument #3");
 
     Bs_Buffer *b = ((Bs_C_Data *)args[0].as.object)->data;
     const size_t index = args[1].as.number;
@@ -1235,7 +961,6 @@ static Bs_Value bs_bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
 
     if (index > b->count) {
         bs_error(bs, "cannot insert at %zu into bytes of length %zu", index, b->count);
-        return bs_value_error;
     }
 
     bs_da_push_many(bs, b, NULL, src->size);

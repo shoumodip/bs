@@ -8,9 +8,6 @@ typedef enum {
     BS_VALUE_NUM,
     BS_VALUE_BOOL,
     BS_VALUE_OBJECT,
-
-    // Special value types
-    BS_VALUE_HALT,
 } Bs_Value_Type;
 
 typedef enum {
@@ -54,9 +51,6 @@ typedef struct {
 #define bs_value_num(v) ((Bs_Value){BS_VALUE_NUM, .as.number = (v)})
 #define bs_value_bool(v) ((Bs_Value){BS_VALUE_BOOL, .as.boolean = (v)})
 #define bs_value_object(v) ((Bs_Value){BS_VALUE_OBJECT, .as.object = (Bs_Object *)(v)})
-
-#define bs_value_halt(v) ((Bs_Value){BS_VALUE_HALT, .as.number = (v)})
-#define bs_value_error ((Bs_Value){BS_VALUE_HALT, .as.number = 1})
 
 bool bs_value_is_falsey(Bs_Value value);
 const char *bs_value_type_name(Bs_Value value);

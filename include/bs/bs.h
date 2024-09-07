@@ -57,23 +57,19 @@ typedef struct {
 
 // Errors
 void bs_error(Bs *bs, const char *fmt, ...);
-bool bs_check_arity(Bs *bs, size_t actual, size_t expected);
-bool bs_check_value_type(Bs *bs, Bs_Value value, Bs_Value_Type expected, const char *label);
-bool bs_check_object_type(Bs *bs, Bs_Value value, Bs_Object_Type expected, const char *label);
-bool bs_check_object_c_type(Bs *bs, Bs_Value value, const Bs_C_Data_Spec *spec, const char *label);
+void bs_unwind(Bs *bs, int exit);
 
-bool bs_check_callable(Bs *bs, Bs_Value value, const char *label);
-bool bs_check_whole_number(Bs *bs, Bs_Value value, const char *label);
+void bs_check_arity(Bs *bs, size_t actual, size_t expected);
+void bs_check_value_type(Bs *bs, Bs_Value value, Bs_Value_Type expected, const char *label);
+void bs_check_object_type(Bs *bs, Bs_Value value, Bs_Object_Type expected, const char *label);
+void bs_check_object_c_type(Bs *bs, Bs_Value value, const Bs_C_Data_Spec *spec, const char *label);
+
+void bs_check_callable(Bs *bs, Bs_Value value, const char *label);
+void bs_check_whole_number(Bs *bs, Bs_Value value, const char *label);
 
 // Interpreter
 int bs_run(Bs *bs, const char *path, Bs_Sv input);
-
-// TODO: if a function calls exit(0), it doesn't exit the program like it's supposed to in the
-// checking logic in the callers of this function
-//
-// Even better eliminiate the choice of returning from the caller and longjump to a preset point
-// when any error occurs. Put longjmp() inside bs_error(), and setjmp() inside bs_run()
-int bs_call(Bs *bs, Bs_Value fn, Bs_Value *args, size_t arity, Bs_Value *output);
+Bs_Value bs_call(Bs *bs, Bs_Value fn, const Bs_Value *args, size_t arity);
 
 // Dynamic Array
 #define BS_DA_INIT_CAP 128
