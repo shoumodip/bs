@@ -95,7 +95,6 @@ struct Bs_Scope {
     size_t capacity;
 
     Bs_Fn *fn;
-    Bs_Jumps jumps;
     Bs_Uplocals uplocals;
 };
 
@@ -103,7 +102,6 @@ struct Bs_Scope {
 
 static void bs_scope_free(Bs *bs, Bs_Scope *s) {
     if (s) {
-        bs_jumps_free(bs, &s->jumps);
         bs_uplocals_free(bs, &s->uplocals);
         bs_da_free(bs, s);
     }
@@ -160,6 +158,8 @@ typedef struct {
 
     Bs *bs;
     Bs_Chunk *chunk;
+
+    Bs_Jumps jumps;
 
     bool is_main_module;
 } Bs_Compiler;
@@ -655,20 +655,20 @@ static void bs_compile_variable(Bs_Compiler *c, bool public) {
 }
 
 static Bs_Jumps bs_compile_jumps_save(Bs_Compiler *c, size_t start) {
-    const Bs_Jumps save = c->scope->jumps;
-    c->scope->jumps.depth = c->scope->depth;
-    c->scope->jumps.start = start;
+    const Bs_Jumps save = c->jumps;
+    c->jumps.depth = c->scope->depth;
+    c->jumps.start = start;
     return save;
 }
 
 static void bs_compile_jumps_reset(Bs_Compiler *c, Bs_Jumps save) {
-    for (size_t i = save.count; i < c->scope->jumps.count; i++) {
-        bs_compile_jump_patch(c, c->scope->jumps.data[i]);
+    for (size_t i = save.count; i < c->jumps.count; i++) {
+        bs_compile_jump_patch(c, c->jumps.data[i]);
     }
 
-    c->scope->jumps.count = save.count;
-    c->scope->jumps.depth = save.depth;
-    c->scope->jumps.start = save.start;
+    c->jumps.count = save.count;
+    c->jumps.depth = save.depth;
+    c->jumps.start = save.start;
 }
 
 static_assert(BS_COUNT_TOKENS == 45, "Update bs_compile_stmt()");
@@ -784,24 +784,24 @@ static void bs_compile_stmt(Bs_Compiler *c) {
     } break;
 
     case BS_TOKEN_BREAK: {
-        if (!c->scope->jumps.depth) {
+        if (!c->jumps.depth) {
             bs_compile_error_unexpected(c, &token);
         }
         bs_lexer_expect(&c->lexer, BS_TOKEN_EOL);
 
-        bs_compile_block_drop(c, c->scope->jumps.depth);
-        bs_jumps_push(c->bs, &c->scope->jumps, c->chunk->count);
+        bs_compile_block_drop(c, c->jumps.depth);
+        bs_jumps_push(c->bs, &c->jumps, c->chunk->count);
         bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_JUMP, 0);
     } break;
 
     case BS_TOKEN_CONTINUE: {
-        if (!c->scope->jumps.depth) {
+        if (!c->jumps.depth) {
             bs_compile_error_unexpected(c, &token);
         }
         bs_lexer_expect(&c->lexer, BS_TOKEN_EOL);
 
-        bs_compile_block_drop(c, c->scope->jumps.depth);
-        bs_compile_jump_direct(c, BS_OP_JUMP, c->scope->jumps.start);
+        bs_compile_block_drop(c, c->jumps.depth);
+        bs_compile_jump_direct(c, BS_OP_JUMP, c->jumps.start);
     } break;
 
     case BS_TOKEN_FN:
@@ -888,6 +888,8 @@ Bs_Fn *bs_compile(Bs *bs, const char *path, Bs_Sv input, bool is_main_module) {
 
         compiler.scope = NULL;
         compiler.chunk = NULL;
+
+        bs_jumps_free(compiler.bs, &compiler.jumps);
         return NULL;
     }
 
@@ -897,5 +899,6 @@ Bs_Fn *bs_compile(Bs *bs, const char *path, Bs_Sv input, bool is_main_module) {
 
     Bs_Fn *fn = bs_compile_scope_end(&compiler);
     bs_scope_free(compiler.bs, &scope);
+    bs_jumps_free(compiler.bs, &compiler.jumps);
     return fn;
 }
