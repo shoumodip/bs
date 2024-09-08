@@ -122,15 +122,12 @@ Bs_Closure *bs_closure_new(Bs *bs, const Bs_Fn *fn);
 
 struct Bs_Upvalue {
     Bs_Object meta;
-    bool closed;
-    union {
-        size_t index;
-        Bs_Value value;
-    };
+    Bs_Value closed;
+    Bs_Value *value;
     Bs_Upvalue *next;
 };
 
-Bs_Upvalue *bs_upvalue_new(Bs *bs, size_t index);
+Bs_Upvalue *bs_upvalue_new(Bs *bs, Bs_Value *value);
 
 struct Bs_C_Fn {
     Bs_Object meta;

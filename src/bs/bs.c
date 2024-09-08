@@ -11,7 +11,7 @@
 #define BS_STACK_CAPACITY (1024 * 1024)
 
 typedef struct {
-    size_t base;
+    Bs_Value *base;
 
     union {
         Bs_Closure *closure;
@@ -223,10 +223,8 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
 
     case BS_OBJECT_UPVALUE: {
         Bs_Upvalue *upvalue = (Bs_Upvalue *)object;
-        if (upvalue->closed) {
-            if (upvalue->value.type == BS_VALUE_OBJECT) {
-                bs_mark_object(bs, upvalue->value.as.object);
-            }
+        if (upvalue->value->type == BS_VALUE_OBJECT) {
+            bs_mark_object(bs, upvalue->value->as.object);
         }
     } break;
 
@@ -693,7 +691,7 @@ static bool bs_call_value(Bs *bs, size_t arity) {
         const Bs_Frame frame = {
             .closure = closure,
             .ip = closure->fn->chunk.data,
-            .base = bs->stack.count - arity - 1,
+            .base = &bs->stack.data[bs->stack.count - arity - 1],
         };
 
         bs_frames_push(bs, &bs->frames, frame);
@@ -707,7 +705,7 @@ static bool bs_call_value(Bs *bs, size_t arity) {
 
         const Bs_Frame frame = {
             .native = native,
-            .base = bs->stack.count - arity,
+            .base = &bs->stack.data[bs->stack.count - arity],
         };
 
         bs_frames_push(bs, &bs->frames, frame);
@@ -731,19 +729,19 @@ static bool bs_call_value(Bs *bs, size_t arity) {
     return true;
 }
 
-static Bs_Upvalue *bs_capture_upvalue(Bs *bs, size_t index) {
+static Bs_Upvalue *bs_capture_upvalue(Bs *bs, Bs_Value *value) {
     Bs_Upvalue *previous = NULL;
     Bs_Upvalue *upvalue = bs->upvalues;
-    while (upvalue && upvalue->index > index) {
+    while (upvalue && upvalue->value > value) {
         previous = upvalue;
         upvalue = upvalue->next;
     }
 
-    if (upvalue && upvalue->index == index) {
+    if (upvalue && upvalue->value == value) {
         return upvalue;
     }
 
-    Bs_Upvalue *created = bs_upvalue_new(bs, index);
+    Bs_Upvalue *created = bs_upvalue_new(bs, value);
     created->next = upvalue;
 
     if (previous) {
@@ -755,11 +753,11 @@ static Bs_Upvalue *bs_capture_upvalue(Bs *bs, size_t index) {
     return created;
 }
 
-static void bs_close_upvalues(Bs *bs, size_t index) {
-    while (bs->upvalues && bs->upvalues->index >= index) {
+static void bs_close_upvalues(Bs *bs, Bs_Value *last) {
+    while (bs->upvalues && bs->upvalues->value >= last) {
         Bs_Upvalue *upvalue = bs->upvalues;
-        upvalue->closed = true;
-        upvalue->value = bs->stack.data[upvalue->index];
+        upvalue->closed = *upvalue->value;
+        upvalue->value = &upvalue->closed;
         bs->upvalues = upvalue->next;
     }
 }
@@ -819,7 +817,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             }
 
             const Bs_Frame *frame = &bs->frames.data[bs->frames.count];
-            bs->stack.count = bs->frame->base;
+            bs->stack.count = bs->frame->base - bs->stack.data;
             bs_stack_push(bs, value);
 
             bs->frame = &bs->frames.data[bs->frames.count - 1];
@@ -856,7 +854,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             break;
 
         case BS_OP_UCLOSE:
-            bs_close_upvalues(bs, bs->stack.count - 1);
+            bs_close_upvalues(bs, bs->stack.data + bs->stack.count - 1);
             bs_stack_pop(bs);
             break;
 
@@ -1173,30 +1171,22 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         } break;
 
         case BS_OP_LGET:
-            bs_stack_push(bs, bs->stack.data[bs->frame->base + bs_chunk_read_int(bs)]);
+            bs_stack_push(bs, bs->frame->base[bs_chunk_read_int(bs)]);
             break;
 
         case BS_OP_LSET:
-            bs->stack.data[bs->frame->base + bs_chunk_read_int(bs)] = bs_stack_peek(bs, 0);
+            bs->frame->base[bs_chunk_read_int(bs)] = bs_stack_peek(bs, 0);
             break;
 
         case BS_OP_UGET: {
             Bs_Upvalue *upvalue = bs->frame->closure->data[bs_chunk_read_int(bs)];
-            if (upvalue->closed) {
-                bs_stack_push(bs, upvalue->value);
-            } else {
-                bs_stack_push(bs, bs->stack.data[upvalue->index]);
-            }
+            bs_stack_push(bs, *upvalue->value);
         } break;
 
         case BS_OP_USET: {
             const Bs_Value value = bs_stack_peek(bs, 0);
             Bs_Upvalue *upvalue = bs->frame->closure->data[bs_chunk_read_int(bs)];
-            if (upvalue->closed) {
-                upvalue->value = value;
-            } else {
-                bs->stack.data[upvalue->index] = value;
-            }
+            *upvalue->value = value;
         } break;
 
         case BS_OP_IGET: {

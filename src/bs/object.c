@@ -209,11 +209,9 @@ Bs_Closure *bs_closure_new(Bs *bs, const Bs_Fn *fn) {
     return closure;
 }
 
-Bs_Upvalue *bs_upvalue_new(Bs *bs, size_t index) {
+Bs_Upvalue *bs_upvalue_new(Bs *bs, Bs_Value *value) {
     Bs_Upvalue *upvalue = (Bs_Upvalue *)bs_object_new(bs, BS_OBJECT_UPVALUE, sizeof(Bs_Upvalue));
-
-    upvalue->closed = false;
-    upvalue->index = index;
+    upvalue->value = value;
     upvalue->next = NULL;
     return upvalue;
 }
