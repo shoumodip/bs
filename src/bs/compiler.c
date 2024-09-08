@@ -96,6 +96,8 @@ struct Bs_Scope {
 
     Bs_Fn *fn;
     Bs_Uplocals uplocals;
+
+    bool is_repl;
 };
 
 #define bs_scope_push bs_da_push
@@ -161,7 +163,7 @@ typedef struct {
 
     Bs_Jumps jumps;
 
-    bool is_main_module;
+    bool is_main;
 } Bs_Compiler;
 
 static size_t bs_compile_jump_start(Bs_Compiler *c, Bs_Op op) {
@@ -348,7 +350,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         break;
 
     case BS_TOKEN_IS_MAIN_MODULE:
-        bs_chunk_push_op(c->bs, c->chunk, c->is_main_module ? BS_OP_TRUE : BS_OP_FALSE);
+        bs_chunk_push_op(c->bs, c->chunk, c->is_main ? BS_OP_TRUE : BS_OP_FALSE);
         break;
 
     default:
@@ -629,6 +631,18 @@ static void bs_compile_lambda(Bs_Compiler *c, const Bs_Token *name) {
     bs_scope_free(c->bs, &scope);
 }
 
+static void bs_compile_function(Bs_Compiler *c, bool public) {
+    Bs_Token token;
+
+    const size_t const_index = bs_compile_definition(c, &token, public);
+    bs_compile_lambda(c, &token);
+
+    if (public) {
+        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_GDEF, const_index);
+        bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
+    }
+}
+
 static void bs_compile_variable(Bs_Compiler *c, bool public) {
     Bs_Token token;
 
@@ -805,8 +819,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
     } break;
 
     case BS_TOKEN_FN:
-        bs_compile_definition(c, &token, false);
-        bs_compile_lambda(c, &token);
+        bs_compile_function(c, c->scope->is_repl && c->scope->depth == 1);
         break;
 
     case BS_TOKEN_PUB:
@@ -821,11 +834,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
 
         token = bs_lexer_next(&c->lexer);
         if (token.type == BS_TOKEN_FN) {
-            const size_t const_index = bs_compile_definition(c, &token, true);
-            bs_compile_lambda(c, &token);
-
-            bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_GDEF, const_index);
-            bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
+            bs_compile_function(c, true);
         } else if (token.type == BS_TOKEN_VAR) {
             bs_compile_variable(c, true);
         } else {
@@ -840,7 +849,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         break;
 
     case BS_TOKEN_VAR:
-        bs_compile_variable(c, false);
+        bs_compile_variable(c, c->scope->is_repl && c->scope->depth == 1);
         break;
 
     case BS_TOKEN_RETURN:
@@ -864,17 +873,17 @@ static void bs_compile_stmt(Bs_Compiler *c) {
     }
 }
 
-Bs_Fn *bs_compile(Bs *bs, const char *path, Bs_Sv input, bool is_main_module) {
+Bs_Fn *bs_compile(Bs *bs, const char *path, Bs_Sv input, bool is_main, bool is_repl) {
     Bs_Compiler compiler = {
         .bs = bs,
         .lexer = bs_lexer_new(path, input, bs_stderr_get(bs)),
-        .is_main_module = is_main_module,
+        .is_main = is_main,
     };
 
     const Bs_Sv path_sv = bs_sv_from_cstr(path);
     compiler.lexer.extended = bs_sv_suffix(path_sv, Bs_Sv_Static(".bsx"));
 
-    Bs_Scope scope = {0};
+    Bs_Scope scope = {.is_repl = is_repl};
     bs_compile_scope_init(&compiler, &scope, path_sv);
     bs_compile_block_init(&compiler);
 
@@ -895,6 +904,11 @@ Bs_Fn *bs_compile(Bs *bs, const char *path, Bs_Sv input, bool is_main_module) {
 
     while (!bs_lexer_read(&compiler.lexer, BS_TOKEN_EOF)) {
         bs_compile_stmt(&compiler);
+    }
+
+    if (is_repl && compiler.chunk->last < compiler.chunk->count &&
+        compiler.chunk->data[compiler.chunk->last] == BS_OP_DROP) {
+        compiler.chunk->data[compiler.chunk->last] = BS_OP_RET;
     }
 
     Bs_Fn *fn = bs_compile_scope_end(&compiler);

@@ -82,6 +82,7 @@ struct Bs {
     void *userdata;
 
     int exit;
+    bool ok;
     jmp_buf unwind;
 };
 
@@ -546,10 +547,11 @@ void bs_error(Bs *bs, const char *fmt, ...) {
         bs_fmt(w, "\n");
     }
 
+    bs->ok = false;
     bs_unwind(bs, 1);
 }
 
-void bs_unwind(Bs *bs, int exit) {
+void bs_unwind(Bs *bs, unsigned char exit) {
     bs->exit = exit;
     longjmp(bs->unwind, 1);
 }
@@ -1104,7 +1106,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                         bs_error(bs, "could not read file '%s'", path);
                     }
 
-                    Bs_Fn *fn = bs_compile(bs, path, bs_sv_from_parts(contents, size), false);
+                    Bs_Fn *fn =
+                        bs_compile(bs, path, bs_sv_from_parts(contents, size), false, false);
                     free(contents);
 
                     if (!fn) {
@@ -1396,12 +1399,14 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
     }
 }
 
-int bs_run(Bs *bs, const char *path, Bs_Sv input) {
-    bs->exit = 0;
+Bs_Result bs_run(Bs *bs, const char *path, Bs_Sv input, bool is_repl) {
+    bs->ok = true;
+    bs->exit = -1;
+    Bs_Result result = {0};
 
-    Bs_Fn *fn = bs_compile(bs, path, input, true);
+    Bs_Fn *fn = bs_compile(bs, path, input, true, is_repl);
     if (!fn) {
-        return 1;
+        return (Bs_Result){.exit = 1};
     }
 
     if (bs->step) {
@@ -1415,7 +1420,7 @@ int bs_run(Bs *bs, const char *path, Bs_Sv input) {
         goto end;
     }
 
-    bs_call(bs, bs_value_object(bs_closure_new(bs, fn)), NULL, 0);
+    result.value = bs_call(bs, bs_value_object(bs_closure_new(bs, fn)), NULL, 0);
 
 end:
     bs->stack.count = 0;
@@ -1429,7 +1434,10 @@ end:
     if (bs->step) {
         bs_fmt(bs_stdout_get(bs), "Stopping BS with exit code %d\n", bs->exit);
     }
-    return bs->exit;
+
+    result.ok = bs->ok;
+    result.exit = bs->exit;
+    return result;
 }
 
 Bs_Value bs_call(Bs *bs, Bs_Value fn, const Bs_Value *args, size_t arity) {

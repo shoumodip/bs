@@ -57,7 +57,7 @@ typedef struct {
 
 // Errors
 void bs_error(Bs *bs, const char *fmt, ...);
-void bs_unwind(Bs *bs, int exit);
+void bs_unwind(Bs *bs, unsigned char exit);
 
 void bs_check_arity(Bs *bs, size_t actual, size_t expected);
 void bs_check_value_type(Bs *bs, Bs_Value value, Bs_Value_Type expected, const char *label);
@@ -68,7 +68,13 @@ void bs_check_callable(Bs *bs, Bs_Value value, const char *label);
 void bs_check_whole_number(Bs *bs, Bs_Value value, const char *label);
 
 // Interpreter
-int bs_run(Bs *bs, const char *path, Bs_Sv input);
+typedef struct {
+    bool ok;
+    int exit;
+    Bs_Value value;
+} Bs_Result;
+
+Bs_Result bs_run(Bs *bs, const char *path, Bs_Sv input, bool is_repl);
 Bs_Value bs_call(Bs *bs, Bs_Value fn, const Bs_Value *args, size_t arity);
 
 // Dynamic Array
