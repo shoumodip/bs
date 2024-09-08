@@ -8,6 +8,7 @@
 // #define BS_GC_DEBUG_LOG
 // #define BS_GC_DEBUG_STRESS
 #define BS_GC_GROW_FACTOR 2
+#define BS_STACK_CAPACITY (1024 * 1024)
 
 typedef struct {
     size_t base;
@@ -55,8 +56,13 @@ static bool bs_modules_find(Bs_Modules *m, Bs_Str *name, size_t *index) {
     return false;
 }
 
+typedef struct {
+    Bs_Value *data;
+    size_t count;
+} Bs_Stack;
+
 struct Bs {
-    Bs_Values stack;
+    Bs_Stack stack;
 
     Bs_Frame *frame;
     Bs_Frames frames;
@@ -321,9 +327,10 @@ static void bs_collect(Bs *bs) {
 // Interface
 Bs *bs_new(bool step) {
     Bs *bs = calloc(1, sizeof(Bs));
-    if (!bs) {
-        return NULL;
-    }
+    assert(bs);
+
+    bs->stack.data = malloc(BS_STACK_CAPACITY * sizeof(*bs->stack.data));
+    assert(bs->stack.data);
 
     bs->gc_max = 1024 * 1024;
 
@@ -623,11 +630,11 @@ void bs_check_whole_number(Bs *bs, Bs_Value value, const char *label) {
 
 // Interpreter
 static void bs_stack_push(Bs *bs, Bs_Value value) {
-    // Do not trigger garbage collection in the stack
-    if (bs->stack.count >= bs->stack.capacity) {
-        bs->stack.capacity = bs->stack.capacity ? bs->stack.capacity * 2 : BS_DA_INIT_CAP;
-        bs->stack.data = realloc(bs->stack.data, bs->stack.capacity * sizeof(*bs->stack.data));
-        assert(bs->stack.data);
+    if (bs->stack.count >= BS_STACK_CAPACITY) {
+        bs_fmt(bs_stderr_get(bs), "error: stack overflow\n");
+
+        bs->ok = false;
+        bs_unwind(bs, 1);
     }
 
     bs->stack.data[bs->stack.count++] = value;

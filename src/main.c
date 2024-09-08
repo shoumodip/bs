@@ -8,10 +8,6 @@ int main(int argc, char **argv) {
         Bs_Result result = {0};
 
         Bs *bs = bs_new(false);
-        if (!bs) {
-            fprintf(stderr, "error: could not create BS instance\n");
-            exit(1);
-        }
         bs_core_init(bs, argc - 1, argv + 1);
 
         char line[1024];
@@ -49,11 +45,6 @@ int main(int argc, char **argv) {
     }
 
     Bs *bs = bs_new(false);
-    if (!bs) {
-        fprintf(stderr, "error: could not create BS instance\n");
-        free(contents);
-        return 1;
-    }
     bs_core_init(bs, argc - 1, argv + 1);
 
     const Bs_Result result = bs_run(bs, path, bs_sv_from_parts(contents, size), false);
