@@ -49,7 +49,59 @@ void bs_lexer_buffer(Bs_Lexer *l, Bs_Token token) {
     l->buffer = token;
 }
 
-static_assert(BS_COUNT_TOKENS == 45, "Update bs_lexer_next()");
+Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc) {
+    Bs_Token token = {.sv = l->sv, .loc = loc};
+
+    while (l->sv.size > 0 && *l->sv.data != '"') {
+        char ch = *l->sv.data;
+        if (ch == '\\') {
+            if (l->sv.size <= 2) {
+                bs_lexer_advance(l);
+                bs_lexer_advance(l);
+                break;
+            }
+
+            switch (l->sv.data[1]) {
+            case 'n':
+            case 't':
+            case '0':
+            case '"':
+            case '\\':
+                break;
+
+            case '(':
+                token.type = BS_TOKEN_ISTR;
+                token.sv.size -= l->sv.size;
+
+                bs_lexer_advance(l);
+                return token;
+
+            default:
+                bs_fmt(
+                    l->error, Bs_Loc_Fmt "error: invalid escape character\n", Bs_Loc_Arg(l->loc));
+
+                bs_lexer_error(l);
+            }
+
+            bs_lexer_advance(l);
+        }
+
+        bs_lexer_advance(l);
+    }
+
+    if (!l->sv.size) {
+        bs_fmt(l->error, Bs_Loc_Fmt "error: unterminated string\n", Bs_Loc_Arg(l->loc));
+        bs_lexer_error(l);
+    }
+
+    token.type = BS_TOKEN_STR;
+    token.sv.size -= l->sv.size;
+
+    bs_lexer_advance(l);
+    return token;
+}
+
+static_assert(BS_COUNT_TOKENS == 46, "Update bs_lexer_next()");
 Bs_Token bs_lexer_next(Bs_Lexer *l) {
     if (l->peeked) {
         l->peeked = false;
@@ -185,48 +237,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
     }
 
     if (bs_lexer_match(l, '"')) {
-        while (l->sv.size > 0 && *l->sv.data != '"') {
-            char ch = *l->sv.data;
-            if (ch == '\\') {
-                if (l->sv.size <= 2) {
-                    bs_lexer_advance(l);
-                    bs_lexer_advance(l);
-                    break;
-                }
-
-                switch (l->sv.data[1]) {
-                case 'n':
-                case 't':
-                case '0':
-                case '"':
-                case '\\':
-                    break;
-
-                default:
-                    bs_fmt(
-                        l->error,
-                        Bs_Loc_Fmt "error: invalid escape character\n",
-                        Bs_Loc_Arg(l->loc));
-
-                    bs_lexer_error(l);
-                }
-
-                bs_lexer_advance(l);
-            }
-
-            bs_lexer_advance(l);
-        }
-
-        if (!l->sv.size) {
-            bs_fmt(l->error, Bs_Loc_Fmt "error: unterminated string\n", Bs_Loc_Arg(token.loc));
-            bs_lexer_error(l);
-        }
-
-        token.type = BS_TOKEN_STR;
-        bs_lexer_advance(l);
-
-        token.sv.size -= l->sv.size;
-        return token;
+        return bs_lexer_str(l, token.loc);
     }
 
     switch (bs_lexer_consume(l)) {

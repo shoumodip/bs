@@ -14,7 +14,7 @@ typedef enum {
     BS_POWER_DOT,
 } Bs_Power;
 
-static_assert(BS_COUNT_TOKENS == 45, "Update bs_token_type_power()");
+static_assert(BS_COUNT_TOKENS == 46, "Update bs_token_type_power()");
 static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_DOT:
@@ -191,7 +191,48 @@ static void bs_compile_error_unexpected(Bs_Compiler *c, const Bs_Token *token) {
 
 static void bs_compile_lambda(Bs_Compiler *c, const Bs_Token *name);
 
-static_assert(BS_COUNT_TOKENS == 45, "Update bs_compile_expr()");
+static void bs_compile_string(Bs_Compiler *c, Bs_Sv sv) {
+    Bs_Buffer *b = bs_buffer_get(c->bs);
+    const size_t start = b->count;
+
+    Bs_Writer w = bs_buffer_writer(b);
+    for (size_t i = 0; i < sv.size; i++) {
+        char ch = sv.data[i];
+        if (ch == '\\') {
+            switch (sv.data[++i]) {
+            case 'n':
+                ch = '\n';
+                break;
+
+            case 't':
+                ch = '\t';
+                break;
+
+            case '0':
+                ch = '\0';
+                break;
+
+            case '"':
+                ch = '\"';
+                break;
+
+            case '\\':
+                ch = '\\';
+                break;
+            }
+        }
+
+        bs_buffer_push(c->bs, b, ch);
+    }
+
+    bs_chunk_push_op_value(
+        c->bs,
+        c->chunk,
+        BS_OP_CONST,
+        bs_value_object(bs_str_const(c->bs, bs_buffer_reset(b, start))));
+}
+
+static_assert(BS_COUNT_TOKENS == 46, "Update bs_compile_expr()");
 static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
     Bs_Loc loc = token.loc;
@@ -201,46 +242,28 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
         break;
 
-    case BS_TOKEN_STR: {
-        Bs_Buffer *b = bs_buffer_get(c->bs);
-        const size_t start = b->count;
+    case BS_TOKEN_STR:
+        bs_compile_string(c, token.sv);
+        break;
 
-        Bs_Writer w = bs_buffer_writer(b);
-        for (size_t i = 1; i + 1 < token.sv.size; i++) {
-            char ch = token.sv.data[i];
-            if (ch == '\\') {
-                switch (token.sv.data[++i]) {
-                case 'n':
-                    ch = '\n';
-                    break;
+    case BS_TOKEN_ISTR:
+        bs_compile_string(c, token.sv);
 
-                case 't':
-                    ch = '\t';
-                    break;
+        while (token.type == BS_TOKEN_ISTR) {
+            bs_lexer_expect(&c->lexer, BS_TOKEN_LPAREN);
+            bs_compile_expr(c, BS_POWER_SET);
+            bs_lexer_expect(&c->lexer, BS_TOKEN_RPAREN);
 
-                case '0':
-                    ch = '\0';
-                    break;
+            bs_chunk_push_op(c->bs, c->chunk, BS_OP_JOIN);
 
-                case '"':
-                    ch = '\"';
-                    break;
+            token = bs_lexer_str(&c->lexer, c->lexer.loc);
 
-                case '\\':
-                    ch = '\\';
-                    break;
-                }
+            if (token.sv.size) {
+                bs_compile_string(c, token.sv);
+                bs_chunk_push_op(c->bs, c->chunk, BS_OP_JOIN);
             }
-
-            bs_buffer_push(c->bs, b, ch);
         }
-
-        bs_chunk_push_op_value(
-            c->bs,
-            c->chunk,
-            BS_OP_CONST,
-            bs_value_object(bs_str_const(c->bs, bs_buffer_reset(b, start))));
-    } break;
+        break;
 
     case BS_TOKEN_NUM:
         bs_chunk_push_op_value(
@@ -685,7 +708,7 @@ static void bs_compile_jumps_reset(Bs_Compiler *c, Bs_Jumps save) {
     c->jumps.start = save.start;
 }
 
-static_assert(BS_COUNT_TOKENS == 45, "Update bs_compile_stmt()");
+static_assert(BS_COUNT_TOKENS == 46, "Update bs_compile_stmt()");
 static void bs_compile_stmt(Bs_Compiler *c) {
     Bs_Token token = bs_lexer_next(&c->lexer);
 
