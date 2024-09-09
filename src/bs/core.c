@@ -405,50 +405,6 @@ static Bs_Value bs_str_slice(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, bs_sv_from_parts(str->data + begin, end - begin)));
 }
 
-static Bs_Value bs_str_format(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!arity) {
-        bs_error(bs, "expected at least 1 argument, got 0");
-    }
-
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
-
-    const Bs_Str *fmt = (const Bs_Str *)args[0].as.object;
-
-    size_t count = 0;
-    for (size_t i = 0; i < fmt->size; i++) {
-        if (fmt->data[i] == '$') {
-            if (i + 1 < fmt->size && fmt->data[i + 1] == '$') {
-                i++;
-            } else {
-                count++;
-            }
-        }
-    }
-
-    bs_check_arity(bs, arity, count + 1);
-
-    Bs_Buffer *b = bs_buffer_get(bs);
-    const size_t start = b->count;
-
-    Bs_Writer w = bs_buffer_writer(b);
-
-    count = 0;
-    for (size_t i = 0; i < fmt->size; i++) {
-        if (fmt->data[i] == '$') {
-            if (i + 1 < fmt->size && fmt->data[i + 1] == '$') {
-                bs_buffer_push(b->bs, b, '$');
-                i++;
-            } else {
-                bs_value_write(&w, args[++count]);
-            }
-        } else {
-            bs_buffer_push(b->bs, b, fmt->data[i]);
-        }
-    }
-
-    return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
-}
-
 static Bs_Value bs_str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
@@ -1029,7 +985,6 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     {
         Bs_Table *str = bs_table_new(bs);
         bs_table_add(bs, str, "slice", bs_value_object(bs_c_fn_new(bs, bs_str_slice)));
-        bs_table_add(bs, str, "format", bs_value_object(bs_c_fn_new(bs, bs_str_format)));
         bs_table_add(bs, str, "reverse", bs_value_object(bs_c_fn_new(bs, bs_str_reverse)));
 
         bs_table_add(bs, str, "find", bs_value_object(bs_c_fn_new(bs, bs_str_find)));
