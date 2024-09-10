@@ -891,8 +891,14 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                     (b.type == BS_VALUE_OBJECT && b.as.object->type == BS_OBJECT_STR)) {
                     bs_error(
                         bs,
-                        "invalid operands to binary (+): %s, %s; use (..) for string "
-                        "concatenation",
+                        "invalid operands to binary (+): %s, %s\n\n"
+                        "Use (..) for string concatenation, or use string interpolation instead\n\n"
+                        "```\n"
+                        "\"Hello, \"..\"world!\";\n"
+                        "\"Hello, \"..69;\n"
+                        "\"Hello, \\(34 + 35) nice!\";\n"
+                        "```\n",
+
                         bs_value_type_name(a),
                         bs_value_type_name(b));
                 } else {
@@ -1074,8 +1080,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                             "    {\"function2_name\", function2_ptr},\n"
                             "    /* ... */\n"
                             "};\n\n"
-                            "const size_t bs_exports_count = sizeof(bs_exports) / "
-                            "sizeof(*bs_exports);\n"
+                            "const size_t bs_exports_count = bs_c_array_size(bs_exports);\n"
                             "```\n",
 
                             Bs_Sv_Arg(*name));
