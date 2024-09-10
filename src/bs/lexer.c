@@ -164,6 +164,8 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
                 token.type = BS_TOKEN_AND;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("nah"))) {
                 token.type = BS_TOKEN_NOT;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("thicc"))) {
+                token.type = BS_TOKEN_LEN;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("redpill"))) {
                 token.type = BS_TOKEN_IMPORT;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("be"))) {
@@ -204,6 +206,8 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
                 token.type = BS_TOKEN_OR;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("and"))) {
                 token.type = BS_TOKEN_AND;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("len"))) {
+                token.type = BS_TOKEN_LEN;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("import"))) {
                 token.type = BS_TOKEN_IMPORT;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("if"))) {
@@ -329,10 +333,6 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
         } else if (!l->extended) {
             token.type = BS_TOKEN_SET;
         }
-        break;
-
-    case '@':
-        token.type = BS_TOKEN_LEN;
         break;
     }
 
