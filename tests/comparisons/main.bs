@@ -1,0 +1,42 @@
+io.println(!true);
+io.println(!false);
+io.println(!nil);
+io.println(!0);
+io.println(!1);
+
+io.println(69 > 420);
+io.println(420 > 420);
+io.println(1337 > 420);
+
+io.println(69 >= 420);
+io.println(420 >= 420);
+io.println(1337 >= 420);
+
+io.println(69 < 420);
+io.println(420 < 420);
+io.println(1337 < 420);
+
+io.println(69 <= 420);
+io.println(420 <= 420);
+io.println(1337 <= 420);
+
+io.println(69 == 420);
+io.println(420 == 420);
+
+io.println(69 != 420);
+io.println(420 != 420);
+
+io.println(nil == nil);
+io.println(nil == true);
+io.println(nil == 69);
+io.println(false == 0);
+
+io.println(true and true);
+io.println(true and false);
+io.println(false and true);
+io.println(false and false);
+
+io.println(true or true);
+io.println(true or false);
+io.println(false or true);
+io.println(false or false);

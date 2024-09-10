@@ -1,0 +1,10 @@
+lit main() {
+    mf f be lit (x) {
+        io.println("Value of x is \(x)") fr
+        bet x * 6 + 6 fr
+    } fr
+
+    io.println(f(69)) fr
+}
+
+main() fr

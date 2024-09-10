@@ -1,0 +1,28 @@
+mf i be 0 fr
+mf a be [] fr
+
+yolo i < 4 {
+    mf v be i fr
+
+    a[thicc(a)] be lit () {
+        io.println("Captured value is \(v)") fr
+    } fr
+
+    i be i + 1 fr
+}
+
+yall _, f amongus a {
+    f() fr
+}
+
+mf a be [] fr
+
+yall i amongus 4, 0 {
+    a[thicc(a)] be lit () {
+        io.println("Captured value is \(i)") fr
+    } fr
+}
+
+yall _, f amongus a {
+    f() fr
+}

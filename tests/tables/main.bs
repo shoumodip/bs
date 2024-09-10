@@ -1,0 +1,20 @@
+var xs = {};
+
+xs.foo = 69;
+xs["bar"] = 420;
+xs[32] = 1337;
+
+io.println(xs["foo"]);
+io.println(xs.bar);
+io.println(xs[32]);
+io.println(len(xs));
+
+xs.foo = nil;
+
+io.println(xs["foo"]);
+io.println(len(xs));
+
+io.println(xs.undefined);
+
+io.println({ foo = "bar", bar = "foo" }.foo);
+io.println({ foo = "bar", bar = "foo" }["bar"]);

@@ -1,0 +1,13 @@
+fn baz() {
+    oops;
+}
+
+fn bar() {
+    baz();
+}
+
+fn foo() {
+    bar();
+}
+
+foo();

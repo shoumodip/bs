@@ -1,0 +1,10 @@
+fn main() {
+    var f = fn (x) {
+        io.println("Value of x is \(x)");
+        return x * 6 + 6;
+    };
+
+    io.println(f(69));
+}
+
+main();

@@ -1,0 +1,3 @@
+var xs = [];
+
+io.println(xs[0]);

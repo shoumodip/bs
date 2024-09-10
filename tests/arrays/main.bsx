@@ -1,0 +1,15 @@
+mf xs be [] fr
+
+xs[thicc(xs)] be 1 fr
+xs[thicc(xs)] be 4 fr
+xs[thicc(xs)] be 9 fr
+
+io.println(xs[0]) fr
+io.println(xs[1]) fr
+io.println(xs[2]) fr
+
+io.println(xs) fr
+io.println(thicc(xs)) fr
+
+io.println([69, 420]) fr
+io.println([69, 420, 1337][2]) fr

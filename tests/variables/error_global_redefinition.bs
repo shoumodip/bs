@@ -1,0 +1,2 @@
+pub var foo = 69;
+pub var foo = 420;

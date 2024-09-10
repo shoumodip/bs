@@ -1,0 +1,6 @@
+mf i be 0 fr
+
+yolo i < 10 {
+    io.println(i) fr
+    i be i + 1 fr
+}

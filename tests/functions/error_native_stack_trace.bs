@@ -1,0 +1,9 @@
+fn foo(s) {
+    return str.reverse(s);
+}
+
+fn main() {
+    array.map([1, 2], foo);
+}
+
+main();

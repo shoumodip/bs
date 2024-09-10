@@ -1,0 +1,13 @@
+fn fact(n) {
+    if n < 2 {
+        return 1;
+    }
+
+    return n * fact(n - 1);
+}
+
+fn main() {
+    io.println("Factorial of 5: \(fact(5))");
+}
+
+main();

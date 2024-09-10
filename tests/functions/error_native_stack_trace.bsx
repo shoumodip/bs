@@ -1,0 +1,9 @@
+lit foo(s) {
+    bet str.reverse(s) fr
+}
+
+lit main() {
+    array.map([1, 2], foo) fr
+}
+
+main() fr

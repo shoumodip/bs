@@ -1,0 +1,20 @@
+mf xs be {} fr
+
+xs.foo be 69 fr
+xs["bar"] be 420 fr
+xs[32] be 1337 fr
+
+io.println(xs["foo"]) fr
+io.println(xs.bar) fr
+io.println(xs[32]) fr
+io.println(thicc(xs)) fr
+
+xs.foo be bruh fr
+
+io.println(xs["foo"]) fr
+io.println(thicc(xs)) fr
+
+io.println(xs.undefined) fr
+
+io.println({ foo be "bar", bar be "foo" }.foo) fr
+io.println({ foo be "bar", bar be "foo" }["bar"]) fr

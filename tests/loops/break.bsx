@@ -1,0 +1,17 @@
+mf i be 0 fr
+yolo i < 10 {
+    io.println(i) fr
+    i be i + 1 fr
+
+    ayo i == 5 {
+        yeet fr
+    }
+}
+
+yall i amongus 10, 0 {
+    io.println(i) fr
+
+    ayo i == 6 {
+        yeet fr
+    }
+}

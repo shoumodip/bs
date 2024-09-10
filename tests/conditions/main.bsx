@@ -1,0 +1,33 @@
+ayo nocap {
+    io.println(1) fr
+}
+
+ayo nocap {
+    io.println(1) fr
+} sike {
+    io.println(2) fr
+}
+
+ayo cap {
+    io.println(1) fr
+}
+
+ayo cap {
+    io.println(1) fr
+} sike {
+    io.println(2) fr
+}
+
+ayo cap {
+    io.println(1) fr
+} sike ayo nocap {
+    io.println(2) fr
+}
+
+ayo cap {
+    io.println(1) fr
+} sike ayo bruh {
+    io.println(2) fr
+} sike {
+    io.println(3) fr
+}

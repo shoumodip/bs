@@ -1,0 +1,4 @@
+redpill("variables/global.bsx") fr
+
+io.println(foo) fr
+io.println(bar) fr

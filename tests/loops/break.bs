@@ -1,0 +1,17 @@
+var i = 0;
+while i < 10 {
+    io.println(i);
+    i = i + 1;
+
+    if i == 5 {
+        break;
+    }
+}
+
+for i in 10, 0 {
+    io.println(i);
+
+    if i == 6 {
+        break;
+    }
+}

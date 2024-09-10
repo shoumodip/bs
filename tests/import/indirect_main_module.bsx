@@ -1,0 +1,3 @@
+mf foo be redpill("import/main_module.bsx") fr
+
+io.println(foo) fr

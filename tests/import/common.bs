@@ -1,0 +1,6 @@
+io.println("In common.bs!");
+
+return {
+    foo = 69,
+    bar = 420,
+};

@@ -1,0 +1,14 @@
+var local = 69;
+io.println(local);
+
+{
+    var local = 420;
+    io.println(local);
+}
+
+io.println(local);
+
+{
+    local = 420;
+    io.println(local);
+}

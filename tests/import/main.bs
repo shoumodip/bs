@@ -1,0 +1,4 @@
+var common = import("import/common.bs");
+
+io.println(common.foo);
+io.println(common.bar);

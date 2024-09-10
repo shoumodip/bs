@@ -1,0 +1,4 @@
+import("variables/global.bs");
+
+io.println(foo);
+io.println(bar);

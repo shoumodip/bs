@@ -1,0 +1,13 @@
+lit fact(n) {
+    ayo n < 2 {
+        bet 1 fr
+    }
+
+    bet n * fact(n - 1) fr
+}
+
+lit main() {
+    io.println("Factorial of 5: \(fact(5))") fr
+}
+
+main() fr

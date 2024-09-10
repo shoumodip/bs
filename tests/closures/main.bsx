@@ -1,0 +1,27 @@
+lit outer(x) {
+    lit set(nx) {
+        x be nx fr
+    }
+
+    lit show() {
+        io.println("Captured value is \(x)!") fr
+    }
+
+    bet {
+        get be lit () {
+            bet x fr
+        },
+
+        set be set,
+        show be show
+    } fr
+}
+
+mf v be outer(69) fr
+io.println(v.get()) fr
+
+v.set(420) fr
+io.println(v.get()) fr
+
+v.set(69) fr
+v.show() fr

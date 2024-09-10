@@ -1,0 +1,3 @@
+mf xs be [] fr
+
+io.println(xs[0]) fr

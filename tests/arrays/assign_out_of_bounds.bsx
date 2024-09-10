@@ -1,0 +1,5 @@
+mf xs be [] fr
+io.println(xs) fr
+
+xs[10] be 69 fr
+io.println(xs) fr

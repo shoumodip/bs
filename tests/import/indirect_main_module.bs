@@ -1,0 +1,3 @@
+var foo = import("import/main_module.bs");
+
+io.println(foo);
