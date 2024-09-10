@@ -128,7 +128,7 @@ static void bs_object_write(Bs_Writer *w, const Bs_Object *o) {
         break;
 
     case BS_OBJECT_C_LIB:
-        bs_fmt(w, "<native library '" Bs_Sv_Fmt "'>", Bs_Sv_Arg(*((const Bs_C_Lib *)o)->path));
+        bs_object_write(w, (const Bs_Object *)&((const Bs_C_Lib *)o)->functions);
         break;
 
     case BS_OBJECT_C_DATA: {
