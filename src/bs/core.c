@@ -734,6 +734,20 @@ static Bs_Value bs_array_reduce(Bs *bs, Bs_Value *args, size_t arity) {
     return acc;
 }
 
+static Bs_Value bs_array_copy(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
+
+    const Bs_Array *src = (const Bs_Array *)args[0].as.object;
+
+    Bs_Array *dst = bs_array_new(bs);
+    for (size_t i = src->count; i > 0; i--) {
+        bs_array_set(bs, dst, i - 1, src->data[i - 1]);
+    }
+
+    return bs_value_object(dst);
+}
+
 static Bs_Value bs_array_join(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
@@ -809,6 +823,24 @@ static Bs_Value bs_array_reverse(Bs *bs, Bs_Value *args, size_t arity) {
         src->data[src->count - i - 1] = t;
     }
     return bs_value_object(src);
+}
+
+// Table
+static Bs_Value bs_table_copy(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_check_object_type(bs, args[0], BS_OBJECT_TABLE, "argument #1");
+
+    const Bs_Table *src = (const Bs_Table *)args[0].as.object;
+
+    Bs_Table *dst = bs_table_new(bs);
+    for (size_t i = 0; i < src->capacity; i++) {
+        const Bs_Entry *entry = &src->data[i];
+        if (entry->key.type != BS_VALUE_NIL) {
+            bs_table_set(bs, dst, entry->key, entry->value);
+        }
+    }
+
+    return bs_value_object(dst);
 }
 
 // Bytes
@@ -992,10 +1024,17 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_table_add(bs, array, "filter", bs_value_object(bs_c_fn_new(bs, bs_array_filter)));
         bs_table_add(bs, array, "reduce", bs_value_object(bs_c_fn_new(bs, bs_array_reduce)));
 
+        bs_table_add(bs, array, "copy", bs_value_object(bs_c_fn_new(bs, bs_array_copy)));
         bs_table_add(bs, array, "join", bs_value_object(bs_c_fn_new(bs, bs_array_join)));
         bs_table_add(bs, array, "sort", bs_value_object(bs_c_fn_new(bs, bs_array_sort)));
         bs_table_add(bs, array, "reverse", bs_value_object(bs_c_fn_new(bs, bs_array_reverse)));
         bs_global_set(bs, Bs_Sv_Static("array"), bs_value_object(array));
+    }
+
+    {
+        Bs_Table *table = bs_table_new(bs);
+        bs_table_add(bs, table, "copy", bs_value_object(bs_c_fn_new(bs, bs_table_copy)));
+        bs_global_set(bs, Bs_Sv_Static("table"), bs_value_object(table));
     }
 
     {
