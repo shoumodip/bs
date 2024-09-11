@@ -1,4 +1,4 @@
-:i count 72
+:i count 74
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -338,18 +338,42 @@ variables/error_global_redefinition.bsx:2:8: error: redefinition of global ident
 :b shell 40
 ../bin/bs arrays/assign_out_of_bounds.bs
 :i returncode 0
-:b stdout 58
+:b stdout 104
 []
-[nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, 69]
+[
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil,
+    69
+]
 
 :b stderr 0
 
 :b shell 41
 ../bin/bs arrays/assign_out_of_bounds.bsx
 :i returncode 0
-:b stdout 68
+:b stdout 114
 []
-[bruh, bruh, bruh, bruh, bruh, bruh, bruh, bruh, bruh, bruh, 69]
+[
+    bruh,
+    bruh,
+    bruh,
+    bruh,
+    bruh,
+    bruh,
+    bruh,
+    bruh,
+    bruh,
+    bruh,
+    69
+]
 
 :b stderr 0
 
@@ -906,6 +930,68 @@ vibeof(deez) = string
 vibeof([]) = array
 vibeof({}) = table
 vibeof(native fn ()) = native function
+
+:b stderr 0
+
+:b shell 33
+../bin/bs pretty_printing/main.bs
+:i returncode 0
+:b stdout 323
+{}
+ligma
+{
+    ["1337 bro"] = {
+        a = 1,
+        c = [1, 2, 3, 4, 5],
+        e = [
+            [
+                [69]
+            ]
+        ],
+        d = [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+        ],
+        [69] = "nice"
+    },
+    bar = 420,
+    foo = 69
+}
+
+:b stderr 0
+
+:b shell 34
+../bin/bs pretty_printing/main.bsx
+:i returncode 0
+:b stdout 323
+{}
+ligma
+{
+    ["1337 bro"] = {
+        a = 1,
+        c = [1, 2, 3, 4, 5],
+        e = [
+            [
+                [69]
+            ]
+        ],
+        d = [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+        ],
+        [69] = "nice"
+    },
+    bar = 420,
+    foo = 69
+}
 
 :b stderr 0
 

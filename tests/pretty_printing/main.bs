@@ -1,0 +1,15 @@
+var xs = {
+    foo = 69,
+    bar = 420,
+    ["\(1337) bro"] = {
+        a = 1,
+        [69] = "nice",
+        c = [1, 2, 3, 4, 5],
+        d = [1, 2, 3, 4, 5, 6],
+        e = [[[69]]],
+    },
+};
+
+io.println({});
+io.println("ligma");
+io.println(xs);

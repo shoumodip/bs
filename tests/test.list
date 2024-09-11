@@ -70,3 +70,5 @@
 ../bin/bs extended/error_type_name_extended.bsx
 ../bin/bs typeof/main.bs
 ../bin/bs typeof/main.bsx
+../bin/bs pretty_printing/main.bs
+../bin/bs pretty_printing/main.bsx
