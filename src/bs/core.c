@@ -402,7 +402,7 @@ static Bs_Value bs_str_slice(Bs *bs, Bs_Value *args, size_t arity) {
         bs_error(bs, "cannot slice string of length %zu from %zu to %zu", str->size, begin, end);
     }
 
-    return bs_value_object(bs_str_new(bs, bs_sv_from_parts(str->data + begin, end - begin)));
+    return bs_value_object(bs_str_new(bs, Bs_Sv(str->data + begin, end - begin)));
 }
 
 static Bs_Value bs_str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
@@ -410,7 +410,7 @@ static Bs_Value bs_str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
 
     const Bs_Str *src = (const Bs_Str *)args[0].as.object;
-    Bs_Str *dst = bs_str_new(bs, bs_sv_from_parts(src->data, src->size));
+    Bs_Str *dst = bs_str_new(bs, Bs_Sv(src->data, src->size));
     for (size_t i = 0; i < dst->size / 2; i++) {
         const char c = dst->data[i];
         dst->data[i] = dst->data[dst->size - i - 1];
@@ -444,9 +444,9 @@ static Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_nil;
     }
 
-    const Bs_Sv pattern_sv = bs_sv_from_parts(pattern->data, pattern->size);
+    const Bs_Sv pattern_sv = Bs_Sv(pattern->data, pattern->size);
     for (size_t i = offset; i + pattern->size <= str->size; i++) {
-        if (bs_sv_eq(bs_sv_from_parts(str->data + i, pattern->size), pattern_sv)) {
+        if (bs_sv_eq(Bs_Sv(str->data + i, pattern->size), pattern_sv)) {
             return bs_value_num(i);
         }
     }
@@ -510,16 +510,16 @@ static Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
 
     Bs_Array *a = bs_array_new(bs);
-    const Bs_Sv pattern_sv = bs_sv_from_parts(pattern->data, pattern->size);
+    const Bs_Sv pattern_sv = Bs_Sv(pattern->data, pattern->size);
 
     size_t i = 0, j = 0;
     while (i + pattern->size <= str->size) {
-        if (bs_sv_eq(bs_sv_from_parts(str->data + i, pattern->size), pattern_sv)) {
+        if (bs_sv_eq(Bs_Sv(str->data + i, pattern->size), pattern_sv)) {
             bs_array_set(
                 bs,
                 a,
                 a->count,
-                bs_value_object(bs_str_new(bs, bs_sv_from_parts(str->data + j, i - j))));
+                bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, i - j))));
 
             i += pattern->size;
             j = i;
@@ -533,7 +533,7 @@ static Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
             bs,
             a,
             a->count,
-            bs_value_object(bs_str_new(bs, bs_sv_from_parts(str->data + j, str->size - j))));
+            bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, str->size - j))));
     }
 
     return bs_value_object(a);
@@ -572,7 +572,7 @@ static Bs_Value bs_str_split_regex(Bs *bs, Bs_Value *args, size_t arity) {
             bs,
             a,
             a->count,
-            bs_value_object(bs_str_new(bs, bs_sv_from_parts(b->data + str_pos + j, match.rm_so))));
+            bs_value_object(bs_str_new(bs, Bs_Sv(b->data + str_pos + j, match.rm_so))));
 
         j += match.rm_eo;
     }
@@ -582,7 +582,7 @@ static Bs_Value bs_str_split_regex(Bs *bs, Bs_Value *args, size_t arity) {
             bs,
             a,
             a->count,
-            bs_value_object(bs_str_new(bs, bs_sv_from_parts(str->data + j, str->size - j))));
+            bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, str->size - j))));
     }
 
     regfree(&regex);
@@ -607,9 +607,9 @@ static Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
     Bs_Buffer *b = bs_buffer_get(bs);
     const size_t start = b->count;
 
-    const Bs_Sv pattern_sv = bs_sv_from_parts(pattern->data, pattern->size);
+    const Bs_Sv pattern_sv = Bs_Sv(pattern->data, pattern->size);
     for (size_t i = 0; i + pattern->size <= str->size; i++) {
-        if (bs_sv_eq(bs_sv_from_parts(str->data + i, pattern->size), pattern_sv)) {
+        if (bs_sv_eq(Bs_Sv(str->data + i, pattern->size), pattern_sv)) {
             bs_da_push_many(bs, b, replacement->data, replacement->size);
             i += pattern->size - 1;
         } else {
@@ -755,7 +755,7 @@ static Bs_Value bs_array_join(Bs *bs, Bs_Value *args, size_t arity) {
 
         const Bs_Array *array = (const Bs_Array *)args[0].as.object;
         const Bs_Str *str = (const Bs_Str *)args[1].as.object;
-        const Bs_Sv separator = bs_sv_from_parts(str->data, str->size);
+        const Bs_Sv separator = Bs_Sv(str->data, str->size);
 
         for (size_t i = 0; i < array->count; i++) {
             if (i) {
@@ -833,7 +833,7 @@ static void bs_bytes_data_free(Bs *bs, void *data) {
 
 static void bs_bytes_data_write(Bs_Writer *w, const void *data) {
     const Bs_Buffer *b = data;
-    w->write(w, bs_sv_from_parts(b->data, b->count));
+    w->write(w, Bs_Sv(b->data, b->count));
 }
 
 static const Bs_C_Data_Spec bs_bytes_data_spec = {
@@ -890,7 +890,7 @@ static Bs_Value bs_bytes_slice(Bs *bs, Bs_Value *args, size_t arity) {
         bs_error(bs, "cannot slice bytes of length %zu from %zu to %zu", b->count, begin, end);
     }
 
-    return bs_value_object(bs_str_new(bs, bs_sv_from_parts(b->data + begin, end - begin)));
+    return bs_value_object(bs_str_new(bs, Bs_Sv(b->data + begin, end - begin)));
 }
 
 static Bs_Value bs_bytes_push(Bs *bs, Bs_Value *args, size_t arity) {

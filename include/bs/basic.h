@@ -11,12 +11,12 @@ typedef struct {
     size_t size;
 } Bs_Sv;
 
+#define Bs_Sv(s, c) ((Bs_Sv){s, c})
 #define Bs_Sv_Fmt "%.*s"
 #define Bs_Sv_Arg(s) (int)(s).size, (s).data
 #define Bs_Sv_Static(s) ((Bs_Sv){s, sizeof(s) - 1})
 
 Bs_Sv bs_sv_from_cstr(const char *data);
-Bs_Sv bs_sv_from_parts(const char *data, size_t size);
 
 bool bs_sv_eq(Bs_Sv a, Bs_Sv b);
 bool bs_sv_prefix(Bs_Sv a, Bs_Sv b);

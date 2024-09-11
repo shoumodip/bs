@@ -1074,7 +1074,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 Bs_Buffer *b = bs_paths_get(bs);
                 Bs_Writer w = bs_buffer_writer(b);
 
-                const Bs_Sv name_sv = bs_sv_from_parts(name->data, name->size);
+                const Bs_Sv name_sv = Bs_Sv(name->data, name->size);
                 bs_buffer_write(&w, name_sv);
                 bs_buffer_push(b->bs, b, '\0');
 
@@ -1139,7 +1139,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                     }
 
                     Bs_Fn *fn =
-                        bs_compile(bs, path, bs_sv_from_parts(contents, size), false, false);
+                        bs_compile(bs, path, Bs_Sv(contents, size), false, false);
                     free(contents);
 
                     if (!fn) {

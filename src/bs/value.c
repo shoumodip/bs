@@ -173,7 +173,7 @@ void bs_value_write_impl(Bs_Writer *w, Bs_Value v, bool extended) {
             }
         }
 
-        w->write(w, bs_sv_from_parts(buffer, count));
+        w->write(w, Bs_Sv(buffer, count));
     } break;
 
     case BS_VALUE_BOOL:

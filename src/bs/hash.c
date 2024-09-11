@@ -61,7 +61,7 @@ Bs_Entry *bs_entries_find_sv(Bs_Entry *entries, size_t capacity, Bs_Sv key) {
         if (entry->key.type != BS_VALUE_NIL) {
             if (entry->key.type == BS_VALUE_OBJECT && entry->key.as.object->type == BS_OBJECT_STR) {
                 const Bs_Str *str = (const Bs_Str *)entry->key.as.object;
-                if (bs_sv_eq(key, bs_sv_from_parts(str->data, str->size))) {
+                if (bs_sv_eq(key, Bs_Sv(str->data, str->size))) {
                     return entry;
                 }
             }

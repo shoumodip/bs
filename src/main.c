@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
     Bs *bs = bs_new(false);
     bs_core_init(bs, argc - 1, argv + 1);
 
-    const Bs_Result result = bs_run(bs, path, bs_sv_from_parts(contents, size), false);
+    const Bs_Result result = bs_run(bs, path, Bs_Sv(contents, size), false);
     free(contents);
 
     bs_free(bs);

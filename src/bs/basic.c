@@ -9,10 +9,6 @@ Bs_Sv bs_sv_from_cstr(const char *data) {
     return (Bs_Sv){data, strlen(data)};
 }
 
-Bs_Sv bs_sv_from_parts(const char *data, size_t size) {
-    return (Bs_Sv){data, size};
-}
-
 bool bs_sv_eq(Bs_Sv a, Bs_Sv b) {
     return a.size == b.size && !memcmp(a.data, b.data, b.size);
 }
@@ -34,7 +30,7 @@ void bs_fmt(Bs_Writer *w, const char *fmt, ...) {
     assert(count >= 0 && count + 1 < sizeof(bs_fmt_buffer));
     va_end(args);
 
-    w->write(w, bs_sv_from_parts(bs_fmt_buffer, count));
+    w->write(w, Bs_Sv(bs_fmt_buffer, count));
 }
 
 char *bs_read_file(const char *path, size_t *size) {
