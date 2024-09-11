@@ -2,7 +2,7 @@
 
 #include "bs/token.h"
 
-static_assert(BS_COUNT_TOKENS == 46, "Update bs_token_type_name()");
+static_assert(BS_COUNT_TOKENS == 47, "Update bs_token_type_name()");
 const char *bs_token_type_name(Bs_Token_Type type, bool extended) {
     switch (type) {
     case BS_TOKEN_EOF:
@@ -101,6 +101,9 @@ const char *bs_token_type_name(Bs_Token_Type type, bool extended) {
 
     case BS_TOKEN_IMPORT:
         return extended ? "'redpill'" : "'import'";
+
+    case BS_TOKEN_TYPEOF:
+        return extended ? "'vibeof'" : "'typeof'";
 
     case BS_TOKEN_SET:
         return extended ? "'be'" : "'='";

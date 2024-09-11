@@ -1,0 +1,12 @@
+fn f(v) {
+    io.println("typeof(\(v)) = \(typeof(v))");
+}
+
+f(nil);
+f(true);
+f(69);
+f(f);
+f("deez");
+f([]);
+f({});
+f(str.reverse);

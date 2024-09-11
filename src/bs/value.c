@@ -20,7 +20,8 @@ const char *bs_object_type_name(Bs_Object_Type type) {
         return "table";
 
     case BS_OBJECT_CLOSURE:
-        return "closure";
+        // In the POV of the user, a closure *is* a function
+        return "function";
 
     case BS_OBJECT_UPVALUE:
         return "upvalue";

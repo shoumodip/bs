@@ -33,6 +33,7 @@ typedef enum {
     BS_OP_LEN,
     BS_OP_JOIN,
     BS_OP_IMPORT,
+    BS_OP_TYPEOF,
 
     BS_OP_GDEF,
     BS_OP_GGET,

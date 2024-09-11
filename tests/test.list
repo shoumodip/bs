@@ -68,3 +68,5 @@
 ../bin/bs extended/error_type_name_normal.bsx
 ../bin/bs extended/error_type_name_extended.bs
 ../bin/bs extended/error_type_name_extended.bsx
+../bin/bs typeof/main.bs
+../bin/bs typeof/main.bsx

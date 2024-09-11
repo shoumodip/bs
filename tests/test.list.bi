@@ -1,4 +1,4 @@
-:i count 70
+:i count 72
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -878,4 +878,34 @@ extended/error_type_name_extended.bs:1:35: in fn oops()
 [C]: error: expected argument #1 to be string, got capness
 extended/common.bsx:9:16: in native fn ()
 extended/error_type_name_extended.bsx:1:36: in fn oops()
+
+:b shell 24
+../bin/bs typeof/main.bs
+:i returncode 0
+:b stdout 186
+typeof(nil) = nil
+typeof(true) = boolean
+typeof(69) = number
+typeof(fn f()) = function
+typeof(deez) = string
+typeof([]) = array
+typeof({}) = table
+typeof(native fn ()) = native function
+
+:b stderr 0
+
+:b shell 25
+../bin/bs typeof/main.bsx
+:i returncode 0
+:b stdout 189
+vibeof(bruh) = bruh
+vibeof(nocap) = capness
+vibeof(69) = number
+vibeof(fn f()) = function
+vibeof(deez) = string
+vibeof([]) = array
+vibeof({}) = table
+vibeof(native fn ()) = native function
+
+:b stderr 0
 

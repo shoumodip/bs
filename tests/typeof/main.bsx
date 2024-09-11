@@ -1,0 +1,12 @@
+lit f(v) {
+    io.println("vibeof(\(v)) = \(vibeof(v))") fr
+}
+
+f(bruh) fr
+f(nocap) fr
+f(69) fr
+f(f) fr
+f("deez") fr
+f([]) fr
+f({}) fr
+f(str.reverse) fr

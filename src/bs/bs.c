@@ -776,7 +776,7 @@ static void bs_close_upvalues(Bs *bs, Bs_Value *last) {
 }
 
 // Interpreter
-static_assert(BS_COUNT_OPS == 41, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 42, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const size_t frames_count_save = bs->frames.count;
@@ -1138,8 +1138,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                         bs_error(bs, "could not read file '%s'", path);
                     }
 
-                    Bs_Fn *fn =
-                        bs_compile(bs, path, Bs_Sv(contents, size), false, false);
+                    Bs_Fn *fn = bs_compile(bs, path, Bs_Sv(contents, size), false, false);
                     free(contents);
 
                     if (!fn) {
@@ -1154,6 +1153,11 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
                 bs->gc_on = gc_on;
             }
+        } break;
+
+        case BS_OP_TYPEOF: {
+            const char *name = bs_value_type_name(bs_stack_peek(bs, 0), bs->frame->extended);
+            bs_stack_set(bs, 0, bs_value_object(bs_str_new(bs, bs_sv_from_cstr(name))));
         } break;
 
         case BS_OP_GDEF: {
