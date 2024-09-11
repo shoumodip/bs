@@ -74,40 +74,40 @@ false
 :b shell 30
 ../bin/bs comparisons/main.bsx
 :i returncode 0
-:b stdout 183
-false
-true
-true
-false
-false
-false
-false
-true
-false
-true
-true
-true
-false
-false
-true
-true
-false
-false
-true
-true
-false
-true
-false
-false
-false
-true
-false
-false
-false
-true
-true
-true
-false
+:b stdout 162
+cap
+nocap
+nocap
+cap
+cap
+cap
+cap
+nocap
+cap
+nocap
+nocap
+nocap
+cap
+cap
+nocap
+nocap
+cap
+cap
+nocap
+nocap
+cap
+nocap
+cap
+cap
+cap
+nocap
+cap
+cap
+cap
+nocap
+nocap
+nocap
+cap
 
 :b stderr 0
 
@@ -154,16 +154,16 @@ false
 :b shell 26
 ../bin/bs strings/main.bsx
 :i returncode 0
-:b stdout 116
+:b stdout 113
 Deez nuts
 Joe Mama
 69 Nice!
 The truth is 420
 Nested interpolation? Are you crazy?
 69 and 420. Hehe
-true
-false
-false
+nocap
+cap
+cap
 
 :b stderr 0
 
@@ -311,9 +311,9 @@ variables/error_global_redefinition.bsx:2:8: error: redefinition of global ident
 :b shell 41
 ../bin/bs arrays/assign_out_of_bounds.bsx
 :i returncode 0
-:b stdout 58
+:b stdout 68
 []
-[nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, 69]
+[bruh, bruh, bruh, bruh, bruh, bruh, bruh, bruh, bruh, bruh, 69]
 
 :b stderr 0
 
@@ -352,14 +352,14 @@ foo
 :b shell 25
 ../bin/bs tables/main.bsx
 :i returncode 0
-:b stdout 32
+:b stdout 34
 69
 420
 1337
 3
-nil
+bruh
 2
-nil
+bruh
 bar
 foo
 

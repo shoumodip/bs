@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
                     break;
                 }
 
-                bs_value_write(w, result.value);
+                bs_value_write(bs, w, result.value);
                 bs_fmt(w, "\n");
             }
         }

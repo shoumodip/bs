@@ -39,16 +39,16 @@ const char *bs_object_type_name(Bs_Object_Type type) {
     }
 }
 
-const char *bs_value_type_name(Bs_Value v) {
+const char *bs_value_type_name(Bs_Value v, bool extended) {
     switch (v.type) {
     case BS_VALUE_NIL:
-        return "nil";
+        return extended ? "bruh" : "nil";
 
     case BS_VALUE_NUM:
         return "number";
 
     case BS_VALUE_BOOL:
-        return "boolean";
+        return extended ? "capness" : "boolean";
 
     case BS_VALUE_OBJECT:
         return bs_object_type_name(v.as.object->type);
@@ -59,15 +59,15 @@ const char *bs_value_type_name(Bs_Value v) {
 }
 
 static_assert(BS_COUNT_OBJECTS == 9, "Update bs_object_write()");
-static void bs_object_write(Bs_Writer *w, const Bs_Object *o) {
+static void bs_object_write_impl(Bs_Writer *w, const Bs_Object *o, bool extended) {
     switch (o->type) {
     case BS_OBJECT_FN: {
         const Bs_Fn *fn = (const Bs_Fn *)o;
         if (fn->module) {
             if (fn->name) {
-                bs_fmt(w, "<module '" Bs_Sv_Fmt "'>", Bs_Sv_Arg(*fn->name));
+                bs_fmt(w, "module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*fn->name));
             } else {
-                bs_fmt(w, "<module>");
+                bs_fmt(w, "module");
             }
         } else if (fn->name) {
             bs_fmt(w, "fn " Bs_Sv_Fmt "()", Bs_Sv_Arg(*fn->name));
@@ -88,7 +88,7 @@ static void bs_object_write(Bs_Writer *w, const Bs_Object *o) {
             if (i) {
                 bs_fmt(w, ", ");
             }
-            bs_value_write(w, array->data[i]);
+            bs_value_write_impl(w, array->data[i], extended);
         }
         bs_fmt(w, "]");
     } break;
@@ -107,16 +107,16 @@ static void bs_object_write(Bs_Writer *w, const Bs_Object *o) {
                 bs_fmt(w, ", ");
             }
 
-            bs_value_write(w, entry->key);
+            bs_value_write_impl(w, entry->key, extended);
             bs_fmt(w, " = ");
-            bs_value_write(w, entry->value);
+            bs_value_write_impl(w, entry->value, extended);
             count++;
         }
         bs_fmt(w, "}");
     } break;
 
     case BS_OBJECT_CLOSURE:
-        bs_object_write(w, (Bs_Object *)((const Bs_Closure *)o)->fn);
+        bs_object_write_impl(w, (Bs_Object *)((const Bs_Closure *)o)->fn, extended);
         break;
 
     case BS_OBJECT_UPVALUE:
@@ -128,7 +128,7 @@ static void bs_object_write(Bs_Writer *w, const Bs_Object *o) {
         break;
 
     case BS_OBJECT_C_LIB:
-        bs_object_write(w, (const Bs_Object *)&((const Bs_C_Lib *)o)->functions);
+        bs_object_write_impl(w, (const Bs_Object *)&((const Bs_C_Lib *)o)->functions, extended);
         break;
 
     case BS_OBJECT_C_DATA: {
@@ -145,10 +145,14 @@ static void bs_object_write(Bs_Writer *w, const Bs_Object *o) {
     }
 }
 
-void bs_value_write(Bs_Writer *w, Bs_Value v) {
+void bs_value_write_impl(Bs_Writer *w, Bs_Value v, bool extended) {
     switch (v.type) {
     case BS_VALUE_NIL:
-        bs_fmt(w, "nil");
+        if (extended) {
+            bs_fmt(w, "bruh");
+        } else {
+            bs_fmt(w, "nil");
+        }
         break;
 
     case BS_VALUE_NUM:
@@ -156,11 +160,15 @@ void bs_value_write(Bs_Writer *w, Bs_Value v) {
         break;
 
     case BS_VALUE_BOOL:
-        bs_fmt(w, "%s", v.as.boolean ? "true" : "false");
+        if (extended) {
+            bs_fmt(w, "%s", v.as.boolean ? "nocap" : "cap");
+        } else {
+            bs_fmt(w, "%s", v.as.boolean ? "true" : "false");
+        }
         break;
 
     case BS_VALUE_OBJECT:
-        bs_object_write(w, v.as.object);
+        bs_object_write_impl(w, v.as.object, extended);
         break;
 
     default:

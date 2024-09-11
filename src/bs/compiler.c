@@ -609,6 +609,8 @@ static Bs_Fn *bs_compile_scope_end(Bs_Compiler *c) {
     } else {
         c->chunk = NULL;
     }
+
+    fn->extended = c->lexer.extended;
     return fn;
 }
 

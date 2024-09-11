@@ -40,6 +40,8 @@ Bs_Fn *bs_fn_new(Bs *bs) {
 
     fn->arity = 0;
     fn->upvalues = 0;
+
+    fn->extended = false;
     return fn;
 }
 

@@ -12,7 +12,7 @@ static void bs_debug_op_value(Bs_Writer *w, const Bs_Chunk *c, size_t *offset, c
     *offset += sizeof(constant);
 
     bs_fmt(w, "%-16s %4zu '", name, constant);
-    bs_value_write(w, c->constants.data[constant]);
+    bs_value_write_impl(w, c->constants.data[constant], false);
     bs_fmt(w, "'\n");
 }
 
@@ -36,7 +36,7 @@ void bs_debug_op(Bs_Writer *w, const Bs_Chunk *c, size_t *offset) {
 
         const Bs_Value value = c->constants.data[constant];
         bs_fmt(w, "%-16s %4zu '", "OP_CLOSURE", constant);
-        bs_value_write(w, value);
+        bs_value_write_impl(w, value, false);
         bs_fmt(w, "'\n");
 
         const Bs_Fn *fn = (const Bs_Fn *)value.as.object;
@@ -226,7 +226,7 @@ void bs_debug_chunks(Bs_Writer *w, const Bs_Object *objects) {
             const Bs_Fn *fn = (const Bs_Fn *)object;
 
             bs_fmt(w, "==== ");
-            bs_value_write(w, bs_value_object(fn));
+            bs_value_write_impl(w, bs_value_object(fn), false);
             bs_fmt(w, " ====\n");
 
             bs_debug_chunk(w, &fn->chunk);

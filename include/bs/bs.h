@@ -41,6 +41,8 @@ Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size);
 Bs_Str *bs_str_const(Bs *bs, Bs_Sv sv);
 void bs_global_set(Bs *bs, Bs_Sv name, Bs_Value value);
 
+void bs_value_write(Bs *bs, Bs_Writer *writer, Bs_Value value);
+
 // FFI
 typedef Bs_Value (*Bs_C_Fn_Ptr)(Bs *bs, Bs_Value *args, size_t arity);
 

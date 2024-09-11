@@ -135,7 +135,7 @@ static Bs_Value bs_io_write(Bs *bs, Bs_Value *args, size_t arity) {
         if (i > 1) {
             bs_fmt(&w, " ");
         }
-        bs_value_write(&w, args[i]);
+        bs_value_write(bs, &w, args[i]);
     }
 
     return bs_value_bool(!ferror(f));
@@ -147,7 +147,7 @@ static Bs_Value bs_io_print(Bs *bs, Bs_Value *args, size_t arity) {
         if (i) {
             bs_fmt(w, " ");
         }
-        bs_value_write(w, args[i]);
+        bs_value_write(bs, w, args[i]);
     }
     return bs_value_nil;
 }
@@ -158,7 +158,7 @@ static Bs_Value bs_io_eprint(Bs *bs, Bs_Value *args, size_t arity) {
         if (i) {
             bs_fmt(w, " ");
         }
-        bs_value_write(w, args[i]);
+        bs_value_write(bs, w, args[i]);
     }
     return bs_value_nil;
 }
@@ -180,7 +180,7 @@ static Bs_Value bs_io_writeln(Bs *bs, Bs_Value *args, size_t arity) {
         if (i > 1) {
             bs_fmt(&w, " ");
         }
-        bs_value_write(&w, args[i]);
+        bs_value_write(bs, &w, args[i]);
     }
     bs_fmt(&w, "\n");
 
@@ -193,7 +193,7 @@ static Bs_Value bs_io_println(Bs *bs, Bs_Value *args, size_t arity) {
         if (i) {
             bs_fmt(w, " ");
         }
-        bs_value_write(w, args[i]);
+        bs_value_write(bs, w, args[i]);
     }
     bs_fmt(w, "\n");
     return bs_value_nil;
@@ -205,7 +205,7 @@ static Bs_Value bs_io_eprintln(Bs *bs, Bs_Value *args, size_t arity) {
         if (i) {
             bs_fmt(w, " ");
         }
-        bs_value_write(w, args[i]);
+        bs_value_write(bs, w, args[i]);
     }
     bs_fmt(w, "\n");
     return bs_value_nil;
@@ -761,7 +761,7 @@ static Bs_Value bs_array_join(Bs *bs, Bs_Value *args, size_t arity) {
             if (i) {
                 w.write(&w, separator);
             }
-            bs_value_write(&w, array->data[i]);
+            bs_value_write(bs, &w, array->data[i]);
         }
     }
     return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));

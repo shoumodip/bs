@@ -53,9 +53,9 @@ typedef struct {
 #define bs_value_object(v) ((Bs_Value){BS_VALUE_OBJECT, .as.object = (Bs_Object *)(v)})
 
 bool bs_value_is_falsey(Bs_Value value);
-const char *bs_value_type_name(Bs_Value value);
+const char *bs_value_type_name(Bs_Value value, bool extended);
 
-void bs_value_write(Bs_Writer *writer, Bs_Value value);
+void bs_value_write_impl(Bs_Writer *writer, Bs_Value value, bool extended);
 bool bs_value_equal(Bs_Value a, Bs_Value b);
 
 #endif // BS_VALUE_H
