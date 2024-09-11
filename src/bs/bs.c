@@ -1216,7 +1216,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 }
             } else if (container.as.object->type == BS_OBJECT_TABLE) {
                 if (index.type == BS_VALUE_NIL) {
-                    bs_error(bs, "cannot use 'nil' as table key");
+                    bs_error(bs, "cannot use '%s' as table key", bs_value_type_name(index));
                 }
 
                 if (bs_value_equal(container, index)) {
@@ -1266,7 +1266,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 bs_array_set(bs, (Bs_Array *)container.as.object, index.as.number, value);
             } else if (container.as.object->type == BS_OBJECT_TABLE) {
                 if (index.type == BS_VALUE_NIL) {
-                    bs_error(bs, "cannot use 'nil' as table key");
+                    bs_error(bs, "cannot use '%s' as table key", bs_value_type_name(index));
                 }
 
                 if (bs_value_equal(container, index)) {
@@ -1362,24 +1362,18 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         case BS_OP_RANGE: {
             const size_t offset = bs_chunk_read_int(bs);
 
-            Bs_Value step = bs_stack_peek(bs, 0);
-            if (step.type != BS_VALUE_NIL && step.type != BS_VALUE_NUM) {
-                bs_error(
-                    bs,
-                    "expected range step to be nil or number, got %s",
-                    bs_value_type_name(step));
-            }
+            const Bs_Value start = bs_stack_peek(bs, 2);
+            bs_check_value_type(bs, start, BS_VALUE_NUM, "range start");
 
             const Bs_Value end = bs_stack_peek(bs, 1);
             bs_check_value_type(bs, end, BS_VALUE_NUM, "range end");
 
-            const Bs_Value start = bs_stack_peek(bs, 2);
-            bs_check_value_type(bs, start, BS_VALUE_NUM, "range start");
-
+            Bs_Value step = bs_stack_peek(bs, 0);
             if (step.type == BS_VALUE_NIL) {
                 step = bs_value_num((end.as.number > start.as.number) ? 1 : -1);
                 bs_stack_set(bs, 0, step);
             }
+            bs_check_value_type(bs, step, BS_VALUE_NUM, "range step");
 
             const bool over = step.as.number > 0 ? (start.as.number >= end.as.number)
                                                  : (start.as.number <= end.as.number);

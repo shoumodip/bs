@@ -749,10 +749,11 @@ static void bs_compile_stmt(Bs_Compiler *c) {
 
         const Bs_Token a = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
         Bs_Token b = bs_lexer_either(&c->lexer, BS_TOKEN_COMMA, BS_TOKEN_IN);
+        Bs_Loc loc = b.loc;
 
         if (b.type != BS_TOKEN_IN) {
             b = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
-            bs_lexer_expect(&c->lexer, BS_TOKEN_IN);
+            loc = bs_lexer_expect(&c->lexer, BS_TOKEN_IN).loc;
         }
 
         // Container / Start
@@ -791,7 +792,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         const size_t loop_addr =
             bs_compile_jump_start(c, b.type == BS_TOKEN_IN ? BS_OP_RANGE : BS_OP_ITER);
 
-        bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
+        bs_chunk_push_op_loc(c->bs, c->chunk, loc);
 
         bs_lexer_buffer(&c->lexer, bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE));
         bs_compile_stmt(c);
