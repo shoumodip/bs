@@ -155,9 +155,26 @@ void bs_value_write_impl(Bs_Writer *w, Bs_Value v, bool extended) {
         }
         break;
 
-    case BS_VALUE_NUM:
-        bs_fmt(w, "%g", v.as.number);
-        break;
+    case BS_VALUE_NUM: {
+        char buffer[32];
+        int count = snprintf(buffer, sizeof(buffer), "%lf", v.as.number);
+        assert(count >= 0 && count + 1 < sizeof(buffer));
+
+        const char *decimal = memchr(buffer, '.', count);
+        if (decimal) {
+            for (const size_t point = decimal - buffer; count > point; count--) {
+                if (buffer[count - 1] != '0') {
+                    break;
+                }
+            }
+
+            if (buffer[count - 1] == '.') {
+                count--;
+            }
+        }
+
+        w->write(w, bs_sv_from_parts(buffer, count));
+    } break;
 
     case BS_VALUE_BOOL:
         if (extended) {
