@@ -3,6 +3,10 @@
 
 #include "bs/lexer.h"
 
+static bool ishex(char c) {
+    return isdigit(c) || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f');
+}
+
 static void bs_lexer_advance(Bs_Lexer *l) {
     if (*l->sv.data == '\n') {
         if (l->sv.size > 1) {
@@ -125,6 +129,29 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
         return token;
     }
 
+    if (bs_sv_prefix(l->sv, Bs_Sv_Static("0x"))) {
+        token.type = BS_TOKEN_NUM;
+        bs_lexer_advance(l);
+        bs_lexer_advance(l);
+
+        while (l->sv.size > 0 && ishex(*l->sv.data)) {
+            bs_lexer_advance(l);
+        }
+
+        if (isalpha(*l->sv.data) || *l->sv.data == '_') {
+            bs_fmt(
+                l->error,
+                Bs_Loc_Fmt "error: invalid digit '%c' in number\n",
+                Bs_Loc_Arg(l->loc),
+                *l->sv.data);
+
+            bs_lexer_error(l);
+        }
+
+        token.sv.size -= l->sv.size;
+        return token;
+    }
+
     if (isdigit(*l->sv.data)) {
         token.type = BS_TOKEN_NUM;
         while (l->sv.size > 0 && isdigit(*l->sv.data)) {
@@ -136,6 +163,16 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
             while (l->sv.size > 0 && isdigit(*l->sv.data)) {
                 bs_lexer_advance(l);
             }
+        }
+
+        if (isalpha(*l->sv.data) || *l->sv.data == '_') {
+            bs_fmt(
+                l->error,
+                Bs_Loc_Fmt "error: invalid digit '%c' in number\n",
+                Bs_Loc_Arg(l->loc),
+                *l->sv.data);
+
+            bs_lexer_error(l);
         }
 
         token.sv.size -= l->sv.size;

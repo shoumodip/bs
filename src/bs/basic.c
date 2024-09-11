@@ -17,6 +17,10 @@ bool bs_sv_eq(Bs_Sv a, Bs_Sv b) {
     return a.size == b.size && !memcmp(a.data, b.data, b.size);
 }
 
+bool bs_sv_prefix(Bs_Sv a, Bs_Sv b) {
+    return a.size >= b.size && !memcmp(a.data, b.data, b.size);
+}
+
 bool bs_sv_suffix(Bs_Sv a, Bs_Sv b) {
     return a.size >= b.size && !memcmp(a.data + a.size - b.size, b.data, b.size);
 }

@@ -19,6 +19,7 @@ Bs_Sv bs_sv_from_cstr(const char *data);
 Bs_Sv bs_sv_from_parts(const char *data, size_t size);
 
 bool bs_sv_eq(Bs_Sv a, Bs_Sv b);
+bool bs_sv_prefix(Bs_Sv a, Bs_Sv b);
 bool bs_sv_suffix(Bs_Sv a, Bs_Sv b);
 
 // Writer
