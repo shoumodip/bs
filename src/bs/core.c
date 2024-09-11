@@ -420,6 +420,51 @@ static Bs_Value bs_str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(dst);
 }
 
+static Bs_Value bs_str_tolower(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+
+    const Bs_Str *src = (const Bs_Str *)args[0].as.object;
+    Bs_Str *dst = bs_str_new(bs, Bs_Sv(src->data, src->size));
+    for (size_t i = 0; i < dst->size; i++) {
+        dst->data[i] = tolower(dst->data[i]);
+    }
+
+    return bs_value_object(dst);
+}
+
+static Bs_Value bs_str_toupper(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+
+    const Bs_Str *src = (const Bs_Str *)args[0].as.object;
+    Bs_Str *dst = bs_str_new(bs, Bs_Sv(src->data, src->size));
+    for (size_t i = 0; i < dst->size; i++) {
+        dst->data[i] = toupper(dst->data[i]);
+    }
+
+    return bs_value_object(dst);
+}
+
+static Bs_Value bs_str_tonumber(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+
+    const Bs_Str *src = (const Bs_Str *)args[0].as.object;
+
+    Bs_Buffer *b = bs_buffer_get(bs);
+    const size_t start = b->count;
+
+    bs_da_push_many(b->bs, b, src->data, src->size);
+    bs_da_push(b->bs, b, '\0');
+
+    const char *input = bs_buffer_reset(b, start).data;
+    char *end;
+
+    const double value = strtod(input, &end);
+    return (end == input || *end != '\0' || errno == ERANGE) ? bs_value_nil : bs_value_num(value);
+}
+
 static Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
     if (arity != 2 && arity != 3) {
         bs_error(bs, "expected 2 or 3 arguments, got %zu", arity);
@@ -1004,6 +1049,10 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         Bs_Table *str = bs_table_new(bs);
         bs_table_add(bs, str, "slice", bs_value_object(bs_c_fn_new(bs, bs_str_slice)));
         bs_table_add(bs, str, "reverse", bs_value_object(bs_c_fn_new(bs, bs_str_reverse)));
+
+        bs_table_add(bs, str, "tolower", bs_value_object(bs_c_fn_new(bs, bs_str_tolower)));
+        bs_table_add(bs, str, "toupper", bs_value_object(bs_c_fn_new(bs, bs_str_toupper)));
+        bs_table_add(bs, str, "tonumber", bs_value_object(bs_c_fn_new(bs, bs_str_tonumber)));
 
         bs_table_add(bs, str, "find", bs_value_object(bs_c_fn_new(bs, bs_str_find)));
         bs_table_add(bs, str, "find_regex", bs_value_object(bs_c_fn_new(bs, bs_str_find_regex)));
