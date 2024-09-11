@@ -1,8 +1,8 @@
-:i count 66
+:i count 70
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
-:b stdout 34
+:b stdout 56
 69
 420
 69
@@ -12,13 +12,15 @@
 420
 69
 420
+1772867055
+2875837935
 
 :b stderr 0
 
 :b shell 30
 ../bin/bs arithmetics/main.bsx
 :i returncode 0
-:b stdout 34
+:b stdout 56
 69
 420
 69
@@ -28,8 +30,42 @@
 420
 69
 420
+1772867055
+2875837935
 
 :b stderr 0
+
+:b shell 44
+../bin/bs arithmetics/error_invalid_digit.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 75
+arithmetics/error_invalid_digit.bs:1:3: error: invalid digit 'x' in number
+
+:b shell 45
+../bin/bs arithmetics/error_invalid_digit.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 76
+arithmetics/error_invalid_digit.bsx:1:3: error: invalid digit 'x' in number
+
+:b shell 48
+../bin/bs arithmetics/error_invalid_hex_digit.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 79
+arithmetics/error_invalid_hex_digit.bs:1:5: error: invalid digit 'g' in number
+
+:b shell 49
+../bin/bs arithmetics/error_invalid_hex_digit.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 80
+arithmetics/error_invalid_hex_digit.bsx:1:5: error: invalid digit 'g' in number
 
 :b shell 29
 ../bin/bs comparisons/main.bs

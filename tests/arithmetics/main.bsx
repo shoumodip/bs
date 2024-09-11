@@ -12,3 +12,7 @@ io.println((900 - 60) / 2) fr
 # Decimals
 io.println(17.25 * 4) fr
 io.println(840 * 0.5) fr
+
+# Hex
+io.println(0x69ABCDEF) fr
+io.println(0xab69cdef) fr

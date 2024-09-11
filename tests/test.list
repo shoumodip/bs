@@ -1,5 +1,9 @@
 ../bin/bs arithmetics/main.bs
 ../bin/bs arithmetics/main.bsx
+../bin/bs arithmetics/error_invalid_digit.bs
+../bin/bs arithmetics/error_invalid_digit.bsx
+../bin/bs arithmetics/error_invalid_hex_digit.bs
+../bin/bs arithmetics/error_invalid_hex_digit.bsx
 ../bin/bs comparisons/main.bs
 ../bin/bs comparisons/main.bsx
 ../bin/bs conditions/main.bs

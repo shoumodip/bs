@@ -12,3 +12,7 @@ io.println((900 - 60) / 2);
 # Decimals
 io.println(17.25 * 4);
 io.println(840 * 0.5);
+
+# Hex
+io.println(0x69ABCDEF);
+io.println(0xab69cdef);
