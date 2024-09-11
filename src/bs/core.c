@@ -516,10 +516,7 @@ static Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
     while (i + pattern->size <= str->size) {
         if (bs_sv_eq(Bs_Sv(str->data + i, pattern->size), pattern_sv)) {
             bs_array_set(
-                bs,
-                a,
-                a->count,
-                bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, i - j))));
+                bs, a, a->count, bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, i - j))));
 
             i += pattern->size;
             j = i;
@@ -530,10 +527,7 @@ static Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
 
     if (j != str->size) {
         bs_array_set(
-            bs,
-            a,
-            a->count,
-            bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, str->size - j))));
+            bs, a, a->count, bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, str->size - j))));
     }
 
     return bs_value_object(a);
@@ -579,10 +573,7 @@ static Bs_Value bs_str_split_regex(Bs *bs, Bs_Value *args, size_t arity) {
 
     if (j != str->size) {
         bs_array_set(
-            bs,
-            a,
-            a->count,
-            bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, str->size - j))));
+            bs, a, a->count, bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, str->size - j))));
     }
 
     regfree(&regex);
@@ -796,11 +787,6 @@ static Bs_Value bs_array_sort(Bs *bs, Bs_Value *args, size_t arity) {
     const Bs_Array *src = (const Bs_Array *)args[0].as.object;
     const Bs_Value fn = args[1];
 
-    Bs_Array *dst = bs_array_new(bs);
-    for (size_t i = src->count; i > 0; i--) {
-        bs_array_set(bs, dst, i - 1, src->data[i - 1]);
-    }
-
     // Prepare the context
     const Bs_Array_Sort_Context context = {
         .bs = bs,
@@ -808,8 +794,8 @@ static Bs_Value bs_array_sort(Bs *bs, Bs_Value *args, size_t arity) {
     };
     bs_array_sort_compare(NULL, &context);
 
-    qsort(dst->data, dst->count, sizeof(*dst->data), bs_array_sort_compare);
-    return bs_value_object(dst);
+    qsort(src->data, src->count, sizeof(*src->data), bs_array_sort_compare);
+    return bs_value_object(src);
 }
 
 static Bs_Value bs_array_reverse(Bs *bs, Bs_Value *args, size_t arity) {
@@ -817,12 +803,12 @@ static Bs_Value bs_array_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
 
     const Bs_Array *src = (const Bs_Array *)args[0].as.object;
-    Bs_Array *dst = bs_array_new(bs);
-    for (size_t i = 0; i < src->count; i++) {
-        bs_array_set(bs, dst, src->count - i - 1, src->data[i]);
+    for (size_t i = 0; i < src->count / 2; i++) {
+        const Bs_Value t = src->data[i];
+        src->data[i] = src->data[src->count - i - 1];
+        src->data[src->count - i - 1] = t;
     }
-
-    return bs_value_object(dst);
+    return bs_value_object(src);
 }
 
 // Bytes
