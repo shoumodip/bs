@@ -269,26 +269,9 @@ void bs_value_print_impl(Bs_Pretty_Printer *p, Bs_Value value) {
         }
         break;
 
-    case BS_VALUE_NUM: {
-        char buffer[32];
-        int count = snprintf(buffer, sizeof(buffer), "%lf", value.as.number);
-        assert(count >= 0 && count + 1 < sizeof(buffer));
-
-        const char *decimal = memchr(buffer, '.', count);
-        if (decimal) {
-            for (const size_t point = decimal - buffer; count > point; count--) {
-                if (buffer[count - 1] != '0') {
-                    break;
-                }
-            }
-
-            if (buffer[count - 1] == '.') {
-                count--;
-            }
-        }
-
-        p->writer->write(p->writer, Bs_Sv(buffer, count));
-    } break;
+    case BS_VALUE_NUM:
+        bs_fmt(p->writer, "%.15g", value.as.number);
+        break;
 
     case BS_VALUE_BOOL:
         if (p->extended) {
