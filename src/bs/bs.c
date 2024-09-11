@@ -84,6 +84,7 @@ struct Bs {
 
     Bs_Writer error;
     Bs_Writer output;
+    Bs_Pretty_Printer printer;
 
     bool step;
     void *userdata;
@@ -168,7 +169,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
 #ifdef BS_GC_DEBUG_LOG
     Bs_Writer *w = bs_stdout_get(bs);
     bs_fmt(w, "[GC] Mark %p ", object);
-    bs_value_write(w, bs_value_object(object));
+    bs_value_write(bs, w, bs_value_object(object));
     bs_fmt(w, "\n");
 #endif // BS_GC_DEBUG_LOG
 
@@ -250,6 +251,9 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
 }
 
 static void bs_collect(Bs *bs) {
+    const bool gc_on = bs->gc_on;
+    bs->gc_on = false;
+
 #ifdef BS_GC_DEBUG_LOG
     Bs_Writer *w = bs_stdout_get(bs);
     bs_fmt(w, "\n-------- GC Begin --------\n");
@@ -321,6 +325,8 @@ static void bs_collect(Bs *bs) {
 
     bs_fmt(w, "-------- GC End ----------\n\n");
 #endif // BS_GC_DEBUG_LOG
+
+    bs->gc_on = gc_on;
 }
 
 // Interface
@@ -338,6 +344,7 @@ Bs *bs_new(bool step) {
 
     bs->error = (Bs_Writer){stderr, bs_file_write};
     bs->output = (Bs_Writer){stdout, bs_file_write};
+    bs->printer.bs = bs;
 
     bs->globals.meta.type = BS_OBJECT_TABLE;
 
@@ -364,6 +371,8 @@ void bs_free(Bs *bs) {
 
     bs_buffer_free(bs, &bs->paths);
     bs_buffer_free(bs, &bs->buffer);
+
+    bs_da_free(bs, &bs->printer);
     free(bs);
 }
 
@@ -473,8 +482,16 @@ void bs_global_set(Bs *bs, Bs_Sv name, Bs_Value value) {
     bs_table_set(bs, &bs->globals, bs_value_object(bs_str_const(bs, name)), value);
 }
 
+static Bs_Pretty_Printer *bs_pretty_printer(Bs *bs, Bs_Writer *w) {
+    bs->printer.writer = w;
+    bs->printer.extended = bs->frame ? bs->frame->extended : false;
+    bs->printer.depth = 0;
+    bs->printer.count = 0;
+    return &bs->printer;
+}
+
 void bs_value_write(Bs *bs, Bs_Writer *w, Bs_Value value) {
-    bs_value_write_impl(w, value, bs->frame->extended);
+    bs_value_print_impl(bs_pretty_printer(bs, w), value);
 }
 
 // Errors
@@ -808,7 +825,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             bs_fmt(w, "\n");
 
             size_t offset = bs->frame->ip - bs->frame->closure->fn->chunk.data;
-            bs_debug_op(w, &bs->frame->closure->fn->chunk, &offset);
+            bs_debug_op(bs_pretty_printer(bs, w), &bs->frame->closure->fn->chunk, &offset);
             bs_fmt(w, "----------------------------------------\n");
             getchar();
         }
@@ -1251,10 +1268,6 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                         bs_value_type_name(index, bs->frame->extended));
                 }
 
-                if (bs_value_equal(container, index)) {
-                    bs_error(bs, "cannot use table itself as key");
-                }
-
                 if (!bs_table_get(bs, (Bs_Table *)container.as.object, index, &value)) {
                     value = bs_value_nil;
                 }
@@ -1307,10 +1320,6 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                         bs,
                         "cannot use '%s' as table key",
                         bs_value_type_name(index, bs->frame->extended));
-                }
-
-                if (bs_value_equal(container, index)) {
-                    bs_error(bs, "cannot use table itself as key");
                 }
 
                 Bs_Table *table = (Bs_Table *)container.as.object;
@@ -1454,7 +1463,7 @@ Bs_Result bs_run(Bs *bs, const char *path, Bs_Sv input, bool is_repl) {
     }
 
     if (bs->step) {
-        bs_debug_chunk(bs_stdout_get(bs), &fn->chunk);
+        bs_debug_chunk(bs_pretty_printer(bs, bs_stdout_get(bs)), &fn->chunk);
     }
 
     bs_da_push(bs, &bs->modules, (Bs_Module){.name = fn->name});

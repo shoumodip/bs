@@ -17,8 +17,10 @@ typedef struct {
 #define Bs_Sv_Static(s) ((Bs_Sv){s, sizeof(s) - 1})
 
 Bs_Sv bs_sv_from_cstr(const char *data);
+Bs_Sv bs_sv_drop(Bs_Sv *s, size_t count);
 
 bool bs_sv_eq(Bs_Sv a, Bs_Sv b);
+bool bs_sv_find(Bs_Sv s, char ch, size_t *index);
 bool bs_sv_prefix(Bs_Sv a, Bs_Sv b);
 bool bs_sv_suffix(Bs_Sv a, Bs_Sv b);
 
@@ -30,7 +32,7 @@ struct Bs_Writer {
     void (*write)(Bs_Writer *writer, Bs_Sv sv);
 };
 
-void bs_fmt(Bs_Writer *writer, const char *fmt, ...);
+void bs_fmt(Bs_Writer *writer, const char *fmt, ...) __attribute__((__format__(__printf__, 2, 3)));
 
 // Defer
 #define bs_return_defer(value)                                                                     \

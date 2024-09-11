@@ -1,3 +1,5 @@
+#include <ctype.h>
+
 #include "bs/object.h"
 
 bool bs_value_is_falsey(Bs_Value v) {
@@ -59,85 +61,196 @@ const char *bs_value_type_name(Bs_Value v, bool extended) {
     }
 }
 
+static bool bs_should_print_multi(const Bs_Object *object) {
+    if (object->type == BS_OBJECT_TABLE) {
+        return ((const Bs_Table *)object)->length != 0;
+    }
+
+    if (object->type == BS_OBJECT_ARRAY) {
+        const Bs_Array *array = (const Bs_Array *)object;
+        if (array->count > 5) {
+            return true;
+        }
+
+        for (size_t i = 0; i < array->count; i++) {
+            const Bs_Value v = array->data[i];
+            if (v.type == BS_VALUE_OBJECT) {
+                if (v.as.object->type == BS_OBJECT_ARRAY || v.as.object->type == BS_OBJECT_TABLE) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+static bool bs_pretty_printer_has(Bs_Pretty_Printer *p, const Bs_Object *object) {
+    for (size_t i = 0; i < p->count; i++) {
+        if (p->data[i] == (uintptr_t)object) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 static_assert(BS_COUNT_OBJECTS == 9, "Update bs_object_write()");
-static void bs_object_write_impl(Bs_Writer *w, const Bs_Object *o, bool extended) {
-    switch (o->type) {
+static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) {
+    switch (object->type) {
     case BS_OBJECT_FN: {
-        const Bs_Fn *fn = (const Bs_Fn *)o;
+        const Bs_Fn *fn = (const Bs_Fn *)object;
         if (fn->module) {
             if (fn->name) {
-                bs_fmt(w, "module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*fn->name));
+                bs_fmt(p->writer, "module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*fn->name));
             } else {
-                bs_fmt(w, "module");
+                bs_fmt(p->writer, "module");
             }
         } else if (fn->name) {
-            bs_fmt(w, "fn " Bs_Sv_Fmt "()", Bs_Sv_Arg(*fn->name));
+            bs_fmt(p->writer, "fn " Bs_Sv_Fmt "()", Bs_Sv_Arg(*fn->name));
         } else {
-            bs_fmt(w, "fn ()");
+            bs_fmt(p->writer, "fn ()");
         }
     } break;
 
     case BS_OBJECT_STR:
-        bs_fmt(w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)o));
+        if (p->depth) {
+            const Bs_Str *str = (const Bs_Str *)object;
+            Bs_Sv sv = Bs_Sv(str->data, str->size);
+
+            bs_fmt(p->writer, "\"");
+            while (sv.size) {
+                size_t index;
+                if (bs_sv_find(sv, '"', &index)) {
+                    p->writer->write(p->writer, bs_sv_drop(&sv, index));
+                    p->writer->write(p->writer, Bs_Sv_Static("\\\""));
+                    bs_sv_drop(&sv, 1);
+                } else {
+                    p->writer->write(p->writer, bs_sv_drop(&sv, sv.size));
+                }
+            }
+            bs_fmt(p->writer, "\"");
+        } else {
+            bs_fmt(p->writer, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)object));
+        }
         break;
 
     case BS_OBJECT_ARRAY: {
-        const Bs_Array *array = (const Bs_Array *)o;
+        if (bs_pretty_printer_has(p, object)) {
+            bs_fmt(p->writer, "<array %p>", object);
+        } else {
+            bs_da_push(p->bs, p, (uintptr_t)object);
+            const Bs_Array *array = (const Bs_Array *)object;
 
-        bs_fmt(w, "[");
-        for (size_t i = 0; i < array->count; i++) {
-            if (i) {
-                bs_fmt(w, ", ");
+            const bool multi = bs_should_print_multi(object);
+            if (multi) {
+                p->depth++;
             }
-            bs_value_write_impl(w, array->data[i], extended);
+
+            bs_fmt(p->writer, "[");
+            for (size_t i = 0; i < array->count; i++) {
+                if (i) {
+                    bs_fmt(p->writer, ",");
+                }
+
+                if (multi) {
+                    bs_fmt(p->writer, "\n%*s", (int)p->depth * BS_PRETTY_PRINT_INDENT, "");
+                } else if (i) {
+                    bs_fmt(p->writer, " ");
+                }
+
+                bs_value_print_impl(p, array->data[i]);
+            }
+
+            if (multi) {
+                p->depth--;
+                bs_fmt(p->writer, "\n%*s", (int)p->depth * BS_PRETTY_PRINT_INDENT, "");
+            }
+            bs_fmt(p->writer, "]");
         }
-        bs_fmt(w, "]");
     } break;
 
     case BS_OBJECT_TABLE: {
-        Bs_Table *table = (Bs_Table *)o;
+        if (bs_pretty_printer_has(p, object)) {
+            bs_fmt(p->writer, "<table %p>", object);
+        } else {
+            bs_da_push(p->bs, p, (uintptr_t)object);
+            const Bs_Table *table = (const Bs_Table *)object;
 
-        bs_fmt(w, "{");
-        for (size_t i = 0, count = 0; i < table->capacity; i++) {
-            Bs_Entry *entry = &table->data[i];
-            if (entry->key.type == BS_VALUE_NIL) {
-                continue;
+            bs_fmt(p->writer, "{");
+            if (table->length) {
+                p->depth++;
+
+                for (size_t i = 0, count = 0; i < table->capacity; i++) {
+                    Bs_Entry *entry = &table->data[i];
+                    if (entry->key.type == BS_VALUE_NIL) {
+                        continue;
+                    }
+
+                    if (count) {
+                        bs_fmt(p->writer, ",");
+                    }
+                    bs_fmt(p->writer, "\n%*s", (int)p->depth * BS_PRETTY_PRINT_INDENT, "");
+
+                    bool symbol = entry->key.type == BS_VALUE_OBJECT &&
+                                  entry->key.as.object->type == BS_OBJECT_STR;
+
+                    if (symbol) {
+                        const Bs_Str *str = (const Bs_Str *)entry->key.as.object;
+                        if (str->size && (isalpha(*str->data) || *str->data == '_')) {
+                            for (size_t i = 0; i < str->size; i++) {
+                                if (!isalnum(str->data[i]) && str->data[i] != '_') {
+                                    symbol = false;
+                                    break;
+                                }
+                            }
+                        } else {
+                            symbol = false;
+                        }
+                    }
+
+                    if (symbol) {
+                        bs_fmt(
+                            p->writer, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)entry->key.as.object));
+                    } else {
+                        p->writer->write(p->writer, Bs_Sv_Static("["));
+                        bs_value_print_impl(p, entry->key);
+                        p->writer->write(p->writer, Bs_Sv_Static("]"));
+                    }
+                    bs_fmt(p->writer, " = ");
+                    bs_value_print_impl(p, entry->value);
+                    count++;
+                }
+
+                p->depth--;
+                bs_fmt(p->writer, "\n%*s", (int)p->depth * BS_PRETTY_PRINT_INDENT, "");
             }
-
-            if (count) {
-                bs_fmt(w, ", ");
-            }
-
-            bs_value_write_impl(w, entry->key, extended);
-            bs_fmt(w, " = ");
-            bs_value_write_impl(w, entry->value, extended);
-            count++;
+            bs_fmt(p->writer, "}");
         }
-        bs_fmt(w, "}");
     } break;
 
     case BS_OBJECT_CLOSURE:
-        bs_object_write_impl(w, (Bs_Object *)((const Bs_Closure *)o)->fn, extended);
+        bs_object_write_impl(p, (Bs_Object *)((const Bs_Closure *)object)->fn);
         break;
 
     case BS_OBJECT_UPVALUE:
-        bs_fmt(w, "<upvalue>");
+        bs_fmt(p->writer, "<upvalue>");
         break;
 
     case BS_OBJECT_C_FN:
-        bs_fmt(w, "native fn ()");
+        bs_fmt(p->writer, "native fn ()");
         break;
 
     case BS_OBJECT_C_LIB:
-        bs_object_write_impl(w, (const Bs_Object *)&((const Bs_C_Lib *)o)->functions, extended);
+        bs_object_write_impl(p, (const Bs_Object *)&((const Bs_C_Lib *)object)->functions);
         break;
 
     case BS_OBJECT_C_DATA: {
-        const Bs_C_Data *native = (const Bs_C_Data *)o;
+        const Bs_C_Data *native = (const Bs_C_Data *)object;
         if (native->spec->write) {
-            native->spec->write(w, native->data);
+            native->spec->write(p->writer, native->data);
         } else {
-            bs_fmt(w, "<native " Bs_Sv_Fmt " object>", Bs_Sv_Arg(native->spec->name));
+            bs_fmt(p->writer, "<native " Bs_Sv_Fmt " object>", Bs_Sv_Arg(native->spec->name));
         }
     } break;
 
@@ -146,19 +259,19 @@ static void bs_object_write_impl(Bs_Writer *w, const Bs_Object *o, bool extended
     }
 }
 
-void bs_value_write_impl(Bs_Writer *w, Bs_Value v, bool extended) {
-    switch (v.type) {
+void bs_value_print_impl(Bs_Pretty_Printer *p, Bs_Value value) {
+    switch (value.type) {
     case BS_VALUE_NIL:
-        if (extended) {
-            bs_fmt(w, "bruh");
+        if (p->extended) {
+            bs_fmt(p->writer, "bruh");
         } else {
-            bs_fmt(w, "nil");
+            bs_fmt(p->writer, "nil");
         }
         break;
 
     case BS_VALUE_NUM: {
         char buffer[32];
-        int count = snprintf(buffer, sizeof(buffer), "%lf", v.as.number);
+        int count = snprintf(buffer, sizeof(buffer), "%lf", value.as.number);
         assert(count >= 0 && count + 1 < sizeof(buffer));
 
         const char *decimal = memchr(buffer, '.', count);
@@ -174,19 +287,19 @@ void bs_value_write_impl(Bs_Writer *w, Bs_Value v, bool extended) {
             }
         }
 
-        w->write(w, Bs_Sv(buffer, count));
+        p->writer->write(p->writer, Bs_Sv(buffer, count));
     } break;
 
     case BS_VALUE_BOOL:
-        if (extended) {
-            bs_fmt(w, "%s", v.as.boolean ? "nocap" : "cap");
+        if (p->extended) {
+            bs_fmt(p->writer, "%s", value.as.boolean ? "nocap" : "cap");
         } else {
-            bs_fmt(w, "%s", v.as.boolean ? "true" : "false");
+            bs_fmt(p->writer, "%s", value.as.boolean ? "true" : "false");
         }
         break;
 
     case BS_VALUE_OBJECT:
-        bs_object_write_impl(w, v.as.object, extended);
+        bs_object_write_impl(p, value.as.object);
         break;
 
     default:

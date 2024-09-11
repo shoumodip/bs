@@ -9,8 +9,25 @@ Bs_Sv bs_sv_from_cstr(const char *data) {
     return (Bs_Sv){data, strlen(data)};
 }
 
+Bs_Sv bs_sv_drop(Bs_Sv *s, size_t count) {
+    const Bs_Sv result = Bs_Sv(s->data, count);
+    s->data += count;
+    s->size -= count;
+    return result;
+}
+
 bool bs_sv_eq(Bs_Sv a, Bs_Sv b) {
     return a.size == b.size && !memcmp(a.data, b.data, b.size);
+}
+
+bool bs_sv_find(Bs_Sv s, char ch, size_t *index) {
+    const char *p = memchr(s.data, ch, s.size);
+    if (!p) {
+        return false;
+    }
+
+    *index = p - s.data;
+    return true;
 }
 
 bool bs_sv_prefix(Bs_Sv a, Bs_Sv b) {

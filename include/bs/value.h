@@ -1,7 +1,11 @@
 #ifndef BS_VALUE_H
 #define BS_VALUE_H
 
+#include <stdint.h>
+
 #include "basic.h"
+
+#define BS_PRETTY_PRINT_INDENT 4
 
 typedef enum {
     BS_VALUE_NIL,
@@ -55,7 +59,19 @@ typedef struct {
 bool bs_value_is_falsey(Bs_Value value);
 const char *bs_value_type_name(Bs_Value value, bool extended);
 
-void bs_value_write_impl(Bs_Writer *writer, Bs_Value value, bool extended);
+typedef struct {
+    void *bs;
+    Bs_Writer *writer;
+
+    bool extended;
+    size_t depth;
+
+    uintptr_t *data;
+    size_t count;
+    size_t capacity;
+} Bs_Pretty_Printer;
+
+void bs_value_print_impl(Bs_Pretty_Printer *printer, Bs_Value value);
 bool bs_value_equal(Bs_Value a, Bs_Value b);
 
 #endif // BS_VALUE_H
