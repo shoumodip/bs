@@ -1,4 +1,4 @@
-:i count 60
+:i count 66
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -784,4 +784,62 @@ Captured value is 2
 Captured value is 1
 
 :b stderr 0
+
+:b shell 26
+../bin/bs extended/main.bs
+:i returncode 0
+:b stdout 38
+x = true; y = nil
+x = nocap; y = bruh
+
+:b stderr 0
+
+:b shell 27
+../bin/bs extended/main.bsx
+:i returncode 0
+:b stdout 38
+x = true; y = nil
+x = nocap; y = bruh
+
+:b stderr 0
+
+:b shell 44
+../bin/bs extended/error_type_name_normal.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 150
+[C]: error: expected argument #1 to be string, got nil
+extended/common.bs:9:16: in native fn ()
+extended/error_type_name_normal.bs:1:34: in fn oops()
+
+:b shell 45
+../bin/bs extended/error_type_name_normal.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 151
+[C]: error: expected argument #1 to be string, got nil
+extended/common.bs:9:16: in native fn ()
+extended/error_type_name_normal.bsx:1:35: in fn oops()
+
+:b shell 46
+../bin/bs extended/error_type_name_extended.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 157
+[C]: error: expected argument #1 to be string, got capness
+extended/common.bsx:9:16: in native fn ()
+extended/error_type_name_extended.bs:1:35: in fn oops()
+
+:b shell 47
+../bin/bs extended/error_type_name_extended.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 158
+[C]: error: expected argument #1 to be string, got capness
+extended/common.bsx:9:16: in native fn ()
+extended/error_type_name_extended.bsx:1:36: in fn oops()
 

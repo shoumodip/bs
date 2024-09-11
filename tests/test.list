@@ -58,3 +58,9 @@
 ../bin/bs closures/main.bsx
 ../bin/bs closures/loops.bs
 ../bin/bs closures/loops.bsx
+../bin/bs extended/main.bs
+../bin/bs extended/main.bsx
+../bin/bs extended/error_type_name_normal.bs
+../bin/bs extended/error_type_name_normal.bsx
+../bin/bs extended/error_type_name_extended.bs
+../bin/bs extended/error_type_name_extended.bsx
