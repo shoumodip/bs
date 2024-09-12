@@ -479,6 +479,9 @@ static Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
+    if (!pattern->size) {
+        return bs_value_nil;
+    }
 
     const size_t offset = arity == 3 ? args[2].as.number : 0;
     if (offset > str->size) {
@@ -499,7 +502,7 @@ static Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-static Bs_Value bs_str_find_regex(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value bs_str_rfind(Bs *bs, Bs_Value *args, size_t arity) {
     if (arity != 2 && arity != 3) {
         bs_error(bs, "expected 2 or 3 arguments, got %zu", arity);
     }
@@ -513,6 +516,9 @@ static Bs_Value bs_str_find_regex(Bs *bs, Bs_Value *args, size_t arity) {
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
+    if (!pattern->size) {
+        return bs_value_nil;
+    }
 
     const size_t offset = arity == 3 ? args[2].as.number : 0;
     if (offset > str->size) {
@@ -555,6 +561,10 @@ static Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
 
     Bs_Array *a = bs_array_new(bs);
+    if (!pattern->size) {
+        bs_array_set(bs, a, a->count, bs_value_object(str));
+        return bs_value_object(a);
+    }
     const Bs_Sv pattern_sv = Bs_Sv(pattern->data, pattern->size);
 
     size_t i = 0, j = 0;
@@ -578,13 +588,19 @@ static Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(a);
 }
 
-static Bs_Value bs_str_split_regex(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value bs_str_rsplit(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
     bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
+
+    Bs_Array *a = bs_array_new(bs);
+    if (!pattern->size) {
+        bs_array_set(bs, a, a->count, bs_value_object(str));
+        return bs_value_object(a);
+    }
 
     Bs_Buffer *b = bs_buffer_get(bs);
     const size_t start = b->count;
@@ -596,8 +612,6 @@ static Bs_Value bs_str_split_regex(Bs *bs, Bs_Value *args, size_t arity) {
     const size_t pattern_pos = b->count;
     bs_da_push_many(bs, b, pattern->data, pattern->size);
     bs_da_push(bs, b, '\0');
-
-    Bs_Array *a = bs_array_new(bs);
 
     regex_t regex;
     if (regcomp(&regex, b->data + pattern_pos, REG_EXTENDED)) {
@@ -626,7 +640,7 @@ static Bs_Value bs_str_split_regex(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(a);
 }
 
-static Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value bs_str_sub(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
     bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
     bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
@@ -634,6 +648,10 @@ static Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
+    if (!pattern->size) {
+        return bs_value_object(str);
+    }
+
     const Bs_Str *replacement = (const Bs_Str *)args[2].as.object;
 
     if (str->size < pattern->size) {
@@ -656,7 +674,7 @@ static Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
 }
 
-static Bs_Value bs_str_replace_regex(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value bs_str_rsub(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
     bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
     bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
@@ -664,6 +682,10 @@ static Bs_Value bs_str_replace_regex(Bs *bs, Bs_Value *args, size_t arity) {
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
+    if (!pattern->size) {
+        return bs_value_object(str);
+    }
+
     const Bs_Str *replacement = (const Bs_Str *)args[2].as.object;
 
     Bs_Buffer *b = bs_buffer_get(bs);
@@ -1055,14 +1077,13 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_table_add(bs, str, "tonumber", bs_value_object(bs_c_fn_new(bs, bs_str_tonumber)));
 
         bs_table_add(bs, str, "find", bs_value_object(bs_c_fn_new(bs, bs_str_find)));
-        bs_table_add(bs, str, "find_regex", bs_value_object(bs_c_fn_new(bs, bs_str_find_regex)));
+        bs_table_add(bs, str, "rfind", bs_value_object(bs_c_fn_new(bs, bs_str_rfind)));
 
         bs_table_add(bs, str, "split", bs_value_object(bs_c_fn_new(bs, bs_str_split)));
-        bs_table_add(bs, str, "split_regex", bs_value_object(bs_c_fn_new(bs, bs_str_split_regex)));
+        bs_table_add(bs, str, "rsplit", bs_value_object(bs_c_fn_new(bs, bs_str_rsplit)));
 
-        bs_table_add(bs, str, "replace", bs_value_object(bs_c_fn_new(bs, bs_str_replace)));
-        bs_table_add(
-            bs, str, "replace_regex", bs_value_object(bs_c_fn_new(bs, bs_str_replace_regex)));
+        bs_table_add(bs, str, "sub", bs_value_object(bs_c_fn_new(bs, bs_str_sub)));
+        bs_table_add(bs, str, "rsub", bs_value_object(bs_c_fn_new(bs, bs_str_rsub)));
 
         bs_global_set(bs, Bs_Sv_Static("str"), bs_value_object(str));
     }

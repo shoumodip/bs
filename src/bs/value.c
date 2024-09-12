@@ -143,9 +143,7 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
             const Bs_Array *array = (const Bs_Array *)object;
 
             const bool multi = bs_should_print_multi(object);
-            if (multi) {
-                p->depth++;
-            }
+            p->depth++;
 
             bs_fmt(p->writer, "[");
             for (size_t i = 0; i < array->count; i++) {
@@ -162,8 +160,8 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
                 bs_value_print_impl(p, array->data[i]);
             }
 
+            p->depth--;
             if (multi) {
-                p->depth--;
                 bs_fmt(p->writer, "\n%*s", (int)p->depth * BS_PRETTY_PRINT_INDENT, "");
             }
             bs_fmt(p->writer, "]");
