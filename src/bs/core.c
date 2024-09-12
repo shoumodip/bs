@@ -736,6 +736,87 @@ static Bs_Value bs_str_rsub(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, bs_buffer_reset(o, result_pos)));
 }
 
+static Bs_Value bs_str_trim(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 2);
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
+    if (!str->size || !pattern->size) {
+        return bs_value_object(str);
+    }
+
+    if (pattern->size > str->size) {
+        return bs_value_object(str);
+    }
+
+    Bs_Sv str_sv = Bs_Sv(str->data, str->size);
+    const Bs_Sv pattern_sv = Bs_Sv(pattern->data, pattern->size);
+
+    while (bs_sv_prefix(str_sv, pattern_sv)) {
+        str_sv.data += pattern_sv.size;
+        str_sv.size -= pattern_sv.size;
+    }
+
+    while (bs_sv_suffix(str_sv, pattern_sv)) {
+        str_sv.size -= pattern_sv.size;
+    }
+
+    return bs_value_object(bs_str_new(bs, str_sv));
+}
+
+static Bs_Value bs_str_ltrim(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 2);
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
+    if (!str->size || !pattern->size) {
+        return bs_value_object(str);
+    }
+
+    if (pattern->size > str->size) {
+        return bs_value_object(str);
+    }
+
+    size_t i = 0;
+
+    Bs_Sv str_sv = Bs_Sv(str->data, str->size);
+    const Bs_Sv pattern_sv = Bs_Sv(pattern->data, pattern->size);
+    while (bs_sv_prefix(str_sv, pattern_sv)) {
+        str_sv.data += pattern_sv.size;
+        str_sv.size -= pattern_sv.size;
+    }
+
+    return bs_value_object(bs_str_new(bs, str_sv));
+}
+
+static Bs_Value bs_str_rtrim(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 2);
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
+    if (!str->size || !pattern->size) {
+        return bs_value_object(str);
+    }
+
+    if (pattern->size > str->size) {
+        return bs_value_object(str);
+    }
+
+    Bs_Sv str_sv = Bs_Sv(str->data, str->size);
+    const Bs_Sv pattern_sv = Bs_Sv(pattern->data, pattern->size);
+    while (bs_sv_suffix(str_sv, pattern_sv)) {
+        str_sv.size -= pattern_sv.size;
+    }
+
+    return bs_value_object(bs_str_new(bs, str_sv));
+}
+
 // Array
 static Bs_Value bs_array_map(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
@@ -1084,6 +1165,10 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
 
         bs_table_add(bs, str, "sub", bs_value_object(bs_c_fn_new(bs, bs_str_sub)));
         bs_table_add(bs, str, "rsub", bs_value_object(bs_c_fn_new(bs, bs_str_rsub)));
+
+        bs_table_add(bs, str, "trim", bs_value_object(bs_c_fn_new(bs, bs_str_trim)));
+        bs_table_add(bs, str, "ltrim", bs_value_object(bs_c_fn_new(bs, bs_str_ltrim)));
+        bs_table_add(bs, str, "rtrim", bs_value_object(bs_c_fn_new(bs, bs_str_rtrim)));
 
         bs_global_set(bs, Bs_Sv_Static("str"), bs_value_object(str));
     }
