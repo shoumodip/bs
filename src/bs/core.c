@@ -817,6 +817,69 @@ static Bs_Value bs_str_rtrim(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, str_sv));
 }
 
+static Bs_Value bs_str_lpad(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 3);
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
+    bs_check_whole_number(bs, args[2], "argument #3");
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
+    const size_t count = args[2].as.number;
+    if (!str->size || !pattern->size) {
+        return bs_value_object(str);
+    }
+
+    if (pattern->size > str->size) {
+        return bs_value_object(str);
+    }
+
+    if (str->size >= count) {
+        return bs_value_object(str);
+    }
+    const size_t padding = count - str->size;
+
+    Bs_Str *result = bs_str_new(bs, Bs_Sv(NULL, count));
+    memcpy(result->data + padding, str->data, str->size);
+
+    for (size_t i = 0; i < padding; i += pattern->size) {
+        memcpy(result->data + i, pattern->data, bs_min(pattern->size, padding - i));
+    }
+
+    return bs_value_object(result);
+}
+
+static Bs_Value bs_str_rpad(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 3);
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
+    bs_check_whole_number(bs, args[2], "argument #3");
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
+    const size_t count = args[2].as.number;
+    if (!str->size || !pattern->size) {
+        return bs_value_object(str);
+    }
+
+    if (pattern->size > str->size) {
+        return bs_value_object(str);
+    }
+
+    if (str->size >= count) {
+        return bs_value_object(str);
+    }
+
+    Bs_Str *result = bs_str_new(bs, Bs_Sv(NULL, count));
+    memcpy(result->data, str->data, str->size);
+
+    for (size_t i = str->size; i < count; i += pattern->size) {
+        memcpy(result->data + i, pattern->data, bs_min(pattern->size, count - i));
+    }
+
+    return bs_value_object(result);
+}
+
 // Array
 static Bs_Value bs_array_map(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
@@ -1169,6 +1232,9 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_table_add(bs, str, "trim", bs_value_object(bs_c_fn_new(bs, bs_str_trim)));
         bs_table_add(bs, str, "ltrim", bs_value_object(bs_c_fn_new(bs, bs_str_ltrim)));
         bs_table_add(bs, str, "rtrim", bs_value_object(bs_c_fn_new(bs, bs_str_rtrim)));
+
+        bs_table_add(bs, str, "lpad", bs_value_object(bs_c_fn_new(bs, bs_str_lpad)));
+        bs_table_add(bs, str, "rpad", bs_value_object(bs_c_fn_new(bs, bs_str_rpad)));
 
         bs_global_set(bs, Bs_Sv_Static("str"), bs_value_object(str));
     }
