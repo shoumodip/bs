@@ -2,7 +2,7 @@
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
-:b stdout 56
+:b stdout 82
 69
 420
 69
@@ -12,6 +12,13 @@
 420
 69
 420
+69
+420
+69
+420
+69
+420
+1337
 1772867055
 2875837935
 
@@ -20,7 +27,7 @@
 :b shell 30
 ../bin/bs arithmetics/main.bsx
 :i returncode 0
-:b stdout 56
+:b stdout 82
 69
 420
 69
@@ -30,6 +37,13 @@
 420
 69
 420
+69
+420
+69
+420
+69
+420
+1337
 1772867055
 2875837935
 
@@ -70,7 +84,7 @@ arithmetics/error_invalid_hex_digit.bsx:1:5: error: invalid digit 'g' in number
 :b shell 29
 ../bin/bs comparisons/main.bs
 :i returncode 0
-:b stdout 183
+:b stdout 205
 false
 true
 true
@@ -101,6 +115,10 @@ false
 false
 false
 true
+true
+true
+false
+false
 true
 true
 false
@@ -110,7 +128,7 @@ false
 :b shell 30
 ../bin/bs comparisons/main.bsx
 :i returncode 0
-:b stdout 162
+:b stdout 182
 cap
 nocap
 nocap
@@ -141,6 +159,10 @@ cap
 cap
 cap
 nocap
+nocap
+nocap
+cap
+cap
 nocap
 nocap
 cap

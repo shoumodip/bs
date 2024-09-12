@@ -31,12 +31,17 @@ io.println(nil == true);
 io.println(nil == 69);
 io.println(false == 0);
 
-io.println(true and true);
-io.println(true and false);
-io.println(false and true);
-io.println(false and false);
+io.println(true && true);
+io.println(true && false);
+io.println(false && true);
+io.println(false && false);
 
-io.println(true or true);
-io.println(true or false);
-io.println(false or true);
-io.println(false or false);
+io.println(true || true);
+io.println(true || false);
+io.println(false || true);
+io.println(false || false);
+
+io.println(true ^^ true);
+io.println(true ^^ false);
+io.println(false ^^ true);
+io.println(false ^^ false);

@@ -21,7 +21,17 @@ typedef enum {
     BS_OP_MUL,
     BS_OP_DIV,
     BS_OP_NEG,
-    BS_OP_NOT,
+
+    BS_OP_BOR,
+    BS_OP_BAND,
+    BS_OP_BXOR,
+    BS_OP_BNOT,
+
+    BS_OP_LXOR,
+    BS_OP_LNOT,
+
+    BS_OP_SHL,
+    BS_OP_SHR,
 
     BS_OP_GT,
     BS_OP_GE,

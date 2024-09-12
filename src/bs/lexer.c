@@ -105,7 +105,7 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc) {
     return token;
 }
 
-static_assert(BS_COUNT_TOKENS == 47, "Update bs_lexer_next()");
+static_assert(BS_COUNT_TOKENS == 54, "Update bs_lexer_next()");
 Bs_Token bs_lexer_next(Bs_Lexer *l) {
     if (l->peeked) {
         l->peeked = false;
@@ -195,12 +195,8 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
                 token.type = BS_TOKEN_TRUE;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("cap"))) {
                 token.type = BS_TOKEN_FALSE;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("or"))) {
-                token.type = BS_TOKEN_OR;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("and"))) {
-                token.type = BS_TOKEN_AND;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("nah"))) {
-                token.type = BS_TOKEN_NOT;
+                token.type = BS_TOKEN_LNOT;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("thicc"))) {
                 token.type = BS_TOKEN_LEN;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("redpill"))) {
@@ -241,10 +237,6 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
                 token.type = BS_TOKEN_TRUE;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("false"))) {
                 token.type = BS_TOKEN_FALSE;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("or"))) {
-                token.type = BS_TOKEN_OR;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("and"))) {
-                token.type = BS_TOKEN_AND;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("len"))) {
                 token.type = BS_TOKEN_LEN;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("import"))) {
@@ -344,16 +336,46 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
         token.type = BS_TOKEN_DIV;
         break;
 
+    case '|':
+        if (bs_lexer_match(l, '|')) {
+            token.type = BS_TOKEN_LOR;
+        } else {
+            token.type = BS_TOKEN_BOR;
+        }
+        break;
+
+    case '&':
+        if (bs_lexer_match(l, '&')) {
+            token.type = BS_TOKEN_LAND;
+        } else {
+            token.type = BS_TOKEN_BAND;
+        }
+        break;
+
+    case '^':
+        if (bs_lexer_match(l, '^')) {
+            token.type = BS_TOKEN_LXOR;
+        } else {
+            token.type = BS_TOKEN_BXOR;
+        }
+        break;
+
+    case '~':
+        token.type = BS_TOKEN_BNOT;
+        break;
+
     case '!':
         if (bs_lexer_match(l, '=')) {
             token.type = BS_TOKEN_NE;
         } else if (!l->extended) {
-            token.type = BS_TOKEN_NOT;
+            token.type = BS_TOKEN_LNOT;
         }
         break;
 
     case '>':
-        if (bs_lexer_match(l, '=')) {
+        if (bs_lexer_match(l, '>')) {
+            token.type = BS_TOKEN_SHR;
+        } else if (bs_lexer_match(l, '=')) {
             token.type = BS_TOKEN_GE;
         } else {
             token.type = BS_TOKEN_GT;
@@ -361,7 +383,9 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
         break;
 
     case '<':
-        if (bs_lexer_match(l, '=')) {
+        if (bs_lexer_match(l, '<')) {
+            token.type = BS_TOKEN_SHL;
+        } else if (bs_lexer_match(l, '=')) {
             token.type = BS_TOKEN_LE;
         } else {
             token.type = BS_TOKEN_LT;

@@ -38,9 +38,18 @@ typedef enum {
     BS_TOKEN_MUL,
     BS_TOKEN_DIV,
 
-    BS_TOKEN_OR,
-    BS_TOKEN_AND,
-    BS_TOKEN_NOT,
+    BS_TOKEN_BOR,
+    BS_TOKEN_BAND,
+    BS_TOKEN_BXOR,
+    BS_TOKEN_BNOT,
+
+    BS_TOKEN_LOR,
+    BS_TOKEN_LAND,
+    BS_TOKEN_LXOR,
+    BS_TOKEN_LNOT,
+
+    BS_TOKEN_SHL,
+    BS_TOKEN_SHR,
 
     BS_TOKEN_GT,
     BS_TOKEN_GE,

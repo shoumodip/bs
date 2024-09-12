@@ -2,7 +2,7 @@
 
 #include "bs/token.h"
 
-static_assert(BS_COUNT_TOKENS == 47, "Update bs_token_type_name()");
+static_assert(BS_COUNT_TOKENS == 54, "Update bs_token_type_name()");
 const char *bs_token_type_name(Bs_Token_Type type, bool extended) {
     switch (type) {
     case BS_TOKEN_EOF:
@@ -66,14 +66,35 @@ const char *bs_token_type_name(Bs_Token_Type type, bool extended) {
     case BS_TOKEN_DIV:
         return "'/'";
 
-    case BS_TOKEN_OR:
-        return "'or'";
+    case BS_TOKEN_BOR:
+        return "'|'";
 
-    case BS_TOKEN_AND:
-        return "'and'";
+    case BS_TOKEN_BAND:
+        return "'&'";
 
-    case BS_TOKEN_NOT:
+    case BS_TOKEN_BXOR:
+        return "'^'";
+
+    case BS_TOKEN_BNOT:
+        return "'~'";
+
+    case BS_TOKEN_LOR:
+        return "'||'";
+
+    case BS_TOKEN_LAND:
+        return "'&&'";
+
+    case BS_TOKEN_LXOR:
+        return "'^^'";
+
+    case BS_TOKEN_LNOT:
         return extended ? "'nah'" : "'!'";
+
+    case BS_TOKEN_SHL:
+        return "'<<'";
+
+    case BS_TOKEN_SHR:
+        return "'>>'";
 
     case BS_TOKEN_GT:
         return "'>'";

@@ -506,6 +506,8 @@ static Bs_Loc bs_chunk_get_loc(const Bs_Chunk *c, size_t op_index) {
 }
 
 void bs_error(Bs *bs, const char *fmt, ...) {
+    bs->gc_on = false;
+
     Bs_Writer *w = bs_stderr_get(bs);
 
     if (bs->frame->ip) {
@@ -590,6 +592,17 @@ void bs_check_arity(Bs *bs, size_t actual, size_t expected) {
     }
 }
 
+void bs_check_callable(Bs *bs, Bs_Value value, const char *label) {
+    if (value.type != BS_VALUE_OBJECT ||
+        (value.as.object->type != BS_OBJECT_CLOSURE && value.as.object->type != BS_OBJECT_C_FN)) {
+        bs_error(
+            bs,
+            "expected %s to be callable object, got %s",
+            label,
+            bs_value_type_name(value, bs->frame->extended));
+    }
+}
+
 void bs_check_value_type(Bs *bs, Bs_Value value, Bs_Value_Type expected, const char *label) {
     if (value.type != expected) {
         bs_error(
@@ -634,14 +647,10 @@ void bs_check_object_c_type(
     }
 }
 
-void bs_check_callable(Bs *bs, Bs_Value value, const char *label) {
-    if (value.type != BS_VALUE_OBJECT ||
-        (value.as.object->type != BS_OBJECT_CLOSURE && value.as.object->type != BS_OBJECT_C_FN)) {
-        bs_error(
-            bs,
-            "expected %s to be callable object, got %s",
-            label,
-            bs_value_type_name(value, bs->frame->extended));
+void bs_check_integer(Bs *bs, Bs_Value value, const char *label) {
+    bs_check_value_type(bs, value, BS_VALUE_NUM, label);
+    if (value.as.number != (long)value.as.number) {
+        bs_error(bs, "expected %s to be integer, got %g", label, value.as.number);
     }
 }
 
@@ -793,7 +802,7 @@ static void bs_close_upvalues(Bs *bs, Bs_Value *last) {
 }
 
 // Interpreter
-static_assert(BS_COUNT_OPS == 42, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 49, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const size_t frames_count_save = bs->frames.count;
@@ -973,9 +982,83 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             bs_stack_push(bs, bs_value_num(-a.as.number));
         } break;
 
-        case BS_OP_NOT:
+        case BS_OP_BOR: {
+            const Bs_Value b = bs_stack_pop(bs);
+            const Bs_Value a = bs_stack_pop(bs);
+            bs_check_integer(bs, a, "operand #1 to binary (|)");
+            bs_check_integer(bs, b, "operand #2 to binary (|)");
+
+            const size_t a1 = a.as.number;
+            const size_t b1 = b.as.number;
+            bs_stack_push(bs, bs_value_num(a1 | b1));
+        } break;
+
+        case BS_OP_BAND: {
+            const Bs_Value b = bs_stack_pop(bs);
+            const Bs_Value a = bs_stack_pop(bs);
+            bs_check_integer(bs, a, "operand #1 to binary (&)");
+            bs_check_integer(bs, b, "operand #2 to binary (&)");
+
+            const size_t a1 = a.as.number;
+            const size_t b1 = b.as.number;
+            bs_stack_push(bs, bs_value_num(a1 & b1));
+        } break;
+
+        case BS_OP_BXOR: {
+            const Bs_Value b = bs_stack_pop(bs);
+            const Bs_Value a = bs_stack_pop(bs);
+            bs_check_integer(bs, a, "operand #1 to binary (^)");
+            bs_check_integer(bs, b, "operand #2 to binary (^)");
+
+            const size_t a1 = a.as.number;
+            const size_t b1 = b.as.number;
+            bs_stack_push(bs, bs_value_num(a1 ^ b1));
+        } break;
+
+        case BS_OP_BNOT: {
+            const Bs_Value a = bs_stack_pop(bs);
+            bs_check_integer(bs, a, "operand to unary (~)");
+
+            const size_t a1 = a.as.number;
+            bs_stack_push(bs, bs_value_num(~a1));
+        } break;
+
+        case BS_OP_LXOR: {
+            const Bs_Value b = bs_stack_pop(bs);
+            const Bs_Value a = bs_stack_pop(bs);
+            bs_check_value_type(bs, a, BS_VALUE_BOOL, "operand #1 to binary (^^)");
+            bs_check_value_type(bs, b, BS_VALUE_BOOL, "operand #2 to binary (^^)");
+
+            const size_t a1 = a.as.boolean;
+            const size_t b1 = b.as.boolean;
+            bs_stack_push(bs, bs_value_bool(a1 != b1));
+        } break;
+
+        case BS_OP_LNOT:
             bs_stack_push(bs, bs_value_bool(bs_value_is_falsey(bs_stack_pop(bs))));
             break;
+
+        case BS_OP_SHL: {
+            const Bs_Value b = bs_stack_pop(bs);
+            const Bs_Value a = bs_stack_pop(bs);
+            bs_check_integer(bs, a, "operand #1 to binary (<<)");
+            bs_check_integer(bs, b, "operand #2 to binary (<<)");
+
+            const size_t a1 = a.as.number;
+            const size_t b1 = b.as.number;
+            bs_stack_push(bs, bs_value_num(a1 << b1));
+        } break;
+
+        case BS_OP_SHR: {
+            const Bs_Value b = bs_stack_pop(bs);
+            const Bs_Value a = bs_stack_pop(bs);
+            bs_check_integer(bs, a, "operand #1 to binary (>>)");
+            bs_check_integer(bs, b, "operand #2 to binary (>>)");
+
+            const size_t a1 = a.as.number;
+            const size_t b1 = b.as.number;
+            bs_stack_push(bs, bs_value_num(a1 >> b1));
+        } break;
 
         case BS_OP_GT: {
             Bs_Value a, b;

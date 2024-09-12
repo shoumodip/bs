@@ -13,6 +13,15 @@ io.println((900 - 60) / 2) fr
 io.println(17.25 * 4) fr
 io.println(840 * 0.5) fr
 
+# Bitwise
+io.println(276 >> 2) fr
+io.println(105 << 2) fr
+io.println(~-70) fr
+io.println(160 | 260) fr
+io.println(77 & 103) fr
+io.println(~-419 + 10 & 3) fr
+io.println(69 ^ 1404) fr
+
 # Hex
 io.println(0x69ABCDEF) fr
 io.println(0xab69cdef) fr

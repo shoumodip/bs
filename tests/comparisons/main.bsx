@@ -31,12 +31,17 @@ io.println(bruh == nocap) fr
 io.println(bruh == 69) fr
 io.println(cap == 0) fr
 
-io.println(nocap and nocap) fr
-io.println(nocap and cap) fr
-io.println(cap and nocap) fr
-io.println(cap and cap) fr
+io.println(nocap && nocap) fr
+io.println(nocap && cap) fr
+io.println(cap && nocap) fr
+io.println(cap && cap) fr
 
-io.println(nocap or nocap) fr
-io.println(nocap or cap) fr
-io.println(cap or nocap) fr
-io.println(cap or cap) fr
+io.println(nocap || nocap) fr
+io.println(nocap || cap) fr
+io.println(cap || nocap) fr
+io.println(cap || cap) fr
+
+io.println(nocap ^^ nocap) fr
+io.println(nocap ^^ cap) fr
+io.println(cap ^^ nocap) fr
+io.println(cap ^^ cap) fr

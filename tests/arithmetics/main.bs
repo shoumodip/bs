@@ -13,6 +13,15 @@ io.println((900 - 60) / 2);
 io.println(17.25 * 4);
 io.println(840 * 0.5);
 
+# Bitwise
+io.println(276 >> 2);
+io.println(105 << 2);
+io.println(~-70);
+io.println(160 | 260);
+io.println(77 & 103);
+io.println(~-419 + 10 & 3);
+io.println(69 ^ 1404);
+
 # Hex
 io.println(0x69ABCDEF);
 io.println(0xab69cdef);

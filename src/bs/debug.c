@@ -18,7 +18,7 @@ bs_debug_op_value(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset, const
     bs_fmt(p->writer, "'\n");
 }
 
-static_assert(BS_COUNT_OPS == 42, "Update bs_debug_op()");
+static_assert(BS_COUNT_OPS == 49, "Update bs_debug_op()");
 void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
     bs_fmt(p->writer, "%04zu ", *offset);
 
@@ -108,8 +108,36 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
         bs_fmt(p->writer, "OP_NEG\n");
         break;
 
-    case BS_OP_NOT:
-        bs_fmt(p->writer, "OP_NOT\n");
+    case BS_OP_BOR:
+        bs_fmt(p->writer, "OP_BOR\n");
+        break;
+
+    case BS_OP_BAND:
+        bs_fmt(p->writer, "OP_BAND\n");
+        break;
+
+    case BS_OP_BXOR:
+        bs_fmt(p->writer, "OP_BXOR\n");
+        break;
+
+    case BS_OP_BNOT:
+        bs_fmt(p->writer, "OP_BNOT\n");
+        break;
+
+    case BS_OP_LXOR:
+        bs_fmt(p->writer, "OP_LXOR\n");
+        break;
+
+    case BS_OP_LNOT:
+        bs_fmt(p->writer, "OP_LNOT\n");
+        break;
+
+    case BS_OP_SHL:
+        bs_fmt(p->writer, "OP_SHL\n");
+        break;
+
+    case BS_OP_SHR:
+        bs_fmt(p->writer, "OP_SHR\n");
         break;
 
     case BS_OP_GT:
