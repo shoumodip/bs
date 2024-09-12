@@ -58,7 +58,7 @@ typedef struct {
 } Bs_C_Data_Spec;
 
 // Errors
-void bs_error(Bs *bs, const char *fmt, ...);
+void bs_error(Bs *bs, const char *fmt, ...) __attribute__((__format__(__printf__, 2, 3)));
 void bs_unwind(Bs *bs, unsigned char exit);
 
 void bs_check_arity(Bs *bs, size_t actual, size_t expected);
