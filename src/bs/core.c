@@ -880,6 +880,32 @@ static Bs_Value bs_str_rpad(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(result);
 }
 
+// Ascii
+static Bs_Value bs_ascii_char(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_check_whole_number(bs, args[0], "argument #1");
+
+    const size_t code = args[0].as.number;
+    if (code > 0xff) {
+        bs_error(bs, "invalid ascii code '%zu'", code);
+    }
+
+    const char ch = code;
+    return bs_value_object(bs_str_new(bs, Bs_Sv(&ch, 1)));
+}
+
+static Bs_Value bs_ascii_code(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    if (str->size != 1) {
+        bs_error(bs, "expected string of length 1, got %zu", str->size);
+    }
+
+    return bs_value_num(*str->data);
+}
+
 // Array
 static Bs_Value bs_array_map(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
@@ -1237,6 +1263,13 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_table_add(bs, str, "rpad", bs_value_object(bs_c_fn_new(bs, bs_str_rpad)));
 
         bs_global_set(bs, Bs_Sv_Static("str"), bs_value_object(str));
+    }
+
+    {
+        Bs_Table *ascii = bs_table_new(bs);
+        bs_table_add(bs, ascii, "char", bs_value_object(bs_c_fn_new(bs, bs_ascii_char)));
+        bs_table_add(bs, ascii, "code", bs_value_object(bs_c_fn_new(bs, bs_ascii_code)));
+        bs_global_set(bs, Bs_Sv_Static("ascii"), bs_value_object(ascii));
     }
 
     {
