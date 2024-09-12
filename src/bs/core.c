@@ -1,5 +1,6 @@
 #include <ctype.h>
 #include <errno.h>
+#include <math.h>
 #include <stdio.h>
 #include <time.h>
 
@@ -1220,12 +1221,139 @@ static Bs_Value bs_bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
+// Math
+static Bs_Value bs_math_sin(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    return bs_value_num(sin(args[0].as.number));
+}
+
+static Bs_Value bs_math_cos(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    return bs_value_num(cos(args[0].as.number));
+}
+
+static Bs_Value bs_math_tan(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    return bs_value_num(tan(args[0].as.number));
+}
+
+static Bs_Value bs_math_asin(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    return bs_value_num(asin(args[0].as.number));
+}
+
+static Bs_Value bs_math_acos(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    return bs_value_num(acos(args[0].as.number));
+}
+
+static Bs_Value bs_math_atan(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    return bs_value_num(atan(args[0].as.number));
+}
+
+static Bs_Value bs_math_sqrt(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    return bs_value_num(sqrt(args[0].as.number));
+}
+
+static Bs_Value bs_math_ceil(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    return bs_value_num(ceil(args[0].as.number));
+}
+
+static Bs_Value bs_math_floor(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    return bs_value_num(floor(args[0].as.number));
+}
+
+static Bs_Value bs_math_round(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    return bs_value_num(round(args[0].as.number));
+}
+
+static Bs_Value bs_math_random(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    return bs_value_num((double)rand() / RAND_MAX);
+}
+
+static Bs_Value bs_math_max(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!arity) {
+        bs_error(bs, "expected at least 1 argument, got 0");
+    }
+
+    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    double max = args[0].as.number;
+    for (size_t i = 1; i < arity; i++) {
+        char label[32];
+        const int count = snprintf(label, sizeof(label), "argument #%zu", i + 1);
+        assert(count >= 0 && count + 1 < sizeof(label));
+
+        bs_check_value_type(bs, args[i], BS_VALUE_NUM, label);
+        max = bs_max(max, args[i].as.number);
+    }
+    return bs_value_num(max);
+}
+
+static Bs_Value bs_math_min(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!arity) {
+        bs_error(bs, "expected at least 1 argument, got 0");
+    }
+
+    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    double min = args[0].as.number;
+    for (size_t i = 1; i < arity; i++) {
+        char label[32];
+        const int count = snprintf(label, sizeof(label), "argument #%zu", i + 1);
+        assert(count >= 0 && count + 1 < sizeof(label));
+
+        bs_check_value_type(bs, args[i], BS_VALUE_NUM, label);
+        min = bs_min(min, args[i].as.number);
+    }
+    return bs_value_num(min);
+}
+
+static Bs_Value bs_math_clamp(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 3);
+    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    bs_check_value_type(bs, args[1], BS_VALUE_NUM, "argument #2");
+    bs_check_value_type(bs, args[2], BS_VALUE_NUM, "argument #3");
+
+    const double low = bs_min(args[1].as.number, args[2].as.number);
+    const double high = bs_max(args[1].as.number, args[2].as.number);
+    return bs_value_num(bs_min(bs_max(args[0].as.number, low), high));
+}
+
+static Bs_Value bs_math_lerp(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 3);
+    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    bs_check_value_type(bs, args[1], BS_VALUE_NUM, "argument #2");
+    bs_check_value_type(bs, args[2], BS_VALUE_NUM, "argument #3");
+
+    const double a = args[0].as.number;
+    const double b = args[1].as.number;
+    const double t = args[2].as.number;
+    return bs_value_num(a + (b - a) * t);
+}
+
 // Main
 static void bs_table_add(Bs *bs, Bs_Table *table, const char *name, Bs_Value value) {
     bs_table_set(bs, table, bs_value_object(bs_str_const(bs, bs_sv_from_cstr(name))), value);
 }
 
 void bs_core_init(Bs *bs, int argc, char **argv) {
+    srand(time(NULL));
+
     {
         Bs_Table *io = bs_table_new(bs);
         bs_table_add(bs, io, "open", bs_value_object(bs_c_fn_new(bs, bs_io_open)));
@@ -1346,5 +1474,28 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_table_add(bs, bytes, "push", bs_value_object(bs_c_fn_new(bs, bs_bytes_push)));
         bs_table_add(bs, bytes, "insert", bs_value_object(bs_c_fn_new(bs, bs_bytes_insert)));
         bs_global_set(bs, Bs_Sv_Static("bytes"), bs_value_object(bytes));
+    }
+
+    {
+        Bs_Table *math = bs_table_new(bs);
+        bs_table_add(bs, math, "PI", bs_value_num(M_PI));
+        bs_table_add(bs, math, "sin", bs_value_object(bs_c_fn_new(bs, bs_math_sin)));
+        bs_table_add(bs, math, "cos", bs_value_object(bs_c_fn_new(bs, bs_math_cos)));
+        bs_table_add(bs, math, "tan", bs_value_object(bs_c_fn_new(bs, bs_math_tan)));
+        bs_table_add(bs, math, "asin", bs_value_object(bs_c_fn_new(bs, bs_math_asin)));
+        bs_table_add(bs, math, "acos", bs_value_object(bs_c_fn_new(bs, bs_math_acos)));
+        bs_table_add(bs, math, "atan", bs_value_object(bs_c_fn_new(bs, bs_math_atan)));
+
+        bs_table_add(bs, math, "sqrt", bs_value_object(bs_c_fn_new(bs, bs_math_sqrt)));
+        bs_table_add(bs, math, "ceil", bs_value_object(bs_c_fn_new(bs, bs_math_ceil)));
+        bs_table_add(bs, math, "floor", bs_value_object(bs_c_fn_new(bs, bs_math_floor)));
+        bs_table_add(bs, math, "round", bs_value_object(bs_c_fn_new(bs, bs_math_round)));
+        bs_table_add(bs, math, "random", bs_value_object(bs_c_fn_new(bs, bs_math_random)));
+
+        bs_table_add(bs, math, "max", bs_value_object(bs_c_fn_new(bs, bs_math_max)));
+        bs_table_add(bs, math, "min", bs_value_object(bs_c_fn_new(bs, bs_math_min)));
+        bs_table_add(bs, math, "clamp", bs_value_object(bs_c_fn_new(bs, bs_math_clamp)));
+        bs_table_add(bs, math, "lerp", bs_value_object(bs_c_fn_new(bs, bs_math_lerp)));
+        bs_global_set(bs, Bs_Sv_Static("math"), bs_value_object(math));
     }
 }
