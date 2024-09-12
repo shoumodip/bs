@@ -387,6 +387,44 @@ static Bs_Value bs_process_spawn(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_c_data_new(bs, (void *)(uintptr_t)pid, &bs_process_data_spec));
 }
 
+// Bit
+static Bs_Value bs_bit_ceil(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_check_whole_number(bs, args[0], "argument #1");
+
+    size_t a = args[0].as.number;
+    if (a == 0) {
+        return bs_value_num(1);
+    }
+
+    a--;
+    a |= a >> 1;
+    a |= a >> 2;
+    a |= a >> 4;
+    a |= a >> 8;
+    a |= a >> 16;
+    a |= a >> 32;
+    return bs_value_num(a + 1);
+}
+
+static Bs_Value bs_bit_floor(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_check_whole_number(bs, args[0], "argument #1");
+
+    size_t a = args[0].as.number;
+    if (a == 0) {
+        return bs_value_num(0);
+    }
+
+    a |= a >> 1;
+    a |= a >> 2;
+    a |= a >> 4;
+    a |= a >> 8;
+    a |= a >> 16;
+    a |= a >> 32;
+    return bs_value_num(a - (a >> 1));
+}
+
 // Str
 static Bs_Value bs_str_slice(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
@@ -1235,6 +1273,13 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_table_add(bs, process, "wait", bs_value_object(bs_c_fn_new(bs, bs_process_wait)));
         bs_table_add(bs, process, "spawn", bs_value_object(bs_c_fn_new(bs, bs_process_spawn)));
         bs_global_set(bs, Bs_Sv_Static("process"), bs_value_object(process));
+    }
+
+    {
+        Bs_Table *bit = bs_table_new(bs);
+        bs_table_add(bs, bit, "ceil", bs_value_object(bs_c_fn_new(bs, bs_bit_ceil)));
+        bs_table_add(bs, bit, "floor", bs_value_object(bs_c_fn_new(bs, bs_bit_floor)));
+        bs_global_set(bs, Bs_Sv_Static("bit"), bs_value_object(bit));
     }
 
     {
