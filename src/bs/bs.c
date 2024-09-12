@@ -815,7 +815,6 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             bs_fmt(w, "Frames:\n");
             for (size_t i = 0; i < bs->frames.count; i++) {
                 const Bs_Frame *frame = &bs->frames.data[i];
-                bs_fmt(w, "    ");
                 if (frame->ip) {
                     bs_value_write(bs, w, bs_value_object(frame->closure));
                 } else {
@@ -825,9 +824,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             }
             bs_fmt(w, "\n");
 
-            bs_fmt(w, "Stack: %zu\n", bs->stack.count);
+            bs_fmt(w, "Stack:\n");
             for (size_t i = 0; i < bs->stack.count; i++) {
-                bs_fmt(w, "    ");
                 bs_value_write(bs, w, bs->stack.data[i]);
                 bs_fmt(w, "\n");
             }

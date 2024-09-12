@@ -31,3 +31,6 @@ ayo cap {
 } sike {
     io.println(3) fr
 }
+
+io.println(ayo nocap sayless 69 sike 420) fr
+io.println(ayo cap sayless 69 sike 420) fr

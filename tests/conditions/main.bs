@@ -31,3 +31,6 @@ if false {
 } else {
     io.println(3);
 }
+
+io.println(if true then 69 else 420);
+io.println(if false then 69 else 420);

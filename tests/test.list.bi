@@ -172,24 +172,28 @@ cap
 :b shell 28
 ../bin/bs conditions/main.bs
 :i returncode 0
-:b stdout 10
+:b stdout 17
 1
 1
 2
 2
 3
+69
+420
 
 :b stderr 0
 
 :b shell 29
 ../bin/bs conditions/main.bsx
 :i returncode 0
-:b stdout 10
+:b stdout 17
 1
 1
 2
 2
 3
+69
+420
 
 :b stderr 0
 
