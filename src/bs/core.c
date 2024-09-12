@@ -221,6 +221,17 @@ static Bs_Value bs_os_exit(Bs *bs, Bs_Value *args, size_t arity) {
     assert(false && "unreachable");
 }
 
+static Bs_Value bs_os_clock(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+
+    struct timespec clock;
+    if (clock_gettime(CLOCK_MONOTONIC, &clock) < 0) {
+        bs_error(bs, "could not get clock");
+    }
+
+    return bs_value_num(clock.tv_sec + clock.tv_nsec * 1e-9);
+}
+
 static Bs_Value bs_os_sleep(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
@@ -1382,7 +1393,9 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     {
         Bs_Table *os = bs_table_new(bs);
         bs_table_add(bs, os, "exit", bs_value_object(bs_c_fn_new(bs, bs_os_exit)));
+        bs_table_add(bs, os, "clock", bs_value_object(bs_c_fn_new(bs, bs_os_clock)));
         bs_table_add(bs, os, "sleep", bs_value_object(bs_c_fn_new(bs, bs_os_sleep)));
+
         bs_table_add(bs, os, "getenv", bs_value_object(bs_c_fn_new(bs, bs_os_getenv)));
         bs_table_add(bs, os, "setenv", bs_value_object(bs_c_fn_new(bs, bs_os_setenv)));
 
