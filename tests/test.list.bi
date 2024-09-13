@@ -802,11 +802,11 @@ functions/error_stack_trace.bsx:13:4: in fn foo()
 :i returncode 1
 :b stdout 0
 
-:b stderr 251
+:b stderr 271
 [C]: error: expected argument #1 to be string, got number
-functions/error_native_stack_trace.bs:2:23: in native fn ()
+functions/error_native_stack_trace.bs:2:23: in native fn str.reverse()
 [C]: in fn foo()
-functions/error_native_stack_trace.bs:6:14: in native fn ()
+functions/error_native_stack_trace.bs:6:14: in native fn array.map()
 functions/error_native_stack_trace.bs:9:5: in fn main()
 
 :b shell 48
@@ -814,11 +814,11 @@ functions/error_native_stack_trace.bs:9:5: in fn main()
 :i returncode 1
 :b stdout 0
 
-:b stderr 254
+:b stderr 274
 [C]: error: expected argument #1 to be string, got number
-functions/error_native_stack_trace.bsx:2:20: in native fn ()
+functions/error_native_stack_trace.bsx:2:20: in native fn str.reverse()
 [C]: in fn foo()
-functions/error_native_stack_trace.bsx:6:14: in native fn ()
+functions/error_native_stack_trace.bsx:6:14: in native fn array.map()
 functions/error_native_stack_trace.bsx:9:5: in fn main()
 
 :b shell 26
@@ -894,9 +894,9 @@ x = nocap; y = bruh
 :i returncode 1
 :b stdout 0
 
-:b stderr 150
+:b stderr 161
 [C]: error: expected argument #1 to be string, got nil
-extended/common.bs:9:16: in native fn ()
+extended/common.bs:9:16: in native fn str.reverse()
 extended/error_type_name_normal.bs:1:34: in fn oops()
 
 :b shell 45
@@ -904,9 +904,9 @@ extended/error_type_name_normal.bs:1:34: in fn oops()
 :i returncode 1
 :b stdout 0
 
-:b stderr 151
+:b stderr 162
 [C]: error: expected argument #1 to be string, got nil
-extended/common.bs:9:16: in native fn ()
+extended/common.bs:9:16: in native fn str.reverse()
 extended/error_type_name_normal.bsx:1:35: in fn oops()
 
 :b shell 46
@@ -914,9 +914,9 @@ extended/error_type_name_normal.bsx:1:35: in fn oops()
 :i returncode 1
 :b stdout 0
 
-:b stderr 157
+:b stderr 168
 [C]: error: expected argument #1 to be string, got capness
-extended/common.bsx:9:16: in native fn ()
+extended/common.bsx:9:16: in native fn str.reverse()
 extended/error_type_name_extended.bs:1:35: in fn oops()
 
 :b shell 47
@@ -924,9 +924,9 @@ extended/error_type_name_extended.bs:1:35: in fn oops()
 :i returncode 1
 :b stdout 0
 
-:b stderr 158
+:b stderr 169
 [C]: error: expected argument #1 to be string, got capness
-extended/common.bsx:9:16: in native fn ()
+extended/common.bsx:9:16: in native fn str.reverse()
 extended/error_type_name_extended.bsx:1:36: in fn oops()
 
 :b shell 24

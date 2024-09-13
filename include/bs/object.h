@@ -134,10 +134,12 @@ Bs_Upvalue *bs_upvalue_new(Bs *bs, Bs_Value *value);
 struct Bs_C_Fn {
     Bs_Object meta;
     Bs_C_Fn_Ptr fn;
-    Bs_C_Lib *library;
+
+    const char *name;
+    const Bs_C_Lib *library;
 };
 
-Bs_C_Fn *bs_c_fn_new(Bs *bs, Bs_C_Fn_Ptr ptr);
+Bs_C_Fn *bs_c_fn_new(Bs *bs, const char *name, Bs_C_Fn_Ptr ptr);
 
 struct Bs_C_Lib {
     Bs_Object meta;

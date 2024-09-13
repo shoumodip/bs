@@ -1435,8 +1435,16 @@ static Bs_Value bs_math_lerp(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Main
-static void bs_table_add(Bs *bs, Bs_Table *table, const char *name, Bs_Value value) {
-    bs_table_set(bs, table, bs_value_object(bs_str_const(bs, bs_sv_from_cstr(name))), value);
+static void bs_add(Bs *bs, Bs_Table *table, const char *key, Bs_Value value) {
+    bs_table_set(bs, table, bs_value_object(bs_str_const(bs, bs_sv_from_cstr(key))), value);
+}
+
+static void bs_add_fn(Bs *bs, Bs_Table *table, const char *key, const char *name, Bs_C_Fn_Ptr fn) {
+    bs_table_set(
+        bs,
+        table,
+        bs_value_object(bs_str_const(bs, bs_sv_from_cstr(key))),
+        bs_value_object(bs_c_fn_new(bs, name, fn)));
 }
 
 void bs_core_init(Bs *bs, int argc, char **argv) {
@@ -1444,155 +1452,152 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
 
     {
         Bs_Table *io = bs_table_new(bs);
-        bs_table_add(bs, io, "open", bs_value_object(bs_c_fn_new(bs, bs_io_open)));
-        bs_table_add(bs, io, "close", bs_value_object(bs_c_fn_new(bs, bs_io_close)));
-        bs_table_add(bs, io, "read", bs_value_object(bs_c_fn_new(bs, bs_io_read)));
-        bs_table_add(bs, io, "flush", bs_value_object(bs_c_fn_new(bs, bs_io_flush)));
+        bs_add_fn(bs, io, "open", "io.open", bs_io_open);
+        bs_add_fn(bs, io, "close", "io.close", bs_io_close);
+        bs_add_fn(bs, io, "read", "io.read", bs_io_read);
+        bs_add_fn(bs, io, "flush", "io.flush", bs_io_flush);
 
-        bs_table_add(bs, io, "write", bs_value_object(bs_c_fn_new(bs, bs_io_write)));
-        bs_table_add(bs, io, "print", bs_value_object(bs_c_fn_new(bs, bs_io_print)));
-        bs_table_add(bs, io, "eprint", bs_value_object(bs_c_fn_new(bs, bs_io_eprint)));
+        bs_add_fn(bs, io, "write", "io.write", bs_io_write);
+        bs_add_fn(bs, io, "print", "io.print", bs_io_print);
+        bs_add_fn(bs, io, "eprint", "io.eprint", bs_io_eprint);
 
-        bs_table_add(bs, io, "writeln", bs_value_object(bs_c_fn_new(bs, bs_io_writeln)));
-        bs_table_add(bs, io, "println", bs_value_object(bs_c_fn_new(bs, bs_io_println)));
-        bs_table_add(bs, io, "eprintln", bs_value_object(bs_c_fn_new(bs, bs_io_eprintln)));
+        bs_add_fn(bs, io, "writeln", "io.writeln", bs_io_writeln);
+        bs_add_fn(bs, io, "println", "io.println", bs_io_println);
+        bs_add_fn(bs, io, "eprintln", "io.eprintln", bs_io_eprintln);
 
-        bs_table_add(
-            bs, io, "stdin", bs_value_object(bs_c_data_new(bs, stdin, &bs_file_data_spec)));
-        bs_table_add(
-            bs, io, "stdout", bs_value_object(bs_c_data_new(bs, stdout, &bs_file_data_spec)));
-        bs_table_add(
-            bs, io, "stderr", bs_value_object(bs_c_data_new(bs, stderr, &bs_file_data_spec)));
+        bs_add(bs, io, "stdin", bs_value_object(bs_c_data_new(bs, stdin, &bs_file_data_spec)));
+        bs_add(bs, io, "stdout", bs_value_object(bs_c_data_new(bs, stdout, &bs_file_data_spec)));
+        bs_add(bs, io, "stderr", bs_value_object(bs_c_data_new(bs, stderr, &bs_file_data_spec)));
 
         bs_global_set(bs, Bs_Sv_Static("io"), bs_value_object(io));
     }
 
     {
         Bs_Table *os = bs_table_new(bs);
-        bs_table_add(bs, os, "exit", bs_value_object(bs_c_fn_new(bs, bs_os_exit)));
-        bs_table_add(bs, os, "clock", bs_value_object(bs_c_fn_new(bs, bs_os_clock)));
-        bs_table_add(bs, os, "sleep", bs_value_object(bs_c_fn_new(bs, bs_os_sleep)));
+        bs_add_fn(bs, os, "exit", "os.exit", bs_os_exit);
+        bs_add_fn(bs, os, "clock", "os.clock", bs_os_clock);
+        bs_add_fn(bs, os, "sleep", "os.sleep", bs_os_sleep);
 
-        bs_table_add(bs, os, "getenv", bs_value_object(bs_c_fn_new(bs, bs_os_getenv)));
-        bs_table_add(bs, os, "setenv", bs_value_object(bs_c_fn_new(bs, bs_os_setenv)));
+        bs_add_fn(bs, os, "getenv", "os.getenv", bs_os_getenv);
+        bs_add_fn(bs, os, "setenv", "os.setenv", bs_os_setenv);
 
         Bs_Array *args = bs_array_new(bs);
         for (int i = 0; i < argc; i++) {
             bs_array_set(bs, args, i, bs_value_object(bs_str_const(bs, bs_sv_from_cstr(argv[i]))));
         }
-        bs_table_add(bs, os, "args", bs_value_object(args));
+        bs_add(bs, os, "args", bs_value_object(args));
 
         bs_global_set(bs, Bs_Sv_Static("os"), bs_value_object(os));
     }
 
     {
         Bs_Table *process = bs_table_new(bs);
-        bs_table_add(bs, process, "kill", bs_value_object(bs_c_fn_new(bs, bs_process_kill)));
-        bs_table_add(bs, process, "wait", bs_value_object(bs_c_fn_new(bs, bs_process_wait)));
-        bs_table_add(bs, process, "spawn", bs_value_object(bs_c_fn_new(bs, bs_process_spawn)));
+        bs_add_fn(bs, process, "kill", "process.kill", bs_process_kill);
+        bs_add_fn(bs, process, "wait", "process.wait", bs_process_wait);
+        bs_add_fn(bs, process, "spawn", "process.spawn", bs_process_spawn);
         bs_global_set(bs, Bs_Sv_Static("process"), bs_value_object(process));
     }
 
     {
         Bs_Table *bit = bs_table_new(bs);
-        bs_table_add(bs, bit, "ceil", bs_value_object(bs_c_fn_new(bs, bs_bit_ceil)));
-        bs_table_add(bs, bit, "floor", bs_value_object(bs_c_fn_new(bs, bs_bit_floor)));
+        bs_add_fn(bs, bit, "ceil", "bit.ceil", bs_bit_ceil);
+        bs_add_fn(bs, bit, "floor", "bit.floor", bs_bit_floor);
         bs_global_set(bs, Bs_Sv_Static("bit"), bs_value_object(bit));
     }
 
     {
         Bs_Table *str = bs_table_new(bs);
-        bs_table_add(bs, str, "slice", bs_value_object(bs_c_fn_new(bs, bs_str_slice)));
-        bs_table_add(bs, str, "reverse", bs_value_object(bs_c_fn_new(bs, bs_str_reverse)));
+        bs_add_fn(bs, str, "slice", "str.slice", bs_str_slice);
+        bs_add_fn(bs, str, "reverse", "str.reverse", bs_str_reverse);
 
-        bs_table_add(bs, str, "tolower", bs_value_object(bs_c_fn_new(bs, bs_str_tolower)));
-        bs_table_add(bs, str, "toupper", bs_value_object(bs_c_fn_new(bs, bs_str_toupper)));
-        bs_table_add(bs, str, "tonumber", bs_value_object(bs_c_fn_new(bs, bs_str_tonumber)));
+        bs_add_fn(bs, str, "tolower", "str.tolower", bs_str_tolower);
+        bs_add_fn(bs, str, "toupper", "str.toupper", bs_str_toupper);
+        bs_add_fn(bs, str, "tonumber", "str.tonumber", bs_str_tonumber);
 
-        bs_table_add(bs, str, "find", bs_value_object(bs_c_fn_new(bs, bs_str_find)));
-        bs_table_add(bs, str, "split", bs_value_object(bs_c_fn_new(bs, bs_str_split)));
-        bs_table_add(bs, str, "replace", bs_value_object(bs_c_fn_new(bs, bs_str_replace)));
+        bs_add_fn(bs, str, "find", "str.find", bs_str_find);
+        bs_add_fn(bs, str, "split", "str.split", bs_str_split);
+        bs_add_fn(bs, str, "replace", "str.replace", bs_str_replace);
 
-        bs_table_add(bs, str, "trim", bs_value_object(bs_c_fn_new(bs, bs_str_trim)));
-        bs_table_add(bs, str, "ltrim", bs_value_object(bs_c_fn_new(bs, bs_str_ltrim)));
-        bs_table_add(bs, str, "rtrim", bs_value_object(bs_c_fn_new(bs, bs_str_rtrim)));
+        bs_add_fn(bs, str, "trim", "str.trim", bs_str_trim);
+        bs_add_fn(bs, str, "ltrim", "str.ltrim", bs_str_ltrim);
+        bs_add_fn(bs, str, "rtrim", "str.rtrim", bs_str_rtrim);
 
-        bs_table_add(bs, str, "lpad", bs_value_object(bs_c_fn_new(bs, bs_str_lpad)));
-        bs_table_add(bs, str, "rpad", bs_value_object(bs_c_fn_new(bs, bs_str_rpad)));
+        bs_add_fn(bs, str, "lpad", "str.lpad", bs_str_lpad);
+        bs_add_fn(bs, str, "rpad", "str.rpad", bs_str_rpad);
 
         bs_global_set(bs, Bs_Sv_Static("str"), bs_value_object(str));
     }
 
     {
         Bs_Table *regex = bs_table_new(bs);
-        bs_table_add(bs, regex, "find", bs_value_object(bs_c_fn_new(bs, bs_regex_find)));
-        bs_table_add(bs, regex, "split", bs_value_object(bs_c_fn_new(bs, bs_regex_split)));
-        bs_table_add(bs, regex, "replace", bs_value_object(bs_c_fn_new(bs, bs_regex_replace)));
+        bs_add_fn(bs, regex, "find", "regex.find", bs_regex_find);
+        bs_add_fn(bs, regex, "split", "regex.split", bs_regex_split);
+        bs_add_fn(bs, regex, "replace", "regex.replace", bs_regex_replace);
         bs_global_set(bs, Bs_Sv_Static("regex"), bs_value_object(regex));
     }
 
     {
         Bs_Table *ascii = bs_table_new(bs);
-        bs_table_add(bs, ascii, "char", bs_value_object(bs_c_fn_new(bs, bs_ascii_char)));
-        bs_table_add(bs, ascii, "code", bs_value_object(bs_c_fn_new(bs, bs_ascii_code)));
+        bs_add_fn(bs, ascii, "char", "ascii.char", bs_ascii_char);
+        bs_add_fn(bs, ascii, "code", "ascii.code", bs_ascii_code);
         bs_global_set(bs, Bs_Sv_Static("ascii"), bs_value_object(ascii));
     }
 
     {
         Bs_Table *bytes = bs_table_new(bs);
-        bs_table_add(bs, bytes, "new", bs_value_object(bs_c_fn_new(bs, bs_bytes_new)));
-        bs_table_add(bs, bytes, "len", bs_value_object(bs_c_fn_new(bs, bs_bytes_len)));
-        bs_table_add(bs, bytes, "reset", bs_value_object(bs_c_fn_new(bs, bs_bytes_reset)));
-        bs_table_add(bs, bytes, "slice", bs_value_object(bs_c_fn_new(bs, bs_bytes_slice)));
+        bs_add_fn(bs, bytes, "new", "bytes.new", bs_bytes_new);
+        bs_add_fn(bs, bytes, "len", "bytes.len", bs_bytes_len);
+        bs_add_fn(bs, bytes, "reset", "bytes.reset", bs_bytes_reset);
+        bs_add_fn(bs, bytes, "slice", "bytes.slice", bs_bytes_slice);
 
-        bs_table_add(bs, bytes, "push", bs_value_object(bs_c_fn_new(bs, bs_bytes_push)));
-        bs_table_add(bs, bytes, "insert", bs_value_object(bs_c_fn_new(bs, bs_bytes_insert)));
+        bs_add_fn(bs, bytes, "push", "bytes.push", bs_bytes_push);
+        bs_add_fn(bs, bytes, "insert", "bytes.insert", bs_bytes_insert);
         bs_global_set(bs, Bs_Sv_Static("bytes"), bs_value_object(bytes));
     }
 
     {
         Bs_Table *array = bs_table_new(bs);
-        bs_table_add(bs, array, "map", bs_value_object(bs_c_fn_new(bs, bs_array_map)));
-        bs_table_add(bs, array, "filter", bs_value_object(bs_c_fn_new(bs, bs_array_filter)));
-        bs_table_add(bs, array, "reduce", bs_value_object(bs_c_fn_new(bs, bs_array_reduce)));
+        bs_add_fn(bs, array, "map", "array.map", bs_array_map);
+        bs_add_fn(bs, array, "filter", "array.filter", bs_array_filter);
+        bs_add_fn(bs, array, "reduce", "array.reduce", bs_array_reduce);
 
-        bs_table_add(bs, array, "copy", bs_value_object(bs_c_fn_new(bs, bs_array_copy)));
-        bs_table_add(bs, array, "join", bs_value_object(bs_c_fn_new(bs, bs_array_join)));
-        bs_table_add(bs, array, "find", bs_value_object(bs_c_fn_new(bs, bs_array_find)));
-        bs_table_add(bs, array, "equal", bs_value_object(bs_c_fn_new(bs, bs_array_equal)));
+        bs_add_fn(bs, array, "copy", "array.copy", bs_array_copy);
+        bs_add_fn(bs, array, "join", "array.join", bs_array_join);
+        bs_add_fn(bs, array, "find", "array.find", bs_array_find);
+        bs_add_fn(bs, array, "equal", "array.equal", bs_array_equal);
 
-        bs_table_add(bs, array, "sort", bs_value_object(bs_c_fn_new(bs, bs_array_sort)));
-        bs_table_add(bs, array, "reverse", bs_value_object(bs_c_fn_new(bs, bs_array_reverse)));
+        bs_add_fn(bs, array, "sort", "array.sort", bs_array_sort);
+        bs_add_fn(bs, array, "reverse", "array.reverse", bs_array_reverse);
         bs_global_set(bs, Bs_Sv_Static("array"), bs_value_object(array));
     }
 
     {
         Bs_Table *table = bs_table_new(bs);
-        bs_table_add(bs, table, "copy", bs_value_object(bs_c_fn_new(bs, bs_table_copy)));
-        bs_table_add(bs, table, "equal", bs_value_object(bs_c_fn_new(bs, bs_table_equal)));
+        bs_add_fn(bs, table, "copy", "table.copy", bs_table_copy);
+        bs_add_fn(bs, table, "equal", "table.equal", bs_table_equal);
         bs_global_set(bs, Bs_Sv_Static("table"), bs_value_object(table));
     }
 
     {
         Bs_Table *math = bs_table_new(bs);
-        bs_table_add(bs, math, "PI", bs_value_num(M_PI));
-        bs_table_add(bs, math, "sin", bs_value_object(bs_c_fn_new(bs, bs_math_sin)));
-        bs_table_add(bs, math, "cos", bs_value_object(bs_c_fn_new(bs, bs_math_cos)));
-        bs_table_add(bs, math, "tan", bs_value_object(bs_c_fn_new(bs, bs_math_tan)));
-        bs_table_add(bs, math, "asin", bs_value_object(bs_c_fn_new(bs, bs_math_asin)));
-        bs_table_add(bs, math, "acos", bs_value_object(bs_c_fn_new(bs, bs_math_acos)));
-        bs_table_add(bs, math, "atan", bs_value_object(bs_c_fn_new(bs, bs_math_atan)));
+        bs_add(bs, math, "PI", bs_value_num(M_PI));
+        bs_add_fn(bs, math, "sin", "math.sin", bs_math_sin);
+        bs_add_fn(bs, math, "cos", "math.cos", bs_math_cos);
+        bs_add_fn(bs, math, "tan", "math.tan", bs_math_tan);
+        bs_add_fn(bs, math, "asin", "math.asin", bs_math_asin);
+        bs_add_fn(bs, math, "acos", "math.acos", bs_math_acos);
+        bs_add_fn(bs, math, "atan", "math.atan", bs_math_atan);
 
-        bs_table_add(bs, math, "sqrt", bs_value_object(bs_c_fn_new(bs, bs_math_sqrt)));
-        bs_table_add(bs, math, "ceil", bs_value_object(bs_c_fn_new(bs, bs_math_ceil)));
-        bs_table_add(bs, math, "floor", bs_value_object(bs_c_fn_new(bs, bs_math_floor)));
-        bs_table_add(bs, math, "round", bs_value_object(bs_c_fn_new(bs, bs_math_round)));
-        bs_table_add(bs, math, "random", bs_value_object(bs_c_fn_new(bs, bs_math_random)));
+        bs_add_fn(bs, math, "sqrt", "math.sqrt", bs_math_sqrt);
+        bs_add_fn(bs, math, "ceil", "math.ceil", bs_math_ceil);
+        bs_add_fn(bs, math, "floor", "math.floor", bs_math_floor);
+        bs_add_fn(bs, math, "round", "math.round", bs_math_round);
+        bs_add_fn(bs, math, "random", "math.random", bs_math_random);
 
-        bs_table_add(bs, math, "max", bs_value_object(bs_c_fn_new(bs, bs_math_max)));
-        bs_table_add(bs, math, "min", bs_value_object(bs_c_fn_new(bs, bs_math_min)));
-        bs_table_add(bs, math, "clamp", bs_value_object(bs_c_fn_new(bs, bs_math_clamp)));
-        bs_table_add(bs, math, "lerp", bs_value_object(bs_c_fn_new(bs, bs_math_lerp)));
+        bs_add_fn(bs, math, "max", "math.max", bs_math_max);
+        bs_add_fn(bs, math, "min", "math.min", bs_math_min);
+        bs_add_fn(bs, math, "clamp", "math.clamp", bs_math_clamp);
+        bs_add_fn(bs, math, "lerp", "math.lerp", bs_math_lerp);
         bs_global_set(bs, Bs_Sv_Static("math"), bs_value_object(math));
     }
 }

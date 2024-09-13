@@ -220,9 +220,10 @@ Bs_Upvalue *bs_upvalue_new(Bs *bs, Bs_Value *value) {
     return upvalue;
 }
 
-Bs_C_Fn *bs_c_fn_new(Bs *bs, Bs_C_Fn_Ptr fn) {
+Bs_C_Fn *bs_c_fn_new(Bs *bs, const char *name, Bs_C_Fn_Ptr fn) {
     Bs_C_Fn *c = (Bs_C_Fn *)bs_object_new(bs, BS_OBJECT_C_FN, sizeof(Bs_C_Fn));
     c->fn = fn;
+    c->name = name;
     c->library = NULL;
     return c;
 }

@@ -570,7 +570,22 @@ void bs_error(Bs *bs, const char *fmt, ...) {
         if (callee->ip) {
             bs_value_write(bs, w, bs_value_object(callee->closure->fn));
         } else {
-            bs_value_write(bs, w, bs_value_object(callee->native));
+            const Bs_C_Fn *fn = callee->native;
+            if (fn->library) {
+                bs_fmt(w, "native fn ");
+
+                Bs_Sv path = Bs_Sv(fn->library->path->data, fn->library->path->size);
+                for (size_t i = path.size; i > 0; i--) {
+                    if (path.data[i - 1] == '.') {
+                        path.size = i - 1;
+                        break;
+                    }
+                }
+
+                bs_fmt(w, Bs_Sv_Fmt ".%s()", Bs_Sv_Arg(path), fn->name);
+            } else {
+                bs_fmt(w, "native fn %s()", fn->name);
+            }
         }
 
         bs_fmt(w, "\n");
@@ -1209,7 +1224,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                     for (size_t i = 0; i < *exports_count; i++) {
                         const Bs_Export export = exports[i];
 
-                        Bs_C_Fn *fn = bs_c_fn_new(bs, export.fn);
+                        Bs_C_Fn *fn = bs_c_fn_new(bs, export.name, export.fn);
                         fn->library = library;
 
                         if (!bs_table_set(
