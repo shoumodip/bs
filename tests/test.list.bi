@@ -492,16 +492,16 @@ In common.bs!
 :i returncode 1
 :b stdout 0
 
-:b stderr 83
-import/error_could_not_open.bs:1:1: error: could not read file 'does_not_exist.bs'
+:b stderr 84
+import/error_could_not_open.bs:1:1: error: could not import module 'does_not_exist'
 
 :b shell 41
 ../bin/bs import/error_could_not_open.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 84
-import/error_could_not_open.bsx:1:1: error: could not read file 'does_not_exist.bs'
+:b stderr 85
+import/error_could_not_open.bsx:1:1: error: could not import module 'does_not_exist'
 
 :b shell 41
 ../bin/bs import/error_expected_string.bs
@@ -509,7 +509,7 @@ import/error_could_not_open.bsx:1:1: error: could not read file 'does_not_exist.
 :b stdout 0
 
 :b stderr 90
-import/error_expected_string.bs:1:1: error: expected import path to be string, got number
+import/error_expected_string.bs:1:1: error: expected module name to be string, got number
 
 :b shell 42
 ../bin/bs import/error_expected_string.bsx
@@ -517,7 +517,7 @@ import/error_expected_string.bs:1:1: error: expected import path to be string, g
 :b stdout 0
 
 :b stderr 91
-import/error_expected_string.bsx:1:1: error: expected import path to be string, got number
+import/error_expected_string.bsx:1:1: error: expected module name to be string, got number
 
 :b shell 31
 ../bin/bs import/main_module.bs
@@ -527,8 +527,8 @@ Directly called
 
 :b stderr 0
 
-:b shell 32
-../bin/bs import/main_module.bsx
+:b shell 41
+../bin/bs import/main_module_extended.bsx
 :i returncode 0
 :b stdout 16
 Directly called
@@ -897,7 +897,7 @@ x = nocap; y = bruh
 :b stderr 161
 [C]: error: expected argument #1 to be string, got nil
 extended/common.bs:9:16: in native fn str.reverse()
-extended/error_type_name_normal.bs:1:34: in fn oops()
+extended/error_type_name_normal.bs:1:31: in fn oops()
 
 :b shell 45
 ../bin/bs extended/error_type_name_normal.bsx
@@ -907,27 +907,27 @@ extended/error_type_name_normal.bs:1:34: in fn oops()
 :b stderr 162
 [C]: error: expected argument #1 to be string, got nil
 extended/common.bs:9:16: in native fn str.reverse()
-extended/error_type_name_normal.bsx:1:35: in fn oops()
+extended/error_type_name_normal.bsx:1:32: in fn oops()
 
 :b shell 46
 ../bin/bs extended/error_type_name_extended.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 168
+:b stderr 177
 [C]: error: expected argument #1 to be string, got capness
-extended/common.bsx:9:16: in native fn str.reverse()
-extended/error_type_name_extended.bs:1:35: in fn oops()
+extended/common_extended.bsx:9:16: in native fn str.reverse()
+extended/error_type_name_extended.bs:1:40: in fn oops()
 
 :b shell 47
 ../bin/bs extended/error_type_name_extended.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 169
+:b stderr 178
 [C]: error: expected argument #1 to be string, got capness
-extended/common.bsx:9:16: in native fn str.reverse()
-extended/error_type_name_extended.bsx:1:36: in fn oops()
+extended/common_extended.bsx:9:16: in native fn str.reverse()
+extended/error_type_name_extended.bsx:1:41: in fn oops()
 
 :b shell 24
 ../bin/bs typeof/main.bs

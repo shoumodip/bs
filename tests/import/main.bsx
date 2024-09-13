@@ -1,4 +1,4 @@
-mf common be redpill("import/common.bs") fr
+mf common be redpill("import/common") fr
 
 io.println(common.foo) fr
 io.println(common.bar) fr

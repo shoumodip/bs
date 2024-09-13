@@ -33,7 +33,7 @@ typedef struct {
 
 typedef struct {
     bool done;
-    Bs_Str *name;
+    const Bs_Str *name;
 
     Bs_Value result;
 } Bs_Module;
@@ -46,7 +46,7 @@ typedef struct {
 
 #define bs_modules_free bs_da_free
 
-static bool bs_modules_find(Bs_Modules *m, Bs_Str *name, size_t *index) {
+static bool bs_modules_find(Bs_Modules *m, const Bs_Str *name, size_t *index) {
     for (size_t i = 0; i < m->count; i++) {
         if (bs_str_eq(m->data[i].name, name)) {
             *index = i;
@@ -251,7 +251,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
 }
 
 static void bs_collect(Bs *bs) {
-    const bool gc_on = bs->gc_on;
+    const bool gc_on_save = bs->gc_on;
     bs->gc_on = false;
 
 #ifdef BS_GC_DEBUG_LOG
@@ -326,7 +326,7 @@ static void bs_collect(Bs *bs) {
     bs_fmt(w, "-------- GC End ----------\n\n");
 #endif // BS_GC_DEBUG_LOG
 
-    bs->gc_on = gc_on;
+    bs->gc_on = gc_on_save;
 }
 
 // Interface
@@ -752,7 +752,7 @@ static bool bs_call_value(Bs *bs, size_t arity) {
 
     case BS_OBJECT_C_FN: {
         const Bs_C_Fn *native = (Bs_C_Fn *)value.as.object;
-        const bool gc_on = bs->gc_on;
+        const bool gc_on_save = bs->gc_on;
         bs->gc_on = false;
 
         const Bs_Frame frame = {
@@ -772,7 +772,7 @@ static bool bs_call_value(Bs *bs, size_t arity) {
         bs->stack.count -= arity;
         bs->stack.data[bs->stack.count - 1] = value;
 
-        bs->gc_on = gc_on;
+        bs->gc_on = gc_on_save;
     } break;
 
     default:
@@ -817,6 +817,131 @@ static void bs_close_upvalues(Bs *bs, Bs_Value *last) {
 }
 
 // Interpreter
+static bool bs_import_language(Bs *bs, const char *path) {
+    size_t size = 0;
+    char *contents = bs_read_file(path, &size);
+    if (!contents) {
+        return false;
+    }
+
+    Bs_Fn *fn = bs_compile(bs, path, Bs_Sv(contents, size), false, false);
+    free(contents);
+
+    if (!fn) {
+        bs_unwind(bs, 1);
+    }
+
+    bs_da_push(bs, &bs->modules, (Bs_Module){.name = fn->name});
+    fn->module = bs->modules.count;
+
+    bs_stack_push(bs, bs_value_object(bs_closure_new(bs, fn)));
+    bs_call_value(bs, 0);
+    return true;
+}
+
+static void bs_import(Bs *bs) {
+    const Bs_Value a = bs_stack_pop(bs);
+    bs_check_object_type(bs, a, BS_OBJECT_STR, "module name");
+
+    const Bs_Str *name = (const Bs_Str *)a.as.object;
+    if (!name->size) {
+        bs_error(bs, "module name cannot be empty");
+    }
+
+    size_t index;
+    if (bs_modules_find(&bs->modules, name, &index)) {
+        const Bs_Module *m = &bs->modules.data[index];
+        if (!m->done) {
+            bs_error(bs, "import loop detected");
+        }
+
+        bs_stack_push(bs, m->result);
+        return;
+    }
+
+    const bool gc_on_save = bs->gc_on;
+    bs->gc_on = false;
+
+    Bs_Buffer *b = bs_paths_get(bs);
+    const size_t start = b->count;
+
+    bs_da_push_many(bs, b, name->data, name->size);
+
+    // Normal
+    {
+        bs_da_push_many(bs, b, ".bs", 4);
+        if (bs_import_language(bs, b->data + start)) {
+            bs->gc_on = gc_on_save;
+            return;
+        }
+        b->count -= 4;
+    }
+
+    // Extended
+    {
+        bs_da_push_many(bs, b, ".bsx", 5);
+        if (bs_import_language(bs, b->data + start)) {
+            bs->gc_on = gc_on_save;
+            return;
+        }
+        b->count -= 5;
+    }
+
+    // Native
+    {
+        bs_da_push_many(bs, b, ".so", 4);
+        void *data = dlopen(b->data + start, RTLD_NOW);
+        if (!data) {
+            bs_error(bs, "could not import module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*name));
+        }
+
+        Bs_C_Lib *library = bs_c_lib_new(bs, data, name);
+
+        const Bs_Export *exports = dlsym(data, "bs_exports");
+        const size_t *exports_count = dlsym(data, "bs_exports_count");
+
+        if (!exports || !exports_count) {
+            bs_error(
+                bs,
+                "invalid native library '" Bs_Sv_Fmt "'\n\n"
+                "A BS native library should define 'bs_exports' and "
+                "'bs_exports_count':\n\n"
+                "```\n"
+                "const Bs_Export bs_exports[] = {\n"
+                "    {\"function1_name\", function1_ptr},\n"
+                "    {\"function2_name\", function2_ptr},\n"
+                "    /* ... */\n"
+                "};\n\n"
+                "const size_t bs_exports_count = bs_c_array_size(bs_exports);\n"
+                "```\n",
+
+                Bs_Sv_Arg(*name));
+        }
+
+        for (size_t i = 0; i < *exports_count; i++) {
+            const Bs_Export export = exports[i];
+
+            Bs_C_Fn *fn = bs_c_fn_new(bs, export.name, export.fn);
+            fn->library = library;
+
+            if (!bs_table_set(
+                    bs,
+                    &library->functions,
+                    bs_value_object(bs_str_const(bs, bs_sv_from_cstr(export.name))),
+                    bs_value_object(fn))) {
+
+                bs_error(bs, "redefinition of function '%s' in FFI", export.name);
+            }
+        }
+
+        const Bs_Value value = bs_value_object(library);
+        bs_da_push(bs, &bs->modules, ((Bs_Module){.done = true, .name = name, .result = value}));
+
+        bs_stack_push(bs, value);
+        bs->gc_on = gc_on_save;
+    }
+}
+
 static_assert(BS_COUNT_OPS == 49, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
@@ -1144,7 +1269,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         } break;
 
         case BS_OP_JOIN: {
-            const bool gc_on = bs->gc_on;
+            const bool gc_on_save = bs->gc_on;
             bs->gc_on = false;
 
             Bs_Buffer *buffer = bs_buffer_get(bs);
@@ -1160,113 +1285,12 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Sv sv = bs_buffer_reset(buffer, start);
             bs_stack_push(bs, bs_value_object(bs_str_new(bs, sv)));
 
-            bs->gc_on = gc_on;
+            bs->gc_on = gc_on_save;
         } break;
 
-        case BS_OP_IMPORT: {
-            const Bs_Value a = bs_stack_pop(bs);
-            bs_check_object_type(bs, a, BS_OBJECT_STR, "import path");
-            Bs_Str *name = (Bs_Str *)a.as.object;
-
-            if (!name->size) {
-                bs_error(bs, "import path cannot be empty");
-            }
-
-            size_t index;
-            if (bs_modules_find(&bs->modules, name, &index)) {
-                const Bs_Module *m = &bs->modules.data[index];
-                if (!m->done) {
-                    bs_error(bs, "import loop detected");
-                }
-
-                bs_stack_push(bs, m->result);
-            } else {
-                const bool gc_on = bs->gc_on;
-                bs->gc_on = false;
-
-                Bs_Buffer *b = bs_paths_get(bs);
-                Bs_Writer w = bs_buffer_writer(b);
-
-                const Bs_Sv name_sv = Bs_Sv(name->data, name->size);
-                bs_buffer_write(&w, name_sv);
-                bs_buffer_push(b->bs, b, '\0');
-
-                const char *path = b->data + b->count - name->size - 1;
-                if (bs_sv_suffix(name_sv, Bs_Sv_Static(".so"))) {
-                    void *data = dlopen(path, RTLD_NOW);
-                    if (!data) {
-                        bs_error(bs, "could not load library '%s': %s", path, dlerror());
-                    }
-
-                    Bs_C_Lib *library = bs_c_lib_new(bs, data, name);
-
-                    const Bs_Export *exports = dlsym(data, "bs_exports");
-                    const size_t *exports_count = dlsym(data, "bs_exports_count");
-
-                    if (!exports || !exports_count) {
-                        bs_error(
-                            bs,
-                            "invalid native library '" Bs_Sv_Fmt "'\n\n"
-                            "A BS native library should define 'bs_exports' and "
-                            "'bs_exports_count':\n\n"
-                            "```\n"
-                            "const Bs_Export bs_exports[] = {\n"
-                            "    {\"function1_name\", function1_ptr},\n"
-                            "    {\"function2_name\", function2_ptr},\n"
-                            "    /* ... */\n"
-                            "};\n\n"
-                            "const size_t bs_exports_count = bs_c_array_size(bs_exports);\n"
-                            "```\n",
-
-                            Bs_Sv_Arg(*name));
-                    }
-
-                    for (size_t i = 0; i < *exports_count; i++) {
-                        const Bs_Export export = exports[i];
-
-                        Bs_C_Fn *fn = bs_c_fn_new(bs, export.name, export.fn);
-                        fn->library = library;
-
-                        if (!bs_table_set(
-                                bs,
-                                &library->functions,
-                                bs_value_object(bs_str_const(bs, bs_sv_from_cstr(export.name))),
-                                bs_value_object(fn))) {
-
-                            bs_error(bs, "redefinition of function '%s' in FFI", export.name);
-                        }
-                    }
-
-                    const Bs_Value value = bs_value_object(library);
-                    bs_da_push(
-                        bs,
-                        &bs->modules,
-                        ((Bs_Module){.done = true, .name = name, .result = value}));
-
-                    bs_stack_push(bs, value);
-                } else {
-                    size_t size = 0;
-                    char *contents = bs_read_file(path, &size);
-                    if (!contents) {
-                        bs_error(bs, "could not read file '%s'", path);
-                    }
-
-                    Bs_Fn *fn = bs_compile(bs, path, Bs_Sv(contents, size), false, false);
-                    free(contents);
-
-                    if (!fn) {
-                        bs_unwind(bs, 1);
-                    }
-                    bs_da_push(bs, &bs->modules, (Bs_Module){.name = fn->name});
-                    fn->module = bs->modules.count;
-
-                    bs_stack_push(bs, bs_value_object(bs_closure_new(bs, fn)));
-                    bs_call_value(bs, 0);
-                }
-
-                bs->gc_on = gc_on;
-            }
-        } break;
+        case BS_OP_IMPORT:
+            bs_import(bs);
+            break;
 
         case BS_OP_TYPEOF: {
             const char *name = bs_value_type_name(bs_stack_peek(bs, 0), bs->frame->extended);

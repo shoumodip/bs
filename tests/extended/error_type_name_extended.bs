@@ -1,1 +1,1 @@
-import("extended/common.bsx").oops();
+import("extended/common_extended").oops();

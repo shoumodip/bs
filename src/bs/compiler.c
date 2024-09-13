@@ -989,11 +989,18 @@ Bs_Fn *bs_compile(Bs *bs, const char *path, Bs_Sv input, bool is_main, bool is_r
         .is_main = is_main,
     };
 
-    const Bs_Sv path_sv = bs_sv_from_cstr(path);
-    compiler.lexer.extended = bs_sv_suffix(path_sv, Bs_Sv_Static(".bsx"));
+    Bs_Sv name = bs_sv_from_cstr(path);
+    compiler.lexer.extended = bs_sv_suffix(name, Bs_Sv_Static(".bsx"));
+
+    for (size_t i = name.size; i > 0; i--) {
+        if (name.data[i - 1] == '.') {
+            name.size = i - 1;
+            break;
+        }
+    }
 
     Bs_Scope scope = {.is_repl = is_repl};
-    bs_compile_scope_init(&compiler, &scope, path_sv);
+    bs_compile_scope_init(&compiler, &scope, name);
     bs_compile_block_init(&compiler);
 
     if (setjmp(compiler.lexer.unwind)) {

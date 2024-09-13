@@ -1,4 +1,4 @@
-import("variables/global.bs");
+import("variables/global");
 
 io.println(foo);
 io.println(bar);

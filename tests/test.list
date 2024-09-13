@@ -37,7 +37,7 @@
 ../bin/bs import/error_expected_string.bs
 ../bin/bs import/error_expected_string.bsx
 ../bin/bs import/main_module.bs
-../bin/bs import/main_module.bsx
+../bin/bs import/main_module_extended.bsx
 ../bin/bs import/indirect_main_module.bs
 ../bin/bs import/indirect_main_module.bsx
 ../bin/bs loops/while.bs

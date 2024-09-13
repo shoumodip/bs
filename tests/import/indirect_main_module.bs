@@ -1,3 +1,3 @@
-var foo = import("import/main_module.bs");
+var foo = import("import/main_module");
 
 io.println(foo);

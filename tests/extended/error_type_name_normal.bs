@@ -1,1 +1,1 @@
-import("extended/common.bs").oops();
+import("extended/common").oops();

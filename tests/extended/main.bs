@@ -1,5 +1,5 @@
-var normal = import("extended/common.bs");
-var extended = import("extended/common.bsx");
+var normal = import("extended/common");
+var extended = import("extended/common_extended");
 
 normal.noice();
 extended.noice();

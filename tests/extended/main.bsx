@@ -1,5 +1,5 @@
-mf normal be redpill("extended/common.bs") fr
-mf extended be redpill("extended/common.bsx") fr
+mf normal be redpill("extended/common") fr
+mf extended be redpill("extended/common_extended") fr
 
 normal.noice() fr
 extended.noice() fr

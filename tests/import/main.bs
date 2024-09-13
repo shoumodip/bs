@@ -1,4 +1,4 @@
-var common = import("import/common.bs");
+var common = import("import/common");
 
 io.println(common.foo);
 io.println(common.bar);
