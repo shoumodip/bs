@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 #include "bs/core.h"
-#include "bs/object.h"
+#include "bs/hash.h"
 
 // IO
 static void bs_file_data_free(Bs *bs, void *data) {
@@ -1170,6 +1170,51 @@ static Bs_Value bs_array_join(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
 }
 
+static Bs_Value bs_array_find(Bs *bs, Bs_Value *args, size_t arity) {
+    if (arity != 2 && arity != 3) {
+        bs_error(bs, "expected 2 or 3 arguments, got %zu", arity);
+    }
+
+    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
+
+    if (arity == 3) {
+        bs_check_whole_number(bs, args[2], "argument #3");
+    }
+
+    const Bs_Array *array = (const Bs_Array *)args[0].as.object;
+    const Bs_Value pred = args[1];
+    const size_t offset = arity == 3 ? args[2].as.number : 0;
+
+    for (size_t i = offset; i < array->count; i++) {
+        if (bs_value_equal(array->data[i], pred)) {
+            return bs_value_num(i);
+        }
+    }
+
+    return bs_value_nil;
+}
+
+static Bs_Value bs_array_equal(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 2);
+    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
+    bs_check_object_type(bs, args[1], BS_OBJECT_ARRAY, "argument #2");
+
+    const Bs_Array *a = (const Bs_Array *)args[0].as.object;
+    const Bs_Array *b = (const Bs_Array *)args[1].as.object;
+
+    if (a->count != b->count) {
+        return bs_value_bool(false);
+    }
+
+    for (size_t i = 0; i < a->count; i++) {
+        if (!bs_value_equal(a->data[i], b->data[i])) {
+            return bs_value_bool(false);
+        }
+    }
+
+    return bs_value_bool(true);
+}
+
 typedef struct {
     Bs *bs;
     Bs_Value fn;
@@ -1239,6 +1284,29 @@ static Bs_Value bs_table_copy(Bs *bs, Bs_Value *args, size_t arity) {
     }
 
     return bs_value_object(dst);
+}
+
+static Bs_Value bs_table_equal(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 2);
+    bs_check_object_type(bs, args[0], BS_OBJECT_TABLE, "argument #1");
+    bs_check_object_type(bs, args[1], BS_OBJECT_TABLE, "argument #2");
+
+    const Bs_Table *a = (const Bs_Table *)args[0].as.object;
+    const Bs_Table *b = (const Bs_Table *)args[1].as.object;
+
+    if (a->length != b->length) {
+        return bs_value_bool(false);
+    }
+
+    for (size_t i = 0; i < a->capacity; i++) {
+        if (a->data[i].key.type != BS_VALUE_NIL) {
+            if (bs_entries_find(b->data, b->capacity, a->data[i].key)->key.type == BS_VALUE_NIL) {
+                return bs_value_bool(false);
+            }
+        }
+    }
+
+    return bs_value_bool(true);
 }
 
 // Math
@@ -1490,6 +1558,9 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
 
         bs_table_add(bs, array, "copy", bs_value_object(bs_c_fn_new(bs, bs_array_copy)));
         bs_table_add(bs, array, "join", bs_value_object(bs_c_fn_new(bs, bs_array_join)));
+        bs_table_add(bs, array, "find", bs_value_object(bs_c_fn_new(bs, bs_array_find)));
+        bs_table_add(bs, array, "equal", bs_value_object(bs_c_fn_new(bs, bs_array_equal)));
+
         bs_table_add(bs, array, "sort", bs_value_object(bs_c_fn_new(bs, bs_array_sort)));
         bs_table_add(bs, array, "reverse", bs_value_object(bs_c_fn_new(bs, bs_array_reverse)));
         bs_global_set(bs, Bs_Sv_Static("array"), bs_value_object(array));
@@ -1498,6 +1569,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     {
         Bs_Table *table = bs_table_new(bs);
         bs_table_add(bs, table, "copy", bs_value_object(bs_c_fn_new(bs, bs_table_copy)));
+        bs_table_add(bs, table, "equal", bs_value_object(bs_c_fn_new(bs, bs_table_equal)));
         bs_global_set(bs, Bs_Sv_Static("table"), bs_value_object(table));
     }
 
