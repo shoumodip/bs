@@ -18,6 +18,7 @@ typedef struct {
 
 Bs_Sv bs_sv_from_cstr(const char *data);
 Bs_Sv bs_sv_drop(Bs_Sv *s, size_t count);
+Bs_Sv bs_sv_split(Bs_Sv *s, char ch);
 
 bool bs_sv_eq(Bs_Sv a, Bs_Sv b);
 bool bs_sv_find(Bs_Sv s, char ch, size_t *index);

@@ -12,6 +12,7 @@ typedef struct {
     bool peeked;
     Bs_Token buffer;
 
+    bool comments;
     bool extended;
     jmp_buf unwind;
 

@@ -11,6 +11,8 @@ done
 wait
 
 cc $CFLAGS -o bin/bs src/bs.c lib/.build/* -lm &
+cc $CFLAGS -o bin/bsdoc src/bsdoc.c lib/.build/basic.c.o lib/.build/token.c.o lib/.build/lexer.c.o &
+
 cc $CFLAGS -o lib/libbs.so -shared lib/.build/* -lm &
 ar rcs lib/libbs.a lib/.build/* &
 wait

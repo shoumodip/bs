@@ -1,0 +1,160 @@
+@font-face {
+  font-family: "DM Sans";
+  src: url(fonts/DMSans/DMSans-Regular.ttf);
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url(fonts/JetBrainsMono/JetBrainsMono-Regular.ttf);
+}
+
+:root {
+    --border: #444444;
+    --border-size: 0.15rem;
+    --border-radius: 0.3rem;
+
+    --pagebg: #202020;
+    --pagefg: #EEEEEE;
+
+    --codebg: #1C1C1C;
+    --codefg: #E0E0E0;
+
+    --string: #00A67D;
+    --comment: #888888;
+    --keyword: #2E95D3;
+    --success: #3FB950;
+    --constant: #A97FD5;
+
+    --padding: 0.4rem;
+    --font-size: 1.1rem;
+}
+
+* {
+    font-family: "DM Sans";
+}
+
+h1, h2, h3, h4, h5, h6 {
+    position: relative;
+    padding-bottom: var(--padding);
+}
+
+h1::after, h2::after, h3::after, h4::after, h5::after, h6::after {
+    left: 0;
+    width: 100%;
+    height: calc(0.5 * var(--border-size));
+    bottom: 0;
+    content: "";
+    display: block;
+    position: absolute;
+    background-color: var(--border);
+}
+
+body {
+    padding: var(--padding);
+    font-size: var(--font-size);
+
+    color: var(--pagefg);
+    background-color: var(--pagebg);
+}
+
+pre {
+    border: var(--border-size) solid var(--border);
+    font-size: calc(0.9 * var(--font-size));
+    line-height: calc(1.5 * var(--font-size));
+}
+
+pre, span {
+    tab-size: 4;
+    overflow-x: auto;
+    font-family: "JetBrains Mono";
+}
+
+button {
+    color: var(--pagefg);
+    outline: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.tab {
+    border: var(--border-size) solid var(--border);
+    cursor: pointer;
+    padding: var(--padding) calc(3 * var(--padding));
+    font-size: calc(0.8 * var(--font-size));
+    font-weight: bold;
+    margin-right: -1px;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    border-bottom: none;
+    background-color: var(--border);
+}
+
+.tab.active {
+    z-index: 1;
+    background-color: var(--codebg);
+}
+
+.tabs {
+    display: flex;
+    padding-top: var(--padding);
+}
+
+.copy, .copied {
+    top: var(--padding);
+    right: var(--padding);
+    border: none;
+    cursor: pointer;
+    padding: calc(0.5 * var(--padding)) calc(0.5 * var(--padding));
+    position: absolute;
+    font-size: calc(0.7 * var(--font-size));
+    border-radius: var(--border-radius);
+
+    fill: var(--codefg);
+    background: transparent;
+}
+
+.copied {
+    fill: var(--success);
+}
+
+.copy.hidden, .copied.hidden {
+    display: none;
+}
+
+.code {
+    display: none;
+    margin-top: calc(-1 * (var(--border-size)));
+}
+
+.code.active {
+    padding: var(--padding);
+    display: block;
+    border-radius: var(--border-radius);
+    border-top-left-radius: 0px;
+
+    background-color: var(--codebg);
+}
+
+.codes {
+    position: relative;
+}
+
+.string {
+    color: var(--string);
+}
+
+.comment {
+    color: var(--comment);
+}
+
+.keyword {
+    color: var(--keyword);
+}
+
+.constant {
+    color: var(--constant);
+}

@@ -16,6 +16,21 @@ Bs_Sv bs_sv_drop(Bs_Sv *s, size_t count) {
     return result;
 }
 
+Bs_Sv bs_sv_split(Bs_Sv *s, char ch) {
+    const char *p = memchr(s->data, ch, s->size);
+    if (!p) {
+        const Bs_Sv result = *s;
+        s->data += s->size;
+        s->size = 0;
+        return result;
+    }
+
+    const Bs_Sv result = Bs_Sv(s->data, p - s->data);
+    s->data = p + 1;
+    s->size -= result.size + 1;
+    return result;
+}
+
 bool bs_sv_eq(Bs_Sv a, Bs_Sv b) {
     return a.size == b.size && !memcmp(a.data, b.data, b.size);
 }

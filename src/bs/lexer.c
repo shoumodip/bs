@@ -105,26 +105,39 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc) {
     return token;
 }
 
-static_assert(BS_COUNT_TOKENS == 55, "Update bs_lexer_next()");
+static_assert(BS_COUNT_TOKENS == 56, "Update bs_lexer_next()");
 Bs_Token bs_lexer_next(Bs_Lexer *l) {
     if (l->peeked) {
         l->peeked = false;
         return l->buffer;
     }
 
+    Bs_Token token = {0};
     while (l->sv.size > 0) {
         if (isspace(*l->sv.data)) {
             bs_lexer_advance(l);
         } else if (*l->sv.data == '#') {
+            if (l->comments) {
+                token.sv = l->sv;
+                token.loc = l->loc;
+            }
+
             while (l->sv.size > 0 && *l->sv.data != '\n') {
                 bs_lexer_advance(l);
+            }
+
+            if (l->comments) {
+                token.type = BS_TOKEN_COMMENT;
+                token.sv.size -= l->sv.size;
+                return token;
             }
         } else {
             break;
         }
     }
 
-    Bs_Token token = {.sv = l->sv, .loc = l->loc};
+    token.sv = l->sv;
+    token.loc = l->loc;
     if (l->sv.size == 0) {
         return token;
     }
