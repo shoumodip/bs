@@ -891,6 +891,7 @@ static void bs_import(Bs *bs) {
     // Native
     {
         bs_buffer_reset(b, start);
+        bs_da_push_many(bs, b, "./", 2);
         bs_da_push_many(bs, b, name->data, name->size);
         bs_da_push_many(bs, b, ".so", 4);
         void *data = dlopen(b->data + start, RTLD_NOW);
