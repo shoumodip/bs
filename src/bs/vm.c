@@ -839,6 +839,7 @@ static bool bs_import_language(Bs *bs, const char *path) {
     return true;
 }
 
+// TODO: resolve the path
 static void bs_import(Bs *bs) {
     const Bs_Value a = bs_stack_pop(bs);
     bs_check_object_type(bs, a, BS_OBJECT_STR, "module name");
@@ -865,7 +866,6 @@ static void bs_import(Bs *bs) {
     Bs_Buffer *b = bs_paths_get(bs);
     const size_t start = b->count;
 
-    bs_da_push_many(bs, b, "./", 2);
     bs_da_push_many(bs, b, name->data, name->size);
 
     // Normal
@@ -890,6 +890,8 @@ static void bs_import(Bs *bs) {
 
     // Native
     {
+        bs_buffer_reset(b, start);
+        bs_da_push_many(bs, b, name->data, name->size);
         bs_da_push_many(bs, b, ".so", 4);
         void *data = dlopen(b->data + start, RTLD_NOW);
         if (!data) {
