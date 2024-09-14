@@ -1,5 +1,5 @@
-#ifndef BS_H
-#define BS_H
+#ifndef BS_VM_H
+#define BS_VM_H
 
 #include <assert.h>
 #include <stdio.h>
@@ -143,4 +143,4 @@ struct Bs_Buffer {
 #define bs_buffer_free bs_da_free
 #define bs_buffer_push bs_da_push
 
-#endif // BS_H
+#endif // BS_VM_H

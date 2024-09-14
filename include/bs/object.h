@@ -3,9 +3,9 @@
 
 #include <stdint.h>
 
-#include "bs.h"
 #include "op.h"
 #include "token.h"
+#include "vm.h"
 
 typedef struct {
     Bs_Value *data;
