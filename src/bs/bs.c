@@ -865,6 +865,7 @@ static void bs_import(Bs *bs) {
     Bs_Buffer *b = bs_paths_get(bs);
     const size_t start = b->count;
 
+    bs_da_push_many(bs, b, "./", 2);
     bs_da_push_many(bs, b, name->data, name->size);
 
     // Normal

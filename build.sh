@@ -8,7 +8,7 @@ for file in $(ls src/bs); do
 done
 wait
 
-cc $CFLAGS -o bin/bs src/main.c lib/.build/* -Wl,-rpath=./ -lm &
-cc $CFLAGS -o lib/libbs.so -shared lib/.build/* -Wl,-rpath=./ -lm &
+cc $CFLAGS -o bin/bs src/main.c lib/.build/* -lm &
+cc $CFLAGS -o lib/libbs.so -shared lib/.build/* -lm &
 ar rcs lib/libbs.a lib/.build/* &
 wait
