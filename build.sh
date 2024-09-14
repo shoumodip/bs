@@ -2,7 +2,9 @@
 
 CFLAGS=$(cat compile_flags.txt)
 
+rm -rf bin lib
 mkdir -p bin lib/.build
+
 for file in $(ls src/bs); do
     cc $CFLAGS -o lib/.build/$file.o -c -fPIC src/bs/$file &
 done
