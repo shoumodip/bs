@@ -1,5 +1,7 @@
 #include <dlfcn.h>
+#include <errno.h>
 #include <setjmp.h>
+#include <unistd.h>
 
 #include "bs/compiler.h"
 #include "bs/debug.h"
@@ -33,9 +35,10 @@ typedef struct {
 
 typedef struct {
     bool done;
-    const Bs_Str *name;
-
     Bs_Value result;
+
+    Bs_Str *name;
+    size_t length;
 } Bs_Module;
 
 typedef struct {
@@ -45,10 +48,12 @@ typedef struct {
 } Bs_Modules;
 
 #define bs_modules_free bs_da_free
+#define bs_modules_push bs_da_push
 
-static bool bs_modules_find(Bs_Modules *m, const Bs_Str *name, size_t *index) {
-    for (size_t i = 0; i < m->count; i++) {
-        if (bs_str_eq(m->data[i].name, name)) {
+static bool bs_modules_find(Bs_Modules *modules, Bs_Sv name, size_t *index) {
+    for (size_t i = 0; i < modules->count; i++) {
+        const Bs_Module *m = &modules->data[i];
+        if (bs_sv_eq(Bs_Sv(m->name->data, m->length), name)) {
             *index = i;
             return true;
         }
@@ -68,6 +73,7 @@ struct Bs {
     Bs_Frame *frame;
     Bs_Frames frames;
 
+    Bs_Str *cwd;
     Bs_Modules modules;
 
     Bs_Table globals;
@@ -272,6 +278,8 @@ static void bs_collect(Bs *bs) {
         bs_mark_object(bs, (Bs_Object *)bs->frames.data[i].closure);
     }
 
+    bs_mark_object(bs, (Bs_Object *)bs->cwd);
+
     for (size_t i = 0; i < bs->modules.count; i++) {
         Bs_Module *m = &bs->modules.data[i];
 
@@ -347,6 +355,7 @@ Bs *bs_new(bool step) {
     bs->printer.bs = bs;
 
     bs->globals.meta.type = BS_OBJECT_TABLE;
+    bs_update_cwd(bs);
 
     bs->step = step;
     return bs;
@@ -395,6 +404,26 @@ void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size) {
     }
 
     return realloc(ptr, new_size);
+}
+
+bool bs_update_cwd(Bs *bs) {
+    Bs_Buffer *b = bs_paths_get(bs);
+    const size_t start = b->count;
+
+    bs_da_push_many(bs, b, NULL, BS_DA_INIT_CAP);
+    while (!getcwd(b->data + start, b->capacity - start)) {
+        if (errno != ERANGE) {
+            b->count = start;
+            return false;
+        }
+
+        b->count = b->capacity;
+        bs_da_push_many(bs, b, NULL, BS_DA_INIT_CAP);
+    }
+    bs->cwd = bs_str_const(bs, bs_sv_from_cstr(b->data + start));
+
+    b->count = start;
+    return true;
 }
 
 // Helpers
@@ -506,6 +535,8 @@ static Bs_Loc bs_chunk_get_loc(const Bs_Chunk *c, size_t op_index) {
 }
 
 void bs_error(Bs *bs, const char *fmt, ...) {
+    fflush(stdout); // Flush stdout beforehand *just in case*
+
     bs->gc_on = false;
 
     Bs_Writer *w = bs_stderr_get(bs);
@@ -555,12 +586,7 @@ void bs_error(Bs *bs, const char *fmt, ...) {
 
         if (caller->ip) {
             const Bs_Fn *fn = caller->closure->fn;
-
             const Bs_Loc loc = bs_chunk_get_loc(&fn->chunk, caller->ip - fn->chunk.data);
-            if (*loc.path == '\0') {
-                continue;
-            }
-
             bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(loc));
         } else {
             bs_fmt(w, "[C]: ");
@@ -816,90 +842,217 @@ static void bs_close_upvalues(Bs *bs, Bs_Value *last) {
     }
 }
 
+// Paths
+Bs_Sv bs_buffer_absolute_path(Bs_Buffer *b, Bs_Sv path) {
+    const size_t start = b->count;
+
+    if (path.size && *path.data != '/') {
+        bs_da_push_many(b->bs, b, b->bs->cwd->data, b->bs->cwd->size);
+        if (b->count != start + 1) {
+            bs_da_push(b->bs, b, '/');
+        }
+    }
+
+    bs_da_push_many(b->bs, b, path.data, path.size);
+    bs_da_push(b->bs, b, '\0');
+
+    const char *p = b->data + start;
+    char *r = b->data + start;
+
+    while (*p) {
+        // Skip consecutive slashes
+        while (*p == '/' && p[1] == '/') {
+            p++;
+        }
+
+        // Handle ./
+        if (*p == '.' && (p[1] == '/' || p[1] == '\0')) {
+            p++;
+            if (*p == '/') {
+                p++;
+            }
+            continue;
+        }
+
+        // Handle ../
+        if (*p == '.' && p[1] == '.' && (p[2] == '/' || p[2] == '\0')) {
+            p += 2;
+            if (*p == '/') {
+                p++;
+            }
+
+            if (r != b->data + start + 1) {
+                r--;
+                while (r != b->data + start && r[-1] != '/') {
+                    r--;
+                }
+            }
+            continue;
+        }
+
+        // Normal
+        while (*p != '/' && *p != '\0') {
+            *r++ = *p++;
+        }
+
+        if (*p == '/') {
+            *r++ = *p++;
+        }
+    }
+
+    b->count = r - b->data;
+    return (Bs_Sv){b->data + start, b->count - start};
+}
+
+Bs_Sv bs_buffer_relative_path(Bs_Buffer *b, Bs_Sv path) {
+    const size_t start = b->count;
+
+    const Bs_Str *cwd = b->bs->cwd;
+    const size_t max = bs_min(path.size, cwd->size);
+
+    size_t i = 0;
+    while (i < max) {
+        if (path.data[i] != cwd->data[i]) {
+            break;
+        }
+
+        i++;
+    }
+
+    if (i != cwd->size || path.data[i] != '/') {
+        bs_da_push_many(b->bs, b, "../", 3);
+        for (size_t j = i; j < cwd->size; j++) {
+            if (cwd->data[j] == '/') {
+                bs_da_push_many(b->bs, b, "../", 3);
+            }
+        }
+
+        while (i && path.data[i - 1] != '/') {
+            i--;
+        }
+    } else {
+        i++;
+    }
+
+    bs_da_push_many(b->bs, b, path.data + i, path.size - i);
+    return Bs_Sv(b->data + start, b->count - start);
+}
+
 // Interpreter
-static bool bs_import_language(Bs *bs, const char *path) {
+const Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl) {
+    Bs_Module module = {
+        .name = bs_str_const(bs, path),
+    };
+
+    const Bs_Sv relative =
+        bs_buffer_relative_path(bs_paths_get(bs), Bs_Sv(module.name->data, module.name->size));
+
+    if (bs_sv_suffix(path, Bs_Sv_Static(".bs"))) {
+        module.length = path.size - 3;
+    } else if (bs_sv_suffix(path, Bs_Sv_Static(".bsx"))) {
+        module.length -= path.size - 4;
+    } else {
+        bs_fmt(
+            bs_stderr_get(bs),
+            "error: invalid input path '" Bs_Sv_Fmt "', expected '.bs' or '.bsx' extension\n",
+            Bs_Sv_Arg(relative));
+
+        return NULL;
+    }
+
+    Bs_Fn *fn = bs_compile_impl(bs, relative, input, is_main, is_repl);
+    if (!fn) {
+        return NULL;
+    }
+
+    bs_modules_push(bs, &bs->modules, module);
+    fn->module = bs->modules.count;
+    return fn;
+}
+
+static bool bs_import_language(Bs *bs, Bs_Sv path, size_t length) {
     size_t size = 0;
-    char *contents = bs_read_file(path, &size);
+    char *contents = bs_read_file(path.data, &size);
     if (!contents) {
         return false;
     }
 
-    Bs_Fn *fn = bs_compile(bs, path, Bs_Sv(contents, size), false, false);
+    path.size--;
+    const Bs_Fn *fn = bs_compile(bs, path, Bs_Sv(contents, size), false, false);
     free(contents);
 
     if (!fn) {
         bs_unwind(bs, 1);
     }
 
-    bs_da_push(bs, &bs->modules, (Bs_Module){.name = fn->name});
-    fn->module = bs->modules.count;
+    if (bs->step) {
+        bs_debug_chunk(bs_pretty_printer(bs, bs_stdout_get(bs)), &fn->chunk);
+    }
 
     bs_stack_push(bs, bs_value_object(bs_closure_new(bs, fn)));
     bs_call_value(bs, 0);
     return true;
 }
 
-// TODO: resolve the path
 static void bs_import(Bs *bs) {
+    const bool gc_on_save = bs->gc_on;
+    bs->gc_on = false;
+
     const Bs_Value a = bs_stack_pop(bs);
     bs_check_object_type(bs, a, BS_OBJECT_STR, "module name");
 
-    const Bs_Str *name = (const Bs_Str *)a.as.object;
-    if (!name->size) {
+    const Bs_Str *path = (const Bs_Str *)a.as.object;
+    if (!path->size) {
         bs_error(bs, "module name cannot be empty");
     }
 
+    Bs_Buffer *b = bs_paths_get(bs);
+
+    const size_t start = b->count;
+    const Bs_Sv resolved = bs_buffer_absolute_path(b, Bs_Sv(path->data, path->size));
+
     size_t index;
-    if (bs_modules_find(&bs->modules, name, &index)) {
+    if (bs_modules_find(&bs->modules, resolved, &index)) {
         const Bs_Module *m = &bs->modules.data[index];
         if (!m->done) {
             bs_error(bs, "import loop detected");
         }
 
         bs_stack_push(bs, m->result);
+
+        bs->gc_on = gc_on_save;
         return;
     }
-
-    const bool gc_on_save = bs->gc_on;
-    bs->gc_on = false;
-
-    Bs_Buffer *b = bs_paths_get(bs);
-    const size_t start = b->count;
-
-    bs_da_push_many(bs, b, name->data, name->size);
 
     // Normal
     {
         bs_da_push_many(bs, b, ".bs", 4);
-        if (bs_import_language(bs, b->data + start)) {
+        if (bs_import_language(bs, bs_buffer_reset(b, start), resolved.size)) {
             bs->gc_on = gc_on_save;
             return;
         }
-        b->count -= 4;
+        b->count = start + resolved.size;
     }
 
     // Extended
     {
         bs_da_push_many(bs, b, ".bsx", 5);
-        if (bs_import_language(bs, b->data + start)) {
+        if (bs_import_language(bs, bs_buffer_reset(b, start), resolved.size)) {
             bs->gc_on = gc_on_save;
             return;
         }
-        b->count -= 5;
+        b->count = start + resolved.size;
     }
 
     // Native
     {
-        bs_buffer_reset(b, start);
-        bs_da_push_many(bs, b, "./", 2);
-        bs_da_push_many(bs, b, name->data, name->size);
         bs_da_push_many(bs, b, ".so", 4);
         void *data = dlopen(b->data + start, RTLD_NOW);
         if (!data) {
-            bs_error(bs, "could not import module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*name));
+            bs_error(bs, "could not import module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*path));
         }
 
-        Bs_C_Lib *library = bs_c_lib_new(bs, data, name);
+        Bs_C_Lib *library = bs_c_lib_new(bs, data, path);
 
         const Bs_Export *exports = dlsym(data, "bs_exports");
         const size_t *exports_count = dlsym(data, "bs_exports_count");
@@ -919,7 +1072,7 @@ static void bs_import(Bs *bs) {
                 "const size_t bs_exports_count = bs_c_array_size(bs_exports);\n"
                 "```\n",
 
-                Bs_Sv_Arg(*name));
+                Bs_Sv_Arg(*path));
         }
 
         for (size_t i = 0; i < *exports_count; i++) {
@@ -938,10 +1091,16 @@ static void bs_import(Bs *bs) {
             }
         }
 
-        const Bs_Value value = bs_value_object(library);
-        bs_da_push(bs, &bs->modules, ((Bs_Module){.done = true, .name = name, .result = value}));
+        const Bs_Module module = {
+            .done = true,
+            .result = bs_value_object(library),
 
-        bs_stack_push(bs, value);
+            .name = bs_str_const(bs, bs_buffer_reset(b, start)),
+            .length = resolved.size,
+        };
+        bs_modules_push(bs, &bs->modules, module);
+
+        bs_stack_push(bs, module.result);
         bs->gc_on = gc_on_save;
     }
 }
@@ -956,6 +1115,18 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         if (bs->step) {
             Bs_Writer *w = bs_stdout_get(bs);
             bs_fmt(w, "\n----------------------------------------\n");
+            bs_fmt(w, "Modules:\n");
+            for (size_t i = 0; i < bs->modules.count; i++) {
+                const Bs_Module *m = &bs->modules.data[i];
+                const Bs_Sv sv = Bs_Sv(m->name->data, m->length);
+                bs_fmt(
+                    w,
+                    "[" Bs_Sv_Fmt "] (Real path: '" Bs_Sv_Fmt "')\n",
+                    Bs_Sv_Arg(sv),
+                    Bs_Sv_Arg(*m->name));
+            }
+            bs_fmt(w, "\n");
+
             bs_fmt(w, "Frames:\n");
             for (size_t i = 0; i < bs->frames.count; i++) {
                 const Bs_Frame *frame = &bs->frames.data[i];
@@ -1576,25 +1747,26 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
     }
 }
 
-Bs_Result bs_run(Bs *bs, const char *path, Bs_Sv input, bool is_repl) {
+Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_repl) {
     bs->ok = true;
     bs->exit = -1;
+    if (setjmp(bs->unwind)) {
+        goto end;
+    }
+
     Bs_Result result = {0};
 
-    Bs_Fn *fn = bs_compile(bs, path, input, true, is_repl);
+    Bs_Buffer *b = bs_paths_get(bs);
+    const size_t start = b->count;
+
+    Bs_Sv resolved = bs_buffer_absolute_path(b, path);
+    const Bs_Fn *fn = bs_compile(bs, bs_buffer_reset(b, start), input, true, is_repl);
     if (!fn) {
         return (Bs_Result){.exit = 1};
     }
 
     if (bs->step) {
         bs_debug_chunk(bs_pretty_printer(bs, bs_stdout_get(bs)), &fn->chunk);
-    }
-
-    bs_da_push(bs, &bs->modules, (Bs_Module){.name = fn->name});
-    fn->module = bs->modules.count;
-
-    if (setjmp(bs->unwind)) {
-        goto end;
     }
 
     result.value = bs_call(bs, bs_value_object(bs_closure_new(bs, fn)), NULL, 0);

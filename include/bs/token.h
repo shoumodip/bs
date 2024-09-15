@@ -4,13 +4,13 @@
 #include "basic.h"
 
 typedef struct {
-    const char *path;
+    Bs_Sv path;
     size_t row;
     size_t col;
 } Bs_Loc;
 
-#define Bs_Loc_Fmt "%s:%zu:%zu: "
-#define Bs_Loc_Arg(p) (p).path, (p).row, (p).col
+#define Bs_Loc_Fmt "%.*s:%zu:%zu: "
+#define Bs_Loc_Arg(p) (int)(p).path.size, (p).path.data, (p).row, (p).col
 
 typedef enum {
     BS_TOKEN_EOF,

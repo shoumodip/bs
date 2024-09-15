@@ -34,7 +34,7 @@ static bool bs_lexer_match(Bs_Lexer *l, char ch) {
     return false;
 }
 
-Bs_Lexer bs_lexer_new(const char *path, Bs_Sv input, Bs_Writer *error) {
+Bs_Lexer bs_lexer_new(Bs_Sv path, Bs_Sv input, Bs_Writer *error) {
     return (Bs_Lexer){
         .sv = input,
         .loc.path = path,

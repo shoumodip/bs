@@ -14,6 +14,7 @@ typedef struct Bs Bs;
 Bs *bs_new(bool step);
 void bs_free(Bs *bs);
 void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size);
+bool bs_update_cwd(Bs *bs);
 
 // Helpers
 typedef struct Bs_Buffer Bs_Buffer;
@@ -70,6 +71,10 @@ void bs_check_object_c_type(Bs *bs, Bs_Value value, const Bs_C_Data_Spec *spec, 
 void bs_check_integer(Bs *bs, Bs_Value value, const char *label);
 void bs_check_whole_number(Bs *bs, Bs_Value value, const char *label);
 
+// Paths
+Bs_Sv bs_buffer_absolute_path(Bs_Buffer *b, Bs_Sv path);
+Bs_Sv bs_buffer_relative_path(Bs_Buffer *b, Bs_Sv path);
+
 // Interpreter
 typedef struct {
     bool ok;
@@ -77,7 +82,9 @@ typedef struct {
     Bs_Value value;
 } Bs_Result;
 
-Bs_Result bs_run(Bs *bs, const char *path, Bs_Sv input, bool is_repl);
+const Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl);
+
+Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_repl);
 Bs_Value bs_call(Bs *bs, Bs_Value fn, const Bs_Value *args, size_t arity);
 
 // Dynamic Array

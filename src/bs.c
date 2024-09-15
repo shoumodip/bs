@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
                 break;
             }
 
-            result = bs_run(bs, "<stdin>", bs_sv_from_cstr(line), true);
+            result = bs_run(bs, Bs_Sv_Static("<stdin>"), bs_sv_from_cstr(line), true);
             if (result.ok) {
                 if (result.exit != -1) {
                     break;
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
     Bs *bs = bs_new(false);
     bs_core_init(bs, argc - 1, argv + 1);
 
-    const Bs_Result result = bs_run(bs, path, Bs_Sv(contents, size), false);
+    const Bs_Result result = bs_run(bs, bs_sv_from_cstr(path), Bs_Sv(contents, size), false);
     free(contents);
 
     bs_free(bs);

@@ -19,7 +19,7 @@ typedef struct {
     Bs_Writer *error;
 } Bs_Lexer;
 
-Bs_Lexer bs_lexer_new(const char *path, Bs_Sv input, Bs_Writer *error);
+Bs_Lexer bs_lexer_new(Bs_Sv path, Bs_Sv input, Bs_Writer *error);
 void bs_lexer_error(Bs_Lexer *lexer);
 void bs_lexer_buffer(Bs_Lexer *lexer, Bs_Token token);
 

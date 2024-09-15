@@ -120,7 +120,7 @@ static bool bsdoc_print_code(const char *path, Bs_Sv contents, size_t start, boo
     Bsdoc_Parens parens = {0};
     Bs_Writer error = {stderr, bsdoc_writer};
 
-    Bs_Lexer lexer = bs_lexer_new(path, contents, &error);
+    Bs_Lexer lexer = bs_lexer_new(bs_sv_from_cstr(path), contents, &error);
     lexer.loc.row = start;
     lexer.comments = true;
     lexer.extended = extended;

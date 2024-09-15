@@ -982,26 +982,22 @@ static void bs_compile_stmt(Bs_Compiler *c) {
     }
 }
 
-Bs_Fn *bs_compile(Bs *bs, const char *path, Bs_Sv input, bool is_main, bool is_repl) {
+Bs_Fn *bs_compile_impl(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl) {
     Bs_Compiler compiler = {
         .bs = bs,
-        .lexer = bs_lexer_new(path, input, bs_stderr_get(bs)),
         .is_main = is_main,
     };
 
-    Bs_Sv name = bs_sv_from_cstr(path);
-    compiler.lexer.extended = bs_sv_suffix(name, Bs_Sv_Static(".bsx"));
-
-    for (size_t i = name.size; i > 0; i--) {
-        if (name.data[i - 1] == '.') {
-            name.size = i - 1;
-            break;
-        }
-    }
-
     Bs_Scope scope = {.is_repl = is_repl};
-    bs_compile_scope_init(&compiler, &scope, name);
+    bs_compile_scope_init(&compiler, &scope, path);
     bs_compile_block_init(&compiler);
+
+    {
+        // Own the path
+        const Bs_Sv path = Bs_Sv(scope.fn->name->data, scope.fn->name->size);
+        compiler.lexer = bs_lexer_new(path, input, bs_stderr_get(bs));
+        compiler.lexer.extended = bs_sv_suffix(path, Bs_Sv_Static(".bsx"));
+    }
 
     if (setjmp(compiler.lexer.unwind)) {
         Bs_Scope *scope = compiler.scope;
