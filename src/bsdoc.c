@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "bs/lexer.h"
 
@@ -59,36 +60,36 @@ static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type, bool extended) {
     }
 }
 
-static void bsdoc_print_styled_sv(Bsdoc_Style style, Bs_Sv sv) {
+static void bsdoc_print_styled_sv(FILE *f, Bsdoc_Style style, Bs_Sv sv) {
     switch (style) {
     case STYLE_NORMAL:
         break;
 
     case STYLE_STRING:
-        printf("<span class='string'>");
+        fprintf(f, "<span class='string'>");
         break;
 
     case STYLE_COMMENT:
-        printf("<span class='comment'>");
+        fprintf(f, "<span class='comment'>");
         break;
 
     case STYLE_KEYWORD:
-        printf("<span class='keyword'>");
+        fprintf(f, "<span class='keyword'>");
         break;
 
     case STYLE_CONSTANT:
-        printf("<span class='constant'>");
+        fprintf(f, "<span class='constant'>");
         break;
     }
 
-    fwrite(sv.data, sv.size, 1, stdout);
+    fwrite(sv.data, sv.size, 1, f);
 
     if (style != STYLE_NORMAL) {
-        printf("</span>");
+        fprintf(f, "</span>");
     }
 }
 
-static void bsdoc_print_token(Bs_Token token, const char **last, bool extended) {
+static void bsdoc_print_token(FILE *f, Bs_Token token, const char **last, bool extended) {
     if (token.type == BS_TOKEN_STR || token.type == BS_TOKEN_ISTR) {
         if (token.sv.data[-1] == '"') {
             token.sv.data--;
@@ -100,8 +101,8 @@ static void bsdoc_print_token(Bs_Token token, const char **last, bool extended) 
         }
     }
 
-    fwrite(*last, token.sv.data - *last, 1, stdout);
-    bsdoc_print_styled_sv(bsdoc_token_type_style(token.type, extended), token.sv);
+    fwrite(*last, token.sv.data - *last, 1, f);
+    bsdoc_print_styled_sv(f, bsdoc_token_type_style(token.type, extended), token.sv);
 
     *last = token.sv.data + token.sv.size;
 }
@@ -116,7 +117,8 @@ static void bsdoc_parens_push(Bsdoc_Parens *f, bool start) {
     f->data[f->count++] = start;
 }
 
-static bool bsdoc_print_code(const char *path, Bs_Sv contents, size_t start, bool extended) {
+static bool
+bsdoc_print_code(FILE *f, const char *path, Bs_Sv contents, size_t start, bool extended) {
     Bsdoc_Parens parens = {0};
     Bs_Writer error = {stderr, bsdoc_writer};
 
@@ -132,12 +134,12 @@ static bool bsdoc_print_code(const char *path, Bs_Sv contents, size_t start, boo
     const char *last = contents.data;
     while (lexer.sv.size) {
         Bs_Token token = bs_lexer_next(&lexer);
-        bsdoc_print_token(token, &last, extended);
+        bsdoc_print_token(f, token, &last, extended);
 
         switch (token.type) {
         case BS_TOKEN_ISTR:
             token = bs_lexer_expect(&lexer, BS_TOKEN_LPAREN);
-            bsdoc_print_token(token, &last, extended);
+            bsdoc_print_token(f, token, &last, extended);
             bsdoc_parens_push(&parens, true);
             break;
 
@@ -149,7 +151,7 @@ static bool bsdoc_print_code(const char *path, Bs_Sv contents, size_t start, boo
             assert(parens.count);
             if (parens.data[--parens.count]) {
                 token = bs_lexer_str(&lexer, lexer.loc);
-                bsdoc_print_token(token, &last, extended);
+                bsdoc_print_token(f, token, &last, extended);
             }
             break;
 
@@ -177,8 +179,9 @@ static Bs_Sv bsdoc_split_code(Bs_Sv *sv, size_t *row, Bs_Sv end) {
 }
 
 // Shamelessly copied from Github
-static void bsdoc_print_copy(const char *onclick) {
-    printf(
+static void bsdoc_print_copy(FILE *f, const char *onclick) {
+    fprintf(
+        f,
         "<button class='copy' onclick='%s(this)'>\n"
         "<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>\n"
         "    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 "
@@ -207,23 +210,42 @@ int main(int argc, char **argv) {
         fprintf(stderr, "usage: %s <path>\n", *argv);
         exit(1);
     }
-    const char *path = argv[1];
+    const char *input = argv[1];
 
     size_t size;
-    char *contents = bs_read_file(path, &size);
+    char *contents = bs_read_file(input, &size);
     if (!contents) {
-        fprintf(stderr, "error: could not read file '%s'\n", path);
+        fprintf(stderr, "error: could not read file '%s'\n", input);
         exit(1);
     }
 
-    printf("<!doctype html>\n"
-           "<html>\n"
-           "<head>\n"
-           "<link rel='stylesheet' href='style.css'>\n"
-           "<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n"
-           "<script src='script.js'></script>\n"
-           "</head>\n"
-           "<body>\n");
+    char *output = NULL;
+    {
+        const size_t length = strlen(input) - 2;
+
+        output = malloc(length + 5);
+        assert(output);
+
+        memcpy(output, input, length);
+        memcpy(output + length, "html", 5);
+    }
+
+    FILE *f = fopen(output, "wb");
+    if (!f) {
+        fprintf(stderr, "error: could not write file '%s'\n", output);
+        exit(1);
+    }
+
+    fprintf(
+        f,
+        "<!doctype html>\n"
+        "<html>\n"
+        "<head>\n"
+        "<link rel='stylesheet' href='style.css'>\n"
+        "<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n"
+        "<script src='script.js'></script>\n"
+        "</head>\n"
+        "<body>\n");
 
     Bs_Sv sv = Bs_Sv(contents, size);
     for (size_t row = 1; sv.size; row++) {
@@ -246,54 +268,58 @@ int main(int argc, char **argv) {
                 fprintf(
                     stderr,
                     "%s:%zu:1: error: invalid heading depth, number of '#' must be less than 6\n",
-                    path,
+                    input,
                     row);
                 bs_return_defer(1);
             }
 
             line.data += level;
             line.size -= level;
-            printf("<h%zu>" Bs_Sv_Fmt "</h%zu>\n", level, Bs_Sv_Arg(line), level);
+            fprintf(f, "<h%zu>" Bs_Sv_Fmt "</h%zu>\n", level, Bs_Sv_Arg(line), level);
             continue;
         }
 
         if (bs_sv_eq(line, Bs_Sv_Static("```"))) {
             size_t start = row + 1;
 
-            printf("<div>\n"
-                   "<div class='tabs'>\n"
-                   "<button class='tab active' onclick='tabClick(this)'>BS</button>\n"
-                   "<button class='tab' onclick='tabClick(this)'>BSX</button>\n"
-                   "</div>\n"
-                   "<div class='codes'>\n");
+            fprintf(
+                f,
+                "<div>\n"
+                "<div class='tabs'>\n"
+                "<button class='tab active' onclick='tabClick(this)'>BS</button>\n"
+                "<button class='tab' onclick='tabClick(this)'>BSX</button>\n"
+                "</div>\n"
+                "<div class='codes'>\n");
 
-            bsdoc_print_copy("copyClickCode");
+            bsdoc_print_copy(f, "copyClickCode");
 
-            printf("<pre class='code active'>\n");
+            fprintf(f, "<pre class='code active'>\n");
             if (!bsdoc_print_code(
-                    path, bsdoc_split_code(&sv, &row, Bs_Sv_Static("---")), start, false)) {
+                    f, input, bsdoc_split_code(&sv, &row, Bs_Sv_Static("---")), start, false)) {
                 bs_return_defer(1);
             }
-            printf("</pre>\n");
+            fprintf(f, "</pre>\n");
 
             start = row + 1;
 
-            printf("<pre class='code'>\n");
+            fprintf(f, "<pre class='code'>\n");
             if (!bsdoc_print_code(
-                    path, bsdoc_split_code(&sv, &row, Bs_Sv_Static("```")), start, true)) {
+                    f, input, bsdoc_split_code(&sv, &row, Bs_Sv_Static("```")), start, true)) {
                 bs_return_defer(1);
             }
-            printf("</pre>\n"
-                   "</div>\n"
-                   "</div>\n");
+            fprintf(
+                f,
+                "</pre>\n"
+                "</div>\n"
+                "</div>\n");
 
             continue;
         }
 
         if (bs_sv_eq(line, Bs_Sv_Static("```sh"))) {
-            printf("<div class='codes'>\n");
-            bsdoc_print_copy("copyClickShell");
-            printf("<pre class='code active'>\n");
+            fprintf(f, "<div class='codes'>\n");
+            bsdoc_print_copy(f, "copyClickShell");
+            fprintf(f, "<pre class='code active'>\n");
 
             while (sv.size) {
                 row++;
@@ -303,27 +329,29 @@ int main(int argc, char **argv) {
                     break;
                 }
 
-                bsdoc_print_styled_sv(STYLE_KEYWORD, Bs_Sv_Static("$ "));
+                bsdoc_print_styled_sv(f, STYLE_KEYWORD, Bs_Sv_Static("$ "));
 
                 Bs_Sv comment = line;
                 line = bs_sv_split(&comment, '#');
-                printf(Bs_Sv_Fmt, Bs_Sv_Arg(line));
+                fwrite(line.data, line.size, 1, f);
 
                 if (comment.size) {
                     comment.data--;
                     comment.size++;
-                    bsdoc_print_styled_sv(STYLE_COMMENT, comment);
+                    bsdoc_print_styled_sv(f, STYLE_COMMENT, comment);
                 }
 
-                printf("\n");
+                fprintf(f, "\n");
             }
 
-            printf("</pre>\n"
-                   "</div>\n");
+            fprintf(
+                f,
+                "</pre>\n"
+                "</div>\n");
             continue;
         }
 
-        printf("<p>\n" Bs_Sv_Fmt "\n", Bs_Sv_Arg(line));
+        fprintf(f, "<p>\n" Bs_Sv_Fmt "\n", Bs_Sv_Arg(line));
         while (sv.size) {
             row++;
 
@@ -331,15 +359,21 @@ int main(int argc, char **argv) {
             if (!line.size) {
                 break;
             }
-            printf(Bs_Sv_Fmt "\n", Bs_Sv_Arg(line));
+            fprintf(f, Bs_Sv_Fmt "\n", Bs_Sv_Arg(line));
         }
-        printf("</p>\n");
+        fprintf(f, "</p>\n");
     }
 
-    printf("</body>\n"
-           "</html>\n");
+    fprintf(
+        f,
+        "</body>\n"
+        "</html>\n");
+
+    printf("Wrote documentation to '%s'\n", output);
 
 defer:
+    fclose(f);
+    free(output);
     free(contents);
     return result;
 }
