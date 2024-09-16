@@ -939,7 +939,7 @@ Bs_Sv bs_buffer_relative_path(Bs_Buffer *b, Bs_Sv path) {
 }
 
 // Interpreter
-const Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl) {
+const Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main) {
     Bs_Module module = {
         .name = bs_str_const(bs, path),
     };
@@ -960,7 +960,7 @@ const Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_r
         return NULL;
     }
 
-    Bs_Fn *fn = bs_compile_impl(bs, relative, input, is_main, is_repl);
+    Bs_Fn *fn = bs_compile_impl(bs, relative, input, is_main);
     if (!fn) {
         return NULL;
     }
@@ -978,7 +978,7 @@ static bool bs_import_language(Bs *bs, Bs_Sv path, size_t length) {
     }
 
     path.size--;
-    const Bs_Fn *fn = bs_compile(bs, path, Bs_Sv(contents, size), false, false);
+    const Bs_Fn *fn = bs_compile(bs, path, Bs_Sv(contents, size), false);
     free(contents);
 
     if (!fn) {
@@ -1747,7 +1747,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
     }
 }
 
-Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_repl) {
+Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input) {
     bs->ok = true;
     bs->exit = -1;
     if (setjmp(bs->unwind)) {
@@ -1760,7 +1760,7 @@ Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_repl) {
     const size_t start = b->count;
 
     Bs_Sv resolved = bs_buffer_absolute_path(b, path);
-    const Bs_Fn *fn = bs_compile(bs, bs_buffer_reset(b, start), input, true, is_repl);
+    const Bs_Fn *fn = bs_compile(bs, bs_buffer_reset(b, start), input, true);
     if (!fn) {
         return (Bs_Result){.exit = 1};
     }

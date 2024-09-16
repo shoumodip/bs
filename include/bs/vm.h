@@ -82,9 +82,9 @@ typedef struct {
     Bs_Value value;
 } Bs_Result;
 
-const Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl);
+const Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main);
 
-Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_repl);
+Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input);
 Bs_Value bs_call(Bs *bs, Bs_Value fn, const Bs_Value *args, size_t arity);
 
 // Dynamic Array

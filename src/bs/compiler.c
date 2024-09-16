@@ -108,8 +108,6 @@ struct Bs_Scope {
 
     Bs_Fn *fn;
     Bs_Uplocals uplocals;
-
-    bool is_repl;
 };
 
 #define bs_scope_push bs_da_push
@@ -928,7 +926,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
     } break;
 
     case BS_TOKEN_FN:
-        bs_compile_function(c, c->scope->is_repl && c->scope->depth == 1);
+        bs_compile_function(c, false);
         break;
 
     case BS_TOKEN_PUB:
@@ -941,24 +939,16 @@ static void bs_compile_stmt(Bs_Compiler *c) {
             bs_lexer_error(&c->lexer);
         }
 
-        token = bs_lexer_next(&c->lexer);
+        token = bs_lexer_either(&c->lexer, BS_TOKEN_FN, BS_TOKEN_VAR);
         if (token.type == BS_TOKEN_FN) {
             bs_compile_function(c, true);
-        } else if (token.type == BS_TOKEN_VAR) {
-            bs_compile_variable(c, true);
         } else {
-            bs_fmt(
-                c->lexer.error,
-                Bs_Loc_Fmt "error: expected 'fn' or 'var', got %s\n",
-                Bs_Loc_Arg(token.loc),
-                bs_token_type_name(token.type, c->lexer.extended));
-
-            bs_lexer_error(&c->lexer);
+            bs_compile_variable(c, true);
         }
         break;
 
     case BS_TOKEN_VAR:
-        bs_compile_variable(c, c->scope->is_repl && c->scope->depth == 1);
+        bs_compile_variable(c, false);
         break;
 
     case BS_TOKEN_RETURN:
@@ -982,13 +972,13 @@ static void bs_compile_stmt(Bs_Compiler *c) {
     }
 }
 
-Bs_Fn *bs_compile_impl(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl) {
+Bs_Fn *bs_compile_impl(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main) {
     Bs_Compiler compiler = {
         .bs = bs,
         .is_main = is_main,
     };
 
-    Bs_Scope scope = {.is_repl = is_repl};
+    Bs_Scope scope = {0};
     bs_compile_scope_init(&compiler, &scope, path);
     bs_compile_block_init(&compiler);
 
@@ -1016,11 +1006,6 @@ Bs_Fn *bs_compile_impl(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_re
 
     while (!bs_lexer_read(&compiler.lexer, BS_TOKEN_EOF)) {
         bs_compile_stmt(&compiler);
-    }
-
-    if (is_repl && compiler.chunk->last < compiler.chunk->count &&
-        compiler.chunk->data[compiler.chunk->last] == BS_OP_DROP) {
-        compiler.chunk->data[compiler.chunk->last] = BS_OP_RET;
     }
 
     Bs_Fn *fn = bs_compile_scope_end(&compiler);

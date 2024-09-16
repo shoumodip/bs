@@ -3,38 +3,11 @@
 #include "bs/core.h"
 
 int main(int argc, char **argv) {
-    // Repl
-    if (argc < 2 || !strcmp(argv[1], "-")) {
-        Bs_Result result = {0};
-
-        Bs *bs = bs_new(false);
-        bs_core_init(bs, argc - 1, argv + 1);
-
-        char line[1024];
-        Bs_Writer *w = bs_stdout_get(bs);
-        while (true) {
-            bs_fmt(w, "> ");
-
-            if (!fgets(line, sizeof(line), stdin)) {
-                break;
-            }
-
-            result = bs_run(bs, Bs_Sv_Static("<stdin>"), bs_sv_from_cstr(line), true);
-            if (result.ok) {
-                if (result.exit != -1) {
-                    break;
-                }
-
-                bs_value_write(bs, w, result.value);
-                bs_fmt(w, "\n");
-            }
-        }
-
-        bs_fmt(w, "\n");
-        bs_free(bs);
-        return result.exit == -1 ? !result.ok : result.exit;
+    if (argc < 2) {
+        fprintf(stderr, "error: file path not provided\n");
+        fprintf(stderr, "usage: %s <file>\n", *argv);
+        exit(1);
     }
-
     const char *path = argv[1];
 
     size_t size = 0;
@@ -47,7 +20,7 @@ int main(int argc, char **argv) {
     Bs *bs = bs_new(false);
     bs_core_init(bs, argc - 1, argv + 1);
 
-    const Bs_Result result = bs_run(bs, bs_sv_from_cstr(path), Bs_Sv(contents, size), false);
+    const Bs_Result result = bs_run(bs, bs_sv_from_cstr(path), Bs_Sv(contents, size));
     free(contents);
 
     bs_free(bs);
