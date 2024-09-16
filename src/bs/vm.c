@@ -1,5 +1,6 @@
 #include <dlfcn.h>
 #include <errno.h>
+#include <math.h>
 #include <setjmp.h>
 #include <unistd.h>
 
@@ -1105,7 +1106,7 @@ static void bs_import(Bs *bs) {
     }
 }
 
-static_assert(BS_COUNT_OPS == 49, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 50, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const size_t frames_count_save = bs->frames.count;
@@ -1281,6 +1282,17 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             Bs_Value a, b;
             bs_binary_op(bs, &a, &b, "/");
             bs_stack_push(bs, bs_value_num(a.as.number / b.as.number));
+        } break;
+
+        case BS_OP_MOD: {
+            Bs_Value a, b;
+            bs_binary_op(bs, &a, &b, "%");
+
+            double result = fmod(a.as.number, b.as.number);
+            if (result < 0) {
+                result += fabs(b.as.number);
+            }
+            bs_stack_push(bs, bs_value_num(result));
         } break;
 
         case BS_OP_NEG: {

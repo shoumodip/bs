@@ -105,7 +105,7 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc) {
     return token;
 }
 
-static_assert(BS_COUNT_TOKENS == 56, "Update bs_lexer_next()");
+static_assert(BS_COUNT_TOKENS == 57, "Update bs_lexer_next()");
 Bs_Token bs_lexer_next(Bs_Lexer *l) {
     if (l->peeked) {
         l->peeked = false;
@@ -351,6 +351,10 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
 
     case '/':
         token.type = BS_TOKEN_DIV;
+        break;
+
+    case '%':
+        token.type = BS_TOKEN_MOD;
         break;
 
     case '|':

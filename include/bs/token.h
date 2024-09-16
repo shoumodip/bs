@@ -37,6 +37,7 @@ typedef enum {
     BS_TOKEN_SUB,
     BS_TOKEN_MUL,
     BS_TOKEN_DIV,
+    BS_TOKEN_MOD,
 
     BS_TOKEN_BOR,
     BS_TOKEN_BAND,

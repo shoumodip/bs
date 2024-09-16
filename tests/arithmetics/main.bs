@@ -3,6 +3,10 @@ io.println(34 + 35);
 io.println(500 - 80);
 io.println(23 * 3);
 io.println(840 / 2);
+io.println(100 % 3);
+io.println(-100 % 3);
+io.println(-100.4 % 3);
+io.println(-100.4 % 3.6);
 io.println(-1337);
 
 # Grouping

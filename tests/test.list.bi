@@ -2,11 +2,15 @@
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
-:b stdout 82
+:b stdout 121
 69
 420
 69
 420
+1
+2
+1.59999999999999
+0.399999999999997
 -1337
 69
 420
@@ -27,11 +31,15 @@
 :b shell 30
 ../bin/bs arithmetics/main.bsx
 :i returncode 0
-:b stdout 82
+:b stdout 121
 69
 420
 69
 420
+1
+2
+1.59999999999999
+0.399999999999997
 -1337
 69
 420

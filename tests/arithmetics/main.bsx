@@ -3,6 +3,10 @@ io.println(34 + 35) fr
 io.println(500 - 80) fr
 io.println(23 * 3) fr
 io.println(840 / 2) fr
+io.println(100 % 3) fr
+io.println(-100 % 3) fr
+io.println(-100.4 % 3) fr
+io.println(-100.4 % 3.6) fr
 io.println(-1337) fr
 
 # Grouping

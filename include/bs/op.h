@@ -20,6 +20,7 @@ typedef enum {
     BS_OP_SUB,
     BS_OP_MUL,
     BS_OP_DIV,
+    BS_OP_MOD,
     BS_OP_NEG,
 
     BS_OP_BOR,
