@@ -19,11 +19,13 @@
     --codebg: #1C1C1C;
     --codefg: #E0E0E0;
 
-    --string: #00A67D;
+    --field: #F78C6C;
+    --string: #D19A66;
     --comment: #888888;
-    --keyword: #2E95D3;
+    --keyword: #C678DD;
     --success: #3FB950;
-    --constant: #A97FD5;
+    --constant: #56B6C2;
+    --function: #5FAFD7;
 
     --padding: 0.4rem;
     --font-size: 1.1rem;
@@ -33,12 +35,26 @@
     font-family: "DM Sans";
 }
 
-h1, h2, h3, h4, h5, h6 {
+a {
+    color: var(--pagefg);
+    border: var(--border-size) solid var(--border);
+    display: inline-block;
+    padding: calc(1.5 * var(--padding)) calc(3 * var(--padding));
+    font-weight: bold;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+}
+
+a:hover {
+    background-color: var(--border);
+}
+
+h1:not(header h1), h2, h3, h4, h5, h6 {
     position: relative;
     padding-bottom: var(--padding);
 }
 
-h1::after, h2::after, h3::after, h4::after, h5::after, h6::after {
+h1:not(header h1)::after, h2::after, h3::after, h4::after, h5::after, h6::after, header::after {
     left: 0;
     width: 100%;
     height: calc(0.5 * var(--border-size));
@@ -47,6 +63,17 @@ h1::after, h2::after, h3::after, h4::after, h5::after, h6::after {
     display: block;
     position: absolute;
     background-color: var(--border);
+}
+
+header {
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header h1 {
+    margin-bottom: var(--padding);
 }
 
 body {
@@ -71,6 +98,9 @@ pre, span {
 
 button {
     color: var(--pagefg);
+}
+
+a, button {
     outline: none;
     user-select: none;
     -webkit-touch-callout: none;
@@ -134,13 +164,37 @@ button {
     padding: var(--padding) calc(2.8 * var(--padding));
     display: block;
     border-radius: var(--border-radius);
-    border-top-left-radius: 0px;
+    border-top-left-radius: 0;
 
     background-color: var(--codebg);
 }
 
 .codes {
     position: relative;
+}
+
+@media (pointer: fine) {
+    .only-mobile {
+        display: none;
+    }
+
+    .only-desktop {
+        display: block;
+    }
+}
+
+@media (pointer: coarse) {
+    .only-mobile {
+        display: block;
+    }
+
+    .only-desktop {
+        display: none;
+    }
+}
+
+.field {
+    color: var(--field);
 }
 
 .string {
@@ -157,4 +211,8 @@ button {
 
 .constant {
     color: var(--constant);
+}
+
+.function {
+    color: var(--function);
 }

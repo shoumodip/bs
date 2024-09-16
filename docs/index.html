@@ -6,9 +6,16 @@
 <script src='script.js'></script>
 </head>
 <body>
-<h1> Hello world!</h1>
+<header>
+<h1> BS</h1>
+<div class="only-desktop">
+<a href='/docs/tutorial.html'>Tutorial</a>
+<a href='/docs/stdlib.html'>Stdlib</a>
+<a href='https://github.com/shoumodip/bs'>GitHub</a>
+</div>
+</header>
 <p>
-Basic "Hello, world!" program in BS
+A minimal embeddable scripting language with sane defaults and strong typing
 </p>
 <div>
 <div class='tabs'>
@@ -27,16 +34,29 @@ Basic "Hello, world!" program in BS
 </svg>
 </button>
 <pre class='code active'>
-io.println(<span class='string'>"Hello, world!"</span>);
+<span class='keyword'>fn</span> <span class='function'>factorial</span>(n) {
+    <span class='keyword'>if</span> n < <span class='constant'>2</span> {
+        <span class='keyword'>return</span> <span class='constant'>1</span>;
+    }
+
+    <span class='keyword'>return</span> n * factorial(n - <span class='constant'>1</span>);
+}
+
+io.<span class='field'>println</span>(<span class='string'>"5! = </span>\(factorial(<span class='constant'>5</span>))<span class='string'>"</span>);
 </pre>
 <pre class='code'>
-io.println(<span class='string'>"Hello, world!"</span>) <span class='keyword'>fr</span>
+<span class='keyword'>lit</span> <span class='function'>factorial</span>(n) {
+    <span class='keyword'>ayo</span> n < <span class='constant'>2</span> {
+        <span class='keyword'>bet</span> <span class='constant'>1</span> <span class='keyword'>fr</span>
+    }
+
+    <span class='keyword'>bet</span> n * factorial(n - <span class='constant'>1</span>) <span class='keyword'>fr</span>
+}
+
+io.<span class='field'>println</span>(<span class='string'>"5! = </span>\(factorial(<span class='constant'>5</span>))<span class='string'>"</span>) <span class='keyword'>fr</span>
 </pre>
 </div>
 </div>
-<p>
-Run it as follows
-</p>
 <div class='codes'>
 <button class='copy' onclick='copyClickShell(this)'>
 <svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
@@ -49,8 +69,17 @@ Run it as follows
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>$ </span>bs hello.bs <span class='comment'># or hello.bsx</span>
+<span class='constant'>$ </span>bs factorial.bs <span class='comment'># or .bsx</span>
+5! = 120
 </pre>
+</div>
+<div class="only-mobile">
+<h2> Getting Started</h2>
+<center>
+<a href='/docs/tutorial.html'>Tutorial</a>
+<a href='/docs/stdlib.html'>Stdlib</a>
+<a href='https://github.com/shoumodip/bs'>GitHub</a>
+</center>
 </div>
 </body>
 </html>
