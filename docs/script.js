@@ -19,17 +19,14 @@ function tabClick(e) {
     }
 }
 
-function copyClick(e) {
-    const [, ok, a, b] = e.parentNode.children
-    const code = a.classList.contains("active") ? a.innerText : b.innerText
-
+function copyClick(e, ok, text) {
     if (navigator.clipboard) {
-        navigator.clipboard.writeText(code)
+        navigator.clipboard.writeText(text)
     } else {
         const textarea = document.createElement("textarea")
         textarea.setAttribute("style", "width: 1px; border:0; opacity:0;")
         document.body.appendChild(textarea)
-        textarea.value = code
+        textarea.value = text
         textarea.select()
         document.execCommand("copy")
         document.body.removeChild(textarea)
@@ -42,4 +39,14 @@ function copyClick(e) {
 
     toggle();
     setTimeout(toggle, 1000)
+}
+
+function copyClickCode(e) {
+    const [, ok, a, b] = e.parentNode.children
+    copyClick(e, ok, a.classList.contains("active") ? a.innerText : b.innerText)
+}
+
+function copyClickShell(e) {
+    const [, ok, a] = e.parentNode.children
+    copyClick(e, ok, a.innerText.split("\n").map((s) => s.slice(2)).join("\n"))
 }

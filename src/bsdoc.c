@@ -176,6 +176,29 @@ static Bs_Sv bsdoc_split_code(Bs_Sv *sv, size_t *row, Bs_Sv end) {
     return block;
 }
 
+// Shamelessly copied from Github
+static void bsdoc_print_copy(const char *onclick) {
+    printf(
+        "<button class='copy' onclick='%s(this)'>\n"
+        "<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>\n"
+        "    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 "
+        "0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 "
+        "0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 "
+        "1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 "
+        "11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 "
+        ".138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>\n"
+        "</svg>\n"
+        "</button>\n"
+        "<button class='copied hidden'>\n"
+        "<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>\n"
+        "    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 "
+        "9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 "
+        "0 0 1 1.06 0Z'></path>\n"
+        "</svg>\n"
+        "</button>\n",
+        onclick);
+}
+
 int main(int argc, char **argv) {
     int result = 0;
 
@@ -237,32 +260,14 @@ int main(int argc, char **argv) {
         if (bs_sv_eq(line, Bs_Sv_Static("```"))) {
             size_t start = row + 1;
 
-            printf(
-                "<div>\n"
-                "<div class='tabs'>\n"
-                "<button class='tab active' onclick='tabClick(this)'>BS</button>\n"
-                "<button class='tab' onclick='tabClick(this)'>BSX</button>\n"
-                "</div>\n"
-                "<div class='codes'>\n"
+            printf("<div>\n"
+                   "<div class='tabs'>\n"
+                   "<button class='tab active' onclick='tabClick(this)'>BS</button>\n"
+                   "<button class='tab' onclick='tabClick(this)'>BSX</button>\n"
+                   "</div>\n"
+                   "<div class='codes'>\n");
 
-                // Shamelessly copied from Github
-                "<button class='copy' onclick='copyClick(this)'>\n"
-                "<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>\n"
-                "    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 "
-                "0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 "
-                "0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 "
-                "1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 "
-                "11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 "
-                ".138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>\n"
-                "</svg>\n"
-                "</button>\n"
-                "<button class='copied hidden'>\n"
-                "<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>\n"
-                "    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 "
-                "9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 "
-                "0 0 1 1.06 0Z'></path>\n"
-                "</svg>\n"
-                "</button>\n");
+            bsdoc_print_copy("copyClickCode");
 
             printf("<pre class='code active'>\n");
             if (!bsdoc_print_code(
@@ -282,6 +287,39 @@ int main(int argc, char **argv) {
                    "</div>\n"
                    "</div>\n");
 
+            continue;
+        }
+
+        if (bs_sv_eq(line, Bs_Sv_Static("```sh"))) {
+            printf("<div class='codes'>\n");
+            bsdoc_print_copy("copyClickShell");
+            printf("<pre class='code active'>\n");
+
+            while (sv.size) {
+                row++;
+
+                line = bs_sv_split(&sv, '\n');
+                if (bs_sv_eq(line, Bs_Sv_Static("```"))) {
+                    break;
+                }
+
+                bsdoc_print_styled_sv(STYLE_KEYWORD, Bs_Sv_Static("$ "));
+
+                Bs_Sv comment = line;
+                line = bs_sv_split(&comment, '#');
+                printf(Bs_Sv_Fmt, Bs_Sv_Arg(line));
+
+                if (comment.size) {
+                    comment.data--;
+                    comment.size++;
+                    bsdoc_print_styled_sv(STYLE_COMMENT, comment);
+                }
+
+                printf("\n");
+            }
+
+            printf("</pre>\n"
+                   "</div>\n");
             continue;
         }
 

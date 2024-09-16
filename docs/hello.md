@@ -6,3 +6,9 @@ io.println("Hello, world!");
 ---
 io.println("Hello, world!") fr
 ```
+
+Run it as follows
+
+```sh
+bs hello.bs # or hello.bsx
+```
