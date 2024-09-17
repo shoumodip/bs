@@ -1276,8 +1276,8 @@ static Bs_Value bs_table_copy(Bs *bs, Bs_Value *args, size_t arity) {
     const Bs_Table *src = (const Bs_Table *)args[0].as.object;
 
     Bs_Table *dst = bs_table_new(bs);
-    for (size_t i = 0; i < src->capacity; i++) {
-        const Bs_Entry *entry = &src->data[i];
+    for (size_t i = 0; i < src->map.capacity; i++) {
+        const Bs_Entry *entry = &src->map.data[i];
         if (entry->key.type != BS_VALUE_NIL) {
             bs_table_set(bs, dst, entry->key, entry->value);
         }
@@ -1294,13 +1294,14 @@ static Bs_Value bs_table_equal(Bs *bs, Bs_Value *args, size_t arity) {
     const Bs_Table *a = (const Bs_Table *)args[0].as.object;
     const Bs_Table *b = (const Bs_Table *)args[1].as.object;
 
-    if (a->length != b->length) {
+    if (a->map.length != b->map.length) {
         return bs_value_bool(false);
     }
 
-    for (size_t i = 0; i < a->capacity; i++) {
-        if (a->data[i].key.type != BS_VALUE_NIL) {
-            if (bs_entries_find(b->data, b->capacity, a->data[i].key)->key.type == BS_VALUE_NIL) {
+    for (size_t i = 0; i < a->map.capacity; i++) {
+        if (a->map.data[i].key.type != BS_VALUE_NIL) {
+            if (bs_entries_find(b->map.data, b->map.capacity, a->map.data[i].key)->key.type ==
+                BS_VALUE_NIL) {
                 return bs_value_bool(false);
             }
         }

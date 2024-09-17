@@ -63,7 +63,7 @@ const char *bs_value_type_name(Bs_Value v, bool extended) {
 
 static bool bs_should_print_multi(const Bs_Object *object) {
     if (object->type == BS_OBJECT_TABLE) {
-        return ((const Bs_Table *)object)->length != 0;
+        return ((const Bs_Table *)object)->map.length != 0;
     }
 
     if (object->type == BS_OBJECT_ARRAY) {
@@ -176,11 +176,11 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
             const Bs_Table *table = (const Bs_Table *)object;
 
             bs_fmt(p->writer, "{");
-            if (table->length) {
+            if (table->map.length) {
                 p->depth++;
 
-                for (size_t i = 0, count = 0; i < table->capacity; i++) {
-                    Bs_Entry *entry = &table->data[i];
+                for (size_t i = 0, count = 0; i < table->map.capacity; i++) {
+                    Bs_Entry *entry = &table->map.data[i];
                     if (entry->key.type == BS_VALUE_NIL) {
                         continue;
                     }

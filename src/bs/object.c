@@ -1,6 +1,4 @@
-#include "bs/hash.h"
-
-#define BS_TABLE_MAX_LOAD 0.75
+#include "bs/object.h"
 
 void bs_chunk_free(Bs *bs, Bs_Chunk *c) {
     bs_values_free(bs, &c->constants);
@@ -111,95 +109,24 @@ void bs_array_set(Bs *bs, Bs_Array *a, size_t index, Bs_Value value) {
 
 Bs_Table *bs_table_new(Bs *bs) {
     Bs_Table *table = (Bs_Table *)bs_object_new(bs, BS_OBJECT_TABLE, sizeof(Bs_Table));
-    table->data = NULL;
-    table->count = 0;
-    table->length = 0;
-    table->capacity = 0;
+    memset(&table->map, 0, sizeof(table->map));
     return table;
 }
 
 void bs_table_free(Bs *bs, Bs_Table *t) {
-    bs_realloc(bs, t->data, sizeof(*t->data) * t->capacity, 0);
-    t->data = NULL;
-    t->count = 0;
-    t->capacity = 0;
+    bs_map_free(bs, &t->map);
 }
 
 bool bs_table_remove(Bs *bs, Bs_Table *t, Bs_Value key) {
-    if (!t->count) {
-        return false;
-    }
-
-    Bs_Entry *entry = bs_entries_find(t->data, t->capacity, key);
-    if (!entry) {
-        return false;
-    }
-
-    if (entry->key.type == BS_VALUE_NIL && entry->value.type == BS_VALUE_BOOL &&
-        entry->value.as.boolean == true) {
-        return false;
-    }
-
-    t->length--;
-    entry->key = bs_value_nil;
-    entry->value = bs_value_bool(true);
-    return true;
+    return bs_map_remove(bs, &t->map, key);
 }
 
 bool bs_table_get(Bs *bs, Bs_Table *t, Bs_Value key, Bs_Value *value) {
-    if (!t->count) {
-        return false;
-    }
-
-    Bs_Entry *entry = bs_entries_find(t->data, t->capacity, key);
-    if (entry->key.type == BS_VALUE_NIL) {
-        return false;
-    }
-
-    *value = entry->value;
-    return true;
-}
-
-static void bs_table_grow(Bs *bs, Bs_Table *t, size_t capacity) {
-    const size_t size = sizeof(Bs_Entry) * capacity;
-
-    Bs_Entry *entries = bs_realloc(bs, NULL, 0, size);
-    memset(entries, 0, size);
-
-    size_t count = 0;
-    for (size_t i = 0; i < t->capacity; i++) {
-        Bs_Entry *src = &t->data[i];
-        if (src->key.type == BS_VALUE_NIL) {
-            continue;
-        }
-
-        Bs_Entry *dst = bs_entries_find(entries, capacity, src->key);
-        dst->key = src->key;
-        dst->value = src->value;
-        count++;
-    }
-
-    bs_table_free(bs, t);
-    t->data = entries;
-    t->count = count;
-    t->capacity = capacity;
+    return bs_map_get(bs, &t->map, key, value);
 }
 
 bool bs_table_set(Bs *bs, Bs_Table *t, Bs_Value key, Bs_Value value) {
-    if (t->count >= t->capacity * BS_TABLE_MAX_LOAD) {
-        bs_table_grow(bs, t, t->capacity ? t->capacity * 2 : BS_DA_INIT_CAP);
-    }
-    Bs_Entry *entry = bs_entries_find(t->data, t->capacity, key);
-
-    bool is_new = entry->key.type == BS_VALUE_NIL;
-    if (is_new && entry->value.type == BS_VALUE_NIL) {
-        t->count++;
-        t->length++;
-    }
-
-    entry->key = key;
-    entry->value = value;
-    return is_new;
+    return bs_map_set(bs, &t->map, key, value);
 }
 
 Bs_Closure *bs_closure_new(Bs *bs, const Bs_Fn *fn) {

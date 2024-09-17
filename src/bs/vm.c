@@ -209,8 +209,8 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
     case BS_OBJECT_TABLE: {
         Bs_Table *table = (Bs_Table *)object;
 
-        for (size_t i = 0; i < table->capacity; i++) {
-            Bs_Entry *entry = &table->data[i];
+        for (size_t i = 0; i < table->map.capacity; i++) {
+            Bs_Entry *entry = &table->map.data[i];
             if (entry->key.type == BS_VALUE_OBJECT) {
                 bs_mark_object(bs, entry->key.as.object);
             }
@@ -498,7 +498,7 @@ Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size) {
 }
 
 Bs_Str *bs_str_const(Bs *bs, Bs_Sv sv) {
-    Bs_Entry *entry = bs_entries_find_sv(bs->strings.data, bs->strings.capacity, sv);
+    Bs_Entry *entry = bs_entries_find_sv(bs->strings.map.data, bs->strings.map.capacity, sv);
     if (entry && entry->key.type != BS_VALUE_NIL) {
         return (Bs_Str *)entry->key.as.object;
     }
@@ -1441,7 +1441,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 break;
 
             case BS_OBJECT_TABLE:
-                size = ((Bs_Table *)a.as.object)->length;
+                size = ((Bs_Table *)a.as.object)->map.length;
                 break;
 
             default:
@@ -1703,14 +1703,15 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                     index = iterator.as.number + 1;
                 }
 
-                while (index < table->capacity && table->data[index].key.type == BS_VALUE_NIL) {
+                while (index < table->map.capacity &&
+                       table->map.data[index].key.type == BS_VALUE_NIL) {
                     index++;
                 }
 
-                if (index >= table->capacity) {
+                if (index >= table->map.capacity) {
                     bs->frame->ip += offset;
                 } else {
-                    const Bs_Entry entry = table->data[index];
+                    const Bs_Entry entry = table->map.data[index];
                     bs_stack_set(bs, 0, bs_value_num(index)); // Iterator
                     bs_stack_push(bs, entry.key);             // Key
                     bs_stack_push(bs, entry.value);           // Value

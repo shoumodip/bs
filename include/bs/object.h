@@ -3,9 +3,9 @@
 
 #include <stdint.h>
 
+#include "map.h"
 #include "op.h"
 #include "token.h"
-#include "vm.h"
 
 typedef struct {
     Bs_Value *data;
@@ -91,17 +91,9 @@ Bs_Array *bs_array_new(Bs *bs);
 bool bs_array_get(Bs *bs, Bs_Array *array, size_t index, Bs_Value *value);
 void bs_array_set(Bs *bs, Bs_Array *array, size_t index, Bs_Value value);
 
-typedef struct {
-    Bs_Value key;
-    Bs_Value value;
-} Bs_Entry;
-
 struct Bs_Table {
     Bs_Object meta;
-    Bs_Entry *data;
-    size_t count;
-    size_t length;
-    size_t capacity;
+    Bs_Map map;
 };
 
 Bs_Table *bs_table_new(Bs *bs);
