@@ -15,11 +15,11 @@
 
     --pagebg: #202020;
     --pagefg: #EEEEEE;
-
     --codebg: #1C1C1C;
-    --codefg: #E0E0E0;
+    --copyfg: #888888;
 
     --field: #F78C6C;
+    --escape: #E78A4E;
     --string: #D19A66;
     --comment: #888888;
     --keyword: #C678DD;
@@ -84,6 +84,15 @@ body {
     background-color: var(--pagebg);
 }
 
+code {
+    padding: 0 calc(0.5 * var(--padding));
+    font-size: calc(0.9 * var(--font-size));
+    whitespace: pre;
+    font-family: "JetBrains Mono";
+    border-radius: var(--border-radius);
+    background-color: var(--border);
+}
+
 pre {
     border: var(--border-size) solid var(--border);
     font-size: calc(0.9 * var(--font-size));
@@ -143,8 +152,12 @@ a, button {
     font-size: calc(0.7 * var(--font-size));
     border-radius: var(--border-radius);
 
-    fill: var(--codefg);
+    fill: var(--copyfg);
     background: transparent;
+}
+
+.shell .copy {
+    padding: calc(1.1 * var(--padding)) calc(0.5 * var(--padding));
 }
 
 .copied {
@@ -157,23 +170,34 @@ a, button {
 
 .code {
     display: none;
-    margin-top: calc(-1 * (var(--border-size)));
+    margin-top: calc(-1 * var(--border-size));
 }
 
 .code.active {
     padding: var(--padding) calc(2.8 * var(--padding));
     display: block;
     border-radius: var(--border-radius);
-    border-top-left-radius: 0;
-
+    margin-bottom: calc(4 * var(--padding));
     background-color: var(--codebg);
+}
+
+.code.active:not(.shell) {
+    border-top-left-radius: 0;
 }
 
 .codes {
     position: relative;
 }
 
+.codes.shell {
+    padding-top: var(--padding);
+}
+
 @media (pointer: fine) {
+    body {
+        padding: var(--padding) calc(20 * var(--padding));
+    }
+
     .only-mobile {
         display: none;
     }
@@ -195,6 +219,10 @@ a, button {
 
 .field {
     color: var(--field);
+}
+
+.escape {
+    color: var(--escape);
 }
 
 .string {

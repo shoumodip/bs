@@ -1,0 +1,471 @@
+<!doctype html>
+<html>
+<head>
+<link rel='stylesheet' href='style.css'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<script src='script.js'></script>
+</head>
+<body>
+<h1> Tutorial</h1>
+<p>
+Let's start with a simple "Hello World" program.
+</p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+io.<span class='field'>println</span>(<span class='string'>"Hello, world!"</span>);
+</pre>
+<pre class='code'>
+io.<span class='field'>println</span>(<span class='string'>"Hello, world!"</span>) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<p>
+Save this to a file named <code>hello.bs</code> and run it as follows.
+</p>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs hello.bs
+Hello, world!
+</pre>
+</div>
+<p>
+That's not all though. As you can see in the code block above, there seems to
+be two "modes" that this language operates in. What's up with that?
+</p>
+<h2> BS and BSX</h2>
+<p>
+BS is more "mainstream" in its syntax, whereas BSX is a parody of Gen Z
+brainrot. There are subtle differences between the two, even besides syntax
+alone, which will be introduced later in appropriate places in the tutorial.
+</p>
+<p>
+You can choose whether to use BS or BSX based on the extension of your file.
+Save the BSX version of the previous example to <code>hello.bsx</code> and run
+it as before.
+</p>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs hello.bsx
+Hello, world!
+</pre>
+</div>
+<h2> Types and Values</h2>
+<p>
+BS supports the types present in all scripting languages: nil, numbers,
+booleans, strings, arrays, tables, and functions.
+</p>
+<h3> Nil</h3>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+io.<span class='field'>println</span>(<span class='constant'>nil</span>); <span class='comment'># Output: nil</span>
+</pre>
+<pre class='code'>
+io.<span class='field'>println</span>(<span class='constant'>bruh</span>) <span class='keyword'>fr</span> <span class='comment'># Output: bruh</span>
+</pre>
+</div>
+</div>
+<p>
+This is the first difference between BS and BSX. Not only is the keyword
+different, but the output itself changes.
+</p>
+<h3> Numbers</h3>
+<p>
+BS supports 64-bit floating point numbers only.
+</p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+io.<span class='field'>println</span>(<span class='constant'>69</span>);     <span class='comment'># Output: 69</span>
+io.<span class='field'>println</span>(<span class='constant'>420.69</span>); <span class='comment'># Output: 420.69</span>
+io.<span class='field'>println</span>(<span class='constant'>0xff</span>);   <span class='comment'># Output: 255</span>
+</pre>
+<pre class='code'>
+io.<span class='field'>println</span>(<span class='constant'>69</span>) <span class='keyword'>fr</span>     <span class='comment'># Output: 69</span>
+io.<span class='field'>println</span>(<span class='constant'>420.69</span>) <span class='keyword'>fr</span> <span class='comment'># Output: 420.69</span>
+io.<span class='field'>println</span>(<span class='constant'>0xff</span>) <span class='keyword'>fr</span>   <span class='comment'># Output: 255</span>
+</pre>
+</div>
+</div>
+<p>
+Standard arithmetic as well as bitwise operations are supported.
+</p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+io.<span class='field'>println</span>(<span class='constant'>34</span> + <span class='constant'>35</span>);        <span class='comment'># Output: 69</span>
+io.<span class='field'>println</span>(<span class='constant'>500</span> - <span class='constant'>80</span>);       <span class='comment'># Output: 420</span>
+io.<span class='field'>println</span>(<span class='constant'>23</span> * <span class='constant'>3</span>);         <span class='comment'># Output: 69</span>
+io.<span class='field'>println</span>(<span class='constant'>840</span> / <span class='constant'>2</span>);        <span class='comment'># Output: 420</span>
+io.<span class='field'>println</span>(<span class='constant'>209</span> % <span class='constant'>70</span>);       <span class='comment'># Output: 69</span>
+io.<span class='field'>println</span>(-<span class='constant'>420</span>);           <span class='comment'># Output: -420</span>
+
+io.<span class='field'>println</span>(<span class='constant'>17</span> * <span class='constant'>2</span> + <span class='constant'>35</span>);    <span class='comment'># Output: 69</span>
+io.<span class='field'>println</span>((<span class='constant'>900</span> - <span class='constant'>60</span>) / <span class='constant'>2</span>); <span class='comment'># Output: 420</span>
+
+io.<span class='field'>println</span>(<span class='constant'>276</span> >> <span class='constant'>2</span>);       <span class='comment'># Output: 69</span>
+io.<span class='field'>println</span>(<span class='constant'>105</span> << <span class='constant'>2</span>);       <span class='comment'># Output: 420</span>
+io.<span class='field'>println</span>(~-<span class='constant'>70</span>);           <span class='comment'># Output: 69</span>
+io.<span class='field'>println</span>(<span class='constant'>160</span> | <span class='constant'>260</span>);      <span class='comment'># Output: 420</span>
+io.<span class='field'>println</span>(<span class='constant'>77</span> & <span class='constant'>103</span>);       <span class='comment'># Output: 69</span>
+io.<span class='field'>println</span>(~-<span class='constant'>419</span> + <span class='constant'>10</span> & <span class='constant'>3</span>); <span class='comment'># Output: 420</span>
+io.<span class='field'>println</span>(<span class='constant'>69</span> ^ <span class='constant'>1404</span>);      <span class='comment'># Output: 1337</span>
+</pre>
+<pre class='code'>
+io.<span class='field'>println</span>(<span class='constant'>34</span> + <span class='constant'>35</span>) <span class='keyword'>fr</span>        <span class='comment'># Output: 69</span>
+io.<span class='field'>println</span>(<span class='constant'>500</span> - <span class='constant'>80</span>) <span class='keyword'>fr</span>       <span class='comment'># Output: 420</span>
+io.<span class='field'>println</span>(<span class='constant'>23</span> * <span class='constant'>3</span>) <span class='keyword'>fr</span>         <span class='comment'># Output: 69</span>
+io.<span class='field'>println</span>(<span class='constant'>840</span> / <span class='constant'>2</span>) <span class='keyword'>fr</span>        <span class='comment'># Output: 420</span>
+io.<span class='field'>println</span>(<span class='constant'>209</span> % <span class='constant'>70</span>) <span class='keyword'>fr</span>       <span class='comment'># Output: 69</span>
+io.<span class='field'>println</span>(-<span class='constant'>420</span>) <span class='keyword'>fr</span>           <span class='comment'># Output: -420</span>
+
+io.<span class='field'>println</span>(<span class='constant'>17</span> * <span class='constant'>2</span> + <span class='constant'>35</span>) <span class='keyword'>fr</span>    <span class='comment'># Output: 69</span>
+io.<span class='field'>println</span>((<span class='constant'>900</span> - <span class='constant'>60</span>) / <span class='constant'>2</span>) <span class='keyword'>fr</span> <span class='comment'># Output: 420</span>
+
+io.<span class='field'>println</span>(<span class='constant'>276</span> >> <span class='constant'>2</span>) <span class='keyword'>fr</span>       <span class='comment'># Output: 69</span>
+io.<span class='field'>println</span>(<span class='constant'>105</span> << <span class='constant'>2</span>) <span class='keyword'>fr</span>       <span class='comment'># Output: 420</span>
+io.<span class='field'>println</span>(~-<span class='constant'>70</span>) <span class='keyword'>fr</span>           <span class='comment'># Output: 69</span>
+io.<span class='field'>println</span>(<span class='constant'>160</span> | <span class='constant'>260</span>) <span class='keyword'>fr</span>      <span class='comment'># Output: 420</span>
+io.<span class='field'>println</span>(<span class='constant'>77</span> & <span class='constant'>103</span>) <span class='keyword'>fr</span>       <span class='comment'># Output: 69</span>
+io.<span class='field'>println</span>(~-<span class='constant'>419</span> + <span class='constant'>10</span> & <span class='constant'>3</span>) <span class='keyword'>fr</span> <span class='comment'># Output: 420</span>
+io.<span class='field'>println</span>(<span class='constant'>69</span> ^ <span class='constant'>1404</span>) <span class='keyword'>fr</span>      <span class='comment'># Output: 1337</span>
+</pre>
+</div>
+</div>
+<h3> Booleans</h3>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+io.<span class='field'>println</span>(<span class='constant'>true</span>);  <span class='comment'># Output: true</span>
+io.<span class='field'>println</span>(<span class='constant'>false</span>); <span class='comment'># Output: false</span>
+</pre>
+<pre class='code'>
+io.<span class='field'>println</span>(<span class='constant'>nocap</span>) <span class='keyword'>fr</span> <span class='comment'># Output: nocap</span>
+io.<span class='field'>println</span>(<span class='constant'>cap</span>) <span class='keyword'>fr</span>   <span class='comment'># Output: cap</span>
+</pre>
+</div>
+</div>
+<p>
+Again, note that the output differs depending on the mode.
+</p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+io.<span class='field'>println</span>(!<span class='constant'>true</span>);          <span class='comment'># Output: false</span>
+io.<span class='field'>println</span>(!<span class='constant'>false</span>);         <span class='comment'># Output: true</span>
+io.<span class='field'>println</span>(!<span class='constant'>nil</span>);           <span class='comment'># Output: true</span>
+
+<span class='comment'># All numbers are considered "true"</span>
+io.<span class='field'>println</span>(!<span class='constant'>0</span>);             <span class='comment'># Output: false</span>
+io.<span class='field'>println</span>(!<span class='constant'>1</span>);             <span class='comment'># Output: false</span>
+
+<span class='comment'># Ordering</span>
+io.<span class='field'>println</span>(<span class='constant'>69</span> > <span class='constant'>420</span>);       <span class='comment'># Output: false</span>
+io.<span class='field'>println</span>(<span class='constant'>69</span> >= <span class='constant'>420</span>);      <span class='comment'># Output: false</span>
+io.<span class='field'>println</span>(<span class='constant'>69</span> < <span class='constant'>420</span>);       <span class='comment'># Output: true</span>
+io.<span class='field'>println</span>(<span class='constant'>69</span> <= <span class='constant'>420</span>);      <span class='comment'># Output: true</span>
+io.<span class='field'>println</span>(<span class='constant'>69</span> == <span class='constant'>420</span>);      <span class='comment'># Output: false</span>
+io.<span class='field'>println</span>(<span class='constant'>69</span> != <span class='constant'>420</span>);      <span class='comment'># Output: true</span>
+
+<span class='comment'># BS is strongly typed</span>
+io.<span class='field'>println</span>(<span class='constant'>nil</span> == <span class='constant'>nil</span>);     <span class='comment'># Output: true</span>
+io.<span class='field'>println</span>(<span class='constant'>nil</span> == <span class='constant'>true</span>);    <span class='comment'># Output: false</span>
+io.<span class='field'>println</span>(<span class='constant'>nil</span> == <span class='constant'>0</span>);       <span class='comment'># Output: false</span>
+io.<span class='field'>println</span>(<span class='constant'>false</span> == <span class='constant'>0</span>);     <span class='comment'># Output: false</span>
+
+<span class='comment'># Logical AND, OR</span>
+io.<span class='field'>println</span>(<span class='constant'>true</span> && <span class='constant'>true</span>);   <span class='comment'># Output: true</span>
+io.<span class='field'>println</span>(<span class='constant'>true</span> && <span class='constant'>false</span>);  <span class='comment'># Output: false</span>
+io.<span class='field'>println</span>(<span class='constant'>true</span> || <span class='constant'>false</span>);  <span class='comment'># Output: true</span>
+io.<span class='field'>println</span>(<span class='constant'>false</span> || <span class='constant'>false</span>); <span class='comment'># Output: false</span>
+
+<span class='comment'># Short circuiting</span>
+io.<span class='field'>println</span>(<span class='constant'>nil</span> && <span class='constant'>true</span>);    <span class='comment'># Output: nil</span>
+io.<span class='field'>println</span>(<span class='constant'>0</span> || <span class='constant'>false</span>);     <span class='comment'># Output: 0</span>
+
+<span class='comment'># Logical XOR.</span>
+io.<span class='field'>println</span>(<span class='constant'>true</span> ^^ <span class='constant'>true</span>);   <span class='comment'># Output: false</span>
+io.<span class='field'>println</span>(<span class='constant'>true</span> ^^ <span class='constant'>false</span>);  <span class='comment'># Output: true</span>
+</pre>
+<pre class='code'>
+io.<span class='field'>println</span>(<span class='keyword'>nah</span> <span class='constant'>nocap</span>) <span class='keyword'>fr</span>      <span class='comment'># Output: cap</span>
+io.<span class='field'>println</span>(<span class='keyword'>nah</span> <span class='constant'>cap</span>) <span class='keyword'>fr</span>        <span class='comment'># Output: nocap</span>
+io.<span class='field'>println</span>(<span class='keyword'>nah</span> <span class='constant'>bruh</span>) <span class='keyword'>fr</span>       <span class='comment'># Output: nocap</span>
+
+<span class='comment'># All numbers are considered "nocap"</span>
+io.<span class='field'>println</span>(<span class='keyword'>nah</span> <span class='constant'>0</span>) <span class='keyword'>fr</span>          <span class='comment'># Output: cap</span>
+io.<span class='field'>println</span>(<span class='keyword'>nah</span> <span class='constant'>1</span>) <span class='keyword'>fr</span>          <span class='comment'># Output: cap</span>
+
+<span class='comment'># Ordering</span>
+io.<span class='field'>println</span>(<span class='constant'>69</span> > <span class='constant'>420</span>) <span class='keyword'>fr</span>       <span class='comment'># Output: cap</span>
+io.<span class='field'>println</span>(<span class='constant'>69</span> >= <span class='constant'>420</span>) <span class='keyword'>fr</span>      <span class='comment'># Output: cap</span>
+io.<span class='field'>println</span>(<span class='constant'>69</span> < <span class='constant'>420</span>) <span class='keyword'>fr</span>       <span class='comment'># Output: nocap</span>
+io.<span class='field'>println</span>(<span class='constant'>69</span> <= <span class='constant'>420</span>) <span class='keyword'>fr</span>      <span class='comment'># Output: nocap</span>
+io.<span class='field'>println</span>(<span class='constant'>69</span> == <span class='constant'>420</span>) <span class='keyword'>fr</span>      <span class='comment'># Output: cap</span>
+io.<span class='field'>println</span>(<span class='constant'>69</span> != <span class='constant'>420</span>) <span class='keyword'>fr</span>      <span class='comment'># Output: nocap</span>
+
+<span class='comment'># BSX is strongly typed</span>
+io.<span class='field'>println</span>(<span class='constant'>bruh</span> == <span class='constant'>bruh</span>) <span class='keyword'>fr</span>   <span class='comment'># Output: nocap</span>
+io.<span class='field'>println</span>(<span class='constant'>bruh</span> == <span class='constant'>nocap</span>) <span class='keyword'>fr</span>  <span class='comment'># Output: cap</span>
+io.<span class='field'>println</span>(<span class='constant'>bruh</span> == <span class='constant'>0</span>) <span class='keyword'>fr</span>      <span class='comment'># Output: cap</span>
+io.<span class='field'>println</span>(<span class='constant'>cap</span> == <span class='constant'>0</span>) <span class='keyword'>fr</span>       <span class='comment'># Output: cap</span>
+
+<span class='comment'># Logical AND, OR</span>
+io.<span class='field'>println</span>(<span class='constant'>nocap</span> && <span class='constant'>nocap</span>) <span class='keyword'>fr</span> <span class='comment'># Output: nocap</span>
+io.<span class='field'>println</span>(<span class='constant'>nocap</span> && <span class='constant'>cap</span>) <span class='keyword'>fr</span>   <span class='comment'># Output: cap</span>
+io.<span class='field'>println</span>(<span class='constant'>nocap</span> || <span class='constant'>cap</span>) <span class='keyword'>fr</span>   <span class='comment'># Output: nocap</span>
+io.<span class='field'>println</span>(<span class='constant'>cap</span> || <span class='constant'>cap</span>) <span class='keyword'>fr</span>     <span class='comment'># Output: cap</span>
+
+<span class='comment'># Short circuiting</span>
+io.<span class='field'>println</span>(<span class='constant'>bruh</span> && <span class='constant'>nocap</span>) <span class='keyword'>fr</span>  <span class='comment'># Output: bruh</span>
+io.<span class='field'>println</span>(<span class='constant'>0</span> || <span class='constant'>cap</span>) <span class='keyword'>fr</span>       <span class='comment'># Output: 0</span>
+
+<span class='comment'># Logical XOR.</span>
+io.<span class='field'>println</span>(<span class='constant'>nocap</span> ^^ <span class='constant'>nocap</span>) <span class='keyword'>fr</span> <span class='comment'># Output: cap</span>
+io.<span class='field'>println</span>(<span class='constant'>nocap</span> ^^ <span class='constant'>cap</span>) <span class='keyword'>fr</span>   <span class='comment'># Output: nocap</span>
+</pre>
+</div>
+</div>
+<h3> Strings</h3>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='comment'># Output: Hello!</span>
+io.<span class='field'>println</span>(<span class='string'>"Hello!"</span>);
+
+<span class='comment'># Output:</span>
+<span class='comment'># Say "Hello"!</span>
+<span class='comment'># Here, a	 tab!</span>
+io.<span class='field'>println</span>(<span class='string'>"Say </span><span class='escape'>\"</span><span class='string'>Hello</span><span class='escape'>\"</span><span class='string'>!</span><span class='escape'>\n</span><span class='string'>Here, a</span><span class='escape'>\t</span><span class='string'> tab!"</span>);
+
+<span class='comment'># Output: Interpolation! 69</span>
+io.<span class='field'>println</span>(<span class='string'>"Interpolation! </span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>34</span> + <span class='constant'>35</span><span class='escape'>)</span><span class='string'>"</span>);
+
+<span class='comment'># Output: Nested interpolation! 420</span>
+io.<span class='field'>println</span>(<span class='string'>"Nested </span><span class='escape'>\</span><span class='escape'>(</span><span class='string'>"interpolation! </span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>420</span><span class='escape'>)</span><span class='string'>"</span><span class='escape'>)</span><span class='string'>"</span>);
+
+<span class='comment'># Output: Hello, world! 69</span>
+io.<span class='field'>println</span>(<span class='string'>"Hello, "</span>..<span class='string'>"world! "</span>..<span class='constant'>69</span>);
+
+<span class='comment'># Output: 6</span>
+io.<span class='field'>println</span>(<span class='keyword'>len</span>(<span class='string'>"Hello!"</span>));
+</pre>
+<pre class='code'>
+<span class='comment'># Output: Hello!</span>
+io.<span class='field'>println</span>(<span class='string'>"Hello!"</span>) <span class='keyword'>fr</span>
+
+<span class='comment'># Output:</span>
+<span class='comment'># Say "Hello"!</span>
+<span class='comment'># Here, a	 tab!</span>
+io.<span class='field'>println</span>(<span class='string'>"Say </span><span class='escape'>\"</span><span class='string'>Hello</span><span class='escape'>\"</span><span class='string'>!</span><span class='escape'>\n</span><span class='string'>Here, a</span><span class='escape'>\t</span><span class='string'> tab!"</span>) <span class='keyword'>fr</span>
+
+<span class='comment'># Output: Interpolation! 69</span>
+io.<span class='field'>println</span>(<span class='string'>"Interpolation! </span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>34</span> + <span class='constant'>35</span><span class='escape'>)</span><span class='string'>"</span>) <span class='keyword'>fr</span>
+
+<span class='comment'># Output: Nested interpolation! 420</span>
+io.<span class='field'>println</span>(<span class='string'>"Nested </span><span class='escape'>\</span><span class='escape'>(</span><span class='string'>"interpolation! </span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>420</span><span class='escape'>)</span><span class='string'>"</span><span class='escape'>)</span><span class='string'>"</span>) <span class='keyword'>fr</span>
+
+<span class='comment'># Output: Hello, world! 69</span>
+io.<span class='field'>println</span>(<span class='string'>"Hello, "</span>..<span class='string'>"world! "</span>..<span class='constant'>69</span>) <span class='keyword'>fr</span>
+
+<span class='comment'># Output: 6</span>
+io.<span class='field'>println</span>(<span class='keyword'>thicc</span>(<span class='string'>"Hello!"</span>)) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<h3> Arrays</h3>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='comment'># Variables will be introduced later</span>
+<span class='keyword'>var</span> array = [<span class='constant'>69</span>, <span class='constant'>420</span>];
+
+<span class='comment'># Pretty printing by default!</span>
+io.<span class='field'>println</span>(array);      <span class='comment'># Output: [69, 420]</span>
+
+<span class='comment'># Array access</span>
+io.<span class='field'>println</span>(array[<span class='constant'>0</span>]);   <span class='comment'># Output: 69</span>
+
+<span class='comment'># Array access out of bounds is an error</span>
+io.<span class='field'>println</span>(array[<span class='constant'>2</span>]);   <span class='comment'># Error!</span>
+
+<span class='comment'># Array assignment</span>
+array[<span class='constant'>1</span>] = <span class='string'>"nice!"</span>;
+io.<span class='field'>println</span>(array);      <span class='comment'># Output: [69, "nice!"]</span>
+
+<span class='comment'># Array assignment out of bounds is NOT an error</span>
+array[<span class='constant'>3</span>] = <span class='string'>"Are you serious?"</span>;
+io.<span class='field'>println</span>(array);      <span class='comment'># Output: [69, "nice!", nil, "Are you serious?"]</span>
+
+<span class='comment'># Array length</span>
+io.<span class='field'>println</span>(<span class='keyword'>len</span>(array)); <span class='comment'># Output: 4</span>
+
+<span class='comment'># Due to the assignment semantics, appending to arrays is quite easy</span>
+array[<span class='keyword'>len</span>(array)] = <span class='constant'>420</span>;
+io.<span class='field'>println</span>(array);      <span class='comment'># Output: [69, "nice!", nil, "Are you serious?", 420]</span>
+</pre>
+<pre class='code'>
+<span class='comment'># Variables will be introduced later</span>
+<span class='keyword'>mf</span> array <span class='keyword'>be</span> [<span class='constant'>69</span>, <span class='constant'>420</span>] <span class='keyword'>fr</span>
+
+<span class='comment'># Pretty printing by default!</span>
+io.<span class='field'>println</span>(array) <span class='keyword'>fr</span>        <span class='comment'># Output: [69, 420]</span>
+
+<span class='comment'># Array access</span>
+io.<span class='field'>println</span>(array[<span class='constant'>0</span>]) <span class='keyword'>fr</span>     <span class='comment'># Output: 69</span>
+
+<span class='comment'># Array access out of bounds is an error</span>
+io.<span class='field'>println</span>(array[<span class='constant'>2</span>]) <span class='keyword'>fr</span>     <span class='comment'># Error!</span>
+
+<span class='comment'># Array assignment</span>
+array[<span class='constant'>1</span>] <span class='keyword'>be</span> <span class='string'>"nice!"</span> <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(array) <span class='keyword'>fr</span>        <span class='comment'># Output: [69, "nice!"]</span>
+
+<span class='comment'># Array assignment out of bounds is NOT an error</span>
+array[<span class='constant'>3</span>] <span class='keyword'>be</span> <span class='string'>"Are you serious?"</span> <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(array) <span class='keyword'>fr</span>        <span class='comment'># Output: [69, "nice!", bruh, "Are you serious?"]</span>
+
+<span class='comment'># Array length</span>
+io.<span class='field'>println</span>(<span class='keyword'>thicc</span>(array)) <span class='keyword'>fr</span> <span class='comment'># Output: 4</span>
+
+<span class='comment'># Due to the assignment semantics, appending to arrays is quite easy</span>
+array[<span class='keyword'>thicc</span>(array)] <span class='keyword'>be</span> <span class='constant'>420</span> <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(array) <span class='keyword'>fr</span>        <span class='comment'># Output: [69, "nice!", bruh, "Are you serious?", 420]</span>
+</pre>
+</div>
+</div>
+</body>
+</html>

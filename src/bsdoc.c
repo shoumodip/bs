@@ -12,6 +12,7 @@ static void bsdoc_writer(Bs_Writer *w, Bs_Sv sv) {
 typedef enum {
     BSDOC_STYLE_NONE,
     BSDOC_STYLE_FIELD,
+    BSDOC_STYLE_ESCAPE,
     BSDOC_STYLE_STRING,
     BSDOC_STYLE_COMMENT,
     BSDOC_STYLE_KEYWORD,
@@ -71,6 +72,10 @@ static void bsdoc_print_styled_sv(FILE *f, Bsdoc_Style style, Bs_Sv sv) {
         fprintf(f, "<span class='field'>");
         break;
 
+    case BSDOC_STYLE_ESCAPE:
+        fprintf(f, "<span class='escape'>");
+        break;
+
     case BSDOC_STYLE_STRING:
         fprintf(f, "<span class='string'>");
         break;
@@ -100,7 +105,9 @@ static void bsdoc_print_styled_sv(FILE *f, Bsdoc_Style style, Bs_Sv sv) {
 }
 
 static void bsdoc_print_token(FILE *f, Bs_Token token, Bsdoc_Style style, const char **last) {
-    if (token.type == BS_TOKEN_STR || token.type == BS_TOKEN_ISTR) {
+    const bool string = token.type == BS_TOKEN_STR || token.type == BS_TOKEN_ISTR;
+    bool interpolation = false;
+    if (string) {
         if (token.sv.data[-1] == '"') {
             token.sv.data--;
             token.sv.size++;
@@ -108,13 +115,32 @@ static void bsdoc_print_token(FILE *f, Bs_Token token, Bsdoc_Style style, const 
 
         if (token.sv.data[token.sv.size] == '"') {
             token.sv.size++;
+        } else if (token.sv.data[token.sv.size] == '\\') {
+            interpolation = true;
         }
     }
 
     fwrite(*last, token.sv.data - *last, 1, f);
-    bsdoc_print_styled_sv(f, style, token.sv);
-
     *last = token.sv.data + token.sv.size;
+
+    if (string) {
+        while (token.sv.size) {
+            size_t index;
+            if (bs_sv_find(token.sv, '\\', &index)) {
+                bsdoc_print_styled_sv(f, style, bs_sv_drop(&token.sv, index));
+                bsdoc_print_styled_sv(f, BSDOC_STYLE_ESCAPE, bs_sv_drop(&token.sv, 2));
+            } else {
+                bsdoc_print_styled_sv(f, style, bs_sv_drop(&token.sv, token.sv.size));
+            }
+        }
+    } else {
+        bsdoc_print_styled_sv(f, style, token.sv);
+    }
+
+    if (interpolation) {
+        bsdoc_print_styled_sv(f, BSDOC_STYLE_ESCAPE, Bs_Sv_Static("\\"));
+        (*last)++;
+    }
 }
 
 typedef struct {
@@ -156,22 +182,27 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
         } else {
             style = bsdoc_token_type_style(token.type, extended);
         }
-        bsdoc_print_token(f, token, style, &last);
 
         switch (token.type) {
         case BS_TOKEN_ISTR:
+            bsdoc_print_token(f, token, style, &last);
+
             token = bs_lexer_expect(&lexer, BS_TOKEN_LPAREN);
-            bsdoc_print_token(f, token, bsdoc_token_type_style(token.type, extended), &last);
+            bsdoc_print_token(f, token, BSDOC_STYLE_ESCAPE, &last);
+
             bsdoc_parens_push(&parens, true);
             break;
 
         case BS_TOKEN_LPAREN:
+            bsdoc_print_token(f, token, style, &last);
             bsdoc_parens_push(&parens, false);
             break;
 
         case BS_TOKEN_RPAREN:
             assert(parens.count);
             if (parens.data[--parens.count]) {
+                bsdoc_print_token(f, token, BSDOC_STYLE_ESCAPE, &last);
+
                 token = bs_lexer_str(&lexer, lexer.loc);
                 bsdoc_print_token(f, token, bsdoc_token_type_style(token.type, extended), &last);
 
@@ -181,18 +212,23 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
                         f, token, bsdoc_token_type_style(token.type, extended), &last);
                     bsdoc_parens_push(&parens, true);
                 }
+            } else {
+                bsdoc_print_token(f, token, style, &last);
             }
             break;
 
         case BS_TOKEN_FN:
+            bsdoc_print_token(f, token, style, &last);
             next = BSDOC_STYLE_FUNCTION;
             break;
 
         case BS_TOKEN_DOT:
+            bsdoc_print_token(f, token, style, &last);
             next = BSDOC_STYLE_FIELD;
             break;
 
         default:
+            bsdoc_print_token(f, token, style, &last);
             break;
         }
     }
@@ -369,9 +405,9 @@ int main(int argc, char **argv) {
         }
 
         if (bs_sv_eq(line, Bs_Sv_Static("```console"))) {
-            fprintf(f, "<div class='codes'>\n");
+            fprintf(f, "<div class='codes shell'>\n");
             bsdoc_print_copy(f, "copyClickShell");
-            fprintf(f, "<pre class='code active'>\n");
+            fprintf(f, "<pre class='code active shell'>\n");
 
             while (sv.size) {
                 row++;
