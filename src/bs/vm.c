@@ -67,6 +67,12 @@ typedef struct {
     size_t count;
 } Bs_Stack;
 
+typedef struct {
+    Bs_Object **data;
+    size_t count;
+    size_t capacity;
+} Bs_Grays;
+
 struct Bs {
     Bs_Stack stack;
 
@@ -83,6 +89,8 @@ struct Bs {
     bool gc_on;
     size_t gc_max;
     size_t gc_bytes;
+
+    Bs_Grays grays;
     Bs_Object *objects;
 
     Bs_Buffer paths;
@@ -185,11 +193,30 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
     if (!object || object->marked) {
         return;
     }
-    object->marked = true;
 
 #ifdef BS_GC_DEBUG_LOG
     Bs_Writer *w = bs_stdout_get(bs);
     bs_fmt(w, "[GC] Mark %p ", object);
+    bs_value_write(bs, w, bs_value_object(object));
+    bs_fmt(w, "\n");
+#endif // BS_GC_DEBUG_LOG
+
+    object->marked = true;
+
+    if (bs->grays.count >= bs->grays.capacity) {
+        bs->grays.capacity = bs->grays.capacity ? bs->grays.capacity * 2 : BS_DA_INIT_CAP;
+        bs->grays.data = realloc(bs->grays.data, bs->grays.capacity * sizeof(Bs_Object *));
+        assert(bs->grays.data);
+    }
+
+    bs->grays.data[bs->grays.count++] = object;
+}
+
+static_assert(BS_COUNT_OBJECTS == 9, "Update bs_blacken_object()");
+static void bs_blacken_object(Bs *bs, Bs_Object *object) {
+#ifdef BS_GC_DEBUG_LOG
+    Bs_Writer *w = bs_stdout_get(bs);
+    bs_fmt(w, "[GC] Blacken %p ", object);
     bs_value_write(bs, w, bs_value_object(object));
     bs_fmt(w, "\n");
 #endif // BS_GC_DEBUG_LOG
@@ -205,6 +232,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
     } break;
 
     case BS_OBJECT_STR:
+    case BS_OBJECT_C_DATA:
         break;
 
     case BS_OBJECT_ARRAY: {
@@ -228,12 +256,9 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
         }
     } break;
 
-    case BS_OBJECT_UPVALUE: {
-        Bs_Upvalue *upvalue = (Bs_Upvalue *)object;
-        if (upvalue->value->type == BS_VALUE_OBJECT) {
-            bs_mark_object(bs, upvalue->value->as.object);
-        }
-    } break;
+    case BS_OBJECT_UPVALUE:
+        bs_mark_value(bs, ((Bs_Upvalue *)object)->closed);
+        break;
 
     case BS_OBJECT_C_FN:
         bs_mark_object(bs, (Bs_Object *)((Bs_C_Fn *)object)->library);
@@ -246,9 +271,6 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
         library->functions.meta.marked = false;
         bs_mark_object(bs, (Bs_Object *)&library->functions);
     } break;
-
-    case BS_OBJECT_C_DATA:
-        break;
 
     default:
         assert(false && "unreachable");
@@ -288,7 +310,20 @@ static void bs_collect(Bs *bs) {
 
     bs_mark_map(bs, &bs->globals);
 
+    // Trace
+    while (bs->grays.count) {
+        Bs_Object *object = bs->grays.data[--bs->grays.count];
+        bs_blacken_object(bs, object);
+    }
+
     // Sweep
+    for (size_t i = 0; i < bs->strings.capacity; i++) {
+        Bs_Entry *entry = &bs->strings.data[i];
+        if (entry->key.type != BS_VALUE_NIL && !entry->key.as.object->marked) {
+            bs_map_remove(bs, &bs->strings, entry->key);
+        }
+    }
+
     Bs_Object *previous = NULL;
     Bs_Object *object = bs->objects;
 
@@ -367,6 +402,7 @@ void bs_free(Bs *bs) {
         bs_free_object(bs, object);
         object = next;
     }
+    free(bs->grays.data);
 
     bs_buffer_free(bs, &bs->paths);
     bs_buffer_free(bs, &bs->buffer);
@@ -498,8 +534,13 @@ Bs_Str *bs_str_new(Bs *bs, Bs_Sv sv) {
     str->hash = hash;
     memcpy(str->data, sv.data, sv.size);
 
+    const bool gc_on_save = bs->gc_on;
+    bs->gc_on = false;
+
     // Intern it
     bs_map_set(bs, &bs->strings, bs_value_object(str), bs_value_nil);
+
+    bs->gc_on = gc_on_save;
     return str;
 }
 
@@ -1015,7 +1056,6 @@ static void bs_import(Bs *bs) {
         }
 
         bs_stack_push(bs, m->result);
-
         bs->gc_on = gc_on_save;
         return;
     }
@@ -1451,23 +1491,19 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         } break;
 
         case BS_OP_JOIN: {
-            const bool gc_on_save = bs->gc_on;
-            bs->gc_on = false;
-
             Bs_Buffer *buffer = bs_buffer_get(bs);
             const size_t start = buffer->count;
 
-            const Bs_Value b = bs_stack_pop(bs);
-            const Bs_Value a = bs_stack_pop(bs);
+            const Bs_Value b = bs_stack_peek(bs, 0);
+            const Bs_Value a = bs_stack_peek(bs, 1);
 
             Bs_Writer w = bs_buffer_writer(buffer);
             bs_value_write(bs, &w, a);
             bs_value_write(bs, &w, b);
 
             const Bs_Sv sv = bs_buffer_reset(buffer, start);
-            bs_stack_push(bs, bs_value_object(bs_str_new(bs, sv)));
-
-            bs->gc_on = gc_on_save;
+            bs_stack_set(bs, 1, bs_value_object(bs_str_new(bs, sv)));
+            bs->stack.count--;
         } break;
 
         case BS_OP_IMPORT:

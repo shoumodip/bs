@@ -119,8 +119,9 @@ Bs_Closure *bs_closure_new(Bs *bs, const Bs_Fn *fn) {
 
 Bs_Upvalue *bs_upvalue_new(Bs *bs, Bs_Value *value) {
     Bs_Upvalue *upvalue = (Bs_Upvalue *)bs_object_new(bs, BS_OBJECT_UPVALUE, sizeof(Bs_Upvalue));
-    upvalue->value = value;
     upvalue->next = NULL;
+    upvalue->value = value;
+    upvalue->closed = bs_value_nil;
     return upvalue;
 }
 
