@@ -168,16 +168,16 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
 
 static void bs_mark_object(Bs *bs, Bs_Object *object);
 
+static void bs_mark_value(Bs *bs, Bs_Value value) {
+    if (value.type == BS_VALUE_OBJECT) {
+        bs_mark_object(bs, value.as.object);
+    }
+}
+
 static void bs_mark_map(Bs *bs, Bs_Map *map) {
     for (size_t i = 0; i < map->capacity; i++) {
-        Bs_Entry *entry = &map->data[i];
-        if (entry->key.type == BS_VALUE_OBJECT) {
-            bs_mark_object(bs, entry->key.as.object);
-        }
-
-        if (entry->value.type == BS_VALUE_OBJECT) {
-            bs_mark_object(bs, entry->value.as.object);
-        }
+        bs_mark_value(bs, map->data[i].key);
+        bs_mark_value(bs, map->data[i].value);
     }
 }
 
@@ -201,10 +201,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
         bs_mark_object(bs, (Bs_Object *)fn->name);
 
         for (size_t i = 0; i < fn->chunk.constants.count; i++) {
-            const Bs_Value value = fn->chunk.constants.data[i];
-            if (value.type == BS_VALUE_OBJECT) {
-                bs_mark_object(bs, value.as.object);
-            }
+            bs_mark_value(bs, fn->chunk.constants.data[i]);
         }
     } break;
 
@@ -214,10 +211,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
     case BS_OBJECT_ARRAY: {
         Bs_Array *array = (Bs_Array *)object;
         for (size_t i = 0; i < array->count; i++) {
-            const Bs_Value value = array->data[i];
-            if (value.type == BS_VALUE_OBJECT) {
-                bs_mark_object(bs, value.as.object);
-            }
+            bs_mark_value(bs, array->data[i]);
         }
     } break;
 
@@ -274,10 +268,7 @@ static void bs_collect(Bs *bs) {
 
     // Mark
     for (size_t i = 0; i < bs->stack.count; i++) {
-        const Bs_Value value = bs->stack.data[i];
-        if (value.type == BS_VALUE_OBJECT) {
-            bs_mark_object(bs, value.as.object);
-        }
+        bs_mark_value(bs, bs->stack.data[i]);
     }
 
     for (size_t i = 0; i < bs->frames.count; i++) {
@@ -288,11 +279,8 @@ static void bs_collect(Bs *bs) {
 
     for (size_t i = 0; i < bs->modules.count; i++) {
         Bs_Module *m = &bs->modules.data[i];
-
         bs_mark_object(bs, (Bs_Object *)m->name);
-        if (m->result.type == BS_VALUE_OBJECT) {
-            bs_mark_object(bs, (Bs_Object *)m->result.as.object);
-        }
+        bs_mark_value(bs, m->result);
     }
 
     for (Bs_Upvalue *upvalue = bs->upvalues; upvalue; upvalue = upvalue->next) {
