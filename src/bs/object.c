@@ -137,9 +137,7 @@ Bs_C_Lib *bs_c_lib_new(Bs *bs, void *data, const Bs_Str *path) {
     Bs_C_Lib *c = (Bs_C_Lib *)bs_object_new(bs, BS_OBJECT_C_LIB, sizeof(Bs_C_Lib));
     c->data = data;
     c->path = path;
-
     memset(&c->functions, 0, sizeof(c->functions));
-    c->functions.meta.type = BS_OBJECT_TABLE;
     return c;
 }
 

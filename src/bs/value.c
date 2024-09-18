@@ -10,6 +10,7 @@ static_assert(BS_COUNT_OBJECTS == 9, "Update bs_object_type_name()");
 const char *bs_object_type_name(Bs_Object_Type type) {
     switch (type) {
     case BS_OBJECT_FN:
+    case BS_OBJECT_CLOSURE:
         return "function";
 
     case BS_OBJECT_STR:
@@ -20,10 +21,6 @@ const char *bs_object_type_name(Bs_Object_Type type) {
 
     case BS_OBJECT_TABLE:
         return "table";
-
-    case BS_OBJECT_CLOSURE:
-        // In the POV of the user, a closure *is* a function
-        return "function";
 
     case BS_OBJECT_UPVALUE:
         return "upvalue";

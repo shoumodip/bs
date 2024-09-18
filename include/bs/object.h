@@ -132,7 +132,7 @@ struct Bs_C_Lib {
     void *data;
     const Bs_Str *path;
 
-    Bs_Table functions;
+    Bs_Map functions;
 };
 
 Bs_C_Lib *bs_c_lib_new(Bs *bs, void *data, const Bs_Str *path);

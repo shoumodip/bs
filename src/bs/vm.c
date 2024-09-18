@@ -153,7 +153,7 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
 
     case BS_OBJECT_C_LIB: {
         Bs_C_Lib *library = (Bs_C_Lib *)object;
-        bs_table_free(bs, &library->functions);
+        bs_map_free(bs, &library->functions);
 
         dlclose(library->data);
         bs_realloc(bs, library, sizeof(*library), 0);
@@ -267,9 +267,7 @@ static void bs_blacken_object(Bs *bs, Bs_Object *object) {
     case BS_OBJECT_C_LIB: {
         Bs_C_Lib *library = ((Bs_C_Lib *)object);
         bs_mark_object(bs, (Bs_Object *)library->path);
-
-        library->functions.meta.marked = false;
-        bs_mark_object(bs, (Bs_Object *)&library->functions);
+        bs_mark_map(bs, &library->functions);
     } break;
 
     default:
@@ -1117,7 +1115,7 @@ static void bs_import(Bs *bs) {
             Bs_C_Fn *fn = bs_c_fn_new(bs, export.name, export.fn);
             fn->library = library;
 
-            if (!bs_table_set(
+            if (!bs_map_set(
                     bs,
                     &library->functions,
                     bs_value_object(bs_str_new(bs, bs_sv_from_cstr(export.name))),
@@ -1618,7 +1616,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 }
 
                 Bs_C_Lib *c = (Bs_C_Lib *)container.as.object;
-                if (!bs_table_get(bs, &c->functions, index, &value)) {
+                if (!bs_map_get(bs, &c->functions, index, &value)) {
                     bs_error(
                         bs,
                         "symbol '" Bs_Sv_Fmt "' doesn't exist in native library '" Bs_Sv_Fmt "'",
