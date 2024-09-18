@@ -3,7 +3,7 @@
 
 #include <stdarg.h>
 #include <stdbool.h>
-#include <stddef.h>
+#include <stdio.h>
 
 // String View
 typedef struct {
@@ -32,6 +32,8 @@ struct Bs_Writer {
     void *data;
     void (*write)(Bs_Writer *writer, Bs_Sv sv);
 };
+
+Bs_Writer bs_file_writer(FILE *file);
 
 void bs_fmt(Bs_Writer *writer, const char *fmt, ...) __attribute__((__format__(__printf__, 2, 3)));
 

@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -51,6 +50,14 @@ bool bs_sv_prefix(Bs_Sv a, Bs_Sv b) {
 
 bool bs_sv_suffix(Bs_Sv a, Bs_Sv b) {
     return a.size >= b.size && !memcmp(a.data + a.size - b.size, b.data, b.size);
+}
+
+static void bs_file_write(Bs_Writer *w, Bs_Sv sv) {
+    fwrite(sv.data, sv.size, 1, w->data);
+}
+
+Bs_Writer bs_file_writer(FILE *f) {
+    return (Bs_Writer){.data = f, .write = bs_file_write};
 }
 
 void bs_fmt(Bs_Writer *w, const char *fmt, ...) {

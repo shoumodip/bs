@@ -14,35 +14,41 @@ typedef struct Bs Bs;
 Bs *bs_new(bool step);
 void bs_free(Bs *bs);
 void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size);
-bool bs_update_cwd(Bs *bs);
 
-// Helpers
-typedef struct Bs_Buffer Bs_Buffer;
-
-void bs_file_write(Bs_Writer *w, Bs_Sv sv);
-void bs_buffer_write(Bs_Writer *writer, Bs_Sv sv);
-Bs_Sv bs_buffer_reset(Bs_Buffer *buffer, size_t pos);
-
-Bs_Writer bs_file_writer(FILE *file);
-Bs_Writer bs_buffer_writer(Bs_Buffer *buffer);
-
-Bs_Buffer *bs_paths_get(Bs *bs);
-Bs_Buffer *bs_buffer_get(Bs *bs);
-
-Bs_Writer *bs_stdout_get(Bs *bs);
-void bs_stdout_set(Bs *bs, Bs_Writer writer);
-
-Bs_Writer *bs_stderr_get(Bs *bs);
-void bs_stderr_set(Bs *bs, Bs_Writer writer);
-
-void *bs_userdata_get(Bs *bs);
-void bs_userdata_set(Bs *bs, void *data);
-
-Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size);
 Bs_Str *bs_str_new(Bs *bs, Bs_Sv sv);
+Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size);
+
+bool bs_update_cwd(Bs *bs);
 void bs_global_set(Bs *bs, Bs_Sv name, Bs_Value value);
 
 void bs_value_write(Bs *bs, Bs_Writer *writer, Bs_Value value);
+
+// Buffer
+typedef struct {
+    Bs *bs;
+    char *data;
+    size_t count;
+    size_t capacity;
+} Bs_Buffer;
+
+Bs_Writer bs_buffer_writer(Bs_Buffer *buffer);
+
+Bs_Sv bs_buffer_reset(Bs_Buffer *buffer, size_t pos);
+Bs_Sv bs_buffer_absolute_path(Bs_Buffer *buffer, Bs_Sv path);
+Bs_Sv bs_buffer_relative_path(Bs_Buffer *buffer, Bs_Sv path);
+
+// Context
+typedef struct {
+    void *userdata;
+
+    Bs_Writer error;
+    Bs_Writer output;
+    Bs_Buffer buffer;
+
+    Bs_Pretty_Printer printer;
+} Bs_Context;
+
+Bs_Context *bs_context(Bs *bs);
 
 // FFI
 typedef Bs_Value (*Bs_C_Fn_Ptr)(Bs *bs, Bs_Value *args, size_t arity);
@@ -71,10 +77,6 @@ void bs_check_object_c_type(Bs *bs, Bs_Value value, const Bs_C_Data_Spec *spec, 
 
 void bs_check_integer(Bs *bs, Bs_Value value, const char *label);
 void bs_check_whole_number(Bs *bs, Bs_Value value, const char *label);
-
-// Paths
-Bs_Sv bs_buffer_absolute_path(Bs_Buffer *b, Bs_Sv path);
-Bs_Sv bs_buffer_relative_path(Bs_Buffer *b, Bs_Sv path);
 
 // Interpreter
 typedef struct {
@@ -139,16 +141,5 @@ Bs_Value bs_call(Bs *bs, Bs_Value fn, const Bs_Value *args, size_t arity);
             (l)->count += (c);                                                                     \
         }                                                                                          \
     } while (0)
-
-// Buffer
-struct Bs_Buffer {
-    Bs *bs;
-    char *data;
-    size_t count;
-    size_t capacity;
-};
-
-#define bs_buffer_free bs_da_free
-#define bs_buffer_push bs_da_push
 
 #endif // BS_VM_H

@@ -30,12 +30,12 @@ static Bs_Value bs_io_open(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
     bs_check_value_type(bs, args[1], BS_VALUE_BOOL, "argument #2");
 
-    Bs_Buffer *b = bs_buffer_get(bs);
+    Bs_Buffer *b = &bs_context(bs)->buffer;
     const size_t start = b->count;
 
     Bs_Writer w = bs_buffer_writer(b);
     bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
-    bs_buffer_push(b->bs, b, '\0');
+    bs_da_push(b->bs, b, '\0');
 
     const bool write = args[1].as.boolean;
     FILE *file = fopen(bs_buffer_reset(b, start).data, write ? "w" : "r");
@@ -148,7 +148,7 @@ static Bs_Value bs_io_write(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_io_print(Bs *bs, Bs_Value *args, size_t arity) {
-    Bs_Writer *w = bs_stdout_get(bs);
+    Bs_Writer *w = &bs_context(bs)->output;
     for (size_t i = 0; i < arity; i++) {
         if (i) {
             bs_fmt(w, " ");
@@ -159,7 +159,7 @@ static Bs_Value bs_io_print(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_io_eprint(Bs *bs, Bs_Value *args, size_t arity) {
-    Bs_Writer *w = bs_stderr_get(bs);
+    Bs_Writer *w = &bs_context(bs)->error;
     for (size_t i = 0; i < arity; i++) {
         if (i) {
             bs_fmt(w, " ");
@@ -195,7 +195,7 @@ static Bs_Value bs_io_writeln(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_io_println(Bs *bs, Bs_Value *args, size_t arity) {
-    Bs_Writer *w = bs_stdout_get(bs);
+    Bs_Writer *w = &bs_context(bs)->output;
     for (size_t i = 0; i < arity; i++) {
         if (i) {
             bs_fmt(w, " ");
@@ -207,7 +207,7 @@ static Bs_Value bs_io_println(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_io_eprintln(Bs *bs, Bs_Value *args, size_t arity) {
-    Bs_Writer *w = bs_stderr_get(bs);
+    Bs_Writer *w = &bs_context(bs)->error;
     for (size_t i = 0; i < arity; i++) {
         if (i) {
             bs_fmt(w, " ");
@@ -264,12 +264,12 @@ static Bs_Value bs_os_getenv(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
 
     {
-        Bs_Buffer *b = bs_buffer_get(bs);
+        Bs_Buffer *b = &bs_context(bs)->buffer;
         const size_t start = b->count;
 
         Bs_Writer w = bs_buffer_writer(b);
         bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
-        bs_buffer_push(b->bs, b, '\0');
+        bs_da_push(b->bs, b, '\0');
 
         const char *key = bs_buffer_reset(b, start).data;
         const char *value = getenv(key);
@@ -290,18 +290,18 @@ static Bs_Value bs_os_setenv(Bs *bs, Bs_Value *args, size_t arity) {
     const char *key;
     const char *value;
     {
-        Bs_Buffer *b = bs_buffer_get(bs);
+        Bs_Buffer *b = &bs_context(bs)->buffer;
         const size_t start = b->count;
 
         Bs_Writer w = bs_buffer_writer(b);
 
         const size_t key_pos = b->count;
         bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
-        bs_buffer_push(b->bs, b, '\0');
+        bs_da_push(b->bs, b, '\0');
 
         const size_t value_pos = b->count;
         bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[1].as.object));
-        bs_buffer_push(b->bs, b, '\0');
+        bs_da_push(b->bs, b, '\0');
 
         key = b->data + key_pos;
         value = b->data + value_pos;
@@ -375,7 +375,7 @@ static Bs_Value bs_process_spawn(Bs *bs, Bs_Value *args, size_t arity) {
     }
 
     if (pid == 0) {
-        Bs_Buffer *b = bs_buffer_get(bs);
+        Bs_Buffer *b = &bs_context(bs)->buffer;
         const size_t start = b->count;
 
         char **cargv = malloc((array->count + 1) * sizeof(char *));
@@ -507,7 +507,7 @@ static Bs_Value bs_str_tonumber(Bs *bs, Bs_Value *args, size_t arity) {
 
     const Bs_Str *src = (const Bs_Str *)args[0].as.object;
 
-    Bs_Buffer *b = bs_buffer_get(bs);
+    Bs_Buffer *b = &bs_context(bs)->buffer;
     const size_t start = b->count;
 
     bs_da_push_many(b->bs, b, src->data, src->size);
@@ -611,7 +611,7 @@ static Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_object(str);
     }
 
-    Bs_Buffer *b = bs_buffer_get(bs);
+    Bs_Buffer *b = &bs_context(bs)->buffer;
     const size_t start = b->count;
 
     const Bs_Sv pattern_sv = Bs_Sv(pattern->data, pattern->size);
@@ -730,7 +730,7 @@ static Bs_Value bs_str_lpad(Bs *bs, Bs_Value *args, size_t arity) {
     }
     const size_t padding = count - str->size;
 
-    Bs_Buffer *b = bs_buffer_get(bs);
+    Bs_Buffer *b = &bs_context(bs)->buffer;
     const size_t start = b->count;
 
     for (size_t i = 0; i < padding; i += pattern->size) {
@@ -762,7 +762,7 @@ static Bs_Value bs_str_rpad(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_object(str);
     }
 
-    Bs_Buffer *b = bs_buffer_get(bs);
+    Bs_Buffer *b = &bs_context(bs)->buffer;
     const size_t start = b->count;
 
     bs_da_push_many(bs, b, str->data, str->size);
@@ -926,7 +926,7 @@ static Bs_Value bs_regex_find(Bs *bs, Bs_Value *args, size_t arity) {
         bs_error(bs, "cannot take offset of %zu in string of length %zu", offset, str->size);
     }
 
-    Bs_Buffer *b = bs_buffer_get(bs);
+    Bs_Buffer *b = &bs_context(bs)->buffer;
     const size_t start = b->count;
 
     const size_t str_pos = b->count;
@@ -967,7 +967,7 @@ static Bs_Value bs_regex_split(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_object(a);
     }
 
-    Bs_Buffer *b = bs_buffer_get(bs);
+    Bs_Buffer *b = &bs_context(bs)->buffer;
     const size_t start = b->count;
 
     const size_t str_pos = b->count;
@@ -1023,7 +1023,7 @@ static Bs_Value bs_regex_replace(Bs *bs, Bs_Value *args, size_t arity) {
 
     const Bs_Str *replacement = (const Bs_Str *)args[2].as.object;
 
-    Bs_Buffer *b = bs_buffer_get(bs);
+    Bs_Buffer *b = &bs_context(bs)->buffer;
     const size_t start = b->count;
 
     const size_t str_pos = b->count;
@@ -1039,17 +1039,16 @@ static Bs_Value bs_regex_replace(Bs *bs, Bs_Value *args, size_t arity) {
         bs_error(bs, "could not compile regex pattern");
     }
 
-    Bs_Buffer *o = bs_paths_get(bs);
-    const size_t result_pos = o->count;
+    const size_t result_pos = b->count;
 
-    const char *cursor = b->data + str_pos;
+    size_t cursor = str_pos;
     regmatch_t matches[10];
-    while (!regexec(&regex, cursor, bs_c_array_size(matches), matches, 0)) {
+    while (!regexec(&regex, b->data + cursor, bs_c_array_size(matches), matches, 0)) {
         if (matches[0].rm_so == matches[0].rm_eo) {
             break;
         }
 
-        bs_da_push_many(bs, o, cursor, matches[0].rm_so);
+        bs_da_push_many(bs, b, b->data + cursor, matches[0].rm_so);
 
         for (size_t i = 0; i < replacement->size; i++) {
             if (replacement->data[i] == '\\' && isdigit(replacement->data[i + 1])) {
@@ -1057,22 +1056,23 @@ static Bs_Value bs_regex_replace(Bs *bs, Bs_Value *args, size_t arity) {
                 if (match_index < bs_c_array_size(matches) && matches[match_index].rm_so != -1) {
                     bs_da_push_many(
                         bs,
-                        o,
-                        cursor + matches[match_index].rm_so,
+                        b,
+                        b->data + cursor + matches[match_index].rm_so,
                         matches[match_index].rm_eo - matches[match_index].rm_so);
                 }
             } else {
-                bs_da_push(bs, o, replacement->data[i]);
+                bs_da_push(bs, b, replacement->data[i]);
             }
         }
 
         cursor += matches[0].rm_eo;
     }
-    bs_da_push_many(bs, o, cursor, strlen(cursor));
+    bs_da_push_many(bs, b, b->data + cursor, strlen(b->data + cursor));
 
+    const Bs_Str *result = bs_str_new(bs, bs_buffer_reset(b, result_pos));
     regfree(&regex);
     bs_buffer_reset(b, start);
-    return bs_value_object(bs_str_new(bs, bs_buffer_reset(o, result_pos)));
+    return bs_value_object(result);
 }
 
 // Array
@@ -1159,7 +1159,7 @@ static Bs_Value bs_array_join(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
     bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
 
-    Bs_Buffer *b = bs_buffer_get(bs);
+    Bs_Buffer *b = &bs_context(bs)->buffer;
     const size_t start = b->count;
     {
         Bs_Writer w = bs_buffer_writer(b);

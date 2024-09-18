@@ -74,18 +74,22 @@ typedef struct {
 } Bs_Grays;
 
 struct Bs {
+    // Stack
     Bs_Stack stack;
-
     Bs_Frame *frame;
     Bs_Frames frames;
 
+    // Filesystem
     Bs_Str *cwd;
+    Bs_Buffer paths;
     Bs_Modules modules;
 
+    // Roots
     Bs_Map globals;
     Bs_Map strings;
     Bs_Upvalue *upvalues;
 
+    // Garbage Collector
     bool gc_on;
     size_t gc_max;
     size_t gc_bytes;
@@ -93,26 +97,22 @@ struct Bs {
     Bs_Grays grays;
     Bs_Object *objects;
 
-    Bs_Buffer paths;
-    Bs_Buffer buffer;
+    Bs_Context context;
 
-    Bs_Writer error;
-    Bs_Writer output;
-    Bs_Pretty_Printer printer;
-
-    bool step;
-    void *userdata;
-
+    // Exit
     int exit;
     bool ok;
     jmp_buf unwind;
+
+    // Debug
+    bool step;
 };
 
 // Garbage collector
 static_assert(BS_COUNT_OBJECTS == 9, "Update bs_free_object()");
 static void bs_free_object(Bs *bs, Bs_Object *object) {
 #ifdef BS_GC_DEBUG_LOG
-    bs_fmt(bs_stdout_get(bs), "[GC] Free %p; Type: %d\n", object, object->type);
+    bs_fmt(&bs->context.output, "[GC] Free %p; Type: %d\n", object, object->type);
 #endif // BS_GC_DEBUG_LOG
 
     switch (object->type) {
@@ -195,7 +195,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
     }
 
 #ifdef BS_GC_DEBUG_LOG
-    Bs_Writer *w = bs_stdout_get(bs);
+    Bs_Writer *w = &bs->context.output;
     bs_fmt(w, "[GC] Mark %p ", object);
     bs_value_write(bs, w, bs_value_object(object));
     bs_fmt(w, "\n");
@@ -215,7 +215,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
 static_assert(BS_COUNT_OBJECTS == 9, "Update bs_blacken_object()");
 static void bs_blacken_object(Bs *bs, Bs_Object *object) {
 #ifdef BS_GC_DEBUG_LOG
-    Bs_Writer *w = bs_stdout_get(bs);
+    Bs_Writer *w = &bs->context.output;
     bs_fmt(w, "[GC] Blacken %p ", object);
     bs_value_write(bs, w, bs_value_object(object));
     bs_fmt(w, "\n");
@@ -280,7 +280,7 @@ static void bs_collect(Bs *bs) {
     bs->gc_on = false;
 
 #ifdef BS_GC_DEBUG_LOG
-    Bs_Writer *w = bs_stdout_get(bs);
+    Bs_Writer *w = &bs->context.output;
     bs_fmt(w, "\n-------- GC Begin --------\n");
     const size_t before = bs->gc_bytes;
 #endif // BS_GC_DEBUG_LOG
@@ -363,6 +363,11 @@ static void bs_collect(Bs *bs) {
 }
 
 // Interface
+static void bs_buffer_write(Bs_Writer *w, Bs_Sv sv) {
+    Bs_Buffer *b = w->data;
+    bs_da_push_many(b->bs, b, sv.data, sv.size);
+}
+
 Bs *bs_new(bool step) {
     Bs *bs = calloc(1, sizeof(Bs));
     assert(bs);
@@ -373,10 +378,10 @@ Bs *bs_new(bool step) {
     bs->gc_max = 1024 * 1024;
 
     bs->paths.bs = bs;
-    bs->buffer.bs = bs;
+    bs->context.buffer.bs = bs;
 
-    bs->error = (Bs_Writer){stderr, bs_file_write};
-    bs->output = (Bs_Writer){stdout, bs_file_write};
+    bs->context.error = bs_file_writer(stderr);
+    bs->context.output = bs_file_writer(stdout);
 
     bs_update_cwd(bs);
 
@@ -402,10 +407,10 @@ void bs_free(Bs *bs) {
     }
     free(bs->grays.data);
 
-    bs_buffer_free(bs, &bs->paths);
-    bs_buffer_free(bs, &bs->buffer);
+    bs_da_free(bs, &bs->paths);
+    bs_da_free(bs, &bs->context.buffer);
 
-    bs_pretty_printer_free(&bs->printer);
+    bs_pretty_printer_free(&bs->context.printer);
     free(bs);
 }
 
@@ -430,82 +435,6 @@ void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size) {
     return realloc(ptr, new_size);
 }
 
-bool bs_update_cwd(Bs *bs) {
-    Bs_Buffer *b = bs_paths_get(bs);
-    const size_t start = b->count;
-
-    bs_da_push_many(bs, b, NULL, BS_DA_INIT_CAP);
-    while (!getcwd(b->data + start, b->capacity - start)) {
-        if (errno != ERANGE) {
-            b->count = start;
-            return false;
-        }
-
-        b->count = b->capacity;
-        bs_da_push_many(bs, b, NULL, BS_DA_INIT_CAP);
-    }
-    bs->cwd = bs_str_new(bs, bs_sv_from_cstr(b->data + start));
-
-    b->count = start;
-    return true;
-}
-
-// Helpers
-void bs_file_write(Bs_Writer *w, Bs_Sv sv) {
-    fwrite(sv.data, sv.size, 1, w->data);
-}
-
-void bs_buffer_write(Bs_Writer *w, Bs_Sv sv) {
-    Bs_Buffer *b = w->data;
-    bs_da_push_many(b->bs, b, sv.data, sv.size);
-}
-
-Bs_Sv bs_buffer_reset(Bs_Buffer *b, size_t pos) {
-    const Bs_Sv sv = {b->data + pos, b->count - pos};
-    b->count = pos;
-    return sv;
-}
-
-Bs_Writer bs_file_writer(FILE *file) {
-    return (Bs_Writer){file, bs_file_write};
-}
-
-Bs_Writer bs_buffer_writer(Bs_Buffer *buffer) {
-    return (Bs_Writer){buffer, bs_buffer_write};
-}
-
-Bs_Buffer *bs_paths_get(Bs *bs) {
-    return &bs->paths;
-}
-
-Bs_Buffer *bs_buffer_get(Bs *bs) {
-    return &bs->buffer;
-}
-
-Bs_Writer *bs_stdout_get(Bs *bs) {
-    return &bs->output;
-}
-
-void bs_stdout_set(Bs *bs, Bs_Writer writer) {
-    bs->output = writer;
-}
-
-Bs_Writer *bs_stderr_get(Bs *bs) {
-    return &bs->error;
-}
-
-void bs_stderr_set(Bs *bs, Bs_Writer writer) {
-    bs->error = writer;
-}
-
-void *bs_userdata_get(Bs *bs) {
-    return bs->userdata;
-}
-
-void bs_userdata_set(Bs *bs, void *data) {
-    bs->userdata = data;
-}
-
 Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size) {
     Bs_Object *object = bs_realloc(bs, NULL, 0, size);
     object->type = type;
@@ -514,7 +443,7 @@ Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size) {
     bs->objects = object;
 
 #ifdef BS_GC_DEBUG_LOG
-    bs_fmt(bs_stdout_get(bs), "[GC] Allocate %p (%zu bytes); Type: %d\n", object, size, type);
+    bs_fmt(&bs->context.output, "[GC] Allocate %p (%zu bytes); Type: %d\n", object, size, type);
 #endif // BS_GC_DEBUG_LOG
 
     return object;
@@ -546,16 +475,148 @@ void bs_global_set(Bs *bs, Bs_Sv name, Bs_Value value) {
     bs_map_set(bs, &bs->globals, bs_value_object(bs_str_new(bs, name)), value);
 }
 
+bool bs_update_cwd(Bs *bs) {
+    Bs_Buffer *b = &bs->paths;
+    const size_t start = b->count;
+
+    bs_da_push_many(bs, b, NULL, BS_DA_INIT_CAP);
+    while (!getcwd(b->data + start, b->capacity - start)) {
+        if (errno != ERANGE) {
+            b->count = start;
+            return false;
+        }
+
+        b->count = b->capacity;
+        bs_da_push_many(bs, b, NULL, BS_DA_INIT_CAP);
+    }
+    bs->cwd = bs_str_new(bs, bs_sv_from_cstr(b->data + start));
+
+    b->count = start;
+    return true;
+}
+
 static Bs_Pretty_Printer *bs_pretty_printer(Bs *bs, Bs_Writer *w) {
-    bs->printer.writer = w;
-    bs->printer.extended = bs->frame ? bs->frame->extended : false;
-    bs->printer.depth = 0;
-    bs->printer.count = 0;
-    return &bs->printer;
+    bs->context.printer.writer = w;
+    bs->context.printer.extended = bs->frame ? bs->frame->extended : false;
+    bs->context.printer.depth = 0;
+    bs->context.printer.count = 0;
+    return &bs->context.printer;
 }
 
 void bs_value_write(Bs *bs, Bs_Writer *w, Bs_Value value) {
     bs_value_print_impl(bs_pretty_printer(bs, w), value);
+}
+
+// Buffer
+Bs_Writer bs_buffer_writer(Bs_Buffer *b) {
+    return (Bs_Writer){.data = b, .write = bs_buffer_write};
+}
+
+Bs_Sv bs_buffer_reset(Bs_Buffer *b, size_t pos) {
+    assert(pos <= b->count);
+    const Bs_Sv sv = {b->data + pos, b->count - pos};
+    b->count = pos;
+    return sv;
+}
+
+Bs_Sv bs_buffer_absolute_path(Bs_Buffer *b, Bs_Sv path) {
+    const size_t start = b->count;
+
+    if (path.size && *path.data != '/') {
+        bs_da_push_many(b->bs, b, b->bs->cwd->data, b->bs->cwd->size);
+        if (b->count != start + 1) {
+            bs_da_push(b->bs, b, '/');
+        }
+    }
+
+    bs_da_push_many(b->bs, b, path.data, path.size);
+    bs_da_push(b->bs, b, '\0');
+
+    const char *p = b->data + start;
+    char *r = b->data + start;
+
+    while (*p) {
+        // Skip consecutive slashes
+        while (*p == '/' && p[1] == '/') {
+            p++;
+        }
+
+        // Handle ./
+        if (*p == '.' && (p[1] == '/' || p[1] == '\0')) {
+            p++;
+            if (*p == '/') {
+                p++;
+            }
+            continue;
+        }
+
+        // Handle ../
+        if (*p == '.' && p[1] == '.' && (p[2] == '/' || p[2] == '\0')) {
+            p += 2;
+            if (*p == '/') {
+                p++;
+            }
+
+            if (r != b->data + start + 1) {
+                r--;
+                while (r != b->data + start && r[-1] != '/') {
+                    r--;
+                }
+            }
+            continue;
+        }
+
+        // Normal
+        while (*p != '/' && *p != '\0') {
+            *r++ = *p++;
+        }
+
+        if (*p == '/') {
+            *r++ = *p++;
+        }
+    }
+
+    b->count = r - b->data;
+    return (Bs_Sv){b->data + start, b->count - start};
+}
+
+Bs_Sv bs_buffer_relative_path(Bs_Buffer *b, Bs_Sv path) {
+    const size_t start = b->count;
+
+    const Bs_Str *cwd = b->bs->cwd;
+    const size_t max = bs_min(path.size, cwd->size);
+
+    size_t i = 0;
+    while (i < max) {
+        if (path.data[i] != cwd->data[i]) {
+            break;
+        }
+
+        i++;
+    }
+
+    if (i != cwd->size || path.data[i] != '/') {
+        bs_da_push_many(b->bs, b, "../", 3);
+        for (size_t j = i; j < cwd->size; j++) {
+            if (cwd->data[j] == '/') {
+                bs_da_push_many(b->bs, b, "../", 3);
+            }
+        }
+
+        while (i && path.data[i - 1] != '/') {
+            i--;
+        }
+    } else {
+        i++;
+    }
+
+    bs_da_push_many(b->bs, b, path.data + i, path.size - i);
+    return Bs_Sv(b->data + start, b->count - start);
+}
+
+// Context
+Bs_Context *bs_context(Bs *bs) {
+    return &bs->context;
 }
 
 // Errors
@@ -574,8 +635,7 @@ void bs_error(Bs *bs, const char *fmt, ...) {
 
     bs->gc_on = false;
 
-    Bs_Writer *w = bs_stderr_get(bs);
-
+    Bs_Writer *w = &bs->context.error;
     if (bs->frame->ip) {
         const Bs_Loc loc = bs_chunk_get_loc(
             &bs->frame->closure->fn->chunk, bs->frame->ip - bs->frame->closure->fn->chunk.data);
@@ -586,7 +646,7 @@ void bs_error(Bs *bs, const char *fmt, ...) {
 
     bs_fmt(w, "error: ");
     {
-        Bs_Buffer *b = bs_buffer_get(bs);
+        Bs_Buffer *b = &bs->context.buffer;
         const size_t start = b->count;
 
         int count;
@@ -607,7 +667,7 @@ void bs_error(Bs *bs, const char *fmt, ...) {
         }
         b->count += count;
 
-        Bs_Writer *w = bs_stderr_get(bs);
+        Bs_Writer *w = &bs->context.error;
         w->write(w, bs_buffer_reset(b, start));
     }
 
@@ -740,7 +800,7 @@ void bs_check_whole_number(Bs *bs, Bs_Value value, const char *label) {
 // Interpreter
 static void bs_stack_push(Bs *bs, Bs_Value value) {
     if (bs->stack.count >= BS_STACK_CAPACITY) {
-        bs_fmt(bs_stderr_get(bs), "error: stack overflow\n");
+        bs_fmt(&bs->context.error, "error: stack overflow\n");
 
         bs->ok = false;
         bs_unwind(bs, 1);
@@ -877,110 +937,13 @@ static void bs_close_upvalues(Bs *bs, Bs_Value *last) {
     }
 }
 
-// Paths
-Bs_Sv bs_buffer_absolute_path(Bs_Buffer *b, Bs_Sv path) {
-    const size_t start = b->count;
-
-    if (path.size && *path.data != '/') {
-        bs_da_push_many(b->bs, b, b->bs->cwd->data, b->bs->cwd->size);
-        if (b->count != start + 1) {
-            bs_da_push(b->bs, b, '/');
-        }
-    }
-
-    bs_da_push_many(b->bs, b, path.data, path.size);
-    bs_da_push(b->bs, b, '\0');
-
-    const char *p = b->data + start;
-    char *r = b->data + start;
-
-    while (*p) {
-        // Skip consecutive slashes
-        while (*p == '/' && p[1] == '/') {
-            p++;
-        }
-
-        // Handle ./
-        if (*p == '.' && (p[1] == '/' || p[1] == '\0')) {
-            p++;
-            if (*p == '/') {
-                p++;
-            }
-            continue;
-        }
-
-        // Handle ../
-        if (*p == '.' && p[1] == '.' && (p[2] == '/' || p[2] == '\0')) {
-            p += 2;
-            if (*p == '/') {
-                p++;
-            }
-
-            if (r != b->data + start + 1) {
-                r--;
-                while (r != b->data + start && r[-1] != '/') {
-                    r--;
-                }
-            }
-            continue;
-        }
-
-        // Normal
-        while (*p != '/' && *p != '\0') {
-            *r++ = *p++;
-        }
-
-        if (*p == '/') {
-            *r++ = *p++;
-        }
-    }
-
-    b->count = r - b->data;
-    return (Bs_Sv){b->data + start, b->count - start};
-}
-
-Bs_Sv bs_buffer_relative_path(Bs_Buffer *b, Bs_Sv path) {
-    const size_t start = b->count;
-
-    const Bs_Str *cwd = b->bs->cwd;
-    const size_t max = bs_min(path.size, cwd->size);
-
-    size_t i = 0;
-    while (i < max) {
-        if (path.data[i] != cwd->data[i]) {
-            break;
-        }
-
-        i++;
-    }
-
-    if (i != cwd->size || path.data[i] != '/') {
-        bs_da_push_many(b->bs, b, "../", 3);
-        for (size_t j = i; j < cwd->size; j++) {
-            if (cwd->data[j] == '/') {
-                bs_da_push_many(b->bs, b, "../", 3);
-            }
-        }
-
-        while (i && path.data[i - 1] != '/') {
-            i--;
-        }
-    } else {
-        i++;
-    }
-
-    bs_da_push_many(b->bs, b, path.data + i, path.size - i);
-    return Bs_Sv(b->data + start, b->count - start);
-}
-
-// Interpreter
 const Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main) {
     Bs_Module module = {
         .name = bs_str_new(bs, path),
     };
 
     const Bs_Sv relative =
-        bs_buffer_relative_path(bs_paths_get(bs), Bs_Sv(module.name->data, module.name->size));
+        bs_buffer_relative_path(&bs->paths, Bs_Sv(module.name->data, module.name->size));
 
     if (bs_sv_suffix(path, Bs_Sv_Static(".bs"))) {
         module.length = path.size - 3;
@@ -988,7 +951,7 @@ const Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main) {
         module.length -= path.size - 4;
     } else {
         bs_fmt(
-            bs_stderr_get(bs),
+            &bs->context.error,
             "error: invalid input path '" Bs_Sv_Fmt "', expected '.bs' or '.bsx' extension\n",
             Bs_Sv_Arg(relative));
 
@@ -1021,7 +984,7 @@ static bool bs_import_language(Bs *bs, Bs_Sv path, size_t length) {
     }
 
     if (bs->step) {
-        bs_debug_chunk(bs_pretty_printer(bs, bs_stdout_get(bs)), &fn->chunk);
+        bs_debug_chunk(bs_pretty_printer(bs, &bs->context.output), &fn->chunk);
     }
 
     bs_stack_push(bs, bs_value_object(bs_closure_new(bs, fn)));
@@ -1041,7 +1004,7 @@ static void bs_import(Bs *bs) {
         bs_error(bs, "module name cannot be empty");
     }
 
-    Bs_Buffer *b = bs_paths_get(bs);
+    Bs_Buffer *b = &bs->paths;
 
     const size_t start = b->count;
     const Bs_Sv resolved = bs_buffer_absolute_path(b, Bs_Sv(path->data, path->size));
@@ -1147,7 +1110,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
     bs->gc_on = true;
     while (true) {
         if (bs->step) {
-            Bs_Writer *w = bs_stdout_get(bs);
+            Bs_Writer *w = &bs->context.output;
             bs_fmt(w, "\n----------------------------------------\n");
             bs_fmt(w, "Modules:\n");
             for (size_t i = 0; i < bs->modules.count; i++) {
@@ -1489,7 +1452,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         } break;
 
         case BS_OP_JOIN: {
-            Bs_Buffer *buffer = bs_buffer_get(bs);
+            Bs_Buffer *buffer = &bs->context.buffer;
             const size_t start = buffer->count;
 
             const Bs_Value b = bs_stack_peek(bs, 0);
@@ -1781,7 +1744,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
         default:
             bs_fmt(
-                bs_stderr_get(bs),
+                &bs->context.error,
                 "error: invalid op %d at offset %zu\n",
                 op,
                 bs->frame->ip - bs->frame->closure->fn->chunk.data - 1);
@@ -1798,7 +1761,7 @@ Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input) {
 
     Bs_Result result = {0};
 
-    Bs_Buffer *b = bs_paths_get(bs);
+    Bs_Buffer *b = &bs->paths;
     const size_t start = b->count;
 
     Bs_Sv resolved = bs_buffer_absolute_path(b, path);
@@ -1808,7 +1771,7 @@ Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input) {
     }
 
     if (bs->step) {
-        bs_debug_chunk(bs_pretty_printer(bs, bs_stdout_get(bs)), &fn->chunk);
+        bs_debug_chunk(bs_pretty_printer(bs, &bs->context.output), &fn->chunk);
     }
 
     result.value = bs_call(bs, bs_value_object(bs_closure_new(bs, fn)), NULL, 0);
@@ -1823,7 +1786,7 @@ end:
     bs->gc_on = false;
 
     if (bs->step) {
-        bs_fmt(bs_stdout_get(bs), "Stopping BS with exit code %d\n", bs->exit);
+        bs_fmt(&bs->context.output, "Stopping BS with exit code %d\n", bs->exit);
     }
 
     result.ok = bs->ok;
