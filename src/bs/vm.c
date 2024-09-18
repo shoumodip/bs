@@ -6,7 +6,6 @@
 
 #include "bs/compiler.h"
 #include "bs/debug.h"
-#include "bs/hash.h"
 
 // #define BS_GC_DEBUG_LOG
 // #define BS_GC_DEBUG_STRESS
@@ -411,7 +410,7 @@ bool bs_update_cwd(Bs *bs) {
         b->count = b->capacity;
         bs_da_push_many(bs, b, NULL, BS_DA_INIT_CAP);
     }
-    bs->cwd = bs_str_const(bs, bs_sv_from_cstr(b->data + start));
+    bs->cwd = bs_str_new(bs, bs_sv_from_cstr(b->data + start));
 
     b->count = start;
     return true;
@@ -487,19 +486,25 @@ Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size) {
     return object;
 }
 
-Bs_Str *bs_str_const(Bs *bs, Bs_Sv sv) {
-    Bs_Entry *entry = bs_entries_find_sv(bs->strings.data, bs->strings.capacity, sv);
+Bs_Str *bs_str_new(Bs *bs, Bs_Sv sv) {
+    const uint32_t hash = bs_hash_bytes(sv.data, sv.size);
+    Bs_Entry *entry = bs_entries_find_sv(bs->strings.data, bs->strings.capacity, sv, hash);
     if (entry && entry->key.type != BS_VALUE_NIL) {
         return (Bs_Str *)entry->key.as.object;
     }
 
-    Bs_Str *str = bs_str_new(bs, sv);
+    Bs_Str *str = (Bs_Str *)bs_object_new(bs, BS_OBJECT_STR, sizeof(Bs_Str) + sv.size);
+    str->size = sv.size;
+    str->hash = hash;
+    memcpy(str->data, sv.data, sv.size);
+
+    // Intern it
     bs_map_set(bs, &bs->strings, bs_value_object(str), bs_value_nil);
     return str;
 }
 
 void bs_global_set(Bs *bs, Bs_Sv name, Bs_Value value) {
-    bs_map_set(bs, &bs->globals, bs_value_object(bs_str_const(bs, name)), value);
+    bs_map_set(bs, &bs->globals, bs_value_object(bs_str_new(bs, name)), value);
 }
 
 static Bs_Pretty_Printer *bs_pretty_printer(Bs *bs, Bs_Writer *w) {
@@ -932,7 +937,7 @@ Bs_Sv bs_buffer_relative_path(Bs_Buffer *b, Bs_Sv path) {
 // Interpreter
 const Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main) {
     Bs_Module module = {
-        .name = bs_str_const(bs, path),
+        .name = bs_str_new(bs, path),
     };
 
     const Bs_Sv relative =
@@ -1075,7 +1080,7 @@ static void bs_import(Bs *bs) {
             if (!bs_table_set(
                     bs,
                     &library->functions,
-                    bs_value_object(bs_str_const(bs, bs_sv_from_cstr(export.name))),
+                    bs_value_object(bs_str_new(bs, bs_sv_from_cstr(export.name))),
                     bs_value_object(fn))) {
 
                 bs_error(bs, "redefinition of function '%s' in FFI", export.name);
@@ -1086,7 +1091,7 @@ static void bs_import(Bs *bs) {
             .done = true,
             .result = bs_value_object(library),
 
-            .name = bs_str_const(bs, bs_buffer_reset(b, start)),
+            .name = bs_str_new(bs, bs_buffer_reset(b, start)),
             .length = resolved.size,
         };
         bs_modules_push(bs, &bs->modules, module);

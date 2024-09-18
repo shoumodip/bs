@@ -69,16 +69,10 @@ Bs_Fn *bs_fn_new(Bs *bs);
 
 struct Bs_Str {
     Bs_Object meta;
-
-    bool hashed;
     uint32_t hash;
-
     size_t size;
     char data[];
 };
-
-Bs_Str *bs_str_new(Bs *bs, Bs_Sv sv);
-bool bs_str_eq(const Bs_Str *a, const Bs_Str *b);
 
 struct Bs_Array {
     Bs_Object meta;

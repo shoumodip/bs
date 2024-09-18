@@ -1,7 +1,75 @@
-#include "bs/map.h"
-#include "bs/hash.h"
+#include "bs/object.h"
 
 #define BS_MAP_MAX_LOAD 0.75
+
+uint32_t bs_hash_bytes(const void *data, size_t size) {
+    uint32_t hash = 2166136261u;
+    for (size_t i = 0; i < size; i++) {
+        hash ^= ((uint8_t *)data)[i];
+        hash *= 16777619;
+    }
+    return hash;
+}
+
+Bs_Entry *bs_entries_find(Bs_Entry *entries, size_t capacity, Bs_Value key) {
+    if (!capacity) {
+        return NULL;
+    }
+
+    uint32_t index;
+    if (key.type == BS_VALUE_OBJECT && key.as.object->type == BS_OBJECT_STR) {
+        index = ((Bs_Str *)key.as.object)->hash;
+    } else {
+        index = bs_hash_bytes(&key, sizeof(key));
+    }
+    index = index & (capacity - 1);
+
+    Bs_Entry *tombstone = NULL;
+    while (true) {
+        Bs_Entry *e = &entries[index];
+        if (e->key.type == BS_VALUE_NIL) {
+            if (e->value.type == BS_VALUE_NIL) {
+                return tombstone ? tombstone : e;
+            }
+
+            if (!tombstone) {
+                tombstone = e;
+            }
+        } else if (bs_value_equal(e->key, key)) {
+            return e;
+        }
+
+        index = (index + 1) & (capacity - 1);
+    }
+}
+
+Bs_Entry *bs_entries_find_sv(Bs_Entry *entries, size_t capacity, Bs_Sv key, uint32_t hash) {
+    if (!capacity) {
+        return NULL;
+    }
+    uint32_t index = hash & (capacity - 1);
+
+    Bs_Entry *tombstone = NULL;
+    while (true) {
+        Bs_Entry *e = &entries[index];
+        if (e->key.type == BS_VALUE_NIL) {
+            if (e->value.type == BS_VALUE_NIL) {
+                return tombstone ? tombstone : e;
+            }
+
+            if (!tombstone) {
+                tombstone = e;
+            }
+        } else if (e->key.type == BS_VALUE_OBJECT && e->key.as.object->type == BS_OBJECT_STR) {
+            const Bs_Str *str = (const Bs_Str *)e->key.as.object;
+            if (bs_sv_eq(key, Bs_Sv(str->data, str->size))) {
+                return e;
+            }
+        }
+
+        index = (index + 1) & (capacity - 1);
+    }
+}
 
 void bs_map_free(Bs *bs, Bs_Map *m) {
     bs_realloc(bs, m->data, sizeof(*m->data) * m->capacity, 0);

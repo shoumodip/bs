@@ -43,29 +43,6 @@ Bs_Fn *bs_fn_new(Bs *bs) {
     return fn;
 }
 
-Bs_Str *bs_str_new(Bs *bs, Bs_Sv sv) {
-    Bs_Str *str = (Bs_Str *)bs_object_new(bs, BS_OBJECT_STR, sizeof(Bs_Str) + sv.size);
-    str->hashed = false;
-
-    if (sv.data) {
-        memcpy(str->data, sv.data, sv.size);
-    }
-    str->size = sv.size;
-    return str;
-}
-
-bool bs_str_eq(const Bs_Str *a, const Bs_Str *b) {
-    if (!a || !b) {
-        return false;
-    }
-
-    if (a == b) {
-        return true;
-    }
-
-    return a->size == b->size && !memcmp(a->data, b->data, b->size);
-}
-
 Bs_Array *bs_array_new(Bs *bs) {
     Bs_Array *array = (Bs_Array *)bs_object_new(bs, BS_OBJECT_ARRAY, sizeof(Bs_Array));
     array->data = NULL;

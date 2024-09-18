@@ -39,7 +39,7 @@ void *bs_userdata_get(Bs *bs);
 void bs_userdata_set(Bs *bs, void *data);
 
 Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size);
-Bs_Str *bs_str_const(Bs *bs, Bs_Sv sv);
+Bs_Str *bs_str_new(Bs *bs, Bs_Sv sv);
 void bs_global_set(Bs *bs, Bs_Sv name, Bs_Value value);
 
 void bs_value_write(Bs *bs, Bs_Writer *writer, Bs_Value value);

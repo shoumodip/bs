@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 #include "bs/core.h"
-#include "bs/hash.h"
+#include "bs/object.h"
 
 // IO
 static void bs_file_data_free(Bs *bs, void *data) {
@@ -725,6 +725,7 @@ static Bs_Value bs_str_lpad(Bs *bs, Bs_Value *args, size_t arity) {
     }
     const size_t padding = count - str->size;
 
+    // TODO: cannot pass NULL to bs_str_new()
     Bs_Str *result = bs_str_new(bs, Bs_Sv(NULL, count));
     memcpy(result->data + padding, str->data, str->size);
 
@@ -756,6 +757,7 @@ static Bs_Value bs_str_rpad(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_object(str);
     }
 
+    // TODO: cannot pass NULL to bs_str_new()
     Bs_Str *result = bs_str_new(bs, Bs_Sv(NULL, count));
     memcpy(result->data, str->data, str->size);
 
@@ -1437,14 +1439,14 @@ static Bs_Value bs_math_lerp(Bs *bs, Bs_Value *args, size_t arity) {
 
 // Main
 static void bs_add(Bs *bs, Bs_Table *table, const char *key, Bs_Value value) {
-    bs_table_set(bs, table, bs_value_object(bs_str_const(bs, bs_sv_from_cstr(key))), value);
+    bs_table_set(bs, table, bs_value_object(bs_str_new(bs, bs_sv_from_cstr(key))), value);
 }
 
 static void bs_add_fn(Bs *bs, Bs_Table *table, const char *key, const char *name, Bs_C_Fn_Ptr fn) {
     bs_table_set(
         bs,
         table,
-        bs_value_object(bs_str_const(bs, bs_sv_from_cstr(key))),
+        bs_value_object(bs_str_new(bs, bs_sv_from_cstr(key))),
         bs_value_object(bs_c_fn_new(bs, name, fn)));
 }
 
@@ -1484,7 +1486,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
 
         Bs_Array *args = bs_array_new(bs);
         for (int i = 0; i < argc; i++) {
-            bs_array_set(bs, args, i, bs_value_object(bs_str_const(bs, bs_sv_from_cstr(argv[i]))));
+            bs_array_set(bs, args, i, bs_value_object(bs_str_new(bs, bs_sv_from_cstr(argv[i]))));
         }
         bs_add(bs, os, "args", bs_value_object(args));
 

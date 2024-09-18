@@ -319,14 +319,6 @@ bool bs_value_equal(Bs_Value a, Bs_Value b) {
         return a.as.boolean == b.as.boolean;
 
     case BS_VALUE_OBJECT:
-        if (a.as.object->type != b.as.object->type) {
-            return false;
-        }
-
-        if (a.as.object->type == BS_OBJECT_STR) {
-            return bs_str_eq((const Bs_Str *)a.as.object, (const Bs_Str *)b.as.object);
-        }
-
         return a.as.object == b.as.object;
 
     default:
