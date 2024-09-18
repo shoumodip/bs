@@ -54,6 +54,7 @@ typedef struct {
 
 typedef struct {
     Bs_Sv name;
+    size_t size;
     void (*free)(Bs *bs, void *data);
     void (*write)(Bs_Writer *writer, const void *data);
 } Bs_C_Data_Spec;

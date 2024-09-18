@@ -165,7 +165,7 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
             data->spec->free(bs, data->data);
         }
 
-        bs_realloc(bs, data, sizeof(*data), 0);
+        bs_realloc(bs, data, sizeof(*data) + data->spec->size, 0);
     } break;
 
     default:

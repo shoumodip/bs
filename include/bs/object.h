@@ -139,10 +139,12 @@ Bs_C_Lib *bs_c_lib_new(Bs *bs, void *data, const Bs_Str *path);
 
 struct Bs_C_Data {
     Bs_Object meta;
-    void *data;
     const Bs_C_Data_Spec *spec;
+    char data[];
 };
 
-Bs_C_Data *bs_c_data_new(Bs *bs, void *data, const Bs_C_Data_Spec *spec);
+#define bs_c_data_as(data, T) (*(T *)(data))
+
+Bs_C_Data *bs_c_data_new(Bs *bs, const void *data, const Bs_C_Data_Spec *spec);
 
 #endif // BS_OBJECT_H

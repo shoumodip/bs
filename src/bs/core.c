@@ -13,13 +13,15 @@
 
 // IO
 static void bs_file_data_free(Bs *bs, void *data) {
-    if (data && fileno(data) > 2) {
-        fclose(data);
+    FILE *f = bs_c_data_as(data, FILE *);
+    if (f && fileno(f) > 2) {
+        fclose(f);
     }
 }
 
 static const Bs_C_Data_Spec bs_file_data_spec = {
     .name = Bs_Sv_Static("file"),
+    .size = sizeof(FILE *),
     .free = bs_file_data_free,
 };
 
@@ -38,7 +40,7 @@ static Bs_Value bs_io_open(Bs *bs, Bs_Value *args, size_t arity) {
     const bool write = args[1].as.boolean;
     FILE *file = fopen(bs_buffer_reset(b, start).data, write ? "w" : "r");
     if (file) {
-        return bs_value_object(bs_c_data_new(bs, file, &bs_file_data_spec));
+        return bs_value_object(bs_c_data_new(bs, &file, &bs_file_data_spec));
     }
 
     return bs_value_nil;
@@ -49,12 +51,12 @@ static Bs_Value bs_io_close(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1");
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
-    if (!c->data) {
+    if (!bs_c_data_as(c->data, FILE *)) {
         bs_error(bs, "cannot close already closed file");
     }
 
     bs_file_data_free(bs, c->data);
-    c->data = NULL;
+    bs_c_data_as(c->data, FILE *) = NULL;
 
     return bs_value_nil;
 }
@@ -64,7 +66,8 @@ static Bs_Value bs_io_read(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1");
     bs_check_whole_number(bs, args[1], "argument #2");
 
-    FILE *f = ((Bs_C_Data *)args[0].as.object)->data;
+    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
+    FILE *f = bs_c_data_as(c->data, FILE *);
     if (!f) {
         bs_error(bs, "cannot read from closed file");
     }
@@ -110,7 +113,8 @@ static Bs_Value bs_io_flush(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1");
 
-    FILE *f = ((Bs_C_Data *)args[0].as.object)->data;
+    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
+    FILE *f = bs_c_data_as(c->data, FILE *);
     if (!f) {
         bs_error(bs, "cannot flush closed file");
     }
@@ -126,7 +130,8 @@ static Bs_Value bs_io_write(Bs *bs, Bs_Value *args, size_t arity) {
 
     bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1");
 
-    FILE *f = ((Bs_C_Data *)args[0].as.object)->data;
+    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
+    FILE *f = bs_c_data_as(c->data, FILE *);
     if (!f) {
         bs_error(bs, "cannot write into closed file");
     }
@@ -171,7 +176,8 @@ static Bs_Value bs_io_writeln(Bs *bs, Bs_Value *args, size_t arity) {
 
     bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1");
 
-    FILE *f = ((Bs_C_Data *)args[0].as.object)->data;
+    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
+    FILE *f = bs_c_data_as(c->data, FILE *);
     if (!f) {
         bs_error(bs, "cannot write into closed file");
     }
@@ -309,6 +315,7 @@ static Bs_Value bs_os_setenv(Bs *bs, Bs_Value *args, size_t arity) {
 // Process
 static const Bs_C_Data_Spec bs_process_data_spec = {
     .name = Bs_Sv_Static("process"),
+    .size = sizeof(pid_t),
 };
 
 static Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
@@ -317,17 +324,16 @@ static Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_whole_number(bs, args[1], "argument #2");
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
-    if (!c->data) {
+    const pid_t pid = bs_c_data_as(c->data, pid_t);
+    if (!pid) {
         bs_error(bs, "cannot kill already terminated process");
     }
-
-    const pid_t pid = (uintptr_t)c->data;
-    c->data = NULL;
 
     if (kill(pid, args[1].as.number) < 0) {
         bs_error(bs, "could not kill process");
     }
 
+    bs_c_data_as(c->data, pid_t) = 0;
     return bs_value_nil;
 }
 
@@ -336,18 +342,17 @@ static Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_object_c_type(bs, args[0], &bs_process_data_spec, "argument #1");
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
-    if (!c->data) {
+    const pid_t pid = bs_c_data_as(c->data, pid_t);
+    if (!pid) {
         bs_error(bs, "cannot wait for already terminated process");
     }
-
-    const pid_t pid = (uintptr_t)c->data;
-    c->data = NULL;
 
     int status;
     if (waitpid(pid, &status, 0) < 0) {
         bs_error(bs, "could not wait for process");
     }
 
+    bs_c_data_as(c->data, pid_t) = 0;
     return WIFEXITED(status) ? bs_value_num(WEXITSTATUS(status)) : bs_value_nil;
 }
 
@@ -396,7 +401,7 @@ static Bs_Value bs_process_spawn(Bs *bs, Bs_Value *args, size_t arity) {
         exit(127);
     }
 
-    return bs_value_object(bs_c_data_new(bs, (void *)(uintptr_t)pid, &bs_process_data_spec));
+    return bs_value_object(bs_c_data_new(bs, &pid, &bs_process_data_spec));
 }
 
 // Bit
@@ -796,17 +801,17 @@ static Bs_Value bs_ascii_code(Bs *bs, Bs_Value *args, size_t arity) {
 
 // Bytes
 static void bs_bytes_data_free(Bs *bs, void *data) {
-    bs_da_free(bs, (Bs_Buffer *)data);
-    free(data);
+    bs_da_free(bs, &bs_c_data_as(data, Bs_Buffer));
 }
 
 static void bs_bytes_data_write(Bs_Writer *w, const void *data) {
-    const Bs_Buffer *b = data;
+    const Bs_Buffer *b = &bs_c_data_as(data, Bs_Buffer);
     w->write(w, Bs_Sv(b->data, b->count));
 }
 
 static const Bs_C_Data_Spec bs_bytes_data_spec = {
     .name = Bs_Sv_Static("bytes"),
+    .size = sizeof(Bs_Buffer),
     .free = bs_bytes_data_free,
     .write = bs_bytes_data_write,
 };
@@ -814,19 +819,16 @@ static const Bs_C_Data_Spec bs_bytes_data_spec = {
 static Bs_Value bs_bytes_new(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
-    Bs_Buffer *buffer = bs_realloc(bs, NULL, 0, sizeof(Bs_Buffer));
-    memset(buffer, 0, sizeof(*buffer));
-    buffer->bs = bs;
-
-    return bs_value_object(bs_c_data_new(bs, buffer, &bs_bytes_data_spec));
+    Bs_Buffer buffer = {.bs = bs};
+    return bs_value_object(bs_c_data_new(bs, &buffer, &bs_bytes_data_spec));
 }
 
-static Bs_Value bs_bytes_len(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value bs_bytes_count(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_check_object_c_type(bs, args[0], &bs_bytes_data_spec, "argument #1");
 
-    const Bs_Buffer *b = ((Bs_C_Data *)args[0].as.object)->data;
-    return bs_value_num(b->count);
+    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
+    return bs_value_num(bs_c_data_as(c->data, Bs_Buffer).count);
 }
 
 static Bs_Value bs_bytes_reset(Bs *bs, Bs_Value *args, size_t arity) {
@@ -834,7 +836,8 @@ static Bs_Value bs_bytes_reset(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_object_c_type(bs, args[0], &bs_bytes_data_spec, "argument #1");
     bs_check_whole_number(bs, args[1], "argument #2");
 
-    Bs_Buffer *b = ((Bs_C_Data *)args[0].as.object)->data;
+    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
+    Bs_Buffer *b = &bs_c_data_as(c->data, Bs_Buffer);
     const size_t reset = args[1].as.number;
 
     if (reset > b->count) {
@@ -851,7 +854,8 @@ static Bs_Value bs_bytes_slice(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_whole_number(bs, args[1], "argument #2");
     bs_check_whole_number(bs, args[2], "argument #3");
 
-    const Bs_Buffer *b = ((Bs_C_Data *)args[0].as.object)->data;
+    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
+    const Bs_Buffer *b = &bs_c_data_as(c->data, Bs_Buffer);
     const size_t begin = bs_min(args[1].as.number, args[2].as.number);
     const size_t end = bs_max(args[1].as.number, args[2].as.number);
 
@@ -867,7 +871,8 @@ static Bs_Value bs_bytes_push(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_object_c_type(bs, args[0], &bs_bytes_data_spec, "argument #1");
     bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
 
-    Bs_Buffer *b = ((Bs_C_Data *)args[0].as.object)->data;
+    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
+    Bs_Buffer *b = &bs_c_data_as(c->data, Bs_Buffer);
     const Bs_Str *src = (const Bs_Str *)args[1].as.object;
     bs_da_push_many(bs, b, src->data, src->size);
 
@@ -880,7 +885,8 @@ static Bs_Value bs_bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_whole_number(bs, args[1], "argument #2");
     bs_check_object_type(bs, args[2], BS_OBJECT_STR, "argument #3");
 
-    Bs_Buffer *b = ((Bs_C_Data *)args[0].as.object)->data;
+    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
+    Bs_Buffer *b = &bs_c_data_as(c->data, Bs_Buffer);
     const size_t index = args[1].as.number;
     const Bs_Str *src = (const Bs_Str *)args[2].as.object;
 
@@ -1468,9 +1474,9 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_add_fn(bs, io, "println", "io.println", bs_io_println);
         bs_add_fn(bs, io, "eprintln", "io.eprintln", bs_io_eprintln);
 
-        bs_add(bs, io, "stdin", bs_value_object(bs_c_data_new(bs, stdin, &bs_file_data_spec)));
-        bs_add(bs, io, "stdout", bs_value_object(bs_c_data_new(bs, stdout, &bs_file_data_spec)));
-        bs_add(bs, io, "stderr", bs_value_object(bs_c_data_new(bs, stderr, &bs_file_data_spec)));
+        bs_add(bs, io, "stdin", bs_value_object(bs_c_data_new(bs, &stdin, &bs_file_data_spec)));
+        bs_add(bs, io, "stdout", bs_value_object(bs_c_data_new(bs, &stdout, &bs_file_data_spec)));
+        bs_add(bs, io, "stderr", bs_value_object(bs_c_data_new(bs, &stderr, &bs_file_data_spec)));
 
         bs_global_set(bs, Bs_Sv_Static("io"), bs_value_object(io));
     }
@@ -1549,7 +1555,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     {
         Bs_Table *bytes = bs_table_new(bs);
         bs_add_fn(bs, bytes, "new", "bytes.new", bs_bytes_new);
-        bs_add_fn(bs, bytes, "len", "bytes.len", bs_bytes_len);
+        bs_add_fn(bs, bytes, "count", "bytes.count", bs_bytes_count);
         bs_add_fn(bs, bytes, "reset", "bytes.reset", bs_bytes_reset);
         bs_add_fn(bs, bytes, "slice", "bytes.slice", bs_bytes_slice);
 
