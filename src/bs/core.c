@@ -725,15 +725,15 @@ static Bs_Value bs_str_lpad(Bs *bs, Bs_Value *args, size_t arity) {
     }
     const size_t padding = count - str->size;
 
-    // TODO: cannot pass NULL to bs_str_new()
-    Bs_Str *result = bs_str_new(bs, Bs_Sv(NULL, count));
-    memcpy(result->data + padding, str->data, str->size);
+    Bs_Buffer *b = bs_buffer_get(bs);
+    const size_t start = b->count;
 
     for (size_t i = 0; i < padding; i += pattern->size) {
-        memcpy(result->data + i, pattern->data, bs_min(pattern->size, padding - i));
+        bs_da_push_many(bs, b, pattern->data, bs_min(pattern->size, padding - i));
     }
+    bs_da_push_many(bs, b, str->data, str->size);
 
-    return bs_value_object(result);
+    return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
 }
 
 static Bs_Value bs_str_rpad(Bs *bs, Bs_Value *args, size_t arity) {
@@ -757,15 +757,15 @@ static Bs_Value bs_str_rpad(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_object(str);
     }
 
-    // TODO: cannot pass NULL to bs_str_new()
-    Bs_Str *result = bs_str_new(bs, Bs_Sv(NULL, count));
-    memcpy(result->data, str->data, str->size);
+    Bs_Buffer *b = bs_buffer_get(bs);
+    const size_t start = b->count;
 
+    bs_da_push_many(bs, b, str->data, str->size);
     for (size_t i = str->size; i < count; i += pattern->size) {
-        memcpy(result->data + i, pattern->data, bs_min(pattern->size, count - i));
+        bs_da_push_many(bs, b, pattern->data, bs_min(pattern->size, count - i));
     }
 
-    return bs_value_object(result);
+    return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
 }
 
 // Ascii
