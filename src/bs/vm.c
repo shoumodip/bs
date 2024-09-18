@@ -77,8 +77,8 @@ struct Bs {
     Bs_Str *cwd;
     Bs_Modules modules;
 
-    Bs_Table globals;
-    Bs_Table strings;
+    Bs_Map globals;
+    Bs_Map strings;
     Bs_Upvalue *upvalues;
 
     bool gc_on;
@@ -166,6 +166,21 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
     }
 }
 
+static void bs_mark_object(Bs *bs, Bs_Object *object);
+
+static void bs_mark_map(Bs *bs, Bs_Map *map) {
+    for (size_t i = 0; i < map->capacity; i++) {
+        Bs_Entry *entry = &map->data[i];
+        if (entry->key.type == BS_VALUE_OBJECT) {
+            bs_mark_object(bs, entry->key.as.object);
+        }
+
+        if (entry->value.type == BS_VALUE_OBJECT) {
+            bs_mark_object(bs, entry->value.as.object);
+        }
+    }
+}
+
 static_assert(BS_COUNT_OBJECTS == 9, "Update bs_mark_object()");
 static void bs_mark_object(Bs *bs, Bs_Object *object) {
     if (!object || object->marked) {
@@ -208,17 +223,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
 
     case BS_OBJECT_TABLE: {
         Bs_Table *table = (Bs_Table *)object;
-
-        for (size_t i = 0; i < table->map.capacity; i++) {
-            Bs_Entry *entry = &table->map.data[i];
-            if (entry->key.type == BS_VALUE_OBJECT) {
-                bs_mark_object(bs, entry->key.as.object);
-            }
-
-            if (entry->value.type == BS_VALUE_OBJECT) {
-                bs_mark_object(bs, entry->value.as.object);
-            }
-        }
+        bs_mark_map(bs, &table->map);
     } break;
 
     case BS_OBJECT_CLOSURE: {
@@ -294,8 +299,7 @@ static void bs_collect(Bs *bs) {
         bs_mark_object(bs, (Bs_Object *)upvalue);
     }
 
-    bs->globals.meta.marked = false;
-    bs_mark_object(bs, (Bs_Object *)&bs->globals);
+    bs_mark_map(bs, &bs->globals);
 
     // Sweep
     Bs_Object *previous = NULL;
@@ -354,7 +358,6 @@ Bs *bs_new(bool step) {
     bs->error = (Bs_Writer){stderr, bs_file_write};
     bs->output = (Bs_Writer){stdout, bs_file_write};
 
-    bs->globals.meta.type = BS_OBJECT_TABLE;
     bs_update_cwd(bs);
 
     bs->step = step;
@@ -368,8 +371,8 @@ void bs_free(Bs *bs) {
     bs_frames_free(bs, &bs->frames);
     bs_modules_free(bs, &bs->modules);
 
-    bs_table_free(bs, &bs->globals);
-    bs_table_free(bs, &bs->strings);
+    bs_map_free(bs, &bs->globals);
+    bs_map_free(bs, &bs->strings);
 
     Bs_Object *object = bs->objects;
     while (object) {
@@ -497,18 +500,18 @@ Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size) {
 }
 
 Bs_Str *bs_str_const(Bs *bs, Bs_Sv sv) {
-    Bs_Entry *entry = bs_entries_find_sv(bs->strings.map.data, bs->strings.map.capacity, sv);
+    Bs_Entry *entry = bs_entries_find_sv(bs->strings.data, bs->strings.capacity, sv);
     if (entry && entry->key.type != BS_VALUE_NIL) {
         return (Bs_Str *)entry->key.as.object;
     }
 
     Bs_Str *str = bs_str_new(bs, sv);
-    bs_table_set(bs, &bs->strings, bs_value_object(str), bs_value_nil);
+    bs_map_set(bs, &bs->strings, bs_value_object(str), bs_value_nil);
     return str;
 }
 
 void bs_global_set(Bs *bs, Bs_Sv name, Bs_Value value) {
-    bs_table_set(bs, &bs->globals, bs_value_object(bs_str_const(bs, name)), value);
+    bs_map_set(bs, &bs->globals, bs_value_object(bs_str_const(bs, name)), value);
 }
 
 static Bs_Pretty_Printer *bs_pretty_printer(Bs *bs, Bs_Writer *w) {
@@ -1486,7 +1489,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         case BS_OP_GDEF: {
             const Bs_Value name = bs_chunk_read_const(bs);
 
-            if (!bs_table_set(bs, &bs->globals, name, bs_stack_peek(bs, 0))) {
+            if (!bs_map_set(bs, &bs->globals, name, bs_stack_peek(bs, 0))) {
                 bs_error(
                     bs,
                     "redefinition of global identifier '" Bs_Sv_Fmt "'",
@@ -1500,7 +1503,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value name = bs_chunk_read_const(bs);
 
             Bs_Value value;
-            if (!bs_table_get(bs, &bs->globals, name, &value)) {
+            if (!bs_map_get(bs, &bs->globals, name, &value)) {
                 bs_error(
                     bs,
                     "undefined identifier '" Bs_Sv_Fmt "'",
@@ -1514,8 +1517,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value name = bs_chunk_read_const(bs);
             const Bs_Value value = bs_stack_peek(bs, 0);
 
-            if (bs_table_set(bs, &bs->globals, name, value)) {
-                bs_table_remove(bs, &bs->globals, name);
+            if (bs_map_set(bs, &bs->globals, name, value)) {
+                bs_map_remove(bs, &bs->globals, name);
 
                 bs_error(
                     bs,
