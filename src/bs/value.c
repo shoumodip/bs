@@ -85,9 +85,24 @@ static bool bs_should_print_multi(const Bs_Object *object) {
     return false;
 }
 
-static bool bs_pretty_printer_has(Bs_Pretty_Printer *p, const Bs_Object *object) {
+void bs_pretty_printer_free(Bs_Pretty_Printer *p) {
+    free(p->data);
+    memset(p, '\0', sizeof(*p));
+}
+
+void bs_pretty_printer_push(Bs_Pretty_Printer *p, const Bs_Object *object) {
+    if (p->count >= p->capacity) {
+        p->capacity = p->capacity ? p->capacity * 2 : BS_DA_INIT_CAP;
+        p->data = realloc(p->data, p->capacity * sizeof(const Bs_Object *));
+        assert(p->data);
+    }
+
+    p->data[p->count++] = object;
+}
+
+bool bs_pretty_printer_has(Bs_Pretty_Printer *p, const Bs_Object *object) {
     for (size_t i = 0; i < p->count; i++) {
-        if (p->data[i] == (uintptr_t)object) {
+        if (p->data[i] == object) {
             return true;
         }
     }
@@ -139,7 +154,7 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
         if (bs_pretty_printer_has(p, object)) {
             bs_fmt(p->writer, "<array %p>", object);
         } else {
-            bs_da_push(p->bs, p, (uintptr_t)object);
+            bs_pretty_printer_push(p, object);
             const Bs_Array *array = (const Bs_Array *)object;
 
             const bool multi = bs_should_print_multi(object);
@@ -172,7 +187,7 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
         if (bs_pretty_printer_has(p, object)) {
             bs_fmt(p->writer, "<table %p>", object);
         } else {
-            bs_da_push(p->bs, p, (uintptr_t)object);
+            bs_pretty_printer_push(p, object);
             const Bs_Table *table = (const Bs_Table *)object;
 
             bs_fmt(p->writer, "{");

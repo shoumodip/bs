@@ -60,16 +60,19 @@ bool bs_value_is_falsey(Bs_Value value);
 const char *bs_value_type_name(Bs_Value value, bool extended);
 
 typedef struct {
-    void *bs;
     Bs_Writer *writer;
 
     bool extended;
     size_t depth;
 
-    uintptr_t *data;
+    const Bs_Object **data;
     size_t count;
     size_t capacity;
 } Bs_Pretty_Printer;
+
+void bs_pretty_printer_free(Bs_Pretty_Printer *p);
+void bs_pretty_printer_push(Bs_Pretty_Printer *p, const Bs_Object *object);
+bool bs_pretty_printer_has(Bs_Pretty_Printer *p, const Bs_Object *object);
 
 void bs_value_print_impl(Bs_Pretty_Printer *printer, Bs_Value value);
 bool bs_value_equal(Bs_Value a, Bs_Value b);

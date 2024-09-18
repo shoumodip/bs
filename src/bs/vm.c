@@ -353,7 +353,6 @@ Bs *bs_new(bool step) {
 
     bs->error = (Bs_Writer){stderr, bs_file_write};
     bs->output = (Bs_Writer){stdout, bs_file_write};
-    bs->printer.bs = bs;
 
     bs->globals.meta.type = BS_OBJECT_TABLE;
     bs_update_cwd(bs);
@@ -382,7 +381,7 @@ void bs_free(Bs *bs) {
     bs_buffer_free(bs, &bs->paths);
     bs_buffer_free(bs, &bs->buffer);
 
-    bs_da_free(bs, &bs->printer);
+    bs_pretty_printer_free(&bs->printer);
     free(bs);
 }
 
