@@ -325,7 +325,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             bs_lexer_expect(&c->lexer, BS_TOKEN_SET);
             bs_compile_expr(c, BS_POWER_SET);
 
-            bs_chunk_push_op(c->bs, c->chunk, BS_OP_ILIT);
+            bs_chunk_push_op(c->bs, c->chunk, BS_OP_ISET_CHAIN);
             bs_chunk_push_op_loc(c->bs, c->chunk, loc);
 
             if (bs_lexer_either(&c->lexer, BS_TOKEN_COMMA, BS_TOKEN_RBRACE).type !=
@@ -344,7 +344,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             bs_compile_expr(c, BS_POWER_SET);
             index++;
 
-            bs_chunk_push_op(c->bs, c->chunk, BS_OP_ILIT);
+            bs_chunk_push_op(c->bs, c->chunk, BS_OP_ISET_CHAIN);
 
             if (bs_lexer_either(&c->lexer, BS_TOKEN_COMMA, BS_TOKEN_RBRACKET).type !=
                 BS_TOKEN_COMMA) {
@@ -442,7 +442,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             const Bs_Op op_get = c->chunk->data[c->chunk->last];
             const Bs_Op op_set = bs_op_get_to_set(op_get);
             if (op_set == BS_OP_RET && op_get != BS_OP_CALL && op_get != BS_OP_IMPORT &&
-                op_get != BS_OP_ILIT) {
+                op_get != BS_OP_ISET_CHAIN) {
                 bs_compile_error_unexpected(c, &token);
             }
 
@@ -601,7 +601,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             const Bs_Op op_get = c->chunk->data[c->chunk->last];
             const Bs_Op op_set = bs_op_get_to_set(op_get);
             if (op_set == BS_OP_RET && op_get != BS_OP_CALL && op_get != BS_OP_IMPORT &&
-                op_get != BS_OP_ILIT) {
+                op_get != BS_OP_ISET_CHAIN) {
                 bs_compile_error_unexpected(c, &token);
             }
 

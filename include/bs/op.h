@@ -49,13 +49,17 @@ typedef enum {
     BS_OP_GDEF,
     BS_OP_GGET,
     BS_OP_GSET,
+
     BS_OP_LGET,
     BS_OP_LSET,
+
     BS_OP_UGET,
     BS_OP_USET,
+
     BS_OP_IGET,
     BS_OP_ISET,
-    BS_OP_ILIT,
+
+    BS_OP_ISET_CHAIN,
 
     BS_OP_JUMP,
     BS_OP_ELSE,

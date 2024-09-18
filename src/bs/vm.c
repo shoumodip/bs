@@ -1598,7 +1598,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         } break;
 
         case BS_OP_ISET:
-        case BS_OP_ILIT: {
+        case BS_OP_ISET_CHAIN: {
             const Bs_Value container = bs_stack_peek(bs, 2);
             if (container.type != BS_VALUE_OBJECT) {
                 bs_error(
