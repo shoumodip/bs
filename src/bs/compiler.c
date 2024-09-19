@@ -454,10 +454,9 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
             token = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
             bs_chunk_push_op_value(
-                c->bs, c->chunk, BS_OP_CONST, bs_value_object(bs_str_new(c->bs, token.sv)));
-
-            bs_chunk_push_op(c->bs, c->chunk, BS_OP_IGET);
+                c->bs, c->chunk, BS_OP_IGET_CONST, bs_value_object(bs_str_new(c->bs, token.sv)));
             bs_chunk_push_op_loc(c->bs, c->chunk, loc);
+            bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
         } break;
 
         case BS_TOKEN_ADD:
@@ -621,11 +620,13 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
                 bs_compile_error_unexpected(c, &token);
             }
 
+            const Bs_Loc index = bs_lexer_peek(&c->lexer).loc;
             bs_compile_expr(c, BS_POWER_SET);
             bs_lexer_expect(&c->lexer, BS_TOKEN_RBRACKET);
 
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_IGET);
             bs_chunk_push_op_loc(c->bs, c->chunk, loc);
+            bs_chunk_push_op_loc(c->bs, c->chunk, index);
         } break;
 
         case BS_TOKEN_JOIN:
@@ -640,7 +641,13 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             }
 
             assert(c->chunk->locations.count);
-            loc = c->chunk->locations.data[--c->chunk->locations.count].loc;
+
+            Bs_Loc locs[2];
+            locs[0] = c->chunk->locations.data[--c->chunk->locations.count].loc;
+            if (op == BS_OP_ISET || op == BS_OP_ISET_CONST) {
+                locs[1] = locs[0];
+                locs[0] = c->chunk->locations.data[--c->chunk->locations.count].loc;
+            }
 
             size_t index;
             if (op != BS_OP_ISET) {
@@ -655,7 +662,11 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             } else {
                 bs_chunk_push_op_int(c->bs, c->chunk, op, index);
             }
-            bs_chunk_push_op_loc(c->bs, c->chunk, loc);
+
+            bs_chunk_push_op_loc(c->bs, c->chunk, locs[0]);
+            if (op == BS_OP_ISET || op == BS_OP_ISET_CONST) {
+                bs_chunk_push_op_loc(c->bs, c->chunk, locs[1]);
+            }
         } break;
 
         default:

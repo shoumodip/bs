@@ -59,6 +59,9 @@ typedef enum {
     BS_OP_IGET,
     BS_OP_ISET,
 
+    BS_OP_IGET_CONST,
+    BS_OP_ISET_CONST,
+
     BS_OP_ISET_CHAIN,
 
     BS_OP_JUMP,

@@ -1166,7 +1166,96 @@ static void bs_import(Bs *bs) {
     }
 }
 
-static_assert(BS_COUNT_OPS == 50, "Update bs_interpret()");
+static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
+    Bs_Value value;
+
+    if (container.type != BS_VALUE_OBJECT) {
+        bs_error(
+            bs, "cannot index into %s value", bs_value_type_name(container, bs->frame->extended));
+    }
+
+    if (container.as.object->type == BS_OBJECT_ARRAY) {
+        bs_check_whole_number_offset(bs, 1, index, "array index");
+
+        Bs_Array *array = (Bs_Array *)container.as.object;
+        if (!bs_array_get(bs, array, index.as.number, &value)) {
+            bs_error(
+                bs,
+                "cannot get value at index %zu in array of length %zu",
+                (size_t)index.as.number,
+                array->count);
+        }
+    } else if (container.as.object->type == BS_OBJECT_TABLE) {
+        if (index.type == BS_VALUE_NIL) {
+            bs_error_offset(
+                bs,
+                1,
+                "cannot use '%s' as table key",
+                bs_value_type_name(index, bs->frame->extended));
+        }
+
+        if (!bs_table_get(bs, (Bs_Table *)container.as.object, index, &value)) {
+            value = bs_value_nil;
+        }
+    } else if (container.as.object->type == BS_OBJECT_C_LIB) {
+        bs_check_object_type_offset(bs, 1, index, BS_OBJECT_STR, "library symbol name");
+
+        Bs_Str *name = (Bs_Str *)index.as.object;
+        if (!name->size) {
+            bs_error_offset(bs, 1, "library symbol name cannot be empty");
+        }
+
+        Bs_C_Lib *c = (Bs_C_Lib *)container.as.object;
+        if (!bs_map_get(bs, &c->functions, index, &value)) {
+            bs_error(
+                bs,
+                "symbol '" Bs_Sv_Fmt "' doesn't exist in native library '" Bs_Sv_Fmt "'",
+                Bs_Sv_Arg(*name),
+                Bs_Sv_Arg(*c->path));
+        }
+    } else {
+        bs_error(
+            bs, "cannot index into %s value", bs_value_type_name(container, bs->frame->extended));
+    }
+
+    return value;
+}
+
+static void bs_container_set(Bs *bs, Bs_Value container, Bs_Value index, Bs_Value value) {
+    if (container.type != BS_VALUE_OBJECT) {
+        bs_error(
+            bs,
+            "cannot take mutable index into %s value",
+            bs_value_type_name(container, bs->frame->extended));
+    }
+
+    if (container.as.object->type == BS_OBJECT_ARRAY) {
+        bs_check_whole_number_offset(bs, 1, index, "array index");
+        bs_array_set(bs, (Bs_Array *)container.as.object, index.as.number, value);
+    } else if (container.as.object->type == BS_OBJECT_TABLE) {
+        if (index.type == BS_VALUE_NIL) {
+            bs_error_offset(
+                bs,
+                1,
+                "cannot use '%s' as table key",
+                bs_value_type_name(index, bs->frame->extended));
+        }
+
+        Bs_Table *table = (Bs_Table *)container.as.object;
+        if (value.type == BS_VALUE_NIL) {
+            bs_table_remove(bs, table, index);
+        } else {
+            bs_table_set(bs, table, index, value);
+        }
+    } else {
+        bs_error(
+            bs,
+            "cannot take mutable index into %s value",
+            bs_value_type_name(container, bs->frame->extended));
+    }
+}
+
+static_assert(BS_COUNT_OPS == 52, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const size_t frames_count_save = bs->frames.count;
@@ -1589,105 +1678,31 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         } break;
 
         case BS_OP_IGET: {
-            Bs_Value value;
-
-            const Bs_Value container = bs_stack_peek(bs, 1);
-            if (container.type != BS_VALUE_OBJECT) {
-                bs_error(
-                    bs,
-                    "cannot index into %s value",
-                    bs_value_type_name(container, bs->frame->extended));
-            }
-
-            const Bs_Value index = bs_stack_peek(bs, 0);
-            if (container.as.object->type == BS_OBJECT_ARRAY) {
-                bs_check_whole_number(bs, index, "array index");
-
-                Bs_Array *array = (Bs_Array *)container.as.object;
-                if (!bs_array_get(bs, array, index.as.number, &value)) {
-                    bs_error(
-                        bs,
-                        "cannot get value at index %zu in array of length %zu",
-                        (size_t)index.as.number,
-                        array->count);
-                }
-            } else if (container.as.object->type == BS_OBJECT_TABLE) {
-                if (index.type == BS_VALUE_NIL) {
-                    bs_error(
-                        bs,
-                        "cannot use '%s' as table key",
-                        bs_value_type_name(index, bs->frame->extended));
-                }
-
-                if (!bs_table_get(bs, (Bs_Table *)container.as.object, index, &value)) {
-                    value = bs_value_nil;
-                }
-            } else if (container.as.object->type == BS_OBJECT_C_LIB) {
-                bs_check_object_type(bs, index, BS_OBJECT_STR, "library symbol name");
-
-                Bs_Str *name = (Bs_Str *)index.as.object;
-                if (!name->size) {
-                    bs_error(bs, "library symbol name cannot be empty");
-                }
-
-                Bs_C_Lib *c = (Bs_C_Lib *)container.as.object;
-                if (!bs_map_get(bs, &c->functions, index, &value)) {
-                    bs_error(
-                        bs,
-                        "symbol '" Bs_Sv_Fmt "' doesn't exist in native library '" Bs_Sv_Fmt "'",
-                        Bs_Sv_Arg(*name),
-                        Bs_Sv_Arg(*c->path));
-                }
-            } else {
-                bs_error(
-                    bs,
-                    "cannot index into %s value",
-                    bs_value_type_name(container, bs->frame->extended));
-            }
-
+            const Bs_Value value = bs_container_get(bs, bs_stack_peek(bs, 1), bs_stack_peek(bs, 0));
             bs->stack.count -= 2;
             bs_stack_push(bs, value);
         } break;
 
-        case BS_OP_ISET:
-        case BS_OP_ISET_CHAIN: {
-            const Bs_Value container = bs_stack_peek(bs, 2);
-            if (container.type != BS_VALUE_OBJECT) {
-                bs_error(
-                    bs,
-                    "cannot take mutable index into %s value",
-                    bs_value_type_name(container, bs->frame->extended));
-            }
+        case BS_OP_IGET_CONST: {
+            const Bs_Value value =
+                bs_container_get(bs, bs_stack_peek(bs, 0), bs_chunk_read_const(bs));
 
-            const Bs_Value value = bs_stack_peek(bs, 0);
-            const Bs_Value index = bs_stack_peek(bs, 1);
-
-            if (container.as.object->type == BS_OBJECT_ARRAY) {
-                bs_check_whole_number(bs, index, "array index");
-                bs_array_set(bs, (Bs_Array *)container.as.object, index.as.number, value);
-            } else if (container.as.object->type == BS_OBJECT_TABLE) {
-                if (index.type == BS_VALUE_NIL) {
-                    bs_error(
-                        bs,
-                        "cannot use '%s' as table key",
-                        bs_value_type_name(index, bs->frame->extended));
-                }
-
-                Bs_Table *table = (Bs_Table *)container.as.object;
-                if (value.type == BS_VALUE_NIL) {
-                    bs_table_remove(bs, table, index);
-                } else {
-                    bs_table_set(bs, table, index, value);
-                }
-            } else {
-                bs_error(
-                    bs,
-                    "cannot take mutable index into %s value",
-                    bs_value_type_name(container, bs->frame->extended));
-            }
-
-            bs->stack.count -= 2;
+            bs->stack.count--;
+            bs_stack_push(bs, value);
         } break;
+
+        case BS_OP_ISET:
+        case BS_OP_ISET_CHAIN:
+            bs_container_set(bs, bs_stack_peek(bs, 2), bs_stack_peek(bs, 1), bs_stack_peek(bs, 0));
+            bs->stack.count -= 2;
+            break;
+
+        case BS_OP_ISET_CONST:
+            bs_container_set(
+                bs, bs_stack_peek(bs, 1), bs_chunk_read_const(bs), bs_stack_peek(bs, 0));
+
+            bs->stack.count--;
+            break;
 
         case BS_OP_JUMP:
             bs->frame->ip += bs_chunk_read_int(bs);

@@ -1,4 +1,4 @@
-:i count 82
+:i count 102
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -427,6 +427,70 @@ arrays/error_index_out_of_bounds.bs:3:14: error: cannot get value at index 0 in 
 :b stderr 99
 arrays/error_index_out_of_bounds.bsx:3:14: error: cannot get value at index 0 in array of length 0
 
+:b shell 39
+../bin/bs arrays/error_invalid_index.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 88
+arrays/error_invalid_index.bs:2:4: error: expected array index to be number, got string
+
+:b shell 40
+../bin/bs arrays/error_invalid_index.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 89
+arrays/error_invalid_index.bsx:2:4: error: expected array index to be number, got string
+
+:b shell 46
+../bin/bs arrays/error_invalid_index_assign.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 95
+arrays/error_invalid_index_assign.bs:2:4: error: expected array index to be number, got string
+
+:b shell 47
+../bin/bs arrays/error_invalid_index_assign.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 96
+arrays/error_invalid_index_assign.bsx:2:4: error: expected array index to be number, got string
+
+:b shell 45
+../bin/bs arrays/error_invalid_index_const.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 94
+arrays/error_invalid_index_const.bs:2:4: error: expected array index to be number, got string
+
+:b shell 46
+../bin/bs arrays/error_invalid_index_const.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 95
+arrays/error_invalid_index_const.bsx:2:4: error: expected array index to be number, got string
+
+:b shell 52
+../bin/bs arrays/error_invalid_index_const_assign.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 101
+arrays/error_invalid_index_const_assign.bs:2:4: error: expected array index to be number, got string
+
+:b shell 53
+../bin/bs arrays/error_invalid_index_const_assign.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 102
+arrays/error_invalid_index_const_assign.bsx:2:4: error: expected array index to be number, got string
+
 :b shell 24
 ../bin/bs tables/main.bs
 :i returncode 0
@@ -458,6 +522,102 @@ bar
 foo
 
 :b stderr 0
+
+:b shell 37
+../bin/bs tables/error_invalid_key.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 70
+tables/error_invalid_key.bs:2:4: error: cannot use 'nil' as table key
+
+:b shell 38
+../bin/bs tables/error_invalid_key.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 72
+tables/error_invalid_key.bsx:2:4: error: cannot use 'bruh' as table key
+
+:b shell 44
+../bin/bs tables/error_invalid_key_assign.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 77
+tables/error_invalid_key_assign.bs:2:4: error: cannot use 'nil' as table key
+
+:b shell 45
+../bin/bs tables/error_invalid_key_assign.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 79
+tables/error_invalid_key_assign.bsx:2:4: error: cannot use 'bruh' as table key
+
+:b shell 47
+../bin/bs containers/error_invalid_container.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 81
+containers/error_invalid_container.bs:2:2: error: cannot index into number value
+
+:b shell 48
+../bin/bs containers/error_invalid_container.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 82
+containers/error_invalid_container.bsx:2:2: error: cannot index into number value
+
+:b shell 53
+../bin/bs containers/error_invalid_container_const.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 87
+containers/error_invalid_container_const.bs:2:2: error: cannot index into number value
+
+:b shell 54
+../bin/bs containers/error_invalid_container_const.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 88
+containers/error_invalid_container_const.bsx:2:2: error: cannot index into number value
+
+:b shell 54
+../bin/bs containers/error_invalid_container_assign.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 101
+containers/error_invalid_container_assign.bs:2:2: error: cannot take mutable index into number value
+
+:b shell 55
+../bin/bs containers/error_invalid_container_assign.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 102
+containers/error_invalid_container_assign.bsx:2:2: error: cannot take mutable index into number value
+
+:b shell 60
+../bin/bs containers/error_invalid_container_const_assign.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 107
+containers/error_invalid_container_const_assign.bs:2:2: error: cannot take mutable index into number value
+
+:b shell 61
+../bin/bs containers/error_invalid_container_const_assign.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 108
+containers/error_invalid_container_const_assign.bsx:2:2: error: cannot take mutable index into number value
 
 :b shell 24
 ../bin/bs import/main.bs

@@ -18,7 +18,7 @@ bs_debug_op_value(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset, const
     bs_fmt(p->writer, "'\n");
 }
 
-static_assert(BS_COUNT_OPS == 50, "Update bs_debug_op()");
+static_assert(BS_COUNT_OPS == 52, "Update bs_debug_op()");
 void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
     bs_fmt(p->writer, "%04zu ", *offset);
 
@@ -220,6 +220,14 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
         bs_fmt(p->writer, "OP_ISET\n");
         break;
 
+    case BS_OP_IGET_CONST:
+        bs_debug_op_value(p, c, offset, "OP_IGET_CONST");
+        break;
+
+    case BS_OP_ISET_CONST:
+        bs_debug_op_value(p, c, offset, "OP_ISET_CONST");
+        break;
+
     case BS_OP_ISET_CHAIN:
         bs_fmt(p->writer, "OP_ISET_CHAIN\n");
         break;
@@ -252,8 +260,21 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
 
 void bs_debug_chunk(Bs_Pretty_Printer *p, const Bs_Chunk *c) {
     size_t i = 0;
+    size_t oploc = 0;
     while (i < c->count) {
         bs_debug_op(p, c, &i);
+        if (oploc < c->locations.count) {
+            bool found = false;
+            while (oploc < c->locations.count && c->locations.data[oploc].index == i) {
+                found = true;
+                bs_fmt(p->writer, Bs_Loc_Fmt "\n", Bs_Loc_Arg(c->locations.data[oploc].loc));
+                oploc++;
+            }
+
+            if (found) {
+                bs_fmt(p->writer, "\n");
+            }
+        }
     }
 }
 
