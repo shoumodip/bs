@@ -1,12 +1,8 @@
-lit f(v) {
-    io.println("vibeof(\(v)) = \(vibeof(v))") fr
-}
-
-f(bruh) fr
-f(nocap) fr
-f(69) fr
-f(f) fr
-f("deez") fr
-f([]) fr
-f({}) fr
-f(str.reverse) fr
+io.println(vibeof(bruh)) fr
+io.println(vibeof(nocap)) fr
+io.println(vibeof(69)) fr
+io.println(vibeof(lit () {})) fr
+io.println(vibeof("deez")) fr
+io.println(vibeof([])) fr
+io.println(vibeof({})) fr
+io.println(vibeof(str.reverse)) fr

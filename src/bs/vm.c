@@ -676,6 +676,7 @@ void bs_error(Bs *bs, const char *fmt, ...) {
         bs_fmt(w, "\n");
     }
 
+    Bs_Pretty_Printer *p = bs_pretty_printer(bs, &bs->config.error);
     for (size_t i = bs->frames.count; i > 1; i--) {
         const Bs_Frame *callee = &bs->frames.data[i - 1];
         const Bs_Frame *caller = &bs->frames.data[i - 2];
@@ -690,12 +691,27 @@ void bs_error(Bs *bs, const char *fmt, ...) {
 
         bs_fmt(w, "in ");
         if (callee->ip) {
-            bs_value_write(bs, w, bs_value_object(callee->closure->fn));
+            if (callee->closure->fn->module) {
+                const Bs_Str *module = callee->closure->fn->name;
+
+                Bs_Sv sv = Bs_Sv(module->data, module->size);
+                if (bs_sv_suffix(sv, Bs_Sv_Static(".bs"))) {
+                    sv.size -= 3;
+                } else if (bs_sv_suffix(sv, Bs_Sv_Static(".bsx"))) {
+                    sv.size -= 4;
+                }
+
+                bs_fmt(w, "%s(", caller->extended ? "redpill" : "import");
+                bs_pretty_printer_quote(p, sv);
+                bs_fmt(w, ")");
+            } else if (callee->closure->fn->name) {
+                bs_fmt(w, Bs_Sv_Fmt "()", Bs_Sv_Arg(*callee->closure->fn->name));
+            } else {
+                bs_fmt(w, "<anonymous>()");
+            }
         } else {
             const Bs_C_Fn *fn = callee->native;
             if (fn->library) {
-                bs_fmt(w, "native fn ");
-
                 Bs_Sv path = Bs_Sv(fn->library->path->data, fn->library->path->size);
                 for (size_t i = path.size; i > 0; i--) {
                     if (path.data[i - 1] == '.') {
@@ -704,10 +720,9 @@ void bs_error(Bs *bs, const char *fmt, ...) {
                     }
                 }
 
-                bs_fmt(w, Bs_Sv_Fmt ".%s()", Bs_Sv_Arg(path), fn->name);
-            } else {
-                bs_fmt(w, "native fn %s()", fn->name);
+                bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(path));
             }
+            bs_fmt(w, "%s()", fn->name);
         }
 
         bs_fmt(w, "\n");
@@ -949,7 +964,7 @@ const Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main) {
     if (bs_sv_suffix(path, Bs_Sv_Static(".bs"))) {
         module.length = path.size - 3;
     } else if (bs_sv_suffix(path, Bs_Sv_Static(".bsx"))) {
-        module.length -= path.size - 4;
+        module.length = path.size - 4;
     } else {
         bs_fmt(
             &bs->config.error,

@@ -1,12 +1,8 @@
-fn f(v) {
-    io.println("typeof(\(v)) = \(typeof(v))");
-}
-
-f(nil);
-f(true);
-f(69);
-f(f);
-f("deez");
-f([]);
-f({});
-f(str.reverse);
+io.println(typeof(nil));
+io.println(typeof(true));
+io.println(typeof(69));
+io.println(typeof(fn () {}));
+io.println(typeof("deez"));
+io.println(typeof([]));
+io.println(typeof({}));
+io.println(typeof(str.reverse));

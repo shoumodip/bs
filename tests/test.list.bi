@@ -788,46 +788,46 @@ functions/error_invalid_arity.bsx:3:2: error: expected 1 argument, got 0
 :i returncode 1
 :b stdout 0
 
-:b stderr 217
+:b stderr 208
 functions/error_stack_trace.bs:2:5: error: undefined identifier 'oops'
-functions/error_stack_trace.bs:6:8: in fn baz()
-functions/error_stack_trace.bs:10:8: in fn bar()
-functions/error_stack_trace.bs:13:4: in fn foo()
+functions/error_stack_trace.bs:6:8: in baz()
+functions/error_stack_trace.bs:10:8: in bar()
+functions/error_stack_trace.bs:13:4: in foo()
 
 :b shell 41
 ../bin/bs functions/error_stack_trace.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 221
+:b stderr 212
 functions/error_stack_trace.bsx:2:5: error: undefined identifier 'oops'
-functions/error_stack_trace.bsx:6:8: in fn baz()
-functions/error_stack_trace.bsx:10:8: in fn bar()
-functions/error_stack_trace.bsx:13:4: in fn foo()
+functions/error_stack_trace.bsx:6:8: in baz()
+functions/error_stack_trace.bsx:10:8: in bar()
+functions/error_stack_trace.bsx:13:4: in foo()
 
 :b shell 47
 ../bin/bs functions/error_native_stack_trace.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 271
+:b stderr 245
 [C]: error: expected argument #1 to be string, got number
-functions/error_native_stack_trace.bs:2:23: in native fn str.reverse()
-[C]: in fn foo()
-functions/error_native_stack_trace.bs:6:14: in native fn array.map()
-functions/error_native_stack_trace.bs:9:5: in fn main()
+functions/error_native_stack_trace.bs:2:23: in str.reverse()
+[C]: in foo()
+functions/error_native_stack_trace.bs:6:14: in array.map()
+functions/error_native_stack_trace.bs:9:5: in main()
 
 :b shell 48
 ../bin/bs functions/error_native_stack_trace.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 274
+:b stderr 248
 [C]: error: expected argument #1 to be string, got number
-functions/error_native_stack_trace.bsx:2:20: in native fn str.reverse()
-[C]: in fn foo()
-functions/error_native_stack_trace.bsx:6:14: in native fn array.map()
-functions/error_native_stack_trace.bsx:9:5: in fn main()
+functions/error_native_stack_trace.bsx:2:20: in str.reverse()
+[C]: in foo()
+functions/error_native_stack_trace.bsx:6:14: in array.map()
+functions/error_native_stack_trace.bsx:9:5: in main()
 
 :b shell 26
 ../bin/bs closures/main.bs
@@ -902,68 +902,68 @@ x = nocap; y = bruh
 :i returncode 1
 :b stdout 0
 
-:b stderr 161
+:b stderr 148
 [C]: error: expected argument #1 to be string, got nil
-extended/common.bs:9:16: in native fn str.reverse()
-extended/error_type_name_normal.bs:1:31: in fn oops()
+extended/common.bs:9:16: in str.reverse()
+extended/error_type_name_normal.bs:1:31: in oops()
 
 :b shell 45
 ../bin/bs extended/error_type_name_normal.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 162
+:b stderr 149
 [C]: error: expected argument #1 to be string, got nil
-extended/common.bs:9:16: in native fn str.reverse()
-extended/error_type_name_normal.bsx:1:32: in fn oops()
+extended/common.bs:9:16: in str.reverse()
+extended/error_type_name_normal.bsx:1:32: in oops()
 
 :b shell 46
 ../bin/bs extended/error_type_name_extended.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 177
+:b stderr 164
 [C]: error: expected argument #1 to be string, got capness
-extended/common_extended.bsx:9:16: in native fn str.reverse()
-extended/error_type_name_extended.bs:1:40: in fn oops()
+extended/common_extended.bsx:9:16: in str.reverse()
+extended/error_type_name_extended.bs:1:40: in oops()
 
 :b shell 47
 ../bin/bs extended/error_type_name_extended.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 178
+:b stderr 165
 [C]: error: expected argument #1 to be string, got capness
-extended/common_extended.bsx:9:16: in native fn str.reverse()
-extended/error_type_name_extended.bsx:1:41: in fn oops()
+extended/common_extended.bsx:9:16: in str.reverse()
+extended/error_type_name_extended.bsx:1:41: in oops()
 
 :b shell 24
 ../bin/bs typeof/main.bs
 :i returncode 0
-:b stdout 186
-typeof(nil) = nil
-typeof(true) = boolean
-typeof(69) = number
-typeof(fn f()) = function
-typeof(deez) = string
-typeof([]) = array
-typeof({}) = table
-typeof(native fn ()) = native function
+:b stdout 56
+nil
+boolean
+number
+function
+string
+array
+table
+function
 
 :b stderr 0
 
 :b shell 25
 ../bin/bs typeof/main.bsx
 :i returncode 0
-:b stdout 189
-vibeof(bruh) = bruh
-vibeof(nocap) = capness
-vibeof(69) = number
-vibeof(fn f()) = function
-vibeof(deez) = string
-vibeof([]) = array
-vibeof({}) = table
-vibeof(native fn ()) = native function
+:b stdout 57
+bruh
+capness
+number
+function
+string
+array
+table
+function
 
 :b stderr 0
 

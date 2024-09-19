@@ -11,6 +11,7 @@ const char *bs_object_type_name(Bs_Object_Type type) {
     switch (type) {
     case BS_OBJECT_FN:
     case BS_OBJECT_CLOSURE:
+    case BS_OBJECT_C_FN:
         return "function";
 
     case BS_OBJECT_STR:
@@ -24,9 +25,6 @@ const char *bs_object_type_name(Bs_Object_Type type) {
 
     case BS_OBJECT_UPVALUE:
         return "upvalue";
-
-    case BS_OBJECT_C_FN:
-        return "native function";
 
     case BS_OBJECT_C_LIB:
         return "native library";
@@ -97,6 +95,21 @@ void bs_pretty_printer_push(Bs_Pretty_Printer *p, const Bs_Object *object) {
     p->data[p->count++] = object;
 }
 
+void bs_pretty_printer_quote(Bs_Pretty_Printer *p, Bs_Sv sv) {
+    bs_fmt(p->writer, "\"");
+    while (sv.size) {
+        size_t index;
+        if (bs_sv_find(sv, '"', &index)) {
+            p->writer->write(p->writer, bs_sv_drop(&sv, index));
+            p->writer->write(p->writer, Bs_Sv_Static("\\\""));
+            bs_sv_drop(&sv, 1);
+        } else {
+            p->writer->write(p->writer, bs_sv_drop(&sv, sv.size));
+        }
+    }
+    bs_fmt(p->writer, "\"");
+}
+
 bool bs_pretty_printer_has(Bs_Pretty_Printer *p, const Bs_Object *object) {
     for (size_t i = 0; i < p->count; i++) {
         if (p->data[i] == object) {
@@ -110,38 +123,14 @@ bool bs_pretty_printer_has(Bs_Pretty_Printer *p, const Bs_Object *object) {
 static_assert(BS_COUNT_OBJECTS == 9, "Update bs_object_write()");
 static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) {
     switch (object->type) {
-    case BS_OBJECT_FN: {
-        const Bs_Fn *fn = (const Bs_Fn *)object;
-        if (fn->module) {
-            if (fn->name) {
-                bs_fmt(p->writer, "module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*fn->name));
-            } else {
-                bs_fmt(p->writer, "module");
-            }
-        } else if (fn->name) {
-            bs_fmt(p->writer, "fn " Bs_Sv_Fmt "()", Bs_Sv_Arg(*fn->name));
-        } else {
-            bs_fmt(p->writer, "fn ()");
-        }
-    } break;
+    case BS_OBJECT_FN:
+        bs_fmt(p->writer, "<fn %p>", object);
+        break;
 
     case BS_OBJECT_STR:
         if (p->depth) {
             const Bs_Str *str = (const Bs_Str *)object;
-            Bs_Sv sv = Bs_Sv(str->data, str->size);
-
-            bs_fmt(p->writer, "\"");
-            while (sv.size) {
-                size_t index;
-                if (bs_sv_find(sv, '"', &index)) {
-                    p->writer->write(p->writer, bs_sv_drop(&sv, index));
-                    p->writer->write(p->writer, Bs_Sv_Static("\\\""));
-                    bs_sv_drop(&sv, 1);
-                } else {
-                    p->writer->write(p->writer, bs_sv_drop(&sv, sv.size));
-                }
-            }
-            bs_fmt(p->writer, "\"");
+            bs_pretty_printer_quote(p, Bs_Sv(str->data, str->size));
         } else {
             bs_fmt(p->writer, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)object));
         }

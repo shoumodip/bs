@@ -72,6 +72,7 @@ typedef struct {
 
 void bs_pretty_printer_free(Bs_Pretty_Printer *p);
 void bs_pretty_printer_push(Bs_Pretty_Printer *p, const Bs_Object *object);
+void bs_pretty_printer_quote(Bs_Pretty_Printer *p, Bs_Sv sv);
 bool bs_pretty_printer_has(Bs_Pretty_Printer *p, const Bs_Object *object);
 
 void bs_value_print_impl(Bs_Pretty_Printer *printer, Bs_Value value);
