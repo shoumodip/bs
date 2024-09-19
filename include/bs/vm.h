@@ -44,8 +44,6 @@ typedef struct {
     Bs_Writer log;
     Bs_Writer error;
     Bs_Buffer buffer;
-
-    Bs_Pretty_Printer printer;
 } Bs_Context;
 
 Bs_Context *bs_context(Bs *bs);

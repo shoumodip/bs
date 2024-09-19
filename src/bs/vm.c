@@ -98,6 +98,7 @@ struct Bs {
     Bs_Object *objects;
 
     Bs_Context context;
+    Bs_Pretty_Printer printer;
 
     // Exit
     int exit;
@@ -410,7 +411,7 @@ void bs_free(Bs *bs) {
     bs_da_free(bs, &bs->paths);
     bs_da_free(bs, &bs->context.buffer);
 
-    bs_pretty_printer_free(&bs->context.printer);
+    bs_pretty_printer_free(&bs->printer);
     free(bs);
 }
 
@@ -496,11 +497,11 @@ bool bs_update_cwd(Bs *bs) {
 }
 
 static Bs_Pretty_Printer *bs_pretty_printer(Bs *bs, Bs_Writer *w) {
-    bs->context.printer.writer = w;
-    bs->context.printer.extended = bs->frame ? bs->frame->extended : false;
-    bs->context.printer.depth = 0;
-    bs->context.printer.count = 0;
-    return &bs->context.printer;
+    bs->printer.writer = w;
+    bs->printer.extended = bs->frame ? bs->frame->extended : false;
+    bs->printer.depth = 0;
+    bs->printer.count = 0;
+    return &bs->printer;
 }
 
 void bs_value_write(Bs *bs, Bs_Writer *w, Bs_Value value) {
