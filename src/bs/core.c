@@ -148,23 +148,23 @@ static Bs_Value bs_io_write(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_io_print(Bs *bs, Bs_Value *args, size_t arity) {
-    Bs_Writer *w = &bs_context(bs)->output;
+    Bs_Writer w = bs_file_writer(stdout);
     for (size_t i = 0; i < arity; i++) {
         if (i) {
-            bs_fmt(w, " ");
+            bs_fmt(&w, " ");
         }
-        bs_value_write(bs, w, args[i]);
+        bs_value_write(bs, &w, args[i]);
     }
     return bs_value_nil;
 }
 
 static Bs_Value bs_io_eprint(Bs *bs, Bs_Value *args, size_t arity) {
-    Bs_Writer *w = &bs_context(bs)->error;
+    Bs_Writer w = bs_file_writer(stderr);
     for (size_t i = 0; i < arity; i++) {
         if (i) {
-            bs_fmt(w, " ");
+            bs_fmt(&w, " ");
         }
-        bs_value_write(bs, w, args[i]);
+        bs_value_write(bs, &w, args[i]);
     }
     return bs_value_nil;
 }
@@ -195,26 +195,26 @@ static Bs_Value bs_io_writeln(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_io_println(Bs *bs, Bs_Value *args, size_t arity) {
-    Bs_Writer *w = &bs_context(bs)->output;
+    Bs_Writer w = bs_file_writer(stdout);
     for (size_t i = 0; i < arity; i++) {
         if (i) {
-            bs_fmt(w, " ");
+            bs_fmt(&w, " ");
         }
-        bs_value_write(bs, w, args[i]);
+        bs_value_write(bs, &w, args[i]);
     }
-    bs_fmt(w, "\n");
+    bs_fmt(&w, "\n");
     return bs_value_nil;
 }
 
 static Bs_Value bs_io_eprintln(Bs *bs, Bs_Value *args, size_t arity) {
-    Bs_Writer *w = &bs_context(bs)->error;
+    Bs_Writer w = bs_file_writer(stderr);
     for (size_t i = 0; i < arity; i++) {
         if (i) {
-            bs_fmt(w, " ");
+            bs_fmt(&w, " ");
         }
-        bs_value_write(bs, w, args[i]);
+        bs_value_write(bs, &w, args[i]);
     }
-    bs_fmt(w, "\n");
+    bs_fmt(&w, "\n");
     return bs_value_nil;
 }
 

@@ -41,8 +41,8 @@ Bs_Sv bs_buffer_relative_path(Bs_Buffer *buffer, Bs_Sv path);
 typedef struct {
     void *userdata;
 
+    Bs_Writer log;
     Bs_Writer error;
-    Bs_Writer output;
     Bs_Buffer buffer;
 
     Bs_Pretty_Printer printer;

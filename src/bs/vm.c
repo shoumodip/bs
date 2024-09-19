@@ -112,7 +112,7 @@ struct Bs {
 static_assert(BS_COUNT_OBJECTS == 9, "Update bs_free_object()");
 static void bs_free_object(Bs *bs, Bs_Object *object) {
 #ifdef BS_GC_DEBUG_LOG
-    bs_fmt(&bs->context.output, "[GC] Free %p; Type: %d\n", object, object->type);
+    bs_fmt(&bs->context.log, "[GC] Free %p; Type: %d\n", object, object->type);
 #endif // BS_GC_DEBUG_LOG
 
     switch (object->type) {
@@ -195,7 +195,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
     }
 
 #ifdef BS_GC_DEBUG_LOG
-    Bs_Writer *w = &bs->context.output;
+    Bs_Writer *w = &bs->context.log;
     bs_fmt(w, "[GC] Mark %p ", object);
     bs_value_write(bs, w, bs_value_object(object));
     bs_fmt(w, "\n");
@@ -215,7 +215,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
 static_assert(BS_COUNT_OBJECTS == 9, "Update bs_blacken_object()");
 static void bs_blacken_object(Bs *bs, Bs_Object *object) {
 #ifdef BS_GC_DEBUG_LOG
-    Bs_Writer *w = &bs->context.output;
+    Bs_Writer *w = &bs->context.log;
     bs_fmt(w, "[GC] Blacken %p ", object);
     bs_value_write(bs, w, bs_value_object(object));
     bs_fmt(w, "\n");
@@ -280,7 +280,7 @@ static void bs_collect(Bs *bs) {
     bs->gc_on = false;
 
 #ifdef BS_GC_DEBUG_LOG
-    Bs_Writer *w = &bs->context.output;
+    Bs_Writer *w = &bs->context.log;
     bs_fmt(w, "\n-------- GC Begin --------\n");
     const size_t before = bs->gc_bytes;
 #endif // BS_GC_DEBUG_LOG
@@ -380,8 +380,8 @@ Bs *bs_new(bool step) {
     bs->paths.bs = bs;
     bs->context.buffer.bs = bs;
 
+    bs->context.log = bs_file_writer(stdout);
     bs->context.error = bs_file_writer(stderr);
-    bs->context.output = bs_file_writer(stdout);
 
     bs_update_cwd(bs);
 
@@ -443,7 +443,7 @@ Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size) {
     bs->objects = object;
 
 #ifdef BS_GC_DEBUG_LOG
-    bs_fmt(&bs->context.output, "[GC] Allocate %p (%zu bytes); Type: %d\n", object, size, type);
+    bs_fmt(&bs->context.log, "[GC] Allocate %p (%zu bytes); Type: %d\n", object, size, type);
 #endif // BS_GC_DEBUG_LOG
 
     return object;
@@ -984,7 +984,7 @@ static bool bs_import_language(Bs *bs, Bs_Sv path, size_t length) {
     }
 
     if (bs->step) {
-        bs_debug_chunk(bs_pretty_printer(bs, &bs->context.output), &fn->chunk);
+        bs_debug_chunk(bs_pretty_printer(bs, &bs->context.log), &fn->chunk);
     }
 
     bs_stack_push(bs, bs_value_object(bs_closure_new(bs, fn)));
@@ -1110,7 +1110,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
     bs->gc_on = true;
     while (true) {
         if (bs->step) {
-            Bs_Writer *w = &bs->context.output;
+            Bs_Writer *w = &bs->context.log;
             bs_fmt(w, "\n----------------------------------------\n");
             bs_fmt(w, "Modules:\n");
             for (size_t i = 0; i < bs->modules.count; i++) {
@@ -1771,7 +1771,7 @@ Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input) {
     }
 
     if (bs->step) {
-        bs_debug_chunk(bs_pretty_printer(bs, &bs->context.output), &fn->chunk);
+        bs_debug_chunk(bs_pretty_printer(bs, &bs->context.log), &fn->chunk);
     }
 
     result.value = bs_call(bs, bs_value_object(bs_closure_new(bs, fn)), NULL, 0);
@@ -1786,7 +1786,7 @@ end:
     bs->gc_on = false;
 
     if (bs->step) {
-        bs_fmt(&bs->context.output, "Stopping BS with exit code %d\n", bs->exit);
+        bs_fmt(&bs->context.log, "Stopping BS with exit code %d\n", bs->exit);
     }
 
     result.ok = bs->ok;
