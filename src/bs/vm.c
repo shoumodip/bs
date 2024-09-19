@@ -113,7 +113,7 @@ struct Bs {
 static_assert(BS_COUNT_OBJECTS == 9, "Update bs_free_object()");
 static void bs_free_object(Bs *bs, Bs_Object *object) {
 #ifdef BS_GC_DEBUG_LOG
-    bs_fmt(&bs->context.log, "[GC] Free %p; Type: %d\n", object, object->type);
+    bs_fmt(&bs->config.log, "[GC] Free %p; Type: %d\n", object, object->type);
 #endif // BS_GC_DEBUG_LOG
 
     switch (object->type) {
@@ -196,7 +196,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
     }
 
 #ifdef BS_GC_DEBUG_LOG
-    Bs_Writer *w = &bs->context.log;
+    Bs_Writer *w = &bs->config.log;
     bs_fmt(w, "[GC] Mark %p ", object);
     bs_value_write(bs, w, bs_value_object(object));
     bs_fmt(w, "\n");
@@ -216,7 +216,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
 static_assert(BS_COUNT_OBJECTS == 9, "Update bs_blacken_object()");
 static void bs_blacken_object(Bs *bs, Bs_Object *object) {
 #ifdef BS_GC_DEBUG_LOG
-    Bs_Writer *w = &bs->context.log;
+    Bs_Writer *w = &bs->config.log;
     bs_fmt(w, "[GC] Blacken %p ", object);
     bs_value_write(bs, w, bs_value_object(object));
     bs_fmt(w, "\n");
@@ -281,7 +281,7 @@ static void bs_collect(Bs *bs) {
     bs->gc_on = false;
 
 #ifdef BS_GC_DEBUG_LOG
-    Bs_Writer *w = &bs->context.log;
+    Bs_Writer *w = &bs->config.log;
     bs_fmt(w, "\n-------- GC Begin --------\n");
     const size_t before = bs->gc_bytes;
 #endif // BS_GC_DEBUG_LOG
@@ -444,7 +444,7 @@ Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size) {
     bs->objects = object;
 
 #ifdef BS_GC_DEBUG_LOG
-    bs_fmt(&bs->context.log, "[GC] Allocate %p (%zu bytes); Type: %d\n", object, size, type);
+    bs_fmt(&bs->config.log, "[GC] Allocate %p (%zu bytes); Type: %d\n", object, size, type);
 #endif // BS_GC_DEBUG_LOG
 
     return object;
