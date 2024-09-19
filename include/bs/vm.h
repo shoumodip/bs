@@ -44,9 +44,9 @@ typedef struct {
     Bs_Writer log;
     Bs_Writer error;
     Bs_Buffer buffer;
-} Bs_Context;
+} Bs_Config;
 
-Bs_Context *bs_context(Bs *bs);
+Bs_Config *bs_config(Bs *bs);
 
 // FFI
 typedef Bs_Value (*Bs_C_Fn_Ptr)(Bs *bs, Bs_Value *args, size_t arity);

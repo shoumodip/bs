@@ -30,7 +30,7 @@ static Bs_Value bs_io_open(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
     bs_check_value_type(bs, args[1], BS_VALUE_BOOL, "argument #2");
 
-    Bs_Buffer *b = &bs_context(bs)->buffer;
+    Bs_Buffer *b = &bs_config(bs)->buffer;
     const size_t start = b->count;
 
     Bs_Writer w = bs_buffer_writer(b);
@@ -264,7 +264,7 @@ static Bs_Value bs_os_getenv(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
 
     {
-        Bs_Buffer *b = &bs_context(bs)->buffer;
+        Bs_Buffer *b = &bs_config(bs)->buffer;
         const size_t start = b->count;
 
         Bs_Writer w = bs_buffer_writer(b);
@@ -290,7 +290,7 @@ static Bs_Value bs_os_setenv(Bs *bs, Bs_Value *args, size_t arity) {
     const char *key;
     const char *value;
     {
-        Bs_Buffer *b = &bs_context(bs)->buffer;
+        Bs_Buffer *b = &bs_config(bs)->buffer;
         const size_t start = b->count;
 
         Bs_Writer w = bs_buffer_writer(b);
@@ -375,7 +375,7 @@ static Bs_Value bs_process_spawn(Bs *bs, Bs_Value *args, size_t arity) {
     }
 
     if (pid == 0) {
-        Bs_Buffer *b = &bs_context(bs)->buffer;
+        Bs_Buffer *b = &bs_config(bs)->buffer;
         const size_t start = b->count;
 
         char **cargv = malloc((array->count + 1) * sizeof(char *));
@@ -507,7 +507,7 @@ static Bs_Value bs_str_tonumber(Bs *bs, Bs_Value *args, size_t arity) {
 
     const Bs_Str *src = (const Bs_Str *)args[0].as.object;
 
-    Bs_Buffer *b = &bs_context(bs)->buffer;
+    Bs_Buffer *b = &bs_config(bs)->buffer;
     const size_t start = b->count;
 
     bs_da_push_many(b->bs, b, src->data, src->size);
@@ -611,7 +611,7 @@ static Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_object(str);
     }
 
-    Bs_Buffer *b = &bs_context(bs)->buffer;
+    Bs_Buffer *b = &bs_config(bs)->buffer;
     const size_t start = b->count;
 
     const Bs_Sv pattern_sv = Bs_Sv(pattern->data, pattern->size);
@@ -730,7 +730,7 @@ static Bs_Value bs_str_lpad(Bs *bs, Bs_Value *args, size_t arity) {
     }
     const size_t padding = count - str->size;
 
-    Bs_Buffer *b = &bs_context(bs)->buffer;
+    Bs_Buffer *b = &bs_config(bs)->buffer;
     const size_t start = b->count;
 
     for (size_t i = 0; i < padding; i += pattern->size) {
@@ -762,7 +762,7 @@ static Bs_Value bs_str_rpad(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_object(str);
     }
 
-    Bs_Buffer *b = &bs_context(bs)->buffer;
+    Bs_Buffer *b = &bs_config(bs)->buffer;
     const size_t start = b->count;
 
     bs_da_push_many(bs, b, str->data, str->size);
@@ -926,7 +926,7 @@ static Bs_Value bs_regex_find(Bs *bs, Bs_Value *args, size_t arity) {
         bs_error(bs, "cannot take offset of %zu in string of length %zu", offset, str->size);
     }
 
-    Bs_Buffer *b = &bs_context(bs)->buffer;
+    Bs_Buffer *b = &bs_config(bs)->buffer;
     const size_t start = b->count;
 
     const size_t str_pos = b->count;
@@ -967,7 +967,7 @@ static Bs_Value bs_regex_split(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_object(a);
     }
 
-    Bs_Buffer *b = &bs_context(bs)->buffer;
+    Bs_Buffer *b = &bs_config(bs)->buffer;
     const size_t start = b->count;
 
     const size_t str_pos = b->count;
@@ -1023,7 +1023,7 @@ static Bs_Value bs_regex_replace(Bs *bs, Bs_Value *args, size_t arity) {
 
     const Bs_Str *replacement = (const Bs_Str *)args[2].as.object;
 
-    Bs_Buffer *b = &bs_context(bs)->buffer;
+    Bs_Buffer *b = &bs_config(bs)->buffer;
     const size_t start = b->count;
 
     const size_t str_pos = b->count;
@@ -1159,7 +1159,7 @@ static Bs_Value bs_array_join(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
     bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
 
-    Bs_Buffer *b = &bs_context(bs)->buffer;
+    Bs_Buffer *b = &bs_config(bs)->buffer;
     const size_t start = b->count;
     {
         Bs_Writer w = bs_buffer_writer(b);

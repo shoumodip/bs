@@ -203,7 +203,7 @@ static void bs_compile_error_unexpected(Bs_Compiler *c, const Bs_Token *token) {
 static void bs_compile_lambda(Bs_Compiler *c, const Bs_Token *name);
 
 static void bs_compile_string(Bs_Compiler *c, Bs_Sv sv) {
-    Bs_Buffer *b = &bs_context(c->bs)->buffer;
+    Bs_Buffer *b = &bs_config(c->bs)->buffer;
     const size_t start = b->count;
 
     Bs_Writer w = bs_buffer_writer(b);
@@ -992,7 +992,7 @@ Bs_Fn *bs_compile_impl(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main) {
     {
         // Own the path
         const Bs_Sv path = Bs_Sv(scope.fn->name->data, scope.fn->name->size);
-        compiler.lexer = bs_lexer_new(path, input, &bs_context(bs)->error);
+        compiler.lexer = bs_lexer_new(path, input, &bs_config(bs)->error);
         compiler.lexer.extended = bs_sv_suffix(path, Bs_Sv_Static(".bsx"));
     }
 

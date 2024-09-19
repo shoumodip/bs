@@ -97,7 +97,7 @@ struct Bs {
     Bs_Grays grays;
     Bs_Object *objects;
 
-    Bs_Context context;
+    Bs_Config config;
     Bs_Pretty_Printer printer;
 
     // Exit
@@ -379,10 +379,10 @@ Bs *bs_new(bool step) {
     bs->gc_max = 1024 * 1024;
 
     bs->paths.bs = bs;
-    bs->context.buffer.bs = bs;
+    bs->config.buffer.bs = bs;
 
-    bs->context.log = bs_file_writer(stdout);
-    bs->context.error = bs_file_writer(stderr);
+    bs->config.log = bs_file_writer(stdout);
+    bs->config.error = bs_file_writer(stderr);
 
     bs_update_cwd(bs);
 
@@ -409,7 +409,7 @@ void bs_free(Bs *bs) {
     free(bs->grays.data);
 
     bs_da_free(bs, &bs->paths);
-    bs_da_free(bs, &bs->context.buffer);
+    bs_da_free(bs, &bs->config.buffer);
 
     bs_pretty_printer_free(&bs->printer);
     free(bs);
@@ -616,8 +616,8 @@ Bs_Sv bs_buffer_relative_path(Bs_Buffer *b, Bs_Sv path) {
 }
 
 // Context
-Bs_Context *bs_context(Bs *bs) {
-    return &bs->context;
+Bs_Config *bs_config(Bs *bs) {
+    return &bs->config;
 }
 
 // Errors
@@ -636,7 +636,7 @@ void bs_error(Bs *bs, const char *fmt, ...) {
 
     bs->gc_on = false;
 
-    Bs_Writer *w = &bs->context.error;
+    Bs_Writer *w = &bs->config.error;
     if (bs->frame->ip) {
         const Bs_Loc loc = bs_chunk_get_loc(
             &bs->frame->closure->fn->chunk, bs->frame->ip - bs->frame->closure->fn->chunk.data);
@@ -647,7 +647,7 @@ void bs_error(Bs *bs, const char *fmt, ...) {
 
     bs_fmt(w, "error: ");
     {
-        Bs_Buffer *b = &bs->context.buffer;
+        Bs_Buffer *b = &bs->config.buffer;
         const size_t start = b->count;
 
         int count;
@@ -668,7 +668,7 @@ void bs_error(Bs *bs, const char *fmt, ...) {
         }
         b->count += count;
 
-        Bs_Writer *w = &bs->context.error;
+        Bs_Writer *w = &bs->config.error;
         w->write(w, bs_buffer_reset(b, start));
     }
 
@@ -801,7 +801,7 @@ void bs_check_whole_number(Bs *bs, Bs_Value value, const char *label) {
 // Interpreter
 static void bs_stack_push(Bs *bs, Bs_Value value) {
     if (bs->stack.count >= BS_STACK_CAPACITY) {
-        bs_fmt(&bs->context.error, "error: stack overflow\n");
+        bs_fmt(&bs->config.error, "error: stack overflow\n");
 
         bs->ok = false;
         bs_unwind(bs, 1);
@@ -952,7 +952,7 @@ const Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main) {
         module.length -= path.size - 4;
     } else {
         bs_fmt(
-            &bs->context.error,
+            &bs->config.error,
             "error: invalid input path '" Bs_Sv_Fmt "', expected '.bs' or '.bsx' extension\n",
             Bs_Sv_Arg(relative));
 
@@ -985,7 +985,7 @@ static bool bs_import_language(Bs *bs, Bs_Sv path, size_t length) {
     }
 
     if (bs->step) {
-        bs_debug_chunk(bs_pretty_printer(bs, &bs->context.log), &fn->chunk);
+        bs_debug_chunk(bs_pretty_printer(bs, &bs->config.log), &fn->chunk);
     }
 
     bs_stack_push(bs, bs_value_object(bs_closure_new(bs, fn)));
@@ -1111,7 +1111,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
     bs->gc_on = true;
     while (true) {
         if (bs->step) {
-            Bs_Writer *w = &bs->context.log;
+            Bs_Writer *w = &bs->config.log;
             bs_fmt(w, "\n----------------------------------------\n");
             bs_fmt(w, "Modules:\n");
             for (size_t i = 0; i < bs->modules.count; i++) {
@@ -1453,7 +1453,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         } break;
 
         case BS_OP_JOIN: {
-            Bs_Buffer *buffer = &bs->context.buffer;
+            Bs_Buffer *buffer = &bs->config.buffer;
             const size_t start = buffer->count;
 
             const Bs_Value b = bs_stack_peek(bs, 0);
@@ -1745,7 +1745,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
         default:
             bs_fmt(
-                &bs->context.error,
+                &bs->config.error,
                 "error: invalid op %d at offset %zu\n",
                 op,
                 bs->frame->ip - bs->frame->closure->fn->chunk.data - 1);
@@ -1772,7 +1772,7 @@ Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input) {
     }
 
     if (bs->step) {
-        bs_debug_chunk(bs_pretty_printer(bs, &bs->context.log), &fn->chunk);
+        bs_debug_chunk(bs_pretty_printer(bs, &bs->config.log), &fn->chunk);
     }
 
     result.value = bs_call(bs, bs_value_object(bs_closure_new(bs, fn)), NULL, 0);
@@ -1787,7 +1787,7 @@ end:
     bs->gc_on = false;
 
     if (bs->step) {
-        bs_fmt(&bs->context.log, "Stopping BS with exit code %d\n", bs->exit);
+        bs_fmt(&bs->config.log, "Stopping BS with exit code %d\n", bs->exit);
     }
 
     result.ok = bs->ok;
