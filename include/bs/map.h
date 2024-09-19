@@ -13,12 +13,12 @@ typedef struct {
 Bs_Entry *bs_entries_find(Bs_Entry *entries, size_t capacity, Bs_Value key);
 Bs_Entry *bs_entries_find_sv(Bs_Entry *entries, size_t capacity, Bs_Sv key, uint32_t hash);
 
-typedef struct {
+struct Bs_Map {
     Bs_Entry *data;
     size_t count;
     size_t length;
     size_t capacity;
-} Bs_Map;
+};
 
 void bs_map_free(Bs *bs, Bs_Map *map);
 bool bs_map_remove(Bs *bs, Bs_Map *map, Bs_Value key);

@@ -16,6 +16,8 @@ typedef enum {
     BS_OP_TABLE,
     BS_OP_CONST,
 
+    BS_OP_CLASS,
+
     BS_OP_ADD,
     BS_OP_SUB,
     BS_OP_MUL,

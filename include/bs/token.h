@@ -78,6 +78,7 @@ typedef enum {
     BS_TOKEN_FN,
     BS_TOKEN_PUB,
     BS_TOKEN_VAR,
+    BS_TOKEN_CLASS,
     BS_TOKEN_RETURN,
 
     BS_TOKEN_COMMENT,

@@ -16,7 +16,7 @@ typedef enum {
     BS_POWER_DOT,
 } Bs_Power;
 
-static_assert(BS_COUNT_TOKENS == 57, "Update bs_token_type_power()");
+static_assert(BS_COUNT_TOKENS == 58, "Update bs_token_type_power()");
 static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_DOT:
@@ -244,7 +244,7 @@ static void bs_compile_string(Bs_Compiler *c, Bs_Sv sv) {
         bs_value_object(bs_str_new(c->bs, bs_buffer_reset(b, start))));
 }
 
-static_assert(BS_COUNT_TOKENS == 57, "Update bs_compile_expr()");
+static_assert(BS_COUNT_TOKENS == 58, "Update bs_compile_expr()");
 static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
     Bs_Loc loc = token.loc;
@@ -774,6 +774,24 @@ static void bs_compile_lambda(Bs_Compiler *c, const Bs_Token *name) {
     bs_scope_free(c->bs, &scope);
 }
 
+static void bs_compile_class(Bs_Compiler *c, bool public) {
+    Bs_Token token;
+
+    const size_t const_index = bs_compile_definition(c, &token, true);
+    if (!public) {
+        bs_da_push(c->bs, c->scope, ((Bs_Local){.token = token, .depth = c->scope->depth}));
+    }
+
+    bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_CLASS, const_index);
+    if (public) {
+        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_GDEF, const_index);
+        bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
+    }
+
+    bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE);
+    bs_lexer_expect(&c->lexer, BS_TOKEN_RBRACE);
+}
+
 static void bs_compile_function(Bs_Compiler *c, bool public) {
     Bs_Token token;
 
@@ -828,7 +846,7 @@ static void bs_compile_jumps_reset(Bs_Compiler *c, Bs_Jumps save) {
     c->jumps.start = save.start;
 }
 
-static_assert(BS_COUNT_TOKENS == 57, "Update bs_compile_stmt()");
+static_assert(BS_COUNT_TOKENS == 58, "Update bs_compile_stmt()");
 static void bs_compile_stmt(Bs_Compiler *c) {
     Bs_Token token = bs_lexer_next(&c->lexer);
 
@@ -985,16 +1003,33 @@ static void bs_compile_stmt(Bs_Compiler *c) {
             bs_lexer_error(&c->lexer);
         }
 
-        token = bs_lexer_either(&c->lexer, BS_TOKEN_FN, BS_TOKEN_VAR);
+        token = bs_lexer_next(&c->lexer);
         if (token.type == BS_TOKEN_FN) {
             bs_compile_function(c, true);
-        } else {
+        } else if (token.type == BS_TOKEN_VAR) {
             bs_compile_variable(c, true);
+        } else if (token.type == BS_TOKEN_CLASS) {
+            bs_compile_class(c, true);
+        } else {
+            bs_fmt(
+                c->lexer.error,
+                Bs_Loc_Fmt "error: expected %s, %s or %s, got %s\n",
+                Bs_Loc_Arg(token.loc),
+                bs_token_type_name(BS_TOKEN_FN, c->lexer.extended),
+                bs_token_type_name(BS_TOKEN_VAR, c->lexer.extended),
+                bs_token_type_name(BS_TOKEN_CLASS, c->lexer.extended),
+                bs_token_type_name(token.type, c->lexer.extended));
+
+            bs_lexer_error(&c->lexer);
         }
         break;
 
     case BS_TOKEN_VAR:
         bs_compile_variable(c, false);
+        break;
+
+    case BS_TOKEN_CLASS:
+        bs_compile_class(c, false);
         break;
 
     case BS_TOKEN_RETURN:

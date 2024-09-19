@@ -21,6 +21,10 @@ typedef enum {
     BS_OBJECT_TABLE,
     BS_OBJECT_CLOSURE,
     BS_OBJECT_UPVALUE,
+
+    BS_OBJECT_CLASS,
+    BS_OBJECT_INSTANCE,
+
     BS_OBJECT_C_FN,
     BS_OBJECT_C_LIB,
     BS_OBJECT_C_DATA,
@@ -38,9 +42,14 @@ typedef struct Bs_Table Bs_Table;
 typedef struct Bs_Closure Bs_Closure;
 typedef struct Bs_Upvalue Bs_Upvalue;
 
+typedef struct Bs_Class Bs_Class;
+typedef struct Bs_Instance Bs_Instance;
+
 typedef struct Bs_C_Fn Bs_C_Fn;
 typedef struct Bs_C_Lib Bs_C_Lib;
 typedef struct Bs_C_Data Bs_C_Data;
+
+typedef struct Bs_Map Bs_Map;
 
 typedef struct {
     Bs_Value_Type type;
@@ -72,8 +81,10 @@ typedef struct {
 
 void bs_pretty_printer_free(Bs_Pretty_Printer *p);
 void bs_pretty_printer_push(Bs_Pretty_Printer *p, const Bs_Object *object);
-void bs_pretty_printer_quote(Bs_Pretty_Printer *p, Bs_Sv sv);
 bool bs_pretty_printer_has(Bs_Pretty_Printer *p, const Bs_Object *object);
+
+void bs_pretty_printer_map(Bs_Pretty_Printer *p, const Bs_Map *map);
+void bs_pretty_printer_quote(Bs_Pretty_Printer *p, Bs_Sv sv);
 
 void bs_value_print_impl(Bs_Pretty_Printer *printer, Bs_Value value);
 bool bs_value_equal(Bs_Value a, Bs_Value b);

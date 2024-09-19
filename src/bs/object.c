@@ -125,6 +125,19 @@ Bs_Upvalue *bs_upvalue_new(Bs *bs, Bs_Value *value) {
     return upvalue;
 }
 
+Bs_Class *bs_class_new(Bs *bs, Bs_Str *name) {
+    Bs_Class *class = (Bs_Class *)bs_object_new(bs, BS_OBJECT_CLASS, sizeof(Bs_Class));
+    class->name = name;
+    return class;
+}
+
+Bs_Instance *bs_instance_new(Bs *bs, Bs_Class *class) {
+    Bs_Instance *i = (Bs_Instance *)bs_object_new(bs, BS_OBJECT_INSTANCE, sizeof(Bs_Instance));
+    i->class = class;
+    memset(&i->fields, '\0', sizeof(i->fields));
+    return i;
+}
+
 Bs_C_Fn *bs_c_fn_new(Bs *bs, const char *name, Bs_C_Fn_Ptr fn) {
     Bs_C_Fn *c = (Bs_C_Fn *)bs_object_new(bs, BS_OBJECT_C_FN, sizeof(Bs_C_Fn));
     c->fn = fn;

@@ -6,7 +6,7 @@ bool bs_value_is_falsey(Bs_Value v) {
     return v.type == BS_VALUE_NIL || (v.type == BS_VALUE_BOOL && !v.as.boolean);
 }
 
-static_assert(BS_COUNT_OBJECTS == 9, "Update bs_object_type_name()");
+static_assert(BS_COUNT_OBJECTS == 11, "Update bs_object_type_name()");
 const char *bs_object_type_name(Bs_Object_Type type) {
     switch (type) {
     case BS_OBJECT_FN:
@@ -25,6 +25,12 @@ const char *bs_object_type_name(Bs_Object_Type type) {
 
     case BS_OBJECT_UPVALUE:
         return "upvalue";
+
+    case BS_OBJECT_CLASS:
+        return "class";
+
+    case BS_OBJECT_INSTANCE:
+        return "instance";
 
     case BS_OBJECT_C_LIB:
         return "native library";
@@ -95,6 +101,67 @@ void bs_pretty_printer_push(Bs_Pretty_Printer *p, const Bs_Object *object) {
     p->data[p->count++] = object;
 }
 
+bool bs_pretty_printer_has(Bs_Pretty_Printer *p, const Bs_Object *object) {
+    for (size_t i = 0; i < p->count; i++) {
+        if (p->data[i] == object) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void bs_pretty_printer_map(Bs_Pretty_Printer *p, const Bs_Map *map) {
+    bs_fmt(p->writer, "{");
+    if (map->length) {
+        p->depth++;
+
+        for (size_t i = 0, count = 0; i < map->capacity; i++) {
+            Bs_Entry *entry = &map->data[i];
+            if (entry->key.type == BS_VALUE_NIL) {
+                continue;
+            }
+
+            if (count) {
+                bs_fmt(p->writer, ",");
+            }
+            bs_fmt(p->writer, "\n%*s", (int)p->depth * BS_PRETTY_PRINT_INDENT, "");
+
+            bool symbol =
+                entry->key.type == BS_VALUE_OBJECT && entry->key.as.object->type == BS_OBJECT_STR;
+
+            if (symbol) {
+                const Bs_Str *str = (const Bs_Str *)entry->key.as.object;
+                if (str->size && (isalpha(*str->data) || *str->data == '_')) {
+                    for (size_t i = 0; i < str->size; i++) {
+                        if (!isalnum(str->data[i]) && str->data[i] != '_') {
+                            symbol = false;
+                            break;
+                        }
+                    }
+                } else {
+                    symbol = false;
+                }
+            }
+
+            if (symbol) {
+                bs_fmt(p->writer, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)entry->key.as.object));
+            } else {
+                p->writer->write(p->writer, Bs_Sv_Static("["));
+                bs_value_print_impl(p, entry->key);
+                p->writer->write(p->writer, Bs_Sv_Static("]"));
+            }
+            bs_fmt(p->writer, " = ");
+            bs_value_print_impl(p, entry->value);
+            count++;
+        }
+
+        p->depth--;
+        bs_fmt(p->writer, "\n%*s", (int)p->depth * BS_PRETTY_PRINT_INDENT, "");
+    }
+    bs_fmt(p->writer, "}");
+}
+
 void bs_pretty_printer_quote(Bs_Pretty_Printer *p, Bs_Sv sv) {
     bs_fmt(p->writer, "\"");
     while (sv.size) {
@@ -110,20 +177,11 @@ void bs_pretty_printer_quote(Bs_Pretty_Printer *p, Bs_Sv sv) {
     bs_fmt(p->writer, "\"");
 }
 
-bool bs_pretty_printer_has(Bs_Pretty_Printer *p, const Bs_Object *object) {
-    for (size_t i = 0; i < p->count; i++) {
-        if (p->data[i] == object) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-static_assert(BS_COUNT_OBJECTS == 9, "Update bs_object_write()");
+static_assert(BS_COUNT_OBJECTS == 11, "Update bs_object_write()");
 static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) {
     switch (object->type) {
     case BS_OBJECT_FN:
+    case BS_OBJECT_C_FN:
         bs_fmt(p->writer, "<fn %p>", object);
         break;
 
@@ -174,57 +232,7 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
             bs_fmt(p->writer, "<table %p>", object);
         } else {
             bs_pretty_printer_push(p, object);
-            const Bs_Table *table = (const Bs_Table *)object;
-
-            bs_fmt(p->writer, "{");
-            if (table->map.length) {
-                p->depth++;
-
-                for (size_t i = 0, count = 0; i < table->map.capacity; i++) {
-                    Bs_Entry *entry = &table->map.data[i];
-                    if (entry->key.type == BS_VALUE_NIL) {
-                        continue;
-                    }
-
-                    if (count) {
-                        bs_fmt(p->writer, ",");
-                    }
-                    bs_fmt(p->writer, "\n%*s", (int)p->depth * BS_PRETTY_PRINT_INDENT, "");
-
-                    bool symbol = entry->key.type == BS_VALUE_OBJECT &&
-                                  entry->key.as.object->type == BS_OBJECT_STR;
-
-                    if (symbol) {
-                        const Bs_Str *str = (const Bs_Str *)entry->key.as.object;
-                        if (str->size && (isalpha(*str->data) || *str->data == '_')) {
-                            for (size_t i = 0; i < str->size; i++) {
-                                if (!isalnum(str->data[i]) && str->data[i] != '_') {
-                                    symbol = false;
-                                    break;
-                                }
-                            }
-                        } else {
-                            symbol = false;
-                        }
-                    }
-
-                    if (symbol) {
-                        bs_fmt(
-                            p->writer, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)entry->key.as.object));
-                    } else {
-                        p->writer->write(p->writer, Bs_Sv_Static("["));
-                        bs_value_print_impl(p, entry->key);
-                        p->writer->write(p->writer, Bs_Sv_Static("]"));
-                    }
-                    bs_fmt(p->writer, " = ");
-                    bs_value_print_impl(p, entry->value);
-                    count++;
-                }
-
-                p->depth--;
-                bs_fmt(p->writer, "\n%*s", (int)p->depth * BS_PRETTY_PRINT_INDENT, "");
-            }
-            bs_fmt(p->writer, "}");
+            bs_pretty_printer_map(p, &((const Bs_Table *)object)->map);
         }
     } break;
 
@@ -236,9 +244,22 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
         bs_fmt(p->writer, "<upvalue>");
         break;
 
-    case BS_OBJECT_C_FN:
-        bs_fmt(p->writer, "native fn ()");
-        break;
+    case BS_OBJECT_CLASS: {
+        const Bs_Str *name = ((const Bs_Class *)object)->name;
+        p->writer->write(p->writer, Bs_Sv(name->data, name->size));
+    } break;
+
+    case BS_OBJECT_INSTANCE: {
+        if (bs_pretty_printer_has(p, object)) {
+            bs_fmt(p->writer, "<instance %p>", object);
+        } else {
+            bs_pretty_printer_push(p, object);
+
+            const Bs_Instance *instance = (const Bs_Instance *)object;
+            bs_fmt(p->writer, Bs_Sv_Fmt " ", Bs_Sv_Arg(*instance->class->name));
+            bs_pretty_printer_map(p, &instance->fields);
+        }
+    } break;
 
     case BS_OBJECT_C_LIB:
         bs_object_write_impl(p, (const Bs_Object *)&((const Bs_C_Lib *)object)->functions);

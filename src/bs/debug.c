@@ -18,7 +18,7 @@ bs_debug_op_value(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset, const
     bs_fmt(p->writer, "'\n");
 }
 
-static_assert(BS_COUNT_OPS == 52, "Update bs_debug_op()");
+static_assert(BS_COUNT_OPS == 53, "Update bs_debug_op()");
 void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
     bs_fmt(p->writer, "%04zu ", *offset);
 
@@ -86,6 +86,10 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
 
     case BS_OP_CONST:
         bs_debug_op_value(p, c, offset, "OP_CONST");
+        break;
+
+    case BS_OP_CLASS:
+        bs_debug_op_value(p, c, offset, "OP_CLASS");
         break;
 
     case BS_OP_ADD:

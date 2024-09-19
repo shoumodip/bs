@@ -117,6 +117,21 @@ struct Bs_Upvalue {
 
 Bs_Upvalue *bs_upvalue_new(Bs *bs, Bs_Value *value);
 
+struct Bs_Class {
+    Bs_Object meta;
+    Bs_Str *name;
+};
+
+Bs_Class *bs_class_new(Bs *bs, Bs_Str *name);
+
+struct Bs_Instance {
+    Bs_Object meta;
+    Bs_Class *class;
+    Bs_Map fields;
+};
+
+Bs_Instance *bs_instance_new(Bs *bs, Bs_Class *class);
+
 struct Bs_C_Fn {
     Bs_Object meta;
     Bs_C_Fn_Ptr fn;

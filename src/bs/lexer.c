@@ -105,7 +105,7 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc) {
     return token;
 }
 
-static_assert(BS_COUNT_TOKENS == 57, "Update bs_lexer_next()");
+static_assert(BS_COUNT_TOKENS == 58, "Update bs_lexer_next()");
 Bs_Token bs_lexer_next(Bs_Lexer *l) {
     if (l->peeked) {
         l->peeked = false;
@@ -240,6 +240,8 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
                 token.type = BS_TOKEN_PUB;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("mf"))) {
                 token.type = BS_TOKEN_VAR;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("wannabe"))) {
+                token.type = BS_TOKEN_CLASS;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("bet"))) {
                 token.type = BS_TOKEN_RETURN;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("is_big_boss"))) {
@@ -280,6 +282,8 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
                 token.type = BS_TOKEN_PUB;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("var"))) {
                 token.type = BS_TOKEN_VAR;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("class"))) {
+                token.type = BS_TOKEN_CLASS;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("return"))) {
                 token.type = BS_TOKEN_RETURN;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("is_main_module"))) {

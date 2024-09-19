@@ -111,7 +111,7 @@ struct Bs {
 };
 
 // Garbage collector
-static_assert(BS_COUNT_OBJECTS == 9, "Update bs_free_object()");
+static_assert(BS_COUNT_OBJECTS == 11, "Update bs_free_object()");
 static void bs_free_object(Bs *bs, Bs_Object *object) {
 #ifdef BS_GC_DEBUG_LOG
     bs_fmt(&bs->config.log, "[GC] Free %p; Type: %d\n", object, object->type);
@@ -148,6 +148,17 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
     case BS_OBJECT_UPVALUE:
         bs_realloc(bs, object, sizeof(Bs_Upvalue), 0);
         break;
+
+    case BS_OBJECT_CLASS: {
+        Bs_Class *class = (Bs_Class *)object;
+        bs_realloc(bs, class, sizeof(*class), 0);
+    } break;
+
+    case BS_OBJECT_INSTANCE: {
+        Bs_Instance *instance = (Bs_Instance *)object;
+        bs_map_free(bs, &instance->fields);
+        bs_realloc(bs, instance, sizeof(*instance), 0);
+    } break;
 
     case BS_OBJECT_C_FN:
         bs_realloc(bs, object, sizeof(Bs_C_Fn), 0);
@@ -190,7 +201,6 @@ static void bs_mark_map(Bs *bs, Bs_Map *map) {
     }
 }
 
-static_assert(BS_COUNT_OBJECTS == 9, "Update bs_mark_object()");
 static void bs_mark_object(Bs *bs, Bs_Object *object) {
     if (!object || object->marked) {
         return;
@@ -214,7 +224,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
     bs->grays.data[bs->grays.count++] = object;
 }
 
-static_assert(BS_COUNT_OBJECTS == 9, "Update bs_blacken_object()");
+static_assert(BS_COUNT_OBJECTS == 11, "Update bs_blacken_object()");
 static void bs_blacken_object(Bs *bs, Bs_Object *object) {
 #ifdef BS_GC_DEBUG_LOG
     Bs_Writer *w = &bs->config.log;
@@ -261,6 +271,17 @@ static void bs_blacken_object(Bs *bs, Bs_Object *object) {
     case BS_OBJECT_UPVALUE:
         bs_mark_value(bs, ((Bs_Upvalue *)object)->closed);
         break;
+
+    case BS_OBJECT_CLASS: {
+        Bs_Class *class = (Bs_Class *)object;
+        bs_mark_object(bs, (Bs_Object *)class->name);
+    } break;
+
+    case BS_OBJECT_INSTANCE: {
+        Bs_Instance *instance = (Bs_Instance *)object;
+        bs_mark_object(bs, (Bs_Object *)instance->class);
+        bs_mark_map(bs, &instance->fields);
+    } break;
 
     case BS_OBJECT_C_FN:
         bs_mark_object(bs, (Bs_Object *)((Bs_C_Fn *)object)->library);
@@ -909,7 +930,7 @@ static void bs_binary_op(Bs *bs, Bs_Value *a, Bs_Value *b, const char *op) {
     }
 }
 
-static_assert(BS_COUNT_OBJECTS == 9, "Update bs_call_value()");
+static_assert(BS_COUNT_OBJECTS == 11, "Update bs_call_value()");
 static bool bs_call_value(Bs *bs, size_t arity) {
     const Bs_Value value = bs_stack_peek(bs, arity);
 
@@ -933,6 +954,11 @@ static bool bs_call_value(Bs *bs, size_t arity) {
 
         bs_frames_push(bs, &bs->frames, frame);
         bs->frame = &bs->frames.data[bs->frames.count - 1];
+    } break;
+
+    case BS_OBJECT_CLASS: {
+        Bs_Class *class = (Bs_Class *)value.as.object;
+        bs->stack.data[bs->stack.count - arity - 1] = bs_value_object(bs_instance_new(bs, class));
     } break;
 
     case BS_OBJECT_C_FN: {
@@ -1197,6 +1223,18 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
         if (!bs_table_get(bs, (Bs_Table *)container.as.object, index, &value)) {
             value = bs_value_nil;
         }
+    } else if (container.as.object->type == BS_OBJECT_INSTANCE) {
+        if (index.type == BS_VALUE_NIL) {
+            bs_error_offset(
+                bs,
+                1,
+                "cannot use '%s' as instance property",
+                bs_value_type_name(index, bs->frame->extended));
+        }
+
+        if (!bs_map_get(bs, &((Bs_Instance *)container.as.object)->fields, index, &value)) {
+            value = bs_value_nil;
+        }
     } else if (container.as.object->type == BS_OBJECT_C_LIB) {
         bs_check_object_type_offset(bs, 1, index, BS_OBJECT_STR, "library symbol name");
 
@@ -1247,6 +1285,21 @@ static void bs_container_set(Bs *bs, Bs_Value container, Bs_Value index, Bs_Valu
         } else {
             bs_table_set(bs, table, index, value);
         }
+    } else if (container.as.object->type == BS_OBJECT_INSTANCE) {
+        if (index.type == BS_VALUE_NIL) {
+            bs_error_offset(
+                bs,
+                1,
+                "cannot use '%s' as instance property",
+                bs_value_type_name(index, bs->frame->extended));
+        }
+
+        Bs_Instance *instance = (Bs_Instance *)container.as.object;
+        if (value.type == BS_VALUE_NIL) {
+            bs_map_remove(bs, &instance->fields, index);
+        } else {
+            bs_map_set(bs, &instance->fields, index, value);
+        }
     } else {
         bs_error(
             bs,
@@ -1255,7 +1308,7 @@ static void bs_container_set(Bs *bs, Bs_Value container, Bs_Value index, Bs_Valu
     }
 }
 
-static_assert(BS_COUNT_OPS == 52, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 53, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const size_t frames_count_save = bs->frames.count;
@@ -1371,6 +1424,12 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         case BS_OP_CONST:
             bs_stack_push(bs, bs_chunk_read_const(bs));
             break;
+
+        case BS_OP_CLASS: {
+            const Bs_Value name = bs_chunk_read_const(bs);
+            assert(name.type == BS_VALUE_OBJECT && name.as.object->type == BS_OBJECT_STR);
+            bs_stack_push(bs, bs_value_object(bs_class_new(bs, (Bs_Str *)name.as.object)));
+        } break;
 
         case BS_OP_ADD: {
             const Bs_Value b = bs_stack_pop(bs);
