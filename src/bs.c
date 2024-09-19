@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    Bs *bs = bs_new(false);
+    Bs *bs = bs_new();
     bs_core_init(bs, argc - 1, argv + 1);
 
     const Bs_Result result = bs_run(bs, bs_sv_from_cstr(path), Bs_Sv(contents, size));

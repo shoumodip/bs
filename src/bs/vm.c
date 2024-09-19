@@ -5,12 +5,16 @@
 #include <unistd.h>
 
 #include "bs/compiler.h"
-#include "bs/debug.h"
 
 // #define BS_GC_DEBUG_LOG
 // #define BS_GC_DEBUG_STRESS
 #define BS_GC_GROW_FACTOR 2
 #define BS_STACK_CAPACITY (1024 * 1024)
+
+// #define BS_STEP_DEBUG
+#ifdef BS_STEP_DEBUG
+#    include "bs/debug.h"
+#endif // BS_STEP_DEBUG
 
 typedef struct {
     Bs_Value *base;
@@ -104,9 +108,6 @@ struct Bs {
     int exit;
     bool ok;
     jmp_buf unwind;
-
-    // Debug
-    bool step;
 };
 
 // Garbage collector
@@ -369,7 +370,7 @@ static void bs_buffer_write(Bs_Writer *w, Bs_Sv sv) {
     bs_da_push_many(b->bs, b, sv.data, sv.size);
 }
 
-Bs *bs_new(bool step) {
+Bs *bs_new(void) {
     Bs *bs = calloc(1, sizeof(Bs));
     assert(bs);
 
@@ -385,8 +386,6 @@ Bs *bs_new(bool step) {
     bs->config.error = bs_file_writer(stderr);
 
     bs_update_cwd(bs);
-
-    bs->step = step;
     return bs;
 }
 
@@ -1048,9 +1047,9 @@ static bool bs_import_language(Bs *bs, Bs_Sv path, size_t length) {
         bs_unwind(bs, 1);
     }
 
-    if (bs->step) {
-        bs_debug_chunk(bs_pretty_printer(bs, &bs->config.log), &fn->chunk);
-    }
+#ifdef BS_STEP_DEBUG
+    bs_debug_chunk(bs_pretty_printer(bs, &bs->config.log), &fn->chunk);
+#endif // BS_STEP_DEBUG
 
     bs_stack_push(bs, bs_value_object(bs_closure_new(bs, fn)));
     bs_call_value(bs, 0);
@@ -1174,45 +1173,33 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
     bs->gc_on = true;
     while (true) {
-        if (bs->step) {
-            Bs_Writer *w = &bs->config.log;
-            bs_fmt(w, "\n----------------------------------------\n");
-            bs_fmt(w, "Modules:\n");
-            for (size_t i = 0; i < bs->modules.count; i++) {
-                const Bs_Module *m = &bs->modules.data[i];
-                const Bs_Sv sv = Bs_Sv(m->name->data, m->length);
-                bs_fmt(
-                    w,
-                    "[" Bs_Sv_Fmt "] (Real path: '" Bs_Sv_Fmt "')\n",
-                    Bs_Sv_Arg(sv),
-                    Bs_Sv_Arg(*m->name));
+#ifdef BS_STEP_DEBUG
+        Bs_Writer *w = &bs->config.log;
+        bs_fmt(w, "\n----------------------------------------\n");
+        bs_fmt(w, "Frames:\n");
+        for (size_t i = 0; i < bs->frames.count; i++) {
+            const Bs_Frame *frame = &bs->frames.data[i];
+            if (frame->ip) {
+                bs_value_write(bs, w, bs_value_object(frame->closure));
+            } else {
+                bs_fmt(w, "[C]");
             }
             bs_fmt(w, "\n");
-
-            bs_fmt(w, "Frames:\n");
-            for (size_t i = 0; i < bs->frames.count; i++) {
-                const Bs_Frame *frame = &bs->frames.data[i];
-                if (frame->ip) {
-                    bs_value_write(bs, w, bs_value_object(frame->closure));
-                } else {
-                    bs_fmt(w, "[C]");
-                }
-                bs_fmt(w, "\n");
-            }
-            bs_fmt(w, "\n");
-
-            bs_fmt(w, "Stack:\n");
-            for (size_t i = 0; i < bs->stack.count; i++) {
-                bs_value_write(bs, w, bs->stack.data[i]);
-                bs_fmt(w, "\n");
-            }
-            bs_fmt(w, "\n");
-
-            size_t offset = bs->frame->ip - bs->frame->closure->fn->chunk.data;
-            bs_debug_op(bs_pretty_printer(bs, w), &bs->frame->closure->fn->chunk, &offset);
-            bs_fmt(w, "----------------------------------------\n");
-            getchar();
         }
+        bs_fmt(w, "\n");
+
+        bs_fmt(w, "Stack:\n");
+        for (size_t i = 0; i < bs->stack.count; i++) {
+            bs_value_write(bs, w, bs->stack.data[i]);
+            bs_fmt(w, "\n");
+        }
+        bs_fmt(w, "\n");
+
+        size_t offset = bs->frame->ip - bs->frame->closure->fn->chunk.data;
+        bs_debug_op(bs_pretty_printer(bs, w), &bs->frame->closure->fn->chunk, &offset);
+        bs_fmt(w, "----------------------------------------\n");
+        getchar();
+#endif // BS_STEP_DEBUG
 
         const Bs_Op op = *bs->frame->ip++;
         switch (op) {
@@ -1835,9 +1822,9 @@ Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input) {
         return (Bs_Result){.exit = 1};
     }
 
-    if (bs->step) {
-        bs_debug_chunk(bs_pretty_printer(bs, &bs->config.log), &fn->chunk);
-    }
+#ifdef BS_STEP_DEBUG
+    bs_debug_chunk(bs_pretty_printer(bs, &bs->config.log), &fn->chunk);
+#endif // BS_STEP_DEBUG
 
     result.value = bs_call(bs, bs_value_object(bs_closure_new(bs, fn)), NULL, 0);
 
@@ -1850,9 +1837,9 @@ end:
     bs->upvalues = NULL;
     bs->gc_on = false;
 
-    if (bs->step) {
-        bs_fmt(&bs->config.log, "Stopping BS with exit code %d\n", bs->exit);
-    }
+#ifdef BS_STEP_DEBUG
+    bs_fmt(&bs->config.log, "Stopping BS with exit code %d\n", bs->exit);
+#endif // BS_STEP_DEBUG
 
     result.ok = bs->ok;
     result.exit = bs->exit;

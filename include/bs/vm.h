@@ -11,7 +11,7 @@
 // Interface
 typedef struct Bs Bs;
 
-Bs *bs_new(bool step);
+Bs *bs_new(void);
 void bs_free(Bs *bs);
 void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size);
 
