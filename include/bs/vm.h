@@ -64,17 +64,52 @@ typedef struct {
 } Bs_C_Data_Spec;
 
 // Errors
-void bs_error(Bs *bs, const char *fmt, ...) __attribute__((__format__(__printf__, 2, 3)));
 void bs_unwind(Bs *bs, unsigned char exit);
 
-void bs_check_arity(Bs *bs, size_t actual, size_t expected);
-void bs_check_callable(Bs *bs, Bs_Value value, const char *label);
-void bs_check_value_type(Bs *bs, Bs_Value value, Bs_Value_Type expected, const char *label);
-void bs_check_object_type(Bs *bs, Bs_Value value, Bs_Object_Type expected, const char *label);
-void bs_check_object_c_type(Bs *bs, Bs_Value value, const Bs_C_Data_Spec *spec, const char *label);
+void bs_error_offset(Bs *bs, size_t offset, const char *fmt, ...)
+    __attribute__((__format__(__printf__, 3, 4)));
 
-void bs_check_integer(Bs *bs, Bs_Value value, const char *label);
-void bs_check_whole_number(Bs *bs, Bs_Value value, const char *label);
+void bs_check_arity_offset(Bs *bs, size_t offset, size_t actual, size_t expected);
+void bs_check_callable_offset(Bs *bs, size_t offset, Bs_Value value, const char *label);
+
+void bs_check_value_type_offset(
+    Bs *bs, size_t offset, Bs_Value value, Bs_Value_Type expected, const char *label);
+void bs_check_object_type_offset(
+    Bs *bs, size_t offset, Bs_Value value, Bs_Object_Type expected, const char *label);
+void bs_check_object_c_type_offset(
+    Bs *bs, size_t offset, Bs_Value value, const Bs_C_Data_Spec *spec, const char *label);
+
+void bs_check_integer_offset(Bs *bs, size_t offset, Bs_Value value, const char *label);
+void bs_check_whole_number_offset(Bs *bs, size_t offset, Bs_Value value, const char *label);
+
+#define bs_error(bs, ...) bs_error_offset(bs, 0, __VA_ARGS__)
+#define bs_check_arity(bs, ...) bs_check_arity_offset(bs, 0, __VA_ARGS__)
+#define bs_check_callable(bs, ...) bs_check_callable_offset(bs, 0, __VA_ARGS__)
+
+#define bs_check_value_type(bs, ...) bs_check_value_type_offset(bs, 0, __VA_ARGS__)
+#define bs_check_object_type(bs, ...) bs_check_object_type_offset(bs, 0, __VA_ARGS__)
+#define bs_check_object_c_type(bs, ...) bs_check_object_c_type_offset(bs, 0, __VA_ARGS__)
+
+#define bs_check_integer(bs, ...) bs_check_integer_offset(bs, 0, __VA_ARGS__)
+#define bs_check_whole_number(bs, ...) bs_check_whole_number_offset(bs, 0, __VA_ARGS__)
+
+#define bs_arg_check_callable(bs, args, index)                                                     \
+    bs_check_callable_offset(bs, (index) + 1, (args)[index], NULL)
+
+#define bs_arg_check_value_type(bs, args, index, ...)                                              \
+    bs_check_value_type_offset(bs, (index) + 1, (args)[index], __VA_ARGS__, NULL)
+
+#define bs_arg_check_object_type(bs, args, index, ...)                                             \
+    bs_check_object_type_offset(bs, (index) + 1, (args)[index], __VA_ARGS__, NULL)
+
+#define bs_arg_check_object_c_type(bs, args, index, ...)                                           \
+    bs_check_object_c_type_offset(bs, (index) + 1, (args)[index], __VA_ARGS__, NULL)
+
+#define bs_arg_check_integer(bs, args, index)                                                      \
+    bs_check_integer_offset(bs, (index) + 1, (args)[index], NULL)
+
+#define bs_arg_check_whole_number(bs, args, index)                                                 \
+    bs_check_whole_number_offset(bs, (index) + 1, (args)[index], NULL)
 
 // Interpreter
 typedef struct {

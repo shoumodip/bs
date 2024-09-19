@@ -173,6 +173,7 @@ typedef struct {
     Bs_Chunk *chunk;
 
     Bs_Jumps jumps;
+    Bs_Op_Locs locations;
 
     bool is_main;
 } Bs_Compiler;
@@ -298,8 +299,8 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         } else {
             bs_chunk_push_op_value(
                 c->bs, c->chunk, BS_OP_GGET, bs_value_object(bs_str_new(c->bs, token.sv)));
-            bs_chunk_push_op_loc(c->bs, c->chunk, loc);
         }
+        bs_chunk_push_op_loc(c->bs, c->chunk, loc);
     } break;
 
     case BS_TOKEN_LPAREN:
@@ -315,6 +316,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             loc = token.loc;
 
             if (token.type == BS_TOKEN_LBRACKET) {
+                loc = bs_lexer_peek(&c->lexer).loc;
                 bs_compile_expr(c, BS_POWER_SET);
                 bs_lexer_expect(&c->lexer, BS_TOKEN_RBRACKET);
             } else {
@@ -372,6 +374,8 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
     case BS_TOKEN_LEN:
         bs_lexer_expect(&c->lexer, BS_TOKEN_LPAREN);
+
+        loc = bs_lexer_peek(&c->lexer).loc;
         bs_compile_expr(c, BS_POWER_PRE);
         bs_lexer_expect(&c->lexer, BS_TOKEN_RPAREN);
 
@@ -381,6 +385,8 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
     case BS_TOKEN_IMPORT:
         bs_lexer_expect(&c->lexer, BS_TOKEN_LPAREN);
+
+        loc = bs_lexer_peek(&c->lexer).loc;
         bs_compile_expr(c, BS_POWER_SET);
         bs_lexer_expect(&c->lexer, BS_TOKEN_RPAREN);
 
@@ -582,8 +588,13 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
                 bs_compile_error_unexpected(c, &token);
             }
 
+            const size_t locations_save = c->locations.count;
+
             size_t arity = 0;
             while (!bs_lexer_read(&c->lexer, BS_TOKEN_RPAREN)) {
+                bs_op_locs_push(
+                    c->bs, &c->locations, (Bs_Op_Loc){.loc = bs_lexer_peek(&c->lexer).loc});
+
                 bs_compile_expr(c, BS_POWER_SET);
                 arity++;
 
@@ -595,6 +606,11 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
             bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_CALL, arity);
             bs_chunk_push_op_loc(c->bs, c->chunk, loc);
+
+            for (size_t i = locations_save; i < c->locations.count; i++) {
+                bs_chunk_push_op_loc(c->bs, c->chunk, c->locations.data[i].loc);
+            }
+            c->locations.count = locations_save;
         } break;
 
         case BS_TOKEN_LBRACKET: {
@@ -622,6 +638,9 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             if (op == BS_OP_RET) {
                 bs_compile_error_unexpected(c, &token);
             }
+
+            assert(c->chunk->locations.count);
+            loc = c->chunk->locations.data[--c->chunk->locations.count].loc;
 
             size_t index;
             if (op != BS_OP_ISET) {
@@ -836,25 +855,30 @@ static void bs_compile_stmt(Bs_Compiler *c) {
 
         const Bs_Token a = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
         Bs_Token b = bs_lexer_either(&c->lexer, BS_TOKEN_COMMA, BS_TOKEN_IN);
-        Bs_Loc loc = b.loc;
 
         if (b.type != BS_TOKEN_IN) {
             b = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
-            loc = bs_lexer_expect(&c->lexer, BS_TOKEN_IN).loc;
+            bs_lexer_expect(&c->lexer, BS_TOKEN_IN);
         }
 
+        Bs_Loc locs[3];
+
         // Container / Start
+        locs[0] = bs_lexer_peek(&c->lexer).loc;
         bs_compile_expr(c, BS_POWER_SET);
         bs_scope_push(c->bs, c->scope, (Bs_Local){.depth = c->scope->depth});
 
         if (b.type == BS_TOKEN_IN) {
             // End
             bs_lexer_expect(&c->lexer, BS_TOKEN_COMMA);
+
+            locs[1] = bs_lexer_peek(&c->lexer).loc;
             bs_compile_expr(c, BS_POWER_SET);
             bs_scope_push(c->bs, c->scope, (Bs_Local){.depth = c->scope->depth});
 
             // Step
             if (bs_lexer_read(&c->lexer, BS_TOKEN_COMMA)) {
+                locs[2] = bs_lexer_peek(&c->lexer).loc;
                 bs_compile_expr(c, BS_POWER_SET);
             } else {
                 bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
@@ -879,7 +903,11 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         const size_t loop_addr =
             bs_compile_jump_start(c, b.type == BS_TOKEN_IN ? BS_OP_RANGE : BS_OP_ITER);
 
-        bs_chunk_push_op_loc(c->bs, c->chunk, loc);
+        bs_chunk_push_op_loc(c->bs, c->chunk, locs[0]);
+        if (b.type == BS_TOKEN_IN) {
+            bs_chunk_push_op_loc(c->bs, c->chunk, locs[1]);
+            bs_chunk_push_op_loc(c->bs, c->chunk, locs[2]);
+        }
 
         bs_lexer_buffer(&c->lexer, bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE));
         bs_compile_stmt(c);
@@ -1008,6 +1036,7 @@ Bs_Fn *bs_compile_impl(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main) {
         compiler.chunk = NULL;
 
         bs_jumps_free(compiler.bs, &compiler.jumps);
+        bs_op_locs_free(compiler.bs, &compiler.locations);
         return NULL;
     }
 
@@ -1018,5 +1047,6 @@ Bs_Fn *bs_compile_impl(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main) {
     Bs_Fn *fn = bs_compile_scope_end(&compiler);
     bs_scope_free(compiler.bs, &scope);
     bs_jumps_free(compiler.bs, &compiler.jumps);
+    bs_op_locs_free(compiler.bs, &compiler.locations);
     return fn;
 }

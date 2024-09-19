@@ -621,26 +621,33 @@ Bs_Config *bs_config(Bs *bs) {
 }
 
 // Errors
-static Bs_Loc bs_chunk_get_loc(const Bs_Chunk *c, size_t op_index) {
+static Bs_Op_Loc *bs_chunk_get_op_loc(const Bs_Chunk *c, size_t op_index) {
     for (size_t i = 0; i < c->locations.count; i++) {
         if (c->locations.data[i].index == op_index) {
-            return c->locations.data[i].loc;
+            return &c->locations.data[i];
         }
     }
 
     assert(false && "unreachable");
 }
 
-void bs_error(Bs *bs, const char *fmt, ...) {
+void bs_unwind(Bs *bs, unsigned char exit) {
+    bs->exit = exit;
+    longjmp(bs->unwind, 1);
+}
+
+void bs_error_offset(Bs *bs, size_t offset, const char *fmt, ...) {
     fflush(stdout); // Flush stdout beforehand *just in case*
 
     bs->gc_on = false;
+    bool printed_location = false;
 
     Bs_Writer *w = &bs->config.error;
     if (bs->frame->ip) {
-        const Bs_Loc loc = bs_chunk_get_loc(
+        printed_location = true;
+        const Bs_Op_Loc *oploc = bs_chunk_get_op_loc(
             &bs->frame->closure->fn->chunk, bs->frame->ip - bs->frame->closure->fn->chunk.data);
-        bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(loc));
+        bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(oploc[offset].loc));
     } else {
         bs_fmt(w, "[C]: ");
     }
@@ -676,6 +683,7 @@ void bs_error(Bs *bs, const char *fmt, ...) {
         bs_fmt(w, "\n");
     }
 
+    // Stack trace
     Bs_Pretty_Printer *p = bs_pretty_printer(bs, &bs->config.error);
     for (size_t i = bs->frames.count; i > 1; i--) {
         const Bs_Frame *callee = &bs->frames.data[i - 1];
@@ -683,11 +691,15 @@ void bs_error(Bs *bs, const char *fmt, ...) {
 
         if (caller->ip) {
             const Bs_Fn *fn = caller->closure->fn;
-            const Bs_Loc loc = bs_chunk_get_loc(&fn->chunk, caller->ip - fn->chunk.data);
-            bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(loc));
+            const Bs_Op_Loc *oploc = bs_chunk_get_op_loc(&fn->chunk, caller->ip - fn->chunk.data);
+            if (!printed_location) {
+                oploc += offset;
+            }
+            bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(oploc->loc));
         } else {
             bs_fmt(w, "[C]: ");
         }
+        printed_location = true;
 
         bs_fmt(w, "in ");
         if (callee->ip) {
@@ -732,33 +744,50 @@ void bs_error(Bs *bs, const char *fmt, ...) {
     bs_unwind(bs, 1);
 }
 
-void bs_unwind(Bs *bs, unsigned char exit) {
-    bs->exit = exit;
-    longjmp(bs->unwind, 1);
-}
-
-void bs_check_arity(Bs *bs, size_t actual, size_t expected) {
+void bs_check_arity_offset(Bs *bs, size_t offset, size_t actual, size_t expected) {
     if (actual != expected) {
-        bs_error(
-            bs, "expected %zu argument%s, got %zu", expected, expected == 1 ? "" : "s", actual);
+        bs_error_offset(
+            bs,
+            offset,
+            "expected %zu argument%s, got %zu",
+            expected,
+            expected == 1 ? "" : "s",
+            actual);
     }
 }
 
-void bs_check_callable(Bs *bs, Bs_Value value, const char *label) {
+static void bs_offset_label(char *buffer, size_t size, const char **label, size_t offset) {
+    if (!(*label)) {
+        const int count = snprintf(buffer, size, "argument #%zu", offset);
+        assert(count >= 0 && count + 1 < size);
+        *label = buffer;
+    }
+}
+
+void bs_check_callable_offset(Bs *bs, size_t offset, Bs_Value value, const char *label) {
     if (value.type != BS_VALUE_OBJECT ||
         (value.as.object->type != BS_OBJECT_CLOSURE && value.as.object->type != BS_OBJECT_C_FN)) {
-        bs_error(
+        char buffer[64];
+        bs_offset_label(buffer, sizeof(buffer), &label, offset);
+
+        bs_error_offset(
             bs,
+            offset,
             "expected %s to be callable object, got %s",
             label,
             bs_value_type_name(value, bs->frame->extended));
     }
 }
 
-void bs_check_value_type(Bs *bs, Bs_Value value, Bs_Value_Type expected, const char *label) {
+void bs_check_value_type_offset(
+    Bs *bs, size_t offset, Bs_Value value, Bs_Value_Type expected, const char *label) {
     if (value.type != expected) {
-        bs_error(
+        char buffer[64];
+        bs_offset_label(buffer, sizeof(buffer), &label, offset);
+
+        bs_error_offset(
             bs,
+            offset,
             "expected %s to be %s, got %s",
             label,
             bs_value_type_name((Bs_Value){.type = expected}, bs->frame->extended),
@@ -766,10 +795,15 @@ void bs_check_value_type(Bs *bs, Bs_Value value, Bs_Value_Type expected, const c
     }
 }
 
-void bs_check_object_type(Bs *bs, Bs_Value value, Bs_Object_Type expected, const char *label) {
+void bs_check_object_type_offset(
+    Bs *bs, size_t offset, Bs_Value value, Bs_Object_Type expected, const char *label) {
     if (value.type != BS_VALUE_OBJECT || value.as.object->type != expected) {
-        bs_error(
+        char buffer[64];
+        bs_offset_label(buffer, sizeof(buffer), &label, offset);
+
+        bs_error_offset(
             bs,
+            offset,
             "expected %s to be %s, got %s",
             label,
             bs_object_type_name(expected),
@@ -777,11 +811,15 @@ void bs_check_object_type(Bs *bs, Bs_Value value, Bs_Object_Type expected, const
     }
 }
 
-void bs_check_object_c_type(
-    Bs *bs, Bs_Value value, const Bs_C_Data_Spec *expected, const char *label) {
+void bs_check_object_c_type_offset(
+    Bs *bs, size_t offset, Bs_Value value, const Bs_C_Data_Spec *expected, const char *label) {
     if (value.type != BS_VALUE_OBJECT || value.as.object->type != BS_OBJECT_C_DATA) {
-        bs_error(
+        char buffer[64];
+        bs_offset_label(buffer, sizeof(buffer), &label, offset);
+
+        bs_error_offset(
             bs,
+            offset,
             "expected %s to be native " Bs_Sv_Fmt " object, got %s",
             label,
             Bs_Sv_Arg(expected->name),
@@ -790,8 +828,12 @@ void bs_check_object_c_type(
 
     const Bs_C_Data *native = (const Bs_C_Data *)value.as.object;
     if (native->spec != expected) {
-        bs_error(
+        char buffer[64];
+        bs_offset_label(buffer, sizeof(buffer), &label, offset);
+
+        bs_error_offset(
             bs,
+            offset,
             "expected %s to be native " Bs_Sv_Fmt " object, got native " Bs_Sv_Fmt " object",
             label,
             Bs_Sv_Arg(expected->name),
@@ -799,17 +841,24 @@ void bs_check_object_c_type(
     }
 }
 
-void bs_check_integer(Bs *bs, Bs_Value value, const char *label) {
-    bs_check_value_type(bs, value, BS_VALUE_NUM, label);
+void bs_check_integer_offset(Bs *bs, size_t offset, Bs_Value value, const char *label) {
+    char buffer[64];
+    bs_offset_label(buffer, sizeof(buffer), &label, offset);
+
+    bs_check_value_type_offset(bs, offset, value, BS_VALUE_NUM, label);
     if (value.as.number != (long)value.as.number) {
-        bs_error(bs, "expected %s to be integer, got %g", label, value.as.number);
+        bs_error_offset(bs, offset, "expected %s to be integer, got %g", label, value.as.number);
     }
 }
 
-void bs_check_whole_number(Bs *bs, Bs_Value value, const char *label) {
-    bs_check_value_type(bs, value, BS_VALUE_NUM, label);
+void bs_check_whole_number_offset(Bs *bs, size_t offset, Bs_Value value, const char *label) {
+    char buffer[64];
+    bs_offset_label(buffer, sizeof(buffer), &label, offset);
+
+    bs_check_value_type_offset(bs, offset, value, BS_VALUE_NUM, label);
     if (value.as.number < 0 || value.as.number != (long)value.as.number) {
-        bs_error(bs, "expected %s to be positive whole number, got %g", label, value.as.number);
+        bs_error_offset(
+            bs, offset, "expected %s to be positive whole number, got %g", label, value.as.number);
     }
 }
 
@@ -1736,17 +1785,17 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const size_t offset = bs_chunk_read_int(bs);
 
             const Bs_Value start = bs_stack_peek(bs, 2);
-            bs_check_value_type(bs, start, BS_VALUE_NUM, "range start");
+            bs_check_value_type_offset(bs, 0, start, BS_VALUE_NUM, "range start");
 
             const Bs_Value end = bs_stack_peek(bs, 1);
-            bs_check_value_type(bs, end, BS_VALUE_NUM, "range end");
+            bs_check_value_type_offset(bs, 1, end, BS_VALUE_NUM, "range end");
 
             Bs_Value step = bs_stack_peek(bs, 0);
             if (step.type == BS_VALUE_NIL) {
                 step = bs_value_num((end.as.number > start.as.number) ? 1 : -1);
                 bs_stack_set(bs, 0, step);
             }
-            bs_check_value_type(bs, step, BS_VALUE_NUM, "range step");
+            bs_check_value_type_offset(bs, 2, step, BS_VALUE_NUM, "range step");
 
             const bool over = step.as.number > 0 ? (start.as.number >= end.as.number)
                                                  : (start.as.number <= end.as.number);

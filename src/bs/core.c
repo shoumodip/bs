@@ -27,8 +27,8 @@ static const Bs_C_Data_Spec bs_file_data_spec = {
 
 static Bs_Value bs_io_open(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
-    bs_check_value_type(bs, args[1], BS_VALUE_BOOL, "argument #2");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    bs_arg_check_value_type(bs, args, 1, BS_VALUE_BOOL);
 
     Bs_Buffer *b = &bs_config(bs)->buffer;
     const size_t start = b->count;
@@ -48,7 +48,7 @@ static Bs_Value bs_io_open(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_io_close(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1");
+    bs_arg_check_object_c_type(bs, args, 0, &bs_file_data_spec);
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
     if (!bs_c_data_as(c->data, FILE *)) {
@@ -63,8 +63,8 @@ static Bs_Value bs_io_close(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_io_read(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
-    bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1");
-    bs_check_whole_number(bs, args[1], "argument #2");
+    bs_arg_check_object_c_type(bs, args, 0, &bs_file_data_spec);
+    bs_arg_check_whole_number(bs, args, 1);
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
     FILE *f = bs_c_data_as(c->data, FILE *);
@@ -111,7 +111,7 @@ static Bs_Value bs_io_read(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_io_flush(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1");
+    bs_arg_check_object_c_type(bs, args, 0, &bs_file_data_spec);
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
     FILE *f = bs_c_data_as(c->data, FILE *);
@@ -128,7 +128,7 @@ static Bs_Value bs_io_write(Bs *bs, Bs_Value *args, size_t arity) {
         bs_error(bs, "expected at least 1 argument, got 0");
     }
 
-    bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1");
+    bs_arg_check_object_c_type(bs, args, 0, &bs_file_data_spec);
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
     FILE *f = bs_c_data_as(c->data, FILE *);
@@ -174,7 +174,7 @@ static Bs_Value bs_io_writeln(Bs *bs, Bs_Value *args, size_t arity) {
         bs_error(bs, "expected at least 1 argument, got 0");
     }
 
-    bs_check_object_c_type(bs, args[0], &bs_file_data_spec, "argument #1");
+    bs_arg_check_object_c_type(bs, args, 0, &bs_file_data_spec);
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
     FILE *f = bs_c_data_as(c->data, FILE *);
@@ -221,7 +221,7 @@ static Bs_Value bs_io_eprintln(Bs *bs, Bs_Value *args, size_t arity) {
 // OS
 static Bs_Value bs_os_exit(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_whole_number(bs, args[0], "argument #1");
+    bs_arg_check_whole_number(bs, args, 0);
 
     bs_unwind(bs, args[0].as.number);
     assert(false && "unreachable");
@@ -240,7 +240,7 @@ static Bs_Value bs_os_clock(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_os_sleep(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
 
     const double seconds = args[0].as.number;
 
@@ -261,7 +261,7 @@ static Bs_Value bs_os_sleep(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_os_getenv(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
     {
         Bs_Buffer *b = &bs_config(bs)->buffer;
@@ -284,8 +284,8 @@ static Bs_Value bs_os_getenv(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_os_setenv(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
-    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
 
     const char *key;
     const char *value;
@@ -320,8 +320,8 @@ static const Bs_C_Data_Spec bs_process_data_spec = {
 
 static Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
-    bs_check_object_c_type(bs, args[0], &bs_process_data_spec, "argument #1");
-    bs_check_whole_number(bs, args[1], "argument #2");
+    bs_arg_check_object_c_type(bs, args, 0, &bs_process_data_spec);
+    bs_arg_check_whole_number(bs, args, 1);
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
     const pid_t pid = bs_c_data_as(c->data, pid_t);
@@ -339,7 +339,7 @@ static Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_object_c_type(bs, args[0], &bs_process_data_spec, "argument #1");
+    bs_arg_check_object_c_type(bs, args, 0, &bs_process_data_spec);
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
     const pid_t pid = bs_c_data_as(c->data, pid_t);
@@ -358,7 +358,7 @@ static Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_process_spawn(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
 
     const Bs_Array *array = (const Bs_Array *)args[0].as.object;
     if (!array->count) {
@@ -366,7 +366,10 @@ static Bs_Value bs_process_spawn(Bs *bs, Bs_Value *args, size_t arity) {
     }
 
     for (size_t i = 0; i < array->count; i++) {
-        bs_check_object_type(bs, array->data[i], BS_OBJECT_STR, "command argument");
+        char buffer[64];
+        const int count = snprintf(buffer, sizeof(buffer), "command string #%zu", i + 1);
+        assert(count >= 0 && count + 1 < sizeof(buffer));
+        bs_check_object_type_offset(bs, 1, array->data[i], BS_OBJECT_STR, buffer);
     }
 
     const pid_t pid = fork();
@@ -407,7 +410,7 @@ static Bs_Value bs_process_spawn(Bs *bs, Bs_Value *args, size_t arity) {
 // Bit
 static Bs_Value bs_bit_ceil(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_whole_number(bs, args[0], "argument #1");
+    bs_arg_check_whole_number(bs, args, 0);
 
     size_t a = args[0].as.number;
     if (a == 0) {
@@ -426,7 +429,7 @@ static Bs_Value bs_bit_ceil(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_bit_floor(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_whole_number(bs, args[0], "argument #1");
+    bs_arg_check_whole_number(bs, args, 0);
 
     size_t a = args[0].as.number;
     if (a == 0) {
@@ -445,9 +448,9 @@ static Bs_Value bs_bit_floor(Bs *bs, Bs_Value *args, size_t arity) {
 // Str
 static Bs_Value bs_str_slice(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
-    bs_check_whole_number(bs, args[1], "argument #2");
-    bs_check_whole_number(bs, args[2], "argument #3");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    bs_arg_check_whole_number(bs, args, 1);
+    bs_arg_check_whole_number(bs, args, 2);
 
     Bs_Str *str = (Bs_Str *)args[0].as.object;
     const size_t begin = bs_min(args[1].as.number, args[2].as.number);
@@ -462,7 +465,7 @@ static Bs_Value bs_str_slice(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
     const Bs_Str *src = (const Bs_Str *)args[0].as.object;
     Bs_Str *dst = bs_str_new(bs, Bs_Sv(src->data, src->size));
@@ -477,7 +480,7 @@ static Bs_Value bs_str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_str_tolower(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
     const Bs_Str *src = (const Bs_Str *)args[0].as.object;
     Bs_Str *dst = bs_str_new(bs, Bs_Sv(src->data, src->size));
@@ -490,7 +493,7 @@ static Bs_Value bs_str_tolower(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_str_toupper(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
     const Bs_Str *src = (const Bs_Str *)args[0].as.object;
     Bs_Str *dst = bs_str_new(bs, Bs_Sv(src->data, src->size));
@@ -503,7 +506,7 @@ static Bs_Value bs_str_toupper(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_str_tonumber(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
     const Bs_Str *src = (const Bs_Str *)args[0].as.object;
 
@@ -525,11 +528,11 @@ static Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
         bs_error(bs, "expected 2 or 3 arguments, got %zu", arity);
     }
 
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
-    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
 
     if (arity == 3) {
-        bs_check_whole_number(bs, args[2], "argument #3");
+        bs_arg_check_whole_number(bs, args, 2);
     }
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
@@ -559,8 +562,8 @@ static Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
-    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
@@ -595,9 +598,9 @@ static Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
-    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
-    bs_check_object_type(bs, args[2], BS_OBJECT_STR, "argument #3");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
+    bs_arg_check_object_type(bs, args, 2, BS_OBJECT_STR);
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
@@ -629,8 +632,8 @@ static Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_str_trim(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
-    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
@@ -659,8 +662,8 @@ static Bs_Value bs_str_trim(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_str_ltrim(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
-    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
@@ -686,8 +689,8 @@ static Bs_Value bs_str_ltrim(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_str_rtrim(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
-    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
@@ -710,9 +713,9 @@ static Bs_Value bs_str_rtrim(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_str_lpad(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
-    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
-    bs_check_whole_number(bs, args[2], "argument #3");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
+    bs_arg_check_whole_number(bs, args, 2);
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
@@ -743,9 +746,9 @@ static Bs_Value bs_str_lpad(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_str_rpad(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
-    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
-    bs_check_whole_number(bs, args[2], "argument #3");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
+    bs_arg_check_whole_number(bs, args, 2);
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
@@ -776,7 +779,7 @@ static Bs_Value bs_str_rpad(Bs *bs, Bs_Value *args, size_t arity) {
 // Ascii
 static Bs_Value bs_ascii_char(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_whole_number(bs, args[0], "argument #1");
+    bs_arg_check_whole_number(bs, args, 0);
 
     const size_t code = args[0].as.number;
     if (code > 0xff) {
@@ -789,7 +792,7 @@ static Bs_Value bs_ascii_char(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_ascii_code(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     if (str->size != 1) {
@@ -825,7 +828,7 @@ static Bs_Value bs_bytes_new(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_bytes_count(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_object_c_type(bs, args[0], &bs_bytes_data_spec, "argument #1");
+    bs_arg_check_object_c_type(bs, args, 0, &bs_bytes_data_spec);
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
     return bs_value_num(bs_c_data_as(c->data, Bs_Buffer).count);
@@ -833,8 +836,8 @@ static Bs_Value bs_bytes_count(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_bytes_reset(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
-    bs_check_object_c_type(bs, args[0], &bs_bytes_data_spec, "argument #1");
-    bs_check_whole_number(bs, args[1], "argument #2");
+    bs_arg_check_object_c_type(bs, args, 0, &bs_bytes_data_spec);
+    bs_arg_check_whole_number(bs, args, 1);
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
     Bs_Buffer *b = &bs_c_data_as(c->data, Bs_Buffer);
@@ -850,9 +853,9 @@ static Bs_Value bs_bytes_reset(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_bytes_slice(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
-    bs_check_object_c_type(bs, args[0], &bs_bytes_data_spec, "argument #1");
-    bs_check_whole_number(bs, args[1], "argument #2");
-    bs_check_whole_number(bs, args[2], "argument #3");
+    bs_arg_check_object_c_type(bs, args, 0, &bs_bytes_data_spec);
+    bs_arg_check_whole_number(bs, args, 1);
+    bs_arg_check_whole_number(bs, args, 2);
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
     const Bs_Buffer *b = &bs_c_data_as(c->data, Bs_Buffer);
@@ -868,8 +871,8 @@ static Bs_Value bs_bytes_slice(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_bytes_push(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
-    bs_check_object_c_type(bs, args[0], &bs_bytes_data_spec, "argument #1");
-    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
+    bs_arg_check_object_c_type(bs, args, 0, &bs_bytes_data_spec);
+    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
     Bs_Buffer *b = &bs_c_data_as(c->data, Bs_Buffer);
@@ -881,9 +884,9 @@ static Bs_Value bs_bytes_push(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
-    bs_check_object_c_type(bs, args[0], &bs_bytes_data_spec, "argument #1");
-    bs_check_whole_number(bs, args[1], "argument #2");
-    bs_check_object_type(bs, args[2], BS_OBJECT_STR, "argument #3");
+    bs_arg_check_object_c_type(bs, args, 0, &bs_bytes_data_spec);
+    bs_arg_check_whole_number(bs, args, 1);
+    bs_arg_check_object_type(bs, args, 2, BS_OBJECT_STR);
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
     Bs_Buffer *b = &bs_c_data_as(c->data, Bs_Buffer);
@@ -908,11 +911,11 @@ static Bs_Value bs_regex_find(Bs *bs, Bs_Value *args, size_t arity) {
         bs_error(bs, "expected 2 or 3 arguments, got %zu", arity);
     }
 
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
-    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
 
     if (arity == 3) {
-        bs_check_whole_number(bs, args[2], "argument #3");
+        bs_arg_check_whole_number(bs, args, 2);
     }
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
@@ -955,8 +958,8 @@ static Bs_Value bs_regex_find(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_regex_split(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
-    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
@@ -1011,9 +1014,9 @@ static Bs_Value bs_regex_split(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_regex_replace(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
-    bs_check_object_type(bs, args[0], BS_OBJECT_STR, "argument #1");
-    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
-    bs_check_object_type(bs, args[2], BS_OBJECT_STR, "argument #3");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
+    bs_arg_check_object_type(bs, args, 2, BS_OBJECT_STR);
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
@@ -1078,8 +1081,8 @@ static Bs_Value bs_regex_replace(Bs *bs, Bs_Value *args, size_t arity) {
 // Array
 static Bs_Value bs_array_map(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
-    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
-    bs_check_callable(bs, args[1], "argument #2");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
+    bs_arg_check_callable(bs, args, 1);
 
     const Bs_Array *src = (const Bs_Array *)args[0].as.object;
     const Bs_Value fn = args[1];
@@ -1096,8 +1099,8 @@ static Bs_Value bs_array_map(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_array_filter(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
-    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
-    bs_check_callable(bs, args[1], "argument #2");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
+    bs_arg_check_callable(bs, args, 1);
 
     const Bs_Array *src = (const Bs_Array *)args[0].as.object;
     const Bs_Value fn = args[1];
@@ -1120,8 +1123,8 @@ static Bs_Value bs_array_reduce(Bs *bs, Bs_Value *args, size_t arity) {
         bs_error(bs, "expected 2 or 3 arguments, got %zu", arity);
     }
 
-    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
-    bs_check_callable(bs, args[1], "argument #2");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
+    bs_arg_check_callable(bs, args, 1);
 
     const Bs_Array *src = (const Bs_Array *)args[0].as.object;
     const Bs_Value fn = args[1];
@@ -1142,7 +1145,7 @@ static Bs_Value bs_array_reduce(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_array_copy(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
 
     const Bs_Array *src = (const Bs_Array *)args[0].as.object;
 
@@ -1156,8 +1159,8 @@ static Bs_Value bs_array_copy(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_array_join(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
-    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
-    bs_check_object_type(bs, args[1], BS_OBJECT_STR, "argument #2");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
+    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
 
     Bs_Buffer *b = &bs_config(bs)->buffer;
     const size_t start = b->count;
@@ -1183,10 +1186,10 @@ static Bs_Value bs_array_find(Bs *bs, Bs_Value *args, size_t arity) {
         bs_error(bs, "expected 2 or 3 arguments, got %zu", arity);
     }
 
-    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
 
     if (arity == 3) {
-        bs_check_whole_number(bs, args[2], "argument #3");
+        bs_arg_check_whole_number(bs, args, 2);
     }
 
     const Bs_Array *array = (const Bs_Array *)args[0].as.object;
@@ -1204,8 +1207,8 @@ static Bs_Value bs_array_find(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_array_equal(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
-    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
-    bs_check_object_type(bs, args[1], BS_OBJECT_ARRAY, "argument #2");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
+    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_ARRAY);
 
     const Bs_Array *a = (const Bs_Array *)args[0].as.object;
     const Bs_Array *b = (const Bs_Array *)args[1].as.object;
@@ -1246,8 +1249,8 @@ static int bs_array_sort_compare(const void *a, const void *b) {
 
 static Bs_Value bs_array_sort(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
-    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
-    bs_check_callable(bs, args[1], "argument #2");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
+    bs_arg_check_callable(bs, args, 1);
 
     const Bs_Array *src = (const Bs_Array *)args[0].as.object;
     const Bs_Value fn = args[1];
@@ -1265,7 +1268,7 @@ static Bs_Value bs_array_sort(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_array_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_object_type(bs, args[0], BS_OBJECT_ARRAY, "argument #1");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
 
     const Bs_Array *src = (const Bs_Array *)args[0].as.object;
     for (size_t i = 0; i < src->count / 2; i++) {
@@ -1279,7 +1282,7 @@ static Bs_Value bs_array_reverse(Bs *bs, Bs_Value *args, size_t arity) {
 // Table
 static Bs_Value bs_table_copy(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_object_type(bs, args[0], BS_OBJECT_TABLE, "argument #1");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_TABLE);
 
     const Bs_Table *src = (const Bs_Table *)args[0].as.object;
 
@@ -1296,8 +1299,8 @@ static Bs_Value bs_table_copy(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_table_equal(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
-    bs_check_object_type(bs, args[0], BS_OBJECT_TABLE, "argument #1");
-    bs_check_object_type(bs, args[1], BS_OBJECT_TABLE, "argument #2");
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_TABLE);
+    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_TABLE);
 
     const Bs_Table *a = (const Bs_Table *)args[0].as.object;
     const Bs_Table *b = (const Bs_Table *)args[1].as.object;
@@ -1321,61 +1324,61 @@ static Bs_Value bs_table_equal(Bs *bs, Bs_Value *args, size_t arity) {
 // Math
 static Bs_Value bs_math_sin(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(sin(args[0].as.number));
 }
 
 static Bs_Value bs_math_cos(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(cos(args[0].as.number));
 }
 
 static Bs_Value bs_math_tan(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(tan(args[0].as.number));
 }
 
 static Bs_Value bs_math_asin(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(asin(args[0].as.number));
 }
 
 static Bs_Value bs_math_acos(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(acos(args[0].as.number));
 }
 
 static Bs_Value bs_math_atan(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(atan(args[0].as.number));
 }
 
 static Bs_Value bs_math_sqrt(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(sqrt(args[0].as.number));
 }
 
 static Bs_Value bs_math_ceil(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(ceil(args[0].as.number));
 }
 
 static Bs_Value bs_math_floor(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(floor(args[0].as.number));
 }
 
 static Bs_Value bs_math_round(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(round(args[0].as.number));
 }
 
@@ -1389,14 +1392,10 @@ static Bs_Value bs_math_max(Bs *bs, Bs_Value *args, size_t arity) {
         bs_error(bs, "expected at least 1 argument, got 0");
     }
 
-    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     double max = args[0].as.number;
     for (size_t i = 1; i < arity; i++) {
-        char label[32];
-        const int count = snprintf(label, sizeof(label), "argument #%zu", i + 1);
-        assert(count >= 0 && count + 1 < sizeof(label));
-
-        bs_check_value_type(bs, args[i], BS_VALUE_NUM, label);
+        bs_arg_check_value_type(bs, args, i, BS_VALUE_NUM);
         max = bs_max(max, args[i].as.number);
     }
     return bs_value_num(max);
@@ -1407,14 +1406,10 @@ static Bs_Value bs_math_min(Bs *bs, Bs_Value *args, size_t arity) {
         bs_error(bs, "expected at least 1 argument, got 0");
     }
 
-    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     double min = args[0].as.number;
     for (size_t i = 1; i < arity; i++) {
-        char label[32];
-        const int count = snprintf(label, sizeof(label), "argument #%zu", i + 1);
-        assert(count >= 0 && count + 1 < sizeof(label));
-
-        bs_check_value_type(bs, args[i], BS_VALUE_NUM, label);
+        bs_arg_check_value_type(bs, args, i, BS_VALUE_NUM);
         min = bs_min(min, args[i].as.number);
     }
     return bs_value_num(min);
@@ -1422,9 +1417,9 @@ static Bs_Value bs_math_min(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_math_clamp(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
-    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
-    bs_check_value_type(bs, args[1], BS_VALUE_NUM, "argument #2");
-    bs_check_value_type(bs, args[2], BS_VALUE_NUM, "argument #3");
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
+    bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
+    bs_arg_check_value_type(bs, args, 2, BS_VALUE_NUM);
 
     const double low = bs_min(args[1].as.number, args[2].as.number);
     const double high = bs_max(args[1].as.number, args[2].as.number);
@@ -1433,9 +1428,9 @@ static Bs_Value bs_math_clamp(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_math_lerp(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
-    bs_check_value_type(bs, args[0], BS_VALUE_NUM, "argument #1");
-    bs_check_value_type(bs, args[1], BS_VALUE_NUM, "argument #2");
-    bs_check_value_type(bs, args[2], BS_VALUE_NUM, "argument #3");
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
+    bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
+    bs_arg_check_value_type(bs, args, 2, BS_VALUE_NUM);
 
     const double a = args[0].as.number;
     const double b = args[1].as.number;

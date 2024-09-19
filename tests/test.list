@@ -48,6 +48,14 @@
 ../bin/bs loops/break.bsx
 ../bin/bs loops/continue.bs
 ../bin/bs loops/continue.bsx
+../bin/bs loops/error_invalid_iterator.bs
+../bin/bs loops/error_invalid_iterator.bsx
+../bin/bs loops/error_invalid_range_start.bs
+../bin/bs loops/error_invalid_range_start.bsx
+../bin/bs loops/error_invalid_range_end.bs
+../bin/bs loops/error_invalid_range_end.bsx
+../bin/bs loops/error_invalid_range_step.bs
+../bin/bs loops/error_invalid_range_step.bsx
 ../bin/bs functions/main.bs
 ../bin/bs functions/main.bsx
 ../bin/bs functions/lambda.bs

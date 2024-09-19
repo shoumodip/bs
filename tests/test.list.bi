@@ -1,4 +1,4 @@
-:i count 74
+:i count 82
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -501,7 +501,7 @@ In common.bs!
 :b stdout 0
 
 :b stderr 84
-import/error_could_not_open.bs:1:1: error: could not import module 'does_not_exist'
+import/error_could_not_open.bs:1:8: error: could not import module 'does_not_exist'
 
 :b shell 41
 ../bin/bs import/error_could_not_open.bsx
@@ -509,7 +509,7 @@ import/error_could_not_open.bs:1:1: error: could not import module 'does_not_exi
 :b stdout 0
 
 :b stderr 85
-import/error_could_not_open.bsx:1:1: error: could not import module 'does_not_exist'
+import/error_could_not_open.bsx:1:9: error: could not import module 'does_not_exist'
 
 :b shell 41
 ../bin/bs import/error_expected_string.bs
@@ -517,7 +517,7 @@ import/error_could_not_open.bsx:1:1: error: could not import module 'does_not_ex
 :b stdout 0
 
 :b stderr 90
-import/error_expected_string.bs:1:1: error: expected module name to be string, got number
+import/error_expected_string.bs:1:8: error: expected module name to be string, got number
 
 :b shell 42
 ../bin/bs import/error_expected_string.bsx
@@ -525,7 +525,7 @@ import/error_expected_string.bs:1:1: error: expected module name to be string, g
 :b stdout 0
 
 :b stderr 91
-import/error_expected_string.bsx:1:1: error: expected module name to be string, got number
+import/error_expected_string.bsx:1:9: error: expected module name to be string, got number
 
 :b shell 31
 ../bin/bs import/main_module.bs
@@ -733,6 +733,70 @@ foo 69
 
 :b stderr 0
 
+:b shell 41
+../bin/bs loops/error_invalid_iterator.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 78
+loops/error_invalid_iterator.bs:1:13: error: cannot iterate over number value
+
+:b shell 42
+../bin/bs loops/error_invalid_iterator.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 79
+loops/error_invalid_iterator.bsx:1:19: error: cannot iterate over number value
+
+:b shell 44
+../bin/bs loops/error_invalid_range_start.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 91
+loops/error_invalid_range_start.bs:1:10: error: expected range start to be number, got nil
+
+:b shell 45
+../bin/bs loops/error_invalid_range_start.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 93
+loops/error_invalid_range_start.bsx:1:16: error: expected range start to be number, got bruh
+
+:b shell 42
+../bin/bs loops/error_invalid_range_end.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 87
+loops/error_invalid_range_end.bs:1:13: error: expected range end to be number, got nil
+
+:b shell 43
+../bin/bs loops/error_invalid_range_end.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 89
+loops/error_invalid_range_end.bsx:1:19: error: expected range end to be number, got bruh
+
+:b shell 43
+../bin/bs loops/error_invalid_range_step.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 93
+loops/error_invalid_range_step.bs:1:17: error: expected range step to be number, got boolean
+
+:b shell 44
+../bin/bs loops/error_invalid_range_step.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 94
+loops/error_invalid_range_step.bsx:1:23: error: expected range step to be number, got capness
+
 :b shell 27
 ../bin/bs functions/main.bs
 :i returncode 0
@@ -812,7 +876,7 @@ functions/error_stack_trace.bsx:13:4: in foo()
 
 :b stderr 245
 [C]: error: expected argument #1 to be string, got number
-functions/error_native_stack_trace.bs:2:23: in str.reverse()
+functions/error_native_stack_trace.bs:2:24: in str.reverse()
 [C]: in foo()
 functions/error_native_stack_trace.bs:6:14: in array.map()
 functions/error_native_stack_trace.bs:9:5: in main()
@@ -824,7 +888,7 @@ functions/error_native_stack_trace.bs:9:5: in main()
 
 :b stderr 248
 [C]: error: expected argument #1 to be string, got number
-functions/error_native_stack_trace.bsx:2:20: in str.reverse()
+functions/error_native_stack_trace.bsx:2:21: in str.reverse()
 [C]: in foo()
 functions/error_native_stack_trace.bsx:6:14: in array.map()
 functions/error_native_stack_trace.bsx:9:5: in main()
@@ -904,7 +968,7 @@ x = nocap; y = bruh
 
 :b stderr 148
 [C]: error: expected argument #1 to be string, got nil
-extended/common.bs:9:16: in str.reverse()
+extended/common.bs:9:17: in str.reverse()
 extended/error_type_name_normal.bs:1:31: in oops()
 
 :b shell 45
@@ -914,7 +978,7 @@ extended/error_type_name_normal.bs:1:31: in oops()
 
 :b stderr 149
 [C]: error: expected argument #1 to be string, got nil
-extended/common.bs:9:16: in str.reverse()
+extended/common.bs:9:17: in str.reverse()
 extended/error_type_name_normal.bsx:1:32: in oops()
 
 :b shell 46
@@ -924,7 +988,7 @@ extended/error_type_name_normal.bsx:1:32: in oops()
 
 :b stderr 164
 [C]: error: expected argument #1 to be string, got capness
-extended/common_extended.bsx:9:16: in str.reverse()
+extended/common_extended.bsx:9:17: in str.reverse()
 extended/error_type_name_extended.bs:1:40: in oops()
 
 :b shell 47
@@ -934,7 +998,7 @@ extended/error_type_name_extended.bs:1:40: in oops()
 
 :b stderr 165
 [C]: error: expected argument #1 to be string, got capness
-extended/common_extended.bsx:9:16: in str.reverse()
+extended/common_extended.bsx:9:17: in str.reverse()
 extended/error_type_name_extended.bsx:1:41: in oops()
 
 :b shell 24
