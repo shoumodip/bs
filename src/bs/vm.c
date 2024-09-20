@@ -1301,8 +1301,9 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
 
         Bs_C_Lib *c = (Bs_C_Lib *)container.as.object;
         if (!bs_map_get(bs, &c->functions, index, &value)) {
-            bs_error(
+            bs_error_at(
                 bs,
+                1,
                 "symbol '" Bs_Sv_Fmt "' doesn't exist in native library '" Bs_Sv_Fmt "'",
                 Bs_Sv_Arg(*name),
                 Bs_Sv_Arg(*c->path));
