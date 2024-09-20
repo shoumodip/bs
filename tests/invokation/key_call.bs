@@ -1,0 +1,7 @@
+var t = {
+    f = fn () {
+        io.println("Hello, world!");
+    }
+};
+
+t.f();

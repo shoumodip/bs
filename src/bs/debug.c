@@ -18,7 +18,18 @@ bs_debug_op_value(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset, const
     bs_fmt(p->writer, "'\n");
 }
 
-static_assert(BS_COUNT_OPS == 56, "Update bs_debug_op()");
+static void
+bs_debug_op_invoke(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset, const char *name) {
+    const size_t constant = *(const size_t *)&c->data[*offset];
+    *offset += sizeof(constant);
+
+    const size_t arity = c->data[(*offset)++];
+    bs_fmt(p->writer, "%-16s (%zu args) %4zu '", name, arity, constant);
+    bs_value_write_impl(p, c->constants.data[constant]);
+    bs_fmt(p->writer, "'\n");
+}
+
+static_assert(BS_COUNT_OPS == 57, "Update bs_debug_op()");
 void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
     bs_fmt(p->writer, "%04zu ", *offset);
 
@@ -90,6 +101,10 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
 
     case BS_OP_CLASS:
         bs_debug_op_value(p, c, offset, "OP_CLASS");
+        break;
+
+    case BS_OP_INVOKE:
+        bs_debug_op_invoke(p, c, offset, "OP_INVOKE");
         break;
 
     case BS_OP_METHOD:

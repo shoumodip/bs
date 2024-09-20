@@ -1,0 +1,1 @@
+io.println(str.reverse("Hello!"));

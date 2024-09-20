@@ -1,4 +1,4 @@
-:i count 116
+:i count 137
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -1366,6 +1366,182 @@ Hello, John Doe!
 :i returncode 0
 :b stdout 3
 69
+
+:b stderr 0
+
+:b shell 29
+../bin/bs invokation/chain.bs
+:i returncode 0
+:b stdout 14
+69
+420
+69
+420
+
+:b stderr 0
+
+:b shell 52
+../bin/bs invokation/error_call_invalid_container.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 86
+invokation/error_call_invalid_container.bs:2:2: error: cannot index into number value
+
+:b shell 46
+../bin/bs invokation/error_call_invalid_key.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 95
+invokation/error_call_invalid_key.bs:2:4: error: expected array index to be number, got string
+
+:b shell 42
+../bin/bs invokation/error_invoked_body.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 145
+invokation/error_invoked_body.bs:3:13: error: invalid operands to binary (+): nil, number
+invokation/error_invoked_body.bs:7:4: in <anonymous>()
+
+:b shell 56
+../bin/bs invokation/error_key_call_argument_location.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 124
+[C]: error: expected argument #1 to be string, got nil
+invokation/error_key_call_argument_location.bs:5:5: in str.reverse()
+
+:b shell 55
+../bin/bs invokation/error_key_call_invalid_function.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 83
+invokation/error_key_call_invalid_function.bs:5:4: error: cannot call number value
+
+:b shell 50
+../bin/bs invokation/error_key_call_wrong_arity.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 81
+invokation/error_key_call_wrong_arity.bs:7:4: error: expected 0 arguments, got 1
+
+:b shell 53
+../bin/bs invokation/error_method_call_wrong_arity.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 84
+invokation/error_method_call_wrong_arity.bs:8:6: error: expected 0 arguments, got 1
+
+:b shell 59
+../bin/bs invokation/error_native_call_argument_location.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 128
+[C]: error: expected argument #1 to be string, got nil
+invokation/error_native_call_argument_location.bs:1:24: in str.reverse()
+
+:b shell 53
+../bin/bs invokation/error_native_call_wrong_arity.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 106
+[C]: error: expected 1 argument, got 2
+invokation/error_native_call_wrong_arity.bs:1:23: in str.reverse()
+
+:b shell 61
+../bin/bs invokation/error_property_call_argument_location.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 129
+[C]: error: expected argument #1 to be string, got nil
+invokation/error_property_call_argument_location.bs:5:7: in str.reverse()
+
+:b shell 60
+../bin/bs invokation/error_property_call_invalid_function.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 88
+invokation/error_property_call_invalid_function.bs:5:6: error: cannot call number value
+
+:b shell 55
+../bin/bs invokation/error_property_call_wrong_arity.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 86
+invokation/error_property_call_wrong_arity.bs:8:6: error: expected 0 arguments, got 1
+
+:b shell 32
+../bin/bs invokation/key_call.bs
+:i returncode 0
+:b stdout 14
+Hello, world!
+
+:b stderr 0
+
+:b shell 33
+../bin/bs invokation/key_call.bsx
+:i returncode 0
+:b stdout 14
+Hello, world!
+
+:b stderr 0
+
+:b shell 35
+../bin/bs invokation/method_call.bs
+:i returncode 0
+:b stdout 14
+Hello, world!
+
+:b stderr 0
+
+:b shell 36
+../bin/bs invokation/method_call.bsx
+:i returncode 0
+:b stdout 14
+Hello, world!
+
+:b stderr 0
+
+:b shell 35
+../bin/bs invokation/native_call.bs
+:i returncode 0
+:b stdout 7
+!olleH
+
+:b stderr 0
+
+:b shell 36
+../bin/bs invokation/native_call.bsx
+:i returncode 0
+:b stdout 7
+!olleH
+
+:b stderr 0
+
+:b shell 37
+../bin/bs invokation/property_call.bs
+:i returncode 0
+:b stdout 14
+Hello, world!
+
+:b stderr 0
+
+:b shell 38
+../bin/bs invokation/property_call.bsx
+:i returncode 0
+:b stdout 14
+Hello, world!
 
 :b stderr 0
 

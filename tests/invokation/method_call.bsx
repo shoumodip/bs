@@ -1,0 +1,8 @@
+wannabe Foo {
+    f() {
+        io.println("Hello, world!") fr
+    }
+}
+
+mf foo be Foo() fr
+foo.f() fr

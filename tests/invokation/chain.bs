@@ -1,0 +1,31 @@
+fn inc() {
+    return fn (b) {
+        return 1 + b;
+    };
+}
+
+io.println(inc()(68));
+
+var table = {
+    inc = inc
+};
+
+io.println(table.inc()(419));
+
+class Foo {
+    init(n) {
+        this.n = n;
+    }
+
+    inc() {
+        return inc();
+    }
+
+    inc2() {
+        this.n = this.n + 1;
+        return this;
+    }
+}
+
+io.println(Foo(1337).inc()(68));
+io.println(Foo(418).inc2().inc2().n);

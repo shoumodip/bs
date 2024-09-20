@@ -1,0 +1,5 @@
+var t = {
+    f = str.reverse
+};
+
+t.f(nil);

@@ -26,6 +26,7 @@ typedef struct {
     };
 
     bool extended;
+    size_t locations_offset;
 } Bs_Frame;
 
 typedef struct {
@@ -680,6 +681,7 @@ void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
         printed_location = true;
         const Bs_Op_Loc *oploc = bs_chunk_get_op_loc(
             &bs->frame->closure->fn->chunk, bs->frame->ip - bs->frame->closure->fn->chunk.data);
+
         bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(oploc[location].loc));
     } else {
         bs_fmt(w, "[C]: ");
@@ -728,6 +730,8 @@ void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
             if (!printed_location) {
                 oploc += location;
             }
+
+            oploc += callee->locations_offset;
             bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(oploc->loc));
         } else {
             bs_fmt(w, "[C]: ");
@@ -947,15 +951,16 @@ static void bs_binary_op(Bs *bs, Bs_Value *a, Bs_Value *b, const char *op) {
     }
 }
 
-static void bs_call_value(Bs *bs, Bs_Value value, size_t arity) {
+static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
     if (value.type != BS_VALUE_OBJECT) {
-        bs_error(bs, "cannot call %s value", bs_value_type_name(value, bs->frame->extended));
+        bs_error_at(
+            bs, offset, "cannot call %s value", bs_value_type_name(value, bs->frame->extended));
     }
 
     switch (value.as.object->type) {
     case BS_OBJECT_CLOSURE: {
         Bs_Closure *closure = (Bs_Closure *)value.as.object;
-        bs_check_arity(bs, arity, closure->fn->arity);
+        bs_check_arity_at(bs, offset, arity, closure->fn->arity);
 
         const Bs_Frame frame = {
             .base = &bs->stack.data[bs->stack.count - arity - 1],
@@ -963,6 +968,8 @@ static void bs_call_value(Bs *bs, Bs_Value value, size_t arity) {
 
             .closure = closure,
             .extended = closure->fn->extended,
+
+            .locations_offset = offset,
         };
 
         bs_frames_push(bs, &bs->frames, frame);
@@ -984,9 +991,9 @@ static void bs_call_value(Bs *bs, Bs_Value value, size_t arity) {
                 bs_entries_find_sv(class->methods.data, class->methods.capacity, sv, hash);
 
             if (entry && entry->key.type != BS_VALUE_NIL) {
-                bs_call_value(bs, entry->value, arity);
+                bs_call_value(bs, offset, entry->value, arity);
             } else if (arity) {
-                bs_check_arity(bs, arity, 0);
+                bs_check_arity_at(bs, offset, arity, 0);
             }
         }
     } break;
@@ -994,7 +1001,7 @@ static void bs_call_value(Bs *bs, Bs_Value value, size_t arity) {
     case BS_OBJECT_BOUND_METHOD: {
         Bs_Bound_Method *method = (Bs_Bound_Method *)value.as.object;
         bs->stack.data[bs->stack.count - arity - 1] = method->this;
-        bs_call_value(bs, method->fn, arity);
+        bs_call_value(bs, offset, method->fn, arity);
     } break;
 
     case BS_OBJECT_C_FN: {
@@ -1007,6 +1014,8 @@ static void bs_call_value(Bs *bs, Bs_Value value, size_t arity) {
 
             .native = native,
             .extended = bs->frame ? bs->frame->extended : false,
+
+            .locations_offset = offset,
         };
 
         bs_frames_push(bs, &bs->frames, frame);
@@ -1026,13 +1035,14 @@ static void bs_call_value(Bs *bs, Bs_Value value, size_t arity) {
     } break;
 
     default:
-        bs_error(bs, "cannot call %s value", bs_value_type_name(value, bs->frame->extended));
+        bs_error_at(
+            bs, offset, "cannot call %s value", bs_value_type_name(value, bs->frame->extended));
     }
 }
 
 static_assert(BS_COUNT_OBJECTS == 12, "Update bs_call_value()");
 static void bs_call_stack_top(Bs *bs, size_t arity) {
-    bs_call_value(bs, bs_stack_peek(bs, arity), arity);
+    bs_call_value(bs, 0, bs_stack_peek(bs, arity), arity);
 }
 
 static Bs_Upvalue *bs_capture_upvalue(Bs *bs, Bs_Value *value) {
@@ -1376,7 +1386,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 56, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 57, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const size_t frames_count_save = bs->frames.count;
@@ -1497,6 +1507,27 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value name = bs_chunk_read_const(bs);
             assert(name.type == BS_VALUE_OBJECT && name.as.object->type == BS_OBJECT_STR);
             bs_stack_push(bs, bs_value_object(bs_class_new(bs, (Bs_Str *)name.as.object)));
+        } break;
+
+        case BS_OP_INVOKE: {
+            const Bs_Value name = bs_chunk_read_const(bs);
+            const size_t arity = *bs->frame->ip++;
+
+            const Bs_Value this = bs_stack_peek(bs, arity);
+            Bs_Value method;
+            if (this.type == BS_VALUE_OBJECT && this.as.object->type == BS_OBJECT_INSTANCE) {
+                Bs_Instance *instance = (Bs_Instance *)this.as.object;
+                if (bs_map_get(bs, &instance->fields, name, &method)) {
+                    bs->stack.data[bs->stack.count - arity - 1] = method;
+                } else if (!bs_map_get(bs, &instance->class->methods, name, &method)) {
+                    method = bs_value_nil;
+                }
+            } else {
+                method = bs_container_get(bs, this, name);
+                bs_stack_set(bs, arity, method);
+            }
+
+            bs_call_value(bs, 2, method, arity);
         } break;
 
         case BS_OP_METHOD: {
@@ -1976,7 +2007,7 @@ end:
     bs->gc_on = false;
 
 #ifdef BS_STEP_DEBUG
-    bs_fmt(&bs->config.log, "Stopping BS with exit code %d\n", bs->exit);
+    bs_fmt(&bs->config.log, "Stopping BS with exit code %d\n", (bs->exit == -1) ? 0 : bs->exit);
 #endif // BS_STEP_DEBUG
 
     result.ok = bs->ok;

@@ -1,0 +1,31 @@
+lit inc() {
+    bet lit (b) {
+        bet 1 + b fr
+    } fr
+}
+
+io.println(inc()(68)) fr
+
+mf table be {
+    inc be inc
+} fr
+
+io.println(table.inc()(419)) fr
+
+wannabe Foo {
+    init(n) {
+        deez.n be n fr
+    }
+
+    inc() {
+        bet inc() fr
+    }
+
+    inc2() {
+        deez.n be deez.n + 1 fr
+        bet deez fr
+    }
+}
+
+io.println(Foo(1337).inc()(68)) fr
+io.println(Foo(418).inc2().inc2().n) fr

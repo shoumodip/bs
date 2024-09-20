@@ -1,0 +1,8 @@
+class Foo {}
+
+var foo = Foo();
+foo.f = fn () {
+    io.println("Hello, world!");
+};
+
+foo.f(69);

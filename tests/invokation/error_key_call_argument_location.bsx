@@ -1,0 +1,5 @@
+mf t be {
+    f be str.reverse
+} fr
+
+t.f(bruh) fr

@@ -1,0 +1,7 @@
+mf t be {
+    f be lit () {
+        io.println("Hello, world!") fr
+    }
+} fr
+
+t.f() fr
