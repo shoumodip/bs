@@ -200,7 +200,7 @@ io.println("Interpolation! \(34 + 35)");
 io.println("Nested \("interpolation! \(420)")");
 
 # Output: Hello, world! 69
-io.println("Hello, ".."world! "..69);
+io.println("Hello, " ++ "world! " ++ 69);
 
 # Output: 6
 io.println(len("Hello!"));
@@ -220,7 +220,7 @@ io.println("Interpolation! \(34 + 35)") fr
 io.println("Nested \("interpolation! \(420)")") fr
 
 # Output: Hello, world! 69
-io.println("Hello, ".."world! "..69) fr
+io.println("Hello, " ++ "world! " ++ 69) fr
 
 # Output: 6
 io.println(thicc("Hello!")) fr

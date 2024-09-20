@@ -242,14 +242,14 @@ cap
 :i returncode 1
 :b stdout 0
 
-:b stderr 238
+:b stderr 242
 strings/error_invalid_addition.bs:1:15: error: invalid operands to binary (+): number, string
 
-Use (..) for string concatenation, or use string interpolation instead
+Use (++) for string concatenation, or use string interpolation instead
 
 ```
-"Hello, ".."world!";
-"Hello, "..69;
+"Hello, " ++ "world!";
+"Hello, " ++ 69;
 "Hello, \(34 + 35) nice!";
 ```
 
@@ -258,14 +258,14 @@ Use (..) for string concatenation, or use string interpolation instead
 :i returncode 1
 :b stdout 0
 
-:b stderr 239
+:b stderr 243
 strings/error_invalid_addition.bsx:1:15: error: invalid operands to binary (+): number, string
 
-Use (..) for string concatenation, or use string interpolation instead
+Use (++) for string concatenation, or use string interpolation instead
 
 ```
-"Hello, ".."world!";
-"Hello, "..69;
+"Hello, " ++ "world!";
+"Hello, " ++ 69;
 "Hello, \(34 + 35) nice!";
 ```
 

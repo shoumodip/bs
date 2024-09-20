@@ -1503,10 +1503,10 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                     bs_error(
                         bs,
                         "invalid operands to binary (+): %s, %s\n\n"
-                        "Use (..) for string concatenation, or use string interpolation instead\n\n"
+                        "Use (++) for string concatenation, or use string interpolation instead\n\n"
                         "```\n"
-                        "\"Hello, \"..\"world!\";\n"
-                        "\"Hello, \"..69;\n"
+                        "\"Hello, \" ++ \"world!\";\n"
+                        "\"Hello, \" ++ 69;\n"
                         "\"Hello, \\(34 + 35) nice!\";\n"
                         "```\n",
 

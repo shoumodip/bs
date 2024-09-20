@@ -121,7 +121,7 @@ const char *bs_token_type_name(Bs_Token_Type type, bool extended) {
         return extended ? "'thicc'" : "'len'";
 
     case BS_TOKEN_JOIN:
-        return "'..'";
+        return "'++'";
 
     case BS_TOKEN_IMPORT:
         return extended ? "'redpill'" : "'import'";

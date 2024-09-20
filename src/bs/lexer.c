@@ -310,11 +310,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
         break;
 
     case '.':
-        if (bs_lexer_match(l, '.')) {
-            token.type = BS_TOKEN_JOIN;
-        } else {
-            token.type = BS_TOKEN_DOT;
-        }
+        token.type = BS_TOKEN_DOT;
         break;
 
     case ',':
@@ -346,7 +342,11 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
         break;
 
     case '+':
-        token.type = BS_TOKEN_ADD;
+        if (bs_lexer_match(l, '+')) {
+            token.type = BS_TOKEN_JOIN;
+        } else {
+            token.type = BS_TOKEN_ADD;
+        }
         break;
 
     case '-':

@@ -364,7 +364,7 @@ io.<span class='field'>println</span>(<span class='string'>"Interpolation! </spa
 io.<span class='field'>println</span>(<span class='string'>"Nested </span><span class='escape'>\</span><span class='escape'>(</span><span class='string'>"interpolation! </span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>420</span><span class='escape'>)</span><span class='string'>"</span><span class='escape'>)</span><span class='string'>"</span>);
 
 <span class='comment'># Output: Hello, world! 69</span>
-io.<span class='field'>println</span>(<span class='string'>"Hello, "</span>..<span class='string'>"world! "</span>..<span class='constant'>69</span>);
+io.<span class='field'>println</span>(<span class='string'>"Hello, "</span> ++ <span class='string'>"world! "</span> ++ <span class='constant'>69</span>);
 
 <span class='comment'># Output: 6</span>
 io.<span class='field'>println</span>(<span class='keyword'>len</span>(<span class='string'>"Hello!"</span>));
@@ -385,7 +385,7 @@ io.<span class='field'>println</span>(<span class='string'>"Interpolation! </spa
 io.<span class='field'>println</span>(<span class='string'>"Nested </span><span class='escape'>\</span><span class='escape'>(</span><span class='string'>"interpolation! </span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>420</span><span class='escape'>)</span><span class='string'>"</span><span class='escape'>)</span><span class='string'>"</span>) <span class='keyword'>fr</span>
 
 <span class='comment'># Output: Hello, world! 69</span>
-io.<span class='field'>println</span>(<span class='string'>"Hello, "</span>..<span class='string'>"world! "</span>..<span class='constant'>69</span>) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(<span class='string'>"Hello, "</span> ++ <span class='string'>"world! "</span> ++ <span class='constant'>69</span>) <span class='keyword'>fr</span>
 
 <span class='comment'># Output: 6</span>
 io.<span class='field'>println</span>(<span class='keyword'>thicc</span>(<span class='string'>"Hello!"</span>)) <span class='keyword'>fr</span>
