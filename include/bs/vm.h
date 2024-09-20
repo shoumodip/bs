@@ -77,33 +77,36 @@ void bs_check_value_type_at(
 void bs_check_object_type_at(
     Bs *bs, size_t location, Bs_Value value, Bs_Object_Type expected, const char *label);
 void bs_check_object_c_type_at(
-    Bs *bs, size_t location, Bs_Value value, const Bs_C_Data_Spec *spec, const char *label);
+    Bs *bs, size_t location, Bs_Value value, const Bs_C_Data_Spec *expected, const char *label);
 
 void bs_check_integer_at(Bs *bs, size_t location, Bs_Value value, const char *label);
 void bs_check_whole_number_at(Bs *bs, size_t location, Bs_Value value, const char *label);
 
 #define bs_error(bs, ...) bs_error_at(bs, 0, __VA_ARGS__)
-#define bs_check_arity(bs, ...) bs_check_arity_at(bs, 0, __VA_ARGS__)
-#define bs_check_callable(bs, ...) bs_check_callable_at(bs, 0, __VA_ARGS__)
+#define bs_check_arity(bs, actual, expected) bs_check_arity_at(bs, 0, actual, expected)
+#define bs_check_callable(bs, value, label) bs_check_callable_at(bs, 0, value, label)
 
-#define bs_check_value_type(bs, ...) bs_check_value_type_at(bs, 0, __VA_ARGS__)
-#define bs_check_object_type(bs, ...) bs_check_object_type_at(bs, 0, __VA_ARGS__)
-#define bs_check_object_c_type(bs, ...) bs_check_object_c_type_at(bs, 0, __VA_ARGS__)
+#define bs_check_value_type(bs, value, expected, label)                                            \
+    bs_check_value_type_at(bs, 0, value, expected, label)
+#define bs_check_object_type(bs, value, expected, label)                                           \
+    bs_check_object_type_at(bs, 0, value, expected, label)
+#define bs_check_object_c_type(bs, value, expected, label)                                         \
+    bs_check_object_c_type_at(bs, 0, value, expected, label)
 
-#define bs_check_integer(bs, ...) bs_check_integer_at(bs, 0, __VA_ARGS__)
-#define bs_check_whole_number(bs, ...) bs_check_whole_number_at(bs, 0, __VA_ARGS__)
+#define bs_check_integer(bs, value, label) bs_check_integer_at(bs, 0, value, label)
+#define bs_check_whole_number(bs, value, lable) bs_check_whole_number_at(bs, 0, value, label)
 
 #define bs_arg_check_callable(bs, args, index)                                                     \
     bs_check_callable_at(bs, (index) + 1, (args)[index], NULL)
 
-#define bs_arg_check_value_type(bs, args, index, ...)                                              \
-    bs_check_value_type_at(bs, (index) + 1, (args)[index], __VA_ARGS__, NULL)
+#define bs_arg_check_value_type(bs, args, index, expected)                                         \
+    bs_check_value_type_at(bs, (index) + 1, (args)[index], expected, NULL)
 
-#define bs_arg_check_object_type(bs, args, index, ...)                                             \
-    bs_check_object_type_at(bs, (index) + 1, (args)[index], __VA_ARGS__, NULL)
+#define bs_arg_check_object_type(bs, args, index, expected)                                        \
+    bs_check_object_type_at(bs, (index) + 1, (args)[index], expected, NULL)
 
-#define bs_arg_check_object_c_type(bs, args, index, ...)                                           \
-    bs_check_object_c_type_at(bs, (index) + 1, (args)[index], __VA_ARGS__, NULL)
+#define bs_arg_check_object_c_type(bs, args, index, expected)                                      \
+    bs_check_object_c_type_at(bs, (index) + 1, (args)[index], expected, NULL)
 
 #define bs_arg_check_integer(bs, args, index)                                                      \
     bs_check_integer_at(bs, (index) + 1, (args)[index], NULL)
