@@ -1,0 +1,11 @@
+wannabe Person {
+    init(name) {
+        deez.name be name fr
+    }
+
+    greet() {
+        io.println("Hello, \(deez.name)!") fr
+    }
+}
+
+Person("John Doe").greet() fr

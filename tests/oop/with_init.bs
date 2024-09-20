@@ -1,0 +1,11 @@
+class Person {
+    init(name) {
+        this.name = name;
+    }
+
+    greet() {
+        io.println("Hello, \(this.name)!");
+    }
+}
+
+Person("John Doe").greet();

@@ -1,0 +1,6 @@
+wannabe Pair {}
+
+mf pair be Pair() fr
+pair.first be 34 fr
+pair.second be 35 fr
+io.println(pair.first + pair.second) fr

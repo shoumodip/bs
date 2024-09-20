@@ -1,0 +1,11 @@
+wannabe Foo {
+    init() {
+        deez.a be 69 fr
+        bet fr
+
+        # Unreachable
+        deez.b be 420 fr
+    }
+}
+
+io.println(Foo()) fr

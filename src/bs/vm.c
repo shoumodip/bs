@@ -972,6 +972,23 @@ static void bs_call_value(Bs *bs, Bs_Value value, size_t arity) {
     case BS_OBJECT_CLASS: {
         Bs_Class *class = (Bs_Class *)value.as.object;
         bs->stack.data[bs->stack.count - arity - 1] = bs_value_object(bs_instance_new(bs, class));
+
+        {
+            const Bs_Sv sv = Bs_Sv_Static("init");
+            static uint32_t hash = 0;
+            if (!hash) {
+                hash = bs_hash_bytes(sv.data, sv.size);
+            }
+
+            const Bs_Entry *entry =
+                bs_entries_find_sv(class->methods.data, class->methods.capacity, sv, hash);
+
+            if (entry && entry->key.type != BS_VALUE_NIL) {
+                bs_call_value(bs, entry->value, arity);
+            } else if (arity) {
+                bs_check_arity(bs, arity, 0);
+            }
+        }
     } break;
 
     case BS_OBJECT_BOUND_METHOD: {

@@ -100,3 +100,17 @@
 ../bin/bs typeof/main.bsx
 ../bin/bs pretty_printing/main.bs
 ../bin/bs pretty_printing/main.bsx
+../bin/bs oop/error_cannot_return_from_init.bs
+../bin/bs oop/error_cannot_return_from_init.bsx
+../bin/bs oop/error_this_outside_class.bs
+../bin/bs oop/error_this_outside_class.bsx
+../bin/bs oop/error_with_init_wrong_arity.bs
+../bin/bs oop/error_with_init_wrong_arity.bsx
+../bin/bs oop/error_without_init_wrong_arity.bs
+../bin/bs oop/error_without_init_wrong_arity.bsx
+../bin/bs oop/return_without_expr_init.bs
+../bin/bs oop/return_without_expr_init.bsx
+../bin/bs oop/with_init.bs
+../bin/bs oop/with_init.bsx
+../bin/bs oop/without_init.bs
+../bin/bs oop/without_init.bsx

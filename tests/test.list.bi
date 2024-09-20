@@ -1,4 +1,4 @@
-:i count 102
+:i count 116
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -1250,6 +1250,122 @@ ligma
     bar = 420,
     foo = 69
 }
+
+:b stderr 0
+
+:b shell 46
+../bin/bs oop/error_cannot_return_from_init.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 98
+oop/error_cannot_return_from_init.bs:3:16: error: cannot return values from an initializer method
+
+:b shell 47
+../bin/bs oop/error_cannot_return_from_init.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 99
+oop/error_cannot_return_from_init.bsx:3:13: error: cannot return values from an initializer method
+
+:b shell 41
+../bin/bs oop/error_this_outside_class.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 81
+oop/error_this_outside_class.bs:1:1: error: cannot use 'this' outside of 'class'
+
+:b shell 42
+../bin/bs oop/error_this_outside_class.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 84
+oop/error_this_outside_class.bsx:1:1: error: cannot use 'deez' outside of 'wannabe'
+
+:b shell 44
+../bin/bs oop/error_with_init_wrong_arity.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 74
+oop/error_with_init_wrong_arity.bs:5:4: error: expected 1 argument, got 0
+
+:b shell 45
+../bin/bs oop/error_with_init_wrong_arity.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 75
+oop/error_with_init_wrong_arity.bsx:5:4: error: expected 1 argument, got 0
+
+:b shell 47
+../bin/bs oop/error_without_init_wrong_arity.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 78
+oop/error_without_init_wrong_arity.bs:3:4: error: expected 0 arguments, got 1
+
+:b shell 48
+../bin/bs oop/error_without_init_wrong_arity.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 79
+oop/error_without_init_wrong_arity.bsx:3:4: error: expected 0 arguments, got 1
+
+:b shell 41
+../bin/bs oop/return_without_expr_init.bs
+:i returncode 0
+:b stdout 19
+Foo {
+    a = 69
+}
+
+:b stderr 0
+
+:b shell 42
+../bin/bs oop/return_without_expr_init.bsx
+:i returncode 0
+:b stdout 19
+Foo {
+    a = 69
+}
+
+:b stderr 0
+
+:b shell 26
+../bin/bs oop/with_init.bs
+:i returncode 0
+:b stdout 17
+Hello, John Doe!
+
+:b stderr 0
+
+:b shell 27
+../bin/bs oop/with_init.bsx
+:i returncode 0
+:b stdout 17
+Hello, John Doe!
+
+:b stderr 0
+
+:b shell 29
+../bin/bs oop/without_init.bs
+:i returncode 0
+:b stdout 3
+69
+
+:b stderr 0
+
+:b shell 30
+../bin/bs oop/without_init.bsx
+:i returncode 0
+:b stdout 3
+69
 
 :b stderr 0
 

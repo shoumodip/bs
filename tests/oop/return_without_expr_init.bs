@@ -1,0 +1,11 @@
+class Foo {
+    init() {
+        this.a = 69;
+        return;
+
+        # Unreachable
+        this.b = 420;
+    }
+}
+
+io.println(Foo());

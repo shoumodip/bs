@@ -105,6 +105,7 @@ struct Bs_Class_Compiler {
 
 typedef enum {
     BS_LAMBDA_FN,
+    BS_LAMBDA_INIT,
     BS_LAMBDA_METHOD,
 } Bs_Lambda_Type;
 
@@ -760,7 +761,11 @@ static void bs_compile_lambda_init(Bs_Compiler *c, Bs_Lambda *lambda, Bs_Sv name
 }
 
 static Bs_Fn *bs_compile_lambda_end(Bs_Compiler *c) {
-    bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
+    if (c->lambda->type == BS_LAMBDA_INIT) {
+        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_LTHIS, 0);
+    } else {
+        bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
+    }
     bs_chunk_push_op(c->bs, c->chunk, BS_OP_RET);
     Bs_Fn *fn = c->lambda->fn;
 
@@ -793,6 +798,10 @@ static void bs_compile_stmt(Bs_Compiler *c);
 
 static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Token *name) {
     Bs_Lambda lambda = {.type = type};
+    if (name && bs_sv_eq(name->sv, Bs_Sv_Static("init"))) {
+        lambda.type = BS_LAMBDA_INIT;
+    }
+
     bs_compile_lambda_init(c, &lambda, name ? name->sv : (Bs_Sv){0});
     bs_compile_block_init(c);
 
@@ -1102,8 +1111,21 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         token = bs_lexer_peek(&c->lexer);
 
         if (token.type == BS_TOKEN_EOL) {
-            bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
+            if (c->lambda->type == BS_LAMBDA_INIT) {
+                bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_LTHIS, 0);
+            } else {
+                bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
+            }
         } else {
+            if (c->lambda->type == BS_LAMBDA_INIT) {
+                bs_fmt(
+                    c->lexer.error,
+                    Bs_Loc_Fmt "error: cannot return values from an initializer method\n",
+                    Bs_Loc_Arg(token.loc));
+
+                bs_lexer_error(&c->lexer);
+            }
+
             bs_compile_expr(c, BS_POWER_SET);
         }
 
