@@ -435,7 +435,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         break;
 
     case BS_TOKEN_THIS: {
-        const Bs_Sv sv = Bs_Sv_Static("this");
+        const Bs_Sv sv = c->lexer.extended ? Bs_Sv_Static("deez") : Bs_Sv_Static("this");
 
         size_t index;
         if (bs_lambda_find_local(c->lambda, sv, &index)) {
@@ -736,7 +736,8 @@ static void bs_compile_lambda_init(Bs_Compiler *c, Bs_Lambda *lambda, Bs_Sv name
     if (lambda->type == BS_LAMBDA_FN) {
         bs_lambda_push(c->bs, lambda, (Bs_Local){0});
     } else {
-        bs_lambda_push(c->bs, lambda, (Bs_Local){.name = Bs_Sv_Static("this")});
+        const Bs_Sv sv = c->lexer.extended ? Bs_Sv_Static("deez") : Bs_Sv_Static("this");
+        bs_lambda_push(c->bs, lambda, (Bs_Local){.name = sv});
     }
 }
 
