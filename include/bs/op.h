@@ -17,6 +17,7 @@ typedef enum {
     BS_OP_CONST,
 
     BS_OP_CLASS,
+    BS_OP_METHOD,
 
     BS_OP_ADD,
     BS_OP_SUB,

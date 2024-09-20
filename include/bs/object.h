@@ -120,6 +120,7 @@ Bs_Upvalue *bs_upvalue_new(Bs *bs, Bs_Value *value);
 struct Bs_Class {
     Bs_Object meta;
     Bs_Str *name;
+    Bs_Map methods;
 };
 
 Bs_Class *bs_class_new(Bs *bs, Bs_Str *name);
@@ -131,6 +132,14 @@ struct Bs_Instance {
 };
 
 Bs_Instance *bs_instance_new(Bs *bs, Bs_Class *class);
+
+struct Bs_Bound_Method {
+    Bs_Object meta;
+    Bs_Value this;
+    Bs_Value fn;
+};
+
+Bs_Bound_Method *bs_bound_method_new(Bs *bs, Bs_Value this, Bs_Value fn);
 
 struct Bs_C_Fn {
     Bs_Object meta;

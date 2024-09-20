@@ -128,6 +128,7 @@ Bs_Upvalue *bs_upvalue_new(Bs *bs, Bs_Value *value) {
 Bs_Class *bs_class_new(Bs *bs, Bs_Str *name) {
     Bs_Class *class = (Bs_Class *)bs_object_new(bs, BS_OBJECT_CLASS, sizeof(Bs_Class));
     class->name = name;
+    memset(&class->methods, '\0', sizeof(class->methods));
     return class;
 }
 
@@ -136,6 +137,14 @@ Bs_Instance *bs_instance_new(Bs *bs, Bs_Class *class) {
     i->class = class;
     memset(&i->fields, '\0', sizeof(i->fields));
     return i;
+}
+
+Bs_Bound_Method *bs_bound_method_new(Bs *bs, Bs_Value this, Bs_Value fn) {
+    Bs_Bound_Method *method =
+        (Bs_Bound_Method *)bs_object_new(bs, BS_OBJECT_BOUND_METHOD, sizeof(Bs_Bound_Method));
+    method->this = this;
+    method->fn = fn;
+    return method;
 }
 
 Bs_C_Fn *bs_c_fn_new(Bs *bs, const char *name, Bs_C_Fn_Ptr fn) {

@@ -369,7 +369,7 @@ static Bs_Value bs_process_spawn(Bs *bs, Bs_Value *args, size_t arity) {
         char buffer[64];
         const int count = snprintf(buffer, sizeof(buffer), "command string #%zu", i + 1);
         assert(count >= 0 && count + 1 < sizeof(buffer));
-        bs_check_object_type_offset(bs, 1, array->data[i], BS_OBJECT_STR, buffer);
+        bs_check_object_type_at(bs, 1, array->data[i], BS_OBJECT_STR, buffer);
     }
 
     const pid_t pid = fork();

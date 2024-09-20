@@ -111,7 +111,7 @@ struct Bs {
 };
 
 // Garbage collector
-static_assert(BS_COUNT_OBJECTS == 11, "Update bs_free_object()");
+static_assert(BS_COUNT_OBJECTS == 12, "Update bs_free_object()");
 static void bs_free_object(Bs *bs, Bs_Object *object) {
 #ifdef BS_GC_DEBUG_LOG
     bs_fmt(&bs->config.log, "[GC] Free %p; Type: %d\n", object, object->type);
@@ -151,6 +151,7 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
 
     case BS_OBJECT_CLASS: {
         Bs_Class *class = (Bs_Class *)object;
+        bs_map_free(bs, &class->methods);
         bs_realloc(bs, class, sizeof(*class), 0);
     } break;
 
@@ -158,6 +159,11 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
         Bs_Instance *instance = (Bs_Instance *)object;
         bs_map_free(bs, &instance->fields);
         bs_realloc(bs, instance, sizeof(*instance), 0);
+    } break;
+
+    case BS_OBJECT_BOUND_METHOD: {
+        Bs_Bound_Method *method = (Bs_Bound_Method *)object;
+        bs_realloc(bs, method, sizeof(*method), 0);
     } break;
 
     case BS_OBJECT_C_FN:
@@ -224,7 +230,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
     bs->grays.data[bs->grays.count++] = object;
 }
 
-static_assert(BS_COUNT_OBJECTS == 11, "Update bs_blacken_object()");
+static_assert(BS_COUNT_OBJECTS == 12, "Update bs_blacken_object()");
 static void bs_blacken_object(Bs *bs, Bs_Object *object) {
 #ifdef BS_GC_DEBUG_LOG
     Bs_Writer *w = &bs->config.log;
@@ -275,12 +281,19 @@ static void bs_blacken_object(Bs *bs, Bs_Object *object) {
     case BS_OBJECT_CLASS: {
         Bs_Class *class = (Bs_Class *)object;
         bs_mark_object(bs, (Bs_Object *)class->name);
+        bs_mark_map(bs, &class->methods);
     } break;
 
     case BS_OBJECT_INSTANCE: {
         Bs_Instance *instance = (Bs_Instance *)object;
         bs_mark_object(bs, (Bs_Object *)instance->class);
         bs_mark_map(bs, &instance->fields);
+    } break;
+
+    case BS_OBJECT_BOUND_METHOD: {
+        Bs_Bound_Method *method = (Bs_Bound_Method *)object;
+        bs_mark_value(bs, method->this);
+        bs_mark_value(bs, method->fn);
     } break;
 
     case BS_OBJECT_C_FN:
@@ -525,7 +538,7 @@ static Bs_Pretty_Printer *bs_pretty_printer(Bs *bs, Bs_Writer *w) {
 }
 
 void bs_value_write(Bs *bs, Bs_Writer *w, Bs_Value value) {
-    bs_value_print_impl(bs_pretty_printer(bs, w), value);
+    bs_value_write_impl(bs_pretty_printer(bs, w), value);
 }
 
 // Buffer
@@ -656,7 +669,7 @@ void bs_unwind(Bs *bs, unsigned char exit) {
     longjmp(bs->unwind, 1);
 }
 
-void bs_error_offset(Bs *bs, size_t offset, const char *fmt, ...) {
+void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
     fflush(stdout); // Flush stdout beforehand *just in case*
 
     bs->gc_on = false;
@@ -667,7 +680,7 @@ void bs_error_offset(Bs *bs, size_t offset, const char *fmt, ...) {
         printed_location = true;
         const Bs_Op_Loc *oploc = bs_chunk_get_op_loc(
             &bs->frame->closure->fn->chunk, bs->frame->ip - bs->frame->closure->fn->chunk.data);
-        bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(oploc[offset].loc));
+        bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(oploc[location].loc));
     } else {
         bs_fmt(w, "[C]: ");
     }
@@ -713,7 +726,7 @@ void bs_error_offset(Bs *bs, size_t offset, const char *fmt, ...) {
             const Bs_Fn *fn = caller->closure->fn;
             const Bs_Op_Loc *oploc = bs_chunk_get_op_loc(&fn->chunk, caller->ip - fn->chunk.data);
             if (!printed_location) {
-                oploc += offset;
+                oploc += location;
             }
             bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(oploc->loc));
         } else {
@@ -764,11 +777,11 @@ void bs_error_offset(Bs *bs, size_t offset, const char *fmt, ...) {
     bs_unwind(bs, 1);
 }
 
-void bs_check_arity_offset(Bs *bs, size_t offset, size_t actual, size_t expected) {
+void bs_check_arity_at(Bs *bs, size_t location, size_t actual, size_t expected) {
     if (actual != expected) {
-        bs_error_offset(
+        bs_error_at(
             bs,
-            offset,
+            location,
             "expected %zu argument%s, got %zu",
             expected,
             expected == 1 ? "" : "s",
@@ -776,38 +789,38 @@ void bs_check_arity_offset(Bs *bs, size_t offset, size_t actual, size_t expected
     }
 }
 
-static void bs_offset_label(char *buffer, size_t size, const char **label, size_t offset) {
+static void bs_label_at(char *buffer, size_t size, const char **label, size_t location) {
     if (!(*label)) {
-        const int count = snprintf(buffer, size, "argument #%zu", offset);
+        const int count = snprintf(buffer, size, "argument #%zu", location);
         assert(count >= 0 && count + 1 < size);
         *label = buffer;
     }
 }
 
-void bs_check_callable_offset(Bs *bs, size_t offset, Bs_Value value, const char *label) {
+void bs_check_callable_at(Bs *bs, size_t location, Bs_Value value, const char *label) {
     if (value.type != BS_VALUE_OBJECT ||
         (value.as.object->type != BS_OBJECT_CLOSURE && value.as.object->type != BS_OBJECT_C_FN)) {
         char buffer[64];
-        bs_offset_label(buffer, sizeof(buffer), &label, offset);
+        bs_label_at(buffer, sizeof(buffer), &label, location);
 
-        bs_error_offset(
+        bs_error_at(
             bs,
-            offset,
+            location,
             "expected %s to be callable object, got %s",
             label,
             bs_value_type_name(value, bs->frame->extended));
     }
 }
 
-void bs_check_value_type_offset(
-    Bs *bs, size_t offset, Bs_Value value, Bs_Value_Type expected, const char *label) {
+void bs_check_value_type_at(
+    Bs *bs, size_t location, Bs_Value value, Bs_Value_Type expected, const char *label) {
     if (value.type != expected) {
         char buffer[64];
-        bs_offset_label(buffer, sizeof(buffer), &label, offset);
+        bs_label_at(buffer, sizeof(buffer), &label, location);
 
-        bs_error_offset(
+        bs_error_at(
             bs,
-            offset,
+            location,
             "expected %s to be %s, got %s",
             label,
             bs_value_type_name((Bs_Value){.type = expected}, bs->frame->extended),
@@ -815,15 +828,15 @@ void bs_check_value_type_offset(
     }
 }
 
-void bs_check_object_type_offset(
-    Bs *bs, size_t offset, Bs_Value value, Bs_Object_Type expected, const char *label) {
+void bs_check_object_type_at(
+    Bs *bs, size_t location, Bs_Value value, Bs_Object_Type expected, const char *label) {
     if (value.type != BS_VALUE_OBJECT || value.as.object->type != expected) {
         char buffer[64];
-        bs_offset_label(buffer, sizeof(buffer), &label, offset);
+        bs_label_at(buffer, sizeof(buffer), &label, location);
 
-        bs_error_offset(
+        bs_error_at(
             bs,
-            offset,
+            location,
             "expected %s to be %s, got %s",
             label,
             bs_object_type_name(expected),
@@ -831,15 +844,15 @@ void bs_check_object_type_offset(
     }
 }
 
-void bs_check_object_c_type_offset(
-    Bs *bs, size_t offset, Bs_Value value, const Bs_C_Data_Spec *expected, const char *label) {
+void bs_check_object_c_type_at(
+    Bs *bs, size_t location, Bs_Value value, const Bs_C_Data_Spec *expected, const char *label) {
     if (value.type != BS_VALUE_OBJECT || value.as.object->type != BS_OBJECT_C_DATA) {
         char buffer[64];
-        bs_offset_label(buffer, sizeof(buffer), &label, offset);
+        bs_label_at(buffer, sizeof(buffer), &label, location);
 
-        bs_error_offset(
+        bs_error_at(
             bs,
-            offset,
+            location,
             "expected %s to be native " Bs_Sv_Fmt " object, got %s",
             label,
             Bs_Sv_Arg(expected->name),
@@ -849,11 +862,11 @@ void bs_check_object_c_type_offset(
     const Bs_C_Data *native = (const Bs_C_Data *)value.as.object;
     if (native->spec != expected) {
         char buffer[64];
-        bs_offset_label(buffer, sizeof(buffer), &label, offset);
+        bs_label_at(buffer, sizeof(buffer), &label, location);
 
-        bs_error_offset(
+        bs_error_at(
             bs,
-            offset,
+            location,
             "expected %s to be native " Bs_Sv_Fmt " object, got native " Bs_Sv_Fmt " object",
             label,
             Bs_Sv_Arg(expected->name),
@@ -861,24 +874,28 @@ void bs_check_object_c_type_offset(
     }
 }
 
-void bs_check_integer_offset(Bs *bs, size_t offset, Bs_Value value, const char *label) {
+void bs_check_integer_at(Bs *bs, size_t location, Bs_Value value, const char *label) {
     char buffer[64];
-    bs_offset_label(buffer, sizeof(buffer), &label, offset);
+    bs_label_at(buffer, sizeof(buffer), &label, location);
 
-    bs_check_value_type_offset(bs, offset, value, BS_VALUE_NUM, label);
+    bs_check_value_type_at(bs, location, value, BS_VALUE_NUM, label);
     if (value.as.number != (long)value.as.number) {
-        bs_error_offset(bs, offset, "expected %s to be integer, got %g", label, value.as.number);
+        bs_error_at(bs, location, "expected %s to be integer, got %g", label, value.as.number);
     }
 }
 
-void bs_check_whole_number_offset(Bs *bs, size_t offset, Bs_Value value, const char *label) {
+void bs_check_whole_number_at(Bs *bs, size_t location, Bs_Value value, const char *label) {
     char buffer[64];
-    bs_offset_label(buffer, sizeof(buffer), &label, offset);
+    bs_label_at(buffer, sizeof(buffer), &label, location);
 
-    bs_check_value_type_offset(bs, offset, value, BS_VALUE_NUM, label);
+    bs_check_value_type_at(bs, location, value, BS_VALUE_NUM, label);
     if (value.as.number < 0 || value.as.number != (long)value.as.number) {
-        bs_error_offset(
-            bs, offset, "expected %s to be positive whole number, got %g", label, value.as.number);
+        bs_error_at(
+            bs,
+            location,
+            "expected %s to be positive whole number, got %g",
+            label,
+            value.as.number);
     }
 }
 
@@ -930,13 +947,9 @@ static void bs_binary_op(Bs *bs, Bs_Value *a, Bs_Value *b, const char *op) {
     }
 }
 
-static_assert(BS_COUNT_OBJECTS == 11, "Update bs_call_value()");
-static bool bs_call_value(Bs *bs, size_t arity) {
-    const Bs_Value value = bs_stack_peek(bs, arity);
-
+static void bs_call_value(Bs *bs, Bs_Value value, size_t arity) {
     if (value.type != BS_VALUE_OBJECT) {
         bs_error(bs, "cannot call %s value", bs_value_type_name(value, bs->frame->extended));
-        return false;
     }
 
     switch (value.as.object->type) {
@@ -959,6 +972,11 @@ static bool bs_call_value(Bs *bs, size_t arity) {
     case BS_OBJECT_CLASS: {
         Bs_Class *class = (Bs_Class *)value.as.object;
         bs->stack.data[bs->stack.count - arity - 1] = bs_value_object(bs_instance_new(bs, class));
+    } break;
+
+    case BS_OBJECT_BOUND_METHOD: {
+        Bs_Bound_Method *method = (Bs_Bound_Method *)value.as.object;
+        bs_call_value(bs, method->fn, arity);
     } break;
 
     case BS_OBJECT_C_FN: {
@@ -988,10 +1006,12 @@ static bool bs_call_value(Bs *bs, size_t arity) {
 
     default:
         bs_error(bs, "cannot call %s value", bs_value_type_name(value, bs->frame->extended));
-        return false;
     }
+}
 
-    return true;
+static_assert(BS_COUNT_OBJECTS == 12, "Update bs_call_value()");
+static void bs_call_stack_top(Bs *bs, size_t arity) {
+    bs_call_value(bs, bs_stack_peek(bs, arity), arity);
 }
 
 static Bs_Upvalue *bs_capture_upvalue(Bs *bs, Bs_Value *value) {
@@ -1078,7 +1098,7 @@ static bool bs_import_language(Bs *bs, Bs_Sv path, size_t length) {
 #endif // BS_STEP_DEBUG
 
     bs_stack_push(bs, bs_value_object(bs_closure_new(bs, fn)));
-    bs_call_value(bs, 0);
+    bs_call_stack_top(bs, 0);
     return true;
 }
 
@@ -1201,7 +1221,7 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
     }
 
     if (container.as.object->type == BS_OBJECT_ARRAY) {
-        bs_check_whole_number_offset(bs, 1, index, "array index");
+        bs_check_whole_number_at(bs, 1, index, "array index");
 
         Bs_Array *array = (Bs_Array *)container.as.object;
         if (!bs_array_get(bs, array, index.as.number, &value)) {
@@ -1213,7 +1233,7 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
         }
     } else if (container.as.object->type == BS_OBJECT_TABLE) {
         if (index.type == BS_VALUE_NIL) {
-            bs_error_offset(
+            bs_error_at(
                 bs,
                 1,
                 "cannot use '%s' as table key",
@@ -1225,22 +1245,27 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
         }
     } else if (container.as.object->type == BS_OBJECT_INSTANCE) {
         if (index.type == BS_VALUE_NIL) {
-            bs_error_offset(
+            bs_error_at(
                 bs,
                 1,
                 "cannot use '%s' as instance property",
                 bs_value_type_name(index, bs->frame->extended));
         }
 
-        if (!bs_map_get(bs, &((Bs_Instance *)container.as.object)->fields, index, &value)) {
-            value = bs_value_nil;
+        Bs_Instance *instance = (Bs_Instance *)container.as.object;
+        if (!bs_map_get(bs, &instance->fields, index, &value)) {
+            if (bs_map_get(bs, &instance->class->methods, index, &value)) {
+                bs_stack_set(bs, 0, bs_value_object(bs_bound_method_new(bs, container, value)));
+            } else {
+                value = bs_value_nil;
+            }
         }
     } else if (container.as.object->type == BS_OBJECT_C_LIB) {
-        bs_check_object_type_offset(bs, 1, index, BS_OBJECT_STR, "library symbol name");
+        bs_check_object_type_at(bs, 1, index, BS_OBJECT_STR, "library symbol name");
 
         Bs_Str *name = (Bs_Str *)index.as.object;
         if (!name->size) {
-            bs_error_offset(bs, 1, "library symbol name cannot be empty");
+            bs_error_at(bs, 1, "library symbol name cannot be empty");
         }
 
         Bs_C_Lib *c = (Bs_C_Lib *)container.as.object;
@@ -1268,11 +1293,11 @@ static void bs_container_set(Bs *bs, Bs_Value container, Bs_Value index, Bs_Valu
     }
 
     if (container.as.object->type == BS_OBJECT_ARRAY) {
-        bs_check_whole_number_offset(bs, 1, index, "array index");
+        bs_check_whole_number_at(bs, 1, index, "array index");
         bs_array_set(bs, (Bs_Array *)container.as.object, index.as.number, value);
     } else if (container.as.object->type == BS_OBJECT_TABLE) {
         if (index.type == BS_VALUE_NIL) {
-            bs_error_offset(
+            bs_error_at(
                 bs,
                 1,
                 "cannot use '%s' as table key",
@@ -1287,7 +1312,7 @@ static void bs_container_set(Bs *bs, Bs_Value container, Bs_Value index, Bs_Valu
         }
     } else if (container.as.object->type == BS_OBJECT_INSTANCE) {
         if (index.type == BS_VALUE_NIL) {
-            bs_error_offset(
+            bs_error_at(
                 bs,
                 1,
                 "cannot use '%s' as instance property",
@@ -1308,7 +1333,29 @@ static void bs_container_set(Bs *bs, Bs_Value container, Bs_Value index, Bs_Valu
     }
 }
 
-static_assert(BS_COUNT_OPS == 53, "Update bs_interpret()");
+static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value iterator) {
+    size_t index;
+    if (iterator.type == BS_VALUE_NIL) {
+        index = 0;
+    } else {
+        index = iterator.as.number + 1;
+    }
+
+    while (index < map->capacity && map->data[index].key.type == BS_VALUE_NIL) {
+        index++;
+    }
+
+    if (index >= map->capacity) {
+        bs->frame->ip += offset;
+    } else {
+        const Bs_Entry entry = map->data[index];
+        bs_stack_set(bs, 0, bs_value_num(index)); // Iterator
+        bs_stack_push(bs, entry.key);             // Key
+        bs_stack_push(bs, entry.value);           // Value
+    }
+}
+
+static_assert(BS_COUNT_OPS == 54, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const size_t frames_count_save = bs->frames.count;
@@ -1372,7 +1419,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         } break;
 
         case BS_OP_CALL:
-            bs_call_value(bs, bs_chunk_read_int(bs));
+            bs_call_stack_top(bs, bs_chunk_read_int(bs));
             break;
 
         case BS_OP_CLOSURE: {
@@ -1429,6 +1476,17 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value name = bs_chunk_read_const(bs);
             assert(name.type == BS_VALUE_OBJECT && name.as.object->type == BS_OBJECT_STR);
             bs_stack_push(bs, bs_value_object(bs_class_new(bs, (Bs_Str *)name.as.object)));
+        } break;
+
+        case BS_OP_METHOD: {
+            const Bs_Value name = bs_chunk_read_const(bs);
+            const Bs_Value method = bs_stack_peek(bs, 0);
+            const Bs_Value class = bs_stack_peek(bs, 1);
+
+            assert(class.type == BS_VALUE_OBJECT && class.as.object->type == BS_OBJECT_CLASS);
+            bs_map_set(bs, &((Bs_Class *)class.as.object)->methods, name, method);
+
+            bs->stack.count--;
         } break;
 
         case BS_OP_ADD: {
@@ -1813,27 +1871,10 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 }
             } else if (container.as.object->type == BS_OBJECT_TABLE) {
                 const Bs_Table *table = (const Bs_Table *)container.as.object;
-
-                size_t index;
-                if (iterator.type == BS_VALUE_NIL) {
-                    index = 0;
-                } else {
-                    index = iterator.as.number + 1;
-                }
-
-                while (index < table->map.capacity &&
-                       table->map.data[index].key.type == BS_VALUE_NIL) {
-                    index++;
-                }
-
-                if (index >= table->map.capacity) {
-                    bs->frame->ip += offset;
-                } else {
-                    const Bs_Entry entry = table->map.data[index];
-                    bs_stack_set(bs, 0, bs_value_num(index)); // Iterator
-                    bs_stack_push(bs, entry.key);             // Key
-                    bs_stack_push(bs, entry.value);           // Value
-                }
+                bs_iter_map(bs, offset, &table->map, iterator);
+            } else if (container.as.object->type == BS_OBJECT_INSTANCE) {
+                const Bs_Instance *instance = (const Bs_Instance *)container.as.object;
+                bs_iter_map(bs, offset, &instance->fields, iterator);
             } else {
                 bs_error(
                     bs,
@@ -1846,17 +1887,17 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const size_t offset = bs_chunk_read_int(bs);
 
             const Bs_Value start = bs_stack_peek(bs, 2);
-            bs_check_value_type_offset(bs, 0, start, BS_VALUE_NUM, "range start");
+            bs_check_value_type_at(bs, 0, start, BS_VALUE_NUM, "range start");
 
             const Bs_Value end = bs_stack_peek(bs, 1);
-            bs_check_value_type_offset(bs, 1, end, BS_VALUE_NUM, "range end");
+            bs_check_value_type_at(bs, 1, end, BS_VALUE_NUM, "range end");
 
             Bs_Value step = bs_stack_peek(bs, 0);
             if (step.type == BS_VALUE_NIL) {
                 step = bs_value_num((end.as.number > start.as.number) ? 1 : -1);
                 bs_stack_set(bs, 0, step);
             }
-            bs_check_value_type_offset(bs, 2, step, BS_VALUE_NUM, "range step");
+            bs_check_value_type_at(bs, 2, step, BS_VALUE_NUM, "range step");
 
             const bool over = step.as.number > 0 ? (start.as.number >= end.as.number)
                                                  : (start.as.number <= end.as.number);
@@ -1928,7 +1969,7 @@ Bs_Value bs_call(Bs *bs, Bs_Value fn, const Bs_Value *args, size_t arity) {
     for (size_t i = 0; i < arity; i++) {
         bs_stack_push(bs, args[i]);
     }
-    bs_call_value(bs, arity);
+    bs_call_stack_top(bs, arity);
 
     Bs_Value result;
     if (fn.as.object->type == BS_OBJECT_C_FN) {

@@ -244,6 +244,19 @@ static void bs_compile_string(Bs_Compiler *c, Bs_Sv sv) {
         bs_value_object(bs_str_new(c->bs, bs_buffer_reset(b, start))));
 }
 
+static void bs_compile_identifier(Bs_Compiler *c, const Bs_Token *token) {
+    size_t index;
+    if (bs_scope_find_local(c->scope, token->sv, &index)) {
+        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_LGET, index);
+    } else if (bs_scope_find_upvalue(c->bs, c->scope, token->sv, &index)) {
+        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_UGET, index);
+    } else {
+        bs_chunk_push_op_value(
+            c->bs, c->chunk, BS_OP_GGET, bs_value_object(bs_str_new(c->bs, token->sv)));
+    }
+    bs_chunk_push_op_loc(c->bs, c->chunk, token->loc);
+}
+
 static_assert(BS_COUNT_TOKENS == 58, "Update bs_compile_expr()");
 static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
@@ -290,18 +303,9 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_FALSE);
         break;
 
-    case BS_TOKEN_IDENT: {
-        size_t index;
-        if (bs_scope_find_local(c->scope, token.sv, &index)) {
-            bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_LGET, index);
-        } else if (bs_scope_find_upvalue(c->bs, c->scope, token.sv, &index)) {
-            bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_UGET, index);
-        } else {
-            bs_chunk_push_op_value(
-                c->bs, c->chunk, BS_OP_GGET, bs_value_object(bs_str_new(c->bs, token.sv)));
-        }
-        bs_chunk_push_op_loc(c->bs, c->chunk, loc);
-    } break;
+    case BS_TOKEN_IDENT:
+        bs_compile_identifier(c, &token);
+        break;
 
     case BS_TOKEN_LPAREN:
         bs_compile_expr(c, BS_POWER_SET);
@@ -777,7 +781,7 @@ static void bs_compile_lambda(Bs_Compiler *c, const Bs_Token *name) {
 static void bs_compile_class(Bs_Compiler *c, bool public) {
     Bs_Token token;
 
-    const size_t const_index = bs_compile_definition(c, &token, true);
+    size_t const_index = bs_compile_definition(c, &token, true);
     if (!public) {
         bs_da_push(c->bs, c->scope, ((Bs_Local){.token = token, .depth = c->scope->depth}));
     }
@@ -788,8 +792,20 @@ static void bs_compile_class(Bs_Compiler *c, bool public) {
         bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
     }
 
+    bs_compile_identifier(c, &token);
     bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE);
-    bs_lexer_expect(&c->lexer, BS_TOKEN_RBRACE);
+    while (true) {
+        token = bs_lexer_either(&c->lexer, BS_TOKEN_RBRACE, BS_TOKEN_IDENT);
+        if (token.type == BS_TOKEN_RBRACE) {
+            break;
+        }
+        bs_lexer_buffer(&c->lexer, token);
+
+        const_index = bs_compile_definition(c, &token, true);
+        bs_compile_lambda(c, &token);
+        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_METHOD, const_index);
+    }
+    bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
 }
 
 static void bs_compile_function(Bs_Compiler *c, bool public) {

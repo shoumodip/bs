@@ -6,11 +6,12 @@ bool bs_value_is_falsey(Bs_Value v) {
     return v.type == BS_VALUE_NIL || (v.type == BS_VALUE_BOOL && !v.as.boolean);
 }
 
-static_assert(BS_COUNT_OBJECTS == 11, "Update bs_object_type_name()");
+static_assert(BS_COUNT_OBJECTS == 12, "Update bs_object_type_name()");
 const char *bs_object_type_name(Bs_Object_Type type) {
     switch (type) {
     case BS_OBJECT_FN:
     case BS_OBJECT_CLOSURE:
+    case BS_OBJECT_BOUND_METHOD:
     case BS_OBJECT_C_FN:
         return "function";
 
@@ -148,11 +149,11 @@ void bs_pretty_printer_map(Bs_Pretty_Printer *p, const Bs_Map *map) {
                 bs_fmt(p->writer, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)entry->key.as.object));
             } else {
                 p->writer->write(p->writer, Bs_Sv_Static("["));
-                bs_value_print_impl(p, entry->key);
+                bs_value_write_impl(p, entry->key);
                 p->writer->write(p->writer, Bs_Sv_Static("]"));
             }
             bs_fmt(p->writer, " = ");
-            bs_value_print_impl(p, entry->value);
+            bs_value_write_impl(p, entry->value);
             count++;
         }
 
@@ -177,12 +178,14 @@ void bs_pretty_printer_quote(Bs_Pretty_Printer *p, Bs_Sv sv) {
     bs_fmt(p->writer, "\"");
 }
 
-static_assert(BS_COUNT_OBJECTS == 11, "Update bs_object_write()");
+static_assert(BS_COUNT_OBJECTS == 12, "Update bs_object_write()");
 static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) {
     switch (object->type) {
     case BS_OBJECT_FN:
+    case BS_OBJECT_CLOSURE:
+    case BS_OBJECT_BOUND_METHOD:
     case BS_OBJECT_C_FN:
-        bs_fmt(p->writer, "<fn %p>", object);
+        bs_fmt(p->writer, "<fn>");
         break;
 
     case BS_OBJECT_STR:
@@ -196,7 +199,7 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
 
     case BS_OBJECT_ARRAY: {
         if (bs_pretty_printer_has(p, object)) {
-            bs_fmt(p->writer, "<array %p>", object);
+            bs_fmt(p->writer, "<array>");
         } else {
             bs_pretty_printer_push(p, object);
             const Bs_Array *array = (const Bs_Array *)object;
@@ -216,7 +219,7 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
                     bs_fmt(p->writer, " ");
                 }
 
-                bs_value_print_impl(p, array->data[i]);
+                bs_value_write_impl(p, array->data[i]);
             }
 
             p->depth--;
@@ -229,16 +232,12 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
 
     case BS_OBJECT_TABLE: {
         if (bs_pretty_printer_has(p, object)) {
-            bs_fmt(p->writer, "<table %p>", object);
+            bs_fmt(p->writer, "<table>");
         } else {
             bs_pretty_printer_push(p, object);
             bs_pretty_printer_map(p, &((const Bs_Table *)object)->map);
         }
     } break;
-
-    case BS_OBJECT_CLOSURE:
-        bs_object_write_impl(p, (Bs_Object *)((const Bs_Closure *)object)->fn);
-        break;
 
     case BS_OBJECT_UPVALUE:
         bs_fmt(p->writer, "<upvalue>");
@@ -250,12 +249,11 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
     } break;
 
     case BS_OBJECT_INSTANCE: {
+        const Bs_Instance *instance = (const Bs_Instance *)object;
         if (bs_pretty_printer_has(p, object)) {
-            bs_fmt(p->writer, "<instance %p>", object);
+            bs_fmt(p->writer, "<" Bs_Sv_Fmt ">", Bs_Sv_Arg(*instance->class->name));
         } else {
             bs_pretty_printer_push(p, object);
-
-            const Bs_Instance *instance = (const Bs_Instance *)object;
             bs_fmt(p->writer, Bs_Sv_Fmt " ", Bs_Sv_Arg(*instance->class->name));
             bs_pretty_printer_map(p, &instance->fields);
         }
@@ -279,7 +277,7 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
     }
 }
 
-void bs_value_print_impl(Bs_Pretty_Printer *p, Bs_Value value) {
+void bs_value_write_impl(Bs_Pretty_Printer *p, Bs_Value value) {
     switch (value.type) {
     case BS_VALUE_NIL:
         if (p->extended) {

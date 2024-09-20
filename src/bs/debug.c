@@ -14,11 +14,11 @@ bs_debug_op_value(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset, const
     *offset += sizeof(constant);
 
     bs_fmt(p->writer, "%-16s %4zu '", name, constant);
-    bs_value_print_impl(p, c->constants.data[constant]);
+    bs_value_write_impl(p, c->constants.data[constant]);
     bs_fmt(p->writer, "'\n");
 }
 
-static_assert(BS_COUNT_OPS == 53, "Update bs_debug_op()");
+static_assert(BS_COUNT_OPS == 54, "Update bs_debug_op()");
 void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
     bs_fmt(p->writer, "%04zu ", *offset);
 
@@ -38,7 +38,7 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
 
         const Bs_Value value = c->constants.data[constant];
         bs_fmt(p->writer, "%-16s %4zu '", "OP_CLOSURE", constant);
-        bs_value_print_impl(p, value);
+        bs_value_write_impl(p, value);
         bs_fmt(p->writer, "'\n");
 
         const Bs_Fn *fn = (const Bs_Fn *)value.as.object;
@@ -90,6 +90,10 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
 
     case BS_OP_CLASS:
         bs_debug_op_value(p, c, offset, "OP_CLASS");
+        break;
+
+    case BS_OP_METHOD:
+        bs_debug_op_value(p, c, offset, "OP_METHOD");
         break;
 
     case BS_OP_ADD:
@@ -289,7 +293,7 @@ void bs_debug_chunks(Bs_Pretty_Printer *p, const Bs_Object *objects) {
             const Bs_Fn *fn = (const Bs_Fn *)object;
 
             bs_fmt(p->writer, "==== ");
-            bs_value_print_impl(p, bs_value_object(fn));
+            bs_value_write_impl(p, bs_value_object(fn));
             bs_fmt(p->writer, " ====\n");
 
             bs_debug_chunk(p, &fn->chunk);
