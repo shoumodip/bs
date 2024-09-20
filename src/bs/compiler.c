@@ -97,6 +97,12 @@ typedef struct {
 #define bs_uplocals_free bs_da_free
 #define bs_uplocals_push bs_da_push
 
+typedef struct Bs_Class_Compiler Bs_Class_Compiler;
+
+struct Bs_Class_Compiler {
+    Bs_Class_Compiler *outer;
+};
+
 typedef enum {
     BS_LAMBDA_FN,
     BS_LAMBDA_METHOD,
@@ -174,6 +180,7 @@ static bool bs_lambda_find_upvalue(Bs *bs, Bs_Lambda *l, Bs_Sv name, size_t *ind
 typedef struct {
     Bs_Lexer lexer;
     Bs_Lambda *lambda;
+    Bs_Class_Compiler *class;
 
     Bs *bs;
     Bs_Chunk *chunk;
@@ -435,6 +442,17 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         break;
 
     case BS_TOKEN_THIS: {
+        if (!c->class) {
+            bs_fmt(
+                c->lexer.error,
+                Bs_Loc_Fmt "error: cannot use %s outside of %s\n",
+                Bs_Loc_Arg(token.loc),
+                bs_token_type_name(token.type, c->lexer.extended),
+                bs_token_type_name(BS_TOKEN_CLASS, c->lexer.extended));
+
+            bs_lexer_error(&c->lexer);
+        }
+
         const Bs_Sv sv = c->lexer.extended ? Bs_Sv_Static("deez") : Bs_Sv_Static("this");
 
         size_t index;
@@ -818,6 +836,10 @@ static void bs_compile_class(Bs_Compiler *c, bool public) {
         bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
     }
 
+    Bs_Class_Compiler class = {0};
+    class.outer = c->class;
+    c->class = &class;
+
     bs_compile_identifier(c, &token);
     bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE);
     while (true) {
@@ -832,6 +854,8 @@ static void bs_compile_class(Bs_Compiler *c, bool public) {
         bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_METHOD, const_index);
     }
     bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
+
+    c->class = c->class->outer;
 }
 
 static void bs_compile_function(Bs_Compiler *c, bool public) {
