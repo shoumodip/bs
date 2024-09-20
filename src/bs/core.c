@@ -62,9 +62,14 @@ static Bs_Value bs_io_close(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_io_read(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 2);
+    if (arity != 1 && arity != 2) {
+        bs_error(bs, "expected 1 or 2 arguments, got %zu", arity);
+    }
+
     bs_arg_check_object_c_type(bs, args, 0, &bs_file_data_spec);
-    bs_arg_check_whole_number(bs, args, 1);
+    if (arity == 2) {
+        bs_arg_check_whole_number(bs, args, 1);
+    }
 
     Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
     FILE *f = bs_c_data_as(c->data, FILE *);
@@ -72,8 +77,10 @@ static Bs_Value bs_io_read(Bs *bs, Bs_Value *args, size_t arity) {
         bs_error(bs, "cannot read from closed file");
     }
 
-    size_t count = args[1].as.number;
-    if (!count) {
+    size_t count = 0;
+    if (arity == 2) {
+        count = args[1].as.number;
+    } else {
         const long start = ftell(f);
         if (start == -1) {
             return bs_value_nil;
