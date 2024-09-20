@@ -976,6 +976,7 @@ static void bs_call_value(Bs *bs, Bs_Value value, size_t arity) {
 
     case BS_OBJECT_BOUND_METHOD: {
         Bs_Bound_Method *method = (Bs_Bound_Method *)value.as.object;
+        bs->stack.data[bs->stack.count - arity - 1] = method->this;
         bs_call_value(bs, method->fn, arity);
     } break;
 
@@ -1002,6 +1003,9 @@ static void bs_call_value(Bs *bs, Bs_Value value, size_t arity) {
         bs->stack.data[bs->stack.count - 1] = value;
 
         bs->gc_on = gc_on_save;
+        if (bs->gc_on && bs->gc_bytes > bs->gc_max) {
+            bs_collect(bs);
+        }
     } break;
 
     default:
@@ -1255,7 +1259,7 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
         Bs_Instance *instance = (Bs_Instance *)container.as.object;
         if (!bs_map_get(bs, &instance->fields, index, &value)) {
             if (bs_map_get(bs, &instance->class->methods, index, &value)) {
-                bs_stack_set(bs, 0, bs_value_object(bs_bound_method_new(bs, container, value)));
+                value = bs_value_object(bs_bound_method_new(bs, container, value));
             } else {
                 value = bs_value_nil;
             }
@@ -1355,7 +1359,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 54, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 56, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const size_t frames_count_save = bs->frames.count;
@@ -1776,6 +1780,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         } break;
 
         case BS_OP_LGET:
+        case BS_OP_LTHIS:
             bs_stack_push(bs, bs->frame->base[bs_chunk_read_int(bs)]);
             break;
 
@@ -1783,7 +1788,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             bs->frame->base[bs_chunk_read_int(bs)] = bs_stack_peek(bs, 0);
             break;
 
-        case BS_OP_UGET: {
+        case BS_OP_UGET:
+        case BS_OP_UTHIS: {
             Bs_Upvalue *upvalue = bs->frame->closure->data[bs_chunk_read_int(bs)];
             bs_stack_push(bs, *upvalue->value);
         } break;
