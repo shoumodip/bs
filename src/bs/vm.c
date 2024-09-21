@@ -2123,10 +2123,17 @@ Bs_Value bs_call(Bs *bs, Bs_Value fn, const Bs_Value *args, size_t arity) {
     bs_call_stack_top(bs, arity);
 
     Bs_Value result;
-    if (fn.as.object->type == BS_OBJECT_C_FN) {
-        result = bs_stack_peek(bs, 0);
-    } else {
+    if (fn.as.object->type == BS_OBJECT_CLOSURE) {
         bs_interpret(bs, &result);
+    } else if (fn.as.object->type == BS_OBJECT_CLASS) {
+        Bs_Class *class = (Bs_Class *)fn.as.object;
+        if (class->init) {
+            bs_interpret(bs, &result);
+        } else {
+            result = bs_stack_peek(bs, 0);
+        }
+    } else {
+        result = bs_stack_peek(bs, 0);
     }
 
     bs->stack.count = stack_count_save;
