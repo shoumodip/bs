@@ -6,7 +6,7 @@ bool bs_value_is_falsey(Bs_Value v) {
     return v.type == BS_VALUE_NIL || (v.type == BS_VALUE_BOOL && !v.as.boolean);
 }
 
-static_assert(BS_COUNT_OBJECTS == 12, "Update bs_object_type_name()");
+static_assert(BS_COUNT_OBJECTS == 14, "Update bs_object_type_name()");
 const char *bs_object_type_name(Bs_Object_Type type) {
     switch (type) {
     case BS_OBJECT_FN:
@@ -28,10 +28,14 @@ const char *bs_object_type_name(Bs_Object_Type type) {
         return "upvalue";
 
     case BS_OBJECT_CLASS:
+    case BS_OBJECT_C_CLASS:
         return "class";
 
     case BS_OBJECT_INSTANCE:
         return "instance";
+
+    case BS_OBJECT_C_INSTANCE:
+        return "native instance";
 
     case BS_OBJECT_C_LIB:
         return "native library";
@@ -178,7 +182,7 @@ void bs_pretty_printer_quote(Bs_Pretty_Printer *p, Bs_Sv sv) {
     bs_fmt(p->writer, "\"");
 }
 
-static_assert(BS_COUNT_OBJECTS == 12, "Update bs_object_write()");
+static_assert(BS_COUNT_OBJECTS == 14, "Update bs_object_write()");
 static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) {
     switch (object->type) {
     case BS_OBJECT_FN:
@@ -244,8 +248,10 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
         break;
 
     case BS_OBJECT_CLASS: {
-        const Bs_Str *name = ((const Bs_Class *)object)->name;
-        p->writer->write(p->writer, Bs_Sv(name->data, name->size));
+        const Bs_Class *class = (const Bs_Class *)object;
+        const Bs_Str *name = class->name;
+        bs_fmt(p->writer, "class " Bs_Sv_Fmt " ", Bs_Sv_Arg(*name));
+        bs_pretty_printer_map(p, &class->methods);
     } break;
 
     case BS_OBJECT_INSTANCE: {
@@ -257,6 +263,17 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
             bs_fmt(p->writer, Bs_Sv_Fmt " ", Bs_Sv_Arg(*instance->class->name));
             bs_pretty_printer_map(p, &instance->fields);
         }
+    } break;
+
+    case BS_OBJECT_C_CLASS: {
+        const Bs_C_Class *class = (const Bs_C_Class *)object;
+        bs_fmt(p->writer, "class " Bs_Sv_Fmt " ", Bs_Sv_Arg(class->name));
+        bs_pretty_printer_map(p, &class->methods);
+    } break;
+
+    case BS_OBJECT_C_INSTANCE: {
+        const Bs_C_Instance *instance = (const Bs_C_Instance *)object;
+        bs_fmt(p->writer, "<" Bs_Sv_Fmt ">", Bs_Sv_Arg(instance->class->name));
     } break;
 
     case BS_OBJECT_C_LIB:

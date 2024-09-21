@@ -139,6 +139,34 @@ Bs_Instance *bs_instance_new(Bs *bs, Bs_Class *class) {
     return i;
 }
 
+Bs_C_Class *
+bs_c_class_new(Bs *bs, Bs_Sv name, size_t size, Bs_C_Fn_Ptr init, Bs_C_Class_Free free) {
+    Bs_C_Class *class = (Bs_C_Class *)bs_object_new(bs, BS_OBJECT_C_CLASS, sizeof(Bs_C_Class));
+    class->name = name;
+    class->size = size;
+    class->init = init ? bs_c_fn_new(bs, name, init) : NULL;
+    class->free = free;
+    memset(&class->methods, '\0', sizeof(class->methods));
+    return class;
+}
+
+void bs_c_class_add(Bs *bs, Bs_C_Class *class, Bs_Sv name, Bs_C_Fn_Ptr fn) {
+    bs_map_set(
+        bs,
+        &class->methods,
+        bs_value_object(bs_str_new(bs, name)),
+        bs_value_object(bs_c_fn_new(bs, name, fn)));
+}
+
+Bs_C_Instance *bs_c_instance_new(Bs *bs, Bs_C_Class *class) {
+    Bs_C_Instance *i = (Bs_C_Instance *)bs_object_new(
+        bs, BS_OBJECT_C_INSTANCE, sizeof(Bs_C_Instance) + class->size);
+
+    i->class = class;
+    memset(i->data, '\0', class->size);
+    return i;
+}
+
 Bs_Bound_Method *bs_bound_method_new(Bs *bs, Bs_Value this, Bs_Value fn) {
     Bs_Bound_Method *method =
         (Bs_Bound_Method *)bs_object_new(bs, BS_OBJECT_BOUND_METHOD, sizeof(Bs_Bound_Method));
@@ -147,7 +175,7 @@ Bs_Bound_Method *bs_bound_method_new(Bs *bs, Bs_Value this, Bs_Value fn) {
     return method;
 }
 
-Bs_C_Fn *bs_c_fn_new(Bs *bs, const char *name, Bs_C_Fn_Ptr fn) {
+Bs_C_Fn *bs_c_fn_new(Bs *bs, Bs_Sv name, Bs_C_Fn_Ptr fn) {
     Bs_C_Fn *c = (Bs_C_Fn *)bs_object_new(bs, BS_OBJECT_C_FN, sizeof(Bs_C_Fn));
     c->fn = fn;
     c->name = name;

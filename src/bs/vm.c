@@ -112,7 +112,7 @@ struct Bs {
 };
 
 // Garbage collector
-static_assert(BS_COUNT_OBJECTS == 12, "Update bs_free_object()");
+static_assert(BS_COUNT_OBJECTS == 14, "Update bs_free_object()");
 static void bs_free_object(Bs *bs, Bs_Object *object) {
 #ifdef BS_GC_DEBUG_LOG
     bs_fmt(&bs->config.log, "[GC] Free %p; Type: %d\n", object, object->type);
@@ -160,6 +160,20 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
         Bs_Instance *instance = (Bs_Instance *)object;
         bs_map_free(bs, &instance->fields);
         bs_realloc(bs, instance, sizeof(*instance), 0);
+    } break;
+
+    case BS_OBJECT_C_CLASS: {
+        Bs_C_Class *class = (Bs_C_Class *)object;
+        bs_map_free(bs, &class->methods);
+        bs_realloc(bs, class, sizeof(*class), 0);
+    } break;
+
+    case BS_OBJECT_C_INSTANCE: {
+        Bs_C_Instance *instance = (Bs_C_Instance *)object;
+        if (instance->class->free) {
+            instance->class->free(bs, instance);
+        }
+        bs_realloc(bs, instance, sizeof(*instance) + instance->class->size, 0);
     } break;
 
     case BS_OBJECT_BOUND_METHOD: {
@@ -231,7 +245,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
     bs->grays.data[bs->grays.count++] = object;
 }
 
-static_assert(BS_COUNT_OBJECTS == 12, "Update bs_blacken_object()");
+static_assert(BS_COUNT_OBJECTS == 14, "Update bs_blacken_object()");
 static void bs_blacken_object(Bs *bs, Bs_Object *object) {
 #ifdef BS_GC_DEBUG_LOG
     Bs_Writer *w = &bs->config.log;
@@ -289,6 +303,17 @@ static void bs_blacken_object(Bs *bs, Bs_Object *object) {
         Bs_Instance *instance = (Bs_Instance *)object;
         bs_mark_object(bs, (Bs_Object *)instance->class);
         bs_mark_map(bs, &instance->fields);
+    } break;
+
+    case BS_OBJECT_C_CLASS: {
+        Bs_C_Class *class = (Bs_C_Class *)object;
+        bs_mark_object(bs, (Bs_Object *)class->init);
+        bs_mark_map(bs, &class->methods);
+    } break;
+
+    case BS_OBJECT_C_INSTANCE: {
+        Bs_C_Instance *instance = (Bs_C_Instance *)object;
+        bs_mark_object(bs, (Bs_Object *)instance->class);
     } break;
 
     case BS_OBJECT_BOUND_METHOD: {
@@ -400,7 +425,7 @@ static void bs_collect(Bs *bs) {
 }
 
 // Interface
-static void bs_buffer_write(Bs_Writer *w, Bs_Sv sv) {
+void bs_buffer_write(Bs_Writer *w, Bs_Sv sv) {
     Bs_Buffer *b = w->data;
     bs_da_push_many(b->bs, b, sv.data, sv.size);
 }
@@ -771,7 +796,7 @@ void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
 
                 bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(path));
             }
-            bs_fmt(w, "%s()", fn->name);
+            bs_fmt(w, Bs_Sv_Fmt "()", Bs_Sv_Arg(fn->name));
         }
 
         bs_fmt(w, "\n");
@@ -951,6 +976,28 @@ static void bs_binary_op(Bs *bs, Bs_Value *a, Bs_Value *b, const char *op) {
     }
 }
 
+static void bs_call_c_fn(Bs *bs, size_t offset, const Bs_C_Fn *native, size_t arity) {
+    const Bs_Frame frame = {
+        .base = &bs->stack.data[bs->stack.count - arity],
+
+        .native = native,
+        .extended = bs->frame ? bs->frame->extended : false,
+
+        .locations_offset = offset,
+    };
+
+    bs_frames_push(bs, &bs->frames, frame);
+    bs->frame = &bs->frames.data[bs->frames.count - 1];
+
+    const Bs_Value value = native->fn(bs, &bs->stack.data[bs->stack.count - arity], arity);
+    bs->frames.count--;
+    bs->frame = &bs->frames.data[bs->frames.count - 1];
+
+    bs->stack.count -= arity;
+    bs->stack.data[bs->stack.count - 1] = value;
+}
+
+static_assert(BS_COUNT_OBJECTS == 14, "Update bs_call_value()");
 static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
     if (value.type != BS_VALUE_OBJECT) {
         bs_error_at(
@@ -998,6 +1045,33 @@ static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
         }
     } break;
 
+    case BS_OBJECT_C_CLASS: {
+        Bs_C_Class *class = (Bs_C_Class *)value.as.object;
+        Bs_Value instance = bs_value_object(bs_c_instance_new(bs, class));
+        bs->stack.data[bs->stack.count - arity - 1] = instance;
+
+        if (class->init) {
+            const bool gc_on_save = bs->gc_on;
+            bs->gc_on = false;
+
+            bs_call_c_fn(bs, offset, class->init, arity);
+            bs_stack_set(bs, 0, instance);
+
+            bs->gc_on = gc_on_save;
+            if (bs->gc_on) {
+#ifdef BS_GC_DEBUG_STRESS
+                bs_collect(bs);
+#else
+                if (bs->gc_bytes > bs->gc_max) {
+                    bs_collect(bs);
+                }
+#endif // BS_GC_DEBUG_STRESS
+            }
+        } else {
+            bs_check_arity_at(bs, offset, arity, 0);
+        }
+    } break;
+
     case BS_OBJECT_BOUND_METHOD: {
         Bs_Bound_Method *method = (Bs_Bound_Method *)value.as.object;
         bs->stack.data[bs->stack.count - arity - 1] = method->this;
@@ -1009,28 +1083,17 @@ static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
         const bool gc_on_save = bs->gc_on;
         bs->gc_on = false;
 
-        const Bs_Frame frame = {
-            .base = &bs->stack.data[bs->stack.count - arity],
-
-            .native = native,
-            .extended = bs->frame ? bs->frame->extended : false,
-
-            .locations_offset = offset,
-        };
-
-        bs_frames_push(bs, &bs->frames, frame);
-        bs->frame = &bs->frames.data[bs->frames.count - 1];
-
-        const Bs_Value value = native->fn(bs, &bs->stack.data[bs->stack.count - arity], arity);
-        bs->frames.count--;
-        bs->frame = &bs->frames.data[bs->frames.count - 1];
-
-        bs->stack.count -= arity;
-        bs->stack.data[bs->stack.count - 1] = value;
+        bs_call_c_fn(bs, offset, native, arity);
 
         bs->gc_on = gc_on_save;
-        if (bs->gc_on && bs->gc_bytes > bs->gc_max) {
+        if (bs->gc_on) {
+#ifdef BS_GC_DEBUG_STRESS
             bs_collect(bs);
+#else
+            if (bs->gc_bytes > bs->gc_max) {
+                bs_collect(bs);
+            }
+#endif // BS_GC_DEBUG_STRESS
         }
     } break;
 
@@ -1040,7 +1103,6 @@ static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
     }
 }
 
-static_assert(BS_COUNT_OBJECTS == 12, "Update bs_call_value()");
 static void bs_call_stack_top(Bs *bs, size_t arity) {
     bs_call_value(bs, 0, bs_stack_peek(bs, arity), arity);
 }
@@ -1192,6 +1254,7 @@ static void bs_import(Bs *bs) {
 
         Bs_C_Lib *library = bs_c_lib_new(bs, data, path);
 
+        // TODO: use bs_library_init() instead
         const Bs_Export *exports = dlsym(data, "bs_exports");
         const size_t *exports_count = dlsym(data, "bs_exports_count");
 
@@ -1216,7 +1279,7 @@ static void bs_import(Bs *bs) {
         for (size_t i = 0; i < *exports_count; i++) {
             const Bs_Export export = exports[i];
 
-            Bs_C_Fn *fn = bs_c_fn_new(bs, export.name, export.fn);
+            Bs_C_Fn *fn = bs_c_fn_new(bs, bs_sv_from_cstr(export.name), export.fn);
             fn->library = library;
 
             if (!bs_map_set(
@@ -1290,6 +1353,21 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
             } else {
                 value = bs_value_nil;
             }
+        }
+    } else if (container.as.object->type == BS_OBJECT_C_INSTANCE) {
+        if (index.type == BS_VALUE_NIL) {
+            bs_error_at(
+                bs,
+                1,
+                "cannot use '%s' as instance property",
+                bs_value_type_name(index, bs->frame->extended));
+        }
+
+        Bs_C_Instance *instance = (Bs_C_Instance *)container.as.object;
+        if (bs_map_get(bs, &instance->class->methods, index, &value)) {
+            value = bs_value_object(bs_bound_method_new(bs, container, value));
+        } else {
+            value = bs_value_nil;
         }
     } else if (container.as.object->type == BS_OBJECT_C_LIB) {
         bs_check_object_type_at(bs, 1, index, BS_OBJECT_STR, "library symbol name");
@@ -1516,12 +1594,22 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
             const Bs_Value this = bs_stack_peek(bs, arity);
             Bs_Value method;
-            if (this.type == BS_VALUE_OBJECT && this.as.object->type == BS_OBJECT_INSTANCE) {
-                Bs_Instance *instance = (Bs_Instance *)this.as.object;
-                if (bs_map_get(bs, &instance->fields, name, &method)) {
-                    bs->stack.data[bs->stack.count - arity - 1] = method;
-                } else if (!bs_map_get(bs, &instance->class->methods, name, &method)) {
-                    method = bs_value_nil;
+            if (this.type == BS_VALUE_OBJECT) {
+                if (this.as.object->type == BS_OBJECT_INSTANCE) {
+                    Bs_Instance *instance = (Bs_Instance *)this.as.object;
+                    if (bs_map_get(bs, &instance->fields, name, &method)) {
+                        bs->stack.data[bs->stack.count - arity - 1] = method;
+                    } else if (!bs_map_get(bs, &instance->class->methods, name, &method)) {
+                        method = bs_value_nil;
+                    }
+                } else if (this.as.object->type == BS_OBJECT_C_INSTANCE) {
+                    Bs_C_Instance *instance = (Bs_C_Instance *)this.as.object;
+                    if (!bs_map_get(bs, &instance->class->methods, name, &method)) {
+                        method = bs_value_nil;
+                    }
+                } else {
+                    method = bs_container_get(bs, this, name);
+                    bs_stack_set(bs, arity, method);
                 }
             } else {
                 method = bs_container_get(bs, this, name);

@@ -121,6 +121,9 @@ struct Bs_Class {
     Bs_Object meta;
     Bs_Str *name;
     Bs_Map methods;
+
+    // TODO: introduce 'init' field like C_Class
+    // TODO: make the init method have the same name as the class itself
 };
 
 Bs_Class *bs_class_new(Bs *bs, Bs_Str *name);
@@ -133,6 +136,32 @@ struct Bs_Instance {
 
 Bs_Instance *bs_instance_new(Bs *bs, Bs_Class *class);
 
+// TODO: don't pass bs, rather pass the userdata
+typedef void (*Bs_C_Class_Free)(Bs *bs, Bs_C_Instance *instance);
+
+struct Bs_C_Class {
+    Bs_Object meta;
+    Bs_Sv name;
+    size_t size;
+    Bs_Map methods;
+
+    Bs_C_Fn *init;
+    Bs_C_Class_Free free;
+};
+
+Bs_C_Class *bs_c_class_new(Bs *bs, Bs_Sv name, size_t size, Bs_C_Fn_Ptr init, Bs_C_Class_Free free);
+void bs_c_class_add(Bs *bs, Bs_C_Class *class, Bs_Sv name, Bs_C_Fn_Ptr fn);
+
+struct Bs_C_Instance {
+    Bs_Object meta;
+    Bs_C_Class *class;
+    char data[];
+};
+
+#define bs_c_instance_data(instance, T) (*(T *)(instance)->data)
+
+Bs_C_Instance *bs_c_instance_new(Bs *bs, Bs_C_Class *class);
+
 struct Bs_Bound_Method {
     Bs_Object meta;
     Bs_Value this;
@@ -143,13 +172,12 @@ Bs_Bound_Method *bs_bound_method_new(Bs *bs, Bs_Value this, Bs_Value fn);
 
 struct Bs_C_Fn {
     Bs_Object meta;
+    Bs_Sv name;
     Bs_C_Fn_Ptr fn;
-
-    const char *name;
     const Bs_C_Lib *library;
 };
 
-Bs_C_Fn *bs_c_fn_new(Bs *bs, const char *name, Bs_C_Fn_Ptr ptr);
+Bs_C_Fn *bs_c_fn_new(Bs *bs, Bs_Sv name, Bs_C_Fn_Ptr ptr);
 
 struct Bs_C_Lib {
     Bs_Object meta;

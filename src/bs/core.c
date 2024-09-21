@@ -1455,7 +1455,7 @@ static void bs_add_fn(Bs *bs, Bs_Table *table, const char *key, const char *name
         bs,
         table,
         bs_value_object(bs_str_new(bs, bs_sv_from_cstr(key))),
-        bs_value_object(bs_c_fn_new(bs, name, fn)));
+        bs_value_object(bs_c_fn_new(bs, bs_sv_from_cstr(name), fn)));
 }
 
 void bs_core_init(Bs *bs, int argc, char **argv) {

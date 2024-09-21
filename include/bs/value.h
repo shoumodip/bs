@@ -24,6 +24,10 @@ typedef enum {
 
     BS_OBJECT_CLASS,
     BS_OBJECT_INSTANCE,
+
+    BS_OBJECT_C_CLASS,
+    BS_OBJECT_C_INSTANCE,
+
     BS_OBJECT_BOUND_METHOD,
 
     BS_OBJECT_C_FN,
@@ -45,6 +49,10 @@ typedef struct Bs_Upvalue Bs_Upvalue;
 
 typedef struct Bs_Class Bs_Class;
 typedef struct Bs_Instance Bs_Instance;
+
+typedef struct Bs_C_Class Bs_C_Class;
+typedef struct Bs_C_Instance Bs_C_Instance;
+
 typedef struct Bs_Bound_Method Bs_Bound_Method;
 
 typedef struct Bs_C_Fn Bs_C_Fn;
