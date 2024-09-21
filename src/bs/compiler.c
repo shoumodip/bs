@@ -830,10 +830,6 @@ static void bs_compile_stmt(Bs_Compiler *c);
 
 static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Token *name) {
     Bs_Lambda lambda = {.type = type};
-    if (name && bs_sv_eq(name->sv, Bs_Sv_Static("init"))) {
-        lambda.type = BS_LAMBDA_INIT;
-    }
-
     bs_compile_lambda_init(c, &lambda, name ? name->sv : (Bs_Sv){0});
     bs_compile_block_init(c);
 
@@ -893,15 +889,21 @@ static void bs_compile_class(Bs_Compiler *c, bool public) {
     bs_compile_identifier(c, &token);
     bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE);
     while (true) {
-        token = bs_lexer_either(&c->lexer, BS_TOKEN_RBRACE, BS_TOKEN_IDENT);
-        if (token.type == BS_TOKEN_RBRACE) {
+        Bs_Token method = bs_lexer_either(&c->lexer, BS_TOKEN_RBRACE, BS_TOKEN_IDENT);
+        if (method.type == BS_TOKEN_RBRACE) {
             break;
         }
-        bs_lexer_buffer(&c->lexer, token);
 
-        const_index = bs_compile_definition(c, &token, true);
-        bs_compile_lambda(c, BS_LAMBDA_METHOD, &token);
-        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_METHOD, const_index);
+        if (bs_sv_eq(method.sv, Bs_Sv_Static("init"))) {
+            bs_compile_lambda(c, BS_LAMBDA_INIT, &token);
+            bs_chunk_push_op(c->bs, c->chunk, BS_OP_INIT_METHOD);
+        } else {
+            bs_lexer_buffer(&c->lexer, method);
+            const_index = bs_compile_definition(c, &method, true);
+
+            bs_compile_lambda(c, BS_LAMBDA_METHOD, &method);
+            bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_METHOD, const_index);
+        }
     }
     bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
 

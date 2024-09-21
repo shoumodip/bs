@@ -296,6 +296,7 @@ static void bs_blacken_object(Bs *bs, Bs_Object *object) {
     case BS_OBJECT_CLASS: {
         Bs_Class *class = (Bs_Class *)object;
         bs_mark_object(bs, (Bs_Object *)class->name);
+        bs_mark_object(bs, (Bs_Object *)class->init);
         bs_mark_map(bs, &class->methods);
     } break;
 
@@ -997,6 +998,23 @@ static void bs_call_c_fn(Bs *bs, size_t offset, const Bs_C_Fn *native, size_t ar
     bs->stack.data[bs->stack.count - 1] = value;
 }
 
+static void bs_call_closure(Bs *bs, size_t offset, Bs_Closure *closure, size_t arity) {
+    bs_check_arity_at(bs, offset, arity, closure->fn->arity);
+
+    const Bs_Frame frame = {
+        .base = &bs->stack.data[bs->stack.count - arity - 1],
+        .ip = closure->fn->chunk.data,
+
+        .closure = closure,
+        .extended = closure->fn->extended,
+
+        .locations_offset = offset,
+    };
+
+    bs_frames_push(bs, &bs->frames, frame);
+    bs->frame = &bs->frames.data[bs->frames.count - 1];
+}
+
 static_assert(BS_COUNT_OBJECTS == 14, "Update bs_call_value()");
 static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
     if (value.type != BS_VALUE_OBJECT) {
@@ -1005,43 +1023,18 @@ static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
     }
 
     switch (value.as.object->type) {
-    case BS_OBJECT_CLOSURE: {
-        Bs_Closure *closure = (Bs_Closure *)value.as.object;
-        bs_check_arity_at(bs, offset, arity, closure->fn->arity);
-
-        const Bs_Frame frame = {
-            .base = &bs->stack.data[bs->stack.count - arity - 1],
-            .ip = closure->fn->chunk.data,
-
-            .closure = closure,
-            .extended = closure->fn->extended,
-
-            .locations_offset = offset,
-        };
-
-        bs_frames_push(bs, &bs->frames, frame);
-        bs->frame = &bs->frames.data[bs->frames.count - 1];
-    } break;
+    case BS_OBJECT_CLOSURE:
+        bs_call_closure(bs, offset, (Bs_Closure *)value.as.object, arity);
+        break;
 
     case BS_OBJECT_CLASS: {
         Bs_Class *class = (Bs_Class *)value.as.object;
         bs->stack.data[bs->stack.count - arity - 1] = bs_value_object(bs_instance_new(bs, class));
 
-        {
-            const Bs_Sv sv = Bs_Sv_Static("init");
-            static uint32_t hash = 0;
-            if (!hash) {
-                hash = bs_hash_bytes(sv.data, sv.size);
-            }
-
-            const Bs_Entry *entry =
-                bs_entries_find_sv(class->methods.data, class->methods.capacity, sv, hash);
-
-            if (entry && entry->key.type != BS_VALUE_NIL) {
-                bs_call_value(bs, offset, entry->value, arity);
-            } else if (arity) {
-                bs_check_arity_at(bs, offset, arity, 0);
-            }
+        if (class->init) {
+            bs_call_closure(bs, offset, class->init, arity);
+        } else if (arity) {
+            bs_check_arity_at(bs, offset, arity, 0);
         }
     } break;
 
@@ -1465,7 +1458,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 57, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 58, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const size_t frames_count_save = bs->frames.count;
@@ -1627,6 +1620,17 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             assert(class.type == BS_VALUE_OBJECT && class.as.object->type == BS_OBJECT_CLASS);
             bs_map_set(bs, &((Bs_Class *)class.as.object)->methods, name, method);
 
+            bs->stack.count--;
+        } break;
+
+        case BS_OP_INIT_METHOD: {
+            const Bs_Value method = bs_stack_peek(bs, 0);
+            assert(method.type == BS_VALUE_OBJECT && method.as.object->type == BS_OBJECT_CLOSURE);
+
+            const Bs_Value class = bs_stack_peek(bs, 1);
+            assert(class.type == BS_VALUE_OBJECT && class.as.object->type == BS_OBJECT_CLASS);
+
+            ((Bs_Class *)class.as.object)->init = (Bs_Closure *)method.as.object;
             bs->stack.count--;
         } break;
 

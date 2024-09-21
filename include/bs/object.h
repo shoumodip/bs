@@ -121,9 +121,7 @@ struct Bs_Class {
     Bs_Object meta;
     Bs_Str *name;
     Bs_Map methods;
-
-    // TODO: introduce 'init' field like C_Class
-    // TODO: make the init method have the same name as the class itself
+    Bs_Closure *init;
 };
 
 Bs_Class *bs_class_new(Bs *bs, Bs_Str *name);

@@ -128,6 +128,7 @@ Bs_Upvalue *bs_upvalue_new(Bs *bs, Bs_Value *value) {
 Bs_Class *bs_class_new(Bs *bs, Bs_Str *name) {
     Bs_Class *class = (Bs_Class *)bs_object_new(bs, BS_OBJECT_CLASS, sizeof(Bs_Class));
     class->name = name;
+    class->init = NULL;
     memset(&class->methods, '\0', sizeof(class->methods));
     return class;
 }
