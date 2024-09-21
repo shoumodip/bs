@@ -171,7 +171,7 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
     case BS_OBJECT_C_INSTANCE: {
         Bs_C_Instance *instance = (Bs_C_Instance *)object;
         if (instance->class->free) {
-            instance->class->free(bs, instance);
+            instance->class->free(bs->config.userdata, instance->data);
         }
         bs_realloc(bs, instance, sizeof(*instance) + instance->class->size, 0);
     } break;

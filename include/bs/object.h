@@ -136,8 +136,7 @@ struct Bs_Instance {
 
 Bs_Instance *bs_instance_new(Bs *bs, Bs_Class *class);
 
-// TODO: don't pass bs, rather pass the userdata
-typedef void (*Bs_C_Class_Free)(Bs *bs, Bs_C_Instance *instance);
+typedef void (*Bs_C_Class_Free)(void *userdata, void *instance_data);
 
 struct Bs_C_Class {
     Bs_Object meta;
@@ -158,7 +157,7 @@ struct Bs_C_Instance {
     char data[];
 };
 
-#define bs_c_instance_data(instance, T) (*(T *)(instance)->data)
+#define bs_static_cast(data, T) (*(T *)(data))
 
 Bs_C_Instance *bs_c_instance_new(Bs *bs, Bs_C_Class *class);
 
