@@ -265,6 +265,7 @@ static void bs_blacken_object(Bs *bs, Bs_Object *object) {
     } break;
 
     case BS_OBJECT_STR:
+    case BS_OBJECT_C_FN:
     case BS_OBJECT_C_DATA:
         break;
 
@@ -322,10 +323,6 @@ static void bs_blacken_object(Bs *bs, Bs_Object *object) {
         bs_mark_value(bs, method->this);
         bs_mark_value(bs, method->fn);
     } break;
-
-    case BS_OBJECT_C_FN:
-        bs_mark_object(bs, (Bs_Object *)((Bs_C_Fn *)object)->library);
-        break;
 
     case BS_OBJECT_C_LIB: {
         Bs_C_Lib *library = ((Bs_C_Lib *)object);
