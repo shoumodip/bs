@@ -646,8 +646,18 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
             size_t arity = 0;
             while (!bs_lexer_read(&c->lexer, BS_TOKEN_RPAREN)) {
-                bs_op_locs_push(
-                    c->bs, &c->locations, (Bs_Op_Loc){.loc = bs_lexer_peek(&c->lexer).loc});
+                token = bs_lexer_peek(&c->lexer);
+                if (arity == 0xFF) {
+                    bs_fmt(
+                        c->lexer.error,
+                        Bs_Loc_Fmt
+                        "error: too many arguments to function call (maximum 255 allowed)\n",
+                        Bs_Loc_Arg(token.loc));
+
+                    bs_lexer_error(&c->lexer);
+                }
+
+                bs_op_locs_push(c->bs, &c->locations, (Bs_Op_Loc){.loc = token.loc});
 
                 bs_compile_expr(c, BS_POWER_SET);
                 arity++;
@@ -660,13 +670,13 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
             if (op_get == BS_OP_IGET_CONST) {
                 bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_INVOKE, call_const_index);
-                assert(arity < 256); // TODO: use a single byte for arity of *all* calls
                 bs_da_push(c->bs, c->chunk, arity);
 
                 bs_chunk_push_op_loc(c->bs, c->chunk, locs[0]);
                 bs_chunk_push_op_loc(c->bs, c->chunk, locs[1]);
             } else {
-                bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_CALL, arity);
+                bs_chunk_push_op(c->bs, c->chunk, BS_OP_CALL);
+                bs_da_push(c->bs, c->chunk, arity);
             }
             bs_chunk_push_op_loc(c->bs, c->chunk, loc);
 
@@ -829,9 +839,18 @@ static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Toke
 
     bs_lexer_expect(&c->lexer, BS_TOKEN_LPAREN);
     while (!bs_lexer_read(&c->lexer, BS_TOKEN_RPAREN)) {
+        const Bs_Token arg = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
+
+        if (c->lambda->fn->arity == 0xFF) {
+            bs_fmt(
+                c->lexer.error,
+                Bs_Loc_Fmt "error: too many arguments in function (maximum 255 allowed)\n",
+                Bs_Loc_Arg(arg.loc));
+
+            bs_lexer_error(&c->lexer);
+        }
         c->lambda->fn->arity++;
 
-        const Bs_Token arg = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
         bs_da_push(c->bs, c->lambda, ((Bs_Local){.name = arg.sv, .depth = c->lambda->depth}));
 
         if (bs_lexer_either(&c->lexer, BS_TOKEN_COMMA, BS_TOKEN_RPAREN).type != BS_TOKEN_COMMA) {

@@ -40,7 +40,7 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
         break;
 
     case BS_OP_CALL:
-        bs_debug_op_int(p, c, offset, "OP_CALL");
+        bs_fmt(p->writer, "OP_CALL %d\n", c->data[(*offset)++]);
         break;
 
     case BS_OP_CLOSURE: {

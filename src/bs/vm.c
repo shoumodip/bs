@@ -1529,7 +1529,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         } break;
 
         case BS_OP_CALL:
-            bs_call_stack_top(bs, bs_chunk_read_int(bs));
+            bs_call_stack_top(bs, *bs->frame->ip++);
             break;
 
         case BS_OP_CLOSURE: {
