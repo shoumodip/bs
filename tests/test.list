@@ -108,6 +108,10 @@
 ../bin/bs oop/error_with_init_wrong_arity.bsx
 ../bin/bs oop/error_without_init_wrong_arity.bs
 ../bin/bs oop/error_without_init_wrong_arity.bsx
+../bin/bs oop/error_inside_init.bs
+../bin/bs oop/error_inside_init.bsx
+../bin/bs oop/error_inside_method_call.bs
+../bin/bs oop/error_inside_method_call.bsx
 ../bin/bs oop/return_without_expr_init.bs
 ../bin/bs oop/return_without_expr_init.bsx
 ../bin/bs oop/with_init.bs

@@ -782,15 +782,28 @@ void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
                 bs_pretty_printer_quote(p, sv);
                 bs_fmt(w, ")");
             } else if (callee->closure->fn->name) {
-                // TODO: if frame->base[0] is an instance, then it is a method call
-                // Print the name of the class in that instance
+                assert(callee->base->type == BS_VALUE_OBJECT);
+                if (callee->base->as.object->type == BS_OBJECT_INSTANCE) {
+                    const Bs_Instance *instance = (const Bs_Instance *)callee->base->as.object;
+                    if (callee->closure != instance->class->init) {
+                        bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(*instance->class->name));
+                    }
+                }
+
                 bs_fmt(w, Bs_Sv_Fmt "()", Bs_Sv_Arg(*callee->closure->fn->name));
             } else {
                 bs_fmt(w, "<anonymous>()");
             }
         } else {
             const Bs_C_Fn *fn = callee->native;
-            if (fn->library) {
+
+            assert(callee->base[-1].type == BS_VALUE_OBJECT);
+            if (callee->base[-1].as.object->type == BS_OBJECT_C_INSTANCE) {
+                const Bs_C_Instance *instance = (const Bs_C_Instance *)callee->base[-1].as.object;
+                if (fn != instance->class->init) {
+                    bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(instance->class->name));
+                }
+            } else if (fn->library) {
                 Bs_Sv path = Bs_Sv(fn->library->name->data, fn->library->name->size);
                 for (size_t i = path.size; i > 0; i--) {
                     if (path.data[i - 1] == '.') {
@@ -801,6 +814,7 @@ void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
 
                 bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(path));
             }
+
             bs_fmt(w, Bs_Sv_Fmt "()", Bs_Sv_Arg(fn->name));
         }
 

@@ -1,4 +1,4 @@
-:i count 137
+:i count 141
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -1316,6 +1316,42 @@ oop/error_without_init_wrong_arity.bs:3:4: error: expected 0 arguments, got 1
 
 :b stderr 79
 oop/error_without_init_wrong_arity.bsx:3:4: error: expected 0 arguments, got 1
+
+:b shell 34
+../bin/bs oop/error_inside_init.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 110
+oop/error_inside_init.bs:3:9: error: invalid operand to unary (-): nil
+oop/error_inside_init.bs:7:4: in Foo()
+
+:b shell 35
+../bin/bs oop/error_inside_init.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 113
+oop/error_inside_init.bsx:3:9: error: invalid operand to unary (-): bruh
+oop/error_inside_init.bsx:7:4: in Foo()
+
+:b shell 41
+../bin/bs oop/error_inside_method_call.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 129
+oop/error_inside_method_call.bs:3:9: error: invalid operand to unary (-): nil
+oop/error_inside_method_call.bs:7:10: in Foo.foo()
+
+:b shell 42
+../bin/bs oop/error_inside_method_call.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 132
+oop/error_inside_method_call.bsx:3:9: error: invalid operand to unary (-): bruh
+oop/error_inside_method_call.bsx:7:10: in Foo.foo()
 
 :b shell 41
 ../bin/bs oop/return_without_expr_init.bs
