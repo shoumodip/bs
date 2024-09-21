@@ -12,20 +12,20 @@
 #include "bs/object.h"
 
 // IO
-static void bs_file_data_free(Bs *bs, void *data) {
+void bs_file_data_free(Bs *bs, void *data) {
     FILE *f = bs_c_data_as(data, FILE *);
     if (f && fileno(f) > 2) {
         fclose(f);
     }
 }
 
-static const Bs_C_Data_Spec bs_file_data_spec = {
+const Bs_C_Data_Spec bs_file_data_spec = {
     .name = Bs_Sv_Static("file"),
     .size = sizeof(FILE *),
     .free = bs_file_data_free,
 };
 
-static Bs_Value bs_io_open(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_io_open(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     bs_arg_check_value_type(bs, args, 1, BS_VALUE_BOOL);
@@ -46,7 +46,7 @@ static Bs_Value bs_io_open(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-static Bs_Value bs_io_close(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_io_close(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_c_type(bs, args, 0, &bs_file_data_spec);
 
@@ -61,7 +61,7 @@ static Bs_Value bs_io_close(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-static Bs_Value bs_io_read(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_io_read(Bs *bs, Bs_Value *args, size_t arity) {
     if (arity != 1 && arity != 2) {
         bs_error(bs, "expected 1 or 2 arguments, got %zu", arity);
     }
@@ -116,7 +116,7 @@ static Bs_Value bs_io_read(Bs *bs, Bs_Value *args, size_t arity) {
     return result;
 }
 
-static Bs_Value bs_io_flush(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_io_flush(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_c_type(bs, args, 0, &bs_file_data_spec);
 
@@ -130,7 +130,7 @@ static Bs_Value bs_io_flush(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-static Bs_Value bs_io_write(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_io_write(Bs *bs, Bs_Value *args, size_t arity) {
     if (!arity) {
         bs_error(bs, "expected at least 1 argument, got 0");
     }
@@ -154,7 +154,7 @@ static Bs_Value bs_io_write(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_bool(!ferror(f));
 }
 
-static Bs_Value bs_io_print(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_io_print(Bs *bs, Bs_Value *args, size_t arity) {
     Bs_Writer w = bs_file_writer(stdout);
     for (size_t i = 0; i < arity; i++) {
         if (i) {
@@ -165,7 +165,7 @@ static Bs_Value bs_io_print(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-static Bs_Value bs_io_eprint(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_io_eprint(Bs *bs, Bs_Value *args, size_t arity) {
     Bs_Writer w = bs_file_writer(stderr);
     for (size_t i = 0; i < arity; i++) {
         if (i) {
@@ -176,7 +176,7 @@ static Bs_Value bs_io_eprint(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-static Bs_Value bs_io_writeln(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_io_writeln(Bs *bs, Bs_Value *args, size_t arity) {
     if (!arity) {
         bs_error(bs, "expected at least 1 argument, got 0");
     }
@@ -201,7 +201,7 @@ static Bs_Value bs_io_writeln(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_bool(!ferror(f));
 }
 
-static Bs_Value bs_io_println(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_io_println(Bs *bs, Bs_Value *args, size_t arity) {
     Bs_Writer w = bs_file_writer(stdout);
     for (size_t i = 0; i < arity; i++) {
         if (i) {
@@ -213,7 +213,7 @@ static Bs_Value bs_io_println(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-static Bs_Value bs_io_eprintln(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_io_eprintln(Bs *bs, Bs_Value *args, size_t arity) {
     Bs_Writer w = bs_file_writer(stderr);
     for (size_t i = 0; i < arity; i++) {
         if (i) {
@@ -226,7 +226,7 @@ static Bs_Value bs_io_eprintln(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // OS
-static Bs_Value bs_os_exit(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_os_exit(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
 
@@ -234,7 +234,7 @@ static Bs_Value bs_os_exit(Bs *bs, Bs_Value *args, size_t arity) {
     assert(false && "unreachable");
 }
 
-static Bs_Value bs_os_clock(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_os_clock(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
     struct timespec clock;
@@ -245,7 +245,7 @@ static Bs_Value bs_os_clock(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_num(clock.tv_sec + clock.tv_nsec * 1e-9);
 }
 
-static Bs_Value bs_os_sleep(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_os_sleep(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
 
@@ -266,7 +266,7 @@ static Bs_Value bs_os_sleep(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-static Bs_Value bs_os_getenv(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_os_getenv(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
@@ -289,7 +289,7 @@ static Bs_Value bs_os_getenv(Bs *bs, Bs_Value *args, size_t arity) {
     }
 }
 
-static Bs_Value bs_os_setenv(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_os_setenv(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
@@ -320,12 +320,12 @@ static Bs_Value bs_os_setenv(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Process
-static const Bs_C_Data_Spec bs_process_data_spec = {
+const Bs_C_Data_Spec bs_process_data_spec = {
     .name = Bs_Sv_Static("process"),
     .size = sizeof(pid_t),
 };
 
-static Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_c_type(bs, args, 0, &bs_process_data_spec);
     bs_arg_check_whole_number(bs, args, 1);
@@ -344,7 +344,7 @@ static Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-static Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_c_type(bs, args, 0, &bs_process_data_spec);
 
@@ -363,7 +363,7 @@ static Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
     return WIFEXITED(status) ? bs_value_num(WEXITSTATUS(status)) : bs_value_nil;
 }
 
-static Bs_Value bs_process_spawn(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_process_spawn(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
 
@@ -415,7 +415,7 @@ static Bs_Value bs_process_spawn(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Bit
-static Bs_Value bs_bit_ceil(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_bit_ceil(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
 
@@ -434,7 +434,7 @@ static Bs_Value bs_bit_ceil(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_num(a + 1);
 }
 
-static Bs_Value bs_bit_floor(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_bit_floor(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
 
@@ -453,7 +453,7 @@ static Bs_Value bs_bit_floor(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Str
-static Bs_Value bs_str_slice(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_str_slice(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     bs_arg_check_whole_number(bs, args, 1);
@@ -470,7 +470,7 @@ static Bs_Value bs_str_slice(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, Bs_Sv(str->data + begin, end - begin)));
 }
 
-static Bs_Value bs_str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
@@ -485,7 +485,7 @@ static Bs_Value bs_str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(dst);
 }
 
-static Bs_Value bs_str_tolower(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_str_tolower(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
@@ -498,7 +498,7 @@ static Bs_Value bs_str_tolower(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(dst);
 }
 
-static Bs_Value bs_str_toupper(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_str_toupper(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
@@ -511,7 +511,7 @@ static Bs_Value bs_str_toupper(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(dst);
 }
 
-static Bs_Value bs_str_tonumber(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_str_tonumber(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
@@ -530,7 +530,7 @@ static Bs_Value bs_str_tonumber(Bs *bs, Bs_Value *args, size_t arity) {
     return (end == input || *end != '\0' || errno == ERANGE) ? bs_value_nil : bs_value_num(value);
 }
 
-static Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
     if (arity != 2 && arity != 3) {
         bs_error(bs, "expected 2 or 3 arguments, got %zu", arity);
     }
@@ -567,7 +567,7 @@ static Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-static Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
@@ -603,7 +603,7 @@ static Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(a);
 }
 
-static Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
@@ -637,7 +637,7 @@ static Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
 }
 
-static Bs_Value bs_str_trim(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_str_trim(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
@@ -667,7 +667,7 @@ static Bs_Value bs_str_trim(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, str_sv));
 }
 
-static Bs_Value bs_str_ltrim(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_str_ltrim(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
@@ -694,7 +694,7 @@ static Bs_Value bs_str_ltrim(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, str_sv));
 }
 
-static Bs_Value bs_str_rtrim(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_str_rtrim(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
@@ -718,7 +718,7 @@ static Bs_Value bs_str_rtrim(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, str_sv));
 }
 
-static Bs_Value bs_str_lpad(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_str_lpad(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
@@ -751,7 +751,7 @@ static Bs_Value bs_str_lpad(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
 }
 
-static Bs_Value bs_str_rpad(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_str_rpad(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
@@ -784,7 +784,7 @@ static Bs_Value bs_str_rpad(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Ascii
-static Bs_Value bs_ascii_char(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_ascii_char(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
 
@@ -797,7 +797,7 @@ static Bs_Value bs_ascii_char(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, Bs_Sv(&ch, 1)));
 }
 
-static Bs_Value bs_ascii_code(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_ascii_code(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
@@ -810,30 +810,30 @@ static Bs_Value bs_ascii_code(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Bytes
-static void bs_bytes_data_free(Bs *bs, void *data) {
+void bs_bytes_data_free(Bs *bs, void *data) {
     bs_da_free(bs, &bs_c_data_as(data, Bs_Buffer));
 }
 
-static void bs_bytes_data_write(Bs_Writer *w, const void *data) {
+void bs_bytes_data_write(Bs_Writer *w, const void *data) {
     const Bs_Buffer *b = &bs_c_data_as(data, Bs_Buffer);
     w->write(w, Bs_Sv(b->data, b->count));
 }
 
-static const Bs_C_Data_Spec bs_bytes_data_spec = {
+const Bs_C_Data_Spec bs_bytes_data_spec = {
     .name = Bs_Sv_Static("bytes"),
     .size = sizeof(Bs_Buffer),
     .free = bs_bytes_data_free,
     .write = bs_bytes_data_write,
 };
 
-static Bs_Value bs_bytes_new(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_bytes_new(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
     Bs_Buffer buffer = {.bs = bs};
     return bs_value_object(bs_c_data_new(bs, &buffer, &bs_bytes_data_spec));
 }
 
-static Bs_Value bs_bytes_count(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_bytes_count(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_c_type(bs, args, 0, &bs_bytes_data_spec);
 
@@ -841,7 +841,7 @@ static Bs_Value bs_bytes_count(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_num(bs_c_data_as(c->data, Bs_Buffer).count);
 }
 
-static Bs_Value bs_bytes_reset(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_bytes_reset(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_c_type(bs, args, 0, &bs_bytes_data_spec);
     bs_arg_check_whole_number(bs, args, 1);
@@ -858,7 +858,7 @@ static Bs_Value bs_bytes_reset(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-static Bs_Value bs_bytes_slice(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_bytes_slice(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
     bs_arg_check_object_c_type(bs, args, 0, &bs_bytes_data_spec);
     bs_arg_check_whole_number(bs, args, 1);
@@ -876,7 +876,7 @@ static Bs_Value bs_bytes_slice(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, Bs_Sv(b->data + begin, end - begin)));
 }
 
-static Bs_Value bs_bytes_push(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_bytes_push(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_c_type(bs, args, 0, &bs_bytes_data_spec);
     bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
@@ -889,7 +889,7 @@ static Bs_Value bs_bytes_push(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-static Bs_Value bs_bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
     bs_arg_check_object_c_type(bs, args, 0, &bs_bytes_data_spec);
     bs_arg_check_whole_number(bs, args, 1);
@@ -913,7 +913,7 @@ static Bs_Value bs_bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Regex
-static Bs_Value bs_regex_find(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_regex_find(Bs *bs, Bs_Value *args, size_t arity) {
     if (arity != 2 && arity != 3) {
         bs_error(bs, "expected 2 or 3 arguments, got %zu", arity);
     }
@@ -963,7 +963,7 @@ static Bs_Value bs_regex_find(Bs *bs, Bs_Value *args, size_t arity) {
     return result;
 }
 
-static Bs_Value bs_regex_split(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_regex_split(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
@@ -1019,7 +1019,7 @@ static Bs_Value bs_regex_split(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(a);
 }
 
-static Bs_Value bs_regex_replace(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_regex_replace(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
@@ -1086,7 +1086,7 @@ static Bs_Value bs_regex_replace(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Array
-static Bs_Value bs_array_map(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_array_map(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
     bs_arg_check_callable(bs, args, 1);
@@ -1104,7 +1104,7 @@ static Bs_Value bs_array_map(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(dst);
 }
 
-static Bs_Value bs_array_filter(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_array_filter(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
     bs_arg_check_callable(bs, args, 1);
@@ -1125,7 +1125,7 @@ static Bs_Value bs_array_filter(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(dst);
 }
 
-static Bs_Value bs_array_reduce(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_array_reduce(Bs *bs, Bs_Value *args, size_t arity) {
     if (arity != 2 && arity != 3) {
         bs_error(bs, "expected 2 or 3 arguments, got %zu", arity);
     }
@@ -1150,7 +1150,7 @@ static Bs_Value bs_array_reduce(Bs *bs, Bs_Value *args, size_t arity) {
     return acc;
 }
 
-static Bs_Value bs_array_copy(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_array_copy(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
 
@@ -1164,7 +1164,7 @@ static Bs_Value bs_array_copy(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(dst);
 }
 
-static Bs_Value bs_array_join(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_array_join(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
     bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
@@ -1188,7 +1188,7 @@ static Bs_Value bs_array_join(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
 }
 
-static Bs_Value bs_array_find(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_array_find(Bs *bs, Bs_Value *args, size_t arity) {
     if (arity != 2 && arity != 3) {
         bs_error(bs, "expected 2 or 3 arguments, got %zu", arity);
     }
@@ -1212,7 +1212,7 @@ static Bs_Value bs_array_find(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-static Bs_Value bs_array_equal(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_array_equal(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
     bs_arg_check_object_type(bs, args, 1, BS_OBJECT_ARRAY);
@@ -1238,7 +1238,7 @@ typedef struct {
     Bs_Value fn;
 } Bs_Array_Sort_Context;
 
-static int bs_array_sort_compare(const void *a, const void *b) {
+int bs_array_sort_compare(const void *a, const void *b) {
     static Bs_Array_Sort_Context context;
     if (!a) {
         context = *(const Bs_Array_Sort_Context *)b;
@@ -1254,7 +1254,7 @@ static int bs_array_sort_compare(const void *a, const void *b) {
     return 1 - !bs_value_is_falsey(output);
 }
 
-static Bs_Value bs_array_sort(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_array_sort(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
     bs_arg_check_callable(bs, args, 1);
@@ -1273,7 +1273,7 @@ static Bs_Value bs_array_sort(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(src);
 }
 
-static Bs_Value bs_array_reverse(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_array_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
 
@@ -1287,7 +1287,7 @@ static Bs_Value bs_array_reverse(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Table
-static Bs_Value bs_table_copy(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_table_copy(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_TABLE);
 
@@ -1304,7 +1304,7 @@ static Bs_Value bs_table_copy(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(dst);
 }
 
-static Bs_Value bs_table_equal(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_table_equal(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_TABLE);
     bs_arg_check_object_type(bs, args, 1, BS_OBJECT_TABLE);
@@ -1329,72 +1329,72 @@ static Bs_Value bs_table_equal(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Math
-static Bs_Value bs_math_sin(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_math_sin(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(sin(args[0].as.number));
 }
 
-static Bs_Value bs_math_cos(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_math_cos(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(cos(args[0].as.number));
 }
 
-static Bs_Value bs_math_tan(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_math_tan(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(tan(args[0].as.number));
 }
 
-static Bs_Value bs_math_asin(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_math_asin(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(asin(args[0].as.number));
 }
 
-static Bs_Value bs_math_acos(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_math_acos(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(acos(args[0].as.number));
 }
 
-static Bs_Value bs_math_atan(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_math_atan(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(atan(args[0].as.number));
 }
 
-static Bs_Value bs_math_sqrt(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_math_sqrt(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(sqrt(args[0].as.number));
 }
 
-static Bs_Value bs_math_ceil(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_math_ceil(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(ceil(args[0].as.number));
 }
 
-static Bs_Value bs_math_floor(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_math_floor(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(floor(args[0].as.number));
 }
 
-static Bs_Value bs_math_round(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_math_round(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     return bs_value_num(round(args[0].as.number));
 }
 
-static Bs_Value bs_math_random(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_math_random(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_num((double)rand() / RAND_MAX);
 }
 
-static Bs_Value bs_math_max(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_math_max(Bs *bs, Bs_Value *args, size_t arity) {
     if (!arity) {
         bs_error(bs, "expected at least 1 argument, got 0");
     }
@@ -1408,7 +1408,7 @@ static Bs_Value bs_math_max(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_num(max);
 }
 
-static Bs_Value bs_math_min(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_math_min(Bs *bs, Bs_Value *args, size_t arity) {
     if (!arity) {
         bs_error(bs, "expected at least 1 argument, got 0");
     }
@@ -1422,7 +1422,7 @@ static Bs_Value bs_math_min(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_num(min);
 }
 
-static Bs_Value bs_math_clamp(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_math_clamp(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
@@ -1433,7 +1433,7 @@ static Bs_Value bs_math_clamp(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_num(bs_min(bs_max(args[0].as.number, low), high));
 }
 
-static Bs_Value bs_math_lerp(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_math_lerp(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
