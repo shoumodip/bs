@@ -277,7 +277,7 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
     } break;
 
     case BS_OBJECT_C_LIB:
-        bs_pretty_printer_map(p, &((const Bs_C_Lib *)object)->functions);
+        bs_pretty_printer_map(p, &((const Bs_C_Lib *)object)->map);
         break;
 
     case BS_OBJECT_C_DATA: {

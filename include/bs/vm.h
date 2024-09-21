@@ -53,9 +53,10 @@ typedef Bs_Value (*Bs_C_Fn_Ptr)(Bs *bs, Bs_Value *args, size_t arity);
 
 typedef struct {
     const char *name;
-    Bs_C_Fn_Ptr fn;
-} Bs_Export;
+    Bs_C_Fn_Ptr ptr;
+} Bs_FFI;
 
+// TODO: remove C_Data object (it has been replaced by C_Class and C_Instance)
 typedef struct {
     Bs_Sv name;
     size_t size;

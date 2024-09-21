@@ -136,6 +136,7 @@ Bs_Instance *bs_instance_new(Bs *bs, Bs_Class *class);
 
 typedef void (*Bs_C_Class_Free)(void *userdata, void *instance_data);
 
+// TODO: store the library name optionally, like Bs_C_Fn does
 struct Bs_C_Class {
     Bs_Object meta;
     Bs_Sv name;
@@ -147,7 +148,7 @@ struct Bs_C_Class {
 };
 
 Bs_C_Class *bs_c_class_new(Bs *bs, Bs_Sv name, size_t size, Bs_C_Fn_Ptr init, Bs_C_Class_Free free);
-void bs_c_class_add(Bs *bs, Bs_C_Class *class, Bs_Sv name, Bs_C_Fn_Ptr fn);
+void bs_c_class_add(Bs *bs, Bs_C_Class *class, Bs_Sv name, Bs_C_Fn_Ptr ptr);
 
 struct Bs_C_Instance {
     Bs_Object meta;
@@ -170,7 +171,7 @@ Bs_Bound_Method *bs_bound_method_new(Bs *bs, Bs_Value this, Bs_Value fn);
 struct Bs_C_Fn {
     Bs_Object meta;
     Bs_Sv name;
-    Bs_C_Fn_Ptr fn;
+    Bs_C_Fn_Ptr ptr;
     const Bs_C_Lib *library;
 };
 
@@ -179,12 +180,15 @@ Bs_C_Fn *bs_c_fn_new(Bs *bs, Bs_Sv name, Bs_C_Fn_Ptr ptr);
 struct Bs_C_Lib {
     Bs_Object meta;
     void *data;
-    const Bs_Str *path;
+    const Bs_Str *name;
 
-    Bs_Map functions;
+    Bs_Map map;
 };
 
-Bs_C_Lib *bs_c_lib_new(Bs *bs, void *data, const Bs_Str *path);
+Bs_C_Lib *bs_c_lib_new(Bs *bs, void *data, const Bs_Str *name);
+void bs_c_lib_add(Bs *bs, Bs_C_Lib *library, Bs_Sv name, Bs_Value value);
+void bs_c_lib_add_fn(Bs *bs, Bs_C_Lib *library, Bs_Sv name, Bs_C_Fn_Ptr ptr);
+void bs_c_lib_add_ffi(Bs *bs, Bs_C_Lib *library, const Bs_FFI *ffi, size_t count);
 
 struct Bs_C_Data {
     Bs_Object meta;

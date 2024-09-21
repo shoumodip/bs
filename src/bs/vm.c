@@ -187,7 +187,7 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
 
     case BS_OBJECT_C_LIB: {
         Bs_C_Lib *library = (Bs_C_Lib *)object;
-        bs_map_free(bs, &library->functions);
+        bs_map_free(bs, &library->map);
 
         dlclose(library->data);
         bs_realloc(bs, library, sizeof(*library), 0);
@@ -329,8 +329,8 @@ static void bs_blacken_object(Bs *bs, Bs_Object *object) {
 
     case BS_OBJECT_C_LIB: {
         Bs_C_Lib *library = ((Bs_C_Lib *)object);
-        bs_mark_object(bs, (Bs_Object *)library->path);
-        bs_mark_map(bs, &library->functions);
+        bs_mark_object(bs, (Bs_Object *)library->name);
+        bs_mark_map(bs, &library->map);
     } break;
 
     default:
@@ -498,6 +498,8 @@ void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size) {
 
 Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size) {
     Bs_Object *object = bs_realloc(bs, NULL, 0, size);
+    assert(object);
+
     object->type = type;
     object->next = bs->objects;
     object->marked = false;
@@ -780,6 +782,8 @@ void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
                 bs_pretty_printer_quote(p, sv);
                 bs_fmt(w, ")");
             } else if (callee->closure->fn->name) {
+                // TODO: if frame->base[0] is an instance, then it is a method call
+                // Print the name of the class in that instance
                 bs_fmt(w, Bs_Sv_Fmt "()", Bs_Sv_Arg(*callee->closure->fn->name));
             } else {
                 bs_fmt(w, "<anonymous>()");
@@ -787,7 +791,7 @@ void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
         } else {
             const Bs_C_Fn *fn = callee->native;
             if (fn->library) {
-                Bs_Sv path = Bs_Sv(fn->library->path->data, fn->library->path->size);
+                Bs_Sv path = Bs_Sv(fn->library->name->data, fn->library->name->size);
                 for (size_t i = path.size; i > 0; i--) {
                     if (path.data[i - 1] == '.') {
                         path.size = i - 1;
@@ -990,7 +994,7 @@ static void bs_call_c_fn(Bs *bs, size_t offset, const Bs_C_Fn *native, size_t ar
     bs_frames_push(bs, &bs->frames, frame);
     bs->frame = &bs->frames.data[bs->frames.count - 1];
 
-    const Bs_Value value = native->fn(bs, &bs->stack.data[bs->stack.count - arity], arity);
+    const Bs_Value value = native->ptr(bs, &bs->stack.data[bs->stack.count - arity], arity);
     bs->frames.count--;
     bs->frame = &bs->frames.data[bs->frames.count - 1];
 
@@ -1240,50 +1244,47 @@ static void bs_import(Bs *bs) {
     // Native
     {
         bs_da_push_many(bs, b, ".so", 4);
-        void *data = dlopen(b->data + start, RTLD_NOW);
+        void *data = dlopen(b->data + start, RTLD_LAZY);
         if (!data) {
             bs_error(bs, "could not import module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*path));
         }
 
         Bs_C_Lib *library = bs_c_lib_new(bs, data, path);
+        const void (*init)(Bs *, Bs_C_Lib *) = dlsym(data, "bs_library_init");
 
-        // TODO: use bs_library_init() instead
-        const Bs_Export *exports = dlsym(data, "bs_exports");
-        const size_t *exports_count = dlsym(data, "bs_exports_count");
-
-        if (!exports || !exports_count) {
+        if (!init) {
             bs_error(
                 bs,
                 "invalid native library '" Bs_Sv_Fmt "'\n\n"
-                "A BS native library should define 'bs_exports' and "
-                "'bs_exports_count':\n\n"
+                "A BS native library must define 'bs_library_init'\n\n"
                 "```\n"
-                "const Bs_Export bs_exports[] = {\n"
-                "    {\"function1_name\", function1_ptr},\n"
-                "    {\"function2_name\", function2_ptr},\n"
-                "    /* ... */\n"
-                "};\n\n"
-                "const size_t bs_exports_count = bs_c_array_size(bs_exports);\n"
+                "void bs_library_init(Bs *bs, Bs_C_Lib *library) {\n"
+                "    // Perform any initialization you wish to do\n"
+                "    // lolcat_init();\n"
+                "\n"
+                "    // Add BS values to the library\n"
+                "    // bs_c_lib_add(bs, library, Bs_Sv_Static(\"foo\"), "
+                "bs_value_object(lolcat_foo));\n"
+                "\n"
+                "    // Add BS native functions to the library\n"
+                "    // bs_c_lib_add_fn(bs, library, Bs_Sv_Static(\"bar\"), lolcat_bar);\n"
+                "\n"
+                "    // Add multiple BS native functions to the library at once\n"
+                "    // static const Bs_FFI ffi[] = {\n"
+                "    //     {\"hello\", lolcat_hello},\n"
+                "    //     {\"urmom\", lolcat_urmom},\n"
+                "    //     /* ... */\n"
+                "    // };\n"
+                "    // bs_c_lib_add_ffi(bs, library, ffi, bs_c_array_size(ffi));\n"
+                "\n"
+                "    // OPTIONAL: Set the library name (defaults to the module name)\n"
+                "    // library->name = bs_str_new(bs, Bs_Sv_Static(\"lolcat\"));\n"
+                "}\n"
                 "```\n",
 
                 Bs_Sv_Arg(*path));
         }
-
-        for (size_t i = 0; i < *exports_count; i++) {
-            const Bs_Export export = exports[i];
-
-            Bs_C_Fn *fn = bs_c_fn_new(bs, bs_sv_from_cstr(export.name), export.fn);
-            fn->library = library;
-
-            if (!bs_map_set(
-                    bs,
-                    &library->functions,
-                    bs_value_object(bs_str_new(bs, bs_sv_from_cstr(export.name))),
-                    bs_value_object(fn))) {
-
-                bs_error(bs, "redefinition of function '%s' in FFI", export.name);
-            }
-        }
+        init(bs, library);
 
         const Bs_Module module = {
             .done = true,
@@ -1371,13 +1372,13 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
         }
 
         Bs_C_Lib *c = (Bs_C_Lib *)container.as.object;
-        if (!bs_map_get(bs, &c->functions, index, &value)) {
+        if (!bs_map_get(bs, &c->map, index, &value)) {
             bs_error_at(
                 bs,
                 1,
                 "symbol '" Bs_Sv_Fmt "' doesn't exist in native library '" Bs_Sv_Fmt "'",
                 Bs_Sv_Arg(*name),
-                Bs_Sv_Arg(*c->path));
+                Bs_Sv_Arg(*c->name));
         }
     } else {
         bs_error(

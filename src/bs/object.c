@@ -134,10 +134,12 @@ Bs_Class *bs_class_new(Bs *bs, Bs_Str *name) {
 }
 
 Bs_Instance *bs_instance_new(Bs *bs, Bs_Class *class) {
-    Bs_Instance *i = (Bs_Instance *)bs_object_new(bs, BS_OBJECT_INSTANCE, sizeof(Bs_Instance));
-    i->class = class;
-    memset(&i->fields, '\0', sizeof(i->fields));
-    return i;
+    Bs_Instance *instance =
+        (Bs_Instance *)bs_object_new(bs, BS_OBJECT_INSTANCE, sizeof(Bs_Instance));
+
+    instance->class = class;
+    memset(&instance->fields, '\0', sizeof(instance->fields));
+    return instance;
 }
 
 Bs_C_Class *
@@ -151,21 +153,21 @@ bs_c_class_new(Bs *bs, Bs_Sv name, size_t size, Bs_C_Fn_Ptr init, Bs_C_Class_Fre
     return class;
 }
 
-void bs_c_class_add(Bs *bs, Bs_C_Class *class, Bs_Sv name, Bs_C_Fn_Ptr fn) {
+void bs_c_class_add(Bs *bs, Bs_C_Class *class, Bs_Sv name, Bs_C_Fn_Ptr ptr) {
     bs_map_set(
         bs,
         &class->methods,
         bs_value_object(bs_str_new(bs, name)),
-        bs_value_object(bs_c_fn_new(bs, name, fn)));
+        bs_value_object(bs_c_fn_new(bs, name, ptr)));
 }
 
 Bs_C_Instance *bs_c_instance_new(Bs *bs, Bs_C_Class *class) {
-    Bs_C_Instance *i = (Bs_C_Instance *)bs_object_new(
+    Bs_C_Instance *instance = (Bs_C_Instance *)bs_object_new(
         bs, BS_OBJECT_C_INSTANCE, sizeof(Bs_C_Instance) + class->size);
 
-    i->class = class;
-    memset(i->data, '\0', class->size);
-    return i;
+    instance->class = class;
+    memset(instance->data, '\0', class->size);
+    return instance;
 }
 
 Bs_Bound_Method *bs_bound_method_new(Bs *bs, Bs_Value this, Bs_Value fn) {
@@ -176,20 +178,39 @@ Bs_Bound_Method *bs_bound_method_new(Bs *bs, Bs_Value this, Bs_Value fn) {
     return method;
 }
 
-Bs_C_Fn *bs_c_fn_new(Bs *bs, Bs_Sv name, Bs_C_Fn_Ptr fn) {
-    Bs_C_Fn *c = (Bs_C_Fn *)bs_object_new(bs, BS_OBJECT_C_FN, sizeof(Bs_C_Fn));
-    c->fn = fn;
-    c->name = name;
-    c->library = NULL;
-    return c;
+Bs_C_Fn *bs_c_fn_new(Bs *bs, Bs_Sv name, Bs_C_Fn_Ptr ptr) {
+    Bs_C_Fn *fn = (Bs_C_Fn *)bs_object_new(bs, BS_OBJECT_C_FN, sizeof(Bs_C_Fn));
+    fn->ptr = ptr;
+    fn->name = name;
+    fn->library = NULL;
+    return fn;
 }
 
-Bs_C_Lib *bs_c_lib_new(Bs *bs, void *data, const Bs_Str *path) {
-    Bs_C_Lib *c = (Bs_C_Lib *)bs_object_new(bs, BS_OBJECT_C_LIB, sizeof(Bs_C_Lib));
-    c->data = data;
-    c->path = path;
-    memset(&c->functions, 0, sizeof(c->functions));
-    return c;
+Bs_C_Lib *bs_c_lib_new(Bs *bs, void *data, const Bs_Str *name) {
+    Bs_C_Lib *library = (Bs_C_Lib *)bs_object_new(bs, BS_OBJECT_C_LIB, sizeof(Bs_C_Lib));
+    library->data = data;
+    library->name = name;
+    memset(&library->map, 0, sizeof(library->map));
+    return library;
+}
+
+void bs_c_lib_add(Bs *bs, Bs_C_Lib *library, Bs_Sv name, Bs_Value value) {
+    bs_map_set(bs, &library->map, bs_value_object(bs_str_new(bs, name)), value);
+}
+
+void bs_c_lib_add_fn(Bs *bs, Bs_C_Lib *library, Bs_Sv name, Bs_C_Fn_Ptr ptr) {
+    Bs_C_Fn *fn = bs_c_fn_new(bs, name, ptr);
+    fn->library = library;
+    bs_map_set(bs, &library->map, bs_value_object(bs_str_new(bs, name)), bs_value_object(fn));
+}
+
+void bs_c_lib_add_ffi(Bs *bs, Bs_C_Lib *library, const Bs_FFI *ffi, size_t count) {
+    for (size_t i = 0; i < count; i++) {
+        const Bs_Sv name = bs_sv_from_cstr(ffi[i].name);
+        Bs_C_Fn *fn = bs_c_fn_new(bs, name, ffi[i].ptr);
+        fn->library = library;
+        bs_map_set(bs, &library->map, bs_value_object(bs_str_new(bs, name)), bs_value_object(fn));
+    }
 }
 
 Bs_C_Data *bs_c_data_new(Bs *bs, const void *data, const Bs_C_Data_Spec *spec) {
