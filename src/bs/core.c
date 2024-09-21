@@ -12,23 +12,39 @@
 #include "bs/object.h"
 
 // IO
-void bs_file_data_free(Bs *bs, void *data) {
-    FILE *f = bs_c_data_as(data, FILE *);
+Bs_C_Class *bs_io_reader_class;
+Bs_C_Class *bs_io_writer_class;
+
+// Generic File functions
+void bs_io_file_free(void *userdata, void *instance_data) {
+    FILE *f = bs_static_cast(instance_data, FILE *);
     if (f && fileno(f) > 2) {
         fclose(f);
     }
 }
 
-const Bs_C_Data_Spec bs_file_data_spec = {
-    .name = Bs_Sv_Static("file"),
-    .size = sizeof(FILE *),
-    .free = bs_file_data_free,
-};
+Bs_Value bs_io_file_ok(Bs *bs, Bs_Value *args, size_t arity) {
+    const FILE *f = bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, FILE *);
+    return bs_value_bool(f != NULL);
+}
 
-Bs_Value bs_io_open(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 2);
+Bs_Value bs_io_file_close(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+
+    Bs_C_Instance *this = (Bs_C_Instance *)args[-1].as.object;
+    if (!bs_static_cast(this->data, FILE *)) {
+        bs_error(bs, "cannot close already closed file");
+    }
+
+    bs_io_file_free(bs_config(bs)->userdata, this->data);
+    bs_static_cast(this->data, FILE *) = NULL;
+    return bs_value_nil;
+}
+
+// Reader
+Bs_Value bs_io_reader_init(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
-    bs_arg_check_value_type(bs, args, 1, BS_VALUE_BOOL);
 
     Bs_Buffer *b = &bs_config(bs)->buffer;
     const size_t start = b->count;
@@ -37,49 +53,28 @@ Bs_Value bs_io_open(Bs *bs, Bs_Value *args, size_t arity) {
     bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
     bs_da_push(b->bs, b, '\0');
 
-    const bool write = args[1].as.boolean;
-    FILE *file = fopen(bs_buffer_reset(b, start).data, write ? "w" : "r");
-    if (file) {
-        return bs_value_object(bs_c_data_new(bs, &file, &bs_file_data_spec));
-    }
-
+    FILE *file = fopen(bs_buffer_reset(b, start).data, "r");
+    bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, FILE *) = file;
     return bs_value_nil;
 }
 
-Bs_Value bs_io_close(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 1);
-    bs_arg_check_object_c_type(bs, args, 0, &bs_file_data_spec);
-
-    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
-    if (!bs_c_data_as(c->data, FILE *)) {
-        bs_error(bs, "cannot close already closed file");
+Bs_Value bs_io_reader_read(Bs *bs, Bs_Value *args, size_t arity) {
+    if (arity > 1) {
+        bs_error(bs, "expected 0 or 1 arguments, got %zu", arity);
     }
 
-    bs_file_data_free(bs, c->data);
-    bs_c_data_as(c->data, FILE *) = NULL;
-
-    return bs_value_nil;
-}
-
-Bs_Value bs_io_read(Bs *bs, Bs_Value *args, size_t arity) {
-    if (arity != 1 && arity != 2) {
-        bs_error(bs, "expected 1 or 2 arguments, got %zu", arity);
+    if (arity) {
+        bs_arg_check_whole_number(bs, args, 0);
     }
 
-    bs_arg_check_object_c_type(bs, args, 0, &bs_file_data_spec);
-    if (arity == 2) {
-        bs_arg_check_whole_number(bs, args, 1);
-    }
-
-    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
-    FILE *f = bs_c_data_as(c->data, FILE *);
+    FILE *f = bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, FILE *);
     if (!f) {
         bs_error(bs, "cannot read from closed file");
     }
 
     size_t count = 0;
-    if (arity == 2) {
-        count = args[1].as.number;
+    if (arity == 1) {
+        count = args[0].as.number;
     } else {
         const long start = ftell(f);
         if (start == -1) {
@@ -116,12 +111,27 @@ Bs_Value bs_io_read(Bs *bs, Bs_Value *args, size_t arity) {
     return result;
 }
 
-Bs_Value bs_io_flush(Bs *bs, Bs_Value *args, size_t arity) {
+// Writer
+Bs_Value bs_io_writer_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_arg_check_object_c_type(bs, args, 0, &bs_file_data_spec);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
-    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
-    FILE *f = bs_c_data_as(c->data, FILE *);
+    Bs_Buffer *b = &bs_config(bs)->buffer;
+    const size_t start = b->count;
+
+    Bs_Writer w = bs_buffer_writer(b);
+    bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
+    bs_da_push(b->bs, b, '\0');
+
+    FILE *file = fopen(bs_buffer_reset(b, start).data, "w");
+    bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, FILE *) = file;
+    return bs_value_nil;
+}
+
+Bs_Value bs_io_writer_flush(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+
+    FILE *f = bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, FILE *);
     if (!f) {
         bs_error(bs, "cannot flush closed file");
     }
@@ -130,26 +140,37 @@ Bs_Value bs_io_flush(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-Bs_Value bs_io_write(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!arity) {
-        bs_error(bs, "expected at least 1 argument, got 0");
-    }
-
-    bs_arg_check_object_c_type(bs, args, 0, &bs_file_data_spec);
-
-    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
-    FILE *f = bs_c_data_as(c->data, FILE *);
+Bs_Value bs_io_writer_write(Bs *bs, Bs_Value *args, size_t arity) {
+    FILE *f = bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, FILE *);
     if (!f) {
         bs_error(bs, "cannot write into closed file");
     }
 
     Bs_Writer w = bs_file_writer(f);
-    for (size_t i = 1; i < arity; i++) {
-        if (i > 1) {
+    for (size_t i = 0; i < arity; i++) {
+        if (i) {
             bs_fmt(&w, " ");
         }
         bs_value_write(bs, &w, args[i]);
     }
+
+    return bs_value_bool(!ferror(f));
+}
+
+Bs_Value bs_io_writer_writeln(Bs *bs, Bs_Value *args, size_t arity) {
+    FILE *f = bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, FILE *);
+    if (!f) {
+        bs_error(bs, "cannot write into closed file");
+    }
+
+    Bs_Writer w = bs_file_writer(f);
+    for (size_t i = 0; i < arity; i++) {
+        if (i) {
+            bs_fmt(&w, " ");
+        }
+        bs_value_write(bs, &w, args[i]);
+    }
+    bs_fmt(&w, "\n");
 
     return bs_value_bool(!ferror(f));
 }
@@ -174,31 +195,6 @@ Bs_Value bs_io_eprint(Bs *bs, Bs_Value *args, size_t arity) {
         bs_value_write(bs, &w, args[i]);
     }
     return bs_value_nil;
-}
-
-Bs_Value bs_io_writeln(Bs *bs, Bs_Value *args, size_t arity) {
-    if (!arity) {
-        bs_error(bs, "expected at least 1 argument, got 0");
-    }
-
-    bs_arg_check_object_c_type(bs, args, 0, &bs_file_data_spec);
-
-    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
-    FILE *f = bs_c_data_as(c->data, FILE *);
-    if (!f) {
-        bs_error(bs, "cannot write into closed file");
-    }
-
-    Bs_Writer w = bs_file_writer(f);
-    for (size_t i = 1; i < arity; i++) {
-        if (i > 1) {
-            bs_fmt(&w, " ");
-        }
-        bs_value_write(bs, &w, args[i]);
-    }
-    bs_fmt(&w, "\n");
-
-    return bs_value_bool(!ferror(f));
 }
 
 Bs_Value bs_io_println(Bs *bs, Bs_Value *args, size_t arity) {
@@ -810,7 +806,7 @@ Bs_Value bs_ascii_code(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Bytes
-Bs_C_Class *bytes_class;
+Bs_C_Class *bs_bytes_class;
 
 void bs_bytes_free(void *userdata, void *instance_data) {
     Bs_Buffer *b = &bs_static_cast(instance_data, Bs_Buffer);
@@ -1447,23 +1443,49 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     srand(time(NULL));
 
     {
-        Bs_Table *io = bs_table_new(bs);
-        bs_add_fn(bs, io, "open", "io.open", bs_io_open);
-        bs_add_fn(bs, io, "close", "io.close", bs_io_close);
-        bs_add_fn(bs, io, "read", "io.read", bs_io_read);
-        bs_add_fn(bs, io, "flush", "io.flush", bs_io_flush);
+        bs_io_reader_class = bs_c_class_new(
+            bs, Bs_Sv_Static("Reader"), sizeof(FILE *), bs_io_reader_init, bs_io_file_free);
 
-        bs_add_fn(bs, io, "write", "io.write", bs_io_write);
+        bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("ok"), bs_io_file_ok);
+        bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("close"), bs_io_file_close);
+        bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("read"), bs_io_reader_read);
+
+        bs_io_writer_class = bs_c_class_new(
+            bs, Bs_Sv_Static("Writer"), sizeof(FILE *), bs_io_writer_init, bs_io_file_free);
+
+        bs_c_class_add(bs, bs_io_writer_class, Bs_Sv_Static("ok"), bs_io_file_ok);
+        bs_c_class_add(bs, bs_io_writer_class, Bs_Sv_Static("close"), bs_io_file_close);
+        bs_c_class_add(bs, bs_io_writer_class, Bs_Sv_Static("flush"), bs_io_writer_flush);
+        bs_c_class_add(bs, bs_io_writer_class, Bs_Sv_Static("write"), bs_io_writer_write);
+        bs_c_class_add(bs, bs_io_writer_class, Bs_Sv_Static("writeln"), bs_io_writer_writeln);
+
+        Bs_Table *io = bs_table_new(bs);
+        bs_add(bs, io, "Reader", bs_value_object(bs_io_reader_class));
+        bs_add(bs, io, "Writer", bs_value_object(bs_io_writer_class));
+
         bs_add_fn(bs, io, "print", "io.print", bs_io_print);
         bs_add_fn(bs, io, "eprint", "io.eprint", bs_io_eprint);
 
-        bs_add_fn(bs, io, "writeln", "io.writeln", bs_io_writeln);
         bs_add_fn(bs, io, "println", "io.println", bs_io_println);
         bs_add_fn(bs, io, "eprintln", "io.eprintln", bs_io_eprintln);
 
-        bs_add(bs, io, "stdin", bs_value_object(bs_c_data_new(bs, &stdin, &bs_file_data_spec)));
-        bs_add(bs, io, "stdout", bs_value_object(bs_c_data_new(bs, &stdout, &bs_file_data_spec)));
-        bs_add(bs, io, "stderr", bs_value_object(bs_c_data_new(bs, &stderr, &bs_file_data_spec)));
+        {
+            Bs_C_Instance *io_stdin = bs_c_instance_new(bs, bs_io_reader_class);
+            bs_static_cast(io_stdin->data, FILE *) = stdin;
+            bs_add(bs, io, "stdin", bs_value_object(io_stdin));
+        }
+
+        {
+            Bs_C_Instance *io_stdout = bs_c_instance_new(bs, bs_io_writer_class);
+            bs_static_cast(io_stdout->data, FILE *) = stdout;
+            bs_add(bs, io, "stdout", bs_value_object(io_stdout));
+        }
+
+        {
+            Bs_C_Instance *io_stderr = bs_c_instance_new(bs, bs_io_writer_class);
+            bs_static_cast(io_stderr->data, FILE *) = stderr;
+            bs_add(bs, io, "stderr", bs_value_object(io_stderr));
+        }
 
         bs_global_set(bs, Bs_Sv_Static("io"), bs_value_object(io));
     }
@@ -1540,17 +1562,17 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     }
 
     {
-        bytes_class = bs_c_class_new(
+        bs_bytes_class = bs_c_class_new(
             bs, Bs_Sv_Static("Bytes"), sizeof(Bs_Buffer), bs_bytes_init, bs_bytes_free);
 
-        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("count"), bs_bytes_count);
-        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("reset"), bs_bytes_reset);
+        bs_c_class_add(bs, bs_bytes_class, Bs_Sv_Static("count"), bs_bytes_count);
+        bs_c_class_add(bs, bs_bytes_class, Bs_Sv_Static("reset"), bs_bytes_reset);
 
-        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("slice"), bs_bytes_slice);
-        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("write"), bs_bytes_write);
-        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("insert"), bs_bytes_insert);
+        bs_c_class_add(bs, bs_bytes_class, Bs_Sv_Static("slice"), bs_bytes_slice);
+        bs_c_class_add(bs, bs_bytes_class, Bs_Sv_Static("write"), bs_bytes_write);
+        bs_c_class_add(bs, bs_bytes_class, Bs_Sv_Static("insert"), bs_bytes_insert);
 
-        bs_global_set(bs, Bs_Sv_Static("Bytes"), bs_value_object(bytes_class));
+        bs_global_set(bs, Bs_Sv_Static("Bytes"), bs_value_object(bs_bytes_class));
     }
 
     {
