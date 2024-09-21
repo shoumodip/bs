@@ -810,64 +810,53 @@ Bs_Value bs_ascii_code(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Bytes
-void bs_bytes_data_free(Bs *bs, void *data) {
-    bs_da_free(bs, &bs_c_data_as(data, Bs_Buffer));
+Bs_C_Class *bytes_class;
+
+void bs_bytes_free(void *userdata, void *instance_data) {
+    Bs_Buffer *b = &bs_static_cast(instance_data, Bs_Buffer);
+    bs_da_free(b->bs, b);
 }
 
-void bs_bytes_data_write(Bs_Writer *w, const void *data) {
-    const Bs_Buffer *b = &bs_c_data_as(data, Bs_Buffer);
-    w->write(w, Bs_Sv(b->data, b->count));
-}
-
-const Bs_C_Data_Spec bs_bytes_data_spec = {
-    .name = Bs_Sv_Static("bytes"),
-    .size = sizeof(Bs_Buffer),
-    .free = bs_bytes_data_free,
-    .write = bs_bytes_data_write,
-};
-
-Bs_Value bs_bytes_new(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_bytes_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-
-    Bs_Buffer buffer = {.bs = bs};
-    return bs_value_object(bs_c_data_new(bs, &buffer, &bs_bytes_data_spec));
+    Bs_Buffer *b = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
+    b->bs = bs;
+    return bs_value_nil;
 }
 
 Bs_Value bs_bytes_count(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 1);
-    bs_arg_check_object_c_type(bs, args, 0, &bs_bytes_data_spec);
-
-    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
-    return bs_value_num(bs_c_data_as(c->data, Bs_Buffer).count);
+    bs_check_arity(bs, arity, 0);
+    const Bs_Buffer *b = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
+    return bs_value_num(b->count);
 }
 
 Bs_Value bs_bytes_reset(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 2);
-    bs_arg_check_object_c_type(bs, args, 0, &bs_bytes_data_spec);
-    bs_arg_check_whole_number(bs, args, 1);
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_whole_number(bs, args, 0);
 
-    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
-    Bs_Buffer *b = &bs_c_data_as(c->data, Bs_Buffer);
-    const size_t reset = args[1].as.number;
+    Bs_Buffer *b = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
+    const size_t reset = args[0].as.number;
 
     if (reset > b->count) {
         bs_error(bs, "cannot reset bytes of length %zu to %zu", b->count, reset);
     }
 
-    b->count = args[1].as.number;
+    b->count = reset;
     return bs_value_nil;
 }
 
 Bs_Value bs_bytes_slice(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 3);
-    bs_arg_check_object_c_type(bs, args, 0, &bs_bytes_data_spec);
+    bs_check_arity(bs, arity, 2);
+    bs_arg_check_whole_number(bs, args, 0);
     bs_arg_check_whole_number(bs, args, 1);
-    bs_arg_check_whole_number(bs, args, 2);
 
-    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
-    const Bs_Buffer *b = &bs_c_data_as(c->data, Bs_Buffer);
-    const size_t begin = bs_min(args[1].as.number, args[2].as.number);
-    const size_t end = bs_max(args[1].as.number, args[2].as.number);
+    const Bs_Buffer *b = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
+    const size_t begin = bs_min(args[0].as.number, args[1].as.number);
+    const size_t end = bs_max(args[0].as.number, args[1].as.number);
+
+    if (begin == end) {
+        return bs_value_object(bs_str_new(bs, Bs_Sv_Static("")));
+    }
 
     if (begin >= b->count || end > b->count) {
         bs_error(bs, "cannot slice bytes of length %zu from %zu to %zu", b->count, begin, end);
@@ -876,29 +865,25 @@ Bs_Value bs_bytes_slice(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, Bs_Sv(b->data + begin, end - begin)));
 }
 
-Bs_Value bs_bytes_push(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 2);
-    bs_arg_check_object_c_type(bs, args, 0, &bs_bytes_data_spec);
-    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
+Bs_Value bs_bytes_write(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
-    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
-    Bs_Buffer *b = &bs_c_data_as(c->data, Bs_Buffer);
-    const Bs_Str *src = (const Bs_Str *)args[1].as.object;
+    Bs_Buffer *b = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
+    const Bs_Str *src = (const Bs_Str *)args[0].as.object;
     bs_da_push_many(bs, b, src->data, src->size);
 
     return bs_value_nil;
 }
 
 Bs_Value bs_bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 3);
-    bs_arg_check_object_c_type(bs, args, 0, &bs_bytes_data_spec);
-    bs_arg_check_whole_number(bs, args, 1);
-    bs_arg_check_object_type(bs, args, 2, BS_OBJECT_STR);
+    bs_check_arity(bs, arity, 2);
+    bs_arg_check_whole_number(bs, args, 0);
+    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
 
-    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
-    Bs_Buffer *b = &bs_c_data_as(c->data, Bs_Buffer);
-    const size_t index = args[1].as.number;
-    const Bs_Str *src = (const Bs_Str *)args[2].as.object;
+    Bs_Buffer *b = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
+    const size_t index = args[0].as.number;
+    const Bs_Str *src = (const Bs_Str *)args[1].as.object;
 
     if (index > b->count) {
         bs_error(bs, "cannot insert at %zu into bytes of length %zu", index, b->count);
@@ -1555,15 +1540,17 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     }
 
     {
-        Bs_Table *bytes = bs_table_new(bs);
-        bs_add_fn(bs, bytes, "new", "bytes.new", bs_bytes_new);
-        bs_add_fn(bs, bytes, "count", "bytes.count", bs_bytes_count);
-        bs_add_fn(bs, bytes, "reset", "bytes.reset", bs_bytes_reset);
-        bs_add_fn(bs, bytes, "slice", "bytes.slice", bs_bytes_slice);
+        bytes_class = bs_c_class_new(
+            bs, Bs_Sv_Static("Bytes"), sizeof(Bs_Buffer), bs_bytes_init, bs_bytes_free);
 
-        bs_add_fn(bs, bytes, "push", "bytes.push", bs_bytes_push);
-        bs_add_fn(bs, bytes, "insert", "bytes.insert", bs_bytes_insert);
-        bs_global_set(bs, Bs_Sv_Static("bytes"), bs_value_object(bytes));
+        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("count"), bs_bytes_count);
+        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("reset"), bs_bytes_reset);
+
+        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("slice"), bs_bytes_slice);
+        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("write"), bs_bytes_write);
+        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("insert"), bs_bytes_insert);
+
+        bs_global_set(bs, Bs_Sv_Static("Bytes"), bs_value_object(bytes_class));
     }
 
     {
