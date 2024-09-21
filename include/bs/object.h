@@ -136,7 +136,6 @@ Bs_Instance *bs_instance_new(Bs *bs, Bs_Class *class);
 
 typedef void (*Bs_C_Class_Free)(void *userdata, void *instance_data);
 
-// TODO: store the library name optionally, like Bs_C_Fn does
 struct Bs_C_Class {
     Bs_Object meta;
     Bs_Sv name;
@@ -172,7 +171,7 @@ struct Bs_C_Fn {
     Bs_Object meta;
     Bs_Sv name;
     Bs_C_Fn_Ptr ptr;
-    const Bs_C_Lib *library;
+    const Bs_C_Lib *library; // TODO: remove this useless field
 };
 
 Bs_C_Fn *bs_c_fn_new(Bs *bs, Bs_Sv name, Bs_C_Fn_Ptr ptr);

@@ -801,15 +801,7 @@ void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
                     bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(instance->class->name));
                 }
             } else if (fn->library) {
-                Bs_Sv path = Bs_Sv(fn->library->name->data, fn->library->name->size);
-                for (size_t i = path.size; i > 0; i--) {
-                    if (path.data[i - 1] == '.') {
-                        path.size = i - 1;
-                        break;
-                    }
-                }
-
-                bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(path));
+                bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(*fn->library->name));
             }
 
             bs_fmt(w, Bs_Sv_Fmt "()", Bs_Sv_Arg(fn->name));
