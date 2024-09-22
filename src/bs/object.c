@@ -212,10 +212,3 @@ void bs_c_lib_add_ffi(Bs *bs, Bs_C_Lib *library, const Bs_FFI *ffi, size_t count
         bs_map_set(bs, &library->map, bs_value_object(bs_str_new(bs, name)), bs_value_object(fn));
     }
 }
-
-Bs_C_Data *bs_c_data_new(Bs *bs, const void *data, const Bs_C_Data_Spec *spec) {
-    Bs_C_Data *c = (Bs_C_Data *)bs_object_new(bs, BS_OBJECT_C_DATA, sizeof(Bs_C_Data) + spec->size);
-    c->spec = spec;
-    memcpy(c->data, data, spec->size);
-    return c;
-}

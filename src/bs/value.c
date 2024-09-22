@@ -280,15 +280,6 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
         bs_pretty_printer_map(p, &((const Bs_C_Lib *)object)->map);
         break;
 
-    case BS_OBJECT_C_DATA: {
-        const Bs_C_Data *native = (const Bs_C_Data *)object;
-        if (native->spec->write) {
-            native->spec->write(p->writer, native->data);
-        } else {
-            bs_fmt(p->writer, "<native " Bs_Sv_Fmt " object>", Bs_Sv_Arg(native->spec->name));
-        }
-    } break;
-
     default:
         assert(false && "unreachable");
     }

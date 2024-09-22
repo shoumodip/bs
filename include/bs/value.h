@@ -57,7 +57,6 @@ typedef struct Bs_Bound_Method Bs_Bound_Method;
 
 typedef struct Bs_C_Fn Bs_C_Fn;
 typedef struct Bs_C_Lib Bs_C_Lib;
-typedef struct Bs_C_Data Bs_C_Data;
 
 typedef struct Bs_Map Bs_Map;
 

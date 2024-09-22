@@ -56,14 +56,6 @@ typedef struct {
     Bs_C_Fn_Ptr ptr;
 } Bs_FFI;
 
-// TODO: remove C_Data object (it has been replaced by C_Class and C_Instance)
-typedef struct {
-    Bs_Sv name;
-    size_t size;
-    void (*free)(Bs *bs, void *data);
-    void (*write)(Bs_Writer *writer, const void *data);
-} Bs_C_Data_Spec;
-
 // Errors
 void bs_unwind(Bs *bs, unsigned char exit);
 
@@ -77,8 +69,6 @@ void bs_check_value_type_at(
     Bs *bs, size_t location, Bs_Value value, Bs_Value_Type expected, const char *label);
 void bs_check_object_type_at(
     Bs *bs, size_t location, Bs_Value value, Bs_Object_Type expected, const char *label);
-void bs_check_object_c_type_at(
-    Bs *bs, size_t location, Bs_Value value, const Bs_C_Data_Spec *expected, const char *label);
 
 void bs_check_integer_at(Bs *bs, size_t location, Bs_Value value, const char *label);
 void bs_check_whole_number_at(Bs *bs, size_t location, Bs_Value value, const char *label);

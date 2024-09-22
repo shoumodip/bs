@@ -193,15 +193,6 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
         bs_realloc(bs, library, sizeof(*library), 0);
     } break;
 
-    case BS_OBJECT_C_DATA: {
-        Bs_C_Data *data = (Bs_C_Data *)object;
-        if (data->spec->free) {
-            data->spec->free(bs, data->data);
-        }
-
-        bs_realloc(bs, data, sizeof(*data) + data->spec->size, 0);
-    } break;
-
     default:
         assert(false && "unreachable");
     }
@@ -878,36 +869,6 @@ void bs_check_object_type_at(
             label,
             bs_object_type_name(expected),
             bs_value_type_name(value, bs->frame->extended));
-    }
-}
-
-void bs_check_object_c_type_at(
-    Bs *bs, size_t location, Bs_Value value, const Bs_C_Data_Spec *expected, const char *label) {
-    if (value.type != BS_VALUE_OBJECT || value.as.object->type != BS_OBJECT_C_DATA) {
-        char buffer[64];
-        bs_label_at(buffer, sizeof(buffer), &label, location);
-
-        bs_error_at(
-            bs,
-            location,
-            "expected %s to be native " Bs_Sv_Fmt " object, got %s",
-            label,
-            Bs_Sv_Arg(expected->name),
-            bs_value_type_name(value, bs->frame->extended));
-    }
-
-    const Bs_C_Data *native = (const Bs_C_Data *)value.as.object;
-    if (native->spec != expected) {
-        char buffer[64];
-        bs_label_at(buffer, sizeof(buffer), &label, location);
-
-        bs_error_at(
-            bs,
-            location,
-            "expected %s to be native " Bs_Sv_Fmt " object, got native " Bs_Sv_Fmt " object",
-            label,
-            Bs_Sv_Arg(expected->name),
-            Bs_Sv_Arg(native->spec->name));
     }
 }
 

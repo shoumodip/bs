@@ -189,14 +189,4 @@ void bs_c_lib_add(Bs *bs, Bs_C_Lib *library, Bs_Sv name, Bs_Value value);
 void bs_c_lib_add_fn(Bs *bs, Bs_C_Lib *library, Bs_Sv name, Bs_C_Fn_Ptr ptr);
 void bs_c_lib_add_ffi(Bs *bs, Bs_C_Lib *library, const Bs_FFI *ffi, size_t count);
 
-struct Bs_C_Data {
-    Bs_Object meta;
-    const Bs_C_Data_Spec *spec;
-    char data[];
-};
-
-#define bs_c_data_as(data, T) (*(T *)(data))
-
-Bs_C_Data *bs_c_data_new(Bs *bs, const void *data, const Bs_C_Data_Spec *spec);
-
 #endif // BS_OBJECT_H
