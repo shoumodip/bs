@@ -16,7 +16,7 @@ typedef enum {
     BS_POWER_DOT,
 } Bs_Power;
 
-static_assert(BS_COUNT_TOKENS == 59, "Update bs_token_type_power()");
+static_assert(BS_COUNT_TOKENS == 60, "Update bs_token_type_power()");
 static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_DOT:
@@ -101,6 +101,7 @@ typedef struct Bs_Class_Compiler Bs_Class_Compiler;
 
 struct Bs_Class_Compiler {
     Bs_Class_Compiler *outer;
+    bool has_super;
 };
 
 typedef enum {
@@ -258,6 +259,18 @@ static void bs_compile_string(Bs_Compiler *c, Bs_Sv sv) {
         bs_value_object(bs_str_new(c->bs, bs_buffer_reset(b, start))));
 }
 
+static void bs_compile_receiver(Bs_Compiler *c, Bs_Sv sv, Bs_Loc loc) {
+    size_t index;
+    if (bs_lambda_find_local(c->lambda, sv, &index)) {
+        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_LTHIS, index);
+    } else if (bs_lambda_find_upvalue(c->bs, c->lambda, sv, &index)) {
+        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_UTHIS, index);
+    } else {
+        assert(false && "unreachable");
+    }
+    bs_chunk_push_op_loc(c->bs, c->chunk, loc);
+}
+
 static void bs_compile_identifier(Bs_Compiler *c, const Bs_Token *token) {
     size_t index;
     if (bs_lambda_find_local(c->lambda, token->sv, &index)) {
@@ -271,7 +284,7 @@ static void bs_compile_identifier(Bs_Compiler *c, const Bs_Token *token) {
     bs_chunk_push_op_loc(c->bs, c->chunk, token->loc);
 }
 
-static_assert(BS_COUNT_TOKENS == 59, "Update bs_compile_expr()");
+static_assert(BS_COUNT_TOKENS == 60, "Update bs_compile_expr()");
 static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
     Bs_Loc loc = token.loc;
@@ -455,16 +468,43 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         }
 
         const Bs_Sv sv = c->lexer.extended ? Bs_Sv_Static("deez") : Bs_Sv_Static("this");
+        bs_compile_receiver(c, sv, token.loc);
+    } break;
 
-        size_t index;
-        if (bs_lambda_find_local(c->lambda, sv, &index)) {
-            bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_LTHIS, index);
-        } else if (bs_lambda_find_upvalue(c->bs, c->lambda, sv, &index)) {
-            bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_UTHIS, index);
-        } else {
-            assert(false && "unreachable");
+    case BS_TOKEN_SUPER: {
+        if (!c->class) {
+            bs_fmt(
+                c->lexer.error,
+                Bs_Loc_Fmt "error: cannot use %s outside of %s\n",
+                Bs_Loc_Arg(token.loc),
+                bs_token_type_name(token.type, c->lexer.extended),
+                bs_token_type_name(BS_TOKEN_CLASS, c->lexer.extended));
+
+            bs_lexer_error(&c->lexer);
         }
-        bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
+
+        if (!c->class->has_super) {
+            bs_fmt(
+                c->lexer.error,
+                Bs_Loc_Fmt "error: cannot use %s outside of an inheriting %s\n",
+                Bs_Loc_Arg(token.loc),
+                bs_token_type_name(token.type, c->lexer.extended),
+                c->lexer.extended ? "wannabe" : "class");
+
+            bs_lexer_error(&c->lexer);
+        }
+
+        bs_lexer_expect(&c->lexer, BS_TOKEN_DOT);
+        const Bs_Token method = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
+
+        const Bs_Sv this = c->lexer.extended ? Bs_Sv_Static("deez") : Bs_Sv_Static("this");
+        const Bs_Sv super = c->lexer.extended ? Bs_Sv_Static("franky") : Bs_Sv_Static("super");
+
+        bs_compile_receiver(c, this, token.loc);
+        bs_compile_receiver(c, super, token.loc);
+        bs_chunk_push_op_value(
+            c->bs, c->chunk, BS_OP_SUPER_GET, bs_value_object(bs_str_new(c->bs, method.sv)));
+        bs_chunk_push_op_loc(c->bs, c->chunk, method.loc);
     } break;
 
     case BS_TOKEN_IS_MAIN_MODULE:
@@ -628,7 +668,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             const Bs_Op op_set = bs_op_get_to_set(op_get);
 
             if (op_set == BS_OP_RET && op_get != BS_OP_CALL && op_get != BS_OP_INVOKE &&
-                op_get != BS_OP_IMPORT && op_get != BS_OP_CLOSURE) {
+                op_get != BS_OP_SUPER_GET && op_get != BS_OP_IMPORT && op_get != BS_OP_CLOSURE) {
                 bs_compile_error_unexpected(c, &token);
             }
 
@@ -886,6 +926,31 @@ static void bs_compile_class(Bs_Compiler *c, bool public) {
     class.outer = c->class;
     c->class = &class;
 
+    if (bs_lexer_read(&c->lexer, BS_TOKEN_LT)) {
+        const Bs_Token super = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
+        if (bs_sv_eq(super.sv, token.sv)) {
+            bs_fmt(
+                c->lexer.error,
+                Bs_Loc_Fmt "error: a class cannot inherit from itself\n",
+                Bs_Loc_Arg(super.loc));
+
+            bs_lexer_error(&c->lexer);
+        }
+        bs_compile_identifier(c, &super);
+
+        bs_compile_block_init(c);
+        {
+            const Bs_Sv sv = c->lexer.extended ? Bs_Sv_Static("franky") : Bs_Sv_Static("super");
+            bs_lambda_push(c->bs, c->lambda, ((Bs_Local){.name = sv, .depth = c->lambda->depth}));
+        }
+
+        bs_compile_identifier(c, &token);
+        bs_chunk_push_op(c->bs, c->chunk, BS_OP_INHERIT);
+        bs_chunk_push_op_loc(c->bs, c->chunk, super.loc);
+
+        c->class->has_super = true;
+    }
+
     bs_compile_identifier(c, &token);
     bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE);
     while (true) {
@@ -906,6 +971,10 @@ static void bs_compile_class(Bs_Compiler *c, bool public) {
         }
     }
     bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
+
+    if (c->class->has_super) {
+        bs_compile_block_end(c);
+    }
 
     c->class = c->class->outer;
 }
@@ -964,7 +1033,7 @@ static void bs_compile_jumps_reset(Bs_Compiler *c, Bs_Jumps save) {
     c->jumps.start = save.start;
 }
 
-static_assert(BS_COUNT_TOKENS == 59, "Update bs_compile_stmt()");
+static_assert(BS_COUNT_TOKENS == 60, "Update bs_compile_stmt()");
 static void bs_compile_stmt(Bs_Compiler *c) {
     Bs_Token token = bs_lexer_next(&c->lexer);
 

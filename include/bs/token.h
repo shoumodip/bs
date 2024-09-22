@@ -81,6 +81,7 @@ typedef enum {
     BS_TOKEN_RETURN,
 
     BS_TOKEN_THIS,
+    BS_TOKEN_SUPER,
     BS_TOKEN_CLASS,
 
     BS_TOKEN_COMMENT,

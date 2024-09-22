@@ -152,3 +152,12 @@ bool bs_map_set(Bs *bs, Bs_Map *m, Bs_Value key, Bs_Value value) {
     entry->value = value;
     return is_new;
 }
+
+void bs_map_copy(Bs *bs, Bs_Map *dst, const Bs_Map *src) {
+    for (size_t i = 0; i < src->capacity; i++) {
+        const Bs_Entry *entry = &src->data[i];
+        if (entry->key.type != BS_VALUE_NIL) {
+            bs_map_set(bs, dst, entry->key, entry->value);
+        }
+    }
+}

@@ -1423,7 +1423,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 58, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 60, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const size_t frames_count_save = bs->frames.count;
@@ -1597,6 +1597,44 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
             ((Bs_Class *)class.as.object)->init = (Bs_Closure *)method.as.object;
             bs->stack.count--;
+        } break;
+
+        case BS_OP_INHERIT: {
+            const Bs_Value super = bs_stack_peek(bs, 1);
+            if (super.type != BS_VALUE_OBJECT || super.as.object->type != BS_OBJECT_CLASS) {
+                bs_error(
+                    bs,
+                    "cannot inherit from %s value",
+                    bs_value_type_name(super, bs->frame->extended));
+            }
+
+            const Bs_Value class = bs_stack_peek(bs, 0);
+            bs_map_copy(
+                bs,
+                &((Bs_Class *)class.as.object)->methods,
+                &((Bs_Class *)super.as.object)->methods);
+
+            bs->stack.count--;
+        } break;
+
+        case BS_OP_SUPER_GET: {
+            const Bs_Value name = bs_chunk_read_const(bs);
+            const Bs_Value super = bs_stack_pop(bs);
+            assert(super.type == BS_VALUE_OBJECT && super.as.object->type == BS_OBJECT_CLASS);
+
+            const Bs_Value this = bs_stack_peek(bs, 0);
+            assert(this.type == BS_VALUE_OBJECT && this.as.object->type == BS_OBJECT_INSTANCE);
+
+            Bs_Class *superclass = (Bs_Class *)super.as.object;
+            Bs_Instance *instance = (Bs_Instance *)this.as.object;
+
+            Bs_Value value;
+            if (bs_map_get(bs, &superclass->methods, name, &value)) {
+                value = bs_value_object(bs_bound_method_new(bs, this, value));
+            } else {
+                value = bs_value_nil;
+            }
+            bs_stack_set(bs, 0, value);
         } break;
 
         case BS_OP_ADD: {

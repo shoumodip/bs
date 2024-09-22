@@ -2,7 +2,7 @@
 
 #include "bs/token.h"
 
-static_assert(BS_COUNT_TOKENS == 59, "Update bs_token_type_name()");
+static_assert(BS_COUNT_TOKENS == 60, "Update bs_token_type_name()");
 const char *bs_token_type_name(Bs_Token_Type type, bool extended) {
     switch (type) {
     case BS_TOKEN_EOF:
@@ -170,6 +170,9 @@ const char *bs_token_type_name(Bs_Token_Type type, bool extended) {
 
     case BS_TOKEN_THIS:
         return extended ? "'deez'" : "'this'";
+
+    case BS_TOKEN_SUPER:
+        return extended ? "'franky'" : "'super'";
 
     case BS_TOKEN_CLASS:
         return extended ? "'wannabe'" : "'class'";

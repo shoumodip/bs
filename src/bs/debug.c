@@ -29,7 +29,7 @@ bs_debug_op_invoke(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset, cons
     bs_fmt(p->writer, "'\n");
 }
 
-static_assert(BS_COUNT_OPS == 58, "Update bs_debug_op()");
+static_assert(BS_COUNT_OPS == 60, "Update bs_debug_op()");
 void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
     bs_fmt(p->writer, "%04zu ", *offset);
 
@@ -113,6 +113,14 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
 
     case BS_OP_INIT_METHOD:
         bs_fmt(p->writer, "OP_INIT_METHOD\n");
+        break;
+
+    case BS_OP_INHERIT:
+        bs_fmt(p->writer, "OP_INHERIT\n");
+        break;
+
+    case BS_OP_SUPER_GET:
+        bs_debug_op_value(p, c, offset, "OP_SUPER_GET");
         break;
 
     case BS_OP_ADD:

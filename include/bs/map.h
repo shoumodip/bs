@@ -26,4 +26,6 @@ bool bs_map_remove(Bs *bs, Bs_Map *map, Bs_Value key);
 bool bs_map_get(Bs *bs, Bs_Map *map, Bs_Value key, Bs_Value *value);
 bool bs_map_set(Bs *bs, Bs_Map *map, Bs_Value key, Bs_Value value);
 
+void bs_map_copy(Bs *bs, Bs_Map *dst, const Bs_Map *src);
+
 #endif // BS_MAP_H

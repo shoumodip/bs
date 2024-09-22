@@ -21,6 +21,9 @@ typedef enum {
     BS_OP_METHOD,
     BS_OP_INIT_METHOD,
 
+    BS_OP_INHERIT,
+    BS_OP_SUPER_GET,
+
     BS_OP_ADD,
     BS_OP_SUB,
     BS_OP_MUL,
@@ -57,7 +60,7 @@ typedef enum {
 
     BS_OP_LGET,
     BS_OP_LSET,
-    BS_OP_LTHIS,
+    BS_OP_LTHIS, // TODO: rename to LRECEIVER
 
     BS_OP_UGET,
     BS_OP_USET,

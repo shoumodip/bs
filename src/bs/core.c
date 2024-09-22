@@ -1264,15 +1264,9 @@ Bs_Value bs_table_copy(Bs *bs, Bs_Value *args, size_t arity) {
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_TABLE);
 
     const Bs_Table *src = (const Bs_Table *)args[0].as.object;
-
     Bs_Table *dst = bs_table_new(bs);
-    for (size_t i = 0; i < src->map.capacity; i++) {
-        const Bs_Entry *entry = &src->map.data[i];
-        if (entry->key.type != BS_VALUE_NIL) {
-            bs_table_set(bs, dst, entry->key, entry->value);
-        }
-    }
 
+    bs_map_copy(bs, &dst->map, &src->map);
     return bs_value_object(dst);
 }
 

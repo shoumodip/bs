@@ -185,6 +185,8 @@ struct Bs_C_Lib {
 };
 
 Bs_C_Lib *bs_c_lib_new(Bs *bs, void *data, const Bs_Str *name);
+
+// TODO: rename to bs_c_lib_set* for consistency with Map and Table
 void bs_c_lib_add(Bs *bs, Bs_C_Lib *library, Bs_Sv name, Bs_Value value);
 void bs_c_lib_add_fn(Bs *bs, Bs_C_Lib *library, Bs_Sv name, Bs_C_Fn_Ptr ptr);
 void bs_c_lib_add_ffi(Bs *bs, Bs_C_Lib *library, const Bs_FFI *ffi, size_t count);
