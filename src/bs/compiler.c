@@ -502,8 +502,13 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
         bs_compile_receiver(c, this, token.loc);
         bs_compile_receiver(c, super, token.loc);
-        bs_chunk_push_op_value(
-            c->bs, c->chunk, BS_OP_SUPER_GET, bs_value_object(bs_str_new(c->bs, method.sv)));
+
+        if (bs_sv_eq(method.sv, Bs_Sv_Static("init"))) {
+            bs_chunk_push_op_value(c->bs, c->chunk, BS_OP_SUPER_GET, bs_value_nil);
+        } else {
+            bs_chunk_push_op_value(
+                c->bs, c->chunk, BS_OP_SUPER_GET, bs_value_object(bs_str_new(c->bs, method.sv)));
+        }
         bs_chunk_push_op_loc(c->bs, c->chunk, method.loc);
     } break;
 

@@ -1626,9 +1626,16 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             assert(this.type == BS_VALUE_OBJECT && this.as.object->type == BS_OBJECT_INSTANCE);
 
             Bs_Class *superclass = (Bs_Class *)super.as.object;
-
             Bs_Value value;
-            if (bs_map_get(bs, &superclass->methods, name, &value)) {
+            if (name.type == BS_VALUE_NIL) {
+                // Requested init()
+                if (superclass->init) {
+                    value = bs_value_object(
+                        bs_bound_method_new(bs, this, bs_value_object(superclass->init)));
+                } else {
+                    value = bs_value_nil;
+                }
+            } else if (bs_map_get(bs, &superclass->methods, name, &value)) {
                 value = bs_value_object(bs_bound_method_new(bs, this, value));
             } else {
                 value = bs_value_nil;
@@ -1647,9 +1654,15 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             assert(this.type == BS_VALUE_OBJECT && this.as.object->type == BS_OBJECT_INSTANCE);
 
             Bs_Class *superclass = (Bs_Class *)super.as.object;
-
             Bs_Value method;
-            if (!bs_map_get(bs, &superclass->methods, name, &method)) {
+            if (name.type == BS_VALUE_NIL) {
+                // Requested init()
+                if (superclass->init) {
+                    method = bs_value_object(superclass->init);
+                } else {
+                    method = bs_value_nil;
+                }
+            } else if (!bs_map_get(bs, &superclass->methods, name, &method)) {
                 method = bs_value_nil;
             }
             bs_call_value(bs, 1, method, arity);
