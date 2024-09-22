@@ -12,10 +12,6 @@
 #include "bs/object.h"
 
 // IO
-Bs_C_Class *bs_io_reader_class;
-Bs_C_Class *bs_io_writer_class;
-
-// Generic File functions
 void bs_io_file_free(void *userdata, void *instance_data) {
     FILE *f = bs_static_cast(instance_data, FILE *);
     if (f && fileno(f) > 2) {
@@ -803,8 +799,6 @@ Bs_Value bs_ascii_code(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Bytes
-Bs_C_Class *bs_bytes_class;
-
 void bs_bytes_free(void *userdata, void *instance_data) {
     Bs_Buffer *b = &bs_static_cast(instance_data, Bs_Buffer);
     bs_da_free(b->bs, b);
@@ -1440,14 +1434,14 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     srand(time(NULL));
 
     {
-        bs_io_reader_class = bs_c_class_new(
+        Bs_C_Class *bs_io_reader_class = bs_c_class_new(
             bs, Bs_Sv_Static("Reader"), sizeof(FILE *), bs_io_reader_init, bs_io_file_free);
 
         bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("ok"), bs_io_file_ok);
         bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("close"), bs_io_file_close);
         bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("read"), bs_io_reader_read);
 
-        bs_io_writer_class = bs_c_class_new(
+        Bs_C_Class *bs_io_writer_class = bs_c_class_new(
             bs, Bs_Sv_Static("Writer"), sizeof(FILE *), bs_io_writer_init, bs_io_file_free);
 
         bs_c_class_add(bs, bs_io_writer_class, Bs_Sv_Static("ok"), bs_io_file_ok);
@@ -1561,7 +1555,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     }
 
     {
-        bs_bytes_class = bs_c_class_new(
+        Bs_C_Class *bs_bytes_class = bs_c_class_new(
             bs, Bs_Sv_Static("Bytes"), sizeof(Bs_Buffer), bs_bytes_init, bs_bytes_free);
 
         bs_c_class_add(bs, bs_bytes_class, Bs_Sv_Static("count"), bs_bytes_count);
