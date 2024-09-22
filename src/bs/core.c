@@ -316,50 +316,11 @@ Bs_Value bs_os_setenv(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Process
-const Bs_C_Data_Spec bs_process_data_spec = {
-    .name = Bs_Sv_Static("process"),
-    .size = sizeof(pid_t),
-};
+typedef struct {
+    pid_t pid;
+} Bs_Process;
 
-Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 2);
-    bs_arg_check_object_c_type(bs, args, 0, &bs_process_data_spec);
-    bs_arg_check_whole_number(bs, args, 1);
-
-    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
-    const pid_t pid = bs_c_data_as(c->data, pid_t);
-    if (!pid) {
-        bs_error(bs, "cannot kill already terminated process");
-    }
-
-    if (kill(pid, args[1].as.number) < 0) {
-        bs_error(bs, "could not kill process");
-    }
-
-    bs_c_data_as(c->data, pid_t) = 0;
-    return bs_value_nil;
-}
-
-Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 1);
-    bs_arg_check_object_c_type(bs, args, 0, &bs_process_data_spec);
-
-    Bs_C_Data *c = (Bs_C_Data *)args[0].as.object;
-    const pid_t pid = bs_c_data_as(c->data, pid_t);
-    if (!pid) {
-        bs_error(bs, "cannot wait for already terminated process");
-    }
-
-    int status;
-    if (waitpid(pid, &status, 0) < 0) {
-        bs_error(bs, "could not wait for process");
-    }
-
-    bs_c_data_as(c->data, pid_t) = 0;
-    return WIFEXITED(status) ? bs_value_num(WEXITSTATUS(status)) : bs_value_nil;
-}
-
-Bs_Value bs_process_spawn(Bs *bs, Bs_Value *args, size_t arity) {
+Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
 
@@ -407,7 +368,43 @@ Bs_Value bs_process_spawn(Bs *bs, Bs_Value *args, size_t arity) {
         exit(127);
     }
 
-    return bs_value_object(bs_c_data_new(bs, &pid, &bs_process_data_spec));
+    Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+    p->pid = pid;
+    return bs_value_nil;
+}
+
+Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_whole_number(bs, args, 0);
+
+    Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+    if (!p->pid) {
+        bs_error(bs, "cannot kill already terminated process");
+    }
+
+    if (kill(p->pid, args[0].as.number) < 0) {
+        bs_error(bs, "could not kill process");
+    }
+
+    p->pid = 0;
+    return bs_value_nil;
+}
+
+Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+
+    Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+    if (!p->pid) {
+        bs_error(bs, "cannot wait for already terminated process");
+    }
+
+    int status;
+    if (waitpid(p->pid, &status, 0) < 0) {
+        bs_error(bs, "could not wait for process");
+    }
+
+    p->pid = 0;
+    return WIFEXITED(status) ? bs_value_num(WEXITSTATUS(status)) : bs_value_nil;
 }
 
 // Bit
@@ -1509,11 +1506,13 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     }
 
     {
-        Bs_Table *process = bs_table_new(bs);
-        bs_add_fn(bs, process, "kill", "process.kill", bs_process_kill);
-        bs_add_fn(bs, process, "wait", "process.wait", bs_process_wait);
-        bs_add_fn(bs, process, "spawn", "process.spawn", bs_process_spawn);
-        bs_global_set(bs, Bs_Sv_Static("process"), bs_value_object(process));
+        Bs_C_Class *bs_process_class =
+            bs_c_class_new(bs, Bs_Sv_Static("Process"), sizeof(Bs_Process), bs_process_init, NULL);
+
+        bs_c_class_add(bs, bs_process_class, Bs_Sv_Static("kill"), bs_process_kill);
+        bs_c_class_add(bs, bs_process_class, Bs_Sv_Static("wait"), bs_process_wait);
+
+        bs_global_set(bs, Bs_Sv_Static("Process"), bs_value_object(bs_process_class));
     }
 
     {
