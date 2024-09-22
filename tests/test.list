@@ -118,6 +118,8 @@
 ../bin/bs oop/with_init.bsx
 ../bin/bs oop/without_init.bs
 ../bin/bs oop/without_init.bsx
+../bin/bs oop/inheritance.bs
+../bin/bs oop/inheritance.bsx
 ../bin/bs invokation/chain.bs
 ../bin/bs invokation/error_call_invalid_container.bs
 ../bin/bs invokation/error_call_invalid_key.bs

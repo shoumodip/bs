@@ -1,4 +1,4 @@
-:i count 141
+:i count 143
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -1402,6 +1402,48 @@ Hello, John Doe!
 :i returncode 0
 :b stdout 3
 69
+
+:b stderr 0
+
+:b shell 28
+../bin/bs oop/inheritance.bs
+:i returncode 0
+:b stdout 613
+[Joe] Created new bank account with balance 69
+[Joe] Deposited 420. New balance: 489
+[Joe] Withdrew 69. New balance: 420
+[Bob] Created new bank account with balance 420
+[Bob] Switched to savings account with interest rate 0.07
+[Bob] Deposited 69. New balance: 489
+[Bob] Applied 7% interest. New balance: 523.23
+[Bob] Withdrew 420. New balance: 103.23
+[Alice] Created new bank account with balance 420
+[Alice] Switched to checking account with overdraft limit 420
+[Alice] Deposited 69. New balance: 489
+[Alice] Withdrew 420. New balance: 69
+[Alice] Withdrew 420. New balance: -351
+[Alice] Overdraft limit exceeded
+
+:b stderr 0
+
+:b shell 29
+../bin/bs oop/inheritance.bsx
+:i returncode 0
+:b stdout 613
+[Joe] Created new bank account with balance 69
+[Joe] Deposited 420. New balance: 489
+[Joe] Withdrew 69. New balance: 420
+[Bob] Created new bank account with balance 420
+[Bob] Switched to savings account with interest rate 0.07
+[Bob] Deposited 69. New balance: 489
+[Bob] Applied 7% interest. New balance: 523.23
+[Bob] Withdrew 420. New balance: 103.23
+[Alice] Created new bank account with balance 420
+[Alice] Switched to checking account with overdraft limit 420
+[Alice] Deposited 69. New balance: 489
+[Alice] Withdrew 420. New balance: 69
+[Alice] Withdrew 420. New balance: -351
+[Alice] Overdraft limit exceeded
 
 :b stderr 0
 
