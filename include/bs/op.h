@@ -23,6 +23,7 @@ typedef enum {
 
     BS_OP_INHERIT,
     BS_OP_SUPER_GET,
+    BS_OP_SUPER_INVOKE,
 
     BS_OP_ADD,
     BS_OP_SUB,

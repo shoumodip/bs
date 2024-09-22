@@ -1423,7 +1423,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 60, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 61, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const size_t frames_count_save = bs->frames.count;
@@ -1626,7 +1626,6 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             assert(this.type == BS_VALUE_OBJECT && this.as.object->type == BS_OBJECT_INSTANCE);
 
             Bs_Class *superclass = (Bs_Class *)super.as.object;
-            Bs_Instance *instance = (Bs_Instance *)this.as.object;
 
             Bs_Value value;
             if (bs_map_get(bs, &superclass->methods, name, &value)) {
@@ -1635,6 +1634,25 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 value = bs_value_nil;
             }
             bs_stack_set(bs, 0, value);
+        } break;
+
+        case BS_OP_SUPER_INVOKE: {
+            const Bs_Value name = bs_chunk_read_const(bs);
+            const size_t arity = *bs->frame->ip++;
+
+            const Bs_Value super = bs_stack_pop(bs);
+            assert(super.type == BS_VALUE_OBJECT && super.as.object->type == BS_OBJECT_CLASS);
+
+            const Bs_Value this = bs_stack_peek(bs, arity);
+            assert(this.type == BS_VALUE_OBJECT && this.as.object->type == BS_OBJECT_INSTANCE);
+
+            Bs_Class *superclass = (Bs_Class *)super.as.object;
+
+            Bs_Value method;
+            if (!bs_map_get(bs, &superclass->methods, name, &method)) {
+                method = bs_value_nil;
+            }
+            bs_call_value(bs, 1, method, arity);
         } break;
 
         case BS_OP_ADD: {
@@ -2072,6 +2090,9 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input) {
     bs->ok = true;
     bs->exit = -1;
+
+    // TODO: set some flag that checks whether bs_run() has been called yet.
+    // Basically don't allow bs_call() to be used if bs_run() hasn't been called
     if (setjmp(bs->unwind)) {
         goto end;
     }

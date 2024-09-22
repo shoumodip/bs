@@ -531,8 +531,8 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             const Bs_Op op_get = c->chunk->data[c->chunk->last];
             const Bs_Op op_set = bs_op_get_to_set(op_get);
             if (op_set == BS_OP_RET && op_get != BS_OP_CALL && op_get != BS_OP_INVOKE &&
-                op_get != BS_OP_IMPORT && op_get != BS_OP_LTHIS && op_get != BS_OP_UTHIS &&
-                op_get != BS_OP_ISET_CHAIN) {
+                op_get != BS_OP_SUPER_INVOKE && op_get != BS_OP_IMPORT && op_get != BS_OP_LTHIS &&
+                op_get != BS_OP_UTHIS && op_get != BS_OP_ISET_CHAIN) {
                 bs_compile_error_unexpected(c, &token);
             }
 
@@ -674,11 +674,22 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
             Bs_Loc locs[2];
             size_t call_const_index = 0;
+            size_t super_const_index = 0;
             if (op_get == BS_OP_IGET_CONST) {
                 call_const_index = *(size_t *)&c->chunk->data[c->chunk->last + 1];
                 c->chunk->count = c->chunk->last;
 
                 locs[1] = c->chunk->locations.data[--c->chunk->locations.count].loc;
+                locs[0] = c->chunk->locations.data[--c->chunk->locations.count].loc;
+            } else if (op_get == BS_OP_SUPER_GET) {
+                call_const_index = *(size_t *)&c->chunk->data[c->chunk->last + 1];
+
+                assert(c->chunk->last > 1 + sizeof(size_t));
+                c->chunk->count = c->chunk->last - 1 - sizeof(size_t);
+
+                assert(c->chunk->data[c->chunk->count] == BS_OP_UTHIS);
+                super_const_index = *(size_t *)&c->chunk->data[c->chunk->count + 1];
+
                 locs[0] = c->chunk->locations.data[--c->chunk->locations.count].loc;
             }
 
@@ -714,6 +725,12 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
                 bs_chunk_push_op_loc(c->bs, c->chunk, locs[0]);
                 bs_chunk_push_op_loc(c->bs, c->chunk, locs[1]);
+            } else if (op_get == BS_OP_SUPER_GET) {
+                bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_UTHIS, super_const_index);
+                bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_SUPER_INVOKE, call_const_index);
+                bs_da_push(c->bs, c->chunk, arity);
+
+                bs_chunk_push_op_loc(c->bs, c->chunk, locs[0]);
             } else {
                 bs_chunk_push_op(c->bs, c->chunk, BS_OP_CALL);
                 bs_da_push(c->bs, c->chunk, arity);
@@ -730,8 +747,8 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             const Bs_Op op_get = c->chunk->data[c->chunk->last];
             const Bs_Op op_set = bs_op_get_to_set(op_get);
             if (op_set == BS_OP_RET && op_get != BS_OP_CALL && op_get != BS_OP_INVOKE &&
-                op_get != BS_OP_IMPORT && op_get != BS_OP_LTHIS && op_get != BS_OP_UTHIS &&
-                op_get != BS_OP_ISET_CHAIN) {
+                op_get != BS_OP_SUPER_INVOKE && op_get != BS_OP_IMPORT && op_get != BS_OP_LTHIS &&
+                op_get != BS_OP_UTHIS && op_get != BS_OP_ISET_CHAIN) {
                 bs_compile_error_unexpected(c, &token);
             }
 
