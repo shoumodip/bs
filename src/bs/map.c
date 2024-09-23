@@ -77,17 +77,12 @@ void bs_map_free(Bs *bs, Bs_Map *m) {
 }
 
 bool bs_map_remove(Bs *bs, Bs_Map *m, Bs_Value key) {
-    if (!m->count) {
+    if (!m->length) {
         return false;
     }
 
     Bs_Entry *entry = bs_entries_find(m->data, m->capacity, key);
-    if (!entry) {
-        return false;
-    }
-
-    if (entry->key.type == BS_VALUE_NIL && entry->value.type == BS_VALUE_BOOL &&
-        entry->value.as.boolean == true) {
+    if (!entry || entry->key.type == BS_VALUE_NIL) {
         return false;
     }
 
@@ -98,7 +93,7 @@ bool bs_map_remove(Bs *bs, Bs_Map *m, Bs_Value key) {
 }
 
 bool bs_map_get(Bs *bs, Bs_Map *m, Bs_Value key, Bs_Value *value) {
-    if (!m->count) {
+    if (!m->length) {
         return false;
     }
 

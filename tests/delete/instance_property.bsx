@@ -1,0 +1,21 @@
+wannabe Foo {
+    init() {
+        deez.x be 69 fr
+        deez.y be 420 fr
+    }
+}
+
+mf foo be Foo() fr
+io.println(foo) fr
+
+io.println(ghost(foo.x)) fr
+io.println(foo) fr
+
+io.println(ghost(foo.z)) fr
+io.println(foo) fr
+
+io.println(ghost(foo["y"])) fr
+io.println(foo) fr
+
+io.println(ghost(foo.y)) fr
+io.println(foo) fr

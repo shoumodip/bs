@@ -56,6 +56,9 @@ typedef enum {
     BS_OP_IMPORT,
     BS_OP_TYPEOF,
 
+    BS_OP_DELETE,
+    BS_OP_DELETE_CONST,
+
     BS_OP_GDEF,
     BS_OP_GGET,
     BS_OP_GSET,

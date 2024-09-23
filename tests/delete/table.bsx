@@ -1,0 +1,17 @@
+mf xs be {
+    foo be 69,
+    bar be 420
+} fr
+io.println(xs) fr
+
+io.println(ghost(xs.foo)) fr
+io.println(xs) fr
+
+io.println(ghost(xs["baz"])) fr
+io.println(xs) fr
+
+io.println(ghost(xs["bar"])) fr
+io.println(xs) fr
+
+io.println(ghost(xs.foo)) fr
+io.println(xs) fr

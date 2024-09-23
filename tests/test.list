@@ -155,3 +155,17 @@
 ../bin/bs invokation/native_call.bsx
 ../bin/bs invokation/property_call.bs
 ../bin/bs invokation/property_call.bsx
+../bin/bs delete/error_cannot_delete_super.bs
+../bin/bs delete/error_cannot_delete_super.bsx
+../bin/bs delete/error_expected_index_expression.bs
+../bin/bs delete/error_expected_index_expression.bsx
+../bin/bs delete/error_invalid_container.bs
+../bin/bs delete/error_invalid_container.bsx
+../bin/bs delete/error_invalid_instance_property.bs
+../bin/bs delete/error_invalid_instance_property.bsx
+../bin/bs delete/error_invalid_table_key.bs
+../bin/bs delete/error_invalid_table_key.bsx
+../bin/bs delete/instance_property.bs
+../bin/bs delete/instance_property.bsx
+../bin/bs delete/table.bs
+../bin/bs delete/table.bsx

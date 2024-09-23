@@ -1,0 +1,17 @@
+var xs = {
+    foo = 69,
+    bar = 420
+};
+io.println(xs);
+
+io.println(delete(xs.foo));
+io.println(xs);
+
+io.println(delete(xs["baz"]));
+io.println(xs);
+
+io.println(delete(xs["bar"]));
+io.println(xs);
+
+io.println(delete(xs.foo));
+io.println(xs);

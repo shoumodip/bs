@@ -1,0 +1,6 @@
+wannabe B {}
+wannabe A < B {
+    foo() {
+        ghost(franky.foo) fr
+    }
+}

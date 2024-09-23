@@ -1,4 +1,4 @@
-:i count 157
+:i count 171
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -1746,6 +1746,192 @@ Hello, world!
 :i returncode 0
 :b stdout 14
 Hello, world!
+
+:b stderr 0
+
+:b shell 45
+../bin/bs delete/error_cannot_delete_super.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 78
+delete/error_cannot_delete_super.bs:4:16: error: cannot use 'delete' on super
+
+:b shell 46
+../bin/bs delete/error_cannot_delete_super.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 79
+delete/error_cannot_delete_super.bsx:4:15: error: cannot use 'ghost' on franky
+
+:b shell 51
+../bin/bs delete/error_expected_index_expression.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 199
+delete/error_expected_index_expression.bs:2:8: error: expected index expression
+
+Index expression can be any of the following
+
+```
+xs.foo;    # Constant index
+xs["bar"]; # Expression based index
+```
+
+:b shell 52
+../bin/bs delete/error_expected_index_expression.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 200
+delete/error_expected_index_expression.bsx:2:7: error: expected index expression
+
+Index expression can be any of the following
+
+```
+xs.foo;    # Constant index
+xs["bar"]; # Expression based index
+```
+
+:b shell 43
+../bin/bs delete/error_invalid_container.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 78
+delete/error_invalid_container.bs:2:9: error: cannot delete from number value
+
+:b shell 44
+../bin/bs delete/error_invalid_container.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 79
+delete/error_invalid_container.bsx:2:8: error: cannot delete from number value
+
+:b shell 51
+../bin/bs delete/error_invalid_instance_property.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 93
+delete/error_invalid_instance_property.bs:2:13: error: cannot use 'nil' as instance property
+
+:b shell 52
+../bin/bs delete/error_invalid_instance_property.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 95
+delete/error_invalid_instance_property.bsx:2:12: error: cannot use 'bruh' as instance property
+
+:b shell 43
+../bin/bs delete/error_invalid_table_key.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 77
+delete/error_invalid_table_key.bs:2:10: error: cannot use 'nil' as table key
+
+:b shell 44
+../bin/bs delete/error_invalid_table_key.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 78
+delete/error_invalid_table_key.bsx:2:9: error: cannot use 'bruh' as table key
+
+:b shell 37
+../bin/bs delete/instance_property.bs
+:i returncode 0
+:b stdout 108
+Foo {
+    x = 69,
+    y = 420
+}
+true
+Foo {
+    y = 420
+}
+false
+Foo {
+    y = 420
+}
+true
+Foo {}
+false
+Foo {}
+
+:b stderr 0
+
+:b shell 38
+../bin/bs delete/instance_property.bsx
+:i returncode 0
+:b stdout 106
+Foo {
+    x = 69,
+    y = 420
+}
+nocap
+Foo {
+    y = 420
+}
+cap
+Foo {
+    y = 420
+}
+nocap
+Foo {}
+cap
+Foo {}
+
+:b stderr 0
+
+:b shell 25
+../bin/bs delete/table.bs
+:i returncode 0
+:b stdout 96
+{
+    bar = 420,
+    foo = 69
+}
+true
+{
+    bar = 420
+}
+false
+{
+    bar = 420
+}
+true
+{}
+false
+{}
+
+:b stderr 0
+
+:b shell 26
+../bin/bs delete/table.bsx
+:i returncode 0
+:b stdout 94
+{
+    bar = 420,
+    foo = 69
+}
+nocap
+{
+    bar = 420
+}
+cap
+{
+    bar = 420
+}
+nocap
+{}
+cap
+{}
 
 :b stderr 0
 

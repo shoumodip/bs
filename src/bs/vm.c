@@ -1416,7 +1416,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 62, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 64, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const size_t frames_count_save = bs->frames.count;
@@ -1967,6 +1967,98 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         case BS_OP_TYPEOF: {
             const char *name = bs_value_type_name(bs_stack_peek(bs, 0), bs->frame->extended);
             bs_stack_set(bs, 0, bs_value_object(bs_str_new(bs, bs_sv_from_cstr(name))));
+        } break;
+
+        case BS_OP_DELETE: {
+            const Bs_Value index = bs_stack_pop(bs);
+            const Bs_Value container = bs_stack_pop(bs);
+
+            if (container.type != BS_VALUE_OBJECT) {
+                bs_error(
+                    bs,
+                    "cannot delete from %s value",
+                    bs_value_type_name(container, bs->frame->extended));
+            }
+
+            Bs_Map *map = map;
+            const char *label = NULL;
+
+            switch (container.as.object->type) {
+            case BS_OBJECT_TABLE:
+                map = &((Bs_Table *)container.as.object)->map;
+                label = "table key";
+                break;
+
+            case BS_OBJECT_INSTANCE:
+                map = &((Bs_Instance *)container.as.object)->properties;
+                label = "instance property";
+                break;
+
+            default:
+                bs_error(
+                    bs,
+                    "cannot delete from %s value",
+                    bs_value_type_name(container, bs->frame->extended));
+            }
+
+            assert(map);
+            assert(label);
+
+            if (index.type == BS_VALUE_NIL) {
+                bs_error(
+                    bs,
+                    "cannot use '%s' as %s",
+                    bs_value_type_name(index, bs->frame->extended),
+                    label);
+            }
+
+            bs_stack_push(bs, bs_value_bool(bs_map_remove(bs, map, index)));
+        } break;
+
+        case BS_OP_DELETE_CONST: {
+            const Bs_Value index = bs_chunk_read_const(bs);
+            const Bs_Value container = bs_stack_pop(bs);
+
+            if (container.type != BS_VALUE_OBJECT) {
+                bs_error(
+                    bs,
+                    "cannot delete from %s value",
+                    bs_value_type_name(container, bs->frame->extended));
+            }
+
+            Bs_Map *map = map;
+            const char *label = NULL;
+
+            switch (container.as.object->type) {
+            case BS_OBJECT_TABLE:
+                map = &((Bs_Table *)container.as.object)->map;
+                label = "table key";
+                break;
+
+            case BS_OBJECT_INSTANCE:
+                map = &((Bs_Instance *)container.as.object)->properties;
+                label = "instance property";
+                break;
+
+            default:
+                bs_error(
+                    bs,
+                    "cannot delete from %s value",
+                    bs_value_type_name(container, bs->frame->extended));
+            }
+
+            assert(map);
+            assert(label);
+
+            if (index.type == BS_VALUE_NIL) {
+                bs_error(
+                    bs,
+                    "cannot use '%s' as %s",
+                    bs_value_type_name(index, bs->frame->extended),
+                    label);
+            }
+
+            bs_stack_push(bs, bs_value_bool(bs_map_remove(bs, map, index)));
         } break;
 
         case BS_OP_GDEF: {

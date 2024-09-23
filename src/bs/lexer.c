@@ -105,7 +105,7 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc) {
     return token;
 }
 
-static_assert(BS_COUNT_TOKENS == 60, "Update bs_lexer_next()");
+static_assert(BS_COUNT_TOKENS == 61, "Update bs_lexer_next()");
 Bs_Token bs_lexer_next(Bs_Lexer *l) {
     if (l->peeked) {
         l->peeked = false;
@@ -212,6 +212,8 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
                 token.type = BS_TOKEN_LNOT;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("thicc"))) {
                 token.type = BS_TOKEN_LEN;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("ghost"))) {
+                token.type = BS_TOKEN_DELETE;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("redpill"))) {
                 token.type = BS_TOKEN_IMPORT;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("vibeof"))) {
@@ -260,6 +262,8 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
                 token.type = BS_TOKEN_FALSE;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("len"))) {
                 token.type = BS_TOKEN_LEN;
+            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("delete"))) {
+                token.type = BS_TOKEN_DELETE;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("import"))) {
                 token.type = BS_TOKEN_IMPORT;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("typeof"))) {
