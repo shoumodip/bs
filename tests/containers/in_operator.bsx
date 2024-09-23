@@ -1,0 +1,33 @@
+{
+    mf xs be {
+        foo be 69,
+        bar be 420
+    } fr
+
+    io.println("foo" amongus xs) fr
+    io.println("bar" amongus xs) fr
+    io.println("lmao" amongus xs) fr
+}
+
+{
+    wannabe Foo {
+        init() {
+            deez.bar be 69 fr
+        }
+
+        foo() {}
+    }
+
+    io.println("foo" amongus Foo) fr
+    io.println("bar" amongus Foo) fr
+
+    mf foo be Foo() fr
+    io.println("foo" amongus foo) fr
+    io.println("bar" amongus foo) fr
+    io.println("lmao" amongus foo) fr
+}
+
+{
+    io.println("write" amongus Bytes) fr
+    io.println("lmao" amongus Bytes) fr
+}

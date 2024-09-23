@@ -19,6 +19,7 @@ typedef enum {
 static_assert(BS_COUNT_TOKENS == 60, "Update bs_token_type_power()");
 static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     switch (type) {
+    case BS_TOKEN_IN:
     case BS_TOKEN_DOT:
     case BS_TOKEN_LPAREN:
     case BS_TOKEN_LBRACKET:
@@ -805,6 +806,12 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
                 bs_chunk_push_op_loc(c->bs, c->chunk, locs[1]);
             }
         } break;
+
+        case BS_TOKEN_IN:
+            bs_compile_expr(c, lbp);
+            bs_chunk_push_op(c->bs, c->chunk, BS_OP_IN);
+            bs_chunk_push_op_loc(c->bs, c->chunk, loc);
+            break;
 
         default:
             assert(false && "unreachable");

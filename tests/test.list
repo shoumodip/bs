@@ -48,6 +48,12 @@
 ../bin/bs containers/error_invalid_container_assign.bsx
 ../bin/bs containers/error_invalid_container_const_assign.bs
 ../bin/bs containers/error_invalid_container_const_assign.bsx
+../bin/bs containers/in_operator.bs
+../bin/bs containers/in_operator.bsx
+../bin/bs containers/error_in_operator_invalid_container.bs
+../bin/bs containers/error_in_operator_invalid_container.bsx
+../bin/bs containers/error_in_operator_invalid_index.bs
+../bin/bs containers/error_in_operator_invalid_index.bsx
 ../bin/bs import/main.bs
 ../bin/bs import/main.bsx
 ../bin/bs import/only_once.bs

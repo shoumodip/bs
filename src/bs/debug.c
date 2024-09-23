@@ -29,7 +29,7 @@ bs_debug_op_invoke(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset, cons
     bs_fmt(p->writer, "'\n");
 }
 
-static_assert(BS_COUNT_OPS == 61, "Update bs_debug_op()");
+static_assert(BS_COUNT_OPS == 62, "Update bs_debug_op()");
 void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
     bs_fmt(p->writer, "%04zu ", *offset);
 
@@ -205,6 +205,10 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
 
     case BS_OP_NE:
         bs_fmt(p->writer, "OP_NE\n");
+        break;
+
+    case BS_OP_IN:
+        bs_fmt(p->writer, "OP_IN\n");
         break;
 
     case BS_OP_LEN:

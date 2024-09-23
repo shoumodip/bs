@@ -107,7 +107,9 @@ bool bs_map_get(Bs *bs, Bs_Map *m, Bs_Value key, Bs_Value *value) {
         return false;
     }
 
-    *value = entry->value;
+    if (value) {
+        *value = entry->value;
+    }
     return true;
 }
 

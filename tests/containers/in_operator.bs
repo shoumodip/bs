@@ -1,0 +1,33 @@
+{
+    var xs = {
+        foo = 69,
+        bar = 420
+    };
+
+    io.println("foo" in xs);
+    io.println("bar" in xs);
+    io.println("lmao" in xs);
+}
+
+{
+    class Foo {
+        init() {
+            this.bar = 69;
+        }
+
+        foo() {}
+    }
+
+    io.println("foo" in Foo);
+    io.println("bar" in Foo);
+
+    var foo = Foo();
+    io.println("foo" in foo);
+    io.println("bar" in foo);
+    io.println("lmao" in foo);
+}
+
+{
+    io.println("write" in Bytes);
+    io.println("lmao" in Bytes);
+}

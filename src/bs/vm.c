@@ -1410,7 +1410,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 61, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 62, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const size_t frames_count_save = bs->frames.count;
@@ -1839,6 +1839,66 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value b = bs_stack_pop(bs);
             const Bs_Value a = bs_stack_pop(bs);
             bs_stack_push(bs, bs_value_bool(!bs_value_equal(a, b)));
+        } break;
+
+        case BS_OP_IN: {
+            const Bs_Value container = bs_stack_pop(bs);
+            const Bs_Value key = bs_stack_pop(bs);
+
+            if (container.type != BS_VALUE_OBJECT) {
+                bs_error(
+                    bs,
+                    "cannot index into %s value",
+                    bs_value_type_name(container, bs->frame->extended));
+            }
+
+            Bs_Map *map = NULL;
+            const char *label = NULL;
+
+            switch (container.as.object->type) {
+            case BS_OBJECT_TABLE:
+                map = &((Bs_Table *)container.as.object)->map;
+                label = "table key";
+                break;
+
+            case BS_OBJECT_CLASS:
+                map = &((Bs_Class *)container.as.object)->methods;
+                label = "class method";
+                break;
+
+            case BS_OBJECT_INSTANCE:
+                map = &((Bs_Instance *)container.as.object)->fields;
+                label = "instance property";
+                break;
+
+            case BS_OBJECT_C_CLASS:
+                map = &((Bs_C_Class *)container.as.object)->methods;
+                label = "class method";
+                break;
+
+            case BS_OBJECT_C_LIB:
+                map = &((Bs_C_Lib *)container.as.object)->map;
+                label = "library symbol";
+                break;
+
+            default:
+                bs_error(
+                    bs,
+                    "cannot index into %s value",
+                    bs_value_type_name(container, bs->frame->extended));
+            }
+
+            if (key.type == BS_VALUE_NIL) {
+                assert(label);
+                bs_error(
+                    bs,
+                    "cannot use '%s' as %s",
+                    bs_value_type_name(key, bs->frame->extended),
+                    label);
+            }
+
+            assert(map);
+            bs_stack_push(bs, bs_value_bool(bs_map_get(bs, map, key, NULL)));
         } break;
 
         case BS_OP_LEN: {

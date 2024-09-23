@@ -1,4 +1,4 @@
-:i count 143
+:i count 149
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -618,6 +618,72 @@ containers/error_invalid_container_const_assign.bs:2:2: error: cannot take mutab
 
 :b stderr 108
 containers/error_invalid_container_const_assign.bsx:2:2: error: cannot take mutable index into number value
+
+:b shell 35
+../bin/bs containers/in_operator.bs
+:i returncode 0
+:b stdout 55
+true
+true
+false
+true
+false
+false
+true
+false
+true
+false
+
+:b stderr 0
+
+:b shell 36
+../bin/bs containers/in_operator.bsx
+:i returncode 0
+:b stdout 50
+nocap
+nocap
+cap
+nocap
+cap
+cap
+nocap
+cap
+nocap
+cap
+
+:b stderr 0
+
+:b shell 59
+../bin/bs containers/error_in_operator_invalid_container.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 93
+containers/error_in_operator_invalid_container.bs:1:4: error: cannot index into number value
+
+:b shell 60
+../bin/bs containers/error_in_operator_invalid_container.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 94
+containers/error_in_operator_invalid_container.bsx:1:4: error: cannot index into number value
+
+:b shell 55
+../bin/bs containers/error_in_operator_invalid_index.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 88
+containers/error_in_operator_invalid_index.bs:1:5: error: cannot use 'nil' as table key
+
+:b shell 56
+../bin/bs containers/error_in_operator_invalid_index.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 90
+containers/error_in_operator_invalid_index.bsx:1:6: error: cannot use 'bruh' as table key
 
 :b shell 24
 ../bin/bs import/main.bs
