@@ -261,7 +261,7 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
         } else {
             bs_pretty_printer_push(p, object);
             bs_fmt(p->writer, Bs_Sv_Fmt " ", Bs_Sv_Arg(*instance->class->name));
-            bs_pretty_printer_map(p, &instance->fields);
+            bs_pretty_printer_map(p, &instance->properties);
         }
     } break;
 

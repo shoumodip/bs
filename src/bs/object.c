@@ -138,7 +138,7 @@ Bs_Instance *bs_instance_new(Bs *bs, Bs_Class *class) {
         (Bs_Instance *)bs_object_new(bs, BS_OBJECT_INSTANCE, sizeof(Bs_Instance));
 
     instance->class = class;
-    memset(&instance->fields, '\0', sizeof(instance->fields));
+    memset(&instance->properties, '\0', sizeof(instance->properties));
     return instance;
 }
 

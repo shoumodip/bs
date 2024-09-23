@@ -1,4 +1,4 @@
-:i count 149
+:i count 157
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -494,14 +494,11 @@ arrays/error_invalid_index_const_assign.bsx:2:4: error: expected array index to 
 :b shell 24
 ../bin/bs tables/main.bs
 :i returncode 0
-:b stdout 32
+:b stdout 22
 69
 420
 1337
 3
-nil
-2
-nil
 bar
 foo
 
@@ -510,14 +507,11 @@ foo
 :b shell 25
 ../bin/bs tables/main.bsx
 :i returncode 0
-:b stdout 34
+:b stdout 22
 69
 420
 1337
 3
-bruh
-2
-bruh
 bar
 foo
 
@@ -684,6 +678,54 @@ containers/error_in_operator_invalid_index.bs:1:5: error: cannot use 'nil' as ta
 
 :b stderr 90
 containers/error_in_operator_invalid_index.bsx:1:6: error: cannot use 'bruh' as table key
+
+:b shell 59
+../bin/bs containers/error_undefined_c_instance_property.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 105
+containers/error_undefined_c_instance_property.bs:1:9: error: undefined instance property or method: foo
+
+:b shell 60
+../bin/bs containers/error_undefined_c_instance_property.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 106
+containers/error_undefined_c_instance_property.bsx:1:9: error: undefined instance property or method: foo
+
+:b shell 57
+../bin/bs containers/error_undefined_instance_property.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 103
+containers/error_undefined_instance_property.bs:2:7: error: undefined instance property or method: foo
+
+:b shell 58
+../bin/bs containers/error_undefined_instance_property.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 104
+containers/error_undefined_instance_property.bsx:2:7: error: undefined instance property or method: foo
+
+:b shell 49
+../bin/bs containers/error_undefined_table_key.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 77
+containers/error_undefined_table_key.bs:5:4: error: undefined table key: bar
+
+:b shell 50
+../bin/bs containers/error_undefined_table_key.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 78
+containers/error_undefined_table_key.bsx:5:4: error: undefined table key: bar
 
 :b shell 24
 ../bin/bs import/main.bs
@@ -1512,6 +1554,24 @@ Hello, John Doe!
 [Alice] Overdraft limit exceeded
 
 :b stderr 0
+
+:b shell 45
+../bin/bs oop/error_undefined_super_method.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 125
+oop/error_undefined_super_method.bs:4:15: error: undefined super method: foo
+oop/error_undefined_super_method.bs:8:2: in A()
+
+:b shell 46
+../bin/bs oop/error_undefined_super_method.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 128
+oop/error_undefined_super_method.bsx:4:16: error: undefined franky method: foo
+oop/error_undefined_super_method.bsx:8:2: in A()
 
 :b shell 29
 ../bin/bs invokation/chain.bs

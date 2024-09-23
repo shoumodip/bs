@@ -1,0 +1,8 @@
+class B {}
+class A < B {
+    init() {
+        super.foo();
+    }
+}
+
+A();

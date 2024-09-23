@@ -158,7 +158,7 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
 
     case BS_OBJECT_INSTANCE: {
         Bs_Instance *instance = (Bs_Instance *)object;
-        bs_map_free(bs, &instance->fields);
+        bs_map_free(bs, &instance->properties);
         bs_realloc(bs, instance, sizeof(*instance), 0);
     } break;
 
@@ -295,7 +295,7 @@ static void bs_blacken_object(Bs *bs, Bs_Object *object) {
     case BS_OBJECT_INSTANCE: {
         Bs_Instance *instance = (Bs_Instance *)object;
         bs_mark_object(bs, (Bs_Object *)instance->class);
-        bs_mark_map(bs, &instance->fields);
+        bs_mark_map(bs, &instance->properties);
     } break;
 
     case BS_OBJECT_C_CLASS: {
@@ -1255,18 +1255,54 @@ static void bs_import(Bs *bs) {
     }
 }
 
-static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
-    Bs_Value value;
+static Bs_Value
+bs_check_map_get_at(Bs *bs, size_t location, Bs_Map *map, Bs_Value index, const char *label) {
+    if (index.type == BS_VALUE_NIL) {
+        bs_error_at(
+            bs,
+            location,
+            "cannot use '%s' as %s",
+            bs_value_type_name(index, bs->frame->extended),
+            label);
+    }
 
+    Bs_Value value;
+    if (!bs_map_get(bs, map, index, &value)) {
+        Bs_Buffer *b = &bs->config.buffer;
+        const size_t start = b->count;
+
+        Bs_Writer w = bs_buffer_writer(b);
+        if (index.type == BS_VALUE_NUM || index.type == BS_VALUE_BOOL) {
+            bs_value_write(bs, &w, index);
+        } else if (index.type == BS_VALUE_OBJECT) {
+            if (index.as.object->type == BS_OBJECT_STR) {
+                bs_value_write(bs, &w, index);
+            } else {
+                bs_fmt(&w, "<%s %p>", bs_object_type_name(index.as.object->type), index.as.object);
+            }
+        } else {
+            assert(false && "unreachable");
+        }
+
+        const Bs_Sv sv = {b->data + start, b->count - start};
+        bs_error_at(bs, location, "undefined %s: " Bs_Sv_Fmt, label, Bs_Sv_Arg(sv));
+    }
+
+    return value;
+}
+
+static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
     if (container.type != BS_VALUE_OBJECT) {
         bs_error(
             bs, "cannot index into %s value", bs_value_type_name(container, bs->frame->extended));
     }
 
+    // The only non mapped container
     if (container.as.object->type == BS_OBJECT_ARRAY) {
         bs_check_whole_number_at(bs, 1, index, "array index");
-
         Bs_Array *array = (Bs_Array *)container.as.object;
+
+        Bs_Value value;
         if (!bs_array_get(bs, array, index.as.number, &value)) {
             bs_error(
                 bs,
@@ -1274,69 +1310,49 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
                 (size_t)index.as.number,
                 array->count);
         }
-    } else if (container.as.object->type == BS_OBJECT_TABLE) {
-        if (index.type == BS_VALUE_NIL) {
-            bs_error_at(
-                bs,
-                1,
-                "cannot use '%s' as table key",
-                bs_value_type_name(index, bs->frame->extended));
-        }
 
-        if (!bs_table_get(bs, (Bs_Table *)container.as.object, index, &value)) {
-            value = bs_value_nil;
-        }
-    } else if (container.as.object->type == BS_OBJECT_INSTANCE) {
-        if (index.type == BS_VALUE_NIL) {
-            bs_error_at(
-                bs,
-                1,
-                "cannot use '%s' as instance property",
-                bs_value_type_name(index, bs->frame->extended));
-        }
+        return value;
+    }
 
+    Bs_Map *map = NULL;
+    const char *label = NULL;
+
+    switch (container.as.object->type) {
+    case BS_OBJECT_TABLE:
+        map = &((Bs_Table *)container.as.object)->map;
+        label = "table key";
+        break;
+
+    case BS_OBJECT_INSTANCE: {
         Bs_Instance *instance = (Bs_Instance *)container.as.object;
-        if (!bs_map_get(bs, &instance->fields, index, &value)) {
-            if (bs_map_get(bs, &instance->class->methods, index, &value)) {
-                value = bs_value_object(bs_bound_method_new(bs, container, value));
-            } else {
-                value = bs_value_nil;
-            }
-        }
-    } else if (container.as.object->type == BS_OBJECT_C_INSTANCE) {
-        if (index.type == BS_VALUE_NIL) {
-            bs_error_at(
-                bs,
-                1,
-                "cannot use '%s' as instance property",
-                bs_value_type_name(index, bs->frame->extended));
-        }
 
-        Bs_C_Instance *instance = (Bs_C_Instance *)container.as.object;
+        Bs_Value value;
         if (bs_map_get(bs, &instance->class->methods, index, &value)) {
-            value = bs_value_object(bs_bound_method_new(bs, container, value));
-        } else {
-            value = bs_value_nil;
-        }
-    } else if (container.as.object->type == BS_OBJECT_C_LIB) {
-        bs_check_object_type_at(bs, 1, index, BS_OBJECT_STR, "library symbol name");
-
-        Bs_Str *name = (Bs_Str *)index.as.object;
-        if (!name->size) {
-            bs_error_at(bs, 1, "library symbol name cannot be empty");
+            return bs_value_object(bs_bound_method_new(bs, container, value));
         }
 
-        Bs_C_Lib *c = (Bs_C_Lib *)container.as.object;
-        if (!bs_map_get(bs, &c->map, index, &value)) {
-            bs_error_at(
-                bs, 1, "undefined symbol '" Bs_Sv_Fmt "' in native library", Bs_Sv_Arg(*name));
-        }
-    } else {
+        map = &instance->properties;
+        label = "instance property or method";
+    } break;
+
+    case BS_OBJECT_C_INSTANCE:
+        map = &((Bs_C_Instance *)container.as.object)->class->methods;
+        label = "instance property or method";
+        break;
+
+    case BS_OBJECT_C_LIB:
+        map = &((Bs_C_Lib *)container.as.object)->map;
+        label = "library symbol";
+        break;
+
+    default:
         bs_error(
             bs, "cannot index into %s value", bs_value_type_name(container, bs->frame->extended));
     }
 
-    return value;
+    assert(map);
+    assert(label);
+    return bs_check_map_get_at(bs, 1, map, index, label);
 }
 
 static void bs_container_set(Bs *bs, Bs_Value container, Bs_Value index, Bs_Value value) {
@@ -1359,12 +1375,7 @@ static void bs_container_set(Bs *bs, Bs_Value container, Bs_Value index, Bs_Valu
                 bs_value_type_name(index, bs->frame->extended));
         }
 
-        Bs_Table *table = (Bs_Table *)container.as.object;
-        if (value.type == BS_VALUE_NIL) {
-            bs_table_remove(bs, table, index);
-        } else {
-            bs_table_set(bs, table, index, value);
-        }
+        bs_table_set(bs, (Bs_Table *)container.as.object, index, value);
     } else if (container.as.object->type == BS_OBJECT_INSTANCE) {
         if (index.type == BS_VALUE_NIL) {
             bs_error_at(
@@ -1374,12 +1385,7 @@ static void bs_container_set(Bs *bs, Bs_Value container, Bs_Value index, Bs_Valu
                 bs_value_type_name(index, bs->frame->extended));
         }
 
-        Bs_Instance *instance = (Bs_Instance *)container.as.object;
-        if (value.type == BS_VALUE_NIL) {
-            bs_map_remove(bs, &instance->fields, index);
-        } else {
-            bs_map_set(bs, &instance->fields, index, value);
-        }
+        bs_map_set(bs, &((Bs_Instance *)container.as.object)->properties, index, value);
     } else {
         bs_error(
             bs,
@@ -1542,16 +1548,16 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             if (this.type == BS_VALUE_OBJECT) {
                 if (this.as.object->type == BS_OBJECT_INSTANCE) {
                     Bs_Instance *instance = (Bs_Instance *)this.as.object;
-                    if (bs_map_get(bs, &instance->fields, name, &method)) {
+                    if (bs_map_get(bs, &instance->properties, name, &method)) {
                         bs->stack.data[bs->stack.count - arity - 1] = method;
-                    } else if (!bs_map_get(bs, &instance->class->methods, name, &method)) {
-                        method = bs_value_nil;
+                    } else {
+                        method = bs_check_map_get_at(
+                            bs, 1, &instance->class->methods, name, "instance property or method");
                     }
                 } else if (this.as.object->type == BS_OBJECT_C_INSTANCE) {
                     Bs_C_Instance *instance = (Bs_C_Instance *)this.as.object;
-                    if (!bs_map_get(bs, &instance->class->methods, name, &method)) {
-                        method = bs_value_nil;
-                    }
+                    method = bs_check_map_get_at(
+                        bs, 1, &instance->class->methods, name, "instance property or method");
                 } else {
                     method = bs_container_get(bs, this, name);
                     bs_stack_set(bs, arity, method);
@@ -1614,18 +1620,19 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
             Bs_Class *superclass = (Bs_Class *)super.as.object;
             Bs_Value value;
+
+            const char *label = bs->frame->extended ? "franky method" : "super method";
             if (name.type == BS_VALUE_NIL) {
                 // Requested init()
                 if (superclass->init) {
                     value = bs_value_object(
                         bs_bound_method_new(bs, this, bs_value_object(superclass->init)));
                 } else {
-                    value = bs_value_nil;
+                    bs_error(bs, "undefined %s: init", label);
                 }
-            } else if (bs_map_get(bs, &superclass->methods, name, &value)) {
-                value = bs_value_object(bs_bound_method_new(bs, this, value));
             } else {
-                value = bs_value_nil;
+                value = bs_value_object(bs_bound_method_new(
+                    bs, this, bs_check_map_get_at(bs, 0, &superclass->methods, name, label)));
             }
             bs_stack_set(bs, 0, value);
         } break;
@@ -1642,15 +1649,17 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
             Bs_Class *superclass = (Bs_Class *)super.as.object;
             Bs_Value method;
+
+            const char *label = bs->frame->extended ? "franky method" : "super method";
             if (name.type == BS_VALUE_NIL) {
                 // Requested init()
                 if (superclass->init) {
                     method = bs_value_object(superclass->init);
                 } else {
-                    method = bs_value_nil;
+                    bs_error(bs, "undefined %s: init", label);
                 }
-            } else if (!bs_map_get(bs, &superclass->methods, name, &method)) {
-                method = bs_value_nil;
+            } else {
+                method = bs_check_map_get_at(bs, 0, &superclass->methods, name, label);
             }
             bs_call_value(bs, 1, method, arity);
         } break;
@@ -1867,7 +1876,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 break;
 
             case BS_OBJECT_INSTANCE:
-                map = &((Bs_Instance *)container.as.object)->fields;
+                map = &((Bs_Instance *)container.as.object)->properties;
                 label = "instance property";
                 break;
 
@@ -2102,7 +2111,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 bs_iter_map(bs, offset, &table->map, iterator);
             } else if (container.as.object->type == BS_OBJECT_INSTANCE) {
                 const Bs_Instance *instance = (const Bs_Instance *)container.as.object;
-                bs_iter_map(bs, offset, &instance->fields, iterator);
+                bs_iter_map(bs, offset, &instance->properties, iterator);
             } else {
                 bs_error(
                     bs,

@@ -1,0 +1,5 @@
+var xs = {
+    foo = 69
+};
+
+xs.bar;

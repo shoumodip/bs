@@ -54,6 +54,12 @@
 ../bin/bs containers/error_in_operator_invalid_container.bsx
 ../bin/bs containers/error_in_operator_invalid_index.bs
 ../bin/bs containers/error_in_operator_invalid_index.bsx
+../bin/bs containers/error_undefined_c_instance_property.bs
+../bin/bs containers/error_undefined_c_instance_property.bsx
+../bin/bs containers/error_undefined_instance_property.bs
+../bin/bs containers/error_undefined_instance_property.bsx
+../bin/bs containers/error_undefined_table_key.bs
+../bin/bs containers/error_undefined_table_key.bsx
 ../bin/bs import/main.bs
 ../bin/bs import/main.bsx
 ../bin/bs import/only_once.bs
@@ -126,6 +132,8 @@
 ../bin/bs oop/without_init.bsx
 ../bin/bs oop/inheritance.bs
 ../bin/bs oop/inheritance.bsx
+../bin/bs oop/error_undefined_super_method.bs
+../bin/bs oop/error_undefined_super_method.bsx
 ../bin/bs invokation/chain.bs
 ../bin/bs invokation/error_call_invalid_container.bs
 ../bin/bs invokation/error_call_invalid_key.bs
