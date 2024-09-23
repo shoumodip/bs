@@ -182,14 +182,12 @@ Bs_C_Fn *bs_c_fn_new(Bs *bs, Bs_Sv name, Bs_C_Fn_Ptr ptr) {
     Bs_C_Fn *fn = (Bs_C_Fn *)bs_object_new(bs, BS_OBJECT_C_FN, sizeof(Bs_C_Fn));
     fn->ptr = ptr;
     fn->name = name;
-    fn->library = NULL;
     return fn;
 }
 
-Bs_C_Lib *bs_c_lib_new(Bs *bs, void *data, const Bs_Str *name) {
+Bs_C_Lib *bs_c_lib_new(Bs *bs, void *data) {
     Bs_C_Lib *library = (Bs_C_Lib *)bs_object_new(bs, BS_OBJECT_C_LIB, sizeof(Bs_C_Lib));
     library->data = data;
-    library->name = name;
     memset(&library->map, 0, sizeof(library->map));
     return library;
 }
@@ -198,17 +196,13 @@ void bs_c_lib_add(Bs *bs, Bs_C_Lib *library, Bs_Sv name, Bs_Value value) {
     bs_map_set(bs, &library->map, bs_value_object(bs_str_new(bs, name)), value);
 }
 
-void bs_c_lib_add_fn(Bs *bs, Bs_C_Lib *library, Bs_Sv name, Bs_C_Fn_Ptr ptr) {
-    Bs_C_Fn *fn = bs_c_fn_new(bs, name, ptr);
-    fn->library = library;
-    bs_map_set(bs, &library->map, bs_value_object(bs_str_new(bs, name)), bs_value_object(fn));
-}
-
 void bs_c_lib_add_ffi(Bs *bs, Bs_C_Lib *library, const Bs_FFI *ffi, size_t count) {
     for (size_t i = 0; i < count; i++) {
         const Bs_Sv name = bs_sv_from_cstr(ffi[i].name);
-        Bs_C_Fn *fn = bs_c_fn_new(bs, name, ffi[i].ptr);
-        fn->library = library;
-        bs_map_set(bs, &library->map, bs_value_object(bs_str_new(bs, name)), bs_value_object(fn));
+        bs_map_set(
+            bs,
+            &library->map,
+            bs_value_object(bs_str_new(bs, name)),
+            bs_value_object(bs_c_fn_new(bs, name, ffi[i].ptr)));
     }
 }

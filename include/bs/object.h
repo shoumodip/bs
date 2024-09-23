@@ -171,7 +171,6 @@ struct Bs_C_Fn {
     Bs_Object meta;
     Bs_Sv name;
     Bs_C_Fn_Ptr ptr;
-    const Bs_C_Lib *library; // TODO: remove this useless field
 };
 
 Bs_C_Fn *bs_c_fn_new(Bs *bs, Bs_Sv name, Bs_C_Fn_Ptr ptr);
@@ -179,16 +178,13 @@ Bs_C_Fn *bs_c_fn_new(Bs *bs, Bs_Sv name, Bs_C_Fn_Ptr ptr);
 struct Bs_C_Lib {
     Bs_Object meta;
     void *data;
-    const Bs_Str *name;
-
     Bs_Map map;
 };
 
-Bs_C_Lib *bs_c_lib_new(Bs *bs, void *data, const Bs_Str *name);
+Bs_C_Lib *bs_c_lib_new(Bs *bs, void *data);
 
 // TODO: rename to bs_c_lib_set* for consistency with Map and Table
 void bs_c_lib_add(Bs *bs, Bs_C_Lib *library, Bs_Sv name, Bs_Value value);
-void bs_c_lib_add_fn(Bs *bs, Bs_C_Lib *library, Bs_Sv name, Bs_C_Fn_Ptr ptr);
 void bs_c_lib_add_ffi(Bs *bs, Bs_C_Lib *library, const Bs_FFI *ffi, size_t count);
 
 #endif // BS_OBJECT_H

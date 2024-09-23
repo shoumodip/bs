@@ -317,7 +317,6 @@ static void bs_blacken_object(Bs *bs, Bs_Object *object) {
 
     case BS_OBJECT_C_LIB: {
         Bs_C_Lib *library = ((Bs_C_Lib *)object);
-        bs_mark_object(bs, (Bs_Object *)library->name);
         bs_mark_map(bs, &library->map);
     } break;
 
@@ -791,8 +790,6 @@ void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
                 if (fn != instance->class->init) {
                     bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(instance->class->name));
                 }
-            } else if (fn->library) {
-                bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(*fn->library->name));
             }
 
             bs_fmt(w, Bs_Sv_Fmt "()", Bs_Sv_Arg(fn->name));
@@ -1213,7 +1210,7 @@ static void bs_import(Bs *bs) {
             bs_error(bs, "could not import module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*path));
         }
 
-        Bs_C_Lib *library = bs_c_lib_new(bs, data, path);
+        Bs_C_Lib *library = bs_c_lib_new(bs, data);
         const void (*init)(Bs *, Bs_C_Lib *) = dlsym(data, "bs_library_init");
 
         if (!init) {
@@ -1338,11 +1335,7 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
         Bs_C_Lib *c = (Bs_C_Lib *)container.as.object;
         if (!bs_map_get(bs, &c->map, index, &value)) {
             bs_error_at(
-                bs,
-                1,
-                "symbol '" Bs_Sv_Fmt "' doesn't exist in native library '" Bs_Sv_Fmt "'",
-                Bs_Sv_Arg(*name),
-                Bs_Sv_Arg(*c->name));
+                bs, 1, "undefined symbol '" Bs_Sv_Fmt "' in native library", Bs_Sv_Arg(*name));
         }
     } else {
         bs_error(
