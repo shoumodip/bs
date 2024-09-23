@@ -192,11 +192,11 @@ Bs_C_Lib *bs_c_lib_new(Bs *bs, void *data) {
     return library;
 }
 
-void bs_c_lib_add(Bs *bs, Bs_C_Lib *library, Bs_Sv name, Bs_Value value) {
+void bs_c_lib_set(Bs *bs, Bs_C_Lib *library, Bs_Sv name, Bs_Value value) {
     bs_map_set(bs, &library->map, bs_value_object(bs_str_new(bs, name)), value);
 }
 
-void bs_c_lib_add_ffi(Bs *bs, Bs_C_Lib *library, const Bs_FFI *ffi, size_t count) {
+void bs_c_lib_ffi(Bs *bs, Bs_C_Lib *library, const Bs_FFI *ffi, size_t count) {
     for (size_t i = 0; i < count; i++) {
         const Bs_Sv name = bs_sv_from_cstr(ffi[i].name);
         bs_map_set(
