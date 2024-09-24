@@ -1587,13 +1587,17 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         } break;
 
         case BS_OP_INIT_METHOD: {
+            const bool can_fail = *bs->frame->ip++;
+
             const Bs_Value method = bs_stack_peek(bs, 0);
             assert(method.type == BS_VALUE_OBJECT && method.as.object->type == BS_OBJECT_CLOSURE);
 
-            const Bs_Value class = bs_stack_peek(bs, 1);
-            assert(class.type == BS_VALUE_OBJECT && class.as.object->type == BS_OBJECT_CLASS);
+            const Bs_Value class0 = bs_stack_peek(bs, 1);
+            assert(class0.type == BS_VALUE_OBJECT && class0.as.object->type == BS_OBJECT_CLASS);
 
-            ((Bs_Class *)class.as.object)->init = (Bs_Closure *)method.as.object;
+            Bs_Class *class = (Bs_Class *)class0.as.object;
+            class->init = (Bs_Closure *)method.as.object;
+            class->can_fail = can_fail;
             bs->stack.count--;
         } break;
 

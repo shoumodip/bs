@@ -102,6 +102,7 @@ typedef struct Bs_Class_Compiler Bs_Class_Compiler;
 
 struct Bs_Class_Compiler {
     Bs_Class_Compiler *outer;
+    bool can_fail;
     bool has_super;
 };
 
@@ -1029,6 +1030,7 @@ static void bs_compile_class(Bs_Compiler *c, bool public) {
         if (bs_sv_eq(method.sv, Bs_Sv_Static("init"))) {
             bs_compile_lambda(c, BS_LAMBDA_INIT, &token);
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_INIT_METHOD);
+            bs_da_push(c->bs, c->chunk, c->class->can_fail);
         } else {
             bs_lexer_buffer(&c->lexer, method);
             const_index = bs_compile_definition(c, &method, true);
@@ -1295,16 +1297,47 @@ static void bs_compile_stmt(Bs_Compiler *c) {
             } else {
                 bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
             }
-        } else {
-            if (c->lambda->type == BS_LAMBDA_INIT) {
+        } else if (c->lambda->type == BS_LAMBDA_INIT) {
+            const Bs_Loc loc = token.loc;
+
+            bool ok = false;
+            if (token.type == BS_TOKEN_NIL) {
+                c->lexer.peeked = false;
+                ok = bs_lexer_peek(&c->lexer).type == BS_TOKEN_EOL;
+            }
+
+            if (ok) {
+                c->class->can_fail = true;
+                bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
+            } else {
+                const char *label = bs_token_type_name(BS_TOKEN_NIL, c->lexer.extended);
                 bs_fmt(
                     c->lexer.error,
-                    Bs_Loc_Fmt "error: cannot return values from an initializer method\n",
-                    Bs_Loc_Arg(token.loc));
+                    Bs_Loc_Fmt
+                    "error: can only explicity return %s from an initializer method\n\n"
+                    "When an initializer method explicitly returns %s, it indicates that the\n"
+                    "initialization failed due to some reason, and the site of the "
+                    "instantiation\n"
+                    "gets %s as the result. This is not strictly OOP, but I missed the part "
+                    "where\n"
+                    "that's my problem.\n\n"
+                    "```\n"
+                    "var f = io.Reader(\"does_not_exist.txt\");\n"
+                    "if !f {\n"
+                    "    io.eprintln(\"Error: could not read file!\");\n"
+                    "    os.exit(1);\n"
+                    "}\n"
+                    "\n"
+                    "io.print(f.read()); # Or whatever you want to do\n"
+                    "```\n",
+                    Bs_Loc_Arg(loc),
+                    label,
+                    label,
+                    label);
 
                 bs_lexer_error(&c->lexer);
             }
-
+        } else {
             bs_compile_expr(c, BS_POWER_SET);
         }
 

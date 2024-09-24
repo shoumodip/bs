@@ -122,6 +122,8 @@ struct Bs_Class {
     Bs_Str *name;
     Bs_Map methods;
     Bs_Closure *init;
+
+    bool can_fail;
 };
 
 Bs_Class *bs_class_new(Bs *bs, Bs_Str *name);

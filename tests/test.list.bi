@@ -1366,16 +1366,46 @@ ligma
 :i returncode 1
 :b stdout 0
 
-:b stderr 98
-oop/error_cannot_return_from_init.bs:3:16: error: cannot return values from an initializer method
+:b stderr 534
+oop/error_cannot_return_from_init.bs:3:16: error: can only explicity return 'nil' from an initializer method
+
+When an initializer method explicitly returns 'nil', it indicates that the
+initialization failed due to some reason, and the site of the instantiation
+gets 'nil' as the result. This is not strictly OOP, but I missed the part where
+that's my problem.
+
+```
+var f = io.Reader("does_not_exist.txt");
+if !f {
+    io.eprintln("Error: could not read file!");
+    os.exit(1);
+}
+
+io.print(f.read()); # Or whatever you want to do
+```
 
 :b shell 47
 ../bin/bs oop/error_cannot_return_from_init.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 99
-oop/error_cannot_return_from_init.bsx:3:13: error: cannot return values from an initializer method
+:b stderr 538
+oop/error_cannot_return_from_init.bsx:3:13: error: can only explicity return 'bruh' from an initializer method
+
+When an initializer method explicitly returns 'bruh', it indicates that the
+initialization failed due to some reason, and the site of the instantiation
+gets 'bruh' as the result. This is not strictly OOP, but I missed the part where
+that's my problem.
+
+```
+var f = io.Reader("does_not_exist.txt");
+if !f {
+    io.eprintln("Error: could not read file!");
+    os.exit(1);
+}
+
+io.print(f.read()); # Or whatever you want to do
+```
 
 :b shell 41
 ../bin/bs oop/error_this_outside_class.bs

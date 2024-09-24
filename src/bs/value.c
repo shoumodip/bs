@@ -116,10 +116,16 @@ bool bs_pretty_printer_has(Bs_Pretty_Printer *p, const Bs_Object *object) {
     return false;
 }
 
-void bs_pretty_printer_map(Bs_Pretty_Printer *p, const Bs_Map *map) {
+static void
+bs_pretty_printer_map_extra(Bs_Pretty_Printer *p, const Bs_Map *map, const char *extra) {
     bs_fmt(p->writer, "{");
-    if (map->length) {
+    if (map->length || extra) {
         p->depth++;
+
+        if (extra) {
+            bs_fmt(p->writer, "\n%*s", (int)p->depth * BS_PRETTY_PRINT_INDENT, "");
+            bs_fmt(p->writer, "%s", extra);
+        }
 
         for (size_t i = 0, count = 0; i < map->capacity; i++) {
             Bs_Entry *entry = &map->data[i];
@@ -165,6 +171,10 @@ void bs_pretty_printer_map(Bs_Pretty_Printer *p, const Bs_Map *map) {
         bs_fmt(p->writer, "\n%*s", (int)p->depth * BS_PRETTY_PRINT_INDENT, "");
     }
     bs_fmt(p->writer, "}");
+}
+
+void bs_pretty_printer_map(Bs_Pretty_Printer *p, const Bs_Map *map) {
+    bs_pretty_printer_map_extra(p, map, NULL);
 }
 
 void bs_pretty_printer_quote(Bs_Pretty_Printer *p, Bs_Sv sv) {
@@ -251,7 +261,7 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
         const Bs_Class *class = (const Bs_Class *)object;
         const Bs_Str *name = class->name;
         bs_fmt(p->writer, "class " Bs_Sv_Fmt " ", Bs_Sv_Arg(*name));
-        bs_pretty_printer_map(p, &class->methods);
+        bs_pretty_printer_map_extra(p, &class->methods, class->can_fail ? "# Can fail" : NULL);
     } break;
 
     case BS_OBJECT_INSTANCE: {
@@ -268,7 +278,7 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
     case BS_OBJECT_C_CLASS: {
         const Bs_C_Class *class = (const Bs_C_Class *)object;
         bs_fmt(p->writer, "class " Bs_Sv_Fmt " ", Bs_Sv_Arg(class->name));
-        bs_pretty_printer_map(p, &class->methods);
+        bs_pretty_printer_map_extra(p, &class->methods, class->can_fail ? "# Can fail" : NULL);
     } break;
 
     case BS_OBJECT_C_INSTANCE: {

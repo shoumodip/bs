@@ -112,7 +112,7 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
         break;
 
     case BS_OP_INIT_METHOD:
-        bs_fmt(p->writer, "OP_INIT_METHOD\n");
+        bs_fmt(p->writer, "OP_INIT_METHOD%s\n", c->data[(*offset)++] ? "      # Can fail" : "");
         break;
 
     case BS_OP_INHERIT:
