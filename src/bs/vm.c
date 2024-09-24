@@ -108,6 +108,7 @@ struct Bs {
     // Exit
     int exit;
     bool ok;
+    bool running;
     jmp_buf unwind;
 };
 
@@ -2250,10 +2251,9 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
 Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input) {
     bs->ok = true;
+    bs->running = true;
     bs->exit = -1;
 
-    // TODO: set some flag that checks whether bs_run() has been called yet.
-    // Basically don't allow bs_call() to be used if bs_run() hasn't been called
     if (setjmp(bs->unwind)) {
         goto end;
     }
@@ -2284,6 +2284,8 @@ end:
     bs->upvalues = NULL;
     bs->gc_on = false;
 
+    bs->running = false;
+
 #ifdef BS_STEP_DEBUG
     bs_fmt(&bs->config.log, "Stopping BS with exit code %d\n", (bs->exit == -1) ? 0 : bs->exit);
 #endif // BS_STEP_DEBUG
@@ -2294,6 +2296,13 @@ end:
 }
 
 Bs_Value bs_call(Bs *bs, Bs_Value fn, const Bs_Value *args, size_t arity) {
+    if (!bs->running) {
+        bs_fmt(
+            &bs->config.error,
+            "error: cannot call bs_call() while BS is not running; call bs_run() first\n");
+        return bs_value_nil;
+    }
+
     const size_t stack_count_save = bs->stack.count;
     const size_t frames_count_save = bs->frames.count;
 
