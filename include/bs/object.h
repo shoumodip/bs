@@ -144,6 +144,8 @@ struct Bs_C_Class {
 
     Bs_C_Fn *init;
     Bs_C_Class_Free free;
+
+    bool can_fail;
 };
 
 Bs_C_Class *bs_c_class_new(Bs *bs, Bs_Sv name, size_t size, Bs_C_Fn_Ptr init, Bs_C_Class_Free free);

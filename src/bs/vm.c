@@ -1014,7 +1014,11 @@ static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
             bs->gc_on = false;
 
             bs_call_c_fn(bs, offset, class->init, arity);
-            bs_stack_set(bs, 0, instance);
+
+            // Failable classes can return either nil or the instance
+            if (!class->can_fail || bs_stack_peek(bs, 0).type != BS_VALUE_NIL) {
+                bs_stack_set(bs, 0, instance);
+            }
 
             bs->gc_on = gc_on_save;
             if (bs->gc_on) {

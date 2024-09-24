@@ -149,6 +149,7 @@ bs_c_class_new(Bs *bs, Bs_Sv name, size_t size, Bs_C_Fn_Ptr init, Bs_C_Class_Fre
     class->size = size;
     class->init = init ? bs_c_fn_new(bs, name, init) : NULL;
     class->free = free;
+    class->can_fail = false;
     memset(&class->methods, '\0', sizeof(class->methods));
     return class;
 }
