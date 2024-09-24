@@ -263,9 +263,9 @@ static void bs_compile_string(Bs_Compiler *c, Bs_Sv sv) {
 static void bs_compile_receiver(Bs_Compiler *c, Bs_Sv sv, Bs_Loc loc) {
     size_t index;
     if (bs_lambda_find_local(c->lambda, sv, &index)) {
-        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_LTHIS, index);
+        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_LRECEIVER, index);
     } else if (bs_lambda_find_upvalue(c->bs, c->lambda, sv, &index)) {
-        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_UTHIS, index);
+        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_URECEIVER, index);
     } else {
         assert(false && "unreachable");
     }
@@ -573,8 +573,9 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             const Bs_Op op_get = c->chunk->data[c->chunk->last];
             const Bs_Op op_set = bs_op_get_to_set(op_get);
             if (op_set == BS_OP_RET && op_get != BS_OP_CALL && op_get != BS_OP_INVOKE &&
-                op_get != BS_OP_SUPER_INVOKE && op_get != BS_OP_IMPORT && op_get != BS_OP_LTHIS &&
-                op_get != BS_OP_UTHIS && op_get != BS_OP_ISET_CHAIN) {
+                op_get != BS_OP_SUPER_INVOKE && op_get != BS_OP_IMPORT &&
+                op_get != BS_OP_LRECEIVER && op_get != BS_OP_URECEIVER &&
+                op_get != BS_OP_ISET_CHAIN) {
                 bs_compile_error_unexpected(c, &token);
             }
 
@@ -729,7 +730,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
                 assert(c->chunk->last > 1 + sizeof(size_t));
                 c->chunk->count = c->chunk->last - 1 - sizeof(size_t);
 
-                assert(c->chunk->data[c->chunk->count] == BS_OP_UTHIS);
+                assert(c->chunk->data[c->chunk->count] == BS_OP_URECEIVER);
                 super_const_index = *(size_t *)&c->chunk->data[c->chunk->count + 1];
 
                 locs[0] = c->chunk->locations.data[--c->chunk->locations.count].loc;
@@ -768,7 +769,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
                 bs_chunk_push_op_loc(c->bs, c->chunk, locs[0]);
                 bs_chunk_push_op_loc(c->bs, c->chunk, locs[1]);
             } else if (op_get == BS_OP_SUPER_GET) {
-                bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_UTHIS, super_const_index);
+                bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_URECEIVER, super_const_index);
                 bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_SUPER_INVOKE, call_const_index);
                 bs_da_push(c->bs, c->chunk, arity);
 
@@ -789,8 +790,9 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             const Bs_Op op_get = c->chunk->data[c->chunk->last];
             const Bs_Op op_set = bs_op_get_to_set(op_get);
             if (op_set == BS_OP_RET && op_get != BS_OP_CALL && op_get != BS_OP_INVOKE &&
-                op_get != BS_OP_SUPER_INVOKE && op_get != BS_OP_IMPORT && op_get != BS_OP_LTHIS &&
-                op_get != BS_OP_UTHIS && op_get != BS_OP_ISET_CHAIN) {
+                op_get != BS_OP_SUPER_INVOKE && op_get != BS_OP_IMPORT &&
+                op_get != BS_OP_LRECEIVER && op_get != BS_OP_URECEIVER &&
+                op_get != BS_OP_ISET_CHAIN) {
                 bs_compile_error_unexpected(c, &token);
             }
 
@@ -899,7 +901,7 @@ static void bs_compile_lambda_init(Bs_Compiler *c, Bs_Lambda *lambda, Bs_Sv name
 
 static Bs_Fn *bs_compile_lambda_end(Bs_Compiler *c) {
     if (c->lambda->type == BS_LAMBDA_INIT) {
-        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_LTHIS, 0);
+        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_LRECEIVER, 0);
     } else {
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
     }
@@ -1289,7 +1291,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
 
         if (token.type == BS_TOKEN_EOL) {
             if (c->lambda->type == BS_LAMBDA_INIT) {
-                bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_LTHIS, 0);
+                bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_LRECEIVER, 0);
             } else {
                 bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
             }

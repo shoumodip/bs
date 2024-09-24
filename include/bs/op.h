@@ -65,11 +65,12 @@ typedef enum {
 
     BS_OP_LGET,
     BS_OP_LSET,
-    BS_OP_LTHIS, // TODO: rename to LRECEIVER
 
     BS_OP_UGET,
     BS_OP_USET,
-    BS_OP_UTHIS,
+
+    BS_OP_LRECEIVER,
+    BS_OP_URECEIVER,
 
     BS_OP_IGET,
     BS_OP_ISET,

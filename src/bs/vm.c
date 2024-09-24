@@ -2103,7 +2103,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         } break;
 
         case BS_OP_LGET:
-        case BS_OP_LTHIS:
+        case BS_OP_LRECEIVER:
             bs_stack_push(bs, bs->frame->base[bs_chunk_read_int(bs)]);
             break;
 
@@ -2112,7 +2112,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             break;
 
         case BS_OP_UGET:
-        case BS_OP_UTHIS: {
+        case BS_OP_URECEIVER: {
             Bs_Upvalue *upvalue = bs->frame->closure->data[bs_chunk_read_int(bs)];
             bs_stack_push(bs, *upvalue->value);
         } break;

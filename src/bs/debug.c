@@ -255,10 +255,6 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
         bs_debug_op_int(p, c, offset, "OP_LSET");
         break;
 
-    case BS_OP_LTHIS:
-        bs_debug_op_int(p, c, offset, "OP_LTHIS");
-        break;
-
     case BS_OP_UGET:
         bs_debug_op_int(p, c, offset, "OP_UGET");
         break;
@@ -267,8 +263,12 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
         bs_debug_op_int(p, c, offset, "OP_USET");
         break;
 
-    case BS_OP_UTHIS:
-        bs_debug_op_int(p, c, offset, "OP_UTHIS");
+    case BS_OP_LRECEIVER:
+        bs_debug_op_int(p, c, offset, "OP_LRECEIVER");
+        break;
+
+    case BS_OP_URECEIVER:
+        bs_debug_op_int(p, c, offset, "OP_URECEIVER");
         break;
 
     case BS_OP_IGET:
