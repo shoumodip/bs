@@ -16,7 +16,7 @@ typedef enum {
     BS_POWER_DOT,
 } Bs_Power;
 
-static_assert(BS_COUNT_TOKENS == 61, "Update bs_token_type_power()");
+static_assert(BS_COUNT_TOKENS == 62, "Update bs_token_type_power()");
 static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_IN:
@@ -286,7 +286,7 @@ static void bs_compile_identifier(Bs_Compiler *c, const Bs_Token *token) {
     bs_chunk_push_op_loc(c->bs, c->chunk, token->loc);
 }
 
-static_assert(BS_COUNT_TOKENS == 61, "Update bs_compile_expr()");
+static_assert(BS_COUNT_TOKENS == 62, "Update bs_compile_expr()");
 static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
     Bs_Loc loc = token.loc;
@@ -930,7 +930,6 @@ static size_t bs_compile_definition(Bs_Compiler *c, Bs_Token *name, bool public)
 
 static void bs_compile_stmt(Bs_Compiler *c);
 
-// TODO: add support for `fn (...) => ...`
 static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Token *name) {
     Bs_Lambda lambda = {.type = type};
     bs_compile_lambda_init(c, &lambda, name ? name->sv : (Bs_Sv){0});
@@ -957,8 +956,14 @@ static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Toke
         }
     }
 
-    bs_lexer_buffer(&c->lexer, bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE));
-    bs_compile_stmt(c);
+    bs_lexer_buffer(&c->lexer, bs_lexer_either(&c->lexer, BS_TOKEN_LBRACE, BS_TOKEN_ARROW));
+    if (c->lexer.buffer.type == BS_TOKEN_LBRACE) {
+        bs_compile_stmt(c);
+    } else {
+        c->lexer.peeked = false;
+        bs_compile_expr(c, BS_POWER_SET);
+        bs_chunk_push_op(c->bs, c->chunk, BS_OP_RET);
+    }
 
     const Bs_Fn *fn = bs_compile_lambda_end(c);
     bs_chunk_push_op_value(c->bs, c->chunk, BS_OP_CLOSURE, bs_value_object(fn));
@@ -1097,7 +1102,7 @@ static void bs_compile_jumps_reset(Bs_Compiler *c, Bs_Jumps save) {
     c->jumps.start = save.start;
 }
 
-static_assert(BS_COUNT_TOKENS == 61, "Update bs_compile_stmt()");
+static_assert(BS_COUNT_TOKENS == 62, "Update bs_compile_stmt()");
 static void bs_compile_stmt(Bs_Compiler *c) {
     Bs_Token token = bs_lexer_next(&c->lexer);
 
