@@ -1,0 +1,13 @@
+mf xs be {
+    foo be 69,
+    bar be 420
+} fr
+mf ys be xs.copy() fr
+
+io.println("xs = \(xs)") fr
+io.println("ys = \(ys)") fr
+
+xs.bar be 1337 fr
+
+io.println("xs = \(xs)") fr
+io.println("ys = \(ys)") fr

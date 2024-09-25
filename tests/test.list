@@ -180,3 +180,17 @@
 ../bin/bs delete/instance_property.bsx
 ../bin/bs delete/table.bs
 ../bin/bs delete/table.bsx
+../bin/bs builtin_methods/array.bs
+../bin/bs builtin_methods/array.bsx
+../bin/bs builtin_methods/number.bs
+../bin/bs builtin_methods/number.bsx
+../bin/bs builtin_methods/string.bs
+../bin/bs builtin_methods/string.bsx
+../bin/bs builtin_methods/table.bs
+../bin/bs builtin_methods/table.bsx
+../bin/bs builtin_methods/error_undefined_array.bs
+../bin/bs builtin_methods/error_undefined_array.bsx
+../bin/bs builtin_methods/error_undefined_number.bs
+../bin/bs builtin_methods/error_undefined_number.bsx
+../bin/bs builtin_methods/error_undefined_str.bs
+../bin/bs builtin_methods/error_undefined_str.bsx

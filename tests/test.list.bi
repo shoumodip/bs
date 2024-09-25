@@ -1,4 +1,4 @@
-:i count 182
+:i count 196
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -2060,4 +2060,146 @@ cap
 {}
 
 :b stderr 0
+
+:b shell 34
+../bin/bs builtin_methods/array.bs
+:i returncode 0
+:b stdout 10
+[2, 4, 6]
+
+:b stderr 0
+
+:b shell 35
+../bin/bs builtin_methods/array.bsx
+:i returncode 0
+:b stdout 10
+[2, 4, 6]
+
+:b stderr 0
+
+:b shell 35
+../bin/bs builtin_methods/number.bs
+:i returncode 0
+:b stdout 21
+1.22464679914735e-16
+
+:b stderr 0
+
+:b shell 36
+../bin/bs builtin_methods/number.bsx
+:i returncode 0
+:b stdout 21
+1.22464679914735e-16
+
+:b stderr 0
+
+:b shell 35
+../bin/bs builtin_methods/string.bs
+:i returncode 0
+:b stdout 6
+HELLO
+
+:b stderr 0
+
+:b shell 36
+../bin/bs builtin_methods/string.bsx
+:i returncode 0
+:b stdout 6
+HELLO
+
+:b stderr 0
+
+:b shell 34
+../bin/bs builtin_methods/table.bs
+:i returncode 0
+:b stdout 149
+xs = {
+    bar = 420,
+    foo = 69
+}
+ys = {
+    bar = 420,
+    foo = 69
+}
+xs = {
+    bar = 1337,
+    foo = 69
+}
+ys = {
+    bar = 420,
+    foo = 69
+}
+
+:b stderr 0
+
+:b shell 35
+../bin/bs builtin_methods/table.bsx
+:i returncode 0
+:b stdout 149
+xs = {
+    bar = 420,
+    foo = 69
+}
+ys = {
+    bar = 420,
+    foo = 69
+}
+xs = {
+    bar = 1337,
+    foo = 69
+}
+ys = {
+    bar = 420,
+    foo = 69
+}
+
+:b stderr 0
+
+:b shell 50
+../bin/bs builtin_methods/error_undefined_array.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 75
+builtin_methods/error_undefined_array.bs:1:4: error: undefined method: foo
+
+:b shell 51
+../bin/bs builtin_methods/error_undefined_array.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 76
+builtin_methods/error_undefined_array.bsx:1:4: error: undefined method: foo
+
+:b shell 51
+../bin/bs builtin_methods/error_undefined_number.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 76
+builtin_methods/error_undefined_number.bs:1:4: error: undefined method: foo
+
+:b shell 52
+../bin/bs builtin_methods/error_undefined_number.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 77
+builtin_methods/error_undefined_number.bsx:1:3: error: undefined method: foo
+
+:b shell 48
+../bin/bs builtin_methods/error_undefined_str.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 73
+builtin_methods/error_undefined_str.bs:1:4: error: undefined method: foo
+
+:b shell 49
+../bin/bs builtin_methods/error_undefined_str.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 74
+builtin_methods/error_undefined_str.bsx:1:4: error: undefined method: foo
 

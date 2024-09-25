@@ -1601,7 +1601,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_global_set(bs, Bs_Sv_Static("math"), bs_value_object(math));
     }
 
-    bs_builtin_value_methods_add(bs, BS_VALUE_NUM, Bs_Sv_Static("sin"), bs_num_sin);
+    bs_builtin_number_methods_add(bs, Bs_Sv_Static("sin"), bs_num_sin);
     bs_builtin_object_methods_add(bs, BS_OBJECT_STR, Bs_Sv_Static("toupper"), bs_str_toupper);
     bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("map"), bs_array_map);
     bs_builtin_object_methods_add(bs, BS_OBJECT_TABLE, Bs_Sv_Static("copy"), bs_table_copy);

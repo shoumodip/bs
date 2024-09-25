@@ -24,7 +24,7 @@ void bs_global_set(Bs *bs, Bs_Sv name, Bs_Value value);
 
 void bs_value_write(Bs *bs, Bs_Writer *writer, Bs_Value value);
 
-void bs_builtin_value_methods_add(Bs *bs, Bs_Value_Type type, Bs_Sv name, Bs_C_Fn_Ptr ptr);
+void bs_builtin_number_methods_add(Bs *bs, Bs_Sv name, Bs_C_Fn_Ptr ptr);
 void bs_builtin_object_methods_add(Bs *bs, Bs_Object_Type type, Bs_Sv name, Bs_C_Fn_Ptr ptr);
 
 // Buffer

@@ -569,21 +569,20 @@ void bs_value_write(Bs *bs, Bs_Writer *w, Bs_Value value) {
     bs_value_write_impl(bs_pretty_printer(bs, w), value);
 }
 
-static Bs_Map *bs_builtin_value_methods_map(Bs *bs, Bs_Value_Type type) {
-    assert(type == BS_VALUE_NUM);
-    return &bs->builtin_methods[type - BS_VALUE_NUM];
+static Bs_Map *bs_builtin_number_methods_map(Bs *bs) {
+    return &bs->builtin_methods[0];
 }
 
 static Bs_Map *bs_builtin_object_methods_map(Bs *bs, Bs_Object_Type type) {
     // The rest are internal and/or have methods already
     assert(type > BS_OBJECT_FN && type <= BS_OBJECT_TABLE);
-    return &bs->builtin_methods[BS_VALUE_OBJECT + type - BS_VALUE_NUM - BS_OBJECT_STR];
+    return &bs->builtin_methods[type];
 }
 
-void bs_builtin_value_methods_add(Bs *bs, Bs_Value_Type type, Bs_Sv name, Bs_C_Fn_Ptr ptr) {
+void bs_builtin_number_methods_add(Bs *bs, Bs_Sv name, Bs_C_Fn_Ptr ptr) {
     bs_map_set(
         bs,
-        bs_builtin_value_methods_map(bs, type),
+        bs_builtin_number_methods_map(bs),
         bs_value_object(bs_str_new(bs, name)),
         bs_value_object(bs_c_fn_new(bs, name, ptr)));
 }
@@ -1370,8 +1369,7 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
         return bs_value_object(bs_bound_method_new(
             bs,
             container,
-            bs_check_map_get_at(
-                bs, 1, bs_builtin_value_methods_map(bs, container.type), index, "method")));
+            bs_check_map_get_at(bs, 1, bs_builtin_number_methods_map(bs), index, "method")));
     }
 
     Bs_Map *map = NULL;
