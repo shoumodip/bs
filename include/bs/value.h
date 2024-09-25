@@ -32,7 +32,6 @@ typedef enum {
 
     BS_OBJECT_C_FN,
     BS_OBJECT_C_LIB,
-    BS_OBJECT_C_DATA,
     BS_COUNT_OBJECTS
 } Bs_Object_Type;
 

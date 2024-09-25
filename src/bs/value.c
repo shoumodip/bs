@@ -6,7 +6,7 @@ bool bs_value_is_falsey(Bs_Value v) {
     return v.type == BS_VALUE_NIL || (v.type == BS_VALUE_BOOL && !v.as.boolean);
 }
 
-static_assert(BS_COUNT_OBJECTS == 14, "Update bs_object_type_name()");
+static_assert(BS_COUNT_OBJECTS == 13, "Update bs_object_type_name()");
 const char *bs_object_type_name(Bs_Object_Type type) {
     switch (type) {
     case BS_OBJECT_FN:
@@ -39,9 +39,6 @@ const char *bs_object_type_name(Bs_Object_Type type) {
 
     case BS_OBJECT_C_LIB:
         return "native library";
-
-    case BS_OBJECT_C_DATA:
-        return "native object";
 
     default:
         assert(false && "unreachable");
@@ -192,7 +189,7 @@ void bs_pretty_printer_quote(Bs_Pretty_Printer *p, Bs_Sv sv) {
     bs_fmt(p->writer, "\"");
 }
 
-static_assert(BS_COUNT_OBJECTS == 14, "Update bs_object_write()");
+static_assert(BS_COUNT_OBJECTS == 13, "Update bs_object_write()");
 static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) {
     switch (object->type) {
     case BS_OBJECT_FN:

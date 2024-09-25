@@ -113,7 +113,7 @@ struct Bs {
 };
 
 // Garbage collector
-static_assert(BS_COUNT_OBJECTS == 14, "Update bs_free_object()");
+static_assert(BS_COUNT_OBJECTS == 13, "Update bs_free_object()");
 static void bs_free_object(Bs *bs, Bs_Object *object) {
 #ifdef BS_GC_DEBUG_LOG
     bs_fmt(&bs->config.log, "[GC] Free %p; Type: %d\n", object, object->type);
@@ -237,7 +237,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
     bs->grays.data[bs->grays.count++] = object;
 }
 
-static_assert(BS_COUNT_OBJECTS == 14, "Update bs_blacken_object()");
+static_assert(BS_COUNT_OBJECTS == 13, "Update bs_blacken_object()");
 static void bs_blacken_object(Bs *bs, Bs_Object *object) {
 #ifdef BS_GC_DEBUG_LOG
     Bs_Writer *w = &bs->config.log;
@@ -258,7 +258,6 @@ static void bs_blacken_object(Bs *bs, Bs_Object *object) {
 
     case BS_OBJECT_STR:
     case BS_OBJECT_C_FN:
-    case BS_OBJECT_C_DATA:
         break;
 
     case BS_OBJECT_ARRAY: {
@@ -981,7 +980,7 @@ static void bs_call_closure(Bs *bs, size_t offset, Bs_Closure *closure, size_t a
     bs->frame = &bs->frames.data[bs->frames.count - 1];
 }
 
-static_assert(BS_COUNT_OBJECTS == 14, "Update bs_call_value()");
+static_assert(BS_COUNT_OBJECTS == 13, "Update bs_call_value()");
 static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
     if (value.type != BS_VALUE_OBJECT) {
         bs_error_at(
