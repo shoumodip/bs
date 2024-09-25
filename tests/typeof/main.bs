@@ -5,4 +5,4 @@ io.println(typeof(fn () {}));
 io.println(typeof("deez"));
 io.println(typeof([]));
 io.println(typeof({}));
-io.println(typeof(str.reverse));
+io.println(typeof("".reverse));

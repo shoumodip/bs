@@ -1,0 +1,62 @@
+io.println(math.E);
+io.println(math.PI);
+
+io.println(0.sin());
+io.println((math.PI / 2).sin());
+io.println(math.PI.sin());
+
+io.println(0.cos());
+io.println((math.PI / 2).cos());
+io.println(math.PI.cos());
+
+io.println(0.tan());
+io.println((math.PI / 2).tan());
+io.println(math.PI.tan());
+
+io.println(0.sin().asin());
+io.println((math.PI / 2).sin().asin());
+
+io.println(0.cos().acos());
+io.println((math.PI / 2).cos().acos());
+io.println(math.PI.cos().acos());
+
+io.println(0.tan().atan());
+io.println((math.PI / 2).tan().atan());
+
+io.println(64.sqrt());
+io.println(69.sqrt());
+
+io.println(420.69.ceil());
+io.println((-420.69).ceil());
+
+io.println(420.69.floor());
+io.println((-420.69).floor());
+
+io.println(420.69.round());
+io.println(69.42.round());
+io.println((-420.69).round());
+io.println((-69.42).round());
+
+io.println(1.max(2));
+io.println(2.max(1));
+io.println(1.max(2, 3));
+io.println(3.max(1, 2));
+
+io.println(1.min(2));
+io.println(2.min(1));
+io.println(1.min(2, 3));
+io.println(3.min(1, 2));
+
+io.println(4.clamp(1, 6));
+io.println(0.clamp(1, 6));
+io.println(7.clamp(1, 6));
+
+io.println(4.lerp(8, 0.5));
+
+io.println(7.bceil());
+io.println(8.bceil());
+io.println(9.bceil());
+
+io.println(7.bfloor());
+io.println(8.bfloor());
+io.println(9.bfloor());

@@ -1,5 +1,5 @@
 class Foo {}
 
 var foo = Foo();
-foo.f = str.reverse;
-foo.f(nil);
+foo.f = "".slice;
+foo.f(nil, 0);

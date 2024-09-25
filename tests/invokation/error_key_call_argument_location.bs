@@ -1,5 +1,5 @@
 var t = {
-    f = str.reverse
+    f = "".slice
 };
 
-t.f(nil);
+t.f(nil, 0);

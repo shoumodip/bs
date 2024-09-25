@@ -1,4 +1,4 @@
-:i count 196
+:i count 204
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -1126,9 +1126,9 @@ functions/error_stack_trace.bsx:13:4: in foo()
 :i returncode 1
 :b stdout 0
 
-:b stderr 245
+:b stderr 243
 [C]: error: expected argument #1 to be string, got number
-functions/error_native_stack_trace.bs:2:24: in str.reverse()
+functions/error_native_stack_trace.bs:2:22: in os.getenv()
 [C]: in foo()
 functions/error_native_stack_trace.bs:6:15: in array.map()
 functions/error_native_stack_trace.bs:9:5: in main()
@@ -1138,9 +1138,9 @@ functions/error_native_stack_trace.bs:9:5: in main()
 :i returncode 1
 :b stdout 0
 
-:b stderr 248
+:b stderr 246
 [C]: error: expected argument #1 to be string, got number
-functions/error_native_stack_trace.bsx:2:21: in str.reverse()
+functions/error_native_stack_trace.bsx:2:19: in os.getenv()
 [C]: in foo()
 functions/error_native_stack_trace.bsx:6:15: in array.map()
 functions/error_native_stack_trace.bsx:9:5: in main()
@@ -1218,9 +1218,9 @@ x = nocap; y = bruh
 :i returncode 1
 :b stdout 0
 
-:b stderr 148
-[C]: error: expected argument #1 to be string, got nil
-extended/common.bs:9:17: in str.reverse()
+:b stderr 149
+[C]: error: expected argument #1 to be number, got nil
+extended/common.bs:9:14: in string.slice()
 extended/error_type_name_normal.bs:1:31: in oops()
 
 :b shell 45
@@ -1228,9 +1228,9 @@ extended/error_type_name_normal.bs:1:31: in oops()
 :i returncode 1
 :b stdout 0
 
-:b stderr 149
-[C]: error: expected argument #1 to be string, got nil
-extended/common.bs:9:17: in str.reverse()
+:b stderr 150
+[C]: error: expected argument #1 to be number, got nil
+extended/common.bs:9:14: in string.slice()
 extended/error_type_name_normal.bsx:1:32: in oops()
 
 :b shell 46
@@ -1238,9 +1238,9 @@ extended/error_type_name_normal.bsx:1:32: in oops()
 :i returncode 1
 :b stdout 0
 
-:b stderr 164
-[C]: error: expected argument #1 to be string, got capness
-extended/common_extended.bsx:9:17: in str.reverse()
+:b stderr 162
+[C]: error: expected argument #1 to be number, got bruh
+extended/common_extended.bsx:9:14: in string.slice()
 extended/error_type_name_extended.bs:1:40: in oops()
 
 :b shell 47
@@ -1248,9 +1248,9 @@ extended/error_type_name_extended.bs:1:40: in oops()
 :i returncode 1
 :b stdout 0
 
-:b stderr 165
-[C]: error: expected argument #1 to be string, got capness
-extended/common_extended.bsx:9:17: in str.reverse()
+:b stderr 163
+[C]: error: expected argument #1 to be number, got bruh
+extended/common_extended.bsx:9:14: in string.slice()
 extended/error_type_name_extended.bsx:1:41: in oops()
 
 :b shell 24
@@ -1664,18 +1664,18 @@ invokation/error_invoked_body.bsx:7:4: in <anonymous>()
 :i returncode 1
 :b stdout 0
 
-:b stderr 124
-[C]: error: expected argument #1 to be string, got nil
-invokation/error_key_call_argument_location.bs:5:5: in str.reverse()
+:b stderr 125
+[C]: error: expected argument #1 to be number, got nil
+invokation/error_key_call_argument_location.bs:5:5: in string.slice()
 
 :b shell 57
 ../bin/bs invokation/error_key_call_argument_location.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 126
-[C]: error: expected argument #1 to be string, got bruh
-invokation/error_key_call_argument_location.bsx:5:5: in str.reverse()
+:b stderr 127
+[C]: error: expected argument #1 to be number, got bruh
+invokation/error_key_call_argument_location.bsx:5:5: in string.slice()
 
 :b shell 55
 ../bin/bs invokation/error_key_call_invalid_function.bs
@@ -1730,54 +1730,54 @@ invokation/error_method_call_wrong_arity.bsx:8:6: error: expected 0 arguments, g
 :i returncode 1
 :b stdout 0
 
-:b stderr 128
-[C]: error: expected argument #1 to be string, got nil
-invokation/error_native_call_argument_location.bs:1:24: in str.reverse()
+:b stderr 129
+[C]: error: expected argument #1 to be number, got nil
+invokation/error_native_call_argument_location.bs:1:21: in string.slice()
 
 :b shell 60
 ../bin/bs invokation/error_native_call_argument_location.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 130
-[C]: error: expected argument #1 to be string, got bruh
-invokation/error_native_call_argument_location.bsx:1:24: in str.reverse()
+:b stderr 131
+[C]: error: expected argument #1 to be number, got bruh
+invokation/error_native_call_argument_location.bsx:1:21: in string.slice()
 
 :b shell 53
 ../bin/bs invokation/error_native_call_wrong_arity.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 106
-[C]: error: expected 1 argument, got 2
-invokation/error_native_call_wrong_arity.bs:1:23: in str.reverse()
+:b stderr 110
+[C]: error: expected 0 arguments, got 1
+invokation/error_native_call_wrong_arity.bs:1:28: in string.reverse()
 
 :b shell 54
 ../bin/bs invokation/error_native_call_wrong_arity.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 107
-[C]: error: expected 1 argument, got 2
-invokation/error_native_call_wrong_arity.bsx:1:23: in str.reverse()
+:b stderr 111
+[C]: error: expected 0 arguments, got 1
+invokation/error_native_call_wrong_arity.bsx:1:28: in string.reverse()
 
 :b shell 61
 ../bin/bs invokation/error_property_call_argument_location.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 129
-[C]: error: expected argument #1 to be string, got nil
-invokation/error_property_call_argument_location.bs:5:7: in str.reverse()
+:b stderr 130
+[C]: error: expected argument #1 to be number, got nil
+invokation/error_property_call_argument_location.bs:5:7: in string.slice()
 
 :b shell 62
 ../bin/bs invokation/error_property_call_argument_location.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 131
-[C]: error: expected argument #1 to be string, got bruh
-invokation/error_property_call_argument_location.bsx:5:7: in str.reverse()
+:b stderr 132
+[C]: error: expected argument #1 to be number, got bruh
+invokation/error_property_call_argument_location.bsx:5:7: in string.slice()
 
 :b shell 60
 ../bin/bs invokation/error_property_call_invalid_function.bs
@@ -2202,4 +2202,306 @@ builtin_methods/error_undefined_str.bs:1:4: error: undefined method: foo
 
 :b stderr 74
 builtin_methods/error_undefined_str.bsx:1:4: error: undefined method: foo
+
+:b shell 24
+../bin/bs core/string.bs
+:i returncode 0
+:b stdout 221
+Foo
+bar
+
+FOOBAR
+foobar
+4
+8
+nil
+nil
+["foo bar baz"]
+["foo", "bar", "baz"]
+["foo bar baz"]
+foo bar baz
+foo---bar---baz
+foo bar ba
+foo bar baz
+foo bar baz  
+   foo bar baz
+foo
+foo
+6foo
+69foo
+696foo
+foo
+foo
+foo6
+foo69
+foo696
+
+:b stderr 0
+
+:b shell 25
+../bin/bs core/string.bsx
+:i returncode 0
+:b stdout 223
+Foo
+bar
+
+FOOBAR
+foobar
+4
+8
+bruh
+bruh
+["foo bar baz"]
+["foo", "bar", "baz"]
+["foo bar baz"]
+foo bar baz
+foo---bar---baz
+foo bar ba
+foo bar baz
+foo bar baz  
+   foo bar baz
+foo
+foo
+6foo
+69foo
+696foo
+foo
+foo
+foo6
+foo69
+foo696
+
+:b stderr 0
+
+:b shell 23
+../bin/bs core/array.bs
+:i returncode 0
+:b stdout 334
+[2, 4, 6, 8, 10]
+[2, 4]
+15
+35
+xs = [1, 2, 3, 4, 5];
+ys = [1, 2, 3, 4, 5];
+zs = [1, 2, 3, 4, 5];
+xs = [69, 2, 3, 4, 5];
+ys = [1, 2, 3, 4, 5];
+zs = [69, 2, 3, 4, 5];
+1
+4
+false
+true
+true
+false
+Before: [2, 5, 1, 4, 3]
+Return: [1, 2, 3, 4, 5]
+Final:  [1, 2, 3, 4, 5]
+Before: [2, 5, 1, 4, 3]
+Return: [3, 4, 1, 5, 2]
+Final:  [3, 4, 1, 5, 2]
+
+:b stderr 0
+
+:b shell 24
+../bin/bs core/array.bsx
+:i returncode 0
+:b stdout 344
+[2, 4, 6, 8, 10]
+[2, 4]
+15
+35
+xs = [1, 2, 3, 4, 5] fr
+ys = [1, 2, 3, 4, 5] fr
+zs = [1, 2, 3, 4, 5] fr
+xs = [69, 2, 3, 4, 5] fr
+ys = [1, 2, 3, 4, 5] fr
+zs = [69, 2, 3, 4, 5] fr
+1
+4
+cap
+nocap
+nocap
+cap
+Before: [2, 5, 1, 4, 3]
+Return: [1, 2, 3, 4, 5]
+Final:  [1, 2, 3, 4, 5]
+Before: [2, 5, 1, 4, 3]
+Return: [3, 4, 1, 5, 2]
+Final:  [3, 4, 1, 5, 2]
+
+:b stderr 0
+
+:b shell 23
+../bin/bs core/table.bs
+:i returncode 0
+:b stdout 240
+xs = {
+    bar = 420,
+    foo = 69
+}
+ys = {
+    bar = 420,
+    foo = 69
+}
+zs = {
+    bar = 420,
+    foo = 69
+}
+xs = {
+    bar = 1337,
+    foo = 69
+}
+ys = {
+    bar = 420,
+    foo = 69
+}
+zs = {
+    bar = 1337,
+    foo = 69
+}
+true
+true
+false
+
+:b stderr 0
+
+:b shell 24
+../bin/bs core/table.bsx
+:i returncode 0
+:b stdout 240
+xs = {
+    bar = 420,
+    foo = 69
+}
+ys = {
+    bar = 420,
+    foo = 69
+}
+zs = {
+    bar = 420,
+    foo = 69
+}
+xs = {
+    bar = 1337,
+    foo = 69
+}
+ys = {
+    bar = 420,
+    foo = 69
+}
+zs = {
+    bar = 1337,
+    foo = 69
+}
+nocap
+nocap
+cap
+
+:b stderr 0
+
+:b shell 22
+../bin/bs core/math.bs
+:i returncode 0
+:b stdout 291
+2.71828182845905
+3.14159265358979
+0
+1
+1.22464679914735e-16
+1
+6.12323399573677e-17
+-1
+0
+1.63312393531954e+16
+-1.22464679914735e-16
+0
+1.5707963267949
+0
+1.5707963267949
+3.14159265358979
+0
+1.5707963267949
+8
+8.30662386291807
+421
+-420
+420
+-421
+421
+69
+-421
+-69
+2
+2
+3
+3
+1
+1
+1
+1
+4
+1
+6
+6
+8
+8
+16
+4
+8
+8
+
+:b stderr 0
+
+:b shell 23
+../bin/bs core/math.bsx
+:i returncode 0
+:b stdout 291
+2.71828182845905
+3.14159265358979
+0
+1
+1.22464679914735e-16
+1
+6.12323399573677e-17
+-1
+0
+1.63312393531954e+16
+-1.22464679914735e-16
+0
+1.5707963267949
+0
+1.5707963267949
+3.14159265358979
+0
+1.5707963267949
+8
+8.30662386291807
+421
+-420
+420
+-421
+421
+69
+-421
+-69
+2
+2
+3
+3
+1
+1
+1
+1
+4
+1
+6
+6
+8
+8
+16
+4
+8
+8
+
+:b stderr 0
 

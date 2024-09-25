@@ -6,7 +6,7 @@ lit noice() {
 }
 
 lit oops() {
-    str.reverse(x) fr
+    "".slice(bruh, 0) fr
 }
 
 bet {

@@ -1,0 +1,38 @@
+{
+    var xs = {
+        foo = 69,
+        bar = 420
+    };
+
+    var ys = xs.copy();
+    var zs = xs;
+
+    io.println("xs = \(xs)");
+    io.println("ys = \(ys)");
+    io.println("zs = \(zs)");
+
+    xs.bar = 1337;
+
+    io.println("xs = \(xs)");
+    io.println("ys = \(ys)");
+    io.println("zs = \(zs)");
+}
+
+{
+    var xs = {
+        foo = 69,
+        bar = 420
+    };
+
+    var ys = {
+        foo = 69,
+        bar = 420
+    };
+
+    io.println(xs.equal(xs));
+    io.println(xs.equal(ys));
+
+    xs.bar = 1337;
+
+    io.println(xs.equal(ys));
+}

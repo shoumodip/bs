@@ -1,5 +1,5 @@
 mf t be {
-    f be str.reverse
+    f be "".slice
 } fr
 
-t.f(bruh) fr
+t.f(bruh, 0) fr

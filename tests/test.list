@@ -194,3 +194,11 @@
 ../bin/bs builtin_methods/error_undefined_number.bsx
 ../bin/bs builtin_methods/error_undefined_str.bs
 ../bin/bs builtin_methods/error_undefined_str.bsx
+../bin/bs core/string.bs
+../bin/bs core/string.bsx
+../bin/bs core/array.bs
+../bin/bs core/array.bsx
+../bin/bs core/table.bs
+../bin/bs core/table.bsx
+../bin/bs core/math.bs
+../bin/bs core/math.bsx

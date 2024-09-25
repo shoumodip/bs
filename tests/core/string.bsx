@@ -1,0 +1,35 @@
+io.println("Foobar".slice(0, 3)) fr
+io.println("Foobar".slice(3, 6)) fr
+io.println("Foobar".slice(3, 3)) fr
+
+io.println("Foobar".toupper()) fr
+io.println("Foobar".tolower()) fr
+
+io.println("foo bar baz".find("ba")) fr
+io.println("foo bar baz".find("ba", 5)) fr
+io.println("foo bar baz".find("ba", 9)) fr
+io.println("foo bar baz".find("lmao")) fr
+
+io.println("foo bar baz".split("")) fr
+io.println("foo bar baz".split(" ")) fr
+io.println("foo bar baz".split("  ")) fr
+
+io.println("foo bar baz".replace("", "-")) fr
+io.println("foo bar baz".replace(" ", "---")) fr
+io.println("foo bar baz".replace("  ", "-")) fr
+
+io.println("   foo bar baz  ".trim(" ")) fr
+io.println("   foo bar baz  ".ltrim(" ")) fr
+io.println("   foo bar baz  ".rtrim(" ")) fr
+
+io.println("foo".lpad("69", 0)) fr
+io.println("foo".lpad("69", 3)) fr
+io.println("foo".lpad("69", 4)) fr
+io.println("foo".lpad("69", 5)) fr
+io.println("foo".lpad("69", 6)) fr
+
+io.println("foo".rpad("69", 0)) fr
+io.println("foo".rpad("69", 3)) fr
+io.println("foo".rpad("69", 4)) fr
+io.println("foo".rpad("69", 5)) fr
+io.println("foo".rpad("69", 6)) fr

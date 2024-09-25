@@ -1,1 +1,1 @@
-io.println(str.reverse(bruh)) fr
+io.println("".slice(bruh, 0)) fr

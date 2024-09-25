@@ -1,0 +1,49 @@
+io.println([1, 2, 3, 4, 5].map(lit (x) => x * 2)) fr
+io.println([1, 2, 3, 4, 5].filter(lit (x) => x % 2 == 0)) fr
+io.println([1, 2, 3, 4, 5].reduce(lit (x, y) => x + y)) fr
+io.println([1, 2, 3, 4, 5].reduce(lit (x, y) => x + y, 20)) fr
+
+{
+    mf xs be [1, 2, 3, 4, 5] fr
+    mf ys be xs.copy() fr
+    mf zs be xs fr
+
+    io.println("xs = \(xs) fr") fr
+    io.println("ys = \(ys) fr") fr
+    io.println("zs = \(zs) fr") fr
+
+    xs[0] be 69 fr
+
+    io.println("xs = \(xs) fr") fr
+    io.println("ys = \(ys) fr") fr
+    io.println("zs = \(zs) fr") fr
+}
+
+io.println([1, 2, 3, 4, 2].find(2)) fr
+io.println([1, 2, 3, 4, 2].find(2, 2)) fr
+
+{
+    mf xs be [1, 2, 3, 4, 5] fr
+    mf ys be [1, 2, 3, 4, 5] fr
+
+    io.println(xs == ys) fr
+    io.println(xs.equal(xs)) fr
+    io.println(xs.equal(ys)) fr
+
+    xs[0] be 69 fr
+    io.println(xs.equal(ys)) fr
+}
+
+{
+    mf xs be [2, 5, 1, 4, 3] fr
+    io.println("Before:", xs) fr
+    io.println("Return:", xs.sort(lit (x, y) => x < y)) fr
+    io.println("Final: ", xs) fr
+}
+
+{
+    mf xs be [2, 5, 1, 4, 3] fr
+    io.println("Before:", xs) fr
+    io.println("Return:", xs.reverse()) fr
+    io.println("Final: ", xs) fr
+}

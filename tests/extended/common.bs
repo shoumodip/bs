@@ -6,7 +6,7 @@ fn noice() {
 }
 
 fn oops() {
-    str.reverse(y);
+    "".slice(nil, 0);
 }
 
 return {

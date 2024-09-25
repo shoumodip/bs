@@ -1,5 +1,5 @@
 fn foo(s) {
-    return str.reverse(s);
+    return os.getenv(s);
 }
 
 fn main() {

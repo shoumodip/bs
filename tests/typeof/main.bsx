@@ -5,4 +5,4 @@ io.println(vibeof(lit () {})) fr
 io.println(vibeof("deez")) fr
 io.println(vibeof([])) fr
 io.println(vibeof({})) fr
-io.println(vibeof(str.reverse)) fr
+io.println(vibeof("".reverse)) fr

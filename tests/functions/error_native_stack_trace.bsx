@@ -1,5 +1,5 @@
 lit foo(s) {
-    bet str.reverse(s) fr
+    bet os.getenv(s) fr
 }
 
 lit main() {
