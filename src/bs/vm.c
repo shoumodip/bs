@@ -76,7 +76,17 @@ typedef struct {
     Bs_Object **data;
     size_t count;
     size_t capacity;
-} Bs_Grays;
+} Bs_Object_List;
+
+static void bs_object_list_push(Bs_Object_List *l, Bs_Object *object) {
+    if (l->count >= l->capacity) {
+        l->capacity = l->capacity ? l->capacity * 2 : BS_DA_INIT_CAP;
+        l->data = realloc(l->data, l->capacity * sizeof(Bs_Object *));
+        assert(l->data);
+    }
+
+    l->data[l->count++] = object;
+}
 
 static_assert(BS_COUNT_OBJECTS == 13, "Update bs.builtin_methods");
 struct Bs {
@@ -107,8 +117,12 @@ struct Bs {
     size_t gc_max;
     size_t gc_bytes;
 
-    Bs_Grays grays;
+    Bs_Object_List grays;
     Bs_Object *objects;
+
+    // Handles
+    bool handles_on;
+    Bs_Object_List handles;
 
     Bs_Config config;
     Bs_Pretty_Printer printer;
@@ -235,14 +249,7 @@ static void bs_mark_object(Bs *bs, Bs_Object *object) {
 #endif // BS_GC_DEBUG_LOG
 
     object->marked = true;
-
-    if (bs->grays.count >= bs->grays.capacity) {
-        bs->grays.capacity = bs->grays.capacity ? bs->grays.capacity * 2 : BS_DA_INIT_CAP;
-        bs->grays.data = realloc(bs->grays.data, bs->grays.capacity * sizeof(Bs_Object *));
-        assert(bs->grays.data);
-    }
-
-    bs->grays.data[bs->grays.count++] = object;
+    bs_object_list_push(&bs->grays, object);
 }
 
 static_assert(BS_COUNT_OBJECTS == 13, "Update bs_blacken_object()");
@@ -366,6 +373,14 @@ static void bs_collect(Bs *bs) {
 
     bs_mark_map(bs, &bs->globals);
 
+    for (size_t i = 0; i < bs->handles.count; i++) {
+        bs_mark_object(bs, bs->handles.data[i]);
+    }
+
+    for (size_t i = 0; i < bs_c_array_size(bs->builtin_methods); i++) {
+        bs_mark_map(bs, &bs->builtin_methods[i]);
+    }
+
     // Trace
     while (bs->grays.count) {
         Bs_Object *object = bs->grays.data[--bs->grays.count];
@@ -466,6 +481,7 @@ void bs_free(Bs *bs) {
         object = next;
     }
     free(bs->grays.data);
+    free(bs->handles.data);
 
     bs_da_free(bs, &bs->paths);
     bs_da_free(bs, &bs->config.buffer);
@@ -507,6 +523,10 @@ Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size) {
 #ifdef BS_GC_DEBUG_LOG
     bs_fmt(&bs->config.log, "[GC] Allocate %p (%zu bytes); Type: %d\n", object, size, type);
 #endif // BS_GC_DEBUG_LOG
+
+    if (bs->handles_on) {
+        bs_object_list_push(&bs->handles, object);
+    }
 
     return object;
 }
@@ -1071,8 +1091,9 @@ static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
         bs->stack.data[bs->stack.count - arity - 1] = instance;
 
         if (class->init) {
-            const bool gc_on_save = bs->gc_on;
-            bs->gc_on = false;
+            const bool handles_on_save = bs->handles_on;
+            const size_t handles_count_save = bs->handles.count;
+            bs->handles_on = true;
 
             bs_call_c_fn(bs, offset, class->init, arity);
 
@@ -1081,16 +1102,8 @@ static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
                 bs_stack_set(bs, 0, instance);
             }
 
-            bs->gc_on = gc_on_save;
-            if (bs->gc_on) {
-#ifdef BS_GC_DEBUG_STRESS
-                bs_collect(bs);
-#else
-                if (bs->gc_bytes > bs->gc_max) {
-                    bs_collect(bs);
-                }
-#endif // BS_GC_DEBUG_STRESS
-            }
+            bs->handles_on = handles_on_save;
+            bs->handles.count = handles_count_save;
         } else {
             bs_check_arity_at(bs, offset, arity, 0);
         }
@@ -1104,21 +1117,15 @@ static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
 
     case BS_OBJECT_C_FN: {
         const Bs_C_Fn *native = (Bs_C_Fn *)value.as.object;
-        const bool gc_on_save = bs->gc_on;
-        bs->gc_on = false;
+
+        const bool handles_on_save = bs->handles_on;
+        const size_t handles_count_save = bs->handles.count;
+        bs->handles_on = true;
 
         bs_call_c_fn(bs, offset, native, arity);
 
-        bs->gc_on = gc_on_save;
-        if (bs->gc_on) {
-#ifdef BS_GC_DEBUG_STRESS
-            bs_collect(bs);
-#else
-            if (bs->gc_bytes > bs->gc_max) {
-                bs_collect(bs);
-            }
-#endif // BS_GC_DEBUG_STRESS
-        }
+        bs->handles_on = handles_on_save;
+        bs->handles.count = handles_count_save;
     } break;
 
     default:
@@ -1222,6 +1229,9 @@ static void bs_import(Bs *bs) {
     const bool gc_on_save = bs->gc_on;
     bs->gc_on = false;
 
+    const bool handles_on_save = bs->handles_on;
+    bs->handles_on = false;
+
     const Bs_Value a = bs_stack_pop(bs);
     bs_check_object_type(bs, a, BS_OBJECT_STR, "module name");
 
@@ -1243,16 +1253,14 @@ static void bs_import(Bs *bs) {
         }
 
         bs_stack_push(bs, m->result);
-        bs->gc_on = gc_on_save;
-        return;
+        goto defer;
     }
 
     // Normal
     {
         bs_da_push_many(bs, b, ".bs", 4);
         if (bs_import_language(bs, bs_buffer_reset(b, start), resolved.size)) {
-            bs->gc_on = gc_on_save;
-            return;
+            goto defer;
         }
         b->count = start + resolved.size;
     }
@@ -1261,8 +1269,7 @@ static void bs_import(Bs *bs) {
     {
         bs_da_push_many(bs, b, ".bsx", 5);
         if (bs_import_language(bs, bs_buffer_reset(b, start), resolved.size)) {
-            bs->gc_on = gc_on_save;
-            return;
+            goto defer;
         }
         b->count = start + resolved.size;
     }
@@ -1316,8 +1323,11 @@ static void bs_import(Bs *bs) {
         bs_modules_push(bs, &bs->modules, module);
 
         bs_stack_push(bs, module.result);
-        bs->gc_on = gc_on_save;
     }
+
+defer:
+    bs->gc_on = gc_on_save;
+    bs->handles_on = handles_on_save;
 }
 
 static Bs_Value
@@ -1528,9 +1538,11 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
 static_assert(BS_COUNT_OPS == 64, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
+    const bool handles_on_save = bs->handles_on;
     const size_t frames_count_save = bs->frames.count;
 
     bs->gc_on = true;
+    bs->handles_on = false;
     while (true) {
 #ifdef BS_STEP_DEBUG
         Bs_Writer *w = &bs->config.log;
@@ -1573,6 +1585,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 }
 
                 bs->gc_on = gc_on_save;
+                bs->handles_on = handles_on_save;
                 return;
             }
 
@@ -2383,6 +2396,7 @@ end:
 
     bs->upvalues = NULL;
     bs->gc_on = false;
+    bs->handles_on = false;
 
     bs->running = false;
 
