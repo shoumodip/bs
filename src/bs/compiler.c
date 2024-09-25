@@ -571,12 +571,9 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         loc = token.loc;
         switch (token.type) {
         case BS_TOKEN_DOT: {
-            const Bs_Op op_get = c->chunk->data[c->chunk->last];
-            const Bs_Op op_set = bs_op_get_to_set(op_get);
-            if (op_set == BS_OP_RET && op_get != BS_OP_CALL && op_get != BS_OP_INVOKE &&
-                op_get != BS_OP_SUPER_INVOKE && op_get != BS_OP_IMPORT &&
-                op_get != BS_OP_LRECEIVER && op_get != BS_OP_URECEIVER &&
-                op_get != BS_OP_ISET_CHAIN) {
+            const Bs_Op op = c->chunk->data[c->chunk->last];
+            if (op == BS_OP_GSET || op == BS_OP_LSET || op == BS_OP_USET || op == BS_OP_ISET ||
+                op == BS_OP_ISET_CONST) {
                 bs_compile_error_unexpected(c, &token);
             }
 
@@ -788,12 +785,9 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         } break;
 
         case BS_TOKEN_LBRACKET: {
-            const Bs_Op op_get = c->chunk->data[c->chunk->last];
-            const Bs_Op op_set = bs_op_get_to_set(op_get);
-            if (op_set == BS_OP_RET && op_get != BS_OP_CALL && op_get != BS_OP_INVOKE &&
-                op_get != BS_OP_SUPER_INVOKE && op_get != BS_OP_IMPORT &&
-                op_get != BS_OP_LRECEIVER && op_get != BS_OP_URECEIVER &&
-                op_get != BS_OP_ISET_CHAIN) {
+            const Bs_Op op = c->chunk->data[c->chunk->last];
+            if (op == BS_OP_GSET || op == BS_OP_LSET || op == BS_OP_USET || op == BS_OP_ISET ||
+                op == BS_OP_ISET_CONST) {
                 bs_compile_error_unexpected(c, &token);
             }
 
