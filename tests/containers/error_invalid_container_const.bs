@@ -1,2 +1,2 @@
-var x = 69;
+var x = nil;
 x.foo;

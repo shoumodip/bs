@@ -1,4 +1,4 @@
-:i count 171
+:i count 182
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -432,16 +432,16 @@ arrays/error_index_out_of_bounds.bsx:3:14: error: cannot get value at index 0 in
 :i returncode 1
 :b stdout 0
 
-:b stderr 88
-arrays/error_invalid_index.bs:2:4: error: expected array index to be number, got string
+:b stderr 89
+arrays/error_invalid_index.bs:2:4: error: expected array index to be number, got boolean
 
 :b shell 40
 ../bin/bs arrays/error_invalid_index.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 89
-arrays/error_invalid_index.bsx:2:4: error: expected array index to be number, got string
+:b stderr 90
+arrays/error_invalid_index.bsx:2:4: error: expected array index to be number, got capness
 
 :b shell 46
 ../bin/bs arrays/error_invalid_index_assign.bs
@@ -458,22 +458,6 @@ arrays/error_invalid_index_assign.bs:2:4: error: expected array index to be numb
 
 :b stderr 96
 arrays/error_invalid_index_assign.bsx:2:4: error: expected array index to be number, got string
-
-:b shell 45
-../bin/bs arrays/error_invalid_index_const.bs
-:i returncode 1
-:b stdout 0
-
-:b stderr 94
-arrays/error_invalid_index_const.bs:2:4: error: expected array index to be number, got string
-
-:b shell 46
-../bin/bs arrays/error_invalid_index_const.bsx
-:i returncode 1
-:b stdout 0
-
-:b stderr 95
-arrays/error_invalid_index_const.bsx:2:4: error: expected array index to be number, got string
 
 :b shell 52
 ../bin/bs arrays/error_invalid_index_const_assign.bs
@@ -554,64 +538,64 @@ tables/error_invalid_key_assign.bsx:2:4: error: cannot use 'bruh' as table key
 :i returncode 1
 :b stdout 0
 
-:b stderr 81
-containers/error_invalid_container.bs:2:2: error: cannot index into number value
+:b stderr 82
+containers/error_invalid_container.bs:2:2: error: cannot invoke or index into nil
 
 :b shell 48
 ../bin/bs containers/error_invalid_container.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 82
-containers/error_invalid_container.bsx:2:2: error: cannot index into number value
+:b stderr 84
+containers/error_invalid_container.bsx:2:2: error: cannot invoke or index into bruh
 
 :b shell 53
 ../bin/bs containers/error_invalid_container_const.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 87
-containers/error_invalid_container_const.bs:2:2: error: cannot index into number value
+:b stderr 88
+containers/error_invalid_container_const.bs:2:2: error: cannot invoke or index into nil
 
 :b shell 54
 ../bin/bs containers/error_invalid_container_const.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 88
-containers/error_invalid_container_const.bsx:2:2: error: cannot index into number value
+:b stderr 90
+containers/error_invalid_container_const.bsx:2:2: error: cannot invoke or index into bruh
 
 :b shell 54
 ../bin/bs containers/error_invalid_container_assign.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 101
-containers/error_invalid_container_assign.bs:2:2: error: cannot take mutable index into number value
+:b stderr 95
+containers/error_invalid_container_assign.bs:2:2: error: cannot take mutable index into number
 
 :b shell 55
 ../bin/bs containers/error_invalid_container_assign.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 102
-containers/error_invalid_container_assign.bsx:2:2: error: cannot take mutable index into number value
+:b stderr 96
+containers/error_invalid_container_assign.bsx:2:2: error: cannot take mutable index into number
 
 :b shell 60
 ../bin/bs containers/error_invalid_container_const_assign.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 107
-containers/error_invalid_container_const_assign.bs:2:2: error: cannot take mutable index into number value
+:b stderr 101
+containers/error_invalid_container_const_assign.bs:2:2: error: cannot take mutable index into number
 
 :b shell 61
 ../bin/bs containers/error_invalid_container_const_assign.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 108
-containers/error_invalid_container_const_assign.bsx:2:2: error: cannot take mutable index into number value
+:b stderr 102
+containers/error_invalid_container_const_assign.bsx:2:2: error: cannot take mutable index into number
 
 :b shell 35
 ../bin/bs containers/in_operator.bs
@@ -652,16 +636,16 @@ cap
 :i returncode 1
 :b stdout 0
 
-:b stderr 93
-containers/error_in_operator_invalid_container.bs:1:4: error: cannot index into number value
+:b stderr 87
+containers/error_in_operator_invalid_container.bs:1:4: error: cannot index into number
 
 :b shell 60
 ../bin/bs containers/error_in_operator_invalid_container.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 94
-containers/error_in_operator_invalid_container.bsx:1:4: error: cannot index into number value
+:b stderr 88
+containers/error_in_operator_invalid_container.bsx:1:4: error: cannot index into number
 
 :b shell 55
 ../bin/bs containers/error_in_operator_invalid_index.bs
@@ -684,32 +668,32 @@ containers/error_in_operator_invalid_index.bsx:1:6: error: cannot use 'bruh' as 
 :i returncode 1
 :b stdout 0
 
-:b stderr 105
-containers/error_undefined_c_instance_property.bs:1:9: error: undefined instance property or method: foo
+:b stderr 110
+containers/error_undefined_c_instance_property.bs:1:9: error: undefined instance property or method name: foo
 
 :b shell 60
 ../bin/bs containers/error_undefined_c_instance_property.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 106
-containers/error_undefined_c_instance_property.bsx:1:9: error: undefined instance property or method: foo
+:b stderr 111
+containers/error_undefined_c_instance_property.bsx:1:9: error: undefined instance property or method name: foo
 
 :b shell 57
 ../bin/bs containers/error_undefined_instance_property.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 103
-containers/error_undefined_instance_property.bs:2:7: error: undefined instance property or method: foo
+:b stderr 108
+containers/error_undefined_instance_property.bs:2:7: error: undefined instance property or method name: foo
 
 :b shell 58
 ../bin/bs containers/error_undefined_instance_property.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 104
-containers/error_undefined_instance_property.bsx:2:7: error: undefined instance property or method: foo
+:b stderr 109
+containers/error_undefined_instance_property.bsx:2:7: error: undefined instance property or method name: foo
 
 :b shell 49
 ../bin/bs containers/error_undefined_table_key.bs
@@ -1006,16 +990,16 @@ foo 69
 :i returncode 1
 :b stdout 0
 
-:b stderr 78
-loops/error_invalid_iterator.bs:1:13: error: cannot iterate over number value
+:b stderr 72
+loops/error_invalid_iterator.bs:1:13: error: cannot iterate over number
 
 :b shell 42
 ../bin/bs loops/error_invalid_iterator.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 79
-loops/error_invalid_iterator.bsx:1:19: error: cannot iterate over number value
+:b stderr 73
+loops/error_invalid_iterator.bsx:1:19: error: cannot iterate over number
 
 :b shell 44
 ../bin/bs loops/error_invalid_range_start.bs
@@ -1146,7 +1130,7 @@ functions/error_stack_trace.bsx:13:4: in foo()
 [C]: error: expected argument #1 to be string, got number
 functions/error_native_stack_trace.bs:2:24: in str.reverse()
 [C]: in foo()
-functions/error_native_stack_trace.bs:6:14: in array.map()
+functions/error_native_stack_trace.bs:6:15: in array.map()
 functions/error_native_stack_trace.bs:9:5: in main()
 
 :b shell 48
@@ -1158,7 +1142,7 @@ functions/error_native_stack_trace.bs:9:5: in main()
 [C]: error: expected argument #1 to be string, got number
 functions/error_native_stack_trace.bsx:2:21: in str.reverse()
 [C]: in foo()
-functions/error_native_stack_trace.bsx:6:14: in array.map()
+functions/error_native_stack_trace.bsx:6:15: in array.map()
 functions/error_native_stack_trace.bsx:9:5: in main()
 
 :b shell 26
@@ -1614,21 +1598,48 @@ oop/error_undefined_super_method.bsx:8:2: in A()
 
 :b stderr 0
 
+:b shell 30
+../bin/bs invokation/chain.bsx
+:i returncode 0
+:b stdout 14
+69
+420
+69
+420
+
+:b stderr 0
+
 :b shell 52
 ../bin/bs invokation/error_call_invalid_container.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 86
-invokation/error_call_invalid_container.bs:2:2: error: cannot index into number value
+:b stderr 87
+invokation/error_call_invalid_container.bs:2:2: error: cannot invoke or index into nil
+
+:b shell 53
+../bin/bs invokation/error_call_invalid_container.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 89
+invokation/error_call_invalid_container.bsx:2:2: error: cannot invoke or index into bruh
 
 :b shell 46
 ../bin/bs invokation/error_call_invalid_key.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 95
-invokation/error_call_invalid_key.bs:2:4: error: expected array index to be number, got string
+:b stderr 92
+invokation/error_call_invalid_key.bs:2:4: error: expected array index to be number, got nil
+
+:b shell 47
+../bin/bs invokation/error_call_invalid_key.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 94
+invokation/error_call_invalid_key.bsx:2:4: error: expected array index to be number, got bruh
 
 :b shell 42
 ../bin/bs invokation/error_invoked_body.bs
@@ -1639,6 +1650,15 @@ invokation/error_call_invalid_key.bs:2:4: error: expected array index to be numb
 invokation/error_invoked_body.bs:3:13: error: invalid operands to binary (+): nil, number
 invokation/error_invoked_body.bs:7:4: in <anonymous>()
 
+:b shell 43
+../bin/bs invokation/error_invoked_body.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 148
+invokation/error_invoked_body.bsx:3:14: error: invalid operands to binary (+): bruh, number
+invokation/error_invoked_body.bsx:7:4: in <anonymous>()
+
 :b shell 56
 ../bin/bs invokation/error_key_call_argument_location.bs
 :i returncode 1
@@ -1648,13 +1668,30 @@ invokation/error_invoked_body.bs:7:4: in <anonymous>()
 [C]: error: expected argument #1 to be string, got nil
 invokation/error_key_call_argument_location.bs:5:5: in str.reverse()
 
+:b shell 57
+../bin/bs invokation/error_key_call_argument_location.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 126
+[C]: error: expected argument #1 to be string, got bruh
+invokation/error_key_call_argument_location.bsx:5:5: in str.reverse()
+
 :b shell 55
 ../bin/bs invokation/error_key_call_invalid_function.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 83
-invokation/error_key_call_invalid_function.bs:5:4: error: cannot call number value
+:b stderr 77
+invokation/error_key_call_invalid_function.bs:5:4: error: cannot call number
+
+:b shell 56
+../bin/bs invokation/error_key_call_invalid_function.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 78
+invokation/error_key_call_invalid_function.bsx:5:4: error: cannot call number
 
 :b shell 50
 ../bin/bs invokation/error_key_call_wrong_arity.bs
@@ -1664,6 +1701,14 @@ invokation/error_key_call_invalid_function.bs:5:4: error: cannot call number val
 :b stderr 81
 invokation/error_key_call_wrong_arity.bs:7:4: error: expected 0 arguments, got 1
 
+:b shell 51
+../bin/bs invokation/error_key_call_wrong_arity.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 82
+invokation/error_key_call_wrong_arity.bsx:7:4: error: expected 0 arguments, got 1
+
 :b shell 53
 ../bin/bs invokation/error_method_call_wrong_arity.bs
 :i returncode 1
@@ -1671,6 +1716,14 @@ invokation/error_key_call_wrong_arity.bs:7:4: error: expected 0 arguments, got 1
 
 :b stderr 84
 invokation/error_method_call_wrong_arity.bs:8:6: error: expected 0 arguments, got 1
+
+:b shell 54
+../bin/bs invokation/error_method_call_wrong_arity.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 85
+invokation/error_method_call_wrong_arity.bsx:8:6: error: expected 0 arguments, got 1
 
 :b shell 59
 ../bin/bs invokation/error_native_call_argument_location.bs
@@ -1681,6 +1734,15 @@ invokation/error_method_call_wrong_arity.bs:8:6: error: expected 0 arguments, go
 [C]: error: expected argument #1 to be string, got nil
 invokation/error_native_call_argument_location.bs:1:24: in str.reverse()
 
+:b shell 60
+../bin/bs invokation/error_native_call_argument_location.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 130
+[C]: error: expected argument #1 to be string, got bruh
+invokation/error_native_call_argument_location.bsx:1:24: in str.reverse()
+
 :b shell 53
 ../bin/bs invokation/error_native_call_wrong_arity.bs
 :i returncode 1
@@ -1689,6 +1751,15 @@ invokation/error_native_call_argument_location.bs:1:24: in str.reverse()
 :b stderr 106
 [C]: error: expected 1 argument, got 2
 invokation/error_native_call_wrong_arity.bs:1:23: in str.reverse()
+
+:b shell 54
+../bin/bs invokation/error_native_call_wrong_arity.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 107
+[C]: error: expected 1 argument, got 2
+invokation/error_native_call_wrong_arity.bsx:1:23: in str.reverse()
 
 :b shell 61
 ../bin/bs invokation/error_property_call_argument_location.bs
@@ -1699,13 +1770,30 @@ invokation/error_native_call_wrong_arity.bs:1:23: in str.reverse()
 [C]: error: expected argument #1 to be string, got nil
 invokation/error_property_call_argument_location.bs:5:7: in str.reverse()
 
+:b shell 62
+../bin/bs invokation/error_property_call_argument_location.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 131
+[C]: error: expected argument #1 to be string, got bruh
+invokation/error_property_call_argument_location.bsx:5:7: in str.reverse()
+
 :b shell 60
 ../bin/bs invokation/error_property_call_invalid_function.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 88
-invokation/error_property_call_invalid_function.bs:5:6: error: cannot call number value
+:b stderr 82
+invokation/error_property_call_invalid_function.bs:5:6: error: cannot call number
+
+:b shell 61
+../bin/bs invokation/error_property_call_invalid_function.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 83
+invokation/error_property_call_invalid_function.bsx:5:6: error: cannot call number
 
 :b shell 55
 ../bin/bs invokation/error_property_call_wrong_arity.bs
@@ -1714,6 +1802,14 @@ invokation/error_property_call_invalid_function.bs:5:6: error: cannot call numbe
 
 :b stderr 86
 invokation/error_property_call_wrong_arity.bs:8:6: error: expected 0 arguments, got 1
+
+:b shell 56
+../bin/bs invokation/error_property_call_wrong_arity.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 87
+invokation/error_property_call_wrong_arity.bsx:8:6: error: expected 0 arguments, got 1
 
 :b shell 32
 ../bin/bs invokation/key_call.bs
@@ -1830,16 +1926,16 @@ xs["bar"]; # Expression based index
 :i returncode 1
 :b stdout 0
 
-:b stderr 78
-delete/error_invalid_container.bs:2:9: error: cannot delete from number value
+:b stderr 72
+delete/error_invalid_container.bs:2:9: error: cannot delete from number
 
 :b shell 44
 ../bin/bs delete/error_invalid_container.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 79
-delete/error_invalid_container.bsx:2:8: error: cannot delete from number value
+:b stderr 73
+delete/error_invalid_container.bsx:2:8: error: cannot delete from number
 
 :b shell 51
 ../bin/bs delete/error_invalid_instance_property.bs

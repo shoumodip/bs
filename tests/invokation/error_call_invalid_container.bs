@@ -1,2 +1,2 @@
-var t = 69;
+var t = nil;
 t.f();

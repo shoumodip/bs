@@ -78,6 +78,7 @@ typedef struct {
     size_t capacity;
 } Bs_Grays;
 
+static_assert(BS_COUNT_OBJECTS == 13, "Update bs.builtin_methods");
 struct Bs {
     // Stack
     Bs_Stack stack;
@@ -88,6 +89,13 @@ struct Bs {
     Bs_Str *cwd;
     Bs_Buffer paths;
     Bs_Modules modules;
+
+    // Methods for builtin types:
+    //   BS_VALUE_NUM
+    //   BS_OBJECT_STR
+    //   BS_OBJECT_ARRAY
+    //   BS_OBJECT_TABLE
+    Bs_Map builtin_methods[4];
 
     // Roots
     Bs_Map globals;
@@ -447,6 +455,10 @@ void bs_free(Bs *bs) {
     bs_map_free(bs, &bs->globals);
     bs_map_free(bs, &bs->strings);
 
+    for (size_t i = 0; i < bs_c_array_size(bs->builtin_methods); i++) {
+        bs_map_free(bs, &bs->builtin_methods[i]);
+    }
+
     Bs_Object *object = bs->objects;
     while (object) {
         Bs_Object *next = object->next;
@@ -555,6 +567,33 @@ static Bs_Pretty_Printer *bs_pretty_printer(Bs *bs, Bs_Writer *w) {
 
 void bs_value_write(Bs *bs, Bs_Writer *w, Bs_Value value) {
     bs_value_write_impl(bs_pretty_printer(bs, w), value);
+}
+
+static Bs_Map *bs_builtin_value_methods_map(Bs *bs, Bs_Value_Type type) {
+    assert(type == BS_VALUE_NUM);
+    return &bs->builtin_methods[type - BS_VALUE_NUM];
+}
+
+static Bs_Map *bs_builtin_object_methods_map(Bs *bs, Bs_Object_Type type) {
+    // The rest are internal and/or have methods already
+    assert(type > BS_OBJECT_FN && type <= BS_OBJECT_TABLE);
+    return &bs->builtin_methods[BS_VALUE_OBJECT + type - BS_VALUE_NUM - BS_OBJECT_STR];
+}
+
+void bs_builtin_value_methods_add(Bs *bs, Bs_Value_Type type, Bs_Sv name, Bs_C_Fn_Ptr ptr) {
+    bs_map_set(
+        bs,
+        bs_builtin_value_methods_map(bs, type),
+        bs_value_object(bs_str_new(bs, name)),
+        bs_value_object(bs_c_fn_new(bs, name, ptr)));
+}
+
+void bs_builtin_object_methods_add(Bs *bs, Bs_Object_Type type, Bs_Sv name, Bs_C_Fn_Ptr ptr) {
+    bs_map_set(
+        bs,
+        bs_builtin_object_methods_map(bs, type),
+        bs_value_object(bs_str_new(bs, name)),
+        bs_value_object(bs_c_fn_new(bs, name, ptr)));
 }
 
 // Buffer
@@ -685,6 +724,28 @@ void bs_unwind(Bs *bs, unsigned char exit) {
     longjmp(bs->unwind, 1);
 }
 
+static bool bs_value_is_receiver(Bs_Value value) {
+    switch (value.type) {
+    case BS_VALUE_NIL:
+    case BS_VALUE_BOOL:
+        return false;
+
+    case BS_VALUE_NUM:
+        return true;
+
+    case BS_VALUE_OBJECT:
+        switch (value.as.object->type) {
+        case BS_OBJECT_STR:
+        case BS_OBJECT_ARRAY:
+        case BS_OBJECT_TABLE:
+            return true;
+
+        default:
+            return false;
+        }
+    }
+}
+
 void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
     fflush(stdout); // Flush stdout beforehand *just in case*
 
@@ -769,12 +830,14 @@ void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
                 bs_pretty_printer_quote(p, sv);
                 bs_fmt(w, ")");
             } else if (callee->closure->fn->name) {
-                assert(callee->base->type == BS_VALUE_OBJECT);
-                if (callee->base->as.object->type == BS_OBJECT_INSTANCE) {
-                    const Bs_Instance *instance = (const Bs_Instance *)callee->base->as.object;
+                const Bs_Value this = *callee->base;
+                if (this.type == BS_VALUE_OBJECT && this.as.object->type == BS_OBJECT_INSTANCE) {
+                    const Bs_Instance *instance = (const Bs_Instance *)this.as.object;
                     if (callee->closure != instance->class->init) {
                         bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(*instance->class->name));
                     }
+                } else if (bs_value_is_receiver(this)) {
+                    bs_fmt(w, "%s.", bs_value_type_name(this, caller->extended));
                 }
 
                 bs_fmt(w, Bs_Sv_Fmt "()", Bs_Sv_Arg(*callee->closure->fn->name));
@@ -783,13 +846,14 @@ void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
             }
         } else {
             const Bs_C_Fn *fn = callee->native;
-
-            assert(callee->base[-1].type == BS_VALUE_OBJECT);
-            if (callee->base[-1].as.object->type == BS_OBJECT_C_INSTANCE) {
-                const Bs_C_Instance *instance = (const Bs_C_Instance *)callee->base[-1].as.object;
+            const Bs_Value this = callee->base[-1];
+            if (this.type == BS_VALUE_OBJECT && this.as.object->type == BS_OBJECT_C_INSTANCE) {
+                const Bs_C_Instance *instance = (const Bs_C_Instance *)this.as.object;
                 if (fn != instance->class->init) {
                     bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(instance->class->name));
                 }
+            } else if (bs_value_is_receiver(this)) {
+                bs_fmt(w, "%s.", bs_value_type_name(this, caller->extended));
             }
 
             bs_fmt(w, Bs_Sv_Fmt "()", Bs_Sv_Arg(fn->name));
@@ -983,8 +1047,7 @@ static void bs_call_closure(Bs *bs, size_t offset, Bs_Closure *closure, size_t a
 static_assert(BS_COUNT_OBJECTS == 13, "Update bs_call_value()");
 static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
     if (value.type != BS_VALUE_OBJECT) {
-        bs_error_at(
-            bs, offset, "cannot call %s value", bs_value_type_name(value, bs->frame->extended));
+        bs_error_at(bs, offset, "cannot call %s", bs_value_type_name(value, bs->frame->extended));
     }
 
     switch (value.as.object->type) {
@@ -1060,8 +1123,7 @@ static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
     } break;
 
     default:
-        bs_error_at(
-            bs, offset, "cannot call %s value", bs_value_type_name(value, bs->frame->extended));
+        bs_error_at(bs, offset, "cannot call %s", bs_value_type_name(value, bs->frame->extended));
     }
 }
 
@@ -1296,13 +1358,41 @@ bs_check_map_get_at(Bs *bs, size_t location, Bs_Map *map, Bs_Value index, const 
 }
 
 static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
-    if (container.type != BS_VALUE_OBJECT) {
+    if (container.type == BS_VALUE_NIL || container.type == BS_VALUE_BOOL) {
         bs_error(
-            bs, "cannot index into %s value", bs_value_type_name(container, bs->frame->extended));
+            bs,
+            "cannot invoke or index into %s",
+            bs_value_type_name(container, bs->frame->extended));
     }
 
-    // The only non mapped container
-    if (container.as.object->type == BS_OBJECT_ARRAY) {
+    if (container.type == BS_VALUE_NUM) {
+        bs_check_object_type_at(bs, 1, index, BS_OBJECT_STR, "method name");
+        return bs_value_object(bs_bound_method_new(
+            bs,
+            container,
+            bs_check_map_get_at(
+                bs, 1, bs_builtin_value_methods_map(bs, container.type), index, "method")));
+    }
+
+    Bs_Map *map = NULL;
+    const char *label = NULL;
+
+    switch (container.as.object->type) {
+    case BS_OBJECT_ARRAY: {
+        if (index.type == BS_VALUE_OBJECT && index.as.object->type == BS_OBJECT_STR) {
+            bs_check_object_type_at(bs, 1, index, BS_OBJECT_STR, "method name");
+            return bs_value_object(bs_bound_method_new(
+                bs,
+                container,
+                bs_check_map_get_at(
+                    bs,
+                    1,
+                    bs_builtin_object_methods_map(bs, container.as.object->type),
+                    index,
+                    "method")));
+        }
+
+        // The only non mapped container
         bs_check_whole_number_at(bs, 1, index, "array index");
         Bs_Array *array = (Bs_Array *)container.as.object;
 
@@ -1316,16 +1406,31 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
         }
 
         return value;
-    }
+    } break;
 
-    Bs_Map *map = NULL;
-    const char *label = NULL;
+    case BS_OBJECT_STR:
+        bs_check_object_type_at(bs, 1, index, BS_OBJECT_STR, "method name");
+        return bs_value_object(bs_bound_method_new(
+            bs,
+            container,
+            bs_check_map_get_at(
+                bs,
+                1,
+                bs_builtin_object_methods_map(bs, container.as.object->type),
+                index,
+                "method")));
+        break;
 
-    switch (container.as.object->type) {
-    case BS_OBJECT_TABLE:
+    case BS_OBJECT_TABLE: {
+        Bs_Value value;
+        if (bs_map_get(
+                bs, bs_builtin_object_methods_map(bs, container.as.object->type), index, &value)) {
+            return bs_value_object(bs_bound_method_new(bs, container, value));
+        }
+
         map = &((Bs_Table *)container.as.object)->map;
         label = "table key";
-        break;
+    } break;
 
     case BS_OBJECT_INSTANCE: {
         Bs_Instance *instance = (Bs_Instance *)container.as.object;
@@ -1336,12 +1441,12 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
         }
 
         map = &instance->properties;
-        label = "instance property or method";
+        label = "instance property or method name";
     } break;
 
     case BS_OBJECT_C_INSTANCE:
         map = &((Bs_C_Instance *)container.as.object)->class->methods;
-        label = "instance property or method";
+        label = "instance property or method name";
         break;
 
     case BS_OBJECT_C_LIB:
@@ -1351,7 +1456,9 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
 
     default:
         bs_error(
-            bs, "cannot index into %s value", bs_value_type_name(container, bs->frame->extended));
+            bs,
+            "cannot invoke or index into %s",
+            bs_value_type_name(container, bs->frame->extended));
     }
 
     assert(map);
@@ -1363,7 +1470,7 @@ static void bs_container_set(Bs *bs, Bs_Value container, Bs_Value index, Bs_Valu
     if (container.type != BS_VALUE_OBJECT) {
         bs_error(
             bs,
-            "cannot take mutable index into %s value",
+            "cannot take mutable index into %s",
             bs_value_type_name(container, bs->frame->extended));
     }
 
@@ -1393,7 +1500,7 @@ static void bs_container_set(Bs *bs, Bs_Value container, Bs_Value index, Bs_Valu
     } else {
         bs_error(
             bs,
-            "cannot take mutable index into %s value",
+            "cannot take mutable index into %s",
             bs_value_type_name(container, bs->frame->extended));
     }
 }
@@ -1604,9 +1711,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value super = bs_stack_peek(bs, 1);
             if (super.type != BS_VALUE_OBJECT || super.as.object->type != BS_OBJECT_CLASS) {
                 bs_error(
-                    bs,
-                    "cannot inherit from %s value",
-                    bs_value_type_name(super, bs->frame->extended));
+                    bs, "cannot inherit from %s", bs_value_type_name(super, bs->frame->extended));
             }
 
             const Bs_Value class = bs_stack_peek(bs, 0);
@@ -1864,9 +1969,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
             if (container.type != BS_VALUE_OBJECT) {
                 bs_error(
-                    bs,
-                    "cannot index into %s value",
-                    bs_value_type_name(container, bs->frame->extended));
+                    bs, "cannot index into %s", bs_value_type_name(container, bs->frame->extended));
             }
 
             Bs_Map *map = NULL;
@@ -1900,9 +2003,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
             default:
                 bs_error(
-                    bs,
-                    "cannot index into %s value",
-                    bs_value_type_name(container, bs->frame->extended));
+                    bs, "cannot index into %s", bs_value_type_name(container, bs->frame->extended));
             }
 
             if (key.type == BS_VALUE_NIL) {
@@ -1921,10 +2022,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         case BS_OP_LEN: {
             const Bs_Value a = bs_stack_peek(bs, 0);
             if (a.type != BS_VALUE_OBJECT) {
-                bs_error(
-                    bs,
-                    "cannot get length of %s value",
-                    bs_value_type_name(a, bs->frame->extended));
+                bs_error(bs, "cannot get length of %s", bs_value_type_name(a, bs->frame->extended));
             }
 
             size_t size;
@@ -1942,10 +2040,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 break;
 
             default:
-                bs_error(
-                    bs,
-                    "cannot get length of %s value",
-                    bs_value_type_name(a, bs->frame->extended));
+                bs_error(bs, "cannot get length of %s", bs_value_type_name(a, bs->frame->extended));
             }
 
             bs_stack_pop(bs);
@@ -1984,7 +2079,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             if (container.type != BS_VALUE_OBJECT) {
                 bs_error(
                     bs,
-                    "cannot delete from %s value",
+                    "cannot delete from %s",
                     bs_value_type_name(container, bs->frame->extended));
             }
 
@@ -2005,7 +2100,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             default:
                 bs_error(
                     bs,
-                    "cannot delete from %s value",
+                    "cannot delete from %s",
                     bs_value_type_name(container, bs->frame->extended));
             }
 
@@ -2030,7 +2125,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             if (container.type != BS_VALUE_OBJECT) {
                 bs_error(
                     bs,
-                    "cannot delete from %s value",
+                    "cannot delete from %s",
                     bs_value_type_name(container, bs->frame->extended));
             }
 
@@ -2051,7 +2146,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             default:
                 bs_error(
                     bs,
-                    "cannot delete from %s value",
+                    "cannot delete from %s",
                     bs_value_type_name(container, bs->frame->extended));
             }
 
@@ -2185,7 +2280,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             if (container.type != BS_VALUE_OBJECT) {
                 bs_error(
                     bs,
-                    "cannot iterate over %s value",
+                    "cannot iterate over %s",
                     bs_value_type_name(container, bs->frame->extended));
             }
 
@@ -2215,7 +2310,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             } else {
                 bs_error(
                     bs,
-                    "cannot iterate over %s value",
+                    "cannot iterate over %s",
                     bs_value_type_name(container, bs->frame->extended));
             }
         } break;

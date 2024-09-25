@@ -491,10 +491,7 @@ Bs_Value bs_str_tolower(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 Bs_Value bs_str_toupper(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 1);
-    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
-
-    const Bs_Str *src = (const Bs_Str *)args[0].as.object;
+    const Bs_Str *src = (const Bs_Str *)args[-1].as.object;
     Bs_Str *dst = bs_str_new(bs, Bs_Sv(src->data, src->size));
     for (size_t i = 0; i < dst->size; i++) {
         dst->data[i] = toupper(dst->data[i]);
@@ -1062,12 +1059,11 @@ Bs_Value bs_regex_replace(Bs *bs, Bs_Value *args, size_t arity) {
 
 // Array
 Bs_Value bs_array_map(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 2);
-    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
-    bs_arg_check_callable(bs, args, 1);
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_callable(bs, args, 0);
 
-    const Bs_Array *src = (const Bs_Array *)args[0].as.object;
-    const Bs_Value fn = args[1];
+    const Bs_Array *src = (const Bs_Array *)args[-1].as.object;
+    const Bs_Value fn = args[0];
     Bs_Array *dst = bs_array_new(bs);
 
     for (size_t i = 0; i < src->count; i++) {
@@ -1263,10 +1259,9 @@ Bs_Value bs_array_reverse(Bs *bs, Bs_Value *args, size_t arity) {
 
 // Table
 Bs_Value bs_table_copy(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 1);
-    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_TABLE);
+    bs_check_arity(bs, arity, 0);
 
-    const Bs_Table *src = (const Bs_Table *)args[0].as.object;
+    const Bs_Table *src = (const Bs_Table *)args[-1].as.object;
     Bs_Table *dst = bs_table_new(bs);
 
     bs_map_copy(bs, &dst->map, &src->map);
@@ -1298,10 +1293,9 @@ Bs_Value bs_table_equal(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Math
-Bs_Value bs_math_sin(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 1);
-    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
-    return bs_value_num(sin(args[0].as.number));
+Bs_Value bs_num_sin(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    return bs_value_num(sin(args[-1].as.number));
 }
 
 Bs_Value bs_math_cos(Bs *bs, Bs_Value *args, size_t arity) {
@@ -1519,7 +1513,6 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_add_fn(bs, str, "reverse", "str.reverse", bs_str_reverse);
 
         bs_add_fn(bs, str, "tolower", "str.tolower", bs_str_tolower);
-        bs_add_fn(bs, str, "toupper", "str.toupper", bs_str_toupper);
         bs_add_fn(bs, str, "tonumber", "str.tonumber", bs_str_tonumber);
 
         bs_add_fn(bs, str, "find", "str.find", bs_str_find);
@@ -1567,7 +1560,6 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
 
     {
         Bs_Table *array = bs_table_new(bs);
-        bs_add_fn(bs, array, "map", "array.map", bs_array_map);
         bs_add_fn(bs, array, "filter", "array.filter", bs_array_filter);
         bs_add_fn(bs, array, "reduce", "array.reduce", bs_array_reduce);
 
@@ -1583,7 +1575,6 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
 
     {
         Bs_Table *table = bs_table_new(bs);
-        bs_add_fn(bs, table, "copy", "table.copy", bs_table_copy);
         bs_add_fn(bs, table, "equal", "table.equal", bs_table_equal);
         bs_global_set(bs, Bs_Sv_Static("table"), bs_value_object(table));
     }
@@ -1591,7 +1582,6 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     {
         Bs_Table *math = bs_table_new(bs);
         bs_add(bs, math, "PI", bs_value_num(M_PI));
-        bs_add_fn(bs, math, "sin", "math.sin", bs_math_sin);
         bs_add_fn(bs, math, "cos", "math.cos", bs_math_cos);
         bs_add_fn(bs, math, "tan", "math.tan", bs_math_tan);
         bs_add_fn(bs, math, "asin", "math.asin", bs_math_asin);
@@ -1610,4 +1600,9 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_add_fn(bs, math, "lerp", "math.lerp", bs_math_lerp);
         bs_global_set(bs, Bs_Sv_Static("math"), bs_value_object(math));
     }
+
+    bs_builtin_value_methods_add(bs, BS_VALUE_NUM, Bs_Sv_Static("sin"), bs_num_sin);
+    bs_builtin_object_methods_add(bs, BS_OBJECT_STR, Bs_Sv_Static("toupper"), bs_str_toupper);
+    bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("map"), bs_array_map);
+    bs_builtin_object_methods_add(bs, BS_OBJECT_TABLE, Bs_Sv_Static("copy"), bs_table_copy);
 }

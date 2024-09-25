@@ -573,7 +573,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         case BS_TOKEN_DOT: {
             const Bs_Op op = c->chunk->data[c->chunk->last];
             if (op == BS_OP_GSET || op == BS_OP_LSET || op == BS_OP_USET || op == BS_OP_ISET ||
-                op == BS_OP_ISET_CONST) {
+                op == BS_OP_ISET_CONST || op == BS_OP_CLOSURE) {
                 bs_compile_error_unexpected(c, &token);
             }
 
@@ -787,7 +787,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         case BS_TOKEN_LBRACKET: {
             const Bs_Op op = c->chunk->data[c->chunk->last];
             if (op == BS_OP_GSET || op == BS_OP_LSET || op == BS_OP_USET || op == BS_OP_ISET ||
-                op == BS_OP_ISET_CONST) {
+                op == BS_OP_ISET_CONST || op == BS_OP_CLOSURE) {
                 bs_compile_error_unexpected(c, &token);
             }
 
@@ -930,6 +930,7 @@ static size_t bs_compile_definition(Bs_Compiler *c, Bs_Token *name, bool public)
 
 static void bs_compile_stmt(Bs_Compiler *c);
 
+// TODO: add support for `fn (...) => ...`
 static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Token *name) {
     Bs_Lambda lambda = {.type = type};
     bs_compile_lambda_init(c, &lambda, name ? name->sv : (Bs_Sv){0});

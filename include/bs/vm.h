@@ -10,6 +10,7 @@
 
 // Interface
 typedef struct Bs Bs;
+typedef Bs_Value (*Bs_C_Fn_Ptr)(Bs *bs, Bs_Value *args, size_t arity);
 
 Bs *bs_new(void);
 void bs_free(Bs *bs);
@@ -22,6 +23,9 @@ bool bs_update_cwd(Bs *bs);
 void bs_global_set(Bs *bs, Bs_Sv name, Bs_Value value);
 
 void bs_value_write(Bs *bs, Bs_Writer *writer, Bs_Value value);
+
+void bs_builtin_value_methods_add(Bs *bs, Bs_Value_Type type, Bs_Sv name, Bs_C_Fn_Ptr ptr);
+void bs_builtin_object_methods_add(Bs *bs, Bs_Object_Type type, Bs_Sv name, Bs_C_Fn_Ptr ptr);
 
 // Buffer
 typedef struct {
@@ -47,14 +51,6 @@ typedef struct {
 } Bs_Config;
 
 Bs_Config *bs_config(Bs *bs);
-
-// FFI
-typedef Bs_Value (*Bs_C_Fn_Ptr)(Bs *bs, Bs_Value *args, size_t arity);
-
-typedef struct {
-    const char *name;
-    Bs_C_Fn_Ptr ptr;
-} Bs_FFI;
 
 // Errors
 void bs_unwind(Bs *bs, unsigned char exit);

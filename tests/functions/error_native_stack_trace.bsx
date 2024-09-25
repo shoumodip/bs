@@ -3,7 +3,7 @@ lit foo(s) {
 }
 
 lit main() {
-    array.map([1, 2], foo) fr
+    [1, 2].map(foo) fr
 }
 
 main() fr

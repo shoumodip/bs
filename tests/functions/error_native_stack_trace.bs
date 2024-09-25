@@ -3,7 +3,7 @@ fn foo(s) {
 }
 
 fn main() {
-    array.map([1, 2], foo);
+    [1, 2].map(foo);
 }
 
 main();
