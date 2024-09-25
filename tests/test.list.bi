@@ -668,32 +668,32 @@ containers/error_in_operator_invalid_index.bsx:1:6: error: cannot use 'bruh' as 
 :i returncode 1
 :b stdout 0
 
-:b stderr 110
-containers/error_undefined_c_instance_property.bs:1:9: error: undefined instance property or method name: foo
+:b stderr 105
+containers/error_undefined_c_instance_property.bs:1:9: error: undefined instance property or method: foo
 
 :b shell 60
 ../bin/bs containers/error_undefined_c_instance_property.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 111
-containers/error_undefined_c_instance_property.bsx:1:9: error: undefined instance property or method name: foo
+:b stderr 106
+containers/error_undefined_c_instance_property.bsx:1:9: error: undefined instance property or method: foo
 
 :b shell 57
 ../bin/bs containers/error_undefined_instance_property.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 108
-containers/error_undefined_instance_property.bs:2:7: error: undefined instance property or method name: foo
+:b stderr 103
+containers/error_undefined_instance_property.bs:2:7: error: undefined instance property or method: foo
 
 :b shell 58
 ../bin/bs containers/error_undefined_instance_property.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 109
-containers/error_undefined_instance_property.bsx:2:7: error: undefined instance property or method name: foo
+:b stderr 104
+containers/error_undefined_instance_property.bsx:2:7: error: undefined instance property or method: foo
 
 :b shell 49
 ../bin/bs containers/error_undefined_table_key.bs

@@ -743,7 +743,7 @@ void bs_unwind(Bs *bs, unsigned char exit) {
     longjmp(bs->unwind, 1);
 }
 
-static bool bs_value_is_receiver(Bs_Value value) {
+static bool bs_value_has_builtin_methods(Bs_Value value) {
     switch (value.type) {
     case BS_VALUE_NIL:
     case BS_VALUE_BOOL:
@@ -855,7 +855,7 @@ void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
                     if (callee->closure != instance->class->init) {
                         bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(*instance->class->name));
                     }
-                } else if (bs_value_is_receiver(this)) {
+                } else if (bs_value_has_builtin_methods(this)) {
                     bs_fmt(w, "%s.", bs_value_type_name(this, caller->extended));
                 }
 
@@ -871,7 +871,7 @@ void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
                 if (fn != instance->class->init) {
                     bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(instance->class->name));
                 }
-            } else if (bs_value_is_receiver(this)) {
+            } else if (bs_value_has_builtin_methods(this)) {
                 bs_fmt(w, "%s.", bs_value_type_name(this, caller->extended));
             }
 
@@ -1449,12 +1449,12 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
         }
 
         map = &instance->properties;
-        label = "instance property or method name";
+        label = "instance property or method";
     } break;
 
     case BS_OBJECT_C_INSTANCE:
         map = &((Bs_C_Instance *)container.as.object)->class->methods;
-        label = "instance property or method name";
+        label = "instance property or method";
         break;
 
     case BS_OBJECT_C_LIB:
@@ -1664,11 +1664,39 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         case BS_OP_INVOKE: {
             const Bs_Value name = bs_chunk_read_const(bs);
             const size_t arity = *bs->frame->ip++;
-
             const Bs_Value this = bs_stack_peek(bs, arity);
+
             Bs_Value method;
-            if (this.type == BS_VALUE_OBJECT) {
-                if (this.as.object->type == BS_OBJECT_INSTANCE) {
+            if (this.type == BS_VALUE_NUM) {
+                method =
+                    bs_check_map_get_at(bs, 1, bs_builtin_number_methods_map(bs), name, "method");
+            } else if (this.type == BS_VALUE_OBJECT) {
+                switch (this.as.object->type) {
+                case BS_OBJECT_STR:
+                case BS_OBJECT_ARRAY:
+                    method = bs_check_map_get_at(
+                        bs,
+                        1,
+                        bs_builtin_object_methods_map(bs, this.as.object->type),
+                        name,
+                        "method");
+                    break;
+
+                case BS_OBJECT_TABLE: {
+                    Bs_Table *table = (Bs_Table *)this.as.object;
+                    if (bs_map_get(bs, &table->map, name, &method)) {
+                        bs->stack.data[bs->stack.count - arity - 1] = method;
+                    } else {
+                        method = bs_check_map_get_at(
+                            bs,
+                            1,
+                            bs_builtin_object_methods_map(bs, this.as.object->type),
+                            name,
+                            "table key");
+                    }
+                } break;
+
+                case BS_OBJECT_INSTANCE: {
                     Bs_Instance *instance = (Bs_Instance *)this.as.object;
                     if (bs_map_get(bs, &instance->properties, name, &method)) {
                         bs->stack.data[bs->stack.count - arity - 1] = method;
@@ -1676,17 +1704,27 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                         method = bs_check_map_get_at(
                             bs, 1, &instance->class->methods, name, "instance property or method");
                     }
-                } else if (this.as.object->type == BS_OBJECT_C_INSTANCE) {
+                } break;
+
+                case BS_OBJECT_C_INSTANCE: {
                     Bs_C_Instance *instance = (Bs_C_Instance *)this.as.object;
                     method = bs_check_map_get_at(
                         bs, 1, &instance->class->methods, name, "instance property or method");
-                } else {
-                    method = bs_container_get(bs, this, name);
-                    bs_stack_set(bs, arity, method);
+                } break;
+
+                default:
+                    bs_error_at(
+                        bs,
+                        0,
+                        "cannot invoke or index into %s",
+                        bs_value_type_name(this, bs->frame->extended));
                 }
             } else {
-                method = bs_container_get(bs, this, name);
-                bs_stack_set(bs, arity, method);
+                bs_error_at(
+                    bs,
+                    0,
+                    "cannot invoke or index into %s",
+                    bs_value_type_name(this, bs->frame->extended));
             }
 
             bs_call_value(bs, 2, method, arity);
