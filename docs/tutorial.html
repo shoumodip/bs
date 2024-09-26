@@ -439,7 +439,7 @@ io.<span class='field'>println</span>(array);      <span class='comment'># Outpu
 </pre>
 <pre class='code'>
 <span class='comment'># Variables will be introduced later</span>
-<span class='keyword'>mf</span> array <span class='keyword'>=</span> [<span class='constant'>69</span>, <span class='constant'>420</span>] <span class='keyword'>fr</span>
+<span class='keyword'>mf</span> array = [<span class='constant'>69</span>, <span class='constant'>420</span>] <span class='keyword'>fr</span>
 
 <span class='comment'># Pretty printing by default!</span>
 io.<span class='field'>println</span>(array) <span class='keyword'>fr</span>        <span class='comment'># Output: [69, 420]</span>
@@ -451,18 +451,18 @@ io.<span class='field'>println</span>(array[<span class='constant'>0</span>]) <s
 io.<span class='field'>println</span>(array[<span class='constant'>2</span>]) <span class='keyword'>fr</span>     <span class='comment'># Error!</span>
 
 <span class='comment'># Array assignment</span>
-array[<span class='constant'>1</span>] <span class='keyword'>=</span> <span class='string'>"nice!"</span> <span class='keyword'>fr</span>
+array[<span class='constant'>1</span>] = <span class='string'>"nice!"</span> <span class='keyword'>fr</span>
 io.<span class='field'>println</span>(array) <span class='keyword'>fr</span>        <span class='comment'># Output: [69, "nice!"]</span>
 
 <span class='comment'># Array assignment out of bounds is NOT an error</span>
-array[<span class='constant'>3</span>] <span class='keyword'>=</span> <span class='string'>"Are you serious?"</span> <span class='keyword'>fr</span>
+array[<span class='constant'>3</span>] = <span class='string'>"Are you serious?"</span> <span class='keyword'>fr</span>
 io.<span class='field'>println</span>(array) <span class='keyword'>fr</span>        <span class='comment'># Output: [69, "nice!", bruh, "Are you serious?"]</span>
 
 <span class='comment'># Array length</span>
 io.<span class='field'>println</span>(<span class='keyword'>thicc</span>(array)) <span class='keyword'>fr</span> <span class='comment'># Output: 4</span>
 
 <span class='comment'># Due to the assignment semantics, appending to arrays is quite easy</span>
-array[<span class='keyword'>thicc</span>(array)] <span class='keyword'>=</span> <span class='constant'>420</span> <span class='keyword'>fr</span>
+array[<span class='keyword'>thicc</span>(array)] = <span class='constant'>420</span> <span class='keyword'>fr</span>
 io.<span class='field'>println</span>(array) <span class='keyword'>fr</span>        <span class='comment'># Output: [69, "nice!", bruh, "Are you serious?", 420]</span>
 </pre>
 </div>

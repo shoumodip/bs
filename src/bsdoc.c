@@ -48,7 +48,6 @@ static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type, bool extended) {
 
     case BS_TOKEN_EOL:
     case BS_TOKEN_LNOT:
-    case BS_TOKEN_SET:
         return extended ? BSDOC_STYLE_KEYWORD : BSDOC_STYLE_NONE;
 
     case BS_TOKEN_NIL:
