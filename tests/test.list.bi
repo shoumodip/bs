@@ -1,4 +1,4 @@
-:i count 212
+:i count 214
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -2750,4 +2750,22 @@ cap
 cap
 
 :b stderr 0
+
+:b shell 41
+../bin/bs core/error_expected_function.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 109
+[C]: error: expected argument #1 to be function, got nil
+core/error_expected_function.bs:1:8: in array.map()
+
+:b shell 42
+../bin/bs core/error_expected_function.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 111
+[C]: error: expected argument #1 to be function, got bruh
+core/error_expected_function.bsx:1:8: in array.map()
 

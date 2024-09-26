@@ -210,3 +210,5 @@
 ../bin/bs core/bit.bsx
 ../bin/bs core/ascii.bs
 ../bin/bs core/ascii.bsx
+../bin/bs core/error_expected_function.bs
+../bin/bs core/error_expected_function.bsx
