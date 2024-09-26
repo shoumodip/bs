@@ -60,16 +60,19 @@ Bs_Writer bs_file_writer(FILE *f) {
     return (Bs_Writer){.data = f, .write = bs_file_write};
 }
 
-void bs_fmt(Bs_Writer *w, const char *fmt, ...) {
-    static char bs_fmt_buffer[1024];
+static char bs_fmt_buffer[1024];
 
-    va_list args;
-    va_start(args, fmt);
+void bs_vfmt(Bs_Writer *w, const char *fmt, va_list args) {
     const int count = vsnprintf(bs_fmt_buffer, sizeof(bs_fmt_buffer), fmt, args);
     assert(count >= 0 && count + 1 < sizeof(bs_fmt_buffer));
-    va_end(args);
-
     w->write(w, Bs_Sv(bs_fmt_buffer, count));
+}
+
+void bs_fmt(Bs_Writer *w, const char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    bs_vfmt(w, fmt, args);
+    va_end(args);
 }
 
 char *bs_read_file(const char *path, size_t *size) {

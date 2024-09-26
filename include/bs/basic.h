@@ -35,6 +35,7 @@ struct Bs_Writer {
 
 Bs_Writer bs_file_writer(FILE *file);
 
+void bs_vfmt(Bs_Writer *writer, const char *fmt, va_list args);
 void bs_fmt(Bs_Writer *writer, const char *fmt, ...) __attribute__((__format__(__printf__, 2, 3)));
 
 // Defer

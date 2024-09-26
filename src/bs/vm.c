@@ -784,29 +784,10 @@ void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
 
     bs_fmt(w, "error: ");
     {
-        Bs_Buffer *b = &bs->config.buffer;
-        const size_t start = b->count;
-
-        int count;
-        {
-            va_list args;
-            va_start(args, fmt);
-            count = vsnprintf(NULL, 0, fmt, args);
-            assert(count >= 0);
-            va_end(args);
-        }
-
-        bs_da_push_many(b->bs, b, NULL, count + 1);
-        {
-            va_list args;
-            va_start(args, fmt);
-            vsnprintf(b->data + b->count, count + 1, fmt, args);
-            va_end(args);
-        }
-        b->count += count;
-
-        Bs_Writer *w = &bs->config.error;
-        w->write(w, bs_buffer_reset(b, start));
+        va_list args;
+        va_start(args, fmt);
+        bs_vfmt(w, fmt, args);
+        va_end(args);
     }
 
     if (fmt[strlen(fmt) - 1] != '\n' || bs->frames.count > 1) {
@@ -1359,7 +1340,7 @@ bs_check_map_get_at(Bs *bs, size_t location, Bs_Map *map, Bs_Value index, const 
             assert(false && "unreachable");
         }
 
-        const Bs_Sv sv = {b->data + start, b->count - start};
+        const Bs_Sv sv = bs_buffer_reset(b, start);
         bs_error_at(bs, location, "undefined %s: " Bs_Sv_Fmt, label, Bs_Sv_Arg(sv));
     }
 
