@@ -58,7 +58,37 @@ void bs_unwind(Bs *bs, unsigned char exit);
 void bs_error_at(Bs *bs, size_t location, const char *fmt, ...)
     __attribute__((__format__(__printf__, 3, 4)));
 
+#define bs_error(bs, ...) bs_error_at(bs, 0, __VA_ARGS__)
+
+// Checks
 void bs_check_arity_at(Bs *bs, size_t location, size_t actual, size_t expected);
+#define bs_check_arity(bs, actual, expected) bs_check_arity_at(bs, 0, actual, expected)
+
+typedef enum {
+    BS_CHECK_VALUE,
+    BS_CHECK_OBJECT,
+
+    BS_CHECK_FN,
+    BS_CHECK_INT,
+    BS_CHECK_WHOLE,
+} Bs_Check_Type;
+
+typedef struct {
+    Bs_Check_Type type;
+    union {
+        Bs_Value_Type value;
+        Bs_Object_Type object;
+    } as;
+} Bs_Check;
+
+void bs_check_multi_at(
+    Bs *bs,
+    size_t location,
+    Bs_Value value,
+    const Bs_Check *checks,
+    size_t count,
+    const char *label);
+
 void bs_check_callable_at(Bs *bs, size_t location, Bs_Value value, const char *label);
 
 void bs_check_value_type_at(
@@ -69,8 +99,9 @@ void bs_check_object_type_at(
 void bs_check_integer_at(Bs *bs, size_t location, Bs_Value value, const char *label);
 void bs_check_whole_number_at(Bs *bs, size_t location, Bs_Value value, const char *label);
 
-#define bs_error(bs, ...) bs_error_at(bs, 0, __VA_ARGS__)
-#define bs_check_arity(bs, actual, expected) bs_check_arity_at(bs, 0, actual, expected)
+#define bs_check_multi(bs, value, checks, count, label)                                            \
+    bs_check_multi_at(bs, 0, value, checks, count, label)
+
 #define bs_check_callable(bs, value, label) bs_check_callable_at(bs, 0, value, label)
 
 #define bs_check_value_type(bs, value, expected, label)                                            \
@@ -82,6 +113,9 @@ void bs_check_whole_number_at(Bs *bs, size_t location, Bs_Value value, const cha
 
 #define bs_check_integer(bs, value, label) bs_check_integer_at(bs, 0, value, label)
 #define bs_check_whole_number(bs, value, lable) bs_check_whole_number_at(bs, 0, value, label)
+
+#define bs_arg_check_multi(bs, args, index, checks, count)                                         \
+    bs_check_multi_at(bs, (index) + 1, (args)[index], checks, count, NULL)
 
 #define bs_arg_check_callable(bs, args, index)                                                     \
     bs_check_callable_at(bs, (index) + 1, (args)[index], NULL)

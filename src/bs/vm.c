@@ -765,7 +765,7 @@ static bool bs_value_has_builtin_methods(Bs_Value value) {
     }
 }
 
-void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
+static bool bs_error_print_before_at(Bs *bs, size_t location) {
     fflush(stdout); // Flush stdout beforehand *just in case*
 
     bs->gc_on = false;
@@ -783,16 +783,11 @@ void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
     }
 
     bs_fmt(w, "error: ");
-    {
-        va_list args;
-        va_start(args, fmt);
-        bs_vfmt(w, fmt, args);
-        va_end(args);
-    }
+    return printed_location;
+}
 
-    if (fmt[strlen(fmt) - 1] != '\n' || bs->frames.count > 1) {
-        bs_fmt(w, "\n");
-    }
+static void bs_error_print_after_at(Bs *bs, size_t location, bool printed_location) {
+    Bs_Writer *w = &bs->config.error;
 
     // Stack trace
     Bs_Pretty_Printer *p = bs_pretty_printer(bs, &bs->config.error);
@@ -837,7 +832,8 @@ void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
                         bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(*instance->class->name));
                     }
                 } else if (bs_value_has_builtin_methods(this)) {
-                    bs_fmt(w, "%s.", bs_value_type_name(this, caller->extended));
+                    const Bs_Sv sv = bs_value_type_name_full(this, caller->extended);
+                    bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(sv));
                 }
 
                 bs_fmt(w, Bs_Sv_Fmt "()", Bs_Sv_Arg(*callee->closure->fn->name));
@@ -853,7 +849,8 @@ void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
                     bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(instance->class->name));
                 }
             } else if (bs_value_has_builtin_methods(this)) {
-                bs_fmt(w, "%s.", bs_value_type_name(this, caller->extended));
+                const Bs_Sv sv = bs_value_type_name_full(this, caller->extended);
+                bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(sv));
             }
 
             bs_fmt(w, Bs_Sv_Fmt "()", Bs_Sv_Arg(fn->name));
@@ -866,6 +863,22 @@ void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
     bs_unwind(bs, 1);
 }
 
+void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
+    const bool printed_location = bs_error_print_before_at(bs, location);
+
+    va_list args;
+    va_start(args, fmt);
+    bs_vfmt(&bs->config.error, fmt, args);
+    va_end(args);
+
+    if (fmt[strlen(fmt) - 1] != '\n' || bs->frames.count > 1) {
+        bs_fmt(&bs->config.error, "\n");
+    }
+
+    bs_error_print_after_at(bs, location, printed_location);
+}
+
+// Checks
 void bs_check_arity_at(Bs *bs, size_t location, size_t actual, size_t expected) {
     if (actual != expected) {
         bs_error_at(
@@ -878,84 +891,153 @@ void bs_check_arity_at(Bs *bs, size_t location, size_t actual, size_t expected) 
     }
 }
 
-static void bs_label_at(char *buffer, size_t size, const char **label, size_t location) {
-    if (!(*label)) {
-        const int count = snprintf(buffer, size, "argument #%zu", location);
-        assert(count >= 0 && count + 1 < size);
-        *label = buffer;
+void bs_check_multi_at(
+    Bs *bs,
+    size_t location,
+    Bs_Value value,
+    const Bs_Check *checks,
+    size_t count,
+    const char *label) {
+
+    if (!count) {
+        return;
     }
+
+    for (size_t i = 0; i < count; i++) {
+        const Bs_Check c = checks[i];
+        switch (c.type) {
+        case BS_CHECK_VALUE:
+            if (value.type == c.as.value) {
+                return;
+            }
+            break;
+
+        case BS_CHECK_OBJECT:
+            if (value.type == BS_VALUE_OBJECT && value.as.object->type == c.as.object) {
+                return;
+            }
+            break;
+
+        case BS_CHECK_FN:
+            if (value.type == BS_VALUE_OBJECT) {
+                switch (value.as.object->type) {
+                case BS_OBJECT_FN:
+                case BS_OBJECT_CLOSURE:
+                case BS_OBJECT_BOUND_METHOD:
+                case BS_OBJECT_C_FN:
+                    return;
+
+                default:
+                    break;
+                }
+            }
+            break;
+
+        case BS_CHECK_INT:
+            if (value.type == BS_VALUE_NUM && value.as.number == (long)value.as.number) {
+                return;
+            }
+            break;
+
+        case BS_CHECK_WHOLE:
+            if (value.type == BS_VALUE_NUM && value.as.number >= 0 &&
+                value.as.number == (long)value.as.number) {
+                return;
+            }
+            break;
+
+        default:
+            assert(false && "unreachable");
+        }
+    }
+
+    const bool printed_location = bs_error_print_before_at(bs, location);
+
+    Bs_Writer *w = &bs->config.error;
+    if (label) {
+        bs_fmt(w, "expected %s to be ", label);
+    } else {
+        bs_fmt(w, "expected argument #%zu to be ", location);
+    }
+
+    for (size_t i = 0; i < count; i++) {
+        if (i) {
+            if (i + 1 == count) {
+                bs_fmt(w, ", or ");
+            } else {
+                bs_fmt(w, ", ");
+            }
+        }
+
+        const Bs_Check c = checks[i];
+        switch (c.type) {
+        case BS_CHECK_VALUE:
+            bs_fmt(w, "%s", bs_value_type_name(c.as.value, bs->frame->extended));
+            break;
+
+        case BS_CHECK_OBJECT:
+            bs_fmt(w, "%s", bs_object_type_name(c.as.object));
+            break;
+
+        case BS_CHECK_FN:
+            bs_fmt(w, "function");
+            break;
+
+        case BS_CHECK_INT:
+            bs_fmt(w, "integer");
+            break;
+
+        case BS_CHECK_WHOLE:
+            bs_fmt(w, "positive integer");
+            break;
+
+        default:
+            assert(false && "unreachable");
+        }
+    }
+
+    const Bs_Sv sv = bs_value_type_name_full(value, bs->frame->extended);
+    bs_fmt(w, ", got " Bs_Sv_Fmt "\n", Bs_Sv_Arg(sv));
+    bs_error_print_after_at(bs, location, printed_location);
 }
 
 void bs_check_callable_at(Bs *bs, size_t location, Bs_Value value, const char *label) {
-    if (value.type != BS_VALUE_OBJECT ||
-        (value.as.object->type != BS_OBJECT_CLOSURE && value.as.object->type != BS_OBJECT_C_FN)) {
-        char buffer[64];
-        bs_label_at(buffer, sizeof(buffer), &label, location);
-
-        bs_error_at(
-            bs,
-            location,
-            "expected %s to be callable object, got %s",
-            label,
-            bs_value_type_name(value, bs->frame->extended));
-    }
+    const Bs_Check check = {
+        .type = BS_CHECK_FN,
+    };
+    bs_check_multi_at(bs, location, value, &check, 1, label);
 }
 
 void bs_check_value_type_at(
     Bs *bs, size_t location, Bs_Value value, Bs_Value_Type expected, const char *label) {
-    if (value.type != expected) {
-        char buffer[64];
-        bs_label_at(buffer, sizeof(buffer), &label, location);
-
-        bs_error_at(
-            bs,
-            location,
-            "expected %s to be %s, got %s",
-            label,
-            bs_value_type_name((Bs_Value){.type = expected}, bs->frame->extended),
-            bs_value_type_name(value, bs->frame->extended));
-    }
+    const Bs_Check check = {
+        .type = BS_CHECK_VALUE,
+        .as.value = expected,
+    };
+    bs_check_multi_at(bs, location, value, &check, 1, label);
 }
 
 void bs_check_object_type_at(
     Bs *bs, size_t location, Bs_Value value, Bs_Object_Type expected, const char *label) {
-    if (value.type != BS_VALUE_OBJECT || value.as.object->type != expected) {
-        char buffer[64];
-        bs_label_at(buffer, sizeof(buffer), &label, location);
-
-        bs_error_at(
-            bs,
-            location,
-            "expected %s to be %s, got %s",
-            label,
-            bs_object_type_name(expected),
-            bs_value_type_name(value, bs->frame->extended));
-    }
+    const Bs_Check check = {
+        .type = BS_CHECK_OBJECT,
+        .as.object = expected,
+    };
+    bs_check_multi_at(bs, location, value, &check, 1, label);
 }
 
 void bs_check_integer_at(Bs *bs, size_t location, Bs_Value value, const char *label) {
-    char buffer[64];
-    bs_label_at(buffer, sizeof(buffer), &label, location);
-
-    bs_check_value_type_at(bs, location, value, BS_VALUE_NUM, label);
-    if (value.as.number != (long)value.as.number) {
-        bs_error_at(bs, location, "expected %s to be integer, got %g", label, value.as.number);
-    }
+    const Bs_Check check = {
+        .type = BS_CHECK_INT,
+    };
+    bs_check_multi_at(bs, location, value, &check, 1, label);
 }
 
 void bs_check_whole_number_at(Bs *bs, size_t location, Bs_Value value, const char *label) {
-    char buffer[64];
-    bs_label_at(buffer, sizeof(buffer), &label, location);
-
-    bs_check_value_type_at(bs, location, value, BS_VALUE_NUM, label);
-    if (value.as.number < 0 || value.as.number != (long)value.as.number) {
-        bs_error_at(
-            bs,
-            location,
-            "expected %s to be positive whole number, got %g",
-            label,
-            value.as.number);
-    }
+    const Bs_Check check = {
+        .type = BS_CHECK_WHOLE,
+    };
+    bs_check_multi_at(bs, location, value, &check, 1, label);
 }
 
 // Interpreter
@@ -997,12 +1079,15 @@ static void bs_binary_op(Bs *bs, Bs_Value *a, Bs_Value *b, const char *op) {
     *a = bs_stack_pop(bs);
 
     if (a->type != BS_VALUE_NUM || b->type != BS_VALUE_NUM) {
+        const Bs_Sv s1 = bs_value_type_name_full(*a, bs->frame->extended);
+        const Bs_Sv s2 = bs_value_type_name_full(*b, bs->frame->extended);
+
         bs_error(
             bs,
-            "invalid operands to binary (%s): %s, %s",
+            "invalid operands to binary (%s): " Bs_Sv_Fmt ", " Bs_Sv_Fmt,
             op,
-            bs_value_type_name(*a, bs->frame->extended),
-            bs_value_type_name(*b, bs->frame->extended));
+            Bs_Sv_Arg(s1),
+            Bs_Sv_Arg(s2));
     }
 }
 
@@ -1047,7 +1132,8 @@ static void bs_call_closure(Bs *bs, size_t offset, Bs_Closure *closure, size_t a
 static_assert(BS_COUNT_OBJECTS == 13, "Update bs_call_value()");
 static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
     if (value.type != BS_VALUE_OBJECT) {
-        bs_error_at(bs, offset, "cannot call %s", bs_value_type_name(value, bs->frame->extended));
+        const Bs_Sv sv = bs_value_type_name_full(value, bs->frame->extended);
+        bs_error_at(bs, offset, "cannot call " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
     }
 
     switch (value.as.object->type) {
@@ -1109,8 +1195,10 @@ static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
         bs->handles.count = handles_count_save;
     } break;
 
-    default:
-        bs_error_at(bs, offset, "cannot call %s", bs_value_type_name(value, bs->frame->extended));
+    default: {
+        const Bs_Sv sv = bs_value_type_name_full(value, bs->frame->extended);
+        bs_error_at(bs, offset, "cannot call " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
+    } break;
     }
 }
 
@@ -1182,7 +1270,7 @@ const Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main) {
     return fn;
 }
 
-static bool bs_import_language(Bs *bs, Bs_Sv path, size_t length) {
+static bool bs_import_language(Bs *bs, Bs_Sv path) {
     size_t size = 0;
     char *contents = bs_read_file(path.data, &size);
     if (!contents) {
@@ -1240,7 +1328,7 @@ static void bs_import(Bs *bs) {
     // Normal
     {
         bs_da_push_many(bs, b, ".bs", 4);
-        if (bs_import_language(bs, bs_buffer_reset(b, start), resolved.size)) {
+        if (bs_import_language(bs, bs_buffer_reset(b, start))) {
             goto defer;
         }
         b->count = start + resolved.size;
@@ -1249,7 +1337,7 @@ static void bs_import(Bs *bs) {
     // Extended
     {
         bs_da_push_many(bs, b, ".bsx", 5);
-        if (bs_import_language(bs, bs_buffer_reset(b, start), resolved.size)) {
+        if (bs_import_language(bs, bs_buffer_reset(b, start))) {
             goto defer;
         }
         b->count = start + resolved.size;
@@ -1264,7 +1352,7 @@ static void bs_import(Bs *bs) {
         }
 
         Bs_C_Lib *library = bs_c_lib_new(bs, data);
-        const void (*init)(Bs *, Bs_C_Lib *) = dlsym(data, "bs_library_init");
+        void (*init)(Bs *, Bs_C_Lib *) = dlsym(data, "bs_library_init");
 
         if (!init) {
             bs_error(
@@ -1314,12 +1402,8 @@ defer:
 static Bs_Value
 bs_check_map_get_at(Bs *bs, size_t location, Bs_Map *map, Bs_Value index, const char *label) {
     if (index.type == BS_VALUE_NIL) {
-        bs_error_at(
-            bs,
-            location,
-            "cannot use '%s' as %s",
-            bs_value_type_name(index, bs->frame->extended),
-            label);
+        const Bs_Sv sv = bs_value_type_name_full(index, bs->frame->extended);
+        bs_error_at(bs, location, "cannot use '" Bs_Sv_Fmt "' as %s", Bs_Sv_Arg(sv), label);
     }
 
     Bs_Value value;
@@ -1349,10 +1433,8 @@ bs_check_map_get_at(Bs *bs, size_t location, Bs_Map *map, Bs_Value index, const 
 
 static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
     if (container.type == BS_VALUE_NIL || container.type == BS_VALUE_BOOL) {
-        bs_error(
-            bs,
-            "cannot invoke or index into %s",
-            bs_value_type_name(container, bs->frame->extended));
+        const Bs_Sv sv = bs_value_type_name_full(container, bs->frame->extended);
+        bs_error(bs, "cannot invoke or index into " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
     }
 
     if (container.type == BS_VALUE_NUM) {
@@ -1443,11 +1525,10 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
         label = "library symbol";
         break;
 
-    default:
-        bs_error(
-            bs,
-            "cannot invoke or index into %s",
-            bs_value_type_name(container, bs->frame->extended));
+    default: {
+        const Bs_Sv sv = bs_value_type_name_full(container, bs->frame->extended);
+        bs_error(bs, "cannot invoke or index into " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
+    } break;
     }
 
     assert(map);
@@ -1457,10 +1538,8 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
 
 static void bs_container_set(Bs *bs, Bs_Value container, Bs_Value index, Bs_Value value) {
     if (container.type != BS_VALUE_OBJECT) {
-        bs_error(
-            bs,
-            "cannot take mutable index into %s",
-            bs_value_type_name(container, bs->frame->extended));
+        const Bs_Sv sv = bs_value_type_name_full(container, bs->frame->extended);
+        bs_error(bs, "cannot take mutable index into " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
     }
 
     if (container.as.object->type == BS_OBJECT_ARRAY) {
@@ -1468,29 +1547,21 @@ static void bs_container_set(Bs *bs, Bs_Value container, Bs_Value index, Bs_Valu
         bs_array_set(bs, (Bs_Array *)container.as.object, index.as.number, value);
     } else if (container.as.object->type == BS_OBJECT_TABLE) {
         if (index.type == BS_VALUE_NIL) {
-            bs_error_at(
-                bs,
-                1,
-                "cannot use '%s' as table key",
-                bs_value_type_name(index, bs->frame->extended));
+            const Bs_Sv sv = bs_value_type_name_full(index, bs->frame->extended);
+            bs_error_at(bs, 1, "cannot use '" Bs_Sv_Fmt "' as table key", Bs_Sv_Arg(sv));
         }
 
         bs_table_set(bs, (Bs_Table *)container.as.object, index, value);
     } else if (container.as.object->type == BS_OBJECT_INSTANCE) {
         if (index.type == BS_VALUE_NIL) {
-            bs_error_at(
-                bs,
-                1,
-                "cannot use '%s' as instance property",
-                bs_value_type_name(index, bs->frame->extended));
+            const Bs_Sv sv = bs_value_type_name_full(index, bs->frame->extended);
+            bs_error_at(bs, 1, "cannot use '" Bs_Sv_Fmt "' as instance property", Bs_Sv_Arg(sv));
         }
 
         bs_map_set(bs, &((Bs_Instance *)container.as.object)->properties, index, value);
     } else {
-        bs_error(
-            bs,
-            "cannot take mutable index into %s",
-            bs_value_type_name(container, bs->frame->extended));
+        const Bs_Sv sv = bs_value_type_name_full(container, bs->frame->extended);
+        bs_error(bs, "cannot take mutable index into " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
     }
 }
 
@@ -1693,19 +1764,14 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                         bs, 1, &instance->class->methods, name, "instance property or method");
                 } break;
 
-                default:
-                    bs_error_at(
-                        bs,
-                        0,
-                        "cannot invoke or index into %s",
-                        bs_value_type_name(this, bs->frame->extended));
+                default: {
+                    const Bs_Sv sv = bs_value_type_name_full(this, bs->frame->extended);
+                    bs_error_at(bs, 0, "cannot invoke or index into " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
+                } break;
                 }
             } else {
-                bs_error_at(
-                    bs,
-                    0,
-                    "cannot invoke or index into %s",
-                    bs_value_type_name(this, bs->frame->extended));
+                const Bs_Sv sv = bs_value_type_name_full(this, bs->frame->extended);
+                bs_error_at(bs, 0, "cannot invoke or index into " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
             }
 
             bs_call_value(bs, 2, method, arity);
@@ -1740,8 +1806,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         case BS_OP_INHERIT: {
             const Bs_Value super = bs_stack_peek(bs, 1);
             if (super.type != BS_VALUE_OBJECT || super.as.object->type != BS_OBJECT_CLASS) {
-                bs_error(
-                    bs, "cannot inherit from %s", bs_value_type_name(super, bs->frame->extended));
+                const Bs_Sv sv = bs_value_type_name_full(super, bs->frame->extended);
+                bs_error(bs, "cannot inherit from " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
             }
 
             const Bs_Value class = bs_stack_peek(bs, 0);
@@ -1812,11 +1878,13 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value a = bs_stack_pop(bs);
 
             if (a.type != BS_VALUE_NUM || b.type != BS_VALUE_NUM) {
+                const Bs_Sv sa = bs_value_type_name_full(a, bs->frame->extended);
+                const Bs_Sv sb = bs_value_type_name_full(b, bs->frame->extended);
                 if ((a.type == BS_VALUE_OBJECT && a.as.object->type == BS_OBJECT_STR) ||
                     (b.type == BS_VALUE_OBJECT && b.as.object->type == BS_OBJECT_STR)) {
                     bs_error(
                         bs,
-                        "invalid operands to binary (+): %s, %s\n\n"
+                        "invalid operands to binary (+): " Bs_Sv_Fmt ", " Bs_Sv_Fmt "\n\n"
                         "Use (++) for string concatenation, or use string interpolation instead\n\n"
                         "```\n"
                         "\"Hello, \" ++ \"world!\";\n"
@@ -1824,14 +1892,14 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                         "\"Hello, \\(34 + 35) nice!\";\n"
                         "```\n",
 
-                        bs_value_type_name(a, bs->frame->extended),
-                        bs_value_type_name(b, bs->frame->extended));
+                        Bs_Sv_Arg(sa),
+                        Bs_Sv_Arg(sb));
                 } else {
                     bs_error(
                         bs,
-                        "invalid operands to binary (+): %s, %s",
-                        bs_value_type_name(a, bs->frame->extended),
-                        bs_value_type_name(b, bs->frame->extended));
+                        "invalid operands to binary (+): " Bs_Sv_Fmt ", " Bs_Sv_Fmt,
+                        Bs_Sv_Arg(sa),
+                        Bs_Sv_Arg(sb));
                 }
             }
 
@@ -1870,10 +1938,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         case BS_OP_NEG: {
             const Bs_Value a = bs_stack_pop(bs);
             if (a.type != BS_VALUE_NUM) {
-                bs_error(
-                    bs,
-                    "invalid operand to unary (-): %s",
-                    bs_value_type_name(a, bs->frame->extended));
+                const Bs_Sv sv = bs_value_type_name_full(a, bs->frame->extended);
+                bs_error(bs, "invalid operand to unary (-): " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
             }
 
             bs_stack_push(bs, bs_value_num(-a.as.number));
@@ -1998,8 +2064,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value key = bs_stack_pop(bs);
 
             if (container.type != BS_VALUE_OBJECT) {
-                bs_error(
-                    bs, "cannot index into %s", bs_value_type_name(container, bs->frame->extended));
+                const Bs_Sv sv = bs_value_type_name_full(container, bs->frame->extended);
+                bs_error(bs, "cannot index into " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
             }
 
             Bs_Map *map = NULL;
@@ -2031,18 +2097,16 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 label = "library symbol";
                 break;
 
-            default:
-                bs_error(
-                    bs, "cannot index into %s", bs_value_type_name(container, bs->frame->extended));
+            default: {
+                const Bs_Sv sv = bs_value_type_name_full(container, bs->frame->extended);
+                bs_error(bs, "cannot index into " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
+            } break;
             }
 
             if (key.type == BS_VALUE_NIL) {
                 assert(label);
-                bs_error(
-                    bs,
-                    "cannot use '%s' as %s",
-                    bs_value_type_name(key, bs->frame->extended),
-                    label);
+                const Bs_Sv sv = bs_value_type_name_full(key, bs->frame->extended);
+                bs_error(bs, "cannot use '" Bs_Sv_Fmt "' as %s", Bs_Sv_Arg(sv), label);
             }
 
             assert(map);
@@ -2052,7 +2116,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         case BS_OP_LEN: {
             const Bs_Value a = bs_stack_peek(bs, 0);
             if (a.type != BS_VALUE_OBJECT) {
-                bs_error(bs, "cannot get length of %s", bs_value_type_name(a, bs->frame->extended));
+                const Bs_Sv sv = bs_value_type_name_full(a, bs->frame->extended);
+                bs_error(bs, "cannot get length of " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
             }
 
             size_t size;
@@ -2069,8 +2134,10 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 size = ((Bs_Table *)a.as.object)->map.length;
                 break;
 
-            default:
-                bs_error(bs, "cannot get length of %s", bs_value_type_name(a, bs->frame->extended));
+            default: {
+                const Bs_Sv sv = bs_value_type_name_full(a, bs->frame->extended);
+                bs_error(bs, "cannot get length of " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
+            } break;
             }
 
             bs_stack_pop(bs);
@@ -2098,8 +2165,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             break;
 
         case BS_OP_TYPEOF: {
-            const char *name = bs_value_type_name(bs_stack_peek(bs, 0), bs->frame->extended);
-            bs_stack_set(bs, 0, bs_value_object(bs_str_new(bs, bs_sv_from_cstr(name))));
+            const Bs_Sv name = bs_value_type_name_full(bs_stack_peek(bs, 0), bs->frame->extended);
+            bs_stack_set(bs, 0, bs_value_object(bs_str_new(bs, name)));
         } break;
 
         case BS_OP_DELETE: {
@@ -2107,10 +2174,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value container = bs_stack_pop(bs);
 
             if (container.type != BS_VALUE_OBJECT) {
-                bs_error(
-                    bs,
-                    "cannot delete from %s",
-                    bs_value_type_name(container, bs->frame->extended));
+                const Bs_Sv sv = bs_value_type_name_full(container, bs->frame->extended);
+                bs_error(bs, "cannot delete from " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
             }
 
             Bs_Map *map = map;
@@ -2127,22 +2192,18 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 label = "instance property";
                 break;
 
-            default:
-                bs_error(
-                    bs,
-                    "cannot delete from %s",
-                    bs_value_type_name(container, bs->frame->extended));
+            default: {
+                const Bs_Sv sv = bs_value_type_name_full(container, bs->frame->extended);
+                bs_error(bs, "cannot delete from " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
+            } break;
             }
 
             assert(map);
             assert(label);
 
             if (index.type == BS_VALUE_NIL) {
-                bs_error(
-                    bs,
-                    "cannot use '%s' as %s",
-                    bs_value_type_name(index, bs->frame->extended),
-                    label);
+                const Bs_Sv sv = bs_value_type_name_full(index, bs->frame->extended);
+                bs_error(bs, "cannot use '" Bs_Sv_Fmt "' as %s", Bs_Sv_Arg(sv), label);
             }
 
             bs_stack_push(bs, bs_value_bool(bs_map_remove(bs, map, index)));
@@ -2153,10 +2214,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value container = bs_stack_pop(bs);
 
             if (container.type != BS_VALUE_OBJECT) {
-                bs_error(
-                    bs,
-                    "cannot delete from %s",
-                    bs_value_type_name(container, bs->frame->extended));
+                const Bs_Sv sv = bs_value_type_name_full(container, bs->frame->extended);
+                bs_error(bs, "cannot delete from " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
             }
 
             Bs_Map *map = map;
@@ -2173,22 +2232,18 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 label = "instance property";
                 break;
 
-            default:
-                bs_error(
-                    bs,
-                    "cannot delete from %s",
-                    bs_value_type_name(container, bs->frame->extended));
+            default: {
+                const Bs_Sv sv = bs_value_type_name_full(container, bs->frame->extended);
+                bs_error(bs, "cannot delete from " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
+            } break;
             }
 
             assert(map);
             assert(label);
 
             if (index.type == BS_VALUE_NIL) {
-                bs_error(
-                    bs,
-                    "cannot use '%s' as %s",
-                    bs_value_type_name(index, bs->frame->extended),
-                    label);
+                const Bs_Sv sv = bs_value_type_name_full(index, bs->frame->extended);
+                bs_error(bs, "cannot use '" Bs_Sv_Fmt "' as %s", Bs_Sv_Arg(sv), label);
             }
 
             bs_stack_push(bs, bs_value_bool(bs_map_remove(bs, map, index)));
@@ -2308,10 +2363,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value container = bs_stack_peek(bs, 1);
 
             if (container.type != BS_VALUE_OBJECT) {
-                bs_error(
-                    bs,
-                    "cannot iterate over %s",
-                    bs_value_type_name(container, bs->frame->extended));
+                const Bs_Sv sv = bs_value_type_name_full(container, bs->frame->extended);
+                bs_error(bs, "cannot iterate over " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
             }
 
             if (container.as.object->type == BS_OBJECT_ARRAY) {
@@ -2338,10 +2391,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 const Bs_Instance *instance = (const Bs_Instance *)container.as.object;
                 bs_iter_map(bs, offset, &instance->properties, iterator);
             } else {
-                bs_error(
-                    bs,
-                    "cannot iterate over %s",
-                    bs_value_type_name(container, bs->frame->extended));
+                const Bs_Sv sv = bs_value_type_name_full(container, bs->frame->extended);
+                bs_error(bs, "cannot iterate over " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
             }
         } break;
 

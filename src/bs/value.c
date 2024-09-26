@@ -6,6 +6,22 @@ bool bs_value_is_falsey(Bs_Value v) {
     return v.type == BS_VALUE_NIL || (v.type == BS_VALUE_BOOL && !v.as.boolean);
 }
 
+const char *bs_value_type_name(Bs_Value_Type type, bool extended) {
+    switch (type) {
+    case BS_VALUE_NIL:
+        return extended ? "bruh" : "nil";
+
+    case BS_VALUE_NUM:
+        return "number";
+
+    case BS_VALUE_BOOL:
+        return extended ? "capness" : "boolean";
+
+    case BS_VALUE_OBJECT:
+        return "object";
+    }
+}
+
 static_assert(BS_COUNT_OBJECTS == 13, "Update bs_object_type_name()");
 const char *bs_object_type_name(Bs_Object_Type type) {
     switch (type) {
@@ -45,22 +61,22 @@ const char *bs_object_type_name(Bs_Object_Type type) {
     }
 }
 
-const char *bs_value_type_name(Bs_Value v, bool extended) {
-    switch (v.type) {
-    case BS_VALUE_NIL:
-        return extended ? "bruh" : "nil";
+Bs_Sv bs_value_type_name_full(Bs_Value v, bool extended) {
+    if (v.type != BS_VALUE_OBJECT) {
+        return bs_sv_from_cstr(bs_value_type_name(v.type, extended));
+    }
 
-    case BS_VALUE_NUM:
-        return "number";
+    switch (v.as.object->type) {
+    case BS_OBJECT_INSTANCE: {
+        const Bs_Str *str = ((const Bs_Instance *)v.as.object)->class->name;
+        return Bs_Sv(str->data, str->size);
+    } break;
 
-    case BS_VALUE_BOOL:
-        return extended ? "capness" : "boolean";
-
-    case BS_VALUE_OBJECT:
-        return bs_object_type_name(v.as.object->type);
+    case BS_OBJECT_C_INSTANCE:
+        return ((const Bs_C_Instance *)v.as.object)->class->name;
 
     default:
-        assert(false && "unreachable");
+        return bs_sv_from_cstr(bs_object_type_name(v.as.object->type));
     }
 }
 

@@ -626,8 +626,6 @@ Bs_Value bs_str_ltrim(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_object(str);
     }
 
-    size_t i = 0;
-
     Bs_Sv str_sv = Bs_Sv(str->data, str->size);
     const Bs_Sv pattern_sv = Bs_Sv(pattern->data, pattern->size);
     while (bs_sv_prefix(str_sv, pattern_sv)) {

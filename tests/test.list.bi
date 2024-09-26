@@ -494,48 +494,48 @@ arrays/error_index_out_of_bounds.bsx:3:14: error: cannot get value at index 0 in
 :i returncode 1
 :b stdout 0
 
-:b stderr 89
-arrays/error_invalid_index.bs:2:4: error: expected array index to be number, got boolean
+:b stderr 99
+arrays/error_invalid_index.bs:2:4: error: expected array index to be positive integer, got boolean
 
 :b shell 40
 ../bin/bs arrays/error_invalid_index.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 90
-arrays/error_invalid_index.bsx:2:4: error: expected array index to be number, got capness
+:b stderr 100
+arrays/error_invalid_index.bsx:2:4: error: expected array index to be positive integer, got capness
 
 :b shell 46
 ../bin/bs arrays/error_invalid_index_assign.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 95
-arrays/error_invalid_index_assign.bs:2:4: error: expected array index to be number, got string
+:b stderr 105
+arrays/error_invalid_index_assign.bs:2:4: error: expected array index to be positive integer, got string
 
 :b shell 47
 ../bin/bs arrays/error_invalid_index_assign.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 96
-arrays/error_invalid_index_assign.bsx:2:4: error: expected array index to be number, got string
+:b stderr 106
+arrays/error_invalid_index_assign.bsx:2:4: error: expected array index to be positive integer, got string
 
 :b shell 52
 ../bin/bs arrays/error_invalid_index_const_assign.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 101
-arrays/error_invalid_index_const_assign.bs:2:4: error: expected array index to be number, got string
+:b stderr 111
+arrays/error_invalid_index_const_assign.bs:2:4: error: expected array index to be positive integer, got string
 
 :b shell 53
 ../bin/bs arrays/error_invalid_index_const_assign.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 102
-arrays/error_invalid_index_const_assign.bsx:2:4: error: expected array index to be number, got string
+:b stderr 112
+arrays/error_invalid_index_const_assign.bsx:2:4: error: expected array index to be positive integer, got string
 
 :b shell 24
 ../bin/bs tables/main.bs
@@ -1280,8 +1280,8 @@ x = nocap; y = bruh
 :i returncode 1
 :b stdout 0
 
-:b stderr 149
-[C]: error: expected argument #1 to be number, got nil
+:b stderr 159
+[C]: error: expected argument #1 to be positive integer, got nil
 extended/common.bs:9:14: in string.slice()
 extended/error_type_name_normal.bs:1:31: in oops()
 
@@ -1290,8 +1290,8 @@ extended/error_type_name_normal.bs:1:31: in oops()
 :i returncode 1
 :b stdout 0
 
-:b stderr 150
-[C]: error: expected argument #1 to be number, got nil
+:b stderr 160
+[C]: error: expected argument #1 to be positive integer, got nil
 extended/common.bs:9:14: in string.slice()
 extended/error_type_name_normal.bsx:1:32: in oops()
 
@@ -1300,8 +1300,8 @@ extended/error_type_name_normal.bsx:1:32: in oops()
 :i returncode 1
 :b stdout 0
 
-:b stderr 162
-[C]: error: expected argument #1 to be number, got bruh
+:b stderr 172
+[C]: error: expected argument #1 to be positive integer, got bruh
 extended/common_extended.bsx:9:14: in string.slice()
 extended/error_type_name_extended.bs:1:40: in oops()
 
@@ -1310,8 +1310,8 @@ extended/error_type_name_extended.bs:1:40: in oops()
 :i returncode 1
 :b stdout 0
 
-:b stderr 163
-[C]: error: expected argument #1 to be number, got bruh
+:b stderr 173
+[C]: error: expected argument #1 to be positive integer, got bruh
 extended/common_extended.bsx:9:14: in string.slice()
 extended/error_type_name_extended.bsx:1:41: in oops()
 
@@ -1692,16 +1692,16 @@ invokation/error_call_invalid_container.bsx:2:2: error: cannot invoke or index i
 :i returncode 1
 :b stdout 0
 
-:b stderr 92
-invokation/error_call_invalid_key.bs:2:4: error: expected array index to be number, got nil
+:b stderr 102
+invokation/error_call_invalid_key.bs:2:4: error: expected array index to be positive integer, got nil
 
 :b shell 47
 ../bin/bs invokation/error_call_invalid_key.bsx
 :i returncode 1
 :b stdout 0
 
-:b stderr 94
-invokation/error_call_invalid_key.bsx:2:4: error: expected array index to be number, got bruh
+:b stderr 104
+invokation/error_call_invalid_key.bsx:2:4: error: expected array index to be positive integer, got bruh
 
 :b shell 42
 ../bin/bs invokation/error_invoked_body.bs
@@ -1726,8 +1726,8 @@ invokation/error_invoked_body.bsx:7:4: in <anonymous>()
 :i returncode 1
 :b stdout 0
 
-:b stderr 125
-[C]: error: expected argument #1 to be number, got nil
+:b stderr 135
+[C]: error: expected argument #1 to be positive integer, got nil
 invokation/error_key_call_argument_location.bs:5:5: in string.slice()
 
 :b shell 57
@@ -1735,8 +1735,8 @@ invokation/error_key_call_argument_location.bs:5:5: in string.slice()
 :i returncode 1
 :b stdout 0
 
-:b stderr 127
-[C]: error: expected argument #1 to be number, got bruh
+:b stderr 137
+[C]: error: expected argument #1 to be positive integer, got bruh
 invokation/error_key_call_argument_location.bsx:5:5: in string.slice()
 
 :b shell 55
@@ -1792,8 +1792,8 @@ invokation/error_method_call_wrong_arity.bsx:8:6: error: expected 0 arguments, g
 :i returncode 1
 :b stdout 0
 
-:b stderr 129
-[C]: error: expected argument #1 to be number, got nil
+:b stderr 139
+[C]: error: expected argument #1 to be positive integer, got nil
 invokation/error_native_call_argument_location.bs:1:21: in string.slice()
 
 :b shell 60
@@ -1801,8 +1801,8 @@ invokation/error_native_call_argument_location.bs:1:21: in string.slice()
 :i returncode 1
 :b stdout 0
 
-:b stderr 131
-[C]: error: expected argument #1 to be number, got bruh
+:b stderr 141
+[C]: error: expected argument #1 to be positive integer, got bruh
 invokation/error_native_call_argument_location.bsx:1:21: in string.slice()
 
 :b shell 53
@@ -1828,8 +1828,8 @@ invokation/error_native_call_wrong_arity.bsx:1:28: in string.reverse()
 :i returncode 1
 :b stdout 0
 
-:b stderr 130
-[C]: error: expected argument #1 to be number, got nil
+:b stderr 140
+[C]: error: expected argument #1 to be positive integer, got nil
 invokation/error_property_call_argument_location.bs:5:7: in string.slice()
 
 :b shell 62
@@ -1837,8 +1837,8 @@ invokation/error_property_call_argument_location.bs:5:7: in string.slice()
 :i returncode 1
 :b stdout 0
 
-:b stderr 132
-[C]: error: expected argument #1 to be number, got bruh
+:b stderr 142
+[C]: error: expected argument #1 to be positive integer, got bruh
 invokation/error_property_call_argument_location.bsx:5:7: in string.slice()
 
 :b shell 60
