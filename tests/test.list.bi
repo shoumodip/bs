@@ -1126,9 +1126,9 @@ functions/error_stack_trace.bsx:13:4: in foo()
 :i returncode 1
 :b stdout 0
 
-:b stderr 243
+:b stderr 240
 [C]: error: expected argument #1 to be string, got number
-functions/error_native_stack_trace.bs:2:22: in os.getenv()
+functions/error_native_stack_trace.bs:2:22: in getenv()
 [C]: in foo()
 functions/error_native_stack_trace.bs:6:15: in array.map()
 functions/error_native_stack_trace.bs:9:5: in main()
@@ -1138,9 +1138,9 @@ functions/error_native_stack_trace.bs:9:5: in main()
 :i returncode 1
 :b stdout 0
 
-:b stderr 246
+:b stderr 243
 [C]: error: expected argument #1 to be string, got number
-functions/error_native_stack_trace.bsx:2:19: in os.getenv()
+functions/error_native_stack_trace.bsx:2:19: in getenv()
 [C]: in foo()
 functions/error_native_stack_trace.bsx:6:15: in array.map()
 functions/error_native_stack_trace.bsx:9:5: in main()

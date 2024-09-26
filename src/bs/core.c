@@ -1395,12 +1395,12 @@ static void bs_add(Bs *bs, Bs_Table *table, const char *key, Bs_Value value) {
     bs_table_set(bs, table, bs_value_object(bs_str_new(bs, bs_sv_from_cstr(key))), value);
 }
 
-static void bs_add_fn(Bs *bs, Bs_Table *table, const char *key, const char *name, Bs_C_Fn_Ptr fn) {
+static void bs_add_fn(Bs *bs, Bs_Table *table, const char *key, Bs_C_Fn_Ptr fn) {
     bs_table_set(
         bs,
         table,
         bs_value_object(bs_str_new(bs, bs_sv_from_cstr(key))),
-        bs_value_object(bs_c_fn_new(bs, bs_sv_from_cstr(name), fn)));
+        bs_value_object(bs_c_fn_new(bs, bs_sv_from_cstr(key), fn)));
 }
 
 void bs_core_init(Bs *bs, int argc, char **argv) {
@@ -1427,11 +1427,11 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_add(bs, io, "Reader", bs_value_object(io_reader_class));
         bs_add(bs, io, "Writer", bs_value_object(io_writer_class));
 
-        bs_add_fn(bs, io, "print", "io.print", bs_io_print);
-        bs_add_fn(bs, io, "eprint", "io.eprint", bs_io_eprint);
+        bs_add_fn(bs, io, "print", bs_io_print);
+        bs_add_fn(bs, io, "eprint", bs_io_eprint);
 
-        bs_add_fn(bs, io, "println", "io.println", bs_io_println);
-        bs_add_fn(bs, io, "eprintln", "io.eprintln", bs_io_eprintln);
+        bs_add_fn(bs, io, "println", bs_io_println);
+        bs_add_fn(bs, io, "eprintln", bs_io_eprintln);
 
         {
             Bs_C_Instance *io_stdin = bs_c_instance_new(bs, io_reader_class);
@@ -1456,12 +1456,12 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
 
     {
         Bs_Table *os = bs_table_new(bs);
-        bs_add_fn(bs, os, "exit", "os.exit", bs_os_exit);
-        bs_add_fn(bs, os, "clock", "os.clock", bs_os_clock);
-        bs_add_fn(bs, os, "sleep", "os.sleep", bs_os_sleep);
+        bs_add_fn(bs, os, "exit", bs_os_exit);
+        bs_add_fn(bs, os, "clock", bs_os_clock);
+        bs_add_fn(bs, os, "sleep", bs_os_sleep);
 
-        bs_add_fn(bs, os, "getenv", "os.getenv", bs_os_getenv);
-        bs_add_fn(bs, os, "setenv", "os.setenv", bs_os_setenv);
+        bs_add_fn(bs, os, "getenv", bs_os_getenv);
+        bs_add_fn(bs, os, "setenv", bs_os_setenv);
 
         Bs_Array *args = bs_array_new(bs);
         for (int i = 0; i < argc; i++) {
@@ -1502,23 +1502,23 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
 
     {
         Bs_Table *regex = bs_table_new(bs);
-        bs_add_fn(bs, regex, "find", "regex.find", bs_regex_find);
-        bs_add_fn(bs, regex, "split", "regex.split", bs_regex_split);
-        bs_add_fn(bs, regex, "replace", "regex.replace", bs_regex_replace);
+        bs_add_fn(bs, regex, "find", bs_regex_find);
+        bs_add_fn(bs, regex, "split", bs_regex_split);
+        bs_add_fn(bs, regex, "replace", bs_regex_replace);
         bs_global_set(bs, Bs_Sv_Static("regex"), bs_value_object(regex));
     }
 
     {
         Bs_Table *bit = bs_table_new(bs);
-        bs_add_fn(bs, bit, "ceil", "bit.ceil", bs_bit_ceil);
-        bs_add_fn(bs, bit, "floor", "bit.floor", bs_bit_floor);
+        bs_add_fn(bs, bit, "ceil", bs_bit_ceil);
+        bs_add_fn(bs, bit, "floor", bs_bit_floor);
         bs_global_set(bs, Bs_Sv_Static("bit"), bs_value_object(bit));
     }
 
     {
         Bs_Table *ascii = bs_table_new(bs);
-        bs_add_fn(bs, ascii, "char", "ascii.char", bs_ascii_char);
-        bs_add_fn(bs, ascii, "code", "ascii.code", bs_ascii_code);
+        bs_add_fn(bs, ascii, "char", bs_ascii_char);
+        bs_add_fn(bs, ascii, "code", bs_ascii_code);
         bs_global_set(bs, Bs_Sv_Static("ascii"), bs_value_object(ascii));
     }
 
@@ -1577,7 +1577,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         Bs_Table *math = bs_table_new(bs);
         bs_add(bs, math, "E", bs_value_num(M_E));
         bs_add(bs, math, "PI", bs_value_num(M_PI));
-        bs_add_fn(bs, math, "random", "math.random", bs_math_random);
+        bs_add_fn(bs, math, "random", bs_math_random);
         bs_global_set(bs, Bs_Sv_Static("math"), bs_value_object(math));
     }
 }
