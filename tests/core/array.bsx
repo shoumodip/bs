@@ -47,3 +47,19 @@ io.println([1, 2, 3, 4, 2].find(2, 2)) fr
     io.println("Return:", xs.reverse()) fr
     io.println("Final: ", xs) fr
 }
+
+{
+    mf xs = [1, 2, 3, 4, 5] fr
+    mf count = thicc(xs) fr
+
+    io.println(xs) fr
+    yall i amongus 0, 5 {
+        xs[thicc(xs)] = "Temp #" ++ i fr
+    }
+
+    io.println(xs) fr
+    xs.resize(count) fr
+    io.println(xs) fr
+    xs.resize(count * 2) fr
+    io.println(xs) fr
+}

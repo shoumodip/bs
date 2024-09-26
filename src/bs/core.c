@@ -1336,7 +1336,7 @@ Bs_Value bs_array_sort(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_callable(bs, args, 0);
 
-    const Bs_Array *src = (const Bs_Array *)args[-1].as.object;
+    Bs_Array *src = (Bs_Array *)args[-1].as.object;
     const Bs_Value fn = args[0];
 
     // Prepare the context
@@ -1350,10 +1350,24 @@ Bs_Value bs_array_sort(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(src);
 }
 
+Bs_Value bs_array_resize(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_whole_number(bs, args, 0);
+
+    Bs_Array *src = (Bs_Array *)args[-1].as.object;
+    const size_t size = args[0].as.number;
+    if (size > src->count) {
+        bs_array_set(bs, src, size - 1, bs_value_nil);
+    } else {
+        src->count = size;
+    }
+    return bs_value_object(src);
+}
+
 Bs_Value bs_array_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
-    const Bs_Array *src = (const Bs_Array *)args[-1].as.object;
+    Bs_Array *src = (Bs_Array *)args[-1].as.object;
     for (size_t i = 0; i < src->count / 2; i++) {
         const Bs_Value t = src->data[i];
         src->data[i] = src->data[src->count - i - 1];
@@ -1677,6 +1691,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("equal"), bs_array_equal);
 
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("sort"), bs_array_sort);
+        bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("resize"), bs_array_resize);
         bs_builtin_object_methods_add(
             bs, BS_OBJECT_ARRAY, Bs_Sv_Static("reverse"), bs_array_reverse);
     }

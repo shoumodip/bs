@@ -47,3 +47,19 @@ io.println([1, 2, 3, 4, 2].find(2, 2));
     io.println("Return:", xs.reverse());
     io.println("Final: ", xs);
 }
+
+{
+    var xs = [1, 2, 3, 4, 5];
+    var count = len(xs);
+
+    io.println(xs);
+    for i in 0, 5 {
+        xs[len(xs)] = "Temp #" ++ i;
+    }
+
+    io.println(xs);
+    xs.resize(count);
+    io.println(xs);
+    xs.resize(count * 2);
+    io.println(xs);
+}

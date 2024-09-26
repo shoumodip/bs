@@ -2338,7 +2338,7 @@ foo696
 :b shell 23
 ../bin/bs core/array.bs
 :i returncode 0
-:b stdout 334
+:b stdout 562
 [2, 4, 6, 8, 10]
 [2, 4]
 15
@@ -2361,13 +2361,39 @@ Final:  [1, 2, 3, 4, 5]
 Before: [2, 5, 1, 4, 3]
 Return: [3, 4, 1, 5, 2]
 Final:  [3, 4, 1, 5, 2]
+[1, 2, 3, 4, 5]
+[
+    1,
+    2,
+    3,
+    4,
+    5,
+    "Temp #0",
+    "Temp #1",
+    "Temp #2",
+    "Temp #3",
+    "Temp #4"
+]
+[1, 2, 3, 4, 5]
+[
+    1,
+    2,
+    3,
+    4,
+    5,
+    nil,
+    nil,
+    nil,
+    nil,
+    nil
+]
 
 :b stderr 0
 
 :b shell 24
 ../bin/bs core/array.bsx
 :i returncode 0
-:b stdout 344
+:b stdout 577
 [2, 4, 6, 8, 10]
 [2, 4]
 15
@@ -2390,6 +2416,32 @@ Final:  [1, 2, 3, 4, 5]
 Before: [2, 5, 1, 4, 3]
 Return: [3, 4, 1, 5, 2]
 Final:  [3, 4, 1, 5, 2]
+[1, 2, 3, 4, 5]
+[
+    1,
+    2,
+    3,
+    4,
+    5,
+    "Temp #0",
+    "Temp #1",
+    "Temp #2",
+    "Temp #3",
+    "Temp #4"
+]
+[1, 2, 3, 4, 5]
+[
+    1,
+    2,
+    3,
+    4,
+    5,
+    bruh,
+    bruh,
+    bruh,
+    bruh,
+    bruh
+]
 
 :b stderr 0
 
