@@ -1,4 +1,4 @@
-:i count 210
+:i count 212
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -2578,6 +2578,124 @@ cap
 4
 8
 8
+
+:b stderr 0
+
+:b shell 23
+../bin/bs core/ascii.bs
+:i returncode 0
+:b stdout 282
+E
+69
+true
+true
+true
+false
+true
+true
+false
+false
+true
+true
+false
+false
+false
+false
+true
+false
+true
+false
+false
+false
+true
+true
+true
+false
+false
+false
+true
+true
+true
+true
+true
+false
+false
+false
+false
+false
+true
+true
+false
+false
+false
+false
+true
+true
+true
+false
+true
+false
+false
+false
+
+:b stderr 0
+
+:b shell 24
+../bin/bs core/ascii.bsx
+:i returncode 0
+:b stdout 251
+E
+69
+nocap
+nocap
+nocap
+cap
+nocap
+nocap
+cap
+cap
+nocap
+nocap
+cap
+cap
+cap
+cap
+nocap
+cap
+nocap
+cap
+cap
+cap
+nocap
+nocap
+nocap
+cap
+cap
+cap
+nocap
+nocap
+nocap
+nocap
+nocap
+cap
+cap
+cap
+cap
+cap
+nocap
+nocap
+cap
+cap
+cap
+cap
+nocap
+nocap
+nocap
+cap
+nocap
+cap
+cap
+cap
 
 :b stderr 0
 

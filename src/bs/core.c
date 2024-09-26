@@ -769,7 +769,7 @@ Bs_Value bs_ascii_char(Bs *bs, Bs_Value *args, size_t arity) {
 
     const size_t code = args[0].as.number;
     if (code > 0xff) {
-        bs_error(bs, "invalid ascii code '%zu'", code);
+        bs_error_at(bs, 1, "invalid ascii code '%zu'", code);
     }
 
     const char ch = code;
@@ -782,10 +782,130 @@ Bs_Value bs_ascii_code(Bs *bs, Bs_Value *args, size_t arity) {
 
     const Bs_Str *str = (const Bs_Str *)args[0].as.object;
     if (str->size != 1) {
-        bs_error(bs, "expected string of length 1, got %zu", str->size);
+        bs_error_at(bs, 1, "expected string of length 1, got %zu", str->size);
     }
 
     return bs_value_num(*str->data);
+}
+
+Bs_Value bs_ascii_isalnum(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    if (str->size != 1) {
+        bs_error_at(bs, 1, "expected string of length 1, got %zu", str->size);
+    }
+
+    return bs_value_bool(isalnum(*str->data));
+}
+
+Bs_Value bs_ascii_isalpha(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    if (str->size != 1) {
+        bs_error_at(bs, 1, "expected string of length 1, got %zu", str->size);
+    }
+
+    return bs_value_bool(isalpha(*str->data));
+}
+
+Bs_Value bs_ascii_iscntrl(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    if (str->size != 1) {
+        bs_error_at(bs, 1, "expected string of length 1, got %zu", str->size);
+    }
+
+    return bs_value_bool(iscntrl(*str->data));
+}
+
+Bs_Value bs_ascii_isdigit(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    if (str->size != 1) {
+        bs_error_at(bs, 1, "expected string of length 1, got %zu", str->size);
+    }
+
+    return bs_value_bool(isdigit(*str->data));
+}
+
+Bs_Value bs_ascii_islower(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    if (str->size != 1) {
+        bs_error_at(bs, 1, "expected string of length 1, got %zu", str->size);
+    }
+
+    return bs_value_bool(islower(*str->data));
+}
+
+Bs_Value bs_ascii_isgraph(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    if (str->size != 1) {
+        bs_error_at(bs, 1, "expected string of length 1, got %zu", str->size);
+    }
+
+    return bs_value_bool(isgraph(*str->data));
+}
+
+Bs_Value bs_ascii_isprint(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    if (str->size != 1) {
+        bs_error_at(bs, 1, "expected string of length 1, got %zu", str->size);
+    }
+
+    return bs_value_bool(isprint(*str->data));
+}
+
+Bs_Value bs_ascii_ispunct(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    if (str->size != 1) {
+        bs_error_at(bs, 1, "expected string of length 1, got %zu", str->size);
+    }
+
+    return bs_value_bool(ispunct(*str->data));
+}
+
+Bs_Value bs_ascii_isspace(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    if (str->size != 1) {
+        bs_error_at(bs, 1, "expected string of length 1, got %zu", str->size);
+    }
+
+    return bs_value_bool(isspace(*str->data));
+}
+
+Bs_Value bs_ascii_isupper(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    if (str->size != 1) {
+        bs_error_at(bs, 1, "expected string of length 1, got %zu", str->size);
+    }
+
+    return bs_value_bool(isupper(*str->data));
 }
 
 // Bytes
@@ -1519,6 +1639,16 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         Bs_Table *ascii = bs_table_new(bs);
         bs_add_fn(bs, ascii, "char", bs_ascii_char);
         bs_add_fn(bs, ascii, "code", bs_ascii_code);
+        bs_add_fn(bs, ascii, "isalnum", bs_ascii_isalnum);
+        bs_add_fn(bs, ascii, "isalpha", bs_ascii_isalpha);
+        bs_add_fn(bs, ascii, "iscntrl", bs_ascii_iscntrl);
+        bs_add_fn(bs, ascii, "isdigit", bs_ascii_isdigit);
+        bs_add_fn(bs, ascii, "islower", bs_ascii_islower);
+        bs_add_fn(bs, ascii, "isgraph", bs_ascii_isgraph);
+        bs_add_fn(bs, ascii, "isprint", bs_ascii_isprint);
+        bs_add_fn(bs, ascii, "ispunct", bs_ascii_ispunct);
+        bs_add_fn(bs, ascii, "isspace", bs_ascii_isspace);
+        bs_add_fn(bs, ascii, "isupper", bs_ascii_isupper);
         bs_global_set(bs, Bs_Sv_Static("ascii"), bs_value_object(ascii));
     }
 

@@ -1,0 +1,62 @@
+io.println(ascii.char(69));
+io.println(ascii.code("E"));
+
+io.println(ascii.isalnum("a"));
+io.println(ascii.isalnum("Z"));
+io.println(ascii.isalnum("0"));
+io.println(ascii.isalnum("."));
+
+io.println(ascii.isalpha("a"));
+io.println(ascii.isalpha("Z"));
+io.println(ascii.isalpha("0"));
+io.println(ascii.isalpha("."));
+
+io.println(ascii.iscntrl("\t"));
+io.println(ascii.iscntrl("\n"));
+io.println(ascii.iscntrl("a"));
+io.println(ascii.iscntrl("0"));
+
+io.println(ascii.isdigit("a"));
+io.println(ascii.isdigit("Z"));
+io.println(ascii.isdigit("0"));
+io.println(ascii.isdigit("."));
+
+io.println(ascii.islower("a"));
+io.println(ascii.islower("Z"));
+io.println(ascii.islower("0"));
+io.println(ascii.islower("."));
+
+io.println(ascii.isgraph("a"));
+io.println(ascii.isgraph("Z"));
+io.println(ascii.isgraph("0"));
+io.println(ascii.isgraph(" "));
+io.println(ascii.isgraph("\t"));
+io.println(ascii.isgraph("\n"));
+
+io.println(ascii.isprint("a"));
+io.println(ascii.isprint("Z"));
+io.println(ascii.isprint("0"));
+io.println(ascii.isprint("."));
+io.println(ascii.isprint(" "));
+io.println(ascii.isprint("\t"));
+io.println(ascii.isprint("\n"));
+
+io.println(ascii.ispunct("a"));
+io.println(ascii.ispunct("Z"));
+io.println(ascii.ispunct("0"));
+io.println(ascii.ispunct(","));
+io.println(ascii.ispunct("."));
+io.println(ascii.ispunct(" "));
+
+io.println(ascii.isspace("a"));
+io.println(ascii.isspace("Z"));
+io.println(ascii.isspace("0"));
+io.println(ascii.isspace("\n"));
+io.println(ascii.isspace("\t"));
+io.println(ascii.isspace(" "));
+
+io.println(ascii.isupper("a"));
+io.println(ascii.isupper("Z"));
+io.println(ascii.isupper("0"));
+io.println(ascii.isupper("."));
+io.println(ascii.isupper(" "));

@@ -208,3 +208,5 @@
 ../bin/bs core/math.bsx
 ../bin/bs core/bit.bs
 ../bin/bs core/bit.bsx
+../bin/bs core/ascii.bs
+../bin/bs core/ascii.bsx
