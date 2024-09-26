@@ -52,11 +52,3 @@ io.println(0.clamp(1, 6));
 io.println(7.clamp(1, 6));
 
 io.println(4.lerp(8, 0.5));
-
-io.println(7.bceil());
-io.println(8.bceil());
-io.println(9.bceil());
-
-io.println(7.bfloor());
-io.println(8.bfloor());
-io.println(9.bfloor());

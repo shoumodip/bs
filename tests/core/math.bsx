@@ -52,11 +52,3 @@ io.println(0.clamp(1, 6)) fr
 io.println(7.clamp(1, 6)) fr
 
 io.println(4.lerp(8, 0.5)) fr
-
-io.println(7.bceil()) fr
-io.println(8.bceil()) fr
-io.println(9.bceil()) fr
-
-io.println(7.bfloor()) fr
-io.println(8.bfloor()) fr
-io.println(9.bfloor()) fr

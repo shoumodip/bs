@@ -724,6 +724,44 @@ Bs_Value bs_str_rpad(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
 }
 
+// Bit
+Bs_Value bs_bit_ceil(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_whole_number(bs, args, 0);
+
+    size_t a = args[0].as.number;
+    if (a == 0) {
+        return bs_value_num(1);
+    }
+
+    a--;
+    a |= a >> 1;
+    a |= a >> 2;
+    a |= a >> 4;
+    a |= a >> 8;
+    a |= a >> 16;
+    a |= a >> 32;
+    return bs_value_num(a + 1);
+}
+
+Bs_Value bs_bit_floor(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_whole_number(bs, args, 0);
+
+    size_t a = args[0].as.number;
+    if (a == 0) {
+        return bs_value_num(0);
+    }
+
+    a |= a >> 1;
+    a |= a >> 2;
+    a |= a >> 4;
+    a |= a >> 8;
+    a |= a >> 16;
+    a |= a >> 32;
+    return bs_value_num(a - (a >> 1));
+}
+
 // Ascii
 Bs_Value bs_ascii_char(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
@@ -1352,41 +1390,6 @@ Bs_Value bs_math_lerp(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_num(a + (b - a) * t);
 }
 
-Bs_Value bs_math_bceil(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 0);
-
-    size_t a = args[-1].as.number;
-    if (a == 0) {
-        return bs_value_num(1);
-    }
-
-    a--;
-    a |= a >> 1;
-    a |= a >> 2;
-    a |= a >> 4;
-    a |= a >> 8;
-    a |= a >> 16;
-    a |= a >> 32;
-    return bs_value_num(a + 1);
-}
-
-Bs_Value bs_math_bfloor(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 0);
-
-    size_t a = args[-1].as.number;
-    if (a == 0) {
-        return bs_value_num(0);
-    }
-
-    a |= a >> 1;
-    a |= a >> 2;
-    a |= a >> 4;
-    a |= a >> 8;
-    a |= a >> 16;
-    a |= a >> 32;
-    return bs_value_num(a - (a >> 1));
-}
-
 // Main
 static void bs_add(Bs *bs, Bs_Table *table, const char *key, Bs_Value value) {
     bs_table_set(bs, table, bs_value_object(bs_str_new(bs, bs_sv_from_cstr(key))), value);
@@ -1506,6 +1509,13 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     }
 
     {
+        Bs_Table *bit = bs_table_new(bs);
+        bs_add_fn(bs, bit, "ceil", "bit.ceil", bs_bit_ceil);
+        bs_add_fn(bs, bit, "floor", "bit.floor", bs_bit_floor);
+        bs_global_set(bs, Bs_Sv_Static("bit"), bs_value_object(bit));
+    }
+
+    {
         Bs_Table *ascii = bs_table_new(bs);
         bs_add_fn(bs, ascii, "char", "ascii.char", bs_ascii_char);
         bs_add_fn(bs, ascii, "code", "ascii.code", bs_ascii_code);
@@ -1563,9 +1573,6 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("min"), bs_math_min);
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("clamp"), bs_math_clamp);
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("lerp"), bs_math_lerp);
-
-        bs_builtin_number_methods_add(bs, Bs_Sv_Static("bceil"), bs_math_bceil);
-        bs_builtin_number_methods_add(bs, Bs_Sv_Static("bfloor"), bs_math_bfloor);
 
         Bs_Table *math = bs_table_new(bs);
         bs_add(bs, math, "E", bs_value_num(M_E));

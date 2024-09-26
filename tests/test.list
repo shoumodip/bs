@@ -202,3 +202,5 @@
 ../bin/bs core/table.bsx
 ../bin/bs core/math.bs
 ../bin/bs core/math.bsx
+../bin/bs core/bit.bs
+../bin/bs core/bit.bsx
