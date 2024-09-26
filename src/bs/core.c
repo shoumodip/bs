@@ -1467,16 +1467,14 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_add(bs, os, "args", bs_value_object(args));
 
         bs_global_set(bs, Bs_Sv_Static("os"), bs_value_object(os));
-    }
 
-    {
         Bs_C_Class *bs_process_class =
             bs_c_class_new(bs, Bs_Sv_Static("Process"), sizeof(Bs_Process), bs_process_init, NULL);
 
         bs_c_class_add(bs, bs_process_class, Bs_Sv_Static("kill"), bs_process_kill);
         bs_c_class_add(bs, bs_process_class, Bs_Sv_Static("wait"), bs_process_wait);
 
-        bs_global_set(bs, Bs_Sv_Static("Process"), bs_value_object(bs_process_class));
+        bs_add(bs, os, "Process", bs_value_object(bs_process_class));
     }
 
     {
