@@ -1,7 +1,7 @@
 {
-    mf xs be {
-        foo be 69,
-        bar be 420
+    mf xs = {
+        foo = 69,
+        bar = 420
     } fr
 
     io.println("foo" amongus xs) fr
@@ -12,7 +12,7 @@
 {
     wannabe Foo {
         init() {
-            deez.bar be 69 fr
+            deez.bar = 69 fr
         }
 
         foo() {}
@@ -21,7 +21,7 @@
     io.println("foo" amongus Foo) fr
     io.println("bar" amongus Foo) fr
 
-    mf foo be Foo() fr
+    mf foo = Foo() fr
     io.println("foo" amongus foo) fr
     io.println("bar" amongus foo) fr
     io.println("lmao" amongus foo) fr

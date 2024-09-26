@@ -1,14 +1,14 @@
-mf local be 69 fr
+mf local = 69 fr
 io.println(local) fr
 
 {
-    mf local be 420 fr
+    mf local = 420 fr
     io.println(local) fr
 }
 
 io.println(local) fr
 
 {
-    local be 420 fr
+    local = 420 fr
     io.println(local) fr
 }

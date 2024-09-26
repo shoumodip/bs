@@ -256,7 +256,7 @@ array[len(array)] = 420;
 io.println(array);      # Output: [69, "nice!", nil, "Are you serious?", 420]
 ---
 # Variables will be introduced later
-mf array be [69, 420] fr
+mf array = [69, 420] fr
 
 # Pretty printing by default!
 io.println(array) fr        # Output: [69, 420]
@@ -268,17 +268,17 @@ io.println(array[0]) fr     # Output: 69
 io.println(array[2]) fr     # Error!
 
 # Array assignment
-array[1] be "nice!" fr
+array[1] = "nice!" fr
 io.println(array) fr        # Output: [69, "nice!"]
 
 # Array assignment out of bounds is NOT an error
-array[3] be "Are you serious?" fr
+array[3] = "Are you serious?" fr
 io.println(array) fr        # Output: [69, "nice!", bruh, "Are you serious?"]
 
 # Array length
 io.println(thicc(array)) fr # Output: 4
 
 # Due to the assignment semantics, appending to arrays is quite easy
-array[thicc(array)] be 420 fr
+array[thicc(array)] = 420 fr
 io.println(array) fr        # Output: [69, "nice!", bruh, "Are you serious?", 420]
 ```

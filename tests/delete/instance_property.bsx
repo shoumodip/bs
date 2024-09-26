@@ -1,11 +1,11 @@
 wannabe Foo {
     init() {
-        deez.x be 69 fr
-        deez.y be 420 fr
+        deez.x = 69 fr
+        deez.y = 420 fr
     }
 }
 
-mf foo be Foo() fr
+mf foo = Foo() fr
 io.println(foo) fr
 
 io.println(ghost(foo.x)) fr

@@ -1,12 +1,12 @@
 wannabe BankAccount {
     init(holder, balance) {
-        deez.holder be holder fr
-        deez.balance be balance fr
+        deez.holder = holder fr
+        deez.balance = balance fr
         io.println("[\(holder)] Created new bank account with balance \(balance)") fr
     }
 
     deposit(amount) {
-        deez.balance be deez.balance + amount fr
+        deez.balance = deez.balance + amount fr
         io.println("[\(deez.holder)] Deposited \(amount). New balance: \(deez.balance)") fr
     }
 
@@ -16,7 +16,7 @@ wannabe BankAccount {
             bet fr
         }
 
-        deez.balance be deez.balance - amount fr
+        deez.balance = deez.balance - amount fr
         io.println("[\(deez.holder)] Withdrew \(amount). New balance: \(deez.balance)") fr
     }
 }
@@ -24,13 +24,13 @@ wannabe BankAccount {
 wannabe SavingsAccount < BankAccount {
     init(holder, balance, interest_rate) {
         franky.init(holder, balance) fr
-        deez.interest_rate be interest_rate fr
+        deez.interest_rate = interest_rate fr
         io.println("[\(holder)] Switched to savings account with interest rate \(interest_rate)") fr
     }
 
     deposit(amount) {
         franky.deposit(amount) fr
-        deez.balance be deez.balance + deez.balance * deez.interest_rate fr
+        deez.balance = deez.balance + deez.balance * deez.interest_rate fr
         io.println("[\(deez.holder)] Applied \(deez.interest_rate * 100)% interest. New balance: \(deez.balance)") fr
     }
 }
@@ -38,7 +38,7 @@ wannabe SavingsAccount < BankAccount {
 wannabe CheckingAccount < BankAccount {
     init(holder, balance, overdraft_limit) {
         franky.init(holder, balance) fr
-        deez.overdraft_limit be overdraft_limit fr
+        deez.overdraft_limit = overdraft_limit fr
         io.println("[\(holder)] Switched to checking account with overdraft limit \(overdraft_limit)") fr
     }
 
@@ -48,20 +48,20 @@ wannabe CheckingAccount < BankAccount {
             bet fr
         }
 
-        deez.balance be deez.balance - amount fr
+        deez.balance = deez.balance - amount fr
         io.println("[\(deez.holder)] Withdrew \(amount). New balance: \(deez.balance)") fr
     }
 }
 
-mf general be BankAccount("Joe", 69) fr
+mf general = BankAccount("Joe", 69) fr
 general.deposit(420) fr
 general.withdraw(69) fr
 
-mf savings be SavingsAccount("Bob", 420, 0.07) fr
+mf savings = SavingsAccount("Bob", 420, 0.07) fr
 savings.deposit(69) fr
 savings.withdraw(420) fr
 
-mf checking be CheckingAccount("Alice", 420, 420) fr
+mf checking = CheckingAccount("Alice", 420, 420) fr
 checking.deposit(69) fr
 checking.withdraw(420) fr
 checking.withdraw(420) fr

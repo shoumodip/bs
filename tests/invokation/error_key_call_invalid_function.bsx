@@ -1,5 +1,5 @@
-mf t be {
-    f be 69
+mf t = {
+    f = 69
 } fr
 
 t.f() fr

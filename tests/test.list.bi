@@ -1,4 +1,4 @@
-:i count 206
+:i count 210
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -88,6 +88,68 @@ arithmetics/error_invalid_hex_digit.bs:1:5: error: invalid digit 'g' in number
 
 :b stderr 80
 arithmetics/error_invalid_hex_digit.bsx:1:5: error: invalid digit 'g' in number
+
+:b shell 28
+../bin/bs assignment/main.bs
+:i returncode 0
+:b stdout 79
+69
+420
+69
+420
+1
+2
+1.59999999999999
+0.399999999999997
+69
+420
+69
+420
+69
+420
+1337
+
+:b stderr 0
+
+:b shell 29
+../bin/bs assignment/main.bsx
+:i returncode 0
+:b stdout 79
+69
+420
+69
+420
+1
+2
+1.59999999999999
+0.399999999999997
+69
+420
+69
+420
+69
+420
+1337
+
+:b stderr 0
+
+:b shell 28
+../bin/bs assignment/join.bs
+:i returncode 0
+:b stdout 20
+Hello
+Hello, world!
+
+:b stderr 0
+
+:b shell 29
+../bin/bs assignment/join.bsx
+:i returncode 0
+:b stdout 20
+Hello
+Hello, world!
+
+:b stderr 0
 
 :b shell 29
 ../bin/bs comparisons/main.bs

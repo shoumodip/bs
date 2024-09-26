@@ -1,5 +1,5 @@
 wannabe Foo {}
 
-mf foo be Foo() fr
-foo.f be "".slice fr
+mf foo = Foo() fr
+foo.f = "".slice fr
 foo.f(bruh, 0) fr

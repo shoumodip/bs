@@ -1,5 +1,5 @@
-mf x be nocap fr
-mf y be bruh fr
+mf x = nocap fr
+mf y = bruh fr
 
 lit noice() {
     io.println("x = \(x); y = \(y)") fr
@@ -10,8 +10,8 @@ lit oops() {
 }
 
 bet {
-    x be x,
-    y be y,
-    noice be noice,
-    oops be oops,
+    x = x,
+    y = y,
+    noice = noice,
+    oops = oops,
 } fr

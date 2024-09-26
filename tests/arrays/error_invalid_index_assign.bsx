@@ -1,2 +1,2 @@
-mf xs be [] fr
-xs["string"] be 69 fr
+mf xs = [] fr
+xs["string"] = 69 fr

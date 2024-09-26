@@ -68,6 +68,19 @@ typedef enum {
 
     BS_TOKEN_SET,
 
+    // Shorthands
+    BS_TOKEN_ADD_SET,
+    BS_TOKEN_SUB_SET,
+    BS_TOKEN_MUL_SET,
+    BS_TOKEN_DIV_SET,
+    BS_TOKEN_MOD_SET,
+    BS_TOKEN_BOR_SET,
+    BS_TOKEN_BAND_SET,
+    BS_TOKEN_BXOR_SET,
+    BS_TOKEN_SHL_SET,
+    BS_TOKEN_SHR_SET,
+    BS_TOKEN_JOIN_SET,
+
     BS_TOKEN_IF,
     BS_TOKEN_THEN,
     BS_TOKEN_ELSE,

@@ -1,6 +1,6 @@
 lit outer(x) {
     lit set(nx) {
-        x be nx fr
+        x = nx fr
     }
 
     lit show() {
@@ -8,16 +8,16 @@ lit outer(x) {
     }
 
     bet {
-        get be lit () {
+        get = lit () {
             bet x fr
         },
 
-        set be set,
-        show be show
+        set = set,
+        show = show
     } fr
 }
 
-mf v be outer(69) fr
+mf v = outer(69) fr
 io.println(v.get()) fr
 
 v.set(420) fr

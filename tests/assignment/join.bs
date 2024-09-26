@@ -1,0 +1,5 @@
+var s = "Hello";
+io.println(s);
+
+s ++= ", world!";
+io.println(s);

@@ -2,7 +2,7 @@
 
 #include "bs/token.h"
 
-static_assert(BS_COUNT_TOKENS == 62, "Update bs_token_type_name()");
+static_assert(BS_COUNT_TOKENS == 73, "Update bs_token_type_name()");
 const char *bs_token_type_name(Bs_Token_Type type, bool extended) {
     switch (type) {
     case BS_TOKEN_EOF:
@@ -90,7 +90,7 @@ const char *bs_token_type_name(Bs_Token_Type type, bool extended) {
     case BS_TOKEN_LAND:
         return "'&&'";
 
-    case BS_TOKEN_LXOR:
+    case BS_TOKEN_LXOR: // TODO: remove LXOR, it is literally just !=
         return "'^^'";
 
     case BS_TOKEN_LNOT:
@@ -136,7 +136,40 @@ const char *bs_token_type_name(Bs_Token_Type type, bool extended) {
         return extended ? "'vibeof'" : "'typeof'";
 
     case BS_TOKEN_SET:
-        return extended ? "'be'" : "'='";
+        return "'='";
+
+    case BS_TOKEN_ADD_SET:
+        return "'+='";
+
+    case BS_TOKEN_SUB_SET:
+        return "'-='";
+
+    case BS_TOKEN_MUL_SET:
+        return "'*='";
+
+    case BS_TOKEN_DIV_SET:
+        return "'/='";
+
+    case BS_TOKEN_MOD_SET:
+        return "'%='";
+
+    case BS_TOKEN_BOR_SET:
+        return "'|='";
+
+    case BS_TOKEN_BAND_SET:
+        return "'&='";
+
+    case BS_TOKEN_BXOR_SET:
+        return "'^='";
+
+    case BS_TOKEN_SHL_SET:
+        return "'<<='";
+
+    case BS_TOKEN_SHR_SET:
+        return "'>>='";
+
+    case BS_TOKEN_JOIN_SET:
+        return "'++='";
 
     case BS_TOKEN_IF:
         return extended ? "'ayo'" : "'if'";

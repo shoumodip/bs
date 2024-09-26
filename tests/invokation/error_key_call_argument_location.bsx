@@ -1,5 +1,5 @@
-mf t be {
-    f be "".slice
+mf t = {
+    f = "".slice
 } fr
 
 t.f(bruh, 0) fr

@@ -6,15 +6,15 @@ lit inc() {
 
 io.println(inc()(68)) fr
 
-mf table be {
-    inc be inc
+mf table = {
+    inc = inc
 } fr
 
 io.println(table.inc()(419)) fr
 
 wannabe Foo {
     init(n) {
-        deez.n be n fr
+        deez.n = n fr
     }
 
     inc() {
@@ -22,7 +22,7 @@ wannabe Foo {
     }
 
     inc2() {
-        deez.n be deez.n + 1 fr
+        deez.n = deez.n + 1 fr
         bet deez fr
     }
 }

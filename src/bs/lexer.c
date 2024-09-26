@@ -105,7 +105,7 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc) {
     return token;
 }
 
-static_assert(BS_COUNT_TOKENS == 62, "Update bs_lexer_next()");
+static_assert(BS_COUNT_TOKENS == 73, "Update bs_lexer_next()");
 Bs_Token bs_lexer_next(Bs_Lexer *l) {
     if (l->peeked) {
         l->peeked = false;
@@ -218,8 +218,6 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
                 token.type = BS_TOKEN_IMPORT;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("vibeof"))) {
                 token.type = BS_TOKEN_TYPEOF;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("be"))) {
-                token.type = BS_TOKEN_SET;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("ayo"))) {
                 token.type = BS_TOKEN_IF;
             } else if (bs_sv_eq(token.sv, Bs_Sv_Static("sayless"))) {
@@ -351,31 +349,55 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
 
     case '+':
         if (bs_lexer_match(l, '+')) {
-            token.type = BS_TOKEN_JOIN;
+            if (bs_lexer_match(l, '=')) {
+                token.type = BS_TOKEN_JOIN_SET;
+            } else {
+                token.type = BS_TOKEN_JOIN;
+            }
+        } else if (bs_lexer_match(l, '=')) {
+            token.type = BS_TOKEN_ADD_SET;
         } else {
             token.type = BS_TOKEN_ADD;
         }
         break;
 
     case '-':
-        token.type = BS_TOKEN_SUB;
+        if (bs_lexer_match(l, '=')) {
+            token.type = BS_TOKEN_SUB_SET;
+        } else {
+            token.type = BS_TOKEN_SUB;
+        }
         break;
 
     case '*':
-        token.type = BS_TOKEN_MUL;
+        if (bs_lexer_match(l, '=')) {
+            token.type = BS_TOKEN_MUL_SET;
+        } else {
+            token.type = BS_TOKEN_MUL;
+        }
         break;
 
     case '/':
-        token.type = BS_TOKEN_DIV;
+        if (bs_lexer_match(l, '=')) {
+            token.type = BS_TOKEN_DIV_SET;
+        } else {
+            token.type = BS_TOKEN_DIV;
+        }
         break;
 
     case '%':
-        token.type = BS_TOKEN_MOD;
+        if (bs_lexer_match(l, '=')) {
+            token.type = BS_TOKEN_MOD_SET;
+        } else {
+            token.type = BS_TOKEN_MOD;
+        }
         break;
 
     case '|':
         if (bs_lexer_match(l, '|')) {
             token.type = BS_TOKEN_LOR;
+        } else if (bs_lexer_match(l, '=')) {
+            token.type = BS_TOKEN_BOR_SET;
         } else {
             token.type = BS_TOKEN_BOR;
         }
@@ -384,6 +406,8 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
     case '&':
         if (bs_lexer_match(l, '&')) {
             token.type = BS_TOKEN_LAND;
+        } else if (bs_lexer_match(l, '=')) {
+            token.type = BS_TOKEN_BAND_SET;
         } else {
             token.type = BS_TOKEN_BAND;
         }
@@ -392,6 +416,8 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
     case '^':
         if (bs_lexer_match(l, '^')) {
             token.type = BS_TOKEN_LXOR;
+        } else if (bs_lexer_match(l, '=')) {
+            token.type = BS_TOKEN_BXOR_SET;
         } else {
             token.type = BS_TOKEN_BXOR;
         }
@@ -411,7 +437,11 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
 
     case '>':
         if (bs_lexer_match(l, '>')) {
-            token.type = BS_TOKEN_SHR;
+            if (bs_lexer_match(l, '=')) {
+                token.type = BS_TOKEN_SHR_SET;
+            } else {
+                token.type = BS_TOKEN_SHR;
+            }
         } else if (bs_lexer_match(l, '=')) {
             token.type = BS_TOKEN_GE;
         } else {
@@ -421,7 +451,11 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
 
     case '<':
         if (bs_lexer_match(l, '<')) {
-            token.type = BS_TOKEN_SHL;
+            if (bs_lexer_match(l, '=')) {
+                token.type = BS_TOKEN_SHL_SET;
+            } else {
+                token.type = BS_TOKEN_SHL;
+            }
         } else if (bs_lexer_match(l, '=')) {
             token.type = BS_TOKEN_LE;
         } else {
@@ -434,7 +468,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
             token.type = BS_TOKEN_EQ;
         } else if (bs_lexer_match(l, '>')) {
             token.type = BS_TOKEN_ARROW;
-        } else if (!l->extended) {
+        } else {
             token.type = BS_TOKEN_SET;
         }
         break;

@@ -1,5 +1,5 @@
-mf normal be redpill("extended/common") fr
-mf extended be redpill("extended/common_extended") fr
+mf normal = redpill("extended/common") fr
+mf extended = redpill("extended/common_extended") fr
 
 normal.noice() fr
 extended.noice() fr

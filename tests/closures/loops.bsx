@@ -1,24 +1,24 @@
-mf i be 0 fr
-mf a be [] fr
+mf i = 0 fr
+mf a = [] fr
 
 yolo i < 4 {
-    mf v be i fr
+    mf v = i fr
 
-    a[thicc(a)] be lit () {
+    a[thicc(a)] = lit () {
         io.println("Captured value is \(v)") fr
     } fr
 
-    i be i + 1 fr
+    i = i + 1 fr
 }
 
 yall _, f amongus a {
     f() fr
 }
 
-mf a be [] fr
+mf a = [] fr
 
 yall i amongus 4, 0 {
-    a[thicc(a)] be lit () {
+    a[thicc(a)] = lit () {
         io.println("Captured value is \(i)") fr
     } fr
 }

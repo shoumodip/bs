@@ -1,5 +1,5 @@
-mf xs be [] fr
+mf xs = [] fr
 io.println(xs) fr
 
-xs[10] be 69 fr
+xs[10] = 69 fr
 io.println(xs) fr

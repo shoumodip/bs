@@ -1,6 +1,6 @@
-mf xs be {
-    foo be 69,
-    bar be 420
+mf xs = {
+    foo = 69,
+    bar = 420
 } fr
 io.println(xs) fr
 

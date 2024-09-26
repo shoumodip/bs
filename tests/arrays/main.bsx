@@ -1,8 +1,8 @@
-mf xs be [] fr
+mf xs = [] fr
 
-xs[thicc(xs)] be 1 fr
-xs[thicc(xs)] be 4 fr
-xs[thicc(xs)] be 9 fr
+xs[thicc(xs)] = 1 fr
+xs[thicc(xs)] = 4 fr
+xs[thicc(xs)] = 9 fr
 
 io.println(xs[0]) fr
 io.println(xs[1]) fr

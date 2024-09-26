@@ -1,6 +1,6 @@
 wannabe Person {
     init(name) {
-        deez.name be name fr
+        deez.name = name fr
     }
 
     greet() {

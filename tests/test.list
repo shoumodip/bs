@@ -4,6 +4,10 @@
 ../bin/bs arithmetics/error_invalid_digit.bsx
 ../bin/bs arithmetics/error_invalid_hex_digit.bs
 ../bin/bs arithmetics/error_invalid_hex_digit.bsx
+../bin/bs assignment/main.bs
+../bin/bs assignment/main.bsx
+../bin/bs assignment/join.bs
+../bin/bs assignment/join.bsx
 ../bin/bs comparisons/main.bs
 ../bin/bs comparisons/main.bsx
 ../bin/bs conditions/main.bs

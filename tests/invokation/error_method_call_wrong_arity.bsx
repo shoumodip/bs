@@ -4,5 +4,5 @@ wannabe Foo {
     }
 }
 
-mf foo be Foo() fr
+mf foo = Foo() fr
 foo.f(69) fr

@@ -1,2 +1,2 @@
-mf xs be {} fr
+mf xs = {} fr
 ghost(xs) fr

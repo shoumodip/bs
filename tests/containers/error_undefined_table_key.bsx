@@ -1,5 +1,5 @@
-mf xs be {
-    foo be 69
+mf xs = {
+    foo = 69
 } fr
 
 xs.bar fr

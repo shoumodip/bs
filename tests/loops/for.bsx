@@ -18,6 +18,6 @@ yall i, v amongus [69, 420, 1337] {
     io.println(i, v) fr
 }
 
-yall k, v amongus {foo be 69, bar be 420} {
+yall k, v amongus {foo = 69, bar = 420} {
     io.println(k, v) fr
 }

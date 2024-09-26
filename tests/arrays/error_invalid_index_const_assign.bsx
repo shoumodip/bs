@@ -1,2 +1,2 @@
-mf xs be [] fr
-xs.foo be 69 fr
+mf xs = [] fr
+xs.foo = 69 fr

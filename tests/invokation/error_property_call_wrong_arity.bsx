@@ -1,7 +1,7 @@
 wannabe Foo {}
 
-mf foo be Foo() fr
-foo.f be lit () {
+mf foo = Foo() fr
+foo.f = lit () {
     io.println("Hello, world!") fr
 } fr
 

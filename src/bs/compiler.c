@@ -16,7 +16,7 @@ typedef enum {
     BS_POWER_DOT,
 } Bs_Power;
 
-static_assert(BS_COUNT_TOKENS == 62, "Update bs_token_type_power()");
+static_assert(BS_COUNT_TOKENS == 73, "Update bs_token_type_power()");
 static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_IN:
@@ -60,6 +60,17 @@ static Bs_Power bs_token_type_power(Bs_Token_Type type) {
         return BS_POWER_ADD;
 
     case BS_TOKEN_SET:
+    case BS_TOKEN_ADD_SET:
+    case BS_TOKEN_SUB_SET:
+    case BS_TOKEN_MUL_SET:
+    case BS_TOKEN_DIV_SET:
+    case BS_TOKEN_MOD_SET:
+    case BS_TOKEN_BOR_SET:
+    case BS_TOKEN_BAND_SET:
+    case BS_TOKEN_BXOR_SET:
+    case BS_TOKEN_SHL_SET:
+    case BS_TOKEN_SHR_SET:
+    case BS_TOKEN_JOIN_SET:
         return BS_POWER_SET;
 
     default:
@@ -286,7 +297,56 @@ static void bs_compile_identifier(Bs_Compiler *c, const Bs_Token *token) {
     bs_chunk_push_op_loc(c->bs, c->chunk, token->loc);
 }
 
-static_assert(BS_COUNT_TOKENS == 62, "Update bs_compile_expr()");
+static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp);
+
+static void bs_compile_assignment(Bs_Compiler *c, const Bs_Token *token, Bs_Op arith_op) {
+    const Bs_Op assign_op = bs_op_get_to_set(c->chunk->data[c->chunk->last]);
+    if (assign_op == BS_OP_RET) {
+        bs_compile_error_unexpected(c, token);
+    }
+
+    assert(c->chunk->locations.count);
+    const size_t locations_count_save = c->chunk->locations.count;
+
+    Bs_Loc locs[2];
+    locs[0] = c->chunk->locations.data[--c->chunk->locations.count].loc;
+    if (assign_op == BS_OP_ISET || assign_op == BS_OP_ISET_CONST) {
+        assert(c->chunk->locations.count > 1);
+        locs[1] = locs[0];
+        locs[0] = c->chunk->locations.data[--c->chunk->locations.count].loc;
+    }
+
+    size_t index;
+    if (assign_op != BS_OP_ISET) {
+        index = *(size_t *)&c->chunk->data[c->chunk->last + 1];
+    }
+
+    if (arith_op == BS_OP_RET) {
+        c->chunk->count = c->chunk->last;
+    } else {
+        c->chunk->locations.count = locations_count_save;
+    }
+
+    bs_compile_expr(c, BS_POWER_SET);
+
+    if (arith_op != BS_OP_RET) {
+        bs_chunk_push_op(c->bs, c->chunk, arith_op);
+        bs_chunk_push_op_loc(c->bs, c->chunk, token->loc);
+    }
+
+    if (assign_op == BS_OP_ISET) {
+        bs_chunk_push_op(c->bs, c->chunk, assign_op);
+    } else {
+        bs_chunk_push_op_int(c->bs, c->chunk, assign_op, index);
+    }
+
+    bs_chunk_push_op_loc(c->bs, c->chunk, locs[0]);
+    if (assign_op == BS_OP_ISET || assign_op == BS_OP_ISET_CONST) {
+        bs_chunk_push_op_loc(c->bs, c->chunk, locs[1]);
+    }
+}
+
+static_assert(BS_COUNT_TOKENS == 73, "Update bs_compile_expr()");
 static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
     Bs_Loc loc = token.loc;
@@ -805,40 +865,53 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_JOIN);
             break;
 
-        case BS_TOKEN_SET: {
-            const Bs_Op op = bs_op_get_to_set(c->chunk->data[c->chunk->last]);
-            if (op == BS_OP_RET) {
-                bs_compile_error_unexpected(c, &token);
-            }
+        case BS_TOKEN_SET:
+            bs_compile_assignment(c, &token, BS_OP_RET);
+            break;
 
-            assert(c->chunk->locations.count);
+        case BS_TOKEN_ADD_SET:
+            bs_compile_assignment(c, &token, BS_OP_ADD);
+            break;
 
-            Bs_Loc locs[2];
-            locs[0] = c->chunk->locations.data[--c->chunk->locations.count].loc;
-            if (op == BS_OP_ISET || op == BS_OP_ISET_CONST) {
-                locs[1] = locs[0];
-                locs[0] = c->chunk->locations.data[--c->chunk->locations.count].loc;
-            }
+        case BS_TOKEN_SUB_SET:
+            bs_compile_assignment(c, &token, BS_OP_SUB);
+            break;
 
-            size_t index;
-            if (op != BS_OP_ISET) {
-                index = *(size_t *)&c->chunk->data[c->chunk->last + 1];
-            }
-            c->chunk->count = c->chunk->last;
+        case BS_TOKEN_MUL_SET:
+            bs_compile_assignment(c, &token, BS_OP_MUL);
+            break;
 
-            bs_compile_expr(c, lbp);
+        case BS_TOKEN_DIV_SET:
+            bs_compile_assignment(c, &token, BS_OP_DIV);
+            break;
 
-            if (op == BS_OP_ISET) {
-                bs_chunk_push_op(c->bs, c->chunk, op);
-            } else {
-                bs_chunk_push_op_int(c->bs, c->chunk, op, index);
-            }
+        case BS_TOKEN_MOD_SET:
+            bs_compile_assignment(c, &token, BS_OP_MOD);
+            break;
 
-            bs_chunk_push_op_loc(c->bs, c->chunk, locs[0]);
-            if (op == BS_OP_ISET || op == BS_OP_ISET_CONST) {
-                bs_chunk_push_op_loc(c->bs, c->chunk, locs[1]);
-            }
-        } break;
+        case BS_TOKEN_BOR_SET:
+            bs_compile_assignment(c, &token, BS_OP_BOR);
+            break;
+
+        case BS_TOKEN_BAND_SET:
+            bs_compile_assignment(c, &token, BS_OP_BAND);
+            break;
+
+        case BS_TOKEN_BXOR_SET:
+            bs_compile_assignment(c, &token, BS_OP_BXOR);
+            break;
+
+        case BS_TOKEN_SHL_SET:
+            bs_compile_assignment(c, &token, BS_OP_SHL);
+            break;
+
+        case BS_TOKEN_SHR_SET:
+            bs_compile_assignment(c, &token, BS_OP_SHR);
+            break;
+
+        case BS_TOKEN_JOIN_SET:
+            bs_compile_assignment(c, &token, BS_OP_JOIN);
+            break;
 
         case BS_TOKEN_IN:
             bs_compile_expr(c, lbp);
@@ -1102,7 +1175,7 @@ static void bs_compile_jumps_reset(Bs_Compiler *c, Bs_Jumps save) {
     c->jumps.start = save.start;
 }
 
-static_assert(BS_COUNT_TOKENS == 62, "Update bs_compile_stmt()");
+static_assert(BS_COUNT_TOKENS == 73, "Update bs_compile_stmt()");
 static void bs_compile_stmt(Bs_Compiler *c) {
     Bs_Token token = bs_lexer_next(&c->lexer);
 

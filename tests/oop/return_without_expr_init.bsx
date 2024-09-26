@@ -1,10 +1,10 @@
 wannabe Foo {
     init() {
-        deez.a be 69 fr
+        deez.a = 69 fr
         bet fr
 
         # Unreachable
-        deez.b be 420 fr
+        deez.b = 420 fr
     }
 }
 
