@@ -234,7 +234,6 @@ static void bs_compile_string(Bs_Compiler *c, Bs_Sv sv) {
     Bs_Buffer *b = &bs_config(c->bs)->buffer;
     const size_t start = b->count;
 
-    Bs_Writer w = bs_buffer_writer(b);
     for (size_t i = 0; i < sv.size; i++) {
         char ch = sv.data[i];
         if (ch == '\\') {

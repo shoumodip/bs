@@ -342,7 +342,6 @@ Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
 
     if (pid == 0) {
         Bs_Buffer *b = &bs_config(bs)->buffer;
-        const size_t start = b->count;
 
         char **cargv = malloc((array->count + 1) * sizeof(char *));
         assert(cargv);

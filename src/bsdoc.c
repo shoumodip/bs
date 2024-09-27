@@ -355,7 +355,6 @@ int main(int argc, char **argv) {
             line.data++;
             line.size--;
 
-            size_t index;
             const Bs_Sv name = bs_sv_split(&line, ']');
 
             line.data++;

@@ -2435,7 +2435,7 @@ Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input) {
     Bs_Buffer *b = &bs->paths;
     const size_t start = b->count;
 
-    Bs_Sv resolved = bs_buffer_absolute_path(b, path);
+    bs_buffer_absolute_path(b, path);
     const Bs_Fn *fn = bs_compile(bs, bs_buffer_reset(b, start), input, true);
     if (!fn) {
         return (Bs_Result){.exit = 1};
