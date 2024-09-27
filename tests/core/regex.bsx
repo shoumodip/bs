@@ -1,0 +1,37 @@
+# Invalid regex
+io.println(Regex("[")) fr
+
+{
+    mf r = Regex("") fr
+    io.println("foo".find(r)) fr
+    io.println("foo".split(r)) fr
+    io.println("foo".replace(r, "bar")) fr
+}
+
+{
+    mf r = Regex("[0-9]") fr
+    io.println("69a".find(r)) fr
+    io.println("69a".find(r, 1)) fr
+    io.println("69a".find(r, 2)) fr
+    io.println("yolol".find(r)) fr
+}
+
+{
+    mf r = Regex(" +") fr
+    io.println("foobar".split(r)) fr
+    io.println("foo bar".split(r)) fr
+    io.println("foo bar   baz".split(r)) fr
+}
+
+{
+    mf r = Regex("([0-9]+) ([a-z]+)") fr
+    io.println("69 apples, 420 oranges".replace(r, "{type: \\2, count: \\1}")) fr
+    io.println("69 apples, 420  oranges".replace(r, "{type: \\2, count: \\1}")) fr
+    io.println("ayo noice!".replace(r, "{type: \\2, count: \\1}")) fr
+}
+
+{
+    mf r = Regex("^,?[0-9]+") fr
+    io.println("69,420".split(r)) fr
+    io.println("69,420".replace(r, "-")) fr
+}

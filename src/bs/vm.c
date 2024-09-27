@@ -7,7 +7,7 @@
 #include "bs/compiler.h"
 
 // #define BS_GC_DEBUG_LOG
-// #define BS_GC_DEBUG_STRESS
+#define BS_GC_DEBUG_STRESS
 #define BS_GC_GROW_FACTOR 2
 #define BS_STACK_CAPACITY (1024 * 1024)
 
@@ -918,6 +918,14 @@ void bs_check_multi_at(
             }
             break;
 
+        case BS_CHECK_C_INSTANCE:
+            if (value.type == BS_VALUE_OBJECT && value.as.object->type == BS_OBJECT_C_INSTANCE) {
+                if (((Bs_C_Instance *)value.as.object)->class == c.as.c_instance) {
+                    return;
+                }
+            }
+            break;
+
         case BS_CHECK_FN:
             if (value.type == BS_VALUE_OBJECT) {
                 switch (value.as.object->type) {
@@ -963,7 +971,7 @@ void bs_check_multi_at(
     for (size_t i = 0; i < count; i++) {
         if (i) {
             if (i + 1 == count) {
-                bs_fmt(w, ", or ");
+                bs_fmt(w, " or ");
             } else {
                 bs_fmt(w, ", ");
             }
@@ -977,6 +985,10 @@ void bs_check_multi_at(
 
         case BS_CHECK_OBJECT:
             bs_fmt(w, "%s", bs_object_type_name(c.as.object));
+            break;
+
+        case BS_CHECK_C_INSTANCE:
+            bs_fmt(w, Bs_Sv_Fmt, Bs_Sv_Arg(c.as.c_instance->name));
             break;
 
         case BS_CHECK_FN:
@@ -1002,41 +1014,29 @@ void bs_check_multi_at(
 }
 
 void bs_check_callable_at(Bs *bs, size_t location, Bs_Value value, const char *label) {
-    const Bs_Check check = {
-        .type = BS_CHECK_FN,
-    };
+    const Bs_Check check = bs_check_fn;
     bs_check_multi_at(bs, location, value, &check, 1, label);
 }
 
 void bs_check_value_type_at(
     Bs *bs, size_t location, Bs_Value value, Bs_Value_Type expected, const char *label) {
-    const Bs_Check check = {
-        .type = BS_CHECK_VALUE,
-        .as.value = expected,
-    };
+    const Bs_Check check = bs_check_value(expected);
     bs_check_multi_at(bs, location, value, &check, 1, label);
 }
 
 void bs_check_object_type_at(
     Bs *bs, size_t location, Bs_Value value, Bs_Object_Type expected, const char *label) {
-    const Bs_Check check = {
-        .type = BS_CHECK_OBJECT,
-        .as.object = expected,
-    };
+    const Bs_Check check = bs_check_object(expected);
     bs_check_multi_at(bs, location, value, &check, 1, label);
 }
 
 void bs_check_integer_at(Bs *bs, size_t location, Bs_Value value, const char *label) {
-    const Bs_Check check = {
-        .type = BS_CHECK_INT,
-    };
+    const Bs_Check check = bs_check_int;
     bs_check_multi_at(bs, location, value, &check, 1, label);
 }
 
 void bs_check_whole_number_at(Bs *bs, size_t location, Bs_Value value, const char *label) {
-    const Bs_Check check = {
-        .type = BS_CHECK_WHOLE,
-    };
+    const Bs_Check check = bs_check_whole;
     bs_check_multi_at(bs, location, value, &check, 1, label);
 }
 

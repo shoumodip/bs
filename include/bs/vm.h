@@ -67,7 +67,7 @@ void bs_check_arity_at(Bs *bs, size_t location, size_t actual, size_t expected);
 typedef enum {
     BS_CHECK_VALUE,
     BS_CHECK_OBJECT,
-
+    BS_CHECK_C_INSTANCE,
     BS_CHECK_FN,
     BS_CHECK_INT,
     BS_CHECK_WHOLE,
@@ -78,8 +78,16 @@ typedef struct {
     union {
         Bs_Value_Type value;
         Bs_Object_Type object;
+        Bs_C_Class *c_instance;
     } as;
 } Bs_Check;
+
+#define bs_check_value(t) ((Bs_Check){.type = BS_CHECK_VALUE, .as.value = (t)})
+#define bs_check_object(t) ((Bs_Check){.type = BS_CHECK_OBJECT, .as.object = (t)})
+#define bs_check_c_instance(t) ((Bs_Check){.type = BS_CHECK_C_INSTANCE, .as.c_instance = (t)})
+#define bs_check_fn ((Bs_Check){.type = BS_CHECK_FN})
+#define bs_check_int ((Bs_Check){.type = BS_CHECK_INT})
+#define bs_check_whole ((Bs_Check){.type = BS_CHECK_WHOLE})
 
 void bs_check_multi_at(
     Bs *bs,

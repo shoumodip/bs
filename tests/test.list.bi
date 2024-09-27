@@ -1,4 +1,4 @@
-:i count 214
+:i count 216
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -2768,4 +2768,50 @@ core/error_expected_function.bs:1:8: in array.map()
 :b stderr 111
 [C]: error: expected argument #1 to be function, got bruh
 core/error_expected_function.bsx:1:8: in array.map()
+
+:b shell 23
+../bin/bs core/regex.bs
+:i returncode 0
+:b stdout 203
+nil
+0
+["foo"]
+foo
+0
+1
+nil
+nil
+["foobar"]
+["foo", "bar"]
+["foo", "bar", "baz"]
+{type: apples, count: 69}, {type: oranges, count: 420}
+{type: apples, count: 69}, 420  oranges
+ayo noice!
+["", ",420"]
+-,420
+
+:b stderr 0
+
+:b shell 24
+../bin/bs core/regex.bsx
+:i returncode 0
+:b stdout 206
+bruh
+0
+["foo"]
+foo
+0
+1
+bruh
+bruh
+["foobar"]
+["foo", "bar"]
+["foo", "bar", "baz"]
+{type: apples, count: 69}, {type: oranges, count: 420}
+{type: apples, count: 69}, 420  oranges
+ayo noice!
+["", ",420"]
+-,420
+
+:b stderr 0
 

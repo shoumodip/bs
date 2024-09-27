@@ -212,3 +212,5 @@
 ../bin/bs core/ascii.bsx
 ../bin/bs core/error_expected_function.bs
 ../bin/bs core/error_expected_function.bsx
+../bin/bs core/regex.bs
+../bin/bs core/regex.bsx

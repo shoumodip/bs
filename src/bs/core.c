@@ -406,6 +406,33 @@ Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
     return WIFEXITED(status) ? bs_value_num(WEXITSTATUS(status)) : bs_value_nil;
 }
 
+// Regex
+Bs_C_Class *bs_regex_class;
+
+void bs_regex_free(void *userdata, void *instance_data) {
+    regfree(&bs_static_cast(instance_data, regex_t));
+}
+
+Bs_Value bs_regex_init(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    Bs_Buffer *b = &bs_config(bs)->buffer;
+    const size_t start = b->count;
+
+    Bs_Writer w = bs_buffer_writer(b);
+    bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
+    bs_da_push(b->bs, b, '\0');
+
+    regex_t regex;
+    if (regcomp(&regex, b->data + start, REG_EXTENDED)) {
+        return bs_value_nil;
+    }
+
+    bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, regex_t) = regex;
+    return args[-1];
+}
+
 // Str
 Bs_Value bs_str_slice(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
@@ -484,31 +511,50 @@ Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
         bs_error(bs, "expected 1 or 2 arguments, got %zu", arity);
     }
 
-    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    const Bs_Check checks[] = {
+        bs_check_object(BS_OBJECT_STR),
+        bs_check_c_instance(bs_regex_class),
+    };
+    bs_arg_check_multi(bs, args, 0, checks, bs_c_array_size(checks));
 
     if (arity == 2) {
         bs_arg_check_whole_number(bs, args, 1);
     }
 
     const Bs_Str *str = (const Bs_Str *)args[-1].as.object;
-    const Bs_Str *pattern = (const Bs_Str *)args[0].as.object;
-    if (!pattern->size) {
-        return bs_value_nil;
-    }
-
     const size_t offset = arity == 2 ? args[1].as.number : 0;
     if (offset > str->size) {
-        bs_error(bs, "cannot take offset of %zu in string of length %zu", offset, str->size);
+        bs_error_at(bs, 2, "cannot take offset of %zu in string of length %zu", offset, str->size);
     }
 
-    if (str->size < pattern->size + offset) {
-        return bs_value_nil;
-    }
+    if (args[0].as.object->type == BS_OBJECT_STR) {
+        const Bs_Str *pattern = (const Bs_Str *)args[0].as.object;
+        if (!pattern->size) {
+            return bs_value_nil;
+        }
 
-    const Bs_Sv pattern_sv = Bs_Sv(pattern->data, pattern->size);
-    for (size_t i = offset; i + pattern->size <= str->size; i++) {
-        if (bs_sv_eq(Bs_Sv(str->data + i, pattern->size), pattern_sv)) {
-            return bs_value_num(i);
+        if (str->size < pattern->size + offset) {
+            return bs_value_nil;
+        }
+
+        const Bs_Sv pattern_sv = Bs_Sv(pattern->data, pattern->size);
+        for (size_t i = offset; i + pattern->size <= str->size; i++) {
+            if (bs_sv_eq(Bs_Sv(str->data + i, pattern->size), pattern_sv)) {
+                return bs_value_num(i);
+            }
+        }
+    } else {
+        Bs_Buffer *b = &bs_config(bs)->buffer;
+        const size_t start = b->count;
+
+        bs_da_push_many(bs, b, str->data + offset, str->size - offset);
+        bs_da_push(bs, b, '\0');
+
+        const regex_t regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, regex_t);
+
+        regmatch_t match;
+        if (!regexec(&regex, bs_buffer_reset(b, start).data, 1, &match, 0)) {
+            return bs_value_num(offset + match.rm_so);
         }
     }
 
@@ -517,28 +563,60 @@ Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
 
 Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Check checks[] = {
+        bs_check_object(BS_OBJECT_STR),
+        bs_check_c_instance(bs_regex_class),
+    };
+    bs_arg_check_multi(bs, args, 0, checks, bs_c_array_size(checks));
 
     const Bs_Str *str = (const Bs_Str *)args[-1].as.object;
-    const Bs_Str *pattern = (const Bs_Str *)args[0].as.object;
 
     Bs_Array *a = bs_array_new(bs);
-    if (!pattern->size) {
-        bs_array_set(bs, a, a->count, bs_value_object(str));
-        return bs_value_object(a);
-    }
-    const Bs_Sv pattern_sv = Bs_Sv(pattern->data, pattern->size);
+    size_t j = 0;
 
-    size_t i = 0, j = 0;
-    while (i + pattern->size <= str->size) {
-        if (bs_sv_eq(Bs_Sv(str->data + i, pattern->size), pattern_sv)) {
+    if (args[0].as.object->type == BS_OBJECT_STR) {
+        const Bs_Str *pattern = (const Bs_Str *)args[0].as.object;
+        if (!pattern->size) {
+            bs_array_set(bs, a, a->count, bs_value_object(str));
+            return bs_value_object(a);
+        }
+        const Bs_Sv pattern_sv = Bs_Sv(pattern->data, pattern->size);
+
+        size_t i = 0;
+        while (i + pattern->size <= str->size) {
+            if (bs_sv_eq(Bs_Sv(str->data + i, pattern->size), pattern_sv)) {
+                bs_array_set(
+                    bs, a, a->count, bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, i - j))));
+
+                i += pattern->size;
+                j = i;
+            } else {
+                i++;
+            }
+        }
+    } else {
+        Bs_Buffer *b = &bs_config(bs)->buffer;
+        const size_t start = b->count;
+
+        bs_da_push_many(bs, b, str->data, str->size);
+        bs_da_push(bs, b, '\0');
+
+        const char *pattern = bs_buffer_reset(b, start).data;
+        const regex_t regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, regex_t);
+
+        int eflags = 0;
+        regmatch_t match;
+        while (!regexec(&regex, pattern + j, 1, &match, eflags)) {
+            eflags = REG_NOTBOL;
+            if (match.rm_so == match.rm_eo) {
+                break;
+            }
+
             bs_array_set(
-                bs, a, a->count, bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, i - j))));
+                bs, a, a->count, bs_value_object(bs_str_new(bs, Bs_Sv(pattern + j, match.rm_so))));
 
-            i += pattern->size;
-            j = i;
-        } else {
-            i++;
+            j += match.rm_eo;
         }
     }
 
@@ -552,35 +630,85 @@ Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
 
 Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
-    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Check checks[] = {
+        bs_check_object(BS_OBJECT_STR),
+        bs_check_c_instance(bs_regex_class),
+    };
+    bs_arg_check_multi(bs, args, 0, checks, bs_c_array_size(checks));
     bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
 
     const Bs_Str *str = (const Bs_Str *)args[-1].as.object;
-    const Bs_Str *pattern = (const Bs_Str *)args[0].as.object;
-    if (!pattern->size) {
-        return bs_value_object(str);
-    }
-
     const Bs_Str *replacement = (const Bs_Str *)args[1].as.object;
 
-    if (str->size < pattern->size) {
-        return bs_value_object(str);
-    }
-
-    Bs_Buffer *b = &bs_config(bs)->buffer;
-    const size_t start = b->count;
-
-    const Bs_Sv pattern_sv = Bs_Sv(pattern->data, pattern->size);
-    for (size_t i = 0; i + pattern->size <= str->size; i++) {
-        if (bs_sv_eq(Bs_Sv(str->data + i, pattern->size), pattern_sv)) {
-            bs_da_push_many(bs, b, replacement->data, replacement->size);
-            i += pattern->size - 1;
-        } else {
-            bs_da_push(bs, b, str->data[i]);
+    if (args[0].as.object->type == BS_OBJECT_STR) {
+        const Bs_Str *pattern = (const Bs_Str *)args[0].as.object;
+        if (!pattern->size) {
+            return bs_value_object(str);
         }
-    }
 
-    return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
+        if (str->size < pattern->size) {
+            return bs_value_object(str);
+        }
+
+        Bs_Buffer *b = &bs_config(bs)->buffer;
+        const size_t start = b->count;
+
+        const Bs_Sv pattern_sv = Bs_Sv(pattern->data, pattern->size);
+        for (size_t i = 0; i + pattern->size <= str->size; i++) {
+            if (bs_sv_eq(Bs_Sv(str->data + i, pattern->size), pattern_sv)) {
+                bs_da_push_many(bs, b, replacement->data, replacement->size);
+                i += pattern->size - 1;
+            } else {
+                bs_da_push(bs, b, str->data[i]);
+            }
+        }
+        return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
+    } else {
+        Bs_Buffer *b = &bs_config(bs)->buffer;
+        const size_t start = b->count;
+
+        bs_da_push_many(bs, b, str->data, str->size);
+        bs_da_push(bs, b, '\0');
+
+        const regex_t regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, regex_t);
+        const size_t result_pos = b->count;
+
+        size_t cursor = start;
+        int eflags = 0;
+        regmatch_t matches[10];
+        while (!regexec(&regex, b->data + cursor, bs_c_array_size(matches), matches, eflags)) {
+            eflags = REG_NOTBOL;
+            if (matches[0].rm_so == matches[0].rm_eo) {
+                break;
+            }
+
+            bs_da_push_many(bs, b, b->data + cursor, matches[0].rm_so);
+
+            for (size_t i = 0; i < replacement->size; i++) {
+                if (replacement->data[i] == '\\' && isdigit(replacement->data[i + 1])) {
+                    const size_t j = replacement->data[++i] - '0';
+                    if (j < bs_c_array_size(matches) && matches[j].rm_so != -1) {
+                        bs_da_push_many(
+                            bs,
+                            b,
+                            b->data + cursor + matches[j].rm_so,
+                            matches[j].rm_eo - matches[j].rm_so);
+                    }
+                } else {
+                    bs_da_push(bs, b, replacement->data[i]);
+                }
+            }
+
+            cursor += matches[0].rm_eo;
+        }
+
+        bs_da_push_many(bs, b, b->data + cursor, strlen(b->data + cursor));
+
+        const Bs_Str *result = bs_str_new(bs, bs_buffer_reset(b, result_pos));
+        bs_buffer_reset(b, start);
+        return bs_value_object(result);
+    }
 }
 
 Bs_Value bs_str_trim(Bs *bs, Bs_Value *args, size_t arity) {
@@ -990,179 +1118,6 @@ Bs_Value bs_bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
     b->count += src->size;
 
     return bs_value_nil;
-}
-
-// Regex
-Bs_Value bs_regex_find(Bs *bs, Bs_Value *args, size_t arity) {
-    if (arity != 2 && arity != 3) {
-        bs_error(bs, "expected 2 or 3 arguments, got %zu", arity);
-    }
-
-    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
-    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
-
-    if (arity == 3) {
-        bs_arg_check_whole_number(bs, args, 2);
-    }
-
-    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
-    const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
-    if (!pattern->size) {
-        return bs_value_nil;
-    }
-
-    const size_t offset = arity == 3 ? args[2].as.number : 0;
-    if (offset > str->size) {
-        bs_error(bs, "cannot take offset of %zu in string of length %zu", offset, str->size);
-    }
-
-    Bs_Buffer *b = &bs_config(bs)->buffer;
-    const size_t start = b->count;
-
-    const size_t str_pos = b->count;
-    bs_da_push_many(bs, b, str->data + offset, str->size - offset);
-    bs_da_push(bs, b, '\0');
-
-    const size_t pattern_pos = b->count;
-    bs_da_push_many(bs, b, pattern->data, pattern->size);
-    bs_da_push(bs, b, '\0');
-
-    regex_t regex;
-    if (regcomp(&regex, b->data + pattern_pos, REG_EXTENDED)) {
-        bs_error(bs, "could not compile regex pattern");
-    }
-
-    regmatch_t match;
-    Bs_Value result = bs_value_nil;
-    if (!regexec(&regex, b->data + str_pos, 1, &match, 0)) {
-        result = bs_value_num(offset + match.rm_so);
-    }
-    regfree(&regex);
-
-    bs_buffer_reset(b, start);
-    return result;
-}
-
-Bs_Value bs_regex_split(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 2);
-    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
-    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
-
-    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
-    const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
-
-    Bs_Array *a = bs_array_new(bs);
-    if (!pattern->size) {
-        bs_array_set(bs, a, a->count, bs_value_object(str));
-        return bs_value_object(a);
-    }
-
-    Bs_Buffer *b = &bs_config(bs)->buffer;
-    const size_t start = b->count;
-
-    const size_t str_pos = b->count;
-    bs_da_push_many(bs, b, str->data, str->size);
-    bs_da_push(bs, b, '\0');
-
-    const size_t pattern_pos = b->count;
-    bs_da_push_many(bs, b, pattern->data, pattern->size);
-    bs_da_push(bs, b, '\0');
-
-    regex_t regex;
-    if (regcomp(&regex, b->data + pattern_pos, REG_EXTENDED)) {
-        bs_error(bs, "could not compile regex pattern");
-    }
-
-    regmatch_t match;
-    size_t j = 0;
-    while (!regexec(&regex, b->data + str_pos + j, 1, &match, 0)) {
-        if (match.rm_so == match.rm_eo) {
-            break;
-        }
-
-        bs_array_set(
-            bs,
-            a,
-            a->count,
-            bs_value_object(bs_str_new(bs, Bs_Sv(b->data + str_pos + j, match.rm_so))));
-
-        j += match.rm_eo;
-    }
-
-    if (j != str->size) {
-        bs_array_set(
-            bs, a, a->count, bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, str->size - j))));
-    }
-
-    regfree(&regex);
-    bs_buffer_reset(b, start);
-    return bs_value_object(a);
-}
-
-Bs_Value bs_regex_replace(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 3);
-    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
-    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
-    bs_arg_check_object_type(bs, args, 2, BS_OBJECT_STR);
-
-    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
-    const Bs_Str *pattern = (const Bs_Str *)args[1].as.object;
-    if (!pattern->size) {
-        return bs_value_object(str);
-    }
-
-    const Bs_Str *replacement = (const Bs_Str *)args[2].as.object;
-
-    Bs_Buffer *b = &bs_config(bs)->buffer;
-    const size_t start = b->count;
-
-    const size_t str_pos = b->count;
-    bs_da_push_many(bs, b, str->data, str->size);
-    bs_da_push(bs, b, '\0');
-
-    const size_t pattern_pos = b->count;
-    bs_da_push_many(bs, b, pattern->data, pattern->size);
-    bs_da_push(bs, b, '\0');
-
-    regex_t regex;
-    if (regcomp(&regex, b->data + pattern_pos, REG_EXTENDED)) {
-        bs_error(bs, "could not compile regex pattern");
-    }
-
-    const size_t result_pos = b->count;
-
-    size_t cursor = str_pos;
-    regmatch_t matches[10];
-    while (!regexec(&regex, b->data + cursor, bs_c_array_size(matches), matches, 0)) {
-        if (matches[0].rm_so == matches[0].rm_eo) {
-            break;
-        }
-
-        bs_da_push_many(bs, b, b->data + cursor, matches[0].rm_so);
-
-        for (size_t i = 0; i < replacement->size; i++) {
-            if (replacement->data[i] == '\\' && isdigit(replacement->data[i + 1])) {
-                const size_t match_index = replacement->data[++i] - '0';
-                if (match_index < bs_c_array_size(matches) && matches[match_index].rm_so != -1) {
-                    bs_da_push_many(
-                        bs,
-                        b,
-                        b->data + cursor + matches[match_index].rm_so,
-                        matches[match_index].rm_eo - matches[match_index].rm_so);
-                }
-            } else {
-                bs_da_push(bs, b, replacement->data[i]);
-            }
-        }
-
-        cursor += matches[0].rm_eo;
-    }
-    bs_da_push_many(bs, b, b->data + cursor, strlen(b->data + cursor));
-
-    const Bs_Str *result = bs_str_new(bs, bs_buffer_reset(b, result_pos));
-    regfree(&regex);
-    bs_buffer_reset(b, start);
-    return bs_value_object(result);
 }
 
 // Array
@@ -1601,15 +1556,23 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         }
         bs_add(bs, os, "args", bs_value_object(args));
 
-        bs_global_set(bs, Bs_Sv_Static("os"), bs_value_object(os));
-
-        Bs_C_Class *bs_process_class =
+        Bs_C_Class *process_class =
             bs_c_class_new(bs, Bs_Sv_Static("Process"), sizeof(Bs_Process), bs_process_init, NULL);
 
-        bs_c_class_add(bs, bs_process_class, Bs_Sv_Static("kill"), bs_process_kill);
-        bs_c_class_add(bs, bs_process_class, Bs_Sv_Static("wait"), bs_process_wait);
+        bs_c_class_add(bs, process_class, Bs_Sv_Static("kill"), bs_process_kill);
+        bs_c_class_add(bs, process_class, Bs_Sv_Static("wait"), bs_process_wait);
 
-        bs_add(bs, os, "Process", bs_value_object(bs_process_class));
+        bs_add(bs, os, "Process", bs_value_object(process_class));
+
+        bs_global_set(bs, Bs_Sv_Static("os"), bs_value_object(os));
+    }
+
+    {
+        bs_regex_class = bs_c_class_new(
+            bs, Bs_Sv_Static("Regex"), sizeof(regex_t), bs_regex_init, bs_regex_free);
+
+        bs_regex_class->can_fail = true;
+        bs_global_set(bs, Bs_Sv_Static("Regex"), bs_value_object(bs_regex_class));
     }
 
     {
@@ -1630,14 +1593,6 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
 
         bs_builtin_object_methods_add(bs, BS_OBJECT_STR, Bs_Sv_Static("lpad"), bs_str_lpad);
         bs_builtin_object_methods_add(bs, BS_OBJECT_STR, Bs_Sv_Static("rpad"), bs_str_rpad);
-    }
-
-    {
-        Bs_Table *regex = bs_table_new(bs);
-        bs_add_fn(bs, regex, "find", bs_regex_find);
-        bs_add_fn(bs, regex, "split", bs_regex_split);
-        bs_add_fn(bs, regex, "replace", bs_regex_replace);
-        bs_global_set(bs, Bs_Sv_Static("regex"), bs_value_object(regex));
     }
 
     {
