@@ -154,7 +154,7 @@ Hello, world!
 :b shell 29
 ../bin/bs comparisons/main.bs
 :i returncode 0
-:b stdout 205
+:b stdout 183
 false
 true
 true
@@ -185,10 +185,6 @@ false
 false
 false
 true
-true
-true
-false
-false
 true
 true
 false
@@ -198,7 +194,7 @@ false
 :b shell 30
 ../bin/bs comparisons/main.bsx
 :i returncode 0
-:b stdout 182
+:b stdout 162
 cap
 nocap
 nocap
@@ -229,10 +225,6 @@ cap
 cap
 cap
 nocap
-nocap
-nocap
-cap
-cap
 nocap
 nocap
 cap

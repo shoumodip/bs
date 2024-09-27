@@ -1587,7 +1587,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 64, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 63, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const bool handles_on_save = bs->handles_on;
@@ -1984,17 +1984,6 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
             const size_t a1 = a.as.number;
             bs_stack_push(bs, bs_value_num(~a1));
-        } break;
-
-        case BS_OP_LXOR: {
-            const Bs_Value b = bs_stack_pop(bs);
-            const Bs_Value a = bs_stack_pop(bs);
-            bs_check_value_type(bs, a, BS_VALUE_BOOL, "operand #1 to binary (^^)");
-            bs_check_value_type(bs, b, BS_VALUE_BOOL, "operand #2 to binary (^^)");
-
-            const size_t a1 = a.as.boolean;
-            const size_t b1 = b.as.boolean;
-            bs_stack_push(bs, bs_value_bool(a1 != b1));
         } break;
 
         case BS_OP_LNOT:

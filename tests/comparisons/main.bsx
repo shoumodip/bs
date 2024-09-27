@@ -40,8 +40,3 @@ io.println(nocap || nocap) fr
 io.println(nocap || cap) fr
 io.println(cap || nocap) fr
 io.println(cap || cap) fr
-
-io.println(nocap ^^ nocap) fr
-io.println(nocap ^^ cap) fr
-io.println(cap ^^ nocap) fr
-io.println(cap ^^ cap) fr

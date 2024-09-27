@@ -36,8 +36,6 @@ typedef enum {
     BS_OP_BAND,
     BS_OP_BXOR,
     BS_OP_BNOT,
-
-    BS_OP_LXOR,
     BS_OP_LNOT,
 
     BS_OP_SHL,

@@ -40,8 +40,3 @@ io.println(true || true);
 io.println(true || false);
 io.println(false || true);
 io.println(false || false);
-
-io.println(true ^^ true);
-io.println(true ^^ false);
-io.println(false ^^ true);
-io.println(false ^^ false);

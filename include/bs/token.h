@@ -47,7 +47,6 @@ typedef enum {
 
     BS_TOKEN_LOR,
     BS_TOKEN_LAND,
-    BS_TOKEN_LXOR,
     BS_TOKEN_LNOT,
 
     BS_TOKEN_SHL,

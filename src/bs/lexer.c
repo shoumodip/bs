@@ -105,7 +105,7 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc) {
     return token;
 }
 
-static_assert(BS_COUNT_TOKENS == 73, "Update bs_lexer_next()");
+static_assert(BS_COUNT_TOKENS == 72, "Update bs_lexer_next()");
 Bs_Token bs_lexer_next(Bs_Lexer *l) {
     if (l->peeked) {
         l->peeked = false;
@@ -414,9 +414,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
         break;
 
     case '^':
-        if (bs_lexer_match(l, '^')) {
-            token.type = BS_TOKEN_LXOR;
-        } else if (bs_lexer_match(l, '=')) {
+        if (bs_lexer_match(l, '=')) {
             token.type = BS_TOKEN_BXOR_SET;
         } else {
             token.type = BS_TOKEN_BXOR;

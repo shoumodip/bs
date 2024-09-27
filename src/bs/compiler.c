@@ -16,7 +16,7 @@ typedef enum {
     BS_POWER_DOT,
 } Bs_Power;
 
-static_assert(BS_COUNT_TOKENS == 73, "Update bs_token_type_power()");
+static_assert(BS_COUNT_TOKENS == 72, "Update bs_token_type_power()");
 static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_IN:
@@ -41,7 +41,6 @@ static Bs_Power bs_token_type_power(Bs_Token_Type type) {
 
     case BS_TOKEN_LOR:
     case BS_TOKEN_LAND:
-    case BS_TOKEN_LXOR:
         return BS_POWER_LOR;
 
     case BS_TOKEN_SHL:
@@ -346,7 +345,7 @@ static void bs_compile_assignment(Bs_Compiler *c, const Bs_Token *token, Bs_Op a
     }
 }
 
-static_assert(BS_COUNT_TOKENS == 73, "Update bs_compile_expr()");
+static_assert(BS_COUNT_TOKENS == 72, "Update bs_compile_expr()");
 static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
     Bs_Loc loc = token.loc;
@@ -709,12 +708,6 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
             bs_compile_jump_patch(c, addr);
         } break;
-
-        case BS_TOKEN_LXOR:
-            bs_compile_expr(c, lbp);
-            bs_chunk_push_op(c->bs, c->chunk, BS_OP_LXOR);
-            bs_chunk_push_op_loc(c->bs, c->chunk, loc);
-            break;
 
         case BS_TOKEN_SHL:
             bs_compile_expr(c, lbp);
@@ -1175,7 +1168,7 @@ static void bs_compile_jumps_reset(Bs_Compiler *c, Bs_Jumps save) {
     c->jumps.start = save.start;
 }
 
-static_assert(BS_COUNT_TOKENS == 73, "Update bs_compile_stmt()");
+static_assert(BS_COUNT_TOKENS == 72, "Update bs_compile_stmt()");
 static void bs_compile_stmt(Bs_Compiler *c) {
     Bs_Token token = bs_lexer_next(&c->lexer);
 
