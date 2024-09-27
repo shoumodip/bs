@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <time.h>
 
+#include <fcntl.h>
 #include <regex.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -335,8 +336,19 @@ Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
         bs_check_object_type_at(bs, 1, array->data[i], BS_OBJECT_STR, buffer);
     }
 
+    int fail[2];
+    if (pipe(fail) < 0) {
+        bs_error(bs, "could not create failure pipe");
+    }
+
+    if (fcntl(fail[1], F_SETFD, FD_CLOEXEC) < 0) {
+        bs_error(bs, "could not create failure pipe");
+    }
+
     const pid_t pid = fork();
     if (pid < 0) {
+        close(fail[0]);
+        close(fail[1]);
         bs_error(bs, "could not fork process");
     }
 
@@ -362,13 +374,26 @@ Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
         }
         cargv[array->count] = NULL;
 
+        close(fail[0]);
         execvp(*cargv, (char *const *)cargv);
+        write(fail[1], "F", 1);
+        close(fail[1]);
         exit(127);
+    }
+
+    close(fail[1]);
+    char buffer[1];
+    const long count = read(fail[0], buffer, sizeof(buffer));
+    close(fail[0]);
+
+    if (count > 0) {
+        waitpid(pid, NULL, 0); // Wait for the child to kill itself so it doesn't become a zombie
+        return bs_value_nil;
     }
 
     Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
     p->pid = pid;
-    return bs_value_nil;
+    return args[-1];
 }
 
 Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
@@ -1558,6 +1583,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         Bs_C_Class *process_class =
             bs_c_class_new(bs, Bs_Sv_Static("Process"), sizeof(Bs_Process), bs_process_init, NULL);
 
+        process_class->can_fail = true;
         bs_c_class_add(bs, process_class, Bs_Sv_Static("kill"), bs_process_kill);
         bs_c_class_add(bs, process_class, Bs_Sv_Static("wait"), bs_process_wait);
 
