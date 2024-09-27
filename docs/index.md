@@ -13,7 +13,7 @@
 
 A minimal embeddable scripting language with sane defaults and strong typing
 
-```
+```bs
 fn factorial(n) {
     if n < 2 {
         return 1;
@@ -23,7 +23,8 @@ fn factorial(n) {
 }
 
 io.println("5! = \(factorial(5))");
----
+```
+```bsx
 lit factorial(n) {
     ayo n < 2 {
         bet 1 fr

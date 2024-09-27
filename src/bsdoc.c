@@ -365,7 +365,7 @@ int main(int argc, char **argv) {
             continue;
         }
 
-        if (bs_sv_eq(line, Bs_Sv_Static("```"))) {
+        if (bs_sv_eq(line, Bs_Sv_Static("```bs"))) {
             size_t start = row + 1;
 
             fprintf(
@@ -381,11 +381,20 @@ int main(int argc, char **argv) {
 
             fprintf(f, "<pre class='code active'>\n");
             if (!bsdoc_print_code(
-                    f, input, bsdoc_split_code(&sv, &row, Bs_Sv_Static("---")), start, false)) {
+                    f, input, bsdoc_split_code(&sv, &row, Bs_Sv_Static("```")), start, false)) {
                 bs_return_defer(1);
             }
             fprintf(f, "</pre>\n");
 
+            row++;
+            if (!bs_sv_eq(bs_sv_split(&sv, '\n'), Bs_Sv_Static("```bsx"))) {
+                fprintf(
+                    stderr,
+                    "%s:%zu:1: error: expected line after BS block to be \"```bsx\"\n",
+                    input,
+                    row);
+                bs_return_defer(1);
+            }
             start = row + 1;
 
             fprintf(f, "<pre class='code'>\n");

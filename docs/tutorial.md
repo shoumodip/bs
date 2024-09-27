@@ -1,9 +1,10 @@
 # Tutorial
 Let's start with a simple "Hello World" program.
 
-```
+```bs
 io.println("Hello, world!");
----
+```
+```bsx
 io.println("Hello, world!") fr
 ```
 
@@ -36,9 +37,10 @@ BS supports the types present in all scripting languages: nil, numbers,
 booleans, strings, arrays, tables, and functions.
 
 ### Nil
-```
+```bs
 io.println(nil); # Output: nil
----
+```
+```bsx
 io.println(bruh) fr # Output: bruh
 ```
 
@@ -48,11 +50,12 @@ different, but the output itself changes.
 ### Numbers
 BS supports 64-bit floating point numbers only.
 
-```
+```bs
 io.println(69);     # Output: 69
 io.println(420.69); # Output: 420.69
 io.println(0xff);   # Output: 255
----
+```
+```bsx
 io.println(69) fr     # Output: 69
 io.println(420.69) fr # Output: 420.69
 io.println(0xff) fr   # Output: 255
@@ -60,7 +63,7 @@ io.println(0xff) fr   # Output: 255
 
 Standard arithmetic as well as bitwise operations are supported.
 
-```
+```bs
 io.println(34 + 35);        # Output: 69
 io.println(500 - 80);       # Output: 420
 io.println(23 * 3);         # Output: 69
@@ -78,7 +81,8 @@ io.println(160 | 260);      # Output: 420
 io.println(77 & 103);       # Output: 69
 io.println(~-419 + 10 & 3); # Output: 420
 io.println(69 ^ 1404);      # Output: 1337
----
+```
+```bsx
 io.println(34 + 35) fr        # Output: 69
 io.println(500 - 80) fr       # Output: 420
 io.println(23 * 3) fr         # Output: 69
@@ -99,17 +103,18 @@ io.println(69 ^ 1404) fr      # Output: 1337
 ```
 
 ### Booleans
-```
+```bs
 io.println(true);  # Output: true
 io.println(false); # Output: false
----
+```
+```bsx
 io.println(nocap) fr # Output: nocap
 io.println(cap) fr   # Output: cap
 ```
 
 Again, note that the output differs depending on the mode.
 
-```
+```bs
 io.println(!true);          # Output: false
 io.println(!false);         # Output: true
 io.println(!nil);           # Output: true
@@ -145,7 +150,8 @@ io.println(0 || false);     # Output: 0
 # Logical XOR.
 io.println(true ^^ true);   # Output: false
 io.println(true ^^ false);  # Output: true
----
+```
+```bsx
 io.println(nah nocap) fr      # Output: cap
 io.println(nah cap) fr        # Output: nocap
 io.println(nah bruh) fr       # Output: nocap
@@ -184,7 +190,7 @@ io.println(nocap ^^ cap) fr   # Output: nocap
 ```
 
 ### Strings
-```
+```bs
 # Output: Hello!
 io.println("Hello!");
 
@@ -204,7 +210,8 @@ io.println("Hello, " ++ "world! " ++ 69);
 
 # Output: 6
 io.println(len("Hello!"));
----
+```
+```bsx
 # Output: Hello!
 io.println("Hello!") fr
 
@@ -227,7 +234,7 @@ io.println(thicc("Hello!")) fr
 ```
 
 ### Arrays
-```
+```bs
 # Variables will be introduced later
 var array = [69, 420];
 
@@ -254,7 +261,8 @@ io.println(len(array)); # Output: 4
 # Due to the assignment semantics, appending to arrays is quite easy
 array[len(array)] = 420;
 io.println(array);      # Output: [69, "nice!", nil, "Are you serious?", 420]
----
+```
+```bsx
 # Variables will be introduced later
 mf array = [69, 420] fr
 
