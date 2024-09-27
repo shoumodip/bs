@@ -1737,7 +1737,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 case BS_OBJECT_TABLE: {
                     Bs_Table *table = (Bs_Table *)this.as.object;
                     if (bs_map_get(bs, &table->map, name, &method)) {
-                        bs->stack.data[bs->stack.count - arity - 1] = method;
+                        bs_stack_set(bs, arity, method);
                     } else {
                         method = bs_check_map_get_at(
                             bs,
@@ -1751,7 +1751,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 case BS_OBJECT_INSTANCE: {
                     Bs_Instance *instance = (Bs_Instance *)this.as.object;
                     if (bs_map_get(bs, &instance->properties, name, &method)) {
-                        bs->stack.data[bs->stack.count - arity - 1] = method;
+                        bs_stack_set(bs, arity, method);
                     } else {
                         method = bs_check_map_get_at(
                             bs, 1, &instance->class->methods, name, "instance property or method");
@@ -1762,6 +1762,12 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                     Bs_C_Instance *instance = (Bs_C_Instance *)this.as.object;
                     method = bs_check_map_get_at(
                         bs, 1, &instance->class->methods, name, "instance property or method");
+                } break;
+
+                case BS_OBJECT_C_LIB: {
+                    Bs_C_Lib *library = (Bs_C_Lib *)this.as.object;
+                    method = bs_check_map_get_at(bs, 1, &library->map, name, "library symbol");
+                    bs_stack_set(bs, arity, method);
                 } break;
 
                 default: {
