@@ -8,6 +8,8 @@
 ../bin/bs assignment/main.bsx
 ../bin/bs assignment/join.bs
 ../bin/bs assignment/join.bsx
+../bin/bs assignment/key_shorthand.bs
+../bin/bs assignment/key_shorthand.bsx
 ../bin/bs comparisons/main.bs
 ../bin/bs comparisons/main.bsx
 ../bin/bs conditions/main.bs

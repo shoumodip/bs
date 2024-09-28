@@ -1587,7 +1587,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 63, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 64, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const bool handles_on_save = bs->handles_on;
@@ -1673,6 +1673,10 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 }
             }
         } break;
+
+        case BS_OP_DUP:
+            bs_stack_push(bs, bs_stack_peek(bs, *bs->frame->ip++));
+            break;
 
         case BS_OP_DROP:
             bs_stack_pop(bs);

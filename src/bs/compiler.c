@@ -1,7 +1,6 @@
-#include <stdio.h>
-
 #include "bs/compiler.h"
 #include "bs/lexer.h"
+#include "bs/op.h"
 
 typedef enum {
     BS_POWER_NIL,
@@ -323,6 +322,29 @@ static void bs_compile_assignment(Bs_Compiler *c, const Bs_Token *token, Bs_Op a
         c->chunk->count = c->chunk->last;
     } else {
         c->chunk->locations.count = locations_count_save;
+
+        if (assign_op == BS_OP_ISET) {
+            c->chunk->count = c->chunk->last;
+
+            bs_chunk_push_op(c->bs, c->chunk, BS_OP_DUP);
+            bs_da_push(c->bs, c->chunk, 1);
+
+            bs_chunk_push_op(c->bs, c->chunk, BS_OP_DUP);
+            bs_da_push(c->bs, c->chunk, 1);
+
+            bs_chunk_push_op(c->bs, c->chunk, BS_OP_IGET);
+            bs_chunk_push_op_loc(c->bs, c->chunk, locs[0]);
+            bs_chunk_push_op_loc(c->bs, c->chunk, locs[1]);
+        } else if (assign_op == BS_OP_ISET_CONST) {
+            c->chunk->count = c->chunk->last;
+
+            bs_chunk_push_op(c->bs, c->chunk, BS_OP_DUP);
+            bs_da_push(c->bs, c->chunk, 0);
+
+            bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_IGET_CONST, index);
+            bs_chunk_push_op_loc(c->bs, c->chunk, locs[0]);
+            bs_chunk_push_op_loc(c->bs, c->chunk, locs[1]);
+        }
     }
 
     bs_compile_expr(c, BS_POWER_SET);
@@ -1027,6 +1049,9 @@ static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Toke
     } else {
         c->lexer.peeked = false;
         bs_compile_expr(c, BS_POWER_SET);
+        if (name) {
+            bs_lexer_expect(&c->lexer, BS_TOKEN_EOL);
+        }
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_RET);
     }
 

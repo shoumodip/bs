@@ -6,6 +6,7 @@ typedef enum {
     BS_OP_CALL,
     BS_OP_CLOSURE,
 
+    BS_OP_DUP,
     BS_OP_DROP,
     BS_OP_UCLOSE,
 

@@ -1,4 +1,4 @@
-:i count 216
+:i count 218
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -148,6 +148,22 @@ Hello, world!
 :b stdout 20
 Hello
 Hello, world!
+
+:b stderr 0
+
+:b shell 37
+../bin/bs assignment/key_shorthand.bs
+:i returncode 0
+:b stdout 3
+69
+
+:b stderr 0
+
+:b shell 38
+../bin/bs assignment/key_shorthand.bsx
+:i returncode 0
+:b stdout 3
+69
 
 :b stderr 0
 
