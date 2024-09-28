@@ -107,6 +107,27 @@ Bs_Value bs_io_reader_read(Bs *bs, Bs_Value *args, size_t arity) {
     return result;
 }
 
+Bs_Value bs_io_reader_readln(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    FILE *f = bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, FILE *);
+    if (!f) {
+        bs_error(bs, "cannot read from closed file");
+    }
+
+    Bs_Buffer *b = &bs_config(bs)->buffer;
+    const size_t start = b->count;
+
+    while (!feof(f)) {
+        const char c = fgetc(f);
+        if (c == '\n') {
+            break;
+        }
+        bs_da_push(bs, b, c);
+    }
+
+    return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
+}
+
 // Writer
 Bs_Value bs_io_writer_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
@@ -478,38 +499,45 @@ Bs_Value bs_str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
     const Bs_Str *src = (const Bs_Str *)args[-1].as.object;
-    Bs_Str *dst = bs_str_new(bs, Bs_Sv(src->data, src->size));
-    for (size_t i = 0; i < dst->size / 2; i++) {
-        const char c = dst->data[i];
-        dst->data[i] = dst->data[dst->size - i - 1];
-        dst->data[dst->size - i - 1] = c;
+
+    Bs_Buffer *b = &bs_config(bs)->buffer;
+    const size_t start = b->count;
+
+    for (size_t i = 0; i < src->size; i++) {
+        bs_da_push(bs, b, src->data[src->size - i - 1]);
     }
 
-    return bs_value_object(dst);
+    return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
 }
 
 Bs_Value bs_str_tolower(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
     const Bs_Str *src = (const Bs_Str *)args[-1].as.object;
-    Bs_Str *dst = bs_str_new(bs, Bs_Sv(src->data, src->size));
-    for (size_t i = 0; i < dst->size; i++) {
-        dst->data[i] = tolower(dst->data[i]);
+
+    Bs_Buffer *b = &bs_config(bs)->buffer;
+    const size_t start = b->count;
+
+    for (size_t i = 0; i < src->size; i++) {
+        bs_da_push(bs, b, tolower(src->data[i]));
     }
 
-    return bs_value_object(dst);
+    return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
 }
 
 Bs_Value bs_str_toupper(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
     const Bs_Str *src = (const Bs_Str *)args[-1].as.object;
-    Bs_Str *dst = bs_str_new(bs, Bs_Sv(src->data, src->size));
-    for (size_t i = 0; i < dst->size; i++) {
-        dst->data[i] = toupper(dst->data[i]);
+
+    Bs_Buffer *b = &bs_config(bs)->buffer;
+    const size_t start = b->count;
+
+    for (size_t i = 0; i < src->size; i++) {
+        bs_da_push(bs, b, toupper(src->data[i]));
     }
 
-    return bs_value_object(dst);
+    return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
 }
 
 Bs_Value bs_str_tonumber(Bs *bs, Bs_Value *args, size_t arity) {
@@ -1524,6 +1552,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         io_reader_class->can_fail = true;
         bs_c_class_add(bs, io_reader_class, Bs_Sv_Static("close"), bs_io_file_close);
         bs_c_class_add(bs, io_reader_class, Bs_Sv_Static("read"), bs_io_reader_read);
+        bs_c_class_add(bs, io_reader_class, Bs_Sv_Static("readln"), bs_io_reader_readln);
 
         Bs_C_Class *io_writer_class = bs_c_class_new(
             bs, Bs_Sv_Static("Writer"), sizeof(FILE *), bs_io_writer_init, bs_io_file_free);
