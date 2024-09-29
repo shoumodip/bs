@@ -196,6 +196,31 @@ Bs_Value bs_io_writer_writeln(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_bool(!ferror(f));
 }
 
+Bs_Value bs_io_input(Bs *bs, Bs_Value *args, size_t arity) {
+    if (arity > 1) {
+        bs_error(bs, "expected 0 or 1 arguments, got %zu", arity);
+    }
+
+    if (arity) {
+        bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+        printf(Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
+        fflush(stdout);
+    }
+
+    Bs_Buffer *b = &bs_config(bs)->buffer;
+    const size_t start = b->count;
+
+    while (!feof(stdin)) {
+        const char c = fgetc(stdin);
+        if (c == '\n') {
+            break;
+        }
+        bs_da_push(bs, b, c);
+    }
+
+    return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
+}
+
 Bs_Value bs_io_print(Bs *bs, Bs_Value *args, size_t arity) {
     Bs_Writer w = bs_file_writer(stdout);
     for (size_t i = 0; i < arity; i++) {
@@ -1566,6 +1591,8 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         Bs_Table *io = bs_table_new(bs);
         bs_add(bs, io, "Reader", bs_value_object(io_reader_class));
         bs_add(bs, io, "Writer", bs_value_object(io_writer_class));
+
+        bs_add_fn(bs, io, "input", bs_io_input);
 
         bs_add_fn(bs, io, "print", bs_io_print);
         bs_add_fn(bs, io, "eprint", bs_io_eprint);
