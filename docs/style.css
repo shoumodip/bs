@@ -19,6 +19,7 @@
     --copyfg: #888888;
 
     --field: #F78C6C;
+    --class: #E6B800;
     --escape: #E78A4E;
     --string: #D19A66;
     --comment: #888888;
@@ -97,11 +98,11 @@ pre {
     border: var(--border-size) solid var(--border);
     font-size: calc(0.9 * var(--font-size));
     line-height: calc(1.5 * var(--font-size));
+    overflow-x: auto;
 }
 
 pre, span {
     tab-size: 4;
-    overflow-x: auto;
     font-family: "JetBrains Mono";
 }
 
@@ -219,6 +220,10 @@ a, button {
 
 .field {
     color: var(--field);
+}
+
+.class {
+    color: var(--class);
 }
 
 .escape {

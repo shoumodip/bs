@@ -48,5 +48,5 @@ function copyClickCode(e) {
 
 function copyClickShell(e) {
     const [, ok, a] = e.parentNode.children
-    copyClick(e, ok, a.innerText.split("\n").map((s) => s.slice(2)).join("\n"))
+    copyClick(e, ok, a.innerText)
 }

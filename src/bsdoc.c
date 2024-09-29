@@ -11,6 +11,7 @@ static void bsdoc_writer(Bs_Writer *w, Bs_Sv sv) {
 
 typedef enum {
     BSDOC_STYLE_NONE,
+    BSDOC_STYLE_CLASS,
     BSDOC_STYLE_FIELD,
     BSDOC_STYLE_ESCAPE,
     BSDOC_STYLE_STRING,
@@ -44,6 +45,7 @@ static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type, bool extended) {
     case BS_TOKEN_FN:
     case BS_TOKEN_PUB:
     case BS_TOKEN_VAR:
+    case BS_TOKEN_CLASS:
     case BS_TOKEN_RETURN:
         return BSDOC_STYLE_KEYWORD;
 
@@ -55,6 +57,8 @@ static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type, bool extended) {
     case BS_TOKEN_NUM:
     case BS_TOKEN_TRUE:
     case BS_TOKEN_FALSE:
+    case BS_TOKEN_THIS:
+    case BS_TOKEN_SUPER:
     case BS_TOKEN_IS_MAIN_MODULE:
         return BSDOC_STYLE_CONSTANT;
 
@@ -66,6 +70,10 @@ static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type, bool extended) {
 static void bsdoc_print_styled_sv(FILE *f, Bsdoc_Style style, Bs_Sv sv) {
     switch (style) {
     case BSDOC_STYLE_NONE:
+        break;
+
+    case BSDOC_STYLE_CLASS:
+        fprintf(f, "<span class='class'>");
         break;
 
     case BSDOC_STYLE_FIELD:
@@ -97,7 +105,16 @@ static void bsdoc_print_styled_sv(FILE *f, Bsdoc_Style style, Bs_Sv sv) {
         break;
     }
 
-    fwrite(sv.data, sv.size, 1, f);
+    for (size_t i = 0; i < sv.size; i++) {
+        const char c = sv.data[i];
+        if (c == '<') {
+            fputs("&lt;", f);
+        } else if (c == '>') {
+            fputs("&gt;", f);
+        } else {
+            fputc(c, f);
+        }
+    }
 
     if (style != BSDOC_STYLE_NONE) {
         fprintf(f, "</span>");
@@ -120,7 +137,7 @@ static void bsdoc_print_token(FILE *f, Bs_Token token, Bsdoc_Style style, const 
         }
     }
 
-    fwrite(*last, token.sv.data - *last, 1, f);
+    bsdoc_print_styled_sv(f, BSDOC_STYLE_NONE, Bs_Sv(*last, token.sv.data - *last));
     *last = token.sv.data + token.sv.size;
 
     if (string) {
@@ -172,13 +189,17 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
         Bs_Token token = bs_lexer_next(&lexer);
         if (next != BSDOC_STYLE_NONE && token.type != BS_TOKEN_IDENT &&
             token.type != BS_TOKEN_COMMENT) {
-            next = BSDOC_STYLE_NONE;
+            if (token.type != BS_TOKEN_LT || next != BSDOC_STYLE_CLASS) {
+                next = BSDOC_STYLE_NONE;
+            }
         }
 
         Bsdoc_Style style;
         if (token.type == BS_TOKEN_IDENT && next != BSDOC_STYLE_NONE) {
             style = next;
-            next = BSDOC_STYLE_NONE;
+            if (next != BSDOC_STYLE_CLASS) {
+                next = BSDOC_STYLE_NONE;
+            }
         } else {
             style = bsdoc_token_type_style(token.type, extended);
         }
@@ -208,8 +229,7 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
 
                 if (token.type == BS_TOKEN_ISTR) {
                     token = bs_lexer_expect(&lexer, BS_TOKEN_LPAREN);
-                    bsdoc_print_token(
-                        f, token, bsdoc_token_type_style(token.type, extended), &last);
+                    bsdoc_print_token(f, token, BSDOC_STYLE_ESCAPE, &last);
                     bsdoc_parens_push(&parens, true);
                 }
             } else {
@@ -220,6 +240,11 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
         case BS_TOKEN_FN:
             bsdoc_print_token(f, token, style, &last);
             next = BSDOC_STYLE_FUNCTION;
+            break;
+
+        case BS_TOKEN_CLASS:
+            bsdoc_print_token(f, token, style, &last);
+            next = BSDOC_STYLE_CLASS;
             break;
 
         case BS_TOKEN_DOT:
@@ -432,7 +457,7 @@ int main(int argc, char **argv) {
 
                     Bs_Sv comment = line;
                     line = bs_sv_split(&comment, '#');
-                    fwrite(line.data, line.size, 1, f);
+                    bsdoc_print_styled_sv(f, BSDOC_STYLE_NONE, line);
 
                     if (comment.size) {
                         comment.data--;
@@ -440,10 +465,10 @@ int main(int argc, char **argv) {
                         bsdoc_print_styled_sv(f, BSDOC_STYLE_COMMENT, comment);
                     }
                 } else {
-                    fwrite(line.data, line.size, 1, f);
+                    bsdoc_print_styled_sv(f, BSDOC_STYLE_NONE, line);
                 }
 
-                fprintf(f, "\n");
+                fputc('\n', f);
             }
 
             fprintf(
