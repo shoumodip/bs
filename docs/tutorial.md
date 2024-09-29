@@ -8,7 +8,7 @@ io.println("Hello, world!");
 io.println("Hello, world!") fr
 ```
 
-Save this to a file named <code>hello.bs</code> and run it as follows.
+Save this to a file named `hello.bs` and run it as follows.
 
 ```console
 $ bs hello.bs
@@ -21,7 +21,7 @@ brainrot. There are subtle differences between the two, even besides syntax
 alone, which will be introduced later in appropriate places in the tutorial.
 
 You can choose whether to use BS or BSX based on the extension of your file.
-Save the BSX version of the previous example to <code>hello.bsx</code> and run
+Save the BSX version of the previous example to `hello.bsx` and run
 it as before.
 
 ```console
@@ -1232,7 +1232,7 @@ $ bs main.bs # or .bsx
 420
 ```
 
-But if the module <code>one</code> is executed directly...
+But if the module `one` is executed directly...
 
 ```console
 $ bs one.bs # or .bsx
@@ -1245,7 +1245,7 @@ is an extended as well as a normal module with the same name, the normal one
 will be imported.
 
 ## OOP
-I refuse to showcase the <code>Animal > Dog, Cat</code> nonsense, so here's a
+I refuse to showcase the `Animal > Dog, Cat` nonsense, so here's a
 more applicable, albeit involved, example.
 
 ```bs
@@ -1511,7 +1511,7 @@ Luffy lost :(
 ### Constructor Failure
 Typical OOP languages mandate that constructors must return the instance under
 all circumstances, even at the cost of error handling. In BS however,
-constructors may return <code>nil</code> in order to indicate that the
+constructors may return `nil` in order to indicate that the
 constructor failed. Any other return value is strictly forbidden, however.
 
 ```bs

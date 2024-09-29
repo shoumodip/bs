@@ -300,6 +300,23 @@ static void bsdoc_print_copy(FILE *f, const char *onclick) {
         onclick);
 }
 
+void bsdoc_print_line(FILE *f, Bs_Sv line, bool newline) {
+    bool code = false;
+    for (size_t i = 0; i < line.size; i++) {
+        const char c = line.data[i];
+        if (c == '`') {
+            code = !code;
+            fputs(code ? "<code>" : "</code>", f);
+        } else {
+            fputc(c, f);
+        }
+    }
+
+    if (newline) {
+        fputc('\n', f);
+    }
+}
+
 int main(int argc, char **argv) {
     int result = 0;
 
@@ -373,7 +390,9 @@ int main(int argc, char **argv) {
 
             line.data += level;
             line.size -= level;
-            fprintf(f, "<h%zu>" Bs_Sv_Fmt "</h%zu>\n", level, Bs_Sv_Arg(line), level);
+            fprintf(f, "<h%zu>", level);
+            bsdoc_print_line(f, line, false);
+            fprintf(f, "</h%zu>\n", level);
             continue;
         }
 
@@ -484,7 +503,8 @@ int main(int argc, char **argv) {
             continue;
         }
 
-        fprintf(f, "<p>\n" Bs_Sv_Fmt "\n", Bs_Sv_Arg(line));
+        fprintf(f, "<p>\n");
+        bsdoc_print_line(f, line, true);
         while (sv.size) {
             row++;
 
@@ -492,7 +512,8 @@ int main(int argc, char **argv) {
             if (!line.size) {
                 break;
             }
-            fprintf(f, Bs_Sv_Fmt "\n", Bs_Sv_Arg(line));
+
+            bsdoc_print_line(f, line, true);
         }
         fprintf(f, "</p>\n");
     }
