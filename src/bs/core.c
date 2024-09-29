@@ -128,6 +128,36 @@ Bs_Value bs_io_reader_readln(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
 }
 
+Bs_Value bs_io_reader_seek(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 2);
+    bs_arg_check_whole_number(bs, args, 0);
+    bs_arg_check_whole_number(bs, args, 1);
+
+    FILE *f = bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, FILE *);
+    if (!f) {
+        bs_error(bs, "cannot seek in closed file");
+    }
+
+    const int whence = args[1].as.number;
+    if (whence > 2) {
+        bs_error_at(bs, 2, "invalid whence '%d'", whence);
+    }
+
+    return bs_value_bool(fseek(f, args[0].as.number, whence) != -1);
+}
+
+Bs_Value bs_io_reader_tell(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+
+    FILE *f = bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, FILE *);
+    if (!f) {
+        bs_error(bs, "cannot get position of closed file");
+    }
+
+    const long position = ftell(f);
+    return position == -1 ? bs_value_nil : bs_value_num(position);
+}
+
 // Writer
 Bs_Value bs_io_writer_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
@@ -1579,6 +1609,9 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_c_class_add(bs, io_reader_class, Bs_Sv_Static("read"), bs_io_reader_read);
         bs_c_class_add(bs, io_reader_class, Bs_Sv_Static("readln"), bs_io_reader_readln);
 
+        bs_c_class_add(bs, io_reader_class, Bs_Sv_Static("seek"), bs_io_reader_seek);
+        bs_c_class_add(bs, io_reader_class, Bs_Sv_Static("tell"), bs_io_reader_tell);
+
         Bs_C_Class *io_writer_class = bs_c_class_new(
             bs, Bs_Sv_Static("Writer"), sizeof(FILE *), bs_io_writer_init, bs_io_file_free);
 
@@ -1616,6 +1649,12 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
             Bs_C_Instance *io_stderr = bs_c_instance_new(bs, io_writer_class);
             bs_static_cast(io_stderr->data, FILE *) = stderr;
             bs_add(bs, io, "stderr", bs_value_object(io_stderr));
+        }
+
+        {
+            bs_add(bs, io, "SEEK_SET", bs_value_num(SEEK_SET));
+            bs_add(bs, io, "SEEK_CUR", bs_value_num(SEEK_CUR));
+            bs_add(bs, io, "SEEK_END", bs_value_num(SEEK_END));
         }
 
         bs_global_set(bs, Bs_Sv_Static("io"), bs_value_object(io));
