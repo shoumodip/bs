@@ -117,9 +117,9 @@ Bs_Value bs_io_reader_readln(Bs *bs, Bs_Value *args, size_t arity) {
     Bs_Buffer *b = &bs_config(bs)->buffer;
     const size_t start = b->count;
 
-    while (!feof(f)) {
+    while (true) {
         const char c = fgetc(f);
-        if (c == '\n') {
+        if (c == '\n' || c == EOF) {
             break;
         }
         bs_da_push(bs, b, c);
@@ -210,9 +210,9 @@ Bs_Value bs_io_input(Bs *bs, Bs_Value *args, size_t arity) {
     Bs_Buffer *b = &bs_config(bs)->buffer;
     const size_t start = b->count;
 
-    while (!feof(stdin)) {
+    while (true) {
         const char c = fgetc(stdin);
-        if (c == '\n') {
+        if (c == '\n' || c == EOF) {
             break;
         }
         bs_da_push(bs, b, c);
