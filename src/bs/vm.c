@@ -7,9 +7,8 @@
 #include "bs/compiler.h"
 
 // #define BS_GC_DEBUG_LOG
-#define BS_GC_DEBUG_STRESS
+// #define BS_GC_DEBUG_STRESS
 #define BS_GC_GROW_FACTOR 2
-#define BS_STACK_CAPACITY (1024 * 1024)
 
 // #define BS_STEP_DEBUG
 #ifdef BS_STEP_DEBUG
@@ -32,11 +31,7 @@ typedef struct {
 typedef struct {
     Bs_Frame *data;
     size_t count;
-    size_t capacity;
 } Bs_Frames;
-
-#define bs_frames_free bs_da_free
-#define bs_frames_push bs_da_push
 
 typedef struct {
     bool done;
@@ -448,6 +443,9 @@ Bs *bs_new(void) {
     bs->stack.data = malloc(BS_STACK_CAPACITY * sizeof(*bs->stack.data));
     assert(bs->stack.data);
 
+    bs->frames.data = malloc(BS_FRAMES_CAPACITY * sizeof(*bs->frames.data));
+    assert(bs->frames.data);
+
     bs->gc_max = 1024 * 1024;
 
     bs->paths.bs = bs;
@@ -464,7 +462,9 @@ void bs_free(Bs *bs) {
     free(bs->stack.data);
     memset(&bs->stack, 0, sizeof(bs->stack));
 
-    bs_frames_free(bs, &bs->frames);
+    free(bs->frames.data);
+    memset(&bs->frames, 0, sizeof(bs->frames));
+
     bs_modules_free(bs, &bs->modules);
 
     bs_map_free(bs, &bs->globals);
@@ -1052,6 +1052,17 @@ static void bs_stack_push(Bs *bs, Bs_Value value) {
     bs->stack.data[bs->stack.count++] = value;
 }
 
+static void bs_frames_push(Bs *bs, Bs_Frame frame) {
+    if (bs->frames.count >= BS_FRAMES_CAPACITY) {
+        bs_fmt(&bs->config.error, "error: call stack overflow\n");
+
+        bs->ok = false;
+        bs_unwind(bs, 1);
+    }
+
+    bs->frames.data[bs->frames.count++] = frame;
+}
+
 static Bs_Value bs_stack_pop(Bs *bs) {
     return bs->stack.data[--bs->stack.count];
 }
@@ -1101,7 +1112,7 @@ static void bs_call_c_fn(Bs *bs, size_t offset, const Bs_C_Fn *native, size_t ar
         .locations_offset = offset,
     };
 
-    bs_frames_push(bs, &bs->frames, frame);
+    bs_frames_push(bs, frame);
     bs->frame = &bs->frames.data[bs->frames.count - 1];
 
     const Bs_Value value = native->ptr(bs, &bs->stack.data[bs->stack.count - arity], arity);
@@ -1125,7 +1136,7 @@ static void bs_call_closure(Bs *bs, size_t offset, Bs_Closure *closure, size_t a
         .locations_offset = offset,
     };
 
-    bs_frames_push(bs, &bs->frames, frame);
+    bs_frames_push(bs, frame);
     bs->frame = &bs->frames.data[bs->frames.count - 1];
 }
 

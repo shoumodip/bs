@@ -8,6 +8,9 @@
 
 #include "value.h"
 
+#define BS_STACK_CAPACITY (128 * 1024)
+#define BS_FRAMES_CAPACITY (8 * 1024)
+
 // Interface
 typedef struct Bs Bs;
 typedef Bs_Value (*Bs_C_Fn_Ptr)(Bs *bs, Bs_Value *args, size_t arity);
