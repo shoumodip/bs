@@ -300,7 +300,13 @@ static void bsdoc_print_copy(FILE *f, const char *onclick) {
         onclick);
 }
 
-void bsdoc_print_line(FILE *f, Bs_Sv line, bool newline) {
+void bsdoc_print_line(FILE *f, Bs_Sv line, bool newline, bool list) {
+    if (list) {
+        fputs("<li>", f);
+        line.data += 2;
+        line.size -= 2;
+    }
+
     bool code = false;
     for (size_t i = 0; i < line.size; i++) {
         const char c = line.data[i];
@@ -310,6 +316,10 @@ void bsdoc_print_line(FILE *f, Bs_Sv line, bool newline) {
         } else {
             fputc(c, f);
         }
+    }
+
+    if (list) {
+        fputs("</li>", f);
     }
 
     if (newline) {
@@ -391,7 +401,7 @@ int main(int argc, char **argv) {
             line.data += level;
             line.size -= level;
             fprintf(f, "<h%zu>", level);
-            bsdoc_print_line(f, line, false);
+            bsdoc_print_line(f, line, false, false);
             fprintf(f, "</h%zu>\n", level);
             continue;
         }
@@ -503,8 +513,14 @@ int main(int argc, char **argv) {
             continue;
         }
 
-        fprintf(f, "<p>\n");
-        bsdoc_print_line(f, line, true);
+        const bool list = bs_sv_prefix(line, Bs_Sv_Static("- "));
+        if (list) {
+            fprintf(f, "<ul>\n");
+        } else {
+            fprintf(f, "<p>\n");
+        }
+
+        bsdoc_print_line(f, line, true, list);
         while (sv.size) {
             row++;
 
@@ -513,9 +529,14 @@ int main(int argc, char **argv) {
                 break;
             }
 
-            bsdoc_print_line(f, line, true);
+            bsdoc_print_line(f, line, true, list);
         }
-        fprintf(f, "</p>\n");
+
+        if (list) {
+            fprintf(f, "</ul>\n");
+        } else {
+            fprintf(f, "</p>\n");
+        }
     }
 
     fprintf(

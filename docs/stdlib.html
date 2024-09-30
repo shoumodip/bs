@@ -1,0 +1,192 @@
+<!doctype html>
+<html>
+<head>
+<link rel='stylesheet' href='/docs/style.css'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<script src='/docs/script.js'></script>
+</head>
+<body>
+<h1> Stdlib Documentation</h1>
+<p>
+BS has a very minimal standard library which just has the bare essentials. This keeps the core runtime simple and easy to embed.
+</p>
+<h2> IO</h2>
+<h3> Function <code>io.input(prompt?: string) -> string</code></h3>
+<p>
+Read a line from standard input, printing the optional argument <code>prompt</code> if provided.
+</p>
+<h3> Function <code>io.print(...)</code></h3>
+<p>
+Print all the arguments to standard output.
+</p>
+<h3> Function <code>io.println(...)</code></h3>
+<p>
+Print all the arguments to standard output, with a following newline.
+</p>
+<h3> Function <code>io.eprint(...)</code></h3>
+<p>
+Print all the arguments to standard error.
+</p>
+<h3> Function <code>io.eprintln(...)</code></h3>
+<p>
+Print all the arguments to standard error, with a following newline.
+</p>
+<h3> Class <code>io.Reader(path: string)</code></h3>
+<p>
+Native C class that opens <code>path</code> in readable mode.
+</p>
+<p>
+Returns <code>nil</code> if failed.
+</p>
+<h4> Method <code>io.Reader.close()</code></h4>
+<p>
+Close the file.
+</p>
+<p>
+This is done automatically by the garbage collector, so can be omitted for
+short programs.
+</p>
+<h4> Method <code>io.Reader.read(count?: number) -> string | nil</code></h4>
+<p>
+Read <code>count</code> bytes from the current position. If the argument <code>bytes</code> is not
+provided, it reads all of the available bytes.
+</p>
+<p>
+Returns <code>nil</code> if failed.
+</p>
+<h4> Method <code>io.Reader.readln() -> string</code></h4>
+<p>
+Read a line.
+</p>
+<h4> Method <code>io.Reader.seek(offset: number, whence: number) -> boolean</code></h4>
+<p>
+Change the read position of the file.
+</p>
+<p>
+Any of the following values can be used for <code>whence</code>.
+</p>
+<ul>
+<li><code>io.SEEK_SET</code> - Seek from beginning of file</li>
+<li><code>io.SEEK_CUR</code> - Seek from current position</li>
+<li><code>io.SEEK_END</code> - Seek from end of file</li>
+</ul>
+<p>
+Returns <code>true</code> if succeeded and <code>false</code> if failed
+</p>
+<h4> Method <code>io.Reader.tell() -> number</code></h4>
+<p>
+Get the current position of the file.
+</p>
+<p>
+Returns <code>nil</code> if failed
+</p>
+<h3> Class <code>io.Writer(path: string)</code></h3>
+<p>
+Native C class that opens <code>path</code> in writeable mode.
+</p>
+<p>
+Returns <code>nil</code> if failed.
+</p>
+<h4> Method <code>io.Writer.close()</code></h4>
+<p>
+Close the file.
+</p>
+<p>
+This is done automatically by the garbage collector, so can be omitted for
+short programs.
+</p>
+<h4> Method <code>io.Writer.flush()</code></h4>
+<p>
+Flush the contents of the file, since IO is buffered in C.
+</p>
+<h4> Method <code>io.Writer.write(...) -> boolean</code></h4>
+<p>
+Write all the arguments into the file.
+</p>
+<p>
+Returns <code>false</code> if any errors were encountered, else <code>true</code>.
+</p>
+<h4> Method <code>io.Writer.writeln(...) -> boolean</code></h4>
+<p>
+Write all the arguments into the file, with a following newline.
+</p>
+<p>
+Returns <code>false</code> if any errors were encountered, else <code>true</code>.
+</p>
+<h3> Instance <code>io.stdin</code></h3>
+<p>
+<code>io.Reader</code> for standard input.
+</p>
+<h3> Instance <code>io.stdout</code></h3>
+<p>
+<code>io.Writer</code> for standard output.
+</p>
+<h3> Instance <code>io.stderr</code></h3>
+<p>
+<code>io.Writer</code> for standard error.
+</p>
+<h2> OS</h2>
+<h3> Function <code>os.exit(code: number)</code></h3>
+<p>
+Halt the BS runtime with exit code <code>code</code>.
+</p>
+<p>
+This doesn't actually exit the process itself in embedded usecase.
+It just halts the BS interpreter, and the caller of the virtual
+machine can decide what to do.
+</p>
+<h3> Functin <code>os.clock() -> number</code></h3>
+<p>
+Get the monotonic time passed since boot.
+</p>
+<p>
+This function provides time with nanosecond level of precision but
+in the unit of seconds.
+</p>
+<h3> Function <code>os.sleep(seconds: number)</code></h3>
+<p>
+Sleep for <code>seconds</code> interval, with nanosecond level of precision.
+</p>
+<h3> Function <code>os.getenv(name: string) -> string | nil</code></h3>
+<p>
+Get the environment variable <code>name</code>.
+</p>
+<p>
+Returns <code>nil</code> if it doesn't exist.
+</p>
+<h3> Function <code>os.setenv(name: string, value: string) -> boolean</code></h3>
+<p>
+Set the environment variable <code>name</code> to <code>value</code>.
+</p>
+<p>
+Returns <code>true</code> if successful, else <code>false</code>.
+</p>
+<h3> Array <code>os.args</code></h3>
+<p>
+Array of command line arguments. First element is the program
+name.
+</p>
+<h3> Class <code>os.Process(args: [string])</code></h3>
+<p>
+Native C class that spawns a process. Expects <code>args</code> to be an
+array of strings that represent the command line arguments.
+</p>
+<p>
+Returns <code>nil</code> if failed.
+</p>
+<h4> Method <code>os.Process.kill(signal: number) -> boolean</code></h4>
+<p>
+Kill the process with <code>signal</code>.
+</p>
+<p>
+Returns <code>false</code> if any errors were encountered, else <code>true</code>.
+</p>
+<h4> Method <code>os.Process.wait() -> number | nil</code></h4>
+<p>
+Wait for the process to exit, and return its exit code.
+</p>
+<p>
+Returns <code>nil</code> if failed.
+</p>
+</body>
+</html>

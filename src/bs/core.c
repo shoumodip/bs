@@ -482,11 +482,11 @@ Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
     }
 
     if (kill(p->pid, args[0].as.number) < 0) {
-        bs_error(bs, "could not kill process");
+        return bs_value_bool(false);
     }
 
     p->pid = 0;
-    return bs_value_nil;
+    return bs_value_bool(true);
 }
 
 Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
@@ -499,7 +499,7 @@ Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
 
     int status;
     if (waitpid(p->pid, &status, 0) < 0) {
-        bs_error(bs, "could not wait for process");
+        return bs_value_nil;
     }
 
     p->pid = 0;
