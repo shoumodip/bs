@@ -2,7 +2,8 @@
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
-:b stdout 121
+:b stdout 157
+Basic
 69
 420
 69
@@ -12,10 +13,13 @@
 1.59999999999999
 0.399999999999997
 -1337
+Grouping
 69
 420
+Decimals
 69
 420
+Bitwise
 69
 420
 69
@@ -23,6 +27,7 @@
 69
 420
 1337
+Hex
 1772867055
 2875837935
 
