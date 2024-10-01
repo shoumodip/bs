@@ -4,8 +4,8 @@
 
 <div class="only-desktop">
 
-[Tutorial](/docs/tutorial.html)
-[Stdlib](/docs/stdlib.html)
+[Tutorial](tutorial.html)
+[Stdlib](stdlib.html)
 [GitHub](https://github.com/shoumodip/bs)
 
 </div>
@@ -47,8 +47,8 @@ $ bs factorial.bs # or .bsx
 
 <center>
 
-[Tutorial](/docs/tutorial.html)
-[Stdlib](/docs/stdlib.html)
+[Tutorial](tutorial.html)
+[Stdlib](stdlib.html)
 [GitHub](https://github.com/shoumodip/bs)
 
 </center>
