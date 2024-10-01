@@ -5,9 +5,10 @@
 #include <time.h>
 
 #include <fcntl.h>
-#include <regex.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
+#include <pcre.h>
 
 #include "bs/core.h"
 #include "bs/object.h"
@@ -510,7 +511,7 @@ Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
 Bs_C_Class *bs_regex_class;
 
 void bs_regex_free(void *userdata, void *instance_data) {
-    regfree(&bs_static_cast(instance_data, regex_t));
+    pcre_free(bs_static_cast(instance_data, pcre *));
 }
 
 Bs_Value bs_regex_init(Bs *bs, Bs_Value *args, size_t arity) {
@@ -524,12 +525,15 @@ Bs_Value bs_regex_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
     bs_da_push(b->bs, b, '\0');
 
-    regex_t regex;
-    if (regcomp(&regex, b->data + start, REG_EXTENDED)) {
+    int temp2 = 0;
+    const char *temp1 = NULL;
+
+    pcre *regex = pcre_compile(bs_buffer_reset(b, start).data, 0, &temp1, &temp2, NULL);
+    if (!regex) {
         return bs_value_nil;
     }
 
-    bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, regex_t) = regex;
+    bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, pcre *) = regex;
     return args[-1];
 }
 
@@ -651,17 +655,14 @@ Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
             }
         }
     } else {
-        Bs_Buffer *b = &bs_config(bs)->buffer;
-        const size_t start = b->count;
+        const pcre *regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, pcre *);
 
-        bs_da_push_many(bs, b, str->data + offset, str->size - offset);
-        bs_da_push(bs, b, '\0');
+        int ovector[30];
+        const int count = pcre_exec(
+            regex, NULL, str->data, str->size, offset, 0, ovector, bs_c_array_size(ovector));
 
-        const regex_t regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, regex_t);
-
-        regmatch_t match;
-        if (!regexec(&regex, bs_buffer_reset(b, start).data, 1, &match, 0)) {
-            return bs_value_num(offset + match.rm_so);
+        if (count >= 0) {
+            return bs_value_num(ovector[0]);
         }
     }
 
@@ -703,27 +704,24 @@ Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
             }
         }
     } else {
-        Bs_Buffer *b = &bs_config(bs)->buffer;
-        const size_t start = b->count;
+        const pcre *regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, pcre *);
 
-        bs_da_push_many(bs, b, str->data, str->size);
-        bs_da_push(bs, b, '\0');
+        int ovector[30];
+        while (true) {
+            const int count = pcre_exec(
+                regex, NULL, str->data, str->size, j, 0, ovector, bs_c_array_size(ovector));
 
-        const char *pattern = bs_buffer_reset(b, start).data;
-        const regex_t regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, regex_t);
-
-        int eflags = 0;
-        regmatch_t match;
-        while (!regexec(&regex, pattern + j, 1, &match, eflags)) {
-            eflags = REG_NOTBOL;
-            if (match.rm_so == match.rm_eo) {
+            if (count < 0 || ovector[0] == ovector[1]) {
                 break;
             }
 
             bs_array_set(
-                bs, a, a->count, bs_value_object(bs_str_new(bs, Bs_Sv(pattern + j, match.rm_so))));
+                bs,
+                a,
+                a->count,
+                bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, ovector[0] - j))));
 
-            j += match.rm_eo;
+            j = ovector[1];
         }
     }
 
@@ -775,46 +773,38 @@ Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
         Bs_Buffer *b = &bs_config(bs)->buffer;
         const size_t start = b->count;
 
-        bs_da_push_many(bs, b, str->data, str->size);
-        bs_da_push(bs, b, '\0');
+        const pcre *regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, pcre *);
 
-        const regex_t regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, regex_t);
-        const size_t result_pos = b->count;
+        int ovector[30];
+        size_t j = 0;
+        while (true) {
+            const int count = pcre_exec(
+                regex, NULL, str->data, str->size, j, 0, ovector, bs_c_array_size(ovector));
 
-        size_t cursor = start;
-        int eflags = 0;
-        regmatch_t matches[10];
-        while (!regexec(&regex, b->data + cursor, bs_c_array_size(matches), matches, eflags)) {
-            eflags = REG_NOTBOL;
-            if (matches[0].rm_so == matches[0].rm_eo) {
+            if (count < 0 || ovector[0] == ovector[1]) {
                 break;
             }
 
-            bs_da_push_many(bs, b, b->data + cursor, matches[0].rm_so);
+            bs_da_push_many(bs, b, str->data + j, ovector[0] - j);
 
             for (size_t i = 0; i < replacement->size; i++) {
-                if (replacement->data[i] == '\\' && isdigit(replacement->data[i + 1])) {
-                    const size_t j = replacement->data[++i] - '0';
-                    if (j < bs_c_array_size(matches) && matches[j].rm_so != -1) {
+                if (i + 1 < replacement->size && replacement->data[i] == '\\' &&
+                    isdigit(replacement->data[i + 1])) {
+                    const size_t m = replacement->data[++i] - '0';
+                    if (m < count) {
                         bs_da_push_many(
-                            bs,
-                            b,
-                            b->data + cursor + matches[j].rm_so,
-                            matches[j].rm_eo - matches[j].rm_so);
+                            bs, b, str->data + ovector[m * 2], ovector[m * 2 + 1] - ovector[m * 2]);
                     }
                 } else {
                     bs_da_push(bs, b, replacement->data[i]);
                 }
             }
 
-            cursor += matches[0].rm_eo;
+            j = ovector[1];
         }
+        bs_da_push_many(bs, b, str->data + j, str->size - j);
 
-        bs_da_push_many(bs, b, b->data + cursor, strlen(b->data + cursor));
-
-        const Bs_Str *result = bs_str_new(bs, bs_buffer_reset(b, result_pos));
-        bs_buffer_reset(b, start);
-        return bs_value_object(result);
+        return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
     }
 }
 
@@ -1738,8 +1728,8 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     }
 
     {
-        bs_regex_class = bs_c_class_new(
-            bs, Bs_Sv_Static("Regex"), sizeof(regex_t), bs_regex_init, bs_regex_free);
+        bs_regex_class =
+            bs_c_class_new(bs, Bs_Sv_Static("Regex"), sizeof(pcre *), bs_regex_init, bs_regex_free);
 
         bs_regex_class->can_fail = true;
         bs_global_set(bs, Bs_Sv_Static("Regex"), bs_value_object(bs_regex_class));
