@@ -1,7 +1,7 @@
 #!/bin/sh
 
-CFLAGS="-I./include -O3"
-LIBS="-lm -ldl -lpcre"
+CFLAGS="-I./include -O3 -I$(brew --prefix pcre)/include"
+LIBS="-L$(brew --prefix pcre)/lib -lm -ldl -lpcre"
 
 rm -rf bin lib
 mkdir -p bin lib/.build

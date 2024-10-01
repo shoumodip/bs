@@ -16,21 +16,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up dependencies for Linux
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libpcre2-dev
-
-      - name: Set up dependencies for macOS
-        if: runner.os == 'macOS'
-        run: |
-          brew install pcre2
-
       - name: Set up dependencies for Windows
         if: runner.os == 'Windows'
         run: |
-          choco install pcre2                      # PCRE2 on Windows
+          choco install -y pcre2
 
       - name: Build for Linux
         if: runner.os == 'Linux'
