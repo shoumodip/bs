@@ -2019,7 +2019,9 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
             const size_t a1 = a.as.number;
             const size_t b1 = b.as.number;
+            fflush(stdout);
             printf("lhs = %zu; rhs = %zu; final = %zu\n", a1, b1, a1 << b1);
+            fflush(stdout);
             bs_stack_push(bs, bs_value_num(a1 << b1));
         } break;
 
@@ -2031,7 +2033,9 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
             const size_t a1 = a.as.number;
             const size_t b1 = b.as.number;
+            fflush(stdout);
             printf("lhs = %zu; rhs = %zu; final = %zu\n", a1, b1, a1 >> b1);
+            fflush(stdout);
             bs_stack_push(bs, bs_value_num(a1 >> b1));
         } break;
 
