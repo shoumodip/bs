@@ -1371,6 +1371,35 @@ Bs_Value bs_array_equal(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_bool(true);
 }
 
+Bs_Value bs_array_push(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    Bs_Array *a = (Bs_Array *)args[-1].as.object;
+    bs_array_set(bs, a, a->count, args[0]);
+    return bs_value_nil;
+}
+
+Bs_Value bs_array_insert(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 2);
+    bs_arg_check_whole_number(bs, args, 0);
+
+    Bs_Array *a = (Bs_Array *)args[-1].as.object;
+    const size_t index = args[0].as.number;
+    const Bs_Value value = args[1];
+
+    if (index < a->count) {
+        bs_array_set(bs, a, a->count, bs_value_nil);
+
+        for (size_t i = index; i + 1 < a->count; i++) {
+            a->data[i + 1] = a->data[i];
+        }
+
+        a->data[index] = value;
+    } else {
+        bs_array_set(bs, a, index, value);
+    }
+    return bs_value_nil;
+}
+
 typedef struct {
     Bs *bs;
     Bs_Value fn;
@@ -1507,6 +1536,27 @@ Bs_Value bs_math_acos(Bs *bs, Bs_Value *args, size_t arity) {
 Bs_Value bs_math_atan(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_num(atan(args[-1].as.number));
+}
+
+Bs_Value bs_math_exp(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    return bs_value_num(exp(args[-1].as.number));
+}
+
+Bs_Value bs_math_log(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    return bs_value_num(log(args[-1].as.number));
+}
+
+Bs_Value bs_math_log10(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    return bs_value_num(log10(args[-1].as.number));
+}
+
+Bs_Value bs_math_pow(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
+    return bs_value_num(pow(args[-1].as.number, args[0].as.number));
 }
 
 Bs_Value bs_math_sqrt(Bs *bs, Bs_Value *args, size_t arity) {
@@ -1763,6 +1813,9 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("find"), bs_array_find);
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("equal"), bs_array_equal);
 
+        bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("push"), bs_array_push);
+        bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("insert"), bs_array_insert);
+
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("sort"), bs_array_sort);
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("resize"), bs_array_resize);
         bs_builtin_object_methods_add(
@@ -1781,6 +1834,11 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("asin"), bs_math_asin);
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("acos"), bs_math_acos);
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("atan"), bs_math_atan);
+
+        bs_builtin_number_methods_add(bs, Bs_Sv_Static("exp"), bs_math_exp);
+        bs_builtin_number_methods_add(bs, Bs_Sv_Static("log"), bs_math_log);
+        bs_builtin_number_methods_add(bs, Bs_Sv_Static("log10"), bs_math_log10);
+        bs_builtin_number_methods_add(bs, Bs_Sv_Static("pow"), bs_math_pow);
 
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("sqrt"), bs_math_sqrt);
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("ceil"), bs_math_ceil);
