@@ -2,7 +2,7 @@
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
-:b stdout 157
+:b stdout 191
 Basic
 69
 420
@@ -22,9 +22,11 @@ Decimals
 Bitwise
 69
 420
+BNOT: -70 -> 69
 69
 420
 69
+BNOT: -419 -> 418
 420
 1337
 Hex
@@ -36,7 +38,7 @@ Hex
 :b shell 30
 ../bin/bs arithmetics/main.bsx
 :i returncode 0
-:b stdout 121
+:b stdout 155
 69
 420
 69
@@ -52,9 +54,11 @@ Hex
 420
 69
 420
+BNOT: -70 -> 69
 69
 420
 69
+BNOT: -419 -> 418
 420
 1337
 1772867055

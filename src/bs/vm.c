@@ -2004,6 +2004,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             bs_check_integer(bs, a, "operand to unary (~)");
 
             const size_t a1 = a.as.number;
+            printf("BNOT: %ld -> %ld\n", a1, ~a1);
             bs_stack_push(bs, bs_value_num(~a1));
         } break;
 
