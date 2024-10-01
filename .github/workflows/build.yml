@@ -51,7 +51,7 @@ jobs:
       - name: Run tests
         run: |
           cd tests
-          ./rere.py replay tests.list
+          ./rere.py replay test.list
 
   release:
     runs-on: ubuntu-latest
