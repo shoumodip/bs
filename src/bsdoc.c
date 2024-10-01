@@ -366,9 +366,9 @@ int main(int argc, char **argv) {
         "<!doctype html>\n"
         "<html>\n"
         "<head>\n"
-        "<link rel='stylesheet' href='/docs/style.css'>\n"
+        "<link rel='stylesheet' href='style.css'>\n"
         "<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n"
-        "<script src='/docs/script.js'></script>\n"
+        "<script src='script.js'></script>\n"
         "</head>\n"
         "<body>\n");
 
