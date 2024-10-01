@@ -1,0 +1,104 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up dependencies for Linux and macOS
+        if: runner.os != 'Windows'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpcre2-dev     # For Linux
+          brew install pcre2                       # For macOS (Homebrew)
+
+      - name: Set up dependencies for Windows
+        if: runner.os == 'Windows'
+        run: |
+          choco install pcre2                      # PCRE2 on Windows
+
+      - name: Build for Linux
+        if: runner.os == 'Linux'
+        run: |
+          chmod +x build/linux.sh
+          ./build/linux.sh
+
+      - name: Build for macOS
+        if: runner.os == 'macOS'
+        run: |
+          chmod +x build/macos.sh
+          ./build/macos.sh
+
+      - name: Build for Windows
+        if: runner.os == 'Windows'
+        run: build\windows.bat
+
+      - name: Run tests
+        run: |
+          cd tests
+          ./rere.py replay tests.list
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build-test
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create ZIP file for Linux
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          zip -r bs-linux-x86_64.zip bin/bs lib/libbs.so lib/libbs.a
+
+      - name: Create ZIP file for macOS
+        if: matrix.os == 'macos-latest'
+        run: |
+          zip -r bs-macos-x86_64.zip bin/bs lib/libbs.dylib lib/libbs.a
+
+      - name: Create ZIP file for Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          zip -r bs-windows-x86_64.zip bin/bs.exe lib/libbs.dll lib/libbs.lib
+
+      - name: Upload release assets
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+            gh release create ${{ github.ref }} bs-linux-x86_64.zip --target ${{ github.ref }}
+          elif [ "${{ matrix.os }}" == "macos-latest" ]; then
+            gh release create ${{ github.ref }} bs-macos-x86_64.zip --target ${{ github.ref }}
+          elif [ "${{ matrix.os }}" == "windows-latest" ]; then
+            gh release create ${{ github.ref }} bs-windows-x86_64.zip --target ${{ github.ref }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          tag_name: ${{ github.ref }}
+          files: |
+            bs-linux-x86_64.zip
+            bs-macos-x86_64.zip
+            bs-windows-x86_64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
