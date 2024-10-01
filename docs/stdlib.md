@@ -376,7 +376,7 @@ Sine in radians.
 Cosine in radians.
 
 ### Method `number.tan() -> number`
-Tangen in radians.
+Tangent in radians.
 
 ### Method `number.asin() -> number`
 Inverse sine in radians.
@@ -393,7 +393,7 @@ Return the exponential function of the number.
 ### Method `number.log() -> number`
 Return the natural logarithm (base `e`) of the number.
 
-### Method `number.log() -> number`
+### Method `number.log10() -> number`
 Return the common logarithm (base `10`) of the number.
 
 ### Method `number.pow(exponent: number) -> number`
@@ -409,7 +409,7 @@ Ceiling.
 Floor.
 
 ### Method `number.round() -> number`
-Round up to the nearest whole number.
+Return the nearest integer.
 
 ### Method `number.max(those ...number) -> number`
 Return the maximum between the method receiver and the provided arguments.
