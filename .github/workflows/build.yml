@@ -16,11 +16,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up dependencies for macOS
-        if: runner.os == 'macOS'
-        run: |
-          brew install pcre2
-
       - name: Set up dependencies for Windows
         if: runner.os == 'Windows'
         run: |
