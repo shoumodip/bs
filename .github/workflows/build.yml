@@ -5,6 +5,10 @@ on:
   push:
     branches: [ main ]
 
+  push:
+    tags:
+      - '*'
+
 jobs:
   build-test:
     runs-on: ${{ matrix.os }}
@@ -16,12 +20,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up dependencies for Linux and macOS
-        if: runner.os != 'Windows'
+      - name: Set up dependencies for Linux
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libpcre2-dev     # For Linux
-          brew install pcre2                       # For macOS (Homebrew)
+          sudo apt-get install -y libpcre2-dev
+
+      - name: Set up dependencies for macOS
+        if: runner.os == 'macOS'
+        run: |
+          brew install pcre2
 
       - name: Set up dependencies for Windows
         if: runner.os == 'Windows'
