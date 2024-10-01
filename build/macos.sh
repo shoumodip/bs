@@ -1,7 +1,7 @@
 #!/bin/sh
 
-CFLAGS="-I./include -O3 $(pkg-config --cflags libpcre2-8)"
-LIBS="$(pkg-config --cflags libpcre2-8) -lm -ldl -lpcre"
+CFLAGS="-I./include -O3"
+LIBS="-lm -ldl -lpcre2-8"
 
 rm -rf bin lib
 mkdir -p bin lib/.build
@@ -10,7 +10,6 @@ for file in $(ls src/bs); do
     cc $CFLAGS -o lib/.build/$file.o -c -fPIC src/bs/$file
 done
 
-echo "Building main executable"
-cc -v $CFLAGS -o bin/bs src/bs.c lib/.build/* $LIBS
+cc $CFLAGS -o bin/bs src/bs.c lib/.build/* $LIBS
 cc $CFLAGS -o lib/libbs.dylib -shared lib/.build/* $LIBS
 ar rcs lib/libbs.a lib/.build/*

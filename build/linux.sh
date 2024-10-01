@@ -1,7 +1,7 @@
 #!/bin/sh
 
 CFLAGS="-I./include -O3"
-LIBS="-lm -ldl -lpcre"
+LIBS="-lm -ldl -lpcre2-8"
 
 rm -rf bin lib
 mkdir -p bin lib/.build

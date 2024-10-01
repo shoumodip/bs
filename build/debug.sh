@@ -1,7 +1,7 @@
 #!/bin/sh
 
-CFLAGS=$(cat compile_flags.txt)
-LIBS="-lm -ldl -lpcre"
+CFLAGS="-I./include"
+LIBS="-lm -ldl -lpcre2-8"
 
 rm -rf bin lib
 mkdir -p bin lib/.build

@@ -8,7 +8,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include <pcre.h>
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
 
 #include "bs/core.h"
 #include "bs/object.h"
@@ -508,32 +509,39 @@ Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Regex
+typedef struct {
+    pcre2_code *code;
+    pcre2_match_data *match_data;
+} Bs_Regex;
+
 Bs_C_Class *bs_regex_class;
 
 void bs_regex_free(void *userdata, void *instance_data) {
-    pcre_free(bs_static_cast(instance_data, pcre *));
+    Bs_Regex *regex = &bs_static_cast(instance_data, Bs_Regex);
+    pcre2_code_free(regex->code);
+    pcre2_match_data_free(regex->match_data);
 }
 
 Bs_Value bs_regex_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
-    Bs_Buffer *b = &bs_config(bs)->buffer;
-    const size_t start = b->count;
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
 
-    Bs_Writer w = bs_buffer_writer(b);
-    bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
-    bs_da_push(b->bs, b, '\0');
+    int temp1 = 0;
+    size_t temp2 = 0;
 
-    int temp2 = 0;
-    const char *temp1 = NULL;
-
-    pcre *regex = pcre_compile(bs_buffer_reset(b, start).data, 0, &temp1, &temp2, NULL);
-    if (!regex) {
+    Bs_Regex *regex = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Regex);
+    regex->code = pcre2_compile((PCRE2_SPTR)str->data, str->size, 0, &temp1, &temp2, NULL);
+    if (!regex->code) {
         return bs_value_nil;
     }
 
-    bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, pcre *) = regex;
+    regex->match_data = pcre2_match_data_create_from_pattern(regex->code, NULL);
+    if (!regex->match_data) {
+        return bs_value_nil;
+    }
+
     return args[-1];
 }
 
@@ -655,13 +663,14 @@ Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
             }
         }
     } else {
-        const pcre *regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, pcre *);
+        const Bs_Regex *regex =
+            &bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, Bs_Regex);
 
-        int ovector[30];
-        const int count = pcre_exec(
-            regex, NULL, str->data, str->size, offset, 0, ovector, bs_c_array_size(ovector));
+        const int count = pcre2_match(
+            regex->code, (PCRE2_SPTR)str->data, str->size, offset, 0, regex->match_data, NULL);
 
         if (count >= 0) {
+            const size_t *ovector = pcre2_get_ovector_pointer(regex->match_data);
             return bs_value_num(ovector[0]);
         }
     }
@@ -704,14 +713,19 @@ Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
             }
         }
     } else {
-        const pcre *regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, pcre *);
+        const Bs_Regex *regex =
+            &bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, Bs_Regex);
 
-        int ovector[30];
         while (true) {
-            const int count = pcre_exec(
-                regex, NULL, str->data, str->size, j, 0, ovector, bs_c_array_size(ovector));
+            const int count = pcre2_match(
+                regex->code, (PCRE2_SPTR)str->data, str->size, j, 0, regex->match_data, NULL);
 
-            if (count < 0 || ovector[0] == ovector[1]) {
+            if (count < 0) {
+                break;
+            }
+
+            const size_t *ovector = pcre2_get_ovector_pointer(regex->match_data);
+            if (ovector[0] == ovector[1]) {
                 break;
             }
 
@@ -773,15 +787,20 @@ Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
         Bs_Buffer *b = &bs_config(bs)->buffer;
         const size_t start = b->count;
 
-        const pcre *regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, pcre *);
+        const Bs_Regex *regex =
+            &bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, Bs_Regex);
 
-        int ovector[30];
         size_t j = 0;
         while (true) {
-            const int count = pcre_exec(
-                regex, NULL, str->data, str->size, j, 0, ovector, bs_c_array_size(ovector));
+            const int count = pcre2_match(
+                regex->code, (PCRE2_SPTR)str->data, str->size, j, 0, regex->match_data, NULL);
 
-            if (count < 0 || ovector[0] == ovector[1]) {
+            if (count < 0) {
+                break;
+            }
+
+            const size_t *ovector = pcre2_get_ovector_pointer(regex->match_data);
+            if (ovector[0] == ovector[1]) {
                 break;
             }
 
@@ -1728,8 +1747,8 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     }
 
     {
-        bs_regex_class =
-            bs_c_class_new(bs, Bs_Sv_Static("Regex"), sizeof(pcre *), bs_regex_init, bs_regex_free);
+        bs_regex_class = bs_c_class_new(
+            bs, Bs_Sv_Static("Regex"), sizeof(Bs_Regex), bs_regex_init, bs_regex_free);
 
         bs_regex_class->can_fail = true;
         bs_global_set(bs, Bs_Sv_Static("Regex"), bs_value_object(bs_regex_class));
