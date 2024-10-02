@@ -67,7 +67,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          cd tests && ./rere.py replay tests.list
+          cd tests && ./rere.py replay test.list
 
   test-windows:
     runs-on: windows-latest
@@ -84,7 +84,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          cd tests && python3 rere.py replay tests.list
+          cd tests && python3 rere.py replay test.list
 
   build-macos:
     runs-on: macos-latest
@@ -101,7 +101,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          cd tests && ./rere.py replay tests.list
+          cd tests && ./rere.py replay test.list
 
       - name: Archive macOS build artifacts
         uses: actions/upload-artifact@v4
