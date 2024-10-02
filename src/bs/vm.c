@@ -1367,7 +1367,8 @@ static void bs_import(Bs *bs) {
     // Native
     {
 #ifdef _WIN32
-        bs_error(bs, "TODO: not implemented on windows\n");
+        // TODO: implement native libraries on windows
+        bs_error(bs, "could not import module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*path));
 #else
         // TODO: macOS expects .dylib, I think?
         bs_da_push_many(bs, b, ".so", 4);
