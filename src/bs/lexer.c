@@ -136,6 +136,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
         }
     }
 
+    fprintf(stderr, Bs_Loc_Fmt "[LOG] %zu bytes left in lexer\n", Bs_Loc_Arg(l->loc), l->sv.size);
     token.sv = l->sv;
     token.loc = l->loc;
     if (l->sv.size == 0) {
