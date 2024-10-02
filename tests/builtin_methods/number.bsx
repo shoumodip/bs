@@ -1,1 +1,1 @@
-io.println(math.PI.sin()) fr
+io.println(6.max(9)) fr

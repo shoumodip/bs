@@ -2155,16 +2155,16 @@ cap
 :b shell 35
 ../bin/bs builtin_methods/number.bs
 :i returncode 0
-:b stdout 21
-1.22464679914735e-16
+:b stdout 2
+9
 
 :b stderr 0
 
 :b shell 36
 ../bin/bs builtin_methods/number.bsx
 :i returncode 0
-:b stdout 21
-1.22464679914735e-16
+:b stdout 2
+9
 
 :b stderr 0
 

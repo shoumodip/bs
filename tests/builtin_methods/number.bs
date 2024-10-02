@@ -1,1 +1,1 @@
-io.println(math.PI.sin());
+io.println(6.max(9));
