@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -xe
+
 CFLAGS="-I./include -O3"
 LIBS="-lm -ldl -lpcre2-8"
 

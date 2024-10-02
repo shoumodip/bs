@@ -28,62 +28,66 @@ jobs:
           chmod +x build/macos.sh
           ./build/macos.sh
 
+      - name: Set up MinGW on Windows
+        if: runner.os == 'Windows'
+        run: |
+          choco install mingw
+
       - name: Build for Windows
         if: runner.os == 'Windows'
         shell: cmd
         run: |
-          call "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat"
-          build\windows.bat
+          bash build/windows.sh
 
       - name: Run tests
         run: |
           cd tests
           ./rere.py replay test.list
 
-  release:
-    runs-on: ubuntu-latest
-    needs: build-test
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+  # release:
+  #   runs-on: ubuntu-latest
+  #   needs: build-test
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, macos-latest, windows-latest]
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
 
-      - name: Create ZIP file for Linux
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          zip -r bs-linux-x86_64.zip bin/bs lib/libbs.so lib/libbs.a
+  #     - name: Create ZIP file for Linux
+  #       if: matrix.os == 'ubuntu-latest'
+  #       run: |
+  #         zip -r bs-linux-x86_64.zip bin/bs lib/libbs.so lib/libbs.a
 
-      - name: Create ZIP file for macOS
-        if: matrix.os == 'macos-latest'
-        run: |
-          zip -r bs-macos-x86_64.zip bin/bs lib/libbs.dylib lib/libbs.a
+  #     - name: Create ZIP file for macOS
+  #       if: matrix.os == 'macos-latest'
+  #       run: |
+  #         zip -r bs-macos-x86_64.zip bin/bs lib/libbs.dylib lib/libbs.a
 
-      - name: Create ZIP file for Windows
-        if: matrix.os == 'windows-latest'
-        run: |
-          zip -r bs-windows-x86_64.zip bin/bs.exe lib/libbs.dll lib/libbs.lib
+  #     - name: Create ZIP file for Windows
+  #       if: matrix.os == 'windows-latest'
+  #       run: |
+  #         zip -r bs-windows-x86_64.zip bin/bs.exe lib/libbs.dll lib/libbs.lib
 
-      - name: Upload release assets
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            gh release create ${{ github.ref }} bs-linux-x86_64.zip --target ${{ github.ref }}
-          elif [ "${{ matrix.os }}" == "macos-latest" ]; then
-            gh release create ${{ github.ref }} bs-macos-x86_64.zip --target ${{ github.ref }}
-          elif [ "${{ matrix.os }}" == "windows-latest" ]; then
-            gh release create ${{ github.ref }} bs-windows-x86_64.zip --target ${{ github.ref }}
+  #     - name: Upload release assets
+  #       if: startsWith(github.ref, 'refs/tags/')
+  #       run: |
+  #         if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+  #           gh release create ${{ github.ref }} bs-linux-x86_64.zip --target ${{ github.ref }}
+  #         elif [ "${{ matrix.os }}" == "macos-latest" ]; then
+  #           gh release create ${{ github.ref }} bs-macos-x86_64.zip --target ${{ github.ref }}
+  #         elif [ "${{ matrix.os }}" == "windows-latest" ]; then
+  #           gh release create ${{ github.ref }} bs-windows-x86_64.zip --target ${{ github.ref }}
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          tag_name: ${{ github.ref }}
-          files: |
-            bs-linux-x86_64.zip
-            bs-macos-x86_64.zip
-            bs-windows-x86_64.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Create GitHub Release
+  #       uses: softprops/action-gh-release@v1
+  #       if: startsWith(github.ref, 'refs/tags/')
+  #       with:
+  #         tag_name: ${{ github.ref }}
+  #         files: |
+  #           bs-linux-x86_64.zip
+  #           bs-macos-x86_64.zip
+  #           bs-windows-x86_64.zip
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
