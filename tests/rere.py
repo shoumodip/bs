@@ -50,14 +50,16 @@ def write_blob_field(f: BinaryIO, name: bytes, blob: bytes):
     f.write(blob)
     f.write(b'\n')
 
-def capture(shell: str) -> dict:
-    print(f"CAPTURING: {shell}")
-    process = subprocess.run(['sh', '-c', shell], capture_output = True)
+def capture(shell: str, debug=True) -> dict:
+    if debug:
+        print(f"CAPTURING: {shell}")
+
+    process = subprocess.run(['sh', '-c', shell], capture_output=True)
     return {
         'shell': shell,
         'returncode': process.returncode,
-        'stdout': process.stdout,
-        'stderr': process.stderr,
+        'stdout': process.stdout.replace(b'\r\n', b'\n'),
+        'stderr': process.stderr.replace(b'\r\n', b'\n'),
     }
 
 def load_list(file_path: str) -> list[str]:
@@ -135,24 +137,24 @@ if __name__ == '__main__':
                 print(f"    ACTUAL:   {shell}")
                 print(f"NOTE: You may want to do `{program_name} record {test_list_path}` to update {test_list_path}.bi")
                 exit(1)
-            process = subprocess.run(['sh', '-c', shell], capture_output = True);
+            process = capture(shell, debug=False);
             failed = False
-            if process.returncode != snapshot['returncode']:
+            if process['returncode'] != snapshot['returncode']:
                 print(f"UNEXPECTED: return code")
                 print(f"    EXPECTED: {snapshot['returncode']}")
-                print(f"    ACTUAL:   {process.returncode}")
+                print(f"    ACTUAL:   {process['returncode']}")
                 failed = True
-            if process.stdout != snapshot['stdout']:
+            if process['stdout'] != snapshot['stdout']:
                 # TODO: support binary outputs
                 a = snapshot['stdout'].decode('utf-8').splitlines(keepends=True)
-                b = process.stdout.decode('utf-8').splitlines(keepends=True)
+                b = process['stdout'].decode('utf-8').splitlines(keepends=True)
                 print(f"UNEXPECTED: stdout")
                 for line in unified_diff(a, b, fromfile="expected", tofile="actual"):
                     print(line, end='')
                 failed = True
-            if process.stderr != snapshot['stderr']:
+            if process['stderr'] != snapshot['stderr']:
                 a = snapshot['stderr'].decode('utf-8').splitlines(keepends=True)
-                b = process.stderr.decode('utf-8').splitlines(keepends=True)
+                b = process['stderr'].decode('utf-8').splitlines(keepends=True)
                 print(f"UNEXPECTED: stderr")
                 for line in unified_diff(a, b, fromfile="expected", tofile="actual"):
                     print(line, end='')
