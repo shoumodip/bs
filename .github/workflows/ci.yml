@@ -1,0 +1,31 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [linux, windows, macos]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up dependencies
+        run: |
+          if [ "${{ matrix.target }}" == "windows" ]; then
+            sudo apt-get install -y mingw-w64
+            sudo apt-get install -y pcregrep
+          fi
+
+      - name: Build the project
+        run: |
+          if [ "${{ matrix.target }}" == "linux" ]; then
+            bash ./build/linux.sh
+          elif [ "${{ matrix.target }}" == "macos" ]; then
+            bash ./build/macos.sh
+          elif [ "${{ matrix.target }}" == "windows" ]; then
+            bash ./build/windows.sh
+          fi
