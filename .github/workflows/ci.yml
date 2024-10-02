@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         target: [linux, windows, macos]
@@ -17,22 +17,22 @@ jobs:
         run: |
           if [ "${{ matrix.target }}" == "windows" ]; then
             sudo apt-get install -y mingw-w64
-            ./build/pcre.sh win32
+            bash ./build/pcre.sh win32
           else
-            ./build/pcre.sh
+            bash ./build/pcre.sh
           fi
 
       - name: Build the project
         run: |
           if [ "${{ matrix.target }}" == "linux" ]; then
-            ./build/linux.sh
+            bash ./build/linux.sh
           elif [ "${{ matrix.target }}" == "macos" ]; then
-            ./build/macos.sh
+            bash ./build/macos.sh
           elif [ "${{ matrix.target }}" == "windows" ]; then
-            ./build/windows.sh
+            bash ./build/windows.sh
           fi
 
       - name: Run tests
         run: |
           cd tests
-          ./rere.py replay test.list
+          python3 ./rere.py replay test.list
