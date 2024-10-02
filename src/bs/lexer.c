@@ -35,7 +35,6 @@ static bool bs_lexer_match(Bs_Lexer *l, char ch) {
 }
 
 Bs_Lexer bs_lexer_new(Bs_Sv path, Bs_Sv input, Bs_Writer *error) {
-    printf("Created lexer with %zu bytes of content\n", input.size);
     return (Bs_Lexer){
         .sv = input,
         .loc.path = path,
@@ -140,7 +139,6 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
     token.sv = l->sv;
     token.loc = l->loc;
     if (l->sv.size == 0) {
-        printf("END OF FILE REACHED\n");
         return token;
     }
 
@@ -477,8 +475,9 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
     if (token.type == BS_TOKEN_EOF) {
         bs_fmt(
             l->error,
-            Bs_Loc_Fmt "error: invalid character '%c'\n",
+            Bs_Loc_Fmt "error: invalid character '%c' (%d)\n",
             Bs_Loc_Arg(token.loc),
+            *token.sv.data,
             *token.sv.data);
 
         bs_lexer_error(l);
