@@ -28,16 +28,17 @@ jobs:
           chmod +x build/macos.sh
           ./build/macos.sh
 
-      - name: Set up MinGW on Windows
+      - name: Install MSYS2 and PCRE on Windows
         if: runner.os == 'Windows'
         run: |
-          choco install mingw
+          choco install msys2
+          refreshenv
+          msys2 -c "pacman -Syu --noconfirm mingw-w64-x86_64-gcc mingw-w64-x86_64-pcre mingw-w64-x86_64-pkg-config"
 
-      - name: Build for Windows
+      - name: Build on Windows using MinGW (via MSYS2)
         if: runner.os == 'Windows'
-        shell: cmd
         run: |
-          bash build/windows.sh
+          msys2 -c "bash ./build/windows.sh"
 
       - name: Run tests
         run: |
