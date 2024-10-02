@@ -40,7 +40,9 @@ bool bs_sv_find(Bs_Sv s, char ch, size_t *index) {
         return false;
     }
 
-    *index = p - s.data;
+    if (index) {
+        *index = p - s.data;
+    }
     return true;
 }
 

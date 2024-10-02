@@ -1,8 +1,14 @@
-#include <dlfcn.h>
 #include <errno.h>
 #include <math.h>
 #include <setjmp.h>
 #include <unistd.h>
+
+#ifdef _WIN32
+#    define WIN32_LEAN_AND_MEAN
+#    include <windows.h>
+#else
+#    include <dlfcn.h>
+#endif // _WIN32
 
 #include "bs/compiler.h"
 
@@ -207,7 +213,11 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
         Bs_C_Lib *library = (Bs_C_Lib *)object;
         bs_map_free(bs, &library->map);
 
+#ifdef _WIN32
+        bs_error(bs, "TODO: not implemented on windows");
+#else
         dlclose(library->data);
+#endif // _WIN32
         bs_realloc(bs, library, sizeof(*library), 0);
     } break;
 
@@ -1356,6 +1366,10 @@ static void bs_import(Bs *bs) {
 
     // Native
     {
+#ifdef _WIN32
+        bs_error(bs, "TODO: not implemented on windows\n");
+#else
+        // TODO: macOS expects .dylib, I think?
         bs_da_push_many(bs, b, ".so", 4);
         void *data = dlopen(b->data + start, RTLD_LAZY);
         if (!data) {
@@ -1403,6 +1417,7 @@ static void bs_import(Bs *bs) {
         bs_modules_push(bs, &bs->modules, module);
 
         bs_stack_push(bs, module.result);
+#endif // _WIN32
     }
 
 defer:

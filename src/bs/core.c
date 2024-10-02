@@ -4,16 +4,17 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <fcntl.h>
-#include <signal.h>
-
 #ifdef _WIN32
+#    define WIN32_LEAN_AND_MEAN
+#    include <windows.h>
 #else
+#    include <fcntl.h>
+#    include <signal.h>
 #    include <sys/wait.h>
+#    include <unistd.h>
 #endif // _WIN32
 
-#include <unistd.h>
-
+#define PCRE2_STATIC
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
 
@@ -317,12 +318,25 @@ Bs_Value bs_os_exit(Bs *bs, Bs_Value *args, size_t arity) {
 Bs_Value bs_os_clock(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
+#ifdef _WIN32
+    LARGE_INTEGER frequency, counter;
+    if (!QueryPerformanceFrequency(&frequency)) {
+        bs_error(bs, "could not get clock");
+    }
+
+    if (!QueryPerformanceCounter(&counter)) {
+        bs_error(bs, "could not get clock");
+    }
+
+    return bs_value_num((double)counter.QuadPart / frequency.QuadPart);
+#else
     struct timespec clock;
     if (clock_gettime(CLOCK_MONOTONIC, &clock) < 0) {
         bs_error(bs, "could not get clock");
     }
 
     return bs_value_num(clock.tv_sec + clock.tv_nsec * 1e-9);
+#endif // _WIN32
 }
 
 Bs_Value bs_os_sleep(Bs *bs, Bs_Value *args, size_t arity) {
@@ -330,6 +344,31 @@ Bs_Value bs_os_sleep(Bs *bs, Bs_Value *args, size_t arity) {
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
 
     const double seconds = args[0].as.number;
+
+#ifdef _WIN32
+    DWORD milliseconds = (DWORD)(seconds * 1000);
+    DWORD remaining_microseconds = (DWORD)((seconds - (milliseconds / 1000.0)) * 1000000);
+
+    Sleep(milliseconds);
+
+    if (remaining_microseconds > 0) {
+        LARGE_INTEGER start, end, frequency;
+        if (!QueryPerformanceFrequency(&frequency)) {
+            bs_error(bs, "could not sleep");
+        }
+
+        if (!QueryPerformanceCounter(&start)) {
+            bs_error(bs, "could not sleep");
+        }
+
+        do {
+            if (!QueryPerformanceCounter(&end)) {
+                bs_error(bs, "could not sleep");
+            }
+        } while (((end.QuadPart - start.QuadPart) * 1000000 / frequency.QuadPart) <
+                 remaining_microseconds);
+    }
+#else
 
     struct timespec req, rem;
     req.tv_sec = (time_t)seconds;
@@ -342,6 +381,7 @@ Bs_Value bs_os_sleep(Bs *bs, Bs_Value *args, size_t arity) {
 
         req = rem;
     }
+#endif // _WIN32
 
     return bs_value_nil;
 }
@@ -350,23 +390,35 @@ Bs_Value bs_os_getenv(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
-    {
-        Bs_Buffer *b = &bs_config(bs)->buffer;
-        const size_t start = b->count;
+    Bs_Buffer *b = &bs_config(bs)->buffer;
+    const size_t start = b->count;
 
-        Bs_Writer w = bs_buffer_writer(b);
-        bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
-        bs_da_push(b->bs, b, '\0');
+    Bs_Writer w = bs_buffer_writer(b);
+    bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
+    bs_da_push(b->bs, b, '\0');
 
-        const char *key = bs_buffer_reset(b, start).data;
-        const char *value = getenv(key);
+#ifdef _WIN32
+    const DWORD size = GetEnvironmentVariableA(b->data + start, NULL, 0);
+    if (size) {
+        bs_da_push_many(bs, b, NULL, size);
 
-        if (value) {
-            return bs_value_object(bs_str_new(bs, bs_sv_from_cstr(value)));
-        } else {
-            return bs_value_nil;
+        if (GetEnvironmentVariableA(b->data + start, b->data + b->count, size)) {
+            const Bs_Str *value = bs_str_new(bs, bs_sv_from_cstr(b->data + b->count));
+            bs_buffer_reset(b, start);
+            return bs_value_object(value);
         }
+
+        bs_buffer_reset(b, start);
     }
+#else
+    const char *key = bs_buffer_reset(b, start).data;
+    const char *value = getenv(key);
+    if (value) {
+        return bs_value_object(bs_str_new(bs, bs_sv_from_cstr(value)));
+    }
+#endif // _WIN32
+
+    return bs_value_nil;
 }
 
 Bs_Value bs_os_setenv(Bs *bs, Bs_Value *args, size_t arity) {
@@ -396,12 +448,20 @@ Bs_Value bs_os_setenv(Bs *bs, Bs_Value *args, size_t arity) {
         bs_buffer_reset(b, start);
     }
 
+#ifdef _WIN32
+    return bs_value_bool(SetEnvironmentVariable(key, value) != 0);
+#else
     return bs_value_bool(setenv(key, value, true) == 0);
+#endif // _WIN32
 }
 
 // Process
 typedef struct {
+#ifdef _WIN32
+    PROCESS_INFORMATION piProcInfo;
+#else
     pid_t pid;
+#endif // _WIN32
 } Bs_Process;
 
 Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
@@ -420,6 +480,74 @@ Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
         bs_check_object_type_at(bs, 1, array->data[i], BS_OBJECT_STR, buffer);
     }
 
+    Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+
+#ifdef _WIN32
+    STARTUPINFOA siStartInfo;
+    ZeroMemory(&siStartInfo, sizeof(siStartInfo));
+    siStartInfo.cb = sizeof(STARTUPINFO);
+
+    // TODO: check for errors in GetStdHandle
+    siStartInfo.hStdError = GetStdHandle(STD_ERROR_HANDLE);
+    siStartInfo.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+    siStartInfo.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+    siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
+
+    ZeroMemory(&p->piProcInfo, sizeof(PROCESS_INFORMATION));
+
+    Bs_Buffer *b = &bs_config(bs)->buffer;
+    const size_t start = b->count;
+
+    const Bs_Str *name = (const Bs_Str *)array->data[0].as.object;
+    bs_da_push_many(bs, b, name->data, name->size);
+    for (size_t i = 1; i < array->count; i++) {
+        bs_da_push(bs, b, ' ');
+
+        const Bs_Str *it_str = (const Bs_Str *)array->data[i].as.object;
+        const Bs_Sv it = Bs_Sv(it_str->data, it_str->size);
+
+        const bool need_quoting = it.size == 0 || bs_sv_find(it, '\t', NULL) ||
+                                  bs_sv_find(it, '\v', NULL) || bs_sv_find(it, ' ', NULL);
+
+        if (need_quoting) {
+            bs_da_push(bs, b, '"');
+        }
+
+        for (size_t j = 0; j < it.size; j++) {
+            switch (it.data[j]) {
+            default:
+                break;
+
+            case '\\':
+                if (j + 1 < it.size && it.data[j + 1] == '"') {
+                    bs_da_push(bs, b, '\\');
+                }
+                break;
+
+            case '"':
+                bs_da_push(bs, b, '\\');
+                break;
+            }
+
+            bs_da_push(bs, b, it.data[j]);
+        }
+
+        if (need_quoting) {
+            bs_da_push(bs, b, '"');
+        }
+    }
+    bs_da_push(bs, b, '\0');
+
+    char *cmdline = b->data + start;
+    b->count = start;
+
+    if (!CreateProcessA(
+            NULL, cmdline, NULL, NULL, TRUE, 0, NULL, NULL, &siStartInfo, &p->piProcInfo)) {
+        return bs_value_nil;
+    }
+
+    CloseHandle(p->piProcInfo.hThread);
+#else
     int fail[2];
     if (pipe(fail) < 0) {
         bs_error(bs, "could not create failure pipe");
@@ -475,8 +603,9 @@ Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_nil;
     }
 
-    Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
     p->pid = pid;
+#endif // _WIN32
+
     return args[-1];
 }
 
@@ -485,6 +614,20 @@ Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
     bs_arg_check_whole_number(bs, args, 0);
 
     Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+#ifdef _WIN32
+    DWORD exit_code;
+    if (!GetExitCodeProcess(p->piProcInfo.hProcess, &exit_code)) {
+        return bs_value_bool(false);
+    }
+
+    if (exit_code != STILL_ACTIVE) {
+        bs_error(bs, "cannot kill already terminated process");
+    }
+
+    if (!TerminateProcess(p->piProcInfo.hProcess, 1)) {
+        return bs_value_bool(false);
+    }
+#else
     if (!p->pid) {
         bs_error(bs, "cannot kill already terminated process");
     }
@@ -494,6 +637,8 @@ Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
     }
 
     p->pid = 0;
+#endif // _WIN32
+
     return bs_value_bool(true);
 }
 
@@ -501,6 +646,28 @@ Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
     Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+
+#ifdef _WIN32
+    DWORD exit_code;
+    if (!GetExitCodeProcess(p->piProcInfo.hProcess, &exit_code)) {
+        return bs_value_nil;
+    }
+
+    if (exit_code != STILL_ACTIVE) {
+        bs_error(bs, "cannot wait for already terminated process");
+    }
+
+    if (WaitForSingleObject(p->piProcInfo.hProcess, INFINITE) == WAIT_FAILED) {
+        return bs_value_nil;
+    }
+
+    if (!GetExitCodeProcess(p->piProcInfo.hProcess, &exit_code)) {
+        return bs_value_nil;
+    }
+
+    CloseHandle(p->piProcInfo.hProcess);
+    return bs_value_num(exit_code);
+#else
     if (!p->pid) {
         bs_error(bs, "cannot wait for already terminated process");
     }
@@ -512,6 +679,7 @@ Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
 
     p->pid = 0;
     return WIFEXITED(status) ? bs_value_num(WEXITSTATUS(status)) : bs_value_nil;
+#endif // _WIN32
 }
 
 // Regex
