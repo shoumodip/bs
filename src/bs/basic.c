@@ -108,10 +108,9 @@ char *bs_read_file(const char *path, size_t *size) {
         free(result);
         bs_return_defer(NULL);
     }
-    result[offset] = '\0';
+    result[bytes] = '\0';
 
-    *size = offset;
-    printf("Offset: %ld, Bytes: %ld\n", offset, bytes);
+    *size = bytes;
 
 defer:
     fclose(f);
