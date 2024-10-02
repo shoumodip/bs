@@ -8,6 +8,7 @@ static bool ishex(char c) {
 }
 
 static void bs_lexer_advance(Bs_Lexer *l) {
+    assert(l->sv.size);
     if (*l->sv.data == '\n') {
         if (l->sv.size > 1) {
             l->loc.row += 1;
@@ -22,6 +23,7 @@ static void bs_lexer_advance(Bs_Lexer *l) {
 }
 
 static char bs_lexer_consume(Bs_Lexer *l) {
+    assert(l->sv.size);
     bs_lexer_advance(l);
     return l->sv.data[-1];
 }
