@@ -103,7 +103,7 @@ char *bs_read_file(const char *path, size_t *size) {
         bs_return_defer(NULL);
     }
 
-    fread(result, offset, 1, f);
+    const long bytes = fread(result, 1, offset, f);
     if (ferror(f)) {
         free(result);
         bs_return_defer(NULL);
@@ -111,6 +111,7 @@ char *bs_read_file(const char *path, size_t *size) {
     result[offset] = '\0';
 
     *size = offset;
+    printf("Offset: %ld, Bytes: %ld\n", offset, bytes);
 
 defer:
     fclose(f);
