@@ -3,36 +3,110 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        target: [linux, windows, macos]
+  build-linux:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up dependencies
+      - name: Install dependencies
         run: |
-          if [ "${{ matrix.target }}" == "windows" ]; then
-            sudo apt-get install -y mingw-w64
-            bash ./build/pcre.sh win32
-          else
-            bash ./build/pcre.sh
-          fi
+          sudo apt-get update
+          sudo apt-get install -y gcc
+          ./build/pcre.sh
 
       - name: Build the project
-        run: |
-          if [ "${{ matrix.target }}" == "linux" ]; then
-            bash ./build/linux.sh
-          elif [ "${{ matrix.target }}" == "macos" ]; then
-            bash ./build/macos.sh
-          elif [ "${{ matrix.target }}" == "windows" ]; then
-            bash ./build/windows.sh
-          fi
+        run: ./build/linux.sh
 
-      - name: Run tests
+      - name: Archive Linux build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-artifacts
+          path: |
+            bin/*
+            lib/*
+
+  build-windows:
+    runs-on: ubuntu-latest
+    needs: build-linux  # Ensure the Linux build is completed
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
         run: |
-          cd tests
-          python3 ./rere.py replay test.list
+          sudo apt-get update
+          sudo apt-get install -y mingw-w64
+          ./build/pcre.sh win32
+
+      - name: Cross-Compile for Windows
+        run: ./build/windows.sh
+
+      - name: Archive Windows build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-artifacts
+          path: |
+            bin/*
+            lib/*
+
+  test-linux:
+    runs-on: ubuntu-latest
+    needs: build-linux  # Ensure the Linux build is completed
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Download Linux build artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: linux-artifacts
+
+      - name: Run Tests
+        run: |
+          cd tests && ./rere.py replay tests.list
+
+  test-windows:
+    runs-on: windows-latest
+    needs: build-windows  # Ensure the Windows build is completed
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Download Windows build artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: windows-artifacts
+
+      - name: Run Tests
+        run: |
+          cd tests && python3 rere.py replay tests.list
+
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: ./build/pcre.sh
+
+      - name: Build the project
+        run: ./build/macos.sh
+
+      - name: Run Tests
+        run: |
+          cd tests && ./rere.py replay tests.list
+
+      - name: Archive macOS build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: macos-artifacts
+          path: |
+            bin/*
+            lib/*
