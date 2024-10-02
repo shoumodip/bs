@@ -8,7 +8,6 @@ static bool ishex(char c) {
 }
 
 static void bs_lexer_advance(Bs_Lexer *l) {
-    assert(l->sv.size);
     if (*l->sv.data == '\n') {
         if (l->sv.size > 1) {
             l->loc.row += 1;
@@ -23,7 +22,6 @@ static void bs_lexer_advance(Bs_Lexer *l) {
 }
 
 static char bs_lexer_consume(Bs_Lexer *l) {
-    assert(l->sv.size);
     bs_lexer_advance(l);
     return l->sv.data[-1];
 }
@@ -37,6 +35,7 @@ static bool bs_lexer_match(Bs_Lexer *l, char ch) {
 }
 
 Bs_Lexer bs_lexer_new(Bs_Sv path, Bs_Sv input, Bs_Writer *error) {
+    printf("Created lexer with %zu bytes of content\n", input.size);
     return (Bs_Lexer){
         .sv = input,
         .loc.path = path,
@@ -141,6 +140,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
     token.sv = l->sv;
     token.loc = l->loc;
     if (l->sv.size == 0) {
+        printf("END OF FILE REACHED\n");
         return token;
     }
 
