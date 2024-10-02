@@ -5,8 +5,8 @@ set -xe
 CC=x86_64-w64-mingw32-gcc
 AR=x86_64-w64-mingw32-ar
 
-CFLAGS="-I./include -O3"
-LIBS="-lm -ldl -lpcre2-8"
+CFLAGS="-I./include -I./thirdparty/pcre-win32/include -O3"
+LIBS="-L./thirdparty/pcre-win32/lib -lm -ldl -lpcre2-8"
 
 rm -rf bin lib
 mkdir -p bin lib/.build
@@ -17,5 +17,4 @@ done
 
 $CC $CFLAGS -o bin/bs.exe src/bs.c lib/.build/* $LIBS
 $CC $CFLAGS -o lib/libbs.dll -shared lib/.build/* $LIBS
-
 $AR rcs lib/libbs.lib lib/.build/*

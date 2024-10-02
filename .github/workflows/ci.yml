@@ -17,17 +17,19 @@ jobs:
         run: |
           if [ "${{ matrix.target }}" == "windows" ]; then
             sudo apt-get install -y mingw-w64
-            sudo apt-get install -y pcregrep
+            ./build/pcre.sh win32
+          else
+            ./build/pcre.sh
           fi
 
       - name: Build the project
         run: |
           if [ "${{ matrix.target }}" == "linux" ]; then
-            bash ./build/linux.sh
+            ./build/linux.sh
           elif [ "${{ matrix.target }}" == "macos" ]; then
-            bash ./build/macos.sh
+            ./build/macos.sh
           elif [ "${{ matrix.target }}" == "windows" ]; then
-            bash ./build/windows.sh
+            ./build/windows.sh
           fi
 
       - name: Run tests

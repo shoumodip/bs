@@ -2,8 +2,8 @@
 
 set -xe
 
-CFLAGS="-I./include -O3 $(pkg-config --cflags libpcre2-8)"
-LIBS="-lm -ldl -lpcre2-8"
+CFLAGS="-I./include -I./thirdparty/pcre-posix/include -O3"
+LIBS="-L./thirdparty/pcre-posix/lib -lm -ldl -lpcre2-8"
 
 rm -rf bin lib
 mkdir -p bin lib/.build

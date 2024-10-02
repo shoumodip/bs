@@ -6,7 +6,12 @@
 
 #include <fcntl.h>
 #include <signal.h>
-#include <sys/wait.h>
+
+#ifdef _WIN32
+#else
+#    include <sys/wait.h>
+#endif // _WIN32
+
 #include <unistd.h>
 
 #define PCRE2_CODE_UNIT_WIDTH 8
