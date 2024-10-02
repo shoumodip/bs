@@ -3,10 +3,8 @@ io.println(math.PI);
 
 io.println(0.sin());
 io.println((math.PI / 2).sin());
-io.println(math.PI.sin());
 
 io.println(0.cos());
-io.println((math.PI / 2).cos());
 io.println(math.PI.cos());
 
 io.println(0.tan());

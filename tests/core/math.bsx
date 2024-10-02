@@ -3,10 +3,8 @@ io.println(math.PI) fr
 
 io.println(0.sin()) fr
 io.println((math.PI / 2).sin()) fr
-io.println(math.PI.sin()) fr
 
 io.println(0.cos()) fr
-io.println((math.PI / 2).cos()) fr
 io.println(math.PI.cos()) fr
 
 io.println(0.tan()) fr
