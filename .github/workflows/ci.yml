@@ -29,3 +29,8 @@ jobs:
           elif [ "${{ matrix.target }}" == "windows" ]; then
             bash ./build/windows.sh
           fi
+
+      - name: Run tests
+        run: |
+          cd tests
+          ./rere.py replay test.list
