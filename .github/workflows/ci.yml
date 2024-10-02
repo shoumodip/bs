@@ -3,7 +3,7 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  build-linux:
+  build-test-linux:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,17 +19,12 @@ jobs:
       - name: Build the project
         run: ./build/linux.sh
 
-      - name: Archive Linux build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-artifacts
-          path: |
-            bin/*
-            lib/*
+      - name: Run Tests
+        run: |
+          cd tests && ./rere.py replay test.list
 
   build-windows:
     runs-on: ubuntu-latest
-    needs: build-linux  # Ensure the Linux build is completed
 
     steps:
       - name: Checkout code
@@ -49,29 +44,12 @@ jobs:
         with:
           name: windows-artifacts
           path: |
-            bin/*
-            lib/*
-
-  test-linux:
-    runs-on: ubuntu-latest
-    needs: build-linux  # Ensure the Linux build is completed
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download Linux build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: linux-artifacts
-
-      - name: Run Tests
-        run: |
-          cd tests && ./rere.py replay test.list
+            bin
+            lib
 
   test-windows:
     runs-on: windows-latest
-    needs: build-windows  # Ensure the Windows build is completed
+    needs: build-windows
 
     steps:
       - name: Checkout code
@@ -86,7 +64,7 @@ jobs:
         run: |
           cd tests && python3 rere.py replay test.list
 
-  build-macos:
+  build-test-macos:
     runs-on: macos-latest
 
     steps:
@@ -102,11 +80,3 @@ jobs:
       - name: Run Tests
         run: |
           cd tests && ./rere.py replay test.list
-
-      - name: Archive macOS build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-artifacts
-          path: |
-            bin/*
-            lib/*
