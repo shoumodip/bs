@@ -2003,8 +2003,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value a = bs_stack_pop(bs);
             bs_check_integer(bs, a, "operand to unary (~)");
 
-            const size_t a1 = a.as.number;
-            printf("BNOT: %ld -> %ld\n", a1, ~a1);
+            const long a1 = (long)a.as.number;
+            printf("BNOT(%g): %ld -> %ld\n", a.as.number, a1, ~a1);
             bs_stack_push(bs, bs_value_num(~a1));
         } break;
 
