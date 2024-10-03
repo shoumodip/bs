@@ -63,13 +63,15 @@ jobs:
         with:
           name: windows-artifacts
 
-      - name: Run Tests
-        shell: cmd
+      - name: Setup MinGW
         run: |
-          call "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat"
+          choco install mingw -y
+
+      - name: Run Tests
+        run: |
           cd tests
-          cl /I"..\include" /LD /Fe:ffi\addsub.dll ffi\addsub.c ..\lib\libbs.lib
-          cl /I"..\include" /LD /Fe:ffi\invalid.dll ffi\invalid.c ..\lib\libbs.lib
+          cc -I../include -o ffi/addsub.dll -fPIC -shared ffi/addsub.c ../lib/libbs.lib
+          cc -I../include -o ffi/invalid.dll -fPIC -shared ffi/invalid.c ../lib/libbs.lib
           python3 rere.py replay test.list
 
   build-test-macos:
