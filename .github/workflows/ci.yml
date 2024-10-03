@@ -64,6 +64,7 @@ jobs:
           name: windows-artifacts
 
       - name: Run Tests
+        shell: cmd
         run: |
           call "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat"
           cd tests
@@ -87,6 +88,7 @@ jobs:
       - name: Run Tests
         run: |
           cd tests
-          cc -I../include -o ffi/addsub.dylib -fPIC -shared ffi/addsub.c ../lib/libbs.dylib
-          cc -I../include -o ffi/invalid.dylib -fPIC -shared ffi/invalid.c ../lib/libbs.dylib
+          ls ../lib # TODO: Temporary
+          cc -I../include -o ffi/addsub.dylib -fPIC -shared ffi/addsub.c $PWD/../lib/libbs.dylib
+          cc -I../include -o ffi/invalid.dylib -fPIC -shared ffi/invalid.c $PWD/../lib/libbs.dylib
           ./rere.py replay test.list
