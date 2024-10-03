@@ -40,7 +40,6 @@ add_dependencies(bs PCRE2) # Ensure PCRE2 is built before this target
 
 # Include the PCRE2 headers and link against the static library
 target_include_directories(bs PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/pcre2-install/include)
-target_link_libraries(bs PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/pcre2-install/lib/libpcre2-8.a m)
 
 # Optionally, if you want to create the static library
 add_library(libbs STATIC ${BS_SRC_FILES})
@@ -51,7 +50,6 @@ set_target_properties(libbs PROPERTIES
 
 # Link the static library against the PCRE2 library
 target_include_directories(libbs PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/pcre2-install/include)
-target_link_libraries(libbs PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/pcre2-install/lib/libpcre2-8.a m)
 
 # Create a shared library
 add_library(libbs_shared SHARED ${BS_SRC_FILES})
@@ -62,4 +60,13 @@ set_target_properties(libbs_shared PROPERTIES
 
 # Link the shared library against the PCRE2 library
 target_include_directories(libbs_shared PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/pcre2-install/include)
-target_link_libraries(libbs_shared PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/pcre2-install/lib/libpcre2-8.a m)
+
+if(WIN32)
+    target_link_libraries(bs PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/pcre2-install/lib/libpcre2-8.lib math)
+    target_link_libraries(libbs PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/pcre2-install/lib/libpcre2-8.lib)
+    target_link_libraries(libbs_shared PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/pcre2-install/lib/libpcre2-8.lib)
+else()
+    target_link_libraries(bs PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/pcre2-install/lib/libpcre2-8.a m)
+    target_link_libraries(libbs PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/pcre2-install/lib/libpcre2-8.a)
+    target_link_libraries(libbs_shared PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/pcre2-install/lib/libpcre2-8.a)
+endif()
