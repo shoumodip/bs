@@ -5,7 +5,14 @@ PKG=pcre2-10.44
 mkdir -p thirdparty && cd thirdparty
 
 if [ ! -d "$PKG" ]; then
-    wget "https://github.com/PCRE2Project/pcre2/releases/download/$PKG/$PKG.tar.bz2"
+    URL="https://github.com/PCRE2Project/pcre2/releases/download/$PKG/$PKG.tar.bz2"
+
+    if [ "$1" = "win32" ]; then
+        powershell -Command "Invoke-WebRequest -Uri '$URL' -OutFile 'file.zip'"
+    else
+        wget "$URL"
+    fi
+
     tar fjx "$PKG.tar.bz2"
     rm -rf "$PKG.tar.bz2"
 fi
