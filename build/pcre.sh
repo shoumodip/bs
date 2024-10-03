@@ -19,7 +19,7 @@ if [ "$1" = "win32" ]; then
 
         # cmake -G "Visual Studio 16 2019" -A x64 -DPCRE2_STATIC=ON -DCMAKE_INSTALL_PREFIX=../pcre-win32 ..
         # cmake -A x64 -DPCRE2_STATIC=ON -DCMAKE_INSTALL_PREFIX=../../pcre-win32 ..
-        cmake -G "MinGW Makefiles" -A x64 -DPCRE2_STATIC=ON -DCMAKE_INSTALL_PREFIX=../../pcre-win32 ..
+        cmake -G "MinGW Makefiles" -DPCRE2_STATIC=ON -DCMAKE_INSTALL_PREFIX=../../pcre-win32 ..
 
         # Build and install
         cmake --build . --config Release --target install
