@@ -1,4 +1,4 @@
-:i count 218
+:i count 222
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -2823,4 +2823,78 @@ ayo noice!
 -,420
 
 :b stderr 0
+
+:b shell 21
+../bin/bs ffi/main.bs
+:i returncode 0
+:b stdout 7
+69
+420
+
+:b stderr 0
+
+:b shell 22
+../bin/bs ffi/main.bsx
+:i returncode 0
+:b stdout 7
+69
+420
+
+:b stderr 0
+
+:b shell 38
+../bin/bs ffi/error_invalid_library.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 647
+ffi/error_invalid_library.bs:1:8: error: invalid native library 'ffi/invalid'
+
+A BS native library must define 'bs_library_init'
+
+```
+void bs_library_init(Bs *bs, Bs_C_Lib *library) {
+    // Perform any initialization you wish to do
+    // lolcat_init();
+
+    // Add BS values to the library
+    // bs_c_lib_set(bs, library, Bs_Sv_Static("foo"), bs_value_object(lolcat_foo));
+
+    // Add multiple BS native functions to the library at once
+    // static const Bs_FFI ffi[] = {
+    //     {"hello", lolcat_hello},
+    //     {"urmom", lolcat_urmom},
+    //     /* ... */
+    // };
+    // bs_c_lib_ffi(bs, library, ffi, bs_c_array_size(ffi));
+}
+```
+
+:b shell 39
+../bin/bs ffi/error_invalid_library.bsx
+:i returncode 1
+:b stdout 0
+
+:b stderr 648
+ffi/error_invalid_library.bsx:1:9: error: invalid native library 'ffi/invalid'
+
+A BS native library must define 'bs_library_init'
+
+```
+void bs_library_init(Bs *bs, Bs_C_Lib *library) {
+    // Perform any initialization you wish to do
+    // lolcat_init();
+
+    // Add BS values to the library
+    // bs_c_lib_set(bs, library, Bs_Sv_Static("foo"), bs_value_object(lolcat_foo));
+
+    // Add multiple BS native functions to the library at once
+    // static const Bs_FFI ffi[] = {
+    //     {"hello", lolcat_hello},
+    //     {"urmom", lolcat_urmom},
+    //     /* ... */
+    // };
+    // bs_c_lib_ffi(bs, library, ffi, bs_c_array_size(ffi));
+}
+```
 

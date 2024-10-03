@@ -21,7 +21,10 @@ jobs:
 
       - name: Run Tests
         run: |
-          cd tests && ./rere.py replay test.list
+          cd tests
+          cc -I../include -o ffi/addsub.so -fPIC -shared ffi/addsub.c ../lib/libbs.so
+          cc -I../include -o ffi/invalid.so -fPIC -shared ffi/invalid.c ../lib/libbs.so
+          ./rere.py replay test.list
 
   build-windows:
     runs-on: ubuntu-latest
@@ -62,7 +65,11 @@ jobs:
 
       - name: Run Tests
         run: |
-          cd tests && python3 rere.py replay test.list
+          call "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat"
+          cd tests
+          cl /I"..\include" /LD /Fe:ffi\addsub.dll ffi\addsub.c ..\lib\libbs.lib
+          cl /I"..\include" /LD /Fe:ffi\invalid.dll ffi\invalid.c ..\lib\libbs.lib
+          python3 rere.py replay test.list
 
   build-test-macos:
     runs-on: macos-latest
@@ -79,4 +86,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          cd tests && ./rere.py replay test.list
+          cd tests
+          cc -I../include -o ffi/addsub.dylib -fPIC -shared ffi/addsub.c ../lib/libbs.dylib
+          cc -I../include -o ffi/invalid.dylib -fPIC -shared ffi/invalid.c ../lib/libbs.dylib
+          ./rere.py replay test.list

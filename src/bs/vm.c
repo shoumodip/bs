@@ -216,7 +216,7 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
 #ifdef _WIN32
         bs_error(bs, "TODO: not implemented on windows");
 #else
-        dlclose(library->data);
+        dlclose(library->handle);
 #endif // _WIN32
         bs_realloc(bs, library, sizeof(*library), 0);
     } break;
@@ -1367,18 +1367,33 @@ static void bs_import(Bs *bs) {
     // Native
     {
 #ifdef _WIN32
+        bs_da_push_many(bs, b, ".dll", 5);
         // TODO: implement native libraries on windows
         bs_error(bs, "could not import module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*path));
-#else
-        // TODO: macOS expects .dylib, I think?
-        bs_da_push_many(bs, b, ".so", 4);
-        void *data = dlopen(b->data + start, RTLD_LAZY);
-        if (!data) {
+#elif defined(__APPLE__)
+        bs_da_push_many(bs, b, ".dylib", 7);
+
+        Bs_C_Lib_Handle handle = dlopen(b->data + start, RTLD_LAZY);
+        if (!handle) {
             bs_error(bs, "could not import module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*path));
         }
+#else
+        bs_da_push_many(bs, b, ".so", 4);
 
-        Bs_C_Lib *library = bs_c_lib_new(bs, data);
-        void (*init)(Bs *, Bs_C_Lib *) = dlsym(data, "bs_library_init");
+        Bs_C_Lib_Handle handle = dlopen(b->data + start, RTLD_LAZY);
+        if (!handle) {
+            bs_error(bs, "could not import module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*path));
+        }
+#endif
+
+        Bs_C_Lib *library = bs_c_lib_new(bs, handle);
+
+#ifdef _WIN32
+        void (*init)(Bs *, Bs_C_Lib *);
+        bs_error(bs, "TODO: not implemented for windows");
+#else
+        void (*init)(Bs *, Bs_C_Lib *) = dlsym(handle, "bs_library_init");
+#endif
 
         if (!init) {
             bs_error(
@@ -1418,7 +1433,6 @@ static void bs_import(Bs *bs) {
         bs_modules_push(bs, &bs->modules, module);
 
         bs_stack_push(bs, module.result);
-#endif // _WIN32
     }
 
 defer:

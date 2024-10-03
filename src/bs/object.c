@@ -187,9 +187,9 @@ Bs_C_Fn *bs_c_fn_new(Bs *bs, Bs_Sv name, Bs_C_Fn_Ptr ptr) {
     return fn;
 }
 
-Bs_C_Lib *bs_c_lib_new(Bs *bs, void *data) {
+Bs_C_Lib *bs_c_lib_new(Bs *bs, Bs_C_Lib_Handle handle) {
     Bs_C_Lib *library = (Bs_C_Lib *)bs_object_new(bs, BS_OBJECT_C_LIB, sizeof(Bs_C_Lib));
-    library->data = data;
+    library->handle = handle;
     memset(&library->map, 0, sizeof(library->map));
     return library;
 }

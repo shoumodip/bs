@@ -179,13 +179,19 @@ struct Bs_C_Fn {
 
 Bs_C_Fn *bs_c_fn_new(Bs *bs, Bs_Sv name, Bs_C_Fn_Ptr ptr);
 
+#ifdef _WIN32
+typedef HMODULE Bs_C_Lib_Handle;
+#else
+typedef void *Bs_C_Lib_Handle;
+#endif // _WIN32
+
 struct Bs_C_Lib {
     Bs_Object meta;
-    void *data;
+    Bs_C_Lib_Handle handle;
     Bs_Map map;
 };
 
-Bs_C_Lib *bs_c_lib_new(Bs *bs, void *data);
+Bs_C_Lib *bs_c_lib_new(Bs *bs, Bs_C_Lib_Handle handle);
 void bs_c_lib_set(Bs *bs, Bs_C_Lib *library, Bs_Sv name, Bs_Value value);
 
 typedef struct {

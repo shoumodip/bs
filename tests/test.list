@@ -216,3 +216,7 @@
 ../bin/bs core/error_expected_function.bsx
 ../bin/bs core/regex.bs
 ../bin/bs core/regex.bsx
+../bin/bs ffi/main.bs
+../bin/bs ffi/main.bsx
+../bin/bs ffi/error_invalid_library.bs
+../bin/bs ffi/error_invalid_library.bsx
