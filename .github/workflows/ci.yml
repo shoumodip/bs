@@ -26,52 +26,57 @@ jobs:
           cc -I../include -o ffi/invalid.so -fPIC -shared ffi/invalid.c ../lib/libbs.so
           ./rere.py replay test.list
 
-  build-windows:
-    runs-on: ubuntu-latest
+  # build-windows:
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+  #     - name: Install dependencies
+  #       run: |
+  #         sudo apt-get update
+  #         sudo apt-get install -y mingw-w64
+  #         ./build/pcre.sh win32
+
+  #     - name: Cross-Compile for Windows
+  #       run: ./build/windows.sh
+
+  #     - name: Archive Windows build artifacts
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: windows-artifacts
+  #         path: |
+  #           bin
+  #           lib
+
+  build-test-windows:
+    runs-on: windows-latest
+    # needs: build-windows
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      # - name: Download Windows build artifacts
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: windows-artifacts
 
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y mingw-w64
-          ./build/pcre.sh win32
-
-      - name: Cross-Compile for Windows
-        run: ./build/windows.sh
-
-      - name: Archive Windows build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-artifacts
-          path: |
-            bin
-            lib
-
-  test-windows:
-    runs-on: windows-latest
-    needs: build-windows
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download Windows build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: windows-artifacts
-
-      - name: Setup MinGW
-        run: |
           choco install mingw -y
+          refreshenv
+          bash ./build/pcre.sh win32
+
+      - name: Build the project
+        run: bash ./build/windows.sh
 
       - name: Run Tests
         run: |
           cd tests
-          cc -I../include -o ffi/addsub.dll -fPIC -shared ffi/addsub.c ../lib/libbs.lib
-          cc -I../include -o ffi/invalid.dll -fPIC -shared ffi/invalid.c ../lib/libbs.lib
+          x86_64-w64-mingw32-gcc -I../include -o ffi/addsub.dll -fPIC -shared ffi/addsub.c ../lib/libbs.lib
+          x86_64-w64-mingw32-gcc -I../include -o ffi/invalid.dll -fPIC -shared ffi/invalid.c ../lib/libbs.lib
           python3 rere.py replay test.list
 
   build-test-macos:
