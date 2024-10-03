@@ -1375,7 +1375,8 @@ static void bs_import(Bs *bs) {
 
         Bs_C_Lib_Handle handle = dlopen(b->data + start, RTLD_LAZY);
         if (!handle) {
-            bs_error(bs, "could not import module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*path));
+            bs_error(
+                bs, "could not import module '" Bs_Sv_Fmt "': %s", Bs_Sv_Arg(*path), dlerror());
         }
 #else
         bs_da_push_many(bs, b, ".so", 4);
