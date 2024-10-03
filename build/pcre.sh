@@ -14,7 +14,13 @@ if [ "$1" = "win32" ]; then
     if [ ! -d pcre-win32 ]; then
         cd "$PKG"
         make clean
-        ./configure --host=x86_64-w64-mingw32 --prefix=$(pwd)/../pcre-win32 --enable-static --disable-shared
+
+        cmake -G "Visual Studio 16 2019" -A x64 -DPCRE2_STATIC=ON -DCMAKE_INSTALL_PREFIX=../pcre-win32 ..
+
+        # Build and install
+        cmake --build . --config Release --target install
+
+        # ./configure --host=x86_64-w64-mingw32 --prefix=$(pwd)/../pcre-win32 --enable-static --disable-shared
         make -j3
         make install
     fi
