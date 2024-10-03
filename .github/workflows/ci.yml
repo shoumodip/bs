@@ -54,6 +54,10 @@ jobs:
     runs-on: windows-latest
     # needs: build-windows
 
+    defaults:
+      run:
+        shell: bash
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -63,14 +67,14 @@ jobs:
       #   with:
       #     name: windows-artifacts
 
+      # - name: Install MinGW
+      #   run: choco install mingw -y
+
       - name: Install dependencies
-        run: |
-          choco install mingw -y
-          refreshenv
-          bash ./build/pcre.sh win32
+        run: ./build/pcre.sh win32
 
       - name: Build the project
-        run: bash ./build/windows.sh
+        run: ./build/windows.sh
 
       - name: Run Tests
         run: |
