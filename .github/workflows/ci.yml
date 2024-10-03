@@ -28,10 +28,6 @@ jobs:
   build-test-windows:
     runs-on: windows-latest
 
-    defaults:
-      run:
-        shell: bash
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -45,10 +41,12 @@ jobs:
           cmake --build . --config Release
 
       - name: Run Tests
+        shell: cmd
         run: |
+          call "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat"
           cd tests
-          # x86_64-w64-mingw32-gcc -I../include -o ffi/addsub.dll -fPIC -shared ffi/addsub.c ../lib/libbs.lib
-          # x86_64-w64-mingw32-gcc -I../include -o ffi/invalid.dll -fPIC -shared ffi/invalid.c ../lib/libbs.lib
+          cl /I"..\include" /LD /Fe:ffi\addsub.dll ffi\addsub.c ..\lib\libbs.lib
+          cl /I"..\include" /LD /Fe:ffi\invalid.dll ffi\invalid.c ..\lib\libbs.lib
           python3 rere.py replay test.list
 
   build-test-macos:
