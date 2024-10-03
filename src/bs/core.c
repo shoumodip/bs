@@ -54,7 +54,7 @@ Bs_Value bs_io_reader_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
     bs_da_push(b->bs, b, '\0');
 
-    FILE *file = fopen(bs_buffer_reset(b, start).data, "r");
+    FILE *file = fopen(bs_buffer_reset(b, start).data, "rb");
     if (!file) {
         return bs_value_nil;
     }
@@ -179,7 +179,7 @@ Bs_Value bs_io_writer_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
     bs_da_push(b->bs, b, '\0');
 
-    FILE *file = fopen(bs_buffer_reset(b, start).data, "w");
+    FILE *file = fopen(bs_buffer_reset(b, start).data, "wb");
     if (!file) {
         return bs_value_nil;
     }

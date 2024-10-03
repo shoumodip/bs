@@ -80,7 +80,7 @@ void bs_fmt(Bs_Writer *w, const char *fmt, ...) {
 char *bs_read_file(const char *path, size_t *size) {
     char *result = NULL;
 
-    FILE *f = fopen(path, "r");
+    FILE *f = fopen(path, "rb");
     if (!f) {
         return NULL;
     }
@@ -103,14 +103,14 @@ char *bs_read_file(const char *path, size_t *size) {
         bs_return_defer(NULL);
     }
 
-    const long bytes = fread(result, 1, offset, f);
+    fread(result, 1, offset, f);
     if (ferror(f)) {
         free(result);
         bs_return_defer(NULL);
     }
-    result[bytes] = '\0';
+    result[offset] = '\0';
 
-    *size = bytes;
+    *size = offset;
 
 defer:
     fclose(f);
