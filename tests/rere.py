@@ -159,8 +159,10 @@ if __name__ == '__main__':
                 for line in unified_diff(a, b, fromfile="expected", tofile="actual"):
                     print(line, end='')
                 failed = True
-            if failed:
-                exit(1)
+            # if failed:
+            #     exit(1)
+        if failed:
+            exit(1)
         print('OK')
     else:
         print(f'ERROR: unknown subcommand {subcommand}');
