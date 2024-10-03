@@ -24,8 +24,8 @@ if [ "$1" = "win32" ]; then
         cmake --build . --config Release --target install
 
         # ./configure --host=x86_64-w64-mingw32 --prefix=$(pwd)/../pcre-win32 --enable-static --disable-shared
-        make -j3
-        make install
+        # make -j3
+        # make install
     fi
 else
     if [ ! -d pcre-posix ]; then
