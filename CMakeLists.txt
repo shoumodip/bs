@@ -17,7 +17,7 @@ ExternalProject_Add(
     SOURCE_DIR ${PCRE2_SOURCE_DIR}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/pcre2-install -DCMAKE_BUILD_TYPE=Release
     BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release
-    INSTALL_COMMAND ${CMAKE_COMMAND} --build . --target install
+    INSTALL_COMMAND ${CMAKE_COMMAND} --build . --config Release --target install
 )
 
 # Include directories for your project
