@@ -88,7 +88,6 @@ jobs:
       - name: Run Tests
         run: |
           cd tests
-          ls ../lib # TODO: Temporary
-          cc -I../include -o ffi/addsub.dylib -fPIC -shared ffi/addsub.c $PWD/../lib/libbs.dylib
-          cc -I../include -o ffi/invalid.dylib -fPIC -shared ffi/invalid.c $PWD/../lib/libbs.dylib
+          cc -I../include -o ffi/addsub.dylib -fPIC -shared ffi/addsub.c ../lib/libbs.dylib -Wl,-rpath,@loader_path/../lib
+          cc -I../include -o ffi/invalid.dylib -fPIC -shared ffi/invalid.c ../lib/libbs.dylib -Wl,-rpath,@loader_path/../lib
           ./rere.py replay test.list
