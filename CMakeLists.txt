@@ -62,7 +62,7 @@ set_target_properties(libbs_shared PROPERTIES
 target_include_directories(libbs_shared PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/pcre2-install/include)
 
 if(WIN32)
-    target_link_libraries(bs PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/pcre2-install/lib/pcre2-8-static.lib math)
+    target_link_libraries(bs PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/pcre2-install/lib/pcre2-8-static.lib)
     target_link_libraries(libbs PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/pcre2-install/lib/pcre2-8-static.lib)
     target_link_libraries(libbs_shared PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/pcre2-install/lib/pcre2-8-static.lib)
 else()
