@@ -1,6 +1,6 @@
 /bin
 /lib
-/thirdparty
+/build
 *.so
 *.dylib
 *.dll
