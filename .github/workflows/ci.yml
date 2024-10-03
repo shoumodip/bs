@@ -87,7 +87,8 @@ jobs:
 
       - name: Run Tests
         run: |
+          export DYLD_LIBRARY_PATH=$PWD/lib:$DYLD_LIBRARY_PATH
           cd tests
-          cc -I../include -o ffi/addsub.dylib -fPIC -shared ffi/addsub.c ../lib/libbs.dylib -Wl,-rpath,@loader_path/../lib
-          cc -I../include -o ffi/invalid.dylib -fPIC -shared ffi/invalid.c ../lib/libbs.dylib -Wl,-rpath,@loader_path/../lib
+          cc -I../include -o ffi/addsub.dylib -fPIC -shared ffi/addsub.c ../lib/libbs.dylib
+          cc -I../include -o ffi/invalid.dylib -fPIC -shared ffi/invalid.c ../lib/libbs.dylib
           ./rere.py replay test.list

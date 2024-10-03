@@ -1368,6 +1368,8 @@ static void bs_import(Bs *bs) {
     {
 #ifdef _WIN32
         bs_da_push_many(bs, b, ".dll", 5);
+
+        Bs_C_Lib_Handle handle;
         // TODO: implement native libraries on windows
         bs_error(bs, "could not import module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*path));
 #elif defined(__APPLE__)
