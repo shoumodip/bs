@@ -1,13 +1,13 @@
 #include <errno.h>
 #include <math.h>
 #include <setjmp.h>
-#include <unistd.h>
 
 #ifdef _WIN32
 #    define WIN32_LEAN_AND_MEAN
 #    include <windows.h>
 #else
 #    include <dlfcn.h>
+#    include <unistd.h>
 #endif // _WIN32
 
 #include "bs/compiler.h"

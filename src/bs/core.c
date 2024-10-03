@@ -2034,8 +2034,8 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("lerp"), bs_math_lerp);
 
         Bs_Table *math = bs_table_new(bs);
-        bs_add(bs, math, "E", bs_value_num(M_E));
-        bs_add(bs, math, "PI", bs_value_num(M_PI));
+        bs_add(bs, math, "E", bs_value_num(2.7182818284590452354));
+        bs_add(bs, math, "PI", bs_value_num(3.14159265358979323846));
         bs_add_fn(bs, math, "random", bs_math_random);
         bs_global_set(bs, Bs_Sv_Static("math"), bs_value_object(math));
     }
