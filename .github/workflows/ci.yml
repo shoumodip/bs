@@ -46,11 +46,12 @@ jobs:
           dir
           dir bin
           dir lib
-          # call "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat"
-          # cd tests
-          # cl /I"..\include" /LD /Fe:ffi\addsub.dll ffi\addsub.c ..\lib\libbs.lib
-          # cl /I"..\include" /LD /Fe:ffi\invalid.dll ffi\invalid.c ..\lib\libbs.lib
-          # python3 rere.py replay test.list
+
+          call "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat"
+          cd tests
+          cl /I"..\include" /LD /Fe:ffi\addsub.dll ffi\addsub.c ..\lib\libbs.lib
+          cl /I"..\include" /LD /Fe:ffi\invalid.dll ffi\invalid.c ..\lib\libbs.lib
+          python3 rere.py replay test.list
 
   build-test-macos:
     runs-on: macos-latest
