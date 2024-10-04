@@ -1,8 +1,15 @@
 #include <stdio.h>
 
 #include "bs/core.h"
+#include "bs/map.h" // TODO: temporary
 
 int main(int argc, char **argv) {
+    // TODO: temporary
+    {
+        Bs_Value v = bs_value_num(69);
+        printf("%u\n", bs_hash_bytes(&v, sizeof(v)));
+    }
+
     if (argc < 2) {
         fprintf(stderr, "error: file path not provided\n");
         fprintf(stderr, "usage: %s <file>\n", *argv);
