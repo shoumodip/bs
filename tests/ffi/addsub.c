@@ -14,7 +14,7 @@ Bs_Value bs_sub(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_num(args[0].as.number - args[1].as.number);
 }
 
-void bs_library_init(Bs *bs, Bs_C_Lib *library) {
+BS_LIBRARY_INIT void bs_library_init(Bs *bs, Bs_C_Lib *library) {
     static const Bs_FFI ffi[] = {
         {"add", bs_add},
         {"sub", bs_sub},

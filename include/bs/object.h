@@ -183,8 +183,12 @@ Bs_C_Fn *bs_c_fn_new(Bs *bs, Bs_Sv name, Bs_C_Fn_Ptr ptr);
 #    define WIN32_LEAN_AND_MEAN
 #    include <windows.h>
 
+#    define BS_LIBRARY_INIT __declspec(dllexport)
+
 typedef HMODULE Bs_C_Lib_Handle;
 #else
+#    define BS_LIBRARY_INIT
+
 typedef void *Bs_C_Lib_Handle;
 #endif // _WIN32
 

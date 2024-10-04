@@ -1403,7 +1403,7 @@ static void bs_import(Bs *bs) {
                 "invalid native library '" Bs_Sv_Fmt "'\n\n"
                 "A BS native library must define 'bs_library_init'\n\n"
                 "```\n"
-                "void bs_library_init(Bs *bs, Bs_C_Lib *library) {\n"
+                "BS_LIBRARY_INIT void bs_library_init(Bs *bs, Bs_C_Lib *library) {\n"
                 "    // Perform any initialization you wish to do\n"
                 "    // lolcat_init();\n"
                 "\n"

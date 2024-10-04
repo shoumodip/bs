@@ -2847,13 +2847,13 @@ ayo noice!
 :i returncode 1
 :b stdout 0
 
-:b stderr 647
+:b stderr 663
 ffi/error_invalid_library.bs:1:8: error: invalid native library 'ffi/invalid'
 
 A BS native library must define 'bs_library_init'
 
 ```
-void bs_library_init(Bs *bs, Bs_C_Lib *library) {
+BS_LIBRARY_INIT void bs_library_init(Bs *bs, Bs_C_Lib *library) {
     // Perform any initialization you wish to do
     // lolcat_init();
 
@@ -2875,13 +2875,13 @@ void bs_library_init(Bs *bs, Bs_C_Lib *library) {
 :i returncode 1
 :b stdout 0
 
-:b stderr 648
+:b stderr 664
 ffi/error_invalid_library.bsx:1:9: error: invalid native library 'ffi/invalid'
 
 A BS native library must define 'bs_library_init'
 
 ```
-void bs_library_init(Bs *bs, Bs_C_Lib *library) {
+BS_LIBRARY_INIT void bs_library_init(Bs *bs, Bs_C_Lib *library) {
     // Perform any initialization you wish to do
     // lolcat_init();
 
