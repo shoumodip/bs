@@ -568,23 +568,39 @@ void bs_global_set(Bs *bs, Bs_Sv name, Bs_Value value) {
 }
 
 bool bs_update_cwd(Bs *bs) {
+    bool result = true;
+
     Bs_Buffer *b = &bs->paths;
     const size_t start = b->count;
 
+#ifdef _WIN32
+    const DWORD size = GetCurrentDirectory(0, NULL);
+    if (!size) {
+        bs_return_defer(false);
+    }
+
+    bs_da_push_many(bs, b, NULL, size);
+    if (!GetCurrentDirectory(size, b->data + start)) {
+        bs_return_defer(false);
+    }
+#else
     bs_da_push_many(bs, b, NULL, BS_DA_INIT_CAP);
+
     while (!getcwd(b->data + start, b->capacity - start)) {
         if (errno != ERANGE) {
-            b->count = start;
-            return false;
+            bs_return_defer(false);
         }
 
         b->count = b->capacity;
         bs_da_push_many(bs, b, NULL, BS_DA_INIT_CAP);
     }
+#endif
+
     bs->cwd = bs_str_new(bs, bs_sv_from_cstr(b->data + start));
 
+defer:
     b->count = start;
-    return true;
+    return result;
 }
 
 static Bs_Pretty_Printer *bs_pretty_printer(Bs *bs, Bs_Writer *w) {
