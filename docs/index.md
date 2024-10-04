@@ -41,9 +41,19 @@ $ bs factorial.bs # or .bsx
 5! = 120
 ```
 
+## Download
+
+```console
+$ git clone https://github.com/shoumodip/bs
+$ cd bs
+$ ./build/linux.sh # If on Linux
+$ ./build/macos.sh # If on macOS
+$ build\windows.bat # If on Windows
+```
+
 <div class="only-mobile">
 
-## Getting Started
+## Further Links
 
 <center>
 
