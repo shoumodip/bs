@@ -214,7 +214,7 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
         bs_map_free(bs, &library->map);
 
 #ifdef _WIN32
-        bs_error(bs, "TODO: not implemented on windows");
+        FreeLibrary(library->handle);
 #else
         dlclose(library->handle);
 #endif // _WIN32
@@ -1369,9 +1369,10 @@ static void bs_import(Bs *bs) {
 #ifdef _WIN32
         bs_da_push_many(bs, b, ".dll", 5);
 
-        Bs_C_Lib_Handle handle;
-        // TODO: implement native libraries on windows
-        bs_error(bs, "could not import module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*path));
+        Bs_C_Lib_Handle handle = LoadLibrary(b->data + start);
+        if (!handle) {
+            bs_error(bs, "could not import module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*path));
+        }
 #elif defined(__APPLE__)
         bs_da_push_many(bs, b, ".dylib", 7);
 
@@ -1391,8 +1392,7 @@ static void bs_import(Bs *bs) {
         Bs_C_Lib *library = bs_c_lib_new(bs, handle);
 
 #ifdef _WIN32
-        void (*init)(Bs *, Bs_C_Lib *);
-        bs_error(bs, "TODO: not implemented for windows");
+        void (*init)(Bs *, Bs_C_Lib *) = GetProcAddress(handle, "bs_library_init");
 #else
         void (*init)(Bs *, Bs_C_Lib *) = dlsym(handle, "bs_library_init");
 #endif
