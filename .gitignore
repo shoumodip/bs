@@ -1,5 +1,4 @@
 /bin
 /lib
-*.so
-*.dylib
-*.dll
+/tests/executables/*
+!/tests/executables/*.c

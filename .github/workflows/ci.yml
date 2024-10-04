@@ -16,8 +16,10 @@ jobs:
       - name: Run Tests
         run: |
           cd tests
-          cc -I../include -o ffi/addsub.so -fPIC -shared ffi/addsub.c ../lib/libbs.so
-          cc -I../include -o ffi/invalid.so -fPIC -shared ffi/invalid.c ../lib/libbs.so
+          cc -o executables/echo_args executables/echo_args.c
+          cc -o executables/echo_stdin executables/echo_stdin.c
+          cc -I../include -o executables/addsub.so -fPIC -shared executables/addsub.c ../lib/libbs.so
+          cc -I../include -o executables/invalid.so -fPIC -shared executables/invalid.c ../lib/libbs.so
           ./rere.py replay test.list
 
   build-test-windows:
@@ -40,8 +42,10 @@ jobs:
         run: |
           call "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat"
           cd tests
-          cl /I"..\include" /LD /Foffi\ /Fe:ffi\addsub.dll ffi\addsub.c ..\lib\libbs.lib
-          cl /I"..\include" /LD /Foffi\ /Fe:ffi\invalid.dll ffi\invalid.c ..\lib\libbs.lib
+          cl /Fe:executables\echo_args.exe executables\echo_args.c
+          cl /Fe:executables\echo_stdin.exe executables\echo_stdin.c
+          cl /I..\include /LD /Foexecutables\ /Fe:executables\addsub.dll executables\addsub.c ..\lib\libbs.lib
+          cl /I..\include /LD /Foexecutables\ /Fe:executables\invalid.dll executables\invalid.c ..\lib\libbs.lib
           python3 rere.py replay test.list
 
   build-test-macos:
@@ -58,6 +62,8 @@ jobs:
         run: |
           export DYLD_LIBRARY_PATH=$PWD/lib:$DYLD_LIBRARY_PATH
           cd tests
-          cc -I../include -o ffi/addsub.dylib -fPIC -shared ffi/addsub.c ../lib/libbs.dylib
-          cc -I../include -o ffi/invalid.dylib -fPIC -shared ffi/invalid.c ../lib/libbs.dylib
+          cc -o executables/echo_args executables/echo_args.c
+          cc -o executables/echo_stdin executables/echo_stdin.c
+          cc -I../include -o executables/addsub.dylib -fPIC -shared executables/addsub.c ../lib/libbs.dylib
+          cc -I../include -o executables/invalid.dylib -fPIC -shared executables/invalid.c ../lib/libbs.dylib
           ./rere.py replay test.list

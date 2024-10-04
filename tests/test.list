@@ -220,3 +220,11 @@
 ../bin/bs ffi/main.bsx
 ../bin/bs ffi/error_invalid_library.bs
 ../bin/bs ffi/error_invalid_library.bsx
+../bin/bs core/os_process_with_args.bs
+../bin/bs core/os_process_with_args.bsx
+../bin/bs core/os_process_capture_stdout.bs
+../bin/bs core/os_process_capture_stdout.bsx
+../bin/bs core/os_process_capture_stderr.bs
+../bin/bs core/os_process_capture_stderr.bsx
+../bin/bs core/os_process_capture_stdin.bs
+../bin/bs core/os_process_capture_stdin.bsx

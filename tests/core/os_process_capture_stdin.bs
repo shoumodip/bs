@@ -1,0 +1,7 @@
+var p = os.Process(["executables/echo_stdin"], false, false, true);
+var f = p.stdin();
+f.writeln("foo");
+f.writeln("bar");
+f.writeln("baz");
+f.close();
+p.wait();

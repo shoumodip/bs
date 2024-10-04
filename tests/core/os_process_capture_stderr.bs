@@ -1,0 +1,3 @@
+var p = os.Process(["executables/echo_args", "foo", "bar"], false, true);
+io.print(p.stderr().read(256));
+p.wait();

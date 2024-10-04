@@ -1,4 +1,4 @@
-:i count 222
+:i count 230
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -2847,8 +2847,8 @@ ayo noice!
 :i returncode 1
 :b stdout 0
 
-:b stderr 663
-ffi/error_invalid_library.bs:1:8: error: invalid native library 'ffi/invalid'
+:b stderr 671
+ffi/error_invalid_library.bs:1:8: error: invalid native library 'executables/invalid'
 
 A BS native library must define 'bs_library_init'
 
@@ -2875,8 +2875,8 @@ BS_LIBRARY_INIT void bs_library_init(Bs *bs, Bs_C_Lib *library) {
 :i returncode 1
 :b stdout 0
 
-:b stderr 664
-ffi/error_invalid_library.bsx:1:9: error: invalid native library 'ffi/invalid'
+:b stderr 672
+ffi/error_invalid_library.bsx:1:9: error: invalid native library 'executables/invalid'
 
 A BS native library must define 'bs_library_init'
 
@@ -2897,4 +2897,90 @@ BS_LIBRARY_INIT void bs_library_init(Bs *bs, Bs_C_Lib *library) {
     // bs_c_lib_ffi(bs, library, ffi, bs_c_array_size(ffi));
 }
 ```
+
+:b shell 38
+../bin/bs core/os_process_with_args.bs
+:i returncode 0
+:b stdout 12
+foo
+bar
+baz
+
+:b stderr 23
+Number of arguments: 4
+
+:b shell 39
+../bin/bs core/os_process_with_args.bsx
+:i returncode 0
+:b stdout 12
+foo
+bar
+baz
+
+:b stderr 23
+Number of arguments: 4
+
+:b shell 43
+../bin/bs core/os_process_capture_stdout.bs
+:i returncode 0
+:b stdout 0
+
+:b stderr 31
+Number of arguments: 3
+foo
+bar
+
+:b shell 44
+../bin/bs core/os_process_capture_stdout.bsx
+:i returncode 0
+:b stdout 0
+
+:b stderr 31
+Number of arguments: 3
+foo
+bar
+
+:b shell 43
+../bin/bs core/os_process_capture_stderr.bs
+:i returncode 0
+:b stdout 31
+foo
+bar
+Number of arguments: 3
+
+:b stderr 0
+
+:b shell 44
+../bin/bs core/os_process_capture_stderr.bsx
+:i returncode 0
+:b stdout 31
+foo
+bar
+Number of arguments: 3
+
+:b stderr 0
+
+:b shell 42
+../bin/bs core/os_process_capture_stdin.bs
+:i returncode 0
+:b stdout 36
+Echo stdin!
+> foo
+> bar
+> baz
+Done!
+
+:b stderr 0
+
+:b shell 43
+../bin/bs core/os_process_capture_stdin.bsx
+:i returncode 0
+:b stdout 36
+Echo stdin!
+> foo
+> bar
+> baz
+Done!
+
+:b stderr 0
 

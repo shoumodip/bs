@@ -1,17 +1,22 @@
 #include <ctype.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
 
 #ifdef _WIN32
 #    define WIN32_LEAN_AND_MEAN
+#    include <io.h>
 #    include <windows.h>
+
+#    define FD_OPEN _fdopen
 #else
-#    include <fcntl.h>
 #    include <signal.h>
 #    include <sys/wait.h>
 #    include <unistd.h>
+
+#    define FD_OPEN fdopen
 #endif // _WIN32
 
 #include "bs/core.h"
@@ -40,6 +45,8 @@ Bs_Value bs_io_file_close(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Reader
+Bs_C_Class *bs_io_reader_class;
+
 Bs_Value bs_io_reader_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
@@ -99,17 +106,16 @@ Bs_Value bs_io_reader_read(Bs *bs, Bs_Value *args, size_t arity) {
         count = offset;
     }
 
-    char *data = malloc(count);
-    assert(data);
+    Bs_Buffer *b = &bs_config(bs)->buffer;
+    bs_da_push_many(bs, b, NULL, count);
 
-    count = fread(data, sizeof(char), count, f);
+    count = fread(b->data + b->count, sizeof(char), count, f);
 
     Bs_Value result = bs_value_nil;
     if (!ferror(f)) {
-        result = bs_value_object(bs_str_new(bs, (Bs_Sv){data, count}));
+        result = bs_value_object(bs_str_new(bs, (Bs_Sv){b->data + b->count, count}));
     }
 
-    free(data);
     return result;
 }
 
@@ -165,6 +171,8 @@ Bs_Value bs_io_reader_tell(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Writer
+Bs_C_Class *bs_io_writer_class;
+
 Bs_Value bs_io_writer_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
@@ -459,11 +467,36 @@ typedef struct {
 #else
     pid_t pid;
 #endif // _WIN32
+
+    int stdout_read;
+    int stderr_read;
+    int stdin_write;
 } Bs_Process;
 
 Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 1);
+    if (arity < 0 || arity > 4) {
+        bs_error(bs, "error: expected 1 to 4 arguments, got %zu", arity);
+    }
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
+
+    bool capture_stdout = false;
+    bool capture_stderr = false;
+    bool capture_stdin = false;
+
+    if (arity >= 2) {
+        bs_arg_check_value_type(bs, args, 1, BS_VALUE_BOOL);
+        capture_stdout = args[1].as.boolean;
+    }
+
+    if (arity >= 3) {
+        bs_arg_check_value_type(bs, args, 2, BS_VALUE_BOOL);
+        capture_stderr = args[2].as.boolean;
+    }
+
+    if (arity == 4) {
+        bs_arg_check_value_type(bs, args, 3, BS_VALUE_BOOL);
+        capture_stdin = args[3].as.boolean;
+    }
 
     const Bs_Array *array = (const Bs_Array *)args[0].as.object;
     if (!array->count) {
@@ -484,10 +517,44 @@ Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
     ZeroMemory(&siStartInfo, sizeof(siStartInfo));
     siStartInfo.cb = sizeof(STARTUPINFO);
 
-    // TODO: check for errors in GetStdHandle
-    siStartInfo.hStdError = GetStdHandle(STD_ERROR_HANDLE);
-    siStartInfo.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-    siStartInfo.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+    SECURITY_ATTRIBUTES saAttr;
+    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+    saAttr.bInheritHandle = TRUE;
+    saAttr.lpSecurityDescriptor = NULL;
+
+    HANDLE stdout_pipe_read = NULL, stdout_pipe_write = NULL;
+    if (capture_stdout) {
+        if (!CreatePipe(&stdout_pipe_read, &stdout_pipe_write, &saAttr, 0)) {
+            bs_error(bs, "could not capture stdout");
+        }
+        SetHandleInformation(stdout_pipe_read, HANDLE_FLAG_INHERIT, 0);
+    } else {
+        stdout_pipe_write = GetStdHandle(STD_OUTPUT_HANDLE);
+    }
+
+    HANDLE stderr_pipe_read = NULL, stderr_pipe_write = NULL;
+    if (capture_stderr) {
+        if (!CreatePipe(&stderr_pipe_read, &stderr_pipe_write, &saAttr, 0)) {
+            bs_error(bs, "could not capture stderr");
+        }
+        SetHandleInformation(stderr_pipe_read, HANDLE_FLAG_INHERIT, 0);
+    } else {
+        stderr_pipe_write = GetStdHandle(STD_ERROR_HANDLE);
+    }
+
+    HANDLE stdin_pipe_read = NULL, stdin_pipe_write = NULL;
+    if (capture_stdin) {
+        if (!CreatePipe(&stdin_pipe_read, &stdin_pipe_write, &saAttr, 0)) {
+            bs_error(bs, "could not capture stdin");
+        }
+        SetHandleInformation(stdin_pipe_write, HANDLE_FLAG_INHERIT, 0);
+    } else {
+        stdin_pipe_read = GetStdHandle(STD_INPUT_HANDLE);
+    }
+
+    siStartInfo.hStdOutput = stdout_pipe_write;
+    siStartInfo.hStdError = stderr_pipe_write;
+    siStartInfo.hStdInput = stdin_pipe_read;
     siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
 
     ZeroMemory(&p->piProcInfo, sizeof(PROCESS_INFORMATION));
@@ -495,13 +562,21 @@ Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
     Bs_Buffer *b = &bs_config(bs)->buffer;
     const size_t start = b->count;
 
-    const Bs_Str *name = (const Bs_Str *)array->data[0].as.object;
-    bs_da_push_many(bs, b, name->data, name->size);
-    for (size_t i = 1; i < array->count; i++) {
-        bs_da_push(bs, b, ' ');
+    for (size_t i = 0; i < array->count; i++) {
+        if (i) {
+            bs_da_push(bs, b, ' ');
+        }
 
         const Bs_Str *it_str = (const Bs_Str *)array->data[i].as.object;
-        const Bs_Sv it = Bs_Sv(it_str->data, it_str->size);
+        Bs_Sv it = Bs_Sv(it_str->data, it_str->size);
+
+        if (!i) {
+            // This is a very ugly hack needed because WinAPI is shit
+            // But what else can you expect from a video game OS?
+            if (bs_sv_prefix(it, Bs_Sv_Static("./"))) {
+                bs_sv_drop(&it, 2);
+            }
+        }
 
         const bool need_quoting = it.size == 0 || bs_sv_find(it, '\t', NULL) ||
                                   bs_sv_find(it, '\v', NULL) || bs_sv_find(it, ' ', NULL);
@@ -544,20 +619,62 @@ Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
     }
 
     CloseHandle(p->piProcInfo.hThread);
+
+    if (capture_stdout) {
+        p->stdout_read = _open_osfhandle((intptr_t)stdout_pipe_read, _O_RDONLY);
+        CloseHandle(stdout_pipe_write);
+    }
+
+    if (capture_stderr) {
+        p->stderr_read = _open_osfhandle((intptr_t)stderr_pipe_read, _O_RDONLY);
+        CloseHandle(stderr_pipe_write);
+    }
+
+    if (capture_stdin) {
+        p->stdin_write = _open_osfhandle((intptr_t)stdin_pipe_write, _O_WRONLY);
+        CloseHandle(stdin_pipe_read);
+    }
 #else
     int fail[2];
-    if (pipe(fail) < 0) {
+    if (pipe(fail) < 0 || fcntl(fail[1], F_SETFD, FD_CLOEXEC) < 0) {
         bs_error(bs, "could not create failure pipe");
     }
 
-    if (fcntl(fail[1], F_SETFD, FD_CLOEXEC) < 0) {
-        bs_error(bs, "could not create failure pipe");
+    int stdout_pipe[2];
+    if (capture_stdout && pipe(stdout_pipe) < 0) {
+        bs_error(bs, "could not capture stdout");
+    }
+
+    int stderr_pipe[2];
+    if (capture_stderr && pipe(stderr_pipe) < 0) {
+        bs_error(bs, "could not capture stderr");
+    }
+
+    int stdin_pipe[2];
+    if (capture_stdin && pipe(stdin_pipe) < 0) {
+        bs_error(bs, "could not capture stdin");
     }
 
     const pid_t pid = fork();
     if (pid < 0) {
         close(fail[0]);
         close(fail[1]);
+
+        if (capture_stdout) {
+            close(stdout_pipe[0]);
+            close(stdout_pipe[1]);
+        }
+
+        if (capture_stderr) {
+            close(stderr_pipe[0]);
+            close(stderr_pipe[1]);
+        }
+
+        if (capture_stdin) {
+            close(stdin_pipe[0]);
+            close(stdin_pipe[1]);
+        }
+
         bs_error(bs, "could not fork process");
     }
 
@@ -583,6 +700,25 @@ Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
         }
         cargv[array->count] = NULL;
 
+        // TODO: error handling
+        if (capture_stdout) {
+            close(stdout_pipe[0]);
+            dup2(stdout_pipe[1], STDOUT_FILENO);
+            close(stdout_pipe[1]);
+        }
+
+        if (capture_stderr) {
+            close(stderr_pipe[0]);
+            dup2(stderr_pipe[1], STDERR_FILENO);
+            close(stderr_pipe[1]);
+        }
+
+        if (capture_stdin) {
+            close(stdin_pipe[1]);
+            dup2(stdin_pipe[0], STDIN_FILENO);
+            close(stdin_pipe[0]);
+        }
+
         close(fail[0]);
         execvp(*cargv, (char *const *)cargv);
         write(fail[1], "F", 1);
@@ -601,6 +737,21 @@ Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
     }
 
     p->pid = pid;
+
+    if (capture_stdout) {
+        close(stdout_pipe[1]);
+        p->stdout_read = stdout_pipe[0];
+    }
+
+    if (capture_stderr) {
+        close(stderr_pipe[1]);
+        p->stderr_read = stderr_pipe[0];
+    }
+
+    if (capture_stdin) {
+        close(stdin_pipe[0]);
+        p->stdin_write = stdin_pipe[1];
+    }
 #endif // _WIN32
 
     return args[-1];
@@ -612,30 +763,20 @@ Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
 
     Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
 #ifdef _WIN32
-    DWORD exit_code;
-    if (!GetExitCodeProcess(p->piProcInfo.hProcess, &exit_code)) {
-        return bs_value_bool(false);
-    }
-
-    if (exit_code != STILL_ACTIVE) {
-        bs_error(bs, "cannot kill already terminated process");
-    }
-
     if (!TerminateProcess(p->piProcInfo.hProcess, 1)) {
         return bs_value_bool(false);
     }
 #else
-    if (!p->pid) {
-        bs_error(bs, "cannot kill already terminated process");
-    }
-
-    if (kill(p->pid, args[0].as.number) < 0) {
+    if (!p->pid || kill(p->pid, args[0].as.number) < 0) {
         return bs_value_bool(false);
     }
 
     p->pid = 0;
 #endif // _WIN32
 
+    p->stdout_read = 0;
+    p->stderr_read = 0;
+    p->stdin_write = 0;
     return bs_value_bool(true);
 }
 
@@ -645,28 +786,20 @@ Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
     Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
 
 #ifdef _WIN32
+    if (WaitForSingleObject(p->piProcInfo.hProcess, INFINITE) == WAIT_FAILED) {
+        return bs_value_nil;
+    }
+
     DWORD exit_code;
     if (!GetExitCodeProcess(p->piProcInfo.hProcess, &exit_code)) {
         return bs_value_nil;
     }
 
-    if (exit_code != STILL_ACTIVE) {
-        bs_error(bs, "cannot wait for already terminated process");
-    }
-
-    if (WaitForSingleObject(p->piProcInfo.hProcess, INFINITE) == WAIT_FAILED) {
-        return bs_value_nil;
-    }
-
-    if (!GetExitCodeProcess(p->piProcInfo.hProcess, &exit_code)) {
-        return bs_value_nil;
-    }
-
     CloseHandle(p->piProcInfo.hProcess);
-    return bs_value_num(exit_code);
+    const Bs_Value return_value = bs_value_num(exit_code);
 #else
     if (!p->pid) {
-        bs_error(bs, "cannot wait for already terminated process");
+        return bs_value_nil;
     }
 
     int status;
@@ -675,8 +808,54 @@ Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
     }
 
     p->pid = 0;
-    return WIFEXITED(status) ? bs_value_num(WEXITSTATUS(status)) : bs_value_nil;
+
+    const Bs_Value return_value =
+        WIFEXITED(status) ? bs_value_num(WEXITSTATUS(status)) : bs_value_nil;
 #endif // _WIN32
+
+    p->stdout_read = 0;
+    p->stderr_read = 0;
+    p->stdin_write = 0;
+    return return_value;
+}
+
+Bs_Value bs_process_stdout(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+
+    Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+    if (!p->stdout_read) {
+        return bs_value_nil;
+    }
+
+    Bs_C_Instance *instance = bs_c_instance_new(bs, bs_io_reader_class);
+    bs_static_cast(instance->data, FILE *) = FD_OPEN(p->stdout_read, "rb");
+    return bs_value_object(instance);
+}
+
+Bs_Value bs_process_stderr(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+
+    Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+    if (!p->stderr_read) {
+        return bs_value_nil;
+    }
+
+    Bs_C_Instance *instance = bs_c_instance_new(bs, bs_io_reader_class);
+    bs_static_cast(instance->data, FILE *) = FD_OPEN(p->stderr_read, "rb");
+    return bs_value_object(instance);
+}
+
+Bs_Value bs_process_stdin(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+
+    Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+    if (!p->stdin_write) {
+        return bs_value_nil;
+    }
+
+    Bs_C_Instance *instance = bs_c_instance_new(bs, bs_io_writer_class);
+    bs_static_cast(instance->data, FILE *) = FD_OPEN(p->stdin_write, "wb");
+    return bs_value_object(instance);
 }
 
 // Regex
@@ -1828,29 +2007,29 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     srand(time(NULL));
 
     {
-        Bs_C_Class *io_reader_class = bs_c_class_new(
+        bs_io_reader_class = bs_c_class_new(
             bs, Bs_Sv_Static("Reader"), sizeof(FILE *), bs_io_reader_init, bs_io_file_free);
 
-        io_reader_class->can_fail = true;
-        bs_c_class_add(bs, io_reader_class, Bs_Sv_Static("close"), bs_io_file_close);
-        bs_c_class_add(bs, io_reader_class, Bs_Sv_Static("read"), bs_io_reader_read);
-        bs_c_class_add(bs, io_reader_class, Bs_Sv_Static("readln"), bs_io_reader_readln);
+        bs_io_reader_class->can_fail = true;
+        bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("close"), bs_io_file_close);
+        bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("read"), bs_io_reader_read);
+        bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("readln"), bs_io_reader_readln);
 
-        bs_c_class_add(bs, io_reader_class, Bs_Sv_Static("seek"), bs_io_reader_seek);
-        bs_c_class_add(bs, io_reader_class, Bs_Sv_Static("tell"), bs_io_reader_tell);
+        bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("seek"), bs_io_reader_seek);
+        bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("tell"), bs_io_reader_tell);
 
-        Bs_C_Class *io_writer_class = bs_c_class_new(
+        bs_io_writer_class = bs_c_class_new(
             bs, Bs_Sv_Static("Writer"), sizeof(FILE *), bs_io_writer_init, bs_io_file_free);
 
-        io_writer_class->can_fail = true;
-        bs_c_class_add(bs, io_writer_class, Bs_Sv_Static("close"), bs_io_file_close);
-        bs_c_class_add(bs, io_writer_class, Bs_Sv_Static("flush"), bs_io_writer_flush);
-        bs_c_class_add(bs, io_writer_class, Bs_Sv_Static("write"), bs_io_writer_write);
-        bs_c_class_add(bs, io_writer_class, Bs_Sv_Static("writeln"), bs_io_writer_writeln);
+        bs_io_writer_class->can_fail = true;
+        bs_c_class_add(bs, bs_io_writer_class, Bs_Sv_Static("close"), bs_io_file_close);
+        bs_c_class_add(bs, bs_io_writer_class, Bs_Sv_Static("flush"), bs_io_writer_flush);
+        bs_c_class_add(bs, bs_io_writer_class, Bs_Sv_Static("write"), bs_io_writer_write);
+        bs_c_class_add(bs, bs_io_writer_class, Bs_Sv_Static("writeln"), bs_io_writer_writeln);
 
         Bs_Table *io = bs_table_new(bs);
-        bs_add(bs, io, "Reader", bs_value_object(io_reader_class));
-        bs_add(bs, io, "Writer", bs_value_object(io_writer_class));
+        bs_add(bs, io, "Reader", bs_value_object(bs_io_reader_class));
+        bs_add(bs, io, "Writer", bs_value_object(bs_io_writer_class));
 
         bs_add_fn(bs, io, "input", bs_io_input);
 
@@ -1861,19 +2040,19 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_add_fn(bs, io, "eprintln", bs_io_eprintln);
 
         {
-            Bs_C_Instance *io_stdin = bs_c_instance_new(bs, io_reader_class);
+            Bs_C_Instance *io_stdin = bs_c_instance_new(bs, bs_io_reader_class);
             bs_static_cast(io_stdin->data, FILE *) = stdin;
             bs_add(bs, io, "stdin", bs_value_object(io_stdin));
         }
 
         {
-            Bs_C_Instance *io_stdout = bs_c_instance_new(bs, io_writer_class);
+            Bs_C_Instance *io_stdout = bs_c_instance_new(bs, bs_io_writer_class);
             bs_static_cast(io_stdout->data, FILE *) = stdout;
             bs_add(bs, io, "stdout", bs_value_object(io_stdout));
         }
 
         {
-            Bs_C_Instance *io_stderr = bs_c_instance_new(bs, io_writer_class);
+            Bs_C_Instance *io_stderr = bs_c_instance_new(bs, bs_io_writer_class);
             bs_static_cast(io_stderr->data, FILE *) = stderr;
             bs_add(bs, io, "stderr", bs_value_object(io_stderr));
         }
@@ -1908,6 +2087,9 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         process_class->can_fail = true;
         bs_c_class_add(bs, process_class, Bs_Sv_Static("kill"), bs_process_kill);
         bs_c_class_add(bs, process_class, Bs_Sv_Static("wait"), bs_process_wait);
+        bs_c_class_add(bs, process_class, Bs_Sv_Static("stdout"), bs_process_stdout);
+        bs_c_class_add(bs, process_class, Bs_Sv_Static("stderr"), bs_process_stderr);
+        bs_c_class_add(bs, process_class, Bs_Sv_Static("stdin"), bs_process_stdin);
 
         bs_add(bs, os, "Process", bs_value_object(process_class));
 
