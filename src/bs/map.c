@@ -21,8 +21,18 @@ Bs_Entry *bs_entries_find(Bs_Entry *entries, size_t capacity, Bs_Value key) {
         index = ((Bs_Str *)key.as.object)->hash;
     } else {
         index = bs_hash_bytes(&key, sizeof(key));
+
+        // TODO: temporary
+        if (key.type == BS_VALUE_NUM) {
+            printf("[DEBUG] Initial hash = %u\n", index);
+        }
     }
-    index = (uint32_t)((size_t)index & (capacity - 1));
+    index = index & (capacity - 1);
+
+    // TODO: temporary
+    if (key.type == BS_VALUE_NUM) {
+        printf("[DEBUG] Hash after mod = %u\n", index);
+    }
 
     Bs_Entry *tombstone = NULL;
     while (true) {
