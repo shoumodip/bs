@@ -11,29 +11,42 @@ uint32_t bs_hash_bytes(const void *data, size_t size) {
     return hash;
 }
 
+uint32_t bs_hash_uint64(uint64_t hash) {
+    // From v8's ComputeLongHash() which in turn cites:
+    // Thomas Wang, Integer Hash Functions.
+    // http://www.concentric.net/~Ttwang/tech/inthash.htm
+    hash = ~hash + (hash << 18); // hash = (hash << 18) - hash - 1;
+    hash = hash ^ (hash >> 31);
+    hash = hash * 21; // hash = (hash + (hash << 2)) + (hash << 4);
+    hash = hash ^ (hash >> 11);
+    hash = hash + (hash << 6);
+    hash = hash ^ (hash >> 22);
+    return (uint32_t)(hash & 0x3fffffff);
+}
+
+uint32_t bs_hash_value(Bs_Value key) {
+    if (key.type == BS_VALUE_NUM) {
+        const union {
+            double num;
+            uint64_t bits;
+        } hash = {.num = key.as.number};
+
+        return bs_hash_uint64(hash.bits);
+    }
+
+    if (key.type == BS_VALUE_OBJECT && key.as.object->type == BS_OBJECT_STR) {
+        return ((Bs_Str *)key.as.object)->hash;
+    }
+
+    return bs_hash_bytes(&key, sizeof(key));
+}
+
 Bs_Entry *bs_entries_find(Bs_Entry *entries, size_t capacity, Bs_Value key) {
     if (!capacity) {
         return NULL;
     }
 
-    uint32_t index;
-    if (key.type == BS_VALUE_OBJECT && key.as.object->type == BS_OBJECT_STR) {
-        index = ((Bs_Str *)key.as.object)->hash;
-    } else {
-        index = bs_hash_bytes(&key, sizeof(key));
-
-        // TODO: temporary
-        if (key.type == BS_VALUE_NUM) {
-            printf("[DEBUG] Initial hash = %u\n", index);
-        }
-    }
-    index = index & (capacity - 1);
-
-    // TODO: temporary
-    if (key.type == BS_VALUE_NUM) {
-        printf("[DEBUG] Hash after mod = %u\n", index);
-    }
-
+    uint32_t index = bs_hash_value(key) & (capacity - 1);
     Bs_Entry *tombstone = NULL;
     while (true) {
         Bs_Entry *e = &entries[index];

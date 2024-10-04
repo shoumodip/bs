@@ -4,6 +4,8 @@
 #include "vm.h"
 
 uint32_t bs_hash_bytes(const void *data, size_t size);
+uint32_t bs_hash_uint64(uint64_t hash);
+uint32_t bs_hash_value(Bs_Value key);
 
 typedef struct {
     Bs_Value key;
