@@ -1392,7 +1392,7 @@ static void bs_import(Bs *bs) {
         Bs_C_Lib *library = bs_c_lib_new(bs, handle);
 
 #ifdef _WIN32
-        void (*init)(Bs *, Bs_C_Lib *) = GetProcAddress(handle, "bs_library_init");
+        void (*init)(Bs *, Bs_C_Lib *) = (void *)GetProcAddress(handle, "bs_library_init");
 #else
         void (*init)(Bs *, Bs_C_Lib *) = dlsym(handle, "bs_library_init");
 #endif
