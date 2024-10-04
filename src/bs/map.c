@@ -22,7 +22,7 @@ Bs_Entry *bs_entries_find(Bs_Entry *entries, size_t capacity, Bs_Value key) {
     } else {
         index = bs_hash_bytes(&key, sizeof(key));
     }
-    index = index & (capacity - 1);
+    index = (uint32_t)((size_t)index & (capacity - 1));
 
     Bs_Entry *tombstone = NULL;
     while (true) {

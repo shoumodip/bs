@@ -2220,7 +2220,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 bs_error(bs, "cannot delete from " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
             }
 
-            Bs_Map *map = map;
+            Bs_Map *map = NULL;
             const char *label = NULL;
 
             switch (container.as.object->type) {
@@ -2260,7 +2260,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 bs_error(bs, "cannot delete from " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
             }
 
-            Bs_Map *map = map;
+            Bs_Map *map = NULL;
             const char *label = NULL;
 
             switch (container.as.object->type) {
