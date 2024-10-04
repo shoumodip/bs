@@ -2004,8 +2004,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             bs_check_integer(bs, a, "operand #1 to binary (|)");
             bs_check_integer(bs, b, "operand #2 to binary (|)");
 
-            const size_t a1 = a.as.number;
-            const size_t b1 = b.as.number;
+            const long a1 = a.as.number;
+            const long b1 = b.as.number;
             bs_stack_push(bs, bs_value_num(a1 | b1));
         } break;
 
@@ -2015,8 +2015,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             bs_check_integer(bs, a, "operand #1 to binary (&)");
             bs_check_integer(bs, b, "operand #2 to binary (&)");
 
-            const size_t a1 = a.as.number;
-            const size_t b1 = b.as.number;
+            const long a1 = a.as.number;
+            const long b1 = b.as.number;
             bs_stack_push(bs, bs_value_num(a1 & b1));
         } break;
 
@@ -2026,8 +2026,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             bs_check_integer(bs, a, "operand #1 to binary (^)");
             bs_check_integer(bs, b, "operand #2 to binary (^)");
 
-            const size_t a1 = a.as.number;
-            const size_t b1 = b.as.number;
+            const long a1 = a.as.number;
+            const long b1 = b.as.number;
             bs_stack_push(bs, bs_value_num(a1 ^ b1));
         } break;
 
@@ -2049,8 +2049,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             bs_check_integer(bs, a, "operand #1 to binary (<<)");
             bs_check_integer(bs, b, "operand #2 to binary (<<)");
 
-            const size_t a1 = a.as.number;
-            const size_t b1 = b.as.number;
+            const long a1 = a.as.number;
+            const long b1 = b.as.number;
             bs_stack_push(bs, bs_value_num(a1 << b1));
         } break;
 
@@ -2060,8 +2060,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             bs_check_integer(bs, a, "operand #1 to binary (>>)");
             bs_check_integer(bs, b, "operand #2 to binary (>>)");
 
-            const size_t a1 = a.as.number;
-            const size_t b1 = b.as.number;
+            const long a1 = a.as.number;
+            const long b1 = b.as.number;
             bs_stack_push(bs, bs_value_num(a1 >> b1));
         } break;
 

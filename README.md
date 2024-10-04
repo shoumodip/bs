@@ -7,5 +7,4 @@ $ ./build.sh
 ```
 
 ## TODO
-- [ ] Cross platform
 - [ ] FFI Documentation
