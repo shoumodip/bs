@@ -14,12 +14,9 @@
 #    include <unistd.h>
 #endif // _WIN32
 
-#define PCRE2_STATIC
-#define PCRE2_CODE_UNIT_WIDTH 8
-#include <pcre2.h>
-
 #include "bs/core.h"
 #include "bs/object.h"
+#include "bs/regex.h"
 
 // IO
 void bs_io_file_free(void *userdata, void *instance_data) {
@@ -684,38 +681,32 @@ Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
 
 // Regex
 typedef struct {
-    pcre2_code *code;
-    pcre2_match_data *match_data;
+    regex_t regex;
 } Bs_Regex;
 
 Bs_C_Class *bs_regex_class;
 
 void bs_regex_free(void *userdata, void *instance_data) {
-    Bs_Regex *regex = &bs_static_cast(instance_data, Bs_Regex);
-    pcre2_code_free(regex->code);
-    pcre2_match_data_free(regex->match_data);
+    regfree(&bs_static_cast(instance_data, regex_t));
 }
 
 Bs_Value bs_regex_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
-    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    Bs_Buffer *b = &bs_config(bs)->buffer;
+    const size_t start = b->count;
 
-    int temp1 = 0;
-    size_t temp2 = 0;
+    Bs_Writer w = bs_buffer_writer(b);
+    bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
+    bs_da_push(b->bs, b, '\0');
 
-    Bs_Regex *regex = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Regex);
-    regex->code = pcre2_compile((PCRE2_SPTR)str->data, str->size, 0, &temp1, &temp2, NULL);
-    if (!regex->code) {
+    regex_t regex;
+    if (regcomp(&regex, b->data + start, REG_EXTENDED)) {
         return bs_value_nil;
     }
 
-    regex->match_data = pcre2_match_data_create_from_pattern(regex->code, NULL);
-    if (!regex->match_data) {
-        return bs_value_nil;
-    }
-
+    bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, regex_t) = regex;
     return args[-1];
 }
 
@@ -837,15 +828,17 @@ Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
             }
         }
     } else {
-        const Bs_Regex *regex =
-            &bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, Bs_Regex);
+        Bs_Buffer *b = &bs_config(bs)->buffer;
+        const size_t start = b->count;
 
-        const int count = pcre2_match(
-            regex->code, (PCRE2_SPTR)str->data, str->size, offset, 0, regex->match_data, NULL);
+        bs_da_push_many(bs, b, str->data + offset, str->size - offset);
+        bs_da_push(bs, b, '\0');
 
-        if (count >= 0) {
-            const size_t *ovector = pcre2_get_ovector_pointer(regex->match_data);
-            return bs_value_num(ovector[0]);
+        const regex_t regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, regex_t);
+
+        regmatch_t match;
+        if (!regexec(&regex, bs_buffer_reset(b, start).data, 1, &match, 0)) {
+            return bs_value_num(offset + match.rm_so);
         }
     }
 
@@ -887,29 +880,27 @@ Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
             }
         }
     } else {
-        const Bs_Regex *regex =
-            &bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, Bs_Regex);
+        Bs_Buffer *b = &bs_config(bs)->buffer;
+        const size_t start = b->count;
 
-        while (true) {
-            const int count = pcre2_match(
-                regex->code, (PCRE2_SPTR)str->data, str->size, j, 0, regex->match_data, NULL);
+        bs_da_push_many(bs, b, str->data, str->size);
+        bs_da_push(bs, b, '\0');
 
-            if (count < 0) {
-                break;
-            }
+        const char *pattern = bs_buffer_reset(b, start).data;
+        const regex_t regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, regex_t);
 
-            const size_t *ovector = pcre2_get_ovector_pointer(regex->match_data);
-            if (ovector[0] == ovector[1]) {
+        int eflags = 0;
+        regmatch_t match;
+        while (!regexec(&regex, pattern + j, 1, &match, eflags)) {
+            eflags = REG_NOTBOL;
+            if (match.rm_so == match.rm_eo) {
                 break;
             }
 
             bs_array_set(
-                bs,
-                a,
-                a->count,
-                bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, ovector[0] - j))));
+                bs, a, a->count, bs_value_object(bs_str_new(bs, Bs_Sv(pattern + j, match.rm_so))));
 
-            j = ovector[1];
+            j += match.rm_eo;
         }
     }
 
@@ -961,43 +952,46 @@ Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
         Bs_Buffer *b = &bs_config(bs)->buffer;
         const size_t start = b->count;
 
-        const Bs_Regex *regex =
-            &bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, Bs_Regex);
+        bs_da_push_many(bs, b, str->data, str->size);
+        bs_da_push(bs, b, '\0');
 
-        size_t j = 0;
-        while (true) {
-            const int count = pcre2_match(
-                regex->code, (PCRE2_SPTR)str->data, str->size, j, 0, regex->match_data, NULL);
+        const regex_t regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, regex_t);
+        const size_t result_pos = b->count;
 
-            if (count < 0) {
+        size_t cursor = start;
+        int eflags = 0;
+        regmatch_t matches[10];
+        while (!regexec(&regex, b->data + cursor, bs_c_array_size(matches), matches, eflags)) {
+            eflags = REG_NOTBOL;
+            if (matches[0].rm_so == matches[0].rm_eo) {
                 break;
             }
 
-            const size_t *ovector = pcre2_get_ovector_pointer(regex->match_data);
-            if (ovector[0] == ovector[1]) {
-                break;
-            }
-
-            bs_da_push_many(bs, b, str->data + j, ovector[0] - j);
+            bs_da_push_many(bs, b, b->data + cursor, matches[0].rm_so);
 
             for (size_t i = 0; i < replacement->size; i++) {
-                if (i + 1 < replacement->size && replacement->data[i] == '\\' &&
-                    isdigit(replacement->data[i + 1])) {
-                    const size_t m = replacement->data[++i] - '0';
-                    if (m < count) {
+                if (replacement->data[i] == '\\' && isdigit(replacement->data[i + 1])) {
+                    const size_t j = replacement->data[++i] - '0';
+                    if (j < bs_c_array_size(matches) && matches[j].rm_so != -1) {
                         bs_da_push_many(
-                            bs, b, str->data + ovector[m * 2], ovector[m * 2 + 1] - ovector[m * 2]);
+                            bs,
+                            b,
+                            b->data + cursor + matches[j].rm_so,
+                            matches[j].rm_eo - matches[j].rm_so);
                     }
                 } else {
                     bs_da_push(bs, b, replacement->data[i]);
                 }
             }
 
-            j = ovector[1];
+            cursor += matches[0].rm_eo;
         }
-        bs_da_push_many(bs, b, str->data + j, str->size - j);
 
-        return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
+        bs_da_push_many(bs, b, b->data + cursor, strlen(b->data + cursor));
+
+        const Bs_Str *result = bs_str_new(bs, bs_buffer_reset(b, result_pos));
+        bs_buffer_reset(b, start);
+        return bs_value_object(result);
     }
 }
 

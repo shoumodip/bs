@@ -1,6 +1,5 @@
 /bin
 /lib
-/build
 *.so
 *.dylib
 *.dll
