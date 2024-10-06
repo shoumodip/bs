@@ -1069,22 +1069,155 @@ builder for optimized string modification operations.
 ### Bytes() @class
 Create a string builder.
 
+```bs
+var b = Bytes();
+b.write("Hello, ");
+b.write("world!");
+io.println(b.slice());
+```
+```bsx
+mf b = Bytes() fr
+b.write("Hello, ") fr
+b.write("world!") fr
+io.println(b.slice()) fr
+```
+
+```console
+$ bs demo.bs
+Hello, world!
+```
+
 ### Bytes.count() @method
 Return the current number of bytes written.
+
+```bs
+var b = Bytes();
+b.write("Hello");
+b.write(" world!");
+io.println(b.slice());
+
+var n = b.count();
+io.println("\(n) bytes written.");
+```
+```bsx
+mf b = Bytes() fr
+b.write("Hello") fr
+b.write(" world!") fr
+io.println(b.slice()) fr
+
+mf n = b.count() fr
+io.println("\(n) bytes written.") fr
+```
+
+```console
+$ bs demo.bs
+Hello world!
+12 bytes written.
+```
 
 ### Bytes.reset(position) @method
 Move back the writer head to `position`.
 
-Also create a string from `position` to the end of the `Bytes` instance and return it.
+```bs
+var b = Bytes();
+b.write("Hello");
 
-### Bytes.slice(start, end) @method
+var p = b.count();
+b.write(" world!");
+
+io.println(b.slice());
+b.reset(p);
+io.println(b.slice());
+```
+```bsx
+mf b = Bytes() fr
+b.write("Hello") fr
+
+mf p = b.count() fr
+b.write(" world!") fr
+
+io.println(b.slice()) fr
+b.reset(p) fr
+io.println(b.slice()) fr
+```
+
+```console
+$ bs demo.bs
+Hello world!
+Hello
+```
+
+### Bytes.slice(start?, end?) @method
 Return a slice from `start` (inclusive) to `end` (exclusive).
 
-### Bytes.write(value) @method
-Write `value` to the end.
+If no arguments are provided to this function, the whole builder is returned as
+a string.
+
+```bs
+var b = Bytes();
+b.write("Hello world!");
+
+io.println(b.slice());
+io.println(b.slice(0, 5));
+io.println(b.slice(6, 12));
+```
+```bsx
+mf b = Bytes() fr
+b.write("Hello world!") fr
+
+io.println(b.slice()) fr
+io.println(b.slice(0, 5)) fr
+io.println(b.slice(6, 12)) fr
+```
+
+```console
+$ bs demo.bs
+Hello world!
+Hello
+world!
+```
+
+### Bytes.write(str) @method
+Write `str` to the end.
+
+```bs
+var b = Bytes();
+b.write("Nice! ");
+b.write("" ++ 69); # Only strings can be written to a Bytes object
+io.println(b.slice());
+```
+```bsx
+mf b = Bytes() fr
+b.write("Nice! ") fr
+b.write("" ++ 69) fr # Only strings can be written to a Bytes object
+io.println(b.slice()) fr
+```
+
+```console
+$ bs demo.bs
+Nice! 69
+```
 
 ### Bytes.insert(position, value) @method
 Write `value` at `position`.
+
+```bs
+var b = Bytes();
+b.write("Helloworld!");
+b.insert(5, ", ");
+io.println(b.slice());
+```
+```bsx
+mf b = Bytes() fr
+b.write("Helloworld!") fr
+b.insert(5, ", ") fr
+io.println(b.slice()) fr
+```
+
+```console
+$ bs demo.bs
+Hello, world!
+```
 
 ## Array
 Methods for the builtin array value.
