@@ -1556,13 +1556,18 @@ Bs_Value bs_bytes_reset(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 Bs_Value bs_bytes_slice(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 2);
-    bs_arg_check_whole_number(bs, args, 0);
-    bs_arg_check_whole_number(bs, args, 1);
+    if (arity != 0 && arity != 2) {
+        bs_error(bs, "expected 0 or 2 arguments, got %zu", arity);
+    }
+
+    if (arity) {
+        bs_arg_check_whole_number(bs, args, 0);
+        bs_arg_check_whole_number(bs, args, 1);
+    }
 
     const Bs_Buffer *b = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
-    const size_t begin = bs_min(args[0].as.number, args[1].as.number);
-    const size_t end = bs_max(args[0].as.number, args[1].as.number);
+    const size_t begin = arity ? bs_min(args[0].as.number, args[1].as.number) : 0;
+    const size_t end = arity ? bs_max(args[0].as.number, args[1].as.number) : b->count;
 
     if (begin == end) {
         return bs_value_object(bs_str_new(bs, Bs_Sv_Static("")));
