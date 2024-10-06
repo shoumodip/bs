@@ -614,17 +614,92 @@ Methods for the builtin string value.
 ### string.slice(start, end) @method
 Slice a string from `start` (inclusive) to `end` (exclusive).
 
+```bs
+io.println("deez nuts".slice(0, 4));
+io.println("deez nuts".slice(5, 9));
+```
+```bsx
+io.println("deez nuts".slice(0, 4)) fr
+io.println("deez nuts".slice(5, 9)) fr
+```
+
+```console
+$ bs demo.bs
+deez
+nuts
+```
+
 ### string.reverse() @method
 Reverse a string.
+
+```bs
+io.println("sllab amgil".reverse());
+```
+```bsx
+io.println("sllab amgil".reverse()) fr
+```
+
+```console
+$ bs demo.bs
+ligma balls
+```
 
 ### string.toupper() @method
 Convert a string to uppercase.
 
+```bs
+io.println("Urmom".toupper());
+```
+```bsx
+io.println("Urmom".toupper()) fr
+```
+
+```console
+$ bs demo.bs
+URMOM
+```
+
 ### string.tolower() @method
 Convert a string to lowercase.
 
+```bs
+io.println("Urmom".tolower());
+```
+```bsx
+io.println("Urmom".tolower()) fr
+```
+
+```console
+$ bs demo.bs
+urmom
+```
+
 ### string.tonumber() @method
 Convert a string to a number.
+
+```bs
+io.println("69".tonumber());
+io.println("420.69".tonumber());
+io.println("0xff".tonumber());
+io.println("69e3".tonumber());
+io.println("nah".tonumber());
+```
+```bsx
+io.println("69".tonumber()) fr
+io.println("420.69".tonumber()) fr
+io.println("0xff".tonumber()) fr
+io.println("69e3".tonumber()) fr
+io.println("nah".tonumber()) fr
+```
+
+```console
+$ bs demo.bs
+69
+420.69
+255
+69000
+nil
+```
 
 ### string.find(pattern, start?) @method
 Find `pattern` within a string starting from position `start` (which defaults
@@ -632,34 +707,253 @@ to `0`).
 
 Returns the position if found, else `nil`.
 
+```bs
+io.println("foo bar baz".find("ba"));
+io.println("foo bar baz".find("ba", 5));
+io.println("foo bar baz".find("ba", 9));
+io.println("foo bar baz".find("lmao"));
+
+var r = Regex("[0-9]");
+io.println("69a".find(r));
+io.println("69a".find(r, 1));
+io.println("69a".find(r, 2));
+io.println("yolol".find(r));
+```
+```bsx
+io.println("foo bar baz".find("ba")) fr
+io.println("foo bar baz".find("ba", 5)) fr
+io.println("foo bar baz".find("ba", 9)) fr
+io.println("foo bar baz".find("lmao")) fr
+
+mf r = Regex("[0-9]") fr
+io.println("69a".find(r)) fr
+io.println("69a".find(r, 1)) fr
+io.println("69a".find(r, 2)) fr
+io.println("yolol".find(r)) fr
+```
+
+```console
+$ bs demo.bs
+4
+8
+nil
+nil
+0
+1
+nil
+nil
+```
+
 ### string.split(pattern) @method
 Split string by `pattern`.
+
+```bs
+io.println("foo bar baz".split(""));
+io.println("foo bar baz".split(" "));
+io.println("foo bar baz".split("  "));
+
+var r = Regex(" +");
+io.println("foobar".split(r));
+io.println("foo bar".split(r));
+io.println("foo bar   baz".split(r));
+```
+```bsx
+io.println("foo bar baz".split("")) fr
+io.println("foo bar baz".split(" ")) fr
+io.println("foo bar baz".split("  ")) fr
+
+mf r = Regex(" +") fr
+io.println("foobar".split(r)) fr
+io.println("foo bar".split(r)) fr
+io.println("foo bar   baz".split(r)) fr
+```
+
+```console
+$ bs demo.bs
+["foo bar baz"]
+["foo", "bar", "baz"]
+["foo bar baz"]
+["foobar"]
+["foo", "bar"]
+["foo", "bar", "baz"]
+```
 
 ### string.replace(pattern, replacement) @method
 Replace `pattern` with `replacement`.
 
+```bs
+io.println("foo bar baz".replace("", "-"));
+io.println("foo bar baz".replace(" ", "---"));
+io.println("foo bar baz".replace("  ", "-"));
+
+var r = Regex("([0-9]+) ([a-z]+)");
+io.println("69 apples, 420 oranges".replace(r, "{type: \\2, count: \\1}"));
+io.println("69 apples, 420  oranges".replace(r, "{type: \\2, count: \\1}"));
+io.println("ayo noice!".replace(r, "{type: \\2, count: \\1}"));
+```
+```bsx
+io.println("foo bar baz".replace("", "-")) fr
+io.println("foo bar baz".replace(" ", "---")) fr
+io.println("foo bar baz".replace("  ", "-")) fr
+
+mf r = Regex("([0-9]+) ([a-z]+)") fr
+io.println("69 apples, 420 oranges".replace(r, "{type: \\2, count: \\1}")) fr
+io.println("69 apples, 420  oranges".replace(r, "{type: \\2, count: \\1}")) fr
+io.println("ayo noice!".replace(r, "{type: \\2, count: \\1}")) fr
+```
+
+```console
+$ bs demo.bs
+foo bar baz
+foo---bar---baz
+foo bar ba
+{type: apples, count: 69}, {type: oranges, count: 420}
+{type: apples, count: 69}, 420  oranges
+ayo noice!
+```
+
 ### string.ltrim(pattern) @method
 Trim `pattern` from the left of a string.
+
+```bs
+io.println("[" ++ "   foo bar baz  ".ltrim(" ") ++ "]");
+```
+```bsx
+io.println("[" ++ "   foo bar baz  ".ltrim(" ") ++ "]") fr
+```
+
+```console
+$ bs demo.bs
+[foo bar baz  ]
+```
 
 ### string.rtrim(pattern) @method
 Trim `pattern` from the right of a string.
 
+```bs
+io.println("[" ++ "   foo bar baz  ".rtrim(" ") ++ "]");
+```
+```bsx
+io.println("[" ++ "   foo bar baz  ".rtrim(" ") ++ "]") fr
+```
+
+```console
+$ bs demo.bs
+[   foo bar baz]
+```
+
 ### string.trim(pattern) @method
 Trim `pattern` from both sides of a string.
+
+```bs
+io.println("[" ++ "   foo bar baz  ".trim(" ") ++ "]");
+```
+```bsx
+io.println("[" ++ "   foo bar baz  ".trim(" ") ++ "]") fr
+```
+
+```console
+$ bs demo.bs
+[foo bar baz]
+```
 
 ### string.lpad(pattern, count) @method
 Pad string with `pattern` on the left side, till the total length reaches
 `count`.
 
+```bs
+io.println("foo".lpad("69", 0));
+io.println("foo".lpad("69", 3));
+io.println("foo".lpad("69", 4));
+io.println("foo".lpad("69", 5));
+io.println("foo".lpad("69", 6));
+```
+```bsx
+io.println("foo".lpad("69", 0)) fr
+io.println("foo".lpad("69", 3)) fr
+io.println("foo".lpad("69", 4)) fr
+io.println("foo".lpad("69", 5)) fr
+io.println("foo".lpad("69", 6)) fr
+```
+
+```console
+$ bs demo.bs
+foo
+foo
+6foo
+69foo
+696foo
+```
+
 ### string.rpad(pattern, count) @method
 Pad string with `pattern` on the right side, till the total length reaches
 `count`.
 
+```bs
+io.println("foo".rpad("69", 0));
+io.println("foo".rpad("69", 3));
+io.println("foo".rpad("69", 4));
+io.println("foo".rpad("69", 5));
+io.println("foo".rpad("69", 6));
+```
+```bsx
+io.println("foo".rpad("69", 0)) fr
+io.println("foo".rpad("69", 3)) fr
+io.println("foo".rpad("69", 4)) fr
+io.println("foo".rpad("69", 5)) fr
+io.println("foo".rpad("69", 6)) fr
+```
+
+```console
+$ bs demo.bs
+foo
+foo
+foo6
+foo69
+foo696
+```
+
 ### string.prefix(pattern) @method
 Check whether string starts with `pattern`.
 
+```bs
+io.println("foobar".prefix("foo"));
+io.println("foobar".prefix("Foo"));
+io.println("foobar".prefix("deez nuts"));
+```
+```bsx
+io.println("foobar".prefix("foo")) fr
+io.println("foobar".prefix("Foo")) fr
+io.println("foobar".prefix("deez nuts")) fr
+```
+
+```console
+$ bs demo.bs
+true
+false
+false
+```
+
 ### string.suffix(pattern) @method
 Check whether string ends with `pattern`.
+
+```bs
+io.println("foobar".suffix("bar"));
+io.println("foobar".suffix("Bar"));
+io.println("foobar".suffix("deez nuts"));
+```
+```bsx
+io.println("foobar".suffix("bar")) fr
+io.println("foobar".suffix("Bar")) fr
+io.println("foobar".suffix("deez nuts")) fr
+```
+
+```console
+$ bs demo.bs
+true
+false
+false
+```
 
 ## Bit
 Contains bitwise operations which are not frequent enough to warrant a
