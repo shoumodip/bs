@@ -1,13 +1,46 @@
 # Stdlib
 
-## IO
+## I/O
 Contains simple I/O primitives.
 
+Note that I/O is binary in BS. On *nix systems it doesn't matter, but on the
+video game OS it should be kept in mind.
+
 ### input(prompt?) @function
-Read a line from standard input, printing the optional argument `prompt` if provided.
+Read a line from standard input, printing the optional argument `prompt` if
+provided.
+
+```bs
+var name = io.input("Enter your name> ");
+io.println("Hello, \(name)!");
+```
+```bsx
+mf name = io.input("Enter your name> ") fr
+io.println("Hello, \(name)!") fr
+```
+
+```console
+$ bs demo.bs
+Enter your name> Batman
+Hello, Batman!
+```
 
 ### print(...) @function
 Print all the arguments to standard output.
+
+```bs
+io.print("Hello", "world", 69);
+```
+```bsx
+io.print("Hello", "world", 69) fr
+```
+
+```console
+$ bs demo.bs
+Hello, world 69⏎
+```
+
+The arguments are separated with spaces.
 
 ### println(...) @function
 Print all the arguments to standard output, with a following newline.
@@ -23,6 +56,39 @@ Native C class that opens `path` in readable mode.
 
 Returns `nil` if failed.
 
+```bs
+var f = io.Reader("input.txt");
+if !f {
+    io.eprintln("Error: could not read file!");
+    os.exit(1);
+}
+
+var contents = f.read();
+io.print(contents);
+```
+```bsx
+mf f = io.Reader("input.txt") fr
+ayo nah f {
+    io.eprintln("Error: could not read file!") fr
+    os.exit(1) fr
+}
+
+mf contents = f.read() fr
+io.print(contents) fr
+```
+
+Create a file `input.txt` with some sample text and run it.
+
+```console
+$ bs demo.bs
+Just a test file
+Nothing to see here
+Foo
+Bar
+Baz
+People's dreams have no end! ~ Blackbeard
+```
+
 #### Reader.close() @method
 Close the file.
 
@@ -30,13 +96,87 @@ This is done automatically by the garbage collector, so can be omitted for
 short programs.
 
 #### Reader.read(count?) @method
-Read `count` bytes from the current position. If the argument `bytes` is not
+Read `count` bytes from the current position. If the argument `count` is not
 provided, it reads all of the available bytes.
 
 Returns `nil` if failed.
 
+```bs
+var f = io.Reader("input.txt");
+if !f {
+    io.eprintln("Error: could not read file!");
+    os.exit(1);
+}
+
+io.print("The first 16 bytes: [\(f.read(16))]\n");
+io.print("The rest:", f.read());
+```
+```bsx
+mf f = io.Reader("input.txt") fr
+ayo nah f {
+    io.eprintln("Error: could not read file!") fr
+    os.exit(1) fr
+}
+
+io.print("The first 16 bytes: [\(f.read(16))]\n") fr
+io.print("The rest:", f.read()) fr
+```
+
+```console
+$ bs demo.bs
+The first 16 bytes: [Just a test file]
+The rest:
+Nothing to see here
+Foo
+Bar
+Baz
+People's dreams have no end! ~ Blackbeard
+```
+
 #### Reader.readln() @method
 Read a line.
+
+```bs
+var f = io.Reader("input.txt");
+if !f {
+    io.eprintln("Error: could not read file!");
+    os.exit(1);
+}
+
+while !f.eof() {
+    var line = f.readln();
+    io.println("Line:", line);
+}
+```
+```bsx
+mf f = io.Reader("input.txt") fr
+ayo nah f {
+    io.eprintln("Error: could not read file!") fr
+    os.exit(1) fr
+}
+
+yolo nah f.eof() {
+    mf line = f.readln() fr
+    io.println("Line:", line) fr
+}
+```
+
+```console
+$ bs demo.bs
+Line: Just a test file
+Line: Nothing to see here
+Line: Foo
+Line: Bar
+Line: Baz
+Line: People's dreams have no end! ~ Blackbeard
+Line:
+```
+
+Note that on windows, the line will have a trailing `\r`, since I/O is binary
+in BS. It is up to the user to decide whether to strip it or not.
+
+#### Reader.eof() @method
+Return whether the end of file has been reached.
 
 #### Reader.seek(offset, whence) @method
 Change the read position of the file.
@@ -49,15 +189,128 @@ Any of the following values can be used for `whence`.
 
 Returns `true` if succeeded and `false` if failed
 
+```bs
+var f = io.Reader("input.txt");
+if !f {
+    io.eprintln("Error: could not read file!");
+    os.exit(1);
+}
+
+io.print("The first 16 bytes: [\(f.read(16))]\n");
+
+f.seek(5, io.SEEK_SET);
+
+io.println("The full content offset by 5:");
+io.print(f.read());
+```
+```bsx
+mf f = io.Reader("input.txt") fr
+ayo nah f {
+    io.eprintln("Error: could not read file!") fr
+    os.exit(1) fr
+}
+
+io.print("The first 16 bytes: [\(f.read(16))]\n") fr
+
+f.seek(5, io.SEEK_SET) fr
+
+io.println("The full content offset by 5:") fr
+io.print(f.read()) fr
+```
+
+```console
+$ bs demo.bs
+The first 16 bytes: [Just a test file]
+The full content offset by 5:
+a test file
+Nothing to see here
+Foo
+Bar
+Baz
+People's dreams have no end! ~ Blackbeard
+```
+
 #### Reader.tell() @method
 Get the current position of the file.
 
 Returns `nil` if failed
 
+```bs
+var f = io.Reader("input.txt");
+if !f {
+    io.eprintln("Error: could not read file!");
+    os.exit(1);
+}
+
+io.println("The first 3 lines:");
+for i in 0, 3 {
+    io.println(f.readln());
+}
+
+io.println();
+io.println("Read \(f.tell()) bytes so far.");
+```
+```bsx
+mf f = io.Reader("input.txt") fr
+ayo nah f {
+    io.eprintln("Error: could not read file!") fr
+    os.exit(1) fr
+}
+
+io.println("The first 3 lines:") fr
+yall i amongus 0, 3 {
+    io.println(f.readln()) fr
+}
+
+io.println() fr
+io.println("Read \(f.tell()) bytes so far.") fr
+```
+
+```console
+$ bs demo.bs
+The first 3 lines:
+Just a test file
+Nothing to see here
+Foo
+
+Read 41 bytes so far.
+```
+
 ### Writer(path) @class
 Native C class that opens `path` in writeable mode.
 
 Returns `nil` if failed.
+
+```bs
+var f = io.Writer("output.txt");
+if !f {
+    io.eprintln("Error: could not create file!");
+    os.exit(1);
+}
+
+f.writeln("Hello there!");
+f.writeln("General Kenobi!");
+f.writeln(69, "Nice!");
+```
+```bsx
+mf f = io.Writer("output.txt") fr
+ayo nah f {
+    io.eprintln("Error: could not create file!") fr
+    os.exit(1) fr
+}
+
+f.writeln("Hello there!") fr
+f.writeln("General Kenobi!") fr
+f.writeln(69, "Nice!") fr
+```
+
+```console
+$ bs demo.bs
+$ cat output.txt # `type output.txt` on windows
+Hello there!
+General Kenobi!
+69 Nice!
+```
 
 #### Writer.close() @method
 Close the file.
@@ -66,7 +319,8 @@ This is done automatically by the garbage collector, so can be omitted for
 short programs.
 
 #### Writer.flush() @method
-Flush the contents of the file, since IO is buffered in C.
+Flush the contents of the file, since I/O is buffered in C, which is the
+language BS is written in.
 
 #### Writer.write(...) @method
 Write all the arguments into the file.
@@ -163,7 +417,8 @@ Convert a string to lowercase.
 Convert a string to a number.
 
 ### string.find(pattern, start?) @method
-Find `pattern` within a string starting from position `start` (which defaults to `0`).
+Find `pattern` within a string starting from position `start` (which defaults
+to `0`).
 
 Returns the position if found, else `nil`.
 
@@ -183,10 +438,18 @@ Trim `pattern` from the right of a string.
 Trim `pattern` from both sides of a string.
 
 ### string.lpad(pattern, count) @method
-Pad string with `pattern` on the left side, till the total length reaches `count`.
+Pad string with `pattern` on the left side, till the total length reaches
+`count`.
 
 ### string.rpad(pattern, count) @method
-Pad string with `pattern` on the right side, till the total length reaches `count`.
+Pad string with `pattern` on the right side, till the total length reaches
+`count`.
+
+### string.prefix(pattern) @method
+Check whether string starts with `pattern`.
+
+### string.suffix(pattern) @method
+Check whether string ends with `pattern`.
 
 ## Bit
 Contains bitwise operations which are not frequent enough to warrant a
@@ -260,7 +523,8 @@ Return whether a character is whitespace.
 Expects `char` to be a string of length `1`.
 
 ## Bytes
-Strings are immutable in BS. The native class `Bytes` provides a mutable string builder for optimized string modification operations.
+Strings are immutable in BS. The native class `Bytes` provides a mutable string
+builder for optimized string modification operations.
 
 ### Bytes() @class
 Create a string builder.
@@ -309,7 +573,8 @@ Copy an array.
 Join the elements of an array, separated by `separator` into a single string.
 
 ### array.find(value, start?) @method
-Find `value` within an array starting from position `start` (which defaults to `0`).
+Find `value` within an array starting from position `start` (which defaults to
+`0`).
 
 Returns the position if found, else `nil`.
 
@@ -342,12 +607,14 @@ xs.sort(lit (x, y) => x < y) fr
 io.println(xs) fr # Output: [1, 2, 3, 4, 5]
 ```
 
-The compare function must take two arguments. If it returns `true`, then the left argument shall be considered "less than", and vice versa for `false`.
+The compare function must take two arguments. If it returns `true`, then the
+left argument shall be considered "less than", and vice versa for `false`.
 
 ### array.resize(size) @method
 Resize an array to one having `size` elements.
 
-If `size` is larger than the original size, the extra elements shall default to `nil`.
+If `size` is larger than the original size, the extra elements shall default to
+`nil`.
 
 This modifies the array.
 
