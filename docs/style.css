@@ -58,12 +58,10 @@ body {
 }
 
 code {
-    padding: 0 calc(0.5 * var(--padding));
     font-size: calc(0.9 * var(--font-size));
     whitespace: pre;
     font-family: "JetBrains Mono";
     border-radius: var(--border-radius);
-    background-color: var(--border);
 }
 
 pre {

@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -111,6 +112,8 @@ static void bsdoc_print_styled_sv(FILE *f, Bsdoc_Style style, Bs_Sv sv) {
             fputs("&lt;", f);
         } else if (c == '>') {
             fputs("&gt;", f);
+        } else if (c == '&') {
+            fputs("&amp;", f);
         } else {
             fputc(c, f);
         }
@@ -317,6 +320,8 @@ void bsdoc_print_line(FILE *f, Bs_Sv line, bool newline, bool list) {
             fputs("&lt;", f);
         } else if (c == '>') {
             fputs("&gt;", f);
+        } else if (c == '&') {
+            fputs("&amp;", f);
         } else {
             fputc(c, f);
         }
@@ -469,12 +474,49 @@ int main(int argc, char **argv) {
             }
             current_level = level;
 
-            fprintf(f, "<section id='s%zu'>\n<h%zu>", sections.count, level);
-            bsdoc_print_line(f, line, false, false);
-            fprintf(f, "</h%zu>\n", level);
+            Bs_Sv highlight = line;
+            line = bs_sv_split(&highlight, '@');
 
             section.title = line;
             section.level = level;
+
+            fprintf(f, "<section id='s%zu'>\n<h%zu>", sections.count, level);
+            if (highlight.size) {
+                line = bs_sv_trim(line, ' ');
+
+                if (bs_sv_eq(highlight, Bs_Sv_Static("method"))) {
+                    const Bs_Sv class = bs_sv_split(&line, '.');
+                    section.title = bs_sv_split(&line, '(');
+
+                    fprintf(
+                        f,
+                        "<code><span class='class'>" Bs_Sv_Fmt
+                        "</span>.<span class='field'>" Bs_Sv_Fmt "</span>(",
+                        Bs_Sv_Arg(class),
+                        Bs_Sv_Arg(section.title));
+
+                    bsdoc_print_line(f, line, false, false);
+                    fprintf(f, "</code>");
+                } else {
+                    Bs_Sv name = line;
+                    for (size_t i = 0; i < name.size; i++) {
+                        if (!isalnum(name.data[i]) && name.data[i] != '_') {
+                            name.size = i;
+                            section.title = name;
+                            break;
+                        }
+                    }
+                    bs_sv_drop(&line, name.size);
+
+                    fprintf(f, "<code><span class='" Bs_Sv_Fmt "'>", Bs_Sv_Arg(highlight));
+                    bsdoc_print_line(f, name, false, false);
+                    fprintf(f, "</span>" Bs_Sv_Fmt "</code>", Bs_Sv_Arg(line));
+                }
+            } else {
+                bsdoc_print_line(f, line, false, false);
+            }
+            fprintf(f, "</h%zu>\n", level);
+
             bsdoc_sections_push(&sections, section);
             continue;
         }

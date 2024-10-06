@@ -17,6 +17,7 @@ typedef struct {
 #define Bs_Sv_Static(s) ((Bs_Sv){s, sizeof(s) - 1})
 
 Bs_Sv bs_sv_from_cstr(const char *data);
+Bs_Sv bs_sv_trim(Bs_Sv s, char ch);
 Bs_Sv bs_sv_drop(Bs_Sv *s, size_t count);
 Bs_Sv bs_sv_split(Bs_Sv *s, char ch);
 

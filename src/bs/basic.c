@@ -8,6 +8,19 @@ Bs_Sv bs_sv_from_cstr(const char *data) {
     return (Bs_Sv){data, strlen(data)};
 }
 
+Bs_Sv bs_sv_trim(Bs_Sv s, char ch) {
+    while (s.size && *s.data == ch) {
+        s.data++;
+        s.size--;
+    }
+
+    while (s.size && s.data[s.size - 1] == ch) {
+        s.size--;
+    }
+
+    return s;
+}
+
 Bs_Sv bs_sv_drop(Bs_Sv *s, size_t count) {
     const Bs_Sv result = Bs_Sv(s->data, count);
     s->data += count;

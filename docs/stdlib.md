@@ -1,143 +1,145 @@
-# Stdlib Documentation
+# Stdlib
 
 ## IO
 Contains simple I/O primitives.
 
-### Function `io.input(prompt?: string) -> string`
+### input(prompt?) @function
 Read a line from standard input, printing the optional argument `prompt` if provided.
 
-### Function `io.print(...)`
+### print(...) @function
 Print all the arguments to standard output.
 
-### Function `io.println(...)`
+### println(...) @function
 Print all the arguments to standard output, with a following newline.
 
-### Function `io.eprint(...)`
+### eprint(...) @function
 Print all the arguments to standard error.
 
-### Function `io.eprintln(...)`
+### eprintln(...) @function
 Print all the arguments to standard error, with a following newline.
 
-### Class `io.Reader(path: string)`
+### Reader(path) @class
 Native C class that opens `path` in readable mode.
 
 Returns `nil` if failed.
 
-#### Method `io.Reader.close()`
+#### Reader.close() @method
 Close the file.
 
 This is done automatically by the garbage collector, so can be omitted for
 short programs.
 
-#### Method `io.Reader.read(count?: number) -> string | nil`
+#### Reader.read(count?) @method
 Read `count` bytes from the current position. If the argument `bytes` is not
 provided, it reads all of the available bytes.
 
 Returns `nil` if failed.
 
-#### Method `io.Reader.readln() -> string`
+#### Reader.readln() @method
 Read a line.
 
-#### Method `io.Reader.seek(offset: number, whence: number) -> boolean`
+#### Reader.seek(offset, whence) @method
 Change the read position of the file.
 
 Any of the following values can be used for `whence`.
 
-- `io.SEEK_SET` - Seek from beginning of file
-- `io.SEEK_CUR` - Seek from current position
-- `io.SEEK_END` - Seek from end of file
+- `SEEK_SET` - Seek from beginning of file
+- `SEEK_CUR` - Seek from current position
+- `SEEK_END` - Seek from end of file
 
 Returns `true` if succeeded and `false` if failed
 
-#### Method `io.Reader.tell() -> number`
+#### Reader.tell() @method
 Get the current position of the file.
 
 Returns `nil` if failed
 
-### Class `io.Writer(path: string)`
+### Writer(path) @class
 Native C class that opens `path` in writeable mode.
 
 Returns `nil` if failed.
 
-#### Method `io.Writer.close()`
+#### Writer.close() @method
 Close the file.
 
 This is done automatically by the garbage collector, so can be omitted for
 short programs.
 
-#### Method `io.Writer.flush()`
+#### Writer.flush() @method
 Flush the contents of the file, since IO is buffered in C.
 
-#### Method `io.Writer.write(...) -> boolean`
+#### Writer.write(...) @method
 Write all the arguments into the file.
 
 Returns `false` if any errors were encountered, else `true`.
 
-#### Method `io.Writer.writeln(...) -> boolean`
+#### Writer.writeln(...) @method
 Write all the arguments into the file, with a following newline.
 
 Returns `false` if any errors were encountered, else `true`.
 
-### Instance `io.stdin`
-`io.Reader` for standard input.
+### stdin @constant
+`Reader` for standard input.
 
-### Instance `io.stdout`
-`io.Writer` for standard output.
+### stdout @constant
+`Writer` for standard output.
 
-### Instance `io.stderr`
-`io.Writer` for standard error.
+### stderr @constant
+`Writer` for standard error.
 
 ## OS
 Contains simple primitives for OS functions.
 
-### Function `os.exit(code: number)`
+### exit(code) @function
 Halt the BS runtime with exit code `code`.
 
 This doesn't actually exit the process itself in embedded usecase.
 It just halts the BS interpreter, and the caller of the virtual
 machine can decide what to do.
 
-### Functin `os.clock() -> number`
+### clock() @function
 Get the monotonic time passed since boot.
 
 This function provides time with nanosecond level of precision but
 in the unit of seconds.
 
-### Function `os.sleep(seconds: number)`
+### sleep(seconds) @function
 Sleep for `seconds` interval, with nanosecond level of precision.
 
-### Function `os.getenv(name: string) -> string | nil`
+### getenv(name) @function
 Get the environment variable `name`.
 
 Returns `nil` if it doesn't exist.
 
-### Function `os.setenv(name: string, value: string) -> boolean`
+### setenv(name, value) @function
 Set the environment variable `name` to `value`.
 
 Returns `true` if successful, else `false`.
 
-### Array `os.args`
+### args @constant
 Array of command line arguments. First element is the program
 name.
 
-### Class `os.Process(args: [string])`
+### Process(args) @class
 Native C class that spawns a process. Expects `args` to be an
 array of strings that represent the command line arguments.
 
 Returns `nil` if failed.
 
-#### Method `os.Process.kill(signal: number) -> boolean`
+#### Process.kill(signal) @method
 Kill the process with `signal`.
 
 Returns `false` if any errors were encountered, else `true`.
 
-#### Method `os.Process.wait() -> number | nil`
+#### Process.wait() @method
 Wait for the process to exit, and return its exit code.
 
 Returns `nil` if failed.
 
-## Regex
-### Class `Regex(pattern: string)`
+## Regular Expressions
+POSIX compatible regular expressions.
+
+### Regex(pattern) @class
 Native C class that compiles a regular expression.
 
 Returns `nil` if failed.
@@ -145,114 +147,114 @@ Returns `nil` if failed.
 ## String
 Methods for the builtin string value.
 
-### Method `string.slice(start: number, end: number) -> string`
+### string.slice(start, end) @method
 Slice a string from `start` (inclusive) to `end` (exclusive).
 
-### Method `string.reverse() -> string`
+### string.reverse() @method
 Reverse a string.
 
-### Method `string.toupper() -> string`
+### string.toupper() @method
 Convert a string to uppercase.
 
-### Method `string.tolower() -> string`
+### string.tolower() @method
 Convert a string to lowercase.
 
-### Method `string.tonumber() -> number | nil`
+### string.tonumber() @method
 Convert a string to a number.
 
-### Method `string.find(pattern: string | Regex, start?: number) -> number | nil`
+### string.find(pattern, start?) @method
 Find `pattern` within a string starting from position `start` (which defaults to `0`).
 
 Returns the position if found, else `nil`.
 
-### Method `string.split(pattern: string | Regex) -> [string]`
+### string.split(pattern) @method
 Split string by `pattern`.
 
-### Method `string.replace(pattern: string | Regex, replacement: string) -> string`
+### string.replace(pattern, replacement) @method
 Replace `pattern` with `replacement`.
 
-### Method `string.ltrim(pattern: string) -> string`
+### string.ltrim(pattern) @method
 Trim `pattern` from the left of a string.
 
-### Method `string.rtrim(pattern: string) -> string`
+### string.rtrim(pattern) @method
 Trim `pattern` from the right of a string.
 
-### Method `string.trim(pattern: string) -> string`
+### string.trim(pattern) @method
 Trim `pattern` from both sides of a string.
 
-### Method `string.lpad(pattern: string, count: number) -> string`
+### string.lpad(pattern, count) @method
 Pad string with `pattern` on the left side, till the total length reaches `count`.
 
-### Method `string.rpad(pattern: string, count: number) -> string`
+### string.rpad(pattern, count) @method
 Pad string with `pattern` on the right side, till the total length reaches `count`.
 
 ## Bit
 Contains bitwise operations which are not frequent enough to warrant a
 dedicated operator, but which still finds occasional uses.
 
-### Function `bit.ceil(n: number) -> number`
+### ceil(n) @function
 Return the bitwise ceiling of a number.
 
-### Function `bit.floor(n: number) -> number`
+### floor(n) @function
 Return the bitwise floor of a number.
 
 ## ASCII
 Contains functions for dealing with ASCII codes and characters.
 
-### Function `ascii.char(code: number) -> string`
+### char(code) @function
 Return the character associated with an ASCII code.
 
-### Function `ascii.code(char: string) -> number`
+### code(char) @function
 Return the ASCII code associated with a character.
 
 Expects `char` to be a string of length `1`.
 
-### Function `ascii.isalnum(char: string) -> boolean`
+### isalnum(char) @function
 Return whether a character is an alphabet or a digit.
 
 Expects `char` to be a string of length `1`.
 
-### Function `ascii.isalpha(char: string) -> boolean`
+### isalpha(char) @function
 Return whether a character is an alphabet.
 
 Expects `char` to be a string of length `1`.
 
-### Function `ascii.iscntrl(char: string) -> boolean`
+### iscntrl(char) @function
 Return whether a character is a control character.
 
 Expects `char` to be a string of length `1`.
 
-### Function `ascii.isdigit(char: string) -> boolean`
+### isdigit(char) @function
 Return whether a character is a digit.
 
 Expects `char` to be a string of length `1`.
 
-### Function `ascii.islower(char: string) -> boolean`
+### islower(char) @function
 Return whether a character is lowercase.
 
 Expects `char` to be a string of length `1`.
 
-### Function `ascii.isupper(char: string) -> boolean`
+### isupper(char) @function
 Return whether a character is uppercase.
 
 Expects `char` to be a string of length `1`.
 
-### Function `ascii.isgraph(char: string) -> boolean`
+### isgraph(char) @function
 Return whether a character is graphable.
 
 Expects `char` to be a string of length `1`.
 
-### Function `ascii.isprint(char: string) -> boolean`
+### isprint(char) @function
 Return whether a character is printable.
 
 Expects `char` to be a string of length `1`.
 
-### Function `ascii.ispunct(char: string) -> boolean`
+### ispunct(char) @function
 Return whether a character is a punctuation.
 
 Expects `char` to be a string of length `1`.
 
-### Function `ascii.isspace(char: string) -> boolean`
+### isspace(char) @function
 Return whether a character is whitespace.
 
 Expects `char` to be a string of length `1`.
@@ -260,71 +262,71 @@ Expects `char` to be a string of length `1`.
 ## Bytes
 Strings are immutable in BS. The native class `Bytes` provides a mutable string builder for optimized string modification operations.
 
-### Class `Bytes()`
+### Bytes() @class
 Create a string builder.
 
-### Method `Bytes.count() -> number`
+### Bytes.count() @method
 Return the current number of bytes written.
 
-### Method `Bytes.reset(position: number) -> string`
+### Bytes.reset(position) @method
 Move back the writer head to `position`.
 
 Also create a string from `position` to the end of the `Bytes` instance and return it.
 
-### Method `Bytes.slice(start: number, end: number) -> string`
+### Bytes.slice(start, end) @method
 Return a slice from `start` (inclusive) to `end` (exclusive).
 
-### Method `Bytes.write(value: string)`
+### Bytes.write(value) @method
 Write `value` to the end.
 
-### Method `Bytes.insert(position: number, value: string)`
+### Bytes.insert(position, value) @method
 Write `value` at `position`.
 
 ## Array
 Methods for the builtin array value.
 
-### Method `array.map(f: function) -> array`
+### array.map(f) @method
 Functional map.
 
 The provided function `f` must take a single argument.
 
-### Method `array.filter(f: function) -> array`
+### array.filter(f) @method
 Functional filter.
 
 The provided function `f` must take a single argument.
 
-### Method `array.reduce(f: function, accumulator?: any) -> any`
+### array.reduce(f, accumulator?) @method
 Functional reduce.
 
 The provided function `f` must take two arguments. The first
 argument shall be the accumulator, and the second shall be the
 current value.
 
-### Method `array.copy() -> array`
+### array.copy() @method
 Copy an array.
 
-### Method `array.join(separator: string) -> string`
+### array.join(separator) @method
 Join the elements of an array, separated by `separator` into a single string.
 
-### Method `array.find(value: any, start?: number) -> number | nil`
+### array.find(value, start?) @method
 Find `value` within an array starting from position `start` (which defaults to `0`).
 
 Returns the position if found, else `nil`.
 
-### Method `array.equal(that: array) -> boolean`
+### array.equal(that) @method
 Compare the elements of two arrays.
 
-### Method `array.push(value: any)`
+### array.push(value) @method
 Push `value` into an array.
 
 This modifies the array.
 
-### Method `array.insert(position: number, value: any)`
+### array.insert(position, value) @method
 Insert `value` into an array at `position`.
 
 This modifies the array.
 
-### Method `array.sort(compare: function) -> array`
+### array.sort(compare) @method
 Sort an array inplace with `compare`, and return itself.
 
 ```bs
@@ -342,14 +344,14 @@ io.println(xs) fr # Output: [1, 2, 3, 4, 5]
 
 The compare function must take two arguments. If it returns `true`, then the left argument shall be considered "less than", and vice versa for `false`.
 
-### Method `array.resize(size: number) -> array`
+### array.resize(size) @method
 Resize an array to one having `size` elements.
 
 If `size` is larger than the original size, the extra elements shall default to `nil`.
 
 This modifies the array.
 
-### Method `array.reverse() -> array`
+### array.reverse() @method
 Reverse an array.
 
 This modifes the array.
@@ -357,10 +359,10 @@ This modifes the array.
 ## Table
 Methods for the builtin table value.
 
-### Method `table.copy() -> table`
+### table.copy() @method
 Copy a table.
 
-### Method `table.equal(that: table) -> boolean`
+### table.equal(that) @method
 Compare the elements of two tables.
 
 ## Math
@@ -368,65 +370,65 @@ Contains simple mathematical primitives.
 
 The methods defined here work on numbers.
 
-### Method `number.sin() -> number`
+### number.sin() @method
 Sine in radians.
 
-### Method `number.cos() -> number`
+### number.cos() @method
 Cosine in radians.
 
-### Method `number.tan() -> number`
+### number.tan() @method
 Tangent in radians.
 
-### Method `number.asin() -> number`
+### number.asin() @method
 Inverse sine in radians.
 
-### Method `number.acos() -> number`
+### number.acos() @method
 Inverse cosine in radians.
 
-### Method `number.atan() -> number`
+### number.atan() @method
 Inverse tangent in radians.
 
-### Method `number.exp() -> number`
+### number.exp() @method
 Return the exponential function of the number.
 
-### Method `number.log() -> number`
+### number.log() @method
 Return the natural logarithm (base `e`) of the number.
 
-### Method `number.log10() -> number`
+### number.log10() @method
 Return the common logarithm (base `10`) of the number.
 
-### Method `number.pow(exponent: number) -> number`
+### number.pow(exponent) @method
 Raise the number to `exponent`.
 
-### Method `number.sqrt() -> number`
+### number.sqrt() @method
 Square root.
 
-### Method `number.ceil() -> number`
+### number.ceil() @method
 Ceiling.
 
-### Method `number.floor() -> number`
+### number.floor() @method
 Floor.
 
-### Method `number.round() -> number`
+### number.round() @method
 Return the nearest integer.
 
-### Method `number.max(those ...number) -> number`
+### number.max(those ...) @method
 Return the maximum between the method receiver and the provided arguments.
 
-### Method `number.min(those ...number) -> number`
+### number.min(those ...) @method
 Return the minimum between the method receiver and the provided arguments.
 
-### Method `number.clamp(low: number, high: number) -> number`
+### number.clamp(low, high) @method
 Clamp the number between `low` and `high`.
 
-### Method `number.lerp(a: number, b: number, t: number) -> number`
+### number.lerp(a, b, t) @method
 Linear interpolation.
 
-### Number `math.E`
+### E @constant
 Euler's constant.
 
-### Number `math.PI`
+### PI @constant
 PI.
 
-### Function `math.random() -> number`
+### random() @function
 Return a pseudorandom number between `0` and `1`.

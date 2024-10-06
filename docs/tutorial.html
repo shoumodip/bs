@@ -188,8 +188,8 @@ io.<span class='field'>println</span>(<span class='constant'>276</span> &gt;&gt;
 io.<span class='field'>println</span>(<span class='constant'>105</span> &lt;&lt; <span class='constant'>2</span>);       <span class='comment'># Output: 420</span>
 io.<span class='field'>println</span>(~-<span class='constant'>70</span>);           <span class='comment'># Output: 69</span>
 io.<span class='field'>println</span>(<span class='constant'>160</span> | <span class='constant'>260</span>);      <span class='comment'># Output: 420</span>
-io.<span class='field'>println</span>(<span class='constant'>77</span> & <span class='constant'>103</span>);       <span class='comment'># Output: 69</span>
-io.<span class='field'>println</span>(~-<span class='constant'>419</span> + <span class='constant'>10</span> & <span class='constant'>3</span>); <span class='comment'># Output: 420</span>
+io.<span class='field'>println</span>(<span class='constant'>77</span> &amp; <span class='constant'>103</span>);       <span class='comment'># Output: 69</span>
+io.<span class='field'>println</span>(~-<span class='constant'>419</span> + <span class='constant'>10</span> &amp; <span class='constant'>3</span>); <span class='comment'># Output: 420</span>
 io.<span class='field'>println</span>(<span class='constant'>69</span> ^ <span class='constant'>1404</span>);      <span class='comment'># Output: 1337</span>
 </pre>
 <pre class='code'>
@@ -207,8 +207,8 @@ io.<span class='field'>println</span>(<span class='constant'>276</span> &gt;&gt;
 io.<span class='field'>println</span>(<span class='constant'>105</span> &lt;&lt; <span class='constant'>2</span>) <span class='keyword'>fr</span>       <span class='comment'># Output: 420</span>
 io.<span class='field'>println</span>(~-<span class='constant'>70</span>) <span class='keyword'>fr</span>           <span class='comment'># Output: 69</span>
 io.<span class='field'>println</span>(<span class='constant'>160</span> | <span class='constant'>260</span>) <span class='keyword'>fr</span>      <span class='comment'># Output: 420</span>
-io.<span class='field'>println</span>(<span class='constant'>77</span> & <span class='constant'>103</span>) <span class='keyword'>fr</span>       <span class='comment'># Output: 69</span>
-io.<span class='field'>println</span>(~-<span class='constant'>419</span> + <span class='constant'>10</span> & <span class='constant'>3</span>) <span class='keyword'>fr</span> <span class='comment'># Output: 420</span>
+io.<span class='field'>println</span>(<span class='constant'>77</span> &amp; <span class='constant'>103</span>) <span class='keyword'>fr</span>       <span class='comment'># Output: 69</span>
+io.<span class='field'>println</span>(~-<span class='constant'>419</span> + <span class='constant'>10</span> &amp; <span class='constant'>3</span>) <span class='keyword'>fr</span> <span class='comment'># Output: 420</span>
 io.<span class='field'>println</span>(<span class='constant'>69</span> ^ <span class='constant'>1404</span>) <span class='keyword'>fr</span>      <span class='comment'># Output: 1337</span>
 </pre>
 </div>
@@ -285,13 +285,13 @@ io.<span class='field'>println</span>(<span class='constant'>nil</span> == <span
 io.<span class='field'>println</span>(<span class='constant'>false</span> == <span class='constant'>0</span>);     <span class='comment'># Output: false</span>
 
 <span class='comment'># Logical AND, OR</span>
-io.<span class='field'>println</span>(<span class='constant'>true</span> && <span class='constant'>true</span>);   <span class='comment'># Output: true</span>
-io.<span class='field'>println</span>(<span class='constant'>true</span> && <span class='constant'>false</span>);  <span class='comment'># Output: false</span>
+io.<span class='field'>println</span>(<span class='constant'>true</span> &amp;&amp; <span class='constant'>true</span>);   <span class='comment'># Output: true</span>
+io.<span class='field'>println</span>(<span class='constant'>true</span> &amp;&amp; <span class='constant'>false</span>);  <span class='comment'># Output: false</span>
 io.<span class='field'>println</span>(<span class='constant'>true</span> || <span class='constant'>false</span>);  <span class='comment'># Output: true</span>
 io.<span class='field'>println</span>(<span class='constant'>false</span> || <span class='constant'>false</span>); <span class='comment'># Output: false</span>
 
 <span class='comment'># Short circuiting</span>
-io.<span class='field'>println</span>(<span class='constant'>nil</span> && <span class='constant'>true</span>);    <span class='comment'># Output: nil</span>
+io.<span class='field'>println</span>(<span class='constant'>nil</span> &amp;&amp; <span class='constant'>true</span>);    <span class='comment'># Output: nil</span>
 io.<span class='field'>println</span>(<span class='constant'>0</span> || <span class='constant'>false</span>);     <span class='comment'># Output: 0</span>
 </pre>
 <pre class='code'>
@@ -318,13 +318,13 @@ io.<span class='field'>println</span>(<span class='constant'>bruh</span> == <spa
 io.<span class='field'>println</span>(<span class='constant'>cap</span> == <span class='constant'>0</span>) <span class='keyword'>fr</span>       <span class='comment'># Output: cap</span>
 
 <span class='comment'># Logical AND, OR</span>
-io.<span class='field'>println</span>(<span class='constant'>nocap</span> && <span class='constant'>nocap</span>) <span class='keyword'>fr</span> <span class='comment'># Output: nocap</span>
-io.<span class='field'>println</span>(<span class='constant'>nocap</span> && <span class='constant'>cap</span>) <span class='keyword'>fr</span>   <span class='comment'># Output: cap</span>
+io.<span class='field'>println</span>(<span class='constant'>nocap</span> &amp;&amp; <span class='constant'>nocap</span>) <span class='keyword'>fr</span> <span class='comment'># Output: nocap</span>
+io.<span class='field'>println</span>(<span class='constant'>nocap</span> &amp;&amp; <span class='constant'>cap</span>) <span class='keyword'>fr</span>   <span class='comment'># Output: cap</span>
 io.<span class='field'>println</span>(<span class='constant'>nocap</span> || <span class='constant'>cap</span>) <span class='keyword'>fr</span>   <span class='comment'># Output: nocap</span>
 io.<span class='field'>println</span>(<span class='constant'>cap</span> || <span class='constant'>cap</span>) <span class='keyword'>fr</span>     <span class='comment'># Output: cap</span>
 
 <span class='comment'># Short circuiting</span>
-io.<span class='field'>println</span>(<span class='constant'>bruh</span> && <span class='constant'>nocap</span>) <span class='keyword'>fr</span>  <span class='comment'># Output: bruh</span>
+io.<span class='field'>println</span>(<span class='constant'>bruh</span> &amp;&amp; <span class='constant'>nocap</span>) <span class='keyword'>fr</span>  <span class='comment'># Output: bruh</span>
 io.<span class='field'>println</span>(<span class='constant'>0</span> || <span class='constant'>cap</span>) <span class='keyword'>fr</span>       <span class='comment'># Output: 0</span>
 </pre>
 </div>
@@ -2393,7 +2393,7 @@ more applicable, albeit involved, example.
 <span class='keyword'>var</span> hero = Hero(io.<span class='field'>input</span>(<span class='string'>"Enter hero's name&gt; "</span>), <span class='constant'>30</span>, <span class='constant'>10</span>);
 <span class='keyword'>var</span> enemy = Enemy(io.<span class='field'>input</span>(<span class='string'>"Enter enemy's name&gt; "</span>), <span class='constant'>25</span>, <span class='constant'>8</span>);
 
-<span class='keyword'>while</span> hero.<span class='field'>isAlive</span>() && enemy.<span class='field'>isAlive</span>() {
+<span class='keyword'>while</span> hero.<span class='field'>isAlive</span>() &amp;&amp; enemy.<span class='field'>isAlive</span>() {
     io.<span class='field'>println</span>();
 
     <span class='comment'># Hero cannot choose while poisoned</span>
@@ -2509,7 +2509,7 @@ more applicable, albeit involved, example.
 <span class='keyword'>mf</span> hero = Hero(io.<span class='field'>input</span>(<span class='string'>"Enter hero's name&gt; "</span>), <span class='constant'>30</span>, <span class='constant'>10</span>) <span class='keyword'>fr</span>
 <span class='keyword'>mf</span> enemy = Enemy(io.<span class='field'>input</span>(<span class='string'>"Enter enemy's name&gt; "</span>), <span class='constant'>25</span>, <span class='constant'>8</span>) <span class='keyword'>fr</span>
 
-<span class='keyword'>yolo</span> hero.<span class='field'>isAlive</span>() && enemy.<span class='field'>isAlive</span>() {
+<span class='keyword'>yolo</span> hero.<span class='field'>isAlive</span>() &amp;&amp; enemy.<span class='field'>isAlive</span>() {
     io.<span class='field'>println</span>() <span class='keyword'>fr</span>
 
     <span class='comment'># Hero cannot choose while poisoned</span>

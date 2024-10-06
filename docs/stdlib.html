@@ -8,7 +8,7 @@
 <body>
 <header id='header'>
 <button id='toggle-sidebar' aria-label='Toggle Sidebar'>☰</button>
-<h1>Stdlib Documentation</h1>
+<h1>Stdlib</h1>
 </header>
 <main id='main'>
 <section id='s0'>
@@ -17,37 +17,37 @@
 Contains simple I/O primitives.
 </p>
 <section id='s1'>
-<h3> Function <code>io.input(prompt?: string) -&gt; string</code></h3>
+<h3><code><span class='function'>input</span>(prompt?)</code></h3>
 <p>
 Read a line from standard input, printing the optional argument <code>prompt</code> if provided.
 </p>
 </section>
 <section id='s2'>
-<h3> Function <code>io.print(...)</code></h3>
+<h3><code><span class='function'>print</span>(...)</code></h3>
 <p>
 Print all the arguments to standard output.
 </p>
 </section>
 <section id='s3'>
-<h3> Function <code>io.println(...)</code></h3>
+<h3><code><span class='function'>println</span>(...)</code></h3>
 <p>
 Print all the arguments to standard output, with a following newline.
 </p>
 </section>
 <section id='s4'>
-<h3> Function <code>io.eprint(...)</code></h3>
+<h3><code><span class='function'>eprint</span>(...)</code></h3>
 <p>
 Print all the arguments to standard error.
 </p>
 </section>
 <section id='s5'>
-<h3> Function <code>io.eprintln(...)</code></h3>
+<h3><code><span class='function'>eprintln</span>(...)</code></h3>
 <p>
 Print all the arguments to standard error, with a following newline.
 </p>
 </section>
 <section id='s6'>
-<h3> Class <code>io.Reader(path: string)</code></h3>
+<h3><code><span class='class'>Reader</span>(path)</code></h3>
 <p>
 Native C class that opens <code>path</code> in readable mode.
 </p>
@@ -55,7 +55,7 @@ Native C class that opens <code>path</code> in readable mode.
 Returns <code>nil</code> if failed.
 </p>
 <section id='s7'>
-<h4> Method <code>io.Reader.close()</code></h4>
+<h4><code><span class='class'>Reader</span>.<span class='field'>close</span>()</code></h4>
 <p>
 Close the file.
 </p>
@@ -65,7 +65,7 @@ short programs.
 </p>
 </section>
 <section id='s8'>
-<h4> Method <code>io.Reader.read(count?: number) -&gt; string | nil</code></h4>
+<h4><code><span class='class'>Reader</span>.<span class='field'>read</span>(count?)</code></h4>
 <p>
 Read <code>count</code> bytes from the current position. If the argument <code>bytes</code> is not
 provided, it reads all of the available bytes.
@@ -75,13 +75,13 @@ Returns <code>nil</code> if failed.
 </p>
 </section>
 <section id='s9'>
-<h4> Method <code>io.Reader.readln() -&gt; string</code></h4>
+<h4><code><span class='class'>Reader</span>.<span class='field'>readln</span>()</code></h4>
 <p>
 Read a line.
 </p>
 </section>
 <section id='s10'>
-<h4> Method <code>io.Reader.seek(offset: number, whence: number) -&gt; boolean</code></h4>
+<h4><code><span class='class'>Reader</span>.<span class='field'>seek</span>(offset, whence)</code></h4>
 <p>
 Change the read position of the file.
 </p>
@@ -89,16 +89,16 @@ Change the read position of the file.
 Any of the following values can be used for <code>whence</code>.
 </p>
 <ul>
-<li><code>io.SEEK_SET</code> - Seek from beginning of file</li>
-<li><code>io.SEEK_CUR</code> - Seek from current position</li>
-<li><code>io.SEEK_END</code> - Seek from end of file</li>
+<li><code>SEEK_SET</code> - Seek from beginning of file</li>
+<li><code>SEEK_CUR</code> - Seek from current position</li>
+<li><code>SEEK_END</code> - Seek from end of file</li>
 </ul>
 <p>
 Returns <code>true</code> if succeeded and <code>false</code> if failed
 </p>
 </section>
 <section id='s11'>
-<h4> Method <code>io.Reader.tell() -&gt; number</code></h4>
+<h4><code><span class='class'>Reader</span>.<span class='field'>tell</span>()</code></h4>
 <p>
 Get the current position of the file.
 </p>
@@ -108,7 +108,7 @@ Returns <code>nil</code> if failed
 </section>
 </section>
 <section id='s12'>
-<h3> Class <code>io.Writer(path: string)</code></h3>
+<h3><code><span class='class'>Writer</span>(path)</code></h3>
 <p>
 Native C class that opens <code>path</code> in writeable mode.
 </p>
@@ -116,7 +116,7 @@ Native C class that opens <code>path</code> in writeable mode.
 Returns <code>nil</code> if failed.
 </p>
 <section id='s13'>
-<h4> Method <code>io.Writer.close()</code></h4>
+<h4><code><span class='class'>Writer</span>.<span class='field'>close</span>()</code></h4>
 <p>
 Close the file.
 </p>
@@ -126,13 +126,13 @@ short programs.
 </p>
 </section>
 <section id='s14'>
-<h4> Method <code>io.Writer.flush()</code></h4>
+<h4><code><span class='class'>Writer</span>.<span class='field'>flush</span>()</code></h4>
 <p>
 Flush the contents of the file, since IO is buffered in C.
 </p>
 </section>
 <section id='s15'>
-<h4> Method <code>io.Writer.write(...) -&gt; boolean</code></h4>
+<h4><code><span class='class'>Writer</span>.<span class='field'>write</span>(...)</code></h4>
 <p>
 Write all the arguments into the file.
 </p>
@@ -141,7 +141,7 @@ Returns <code>false</code> if any errors were encountered, else <code>true</code
 </p>
 </section>
 <section id='s16'>
-<h4> Method <code>io.Writer.writeln(...) -&gt; boolean</code></h4>
+<h4><code><span class='class'>Writer</span>.<span class='field'>writeln</span>(...)</code></h4>
 <p>
 Write all the arguments into the file, with a following newline.
 </p>
@@ -151,21 +151,21 @@ Returns <code>false</code> if any errors were encountered, else <code>true</code
 </section>
 </section>
 <section id='s17'>
-<h3> Instance <code>io.stdin</code></h3>
+<h3><code><span class='constant'>stdin</span></code></h3>
 <p>
-<code>io.Reader</code> for standard input.
+<code>Reader</code> for standard input.
 </p>
 </section>
 <section id='s18'>
-<h3> Instance <code>io.stdout</code></h3>
+<h3><code><span class='constant'>stdout</span></code></h3>
 <p>
-<code>io.Writer</code> for standard output.
+<code>Writer</code> for standard output.
 </p>
 </section>
 <section id='s19'>
-<h3> Instance <code>io.stderr</code></h3>
+<h3><code><span class='constant'>stderr</span></code></h3>
 <p>
-<code>io.Writer</code> for standard error.
+<code>Writer</code> for standard error.
 </p>
 </section>
 </section>
@@ -175,7 +175,7 @@ Returns <code>false</code> if any errors were encountered, else <code>true</code
 Contains simple primitives for OS functions.
 </p>
 <section id='s21'>
-<h3> Function <code>os.exit(code: number)</code></h3>
+<h3><code><span class='function'>exit</span>(code)</code></h3>
 <p>
 Halt the BS runtime with exit code <code>code</code>.
 </p>
@@ -186,7 +186,7 @@ machine can decide what to do.
 </p>
 </section>
 <section id='s22'>
-<h3> Functin <code>os.clock() -&gt; number</code></h3>
+<h3><code><span class='function'>clock</span>()</code></h3>
 <p>
 Get the monotonic time passed since boot.
 </p>
@@ -196,13 +196,13 @@ in the unit of seconds.
 </p>
 </section>
 <section id='s23'>
-<h3> Function <code>os.sleep(seconds: number)</code></h3>
+<h3><code><span class='function'>sleep</span>(seconds)</code></h3>
 <p>
 Sleep for <code>seconds</code> interval, with nanosecond level of precision.
 </p>
 </section>
 <section id='s24'>
-<h3> Function <code>os.getenv(name: string) -&gt; string | nil</code></h3>
+<h3><code><span class='function'>getenv</span>(name)</code></h3>
 <p>
 Get the environment variable <code>name</code>.
 </p>
@@ -211,7 +211,7 @@ Returns <code>nil</code> if it doesn't exist.
 </p>
 </section>
 <section id='s25'>
-<h3> Function <code>os.setenv(name: string, value: string) -&gt; boolean</code></h3>
+<h3><code><span class='function'>setenv</span>(name, value)</code></h3>
 <p>
 Set the environment variable <code>name</code> to <code>value</code>.
 </p>
@@ -220,14 +220,14 @@ Returns <code>true</code> if successful, else <code>false</code>.
 </p>
 </section>
 <section id='s26'>
-<h3> Array <code>os.args</code></h3>
+<h3><code><span class='constant'>args</span></code></h3>
 <p>
 Array of command line arguments. First element is the program
 name.
 </p>
 </section>
 <section id='s27'>
-<h3> Class <code>os.Process(args: [string])</code></h3>
+<h3><code><span class='class'>Process</span>(args)</code></h3>
 <p>
 Native C class that spawns a process. Expects <code>args</code> to be an
 array of strings that represent the command line arguments.
@@ -236,7 +236,7 @@ array of strings that represent the command line arguments.
 Returns <code>nil</code> if failed.
 </p>
 <section id='s28'>
-<h4> Method <code>os.Process.kill(signal: number) -&gt; boolean</code></h4>
+<h4><code><span class='class'>Process</span>.<span class='field'>kill</span>(signal)</code></h4>
 <p>
 Kill the process with <code>signal</code>.
 </p>
@@ -245,7 +245,7 @@ Returns <code>false</code> if any errors were encountered, else <code>true</code
 </p>
 </section>
 <section id='s29'>
-<h4> Method <code>os.Process.wait() -&gt; number | nil</code></h4>
+<h4><code><span class='class'>Process</span>.<span class='field'>wait</span>()</code></h4>
 <p>
 Wait for the process to exit, and return its exit code.
 </p>
@@ -256,9 +256,12 @@ Returns <code>nil</code> if failed.
 </section>
 </section>
 <section id='s30'>
-<h2> Regex</h2>
+<h2> Regular Expressions</h2>
+<p>
+POSIX compatible regular expressions.
+</p>
 <section id='s31'>
-<h3> Class <code>Regex(pattern: string)</code></h3>
+<h3><code><span class='class'>Regex</span>(pattern)</code></h3>
 <p>
 Native C class that compiles a regular expression.
 </p>
@@ -273,37 +276,37 @@ Returns <code>nil</code> if failed.
 Methods for the builtin string value.
 </p>
 <section id='s33'>
-<h3> Method <code>string.slice(start: number, end: number) -&gt; string</code></h3>
+<h3><code><span class='class'>string</span>.<span class='field'>slice</span>(start, end)</code></h3>
 <p>
 Slice a string from <code>start</code> (inclusive) to <code>end</code> (exclusive).
 </p>
 </section>
 <section id='s34'>
-<h3> Method <code>string.reverse() -&gt; string</code></h3>
+<h3><code><span class='class'>string</span>.<span class='field'>reverse</span>()</code></h3>
 <p>
 Reverse a string.
 </p>
 </section>
 <section id='s35'>
-<h3> Method <code>string.toupper() -&gt; string</code></h3>
+<h3><code><span class='class'>string</span>.<span class='field'>toupper</span>()</code></h3>
 <p>
 Convert a string to uppercase.
 </p>
 </section>
 <section id='s36'>
-<h3> Method <code>string.tolower() -&gt; string</code></h3>
+<h3><code><span class='class'>string</span>.<span class='field'>tolower</span>()</code></h3>
 <p>
 Convert a string to lowercase.
 </p>
 </section>
 <section id='s37'>
-<h3> Method <code>string.tonumber() -&gt; number | nil</code></h3>
+<h3><code><span class='class'>string</span>.<span class='field'>tonumber</span>()</code></h3>
 <p>
 Convert a string to a number.
 </p>
 </section>
 <section id='s38'>
-<h3> Method <code>string.find(pattern: string | Regex, start?: number) -&gt; number | nil</code></h3>
+<h3><code><span class='class'>string</span>.<span class='field'>find</span>(pattern, start?)</code></h3>
 <p>
 Find <code>pattern</code> within a string starting from position <code>start</code> (which defaults to <code>0</code>).
 </p>
@@ -312,43 +315,43 @@ Returns the position if found, else <code>nil</code>.
 </p>
 </section>
 <section id='s39'>
-<h3> Method <code>string.split(pattern: string | Regex) -&gt; [string]</code></h3>
+<h3><code><span class='class'>string</span>.<span class='field'>split</span>(pattern)</code></h3>
 <p>
 Split string by <code>pattern</code>.
 </p>
 </section>
 <section id='s40'>
-<h3> Method <code>string.replace(pattern: string | Regex, replacement: string) -&gt; string</code></h3>
+<h3><code><span class='class'>string</span>.<span class='field'>replace</span>(pattern, replacement)</code></h3>
 <p>
 Replace <code>pattern</code> with <code>replacement</code>.
 </p>
 </section>
 <section id='s41'>
-<h3> Method <code>string.ltrim(pattern: string) -&gt; string</code></h3>
+<h3><code><span class='class'>string</span>.<span class='field'>ltrim</span>(pattern)</code></h3>
 <p>
 Trim <code>pattern</code> from the left of a string.
 </p>
 </section>
 <section id='s42'>
-<h3> Method <code>string.rtrim(pattern: string) -&gt; string</code></h3>
+<h3><code><span class='class'>string</span>.<span class='field'>rtrim</span>(pattern)</code></h3>
 <p>
 Trim <code>pattern</code> from the right of a string.
 </p>
 </section>
 <section id='s43'>
-<h3> Method <code>string.trim(pattern: string) -&gt; string</code></h3>
+<h3><code><span class='class'>string</span>.<span class='field'>trim</span>(pattern)</code></h3>
 <p>
 Trim <code>pattern</code> from both sides of a string.
 </p>
 </section>
 <section id='s44'>
-<h3> Method <code>string.lpad(pattern: string, count: number) -&gt; string</code></h3>
+<h3><code><span class='class'>string</span>.<span class='field'>lpad</span>(pattern, count)</code></h3>
 <p>
 Pad string with <code>pattern</code> on the left side, till the total length reaches <code>count</code>.
 </p>
 </section>
 <section id='s45'>
-<h3> Method <code>string.rpad(pattern: string, count: number) -&gt; string</code></h3>
+<h3><code><span class='class'>string</span>.<span class='field'>rpad</span>(pattern, count)</code></h3>
 <p>
 Pad string with <code>pattern</code> on the right side, till the total length reaches <code>count</code>.
 </p>
@@ -361,13 +364,13 @@ Contains bitwise operations which are not frequent enough to warrant a
 dedicated operator, but which still finds occasional uses.
 </p>
 <section id='s47'>
-<h3> Function <code>bit.ceil(n: number) -&gt; number</code></h3>
+<h3><code><span class='function'>ceil</span>(n)</code></h3>
 <p>
 Return the bitwise ceiling of a number.
 </p>
 </section>
 <section id='s48'>
-<h3> Function <code>bit.floor(n: number) -&gt; number</code></h3>
+<h3><code><span class='function'>floor</span>(n)</code></h3>
 <p>
 Return the bitwise floor of a number.
 </p>
@@ -379,13 +382,13 @@ Return the bitwise floor of a number.
 Contains functions for dealing with ASCII codes and characters.
 </p>
 <section id='s50'>
-<h3> Function <code>ascii.char(code: number) -&gt; string</code></h3>
+<h3><code><span class='function'>char</span>(code)</code></h3>
 <p>
 Return the character associated with an ASCII code.
 </p>
 </section>
 <section id='s51'>
-<h3> Function <code>ascii.code(char: string) -&gt; number</code></h3>
+<h3><code><span class='function'>code</span>(char)</code></h3>
 <p>
 Return the ASCII code associated with a character.
 </p>
@@ -394,7 +397,7 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s52'>
-<h3> Function <code>ascii.isalnum(char: string) -&gt; boolean</code></h3>
+<h3><code><span class='function'>isalnum</span>(char)</code></h3>
 <p>
 Return whether a character is an alphabet or a digit.
 </p>
@@ -403,7 +406,7 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s53'>
-<h3> Function <code>ascii.isalpha(char: string) -&gt; boolean</code></h3>
+<h3><code><span class='function'>isalpha</span>(char)</code></h3>
 <p>
 Return whether a character is an alphabet.
 </p>
@@ -412,7 +415,7 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s54'>
-<h3> Function <code>ascii.iscntrl(char: string) -&gt; boolean</code></h3>
+<h3><code><span class='function'>iscntrl</span>(char)</code></h3>
 <p>
 Return whether a character is a control character.
 </p>
@@ -421,7 +424,7 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s55'>
-<h3> Function <code>ascii.isdigit(char: string) -&gt; boolean</code></h3>
+<h3><code><span class='function'>isdigit</span>(char)</code></h3>
 <p>
 Return whether a character is a digit.
 </p>
@@ -430,7 +433,7 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s56'>
-<h3> Function <code>ascii.islower(char: string) -&gt; boolean</code></h3>
+<h3><code><span class='function'>islower</span>(char)</code></h3>
 <p>
 Return whether a character is lowercase.
 </p>
@@ -439,7 +442,7 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s57'>
-<h3> Function <code>ascii.isupper(char: string) -&gt; boolean</code></h3>
+<h3><code><span class='function'>isupper</span>(char)</code></h3>
 <p>
 Return whether a character is uppercase.
 </p>
@@ -448,7 +451,7 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s58'>
-<h3> Function <code>ascii.isgraph(char: string) -&gt; boolean</code></h3>
+<h3><code><span class='function'>isgraph</span>(char)</code></h3>
 <p>
 Return whether a character is graphable.
 </p>
@@ -457,7 +460,7 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s59'>
-<h3> Function <code>ascii.isprint(char: string) -&gt; boolean</code></h3>
+<h3><code><span class='function'>isprint</span>(char)</code></h3>
 <p>
 Return whether a character is printable.
 </p>
@@ -466,7 +469,7 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s60'>
-<h3> Function <code>ascii.ispunct(char: string) -&gt; boolean</code></h3>
+<h3><code><span class='function'>ispunct</span>(char)</code></h3>
 <p>
 Return whether a character is a punctuation.
 </p>
@@ -475,7 +478,7 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s61'>
-<h3> Function <code>ascii.isspace(char: string) -&gt; boolean</code></h3>
+<h3><code><span class='function'>isspace</span>(char)</code></h3>
 <p>
 Return whether a character is whitespace.
 </p>
@@ -490,19 +493,19 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 Strings are immutable in BS. The native class <code>Bytes</code> provides a mutable string builder for optimized string modification operations.
 </p>
 <section id='s63'>
-<h3> Class <code>Bytes()</code></h3>
+<h3><code><span class='class'>Bytes</span>()</code></h3>
 <p>
 Create a string builder.
 </p>
 </section>
 <section id='s64'>
-<h3> Method <code>Bytes.count() -&gt; number</code></h3>
+<h3><code><span class='class'>Bytes</span>.<span class='field'>count</span>()</code></h3>
 <p>
 Return the current number of bytes written.
 </p>
 </section>
 <section id='s65'>
-<h3> Method <code>Bytes.reset(position: number) -&gt; string</code></h3>
+<h3><code><span class='class'>Bytes</span>.<span class='field'>reset</span>(position)</code></h3>
 <p>
 Move back the writer head to <code>position</code>.
 </p>
@@ -511,19 +514,19 @@ Also create a string from <code>position</code> to the end of the <code>Bytes</c
 </p>
 </section>
 <section id='s66'>
-<h3> Method <code>Bytes.slice(start: number, end: number) -&gt; string</code></h3>
+<h3><code><span class='class'>Bytes</span>.<span class='field'>slice</span>(start, end)</code></h3>
 <p>
 Return a slice from <code>start</code> (inclusive) to <code>end</code> (exclusive).
 </p>
 </section>
 <section id='s67'>
-<h3> Method <code>Bytes.write(value: string)</code></h3>
+<h3><code><span class='class'>Bytes</span>.<span class='field'>write</span>(value)</code></h3>
 <p>
 Write <code>value</code> to the end.
 </p>
 </section>
 <section id='s68'>
-<h3> Method <code>Bytes.insert(position: number, value: string)</code></h3>
+<h3><code><span class='class'>Bytes</span>.<span class='field'>insert</span>(position, value)</code></h3>
 <p>
 Write <code>value</code> at <code>position</code>.
 </p>
@@ -535,7 +538,7 @@ Write <code>value</code> at <code>position</code>.
 Methods for the builtin array value.
 </p>
 <section id='s70'>
-<h3> Method <code>array.map(f: function) -&gt; array</code></h3>
+<h3><code><span class='class'>array</span>.<span class='field'>map</span>(f)</code></h3>
 <p>
 Functional map.
 </p>
@@ -544,7 +547,7 @@ The provided function <code>f</code> must take a single argument.
 </p>
 </section>
 <section id='s71'>
-<h3> Method <code>array.filter(f: function) -&gt; array</code></h3>
+<h3><code><span class='class'>array</span>.<span class='field'>filter</span>(f)</code></h3>
 <p>
 Functional filter.
 </p>
@@ -553,7 +556,7 @@ The provided function <code>f</code> must take a single argument.
 </p>
 </section>
 <section id='s72'>
-<h3> Method <code>array.reduce(f: function, accumulator?: any) -&gt; any</code></h3>
+<h3><code><span class='class'>array</span>.<span class='field'>reduce</span>(f, accumulator?)</code></h3>
 <p>
 Functional reduce.
 </p>
@@ -564,19 +567,19 @@ current value.
 </p>
 </section>
 <section id='s73'>
-<h3> Method <code>array.copy() -&gt; array</code></h3>
+<h3><code><span class='class'>array</span>.<span class='field'>copy</span>()</code></h3>
 <p>
 Copy an array.
 </p>
 </section>
 <section id='s74'>
-<h3> Method <code>array.join(separator: string) -&gt; string</code></h3>
+<h3><code><span class='class'>array</span>.<span class='field'>join</span>(separator)</code></h3>
 <p>
 Join the elements of an array, separated by <code>separator</code> into a single string.
 </p>
 </section>
 <section id='s75'>
-<h3> Method <code>array.find(value: any, start?: number) -&gt; number | nil</code></h3>
+<h3><code><span class='class'>array</span>.<span class='field'>find</span>(value, start?)</code></h3>
 <p>
 Find <code>value</code> within an array starting from position <code>start</code> (which defaults to <code>0</code>).
 </p>
@@ -585,13 +588,13 @@ Returns the position if found, else <code>nil</code>.
 </p>
 </section>
 <section id='s76'>
-<h3> Method <code>array.equal(that: array) -&gt; boolean</code></h3>
+<h3><code><span class='class'>array</span>.<span class='field'>equal</span>(that)</code></h3>
 <p>
 Compare the elements of two arrays.
 </p>
 </section>
 <section id='s77'>
-<h3> Method <code>array.push(value: any)</code></h3>
+<h3><code><span class='class'>array</span>.<span class='field'>push</span>(value)</code></h3>
 <p>
 Push <code>value</code> into an array.
 </p>
@@ -600,7 +603,7 @@ This modifies the array.
 </p>
 </section>
 <section id='s78'>
-<h3> Method <code>array.insert(position: number, value: any)</code></h3>
+<h3><code><span class='class'>array</span>.<span class='field'>insert</span>(position, value)</code></h3>
 <p>
 Insert <code>value</code> into an array at <code>position</code>.
 </p>
@@ -609,7 +612,7 @@ This modifies the array.
 </p>
 </section>
 <section id='s79'>
-<h3> Method <code>array.sort(compare: function) -&gt; array</code></h3>
+<h3><code><span class='class'>array</span>.<span class='field'>sort</span>(compare)</code></h3>
 <p>
 Sort an array inplace with <code>compare</code>, and return itself.
 </p>
@@ -648,7 +651,7 @@ The compare function must take two arguments. If it returns <code>true</code>, t
 </p>
 </section>
 <section id='s80'>
-<h3> Method <code>array.resize(size: number) -&gt; array</code></h3>
+<h3><code><span class='class'>array</span>.<span class='field'>resize</span>(size)</code></h3>
 <p>
 Resize an array to one having <code>size</code> elements.
 </p>
@@ -660,7 +663,7 @@ This modifies the array.
 </p>
 </section>
 <section id='s81'>
-<h3> Method <code>array.reverse() -&gt; array</code></h3>
+<h3><code><span class='class'>array</span>.<span class='field'>reverse</span>()</code></h3>
 <p>
 Reverse an array.
 </p>
@@ -675,13 +678,13 @@ This modifes the array.
 Methods for the builtin table value.
 </p>
 <section id='s83'>
-<h3> Method <code>table.copy() -&gt; table</code></h3>
+<h3><code><span class='class'>table</span>.<span class='field'>copy</span>()</code></h3>
 <p>
 Copy a table.
 </p>
 </section>
 <section id='s84'>
-<h3> Method <code>table.equal(that: table) -&gt; boolean</code></h3>
+<h3><code><span class='class'>table</span>.<span class='field'>equal</span>(that)</code></h3>
 <p>
 Compare the elements of two tables.
 </p>
@@ -696,127 +699,127 @@ Contains simple mathematical primitives.
 The methods defined here work on numbers.
 </p>
 <section id='s86'>
-<h3> Method <code>number.sin() -&gt; number</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>sin</span>()</code></h3>
 <p>
 Sine in radians.
 </p>
 </section>
 <section id='s87'>
-<h3> Method <code>number.cos() -&gt; number</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>cos</span>()</code></h3>
 <p>
 Cosine in radians.
 </p>
 </section>
 <section id='s88'>
-<h3> Method <code>number.tan() -&gt; number</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>tan</span>()</code></h3>
 <p>
 Tangent in radians.
 </p>
 </section>
 <section id='s89'>
-<h3> Method <code>number.asin() -&gt; number</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>asin</span>()</code></h3>
 <p>
 Inverse sine in radians.
 </p>
 </section>
 <section id='s90'>
-<h3> Method <code>number.acos() -&gt; number</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>acos</span>()</code></h3>
 <p>
 Inverse cosine in radians.
 </p>
 </section>
 <section id='s91'>
-<h3> Method <code>number.atan() -&gt; number</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>atan</span>()</code></h3>
 <p>
 Inverse tangent in radians.
 </p>
 </section>
 <section id='s92'>
-<h3> Method <code>number.exp() -&gt; number</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>exp</span>()</code></h3>
 <p>
 Return the exponential function of the number.
 </p>
 </section>
 <section id='s93'>
-<h3> Method <code>number.log() -&gt; number</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>log</span>()</code></h3>
 <p>
 Return the natural logarithm (base <code>e</code>) of the number.
 </p>
 </section>
 <section id='s94'>
-<h3> Method <code>number.log10() -&gt; number</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>log10</span>()</code></h3>
 <p>
 Return the common logarithm (base <code>10</code>) of the number.
 </p>
 </section>
 <section id='s95'>
-<h3> Method <code>number.pow(exponent: number) -&gt; number</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>pow</span>(exponent)</code></h3>
 <p>
 Raise the number to <code>exponent</code>.
 </p>
 </section>
 <section id='s96'>
-<h3> Method <code>number.sqrt() -&gt; number</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>sqrt</span>()</code></h3>
 <p>
 Square root.
 </p>
 </section>
 <section id='s97'>
-<h3> Method <code>number.ceil() -&gt; number</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>ceil</span>()</code></h3>
 <p>
 Ceiling.
 </p>
 </section>
 <section id='s98'>
-<h3> Method <code>number.floor() -&gt; number</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>floor</span>()</code></h3>
 <p>
 Floor.
 </p>
 </section>
 <section id='s99'>
-<h3> Method <code>number.round() -&gt; number</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>round</span>()</code></h3>
 <p>
 Return the nearest integer.
 </p>
 </section>
 <section id='s100'>
-<h3> Method <code>number.max(those ...number) -&gt; number</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>max</span>(those ...)</code></h3>
 <p>
 Return the maximum between the method receiver and the provided arguments.
 </p>
 </section>
 <section id='s101'>
-<h3> Method <code>number.min(those ...number) -&gt; number</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>min</span>(those ...)</code></h3>
 <p>
 Return the minimum between the method receiver and the provided arguments.
 </p>
 </section>
 <section id='s102'>
-<h3> Method <code>number.clamp(low: number, high: number) -&gt; number</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>clamp</span>(low, high)</code></h3>
 <p>
 Clamp the number between <code>low</code> and <code>high</code>.
 </p>
 </section>
 <section id='s103'>
-<h3> Method <code>number.lerp(a: number, b: number, t: number) -&gt; number</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>lerp</span>(a, b, t)</code></h3>
 <p>
 Linear interpolation.
 </p>
 </section>
 <section id='s104'>
-<h3> Number <code>math.E</code></h3>
+<h3><code><span class='constant'>E</span></code></h3>
 <p>
 Euler's constant.
 </p>
 </section>
 <section id='s105'>
-<h3> Number <code>math.PI</code></h3>
+<h3><code><span class='constant'>PI</span></code></h3>
 <p>
 PI.
 </p>
 </section>
 <section id='s106'>
-<h3> Function <code>math.random() -&gt; number</code></h3>
+<h3><code><span class='function'>random</span>()</code></h3>
 <p>
 Return a pseudorandom number between <code>0</code> and <code>1</code>.
 </p>
@@ -829,65 +832,65 @@ Return a pseudorandom number between <code>0</code> and <code>1</code>.
 <a href='#s0'> IO</a>
 <ul>
 <li>
-<a href='#s1'> Function <code>io.input(prompt?: string) -&gt; string</code></a>
+<a href='#s1'>input</a>
 </li>
 <li>
-<a href='#s2'> Function <code>io.print(...)</code></a>
+<a href='#s2'>print</a>
 </li>
 <li>
-<a href='#s3'> Function <code>io.println(...)</code></a>
+<a href='#s3'>println</a>
 </li>
 <li>
-<a href='#s4'> Function <code>io.eprint(...)</code></a>
+<a href='#s4'>eprint</a>
 </li>
 <li>
-<a href='#s5'> Function <code>io.eprintln(...)</code></a>
+<a href='#s5'>eprintln</a>
 </li>
 <li>
-<a href='#s6'> Class <code>io.Reader(path: string)</code></a>
+<a href='#s6'>Reader</a>
 <ul>
 <li>
-<a href='#s7'> Method <code>io.Reader.close()</code></a>
+<a href='#s7'>close</a>
 </li>
 <li>
-<a href='#s8'> Method <code>io.Reader.read(count?: number) -&gt; string | nil</code></a>
+<a href='#s8'>read</a>
 </li>
 <li>
-<a href='#s9'> Method <code>io.Reader.readln() -&gt; string</code></a>
+<a href='#s9'>readln</a>
 </li>
 <li>
-<a href='#s10'> Method <code>io.Reader.seek(offset: number, whence: number) -&gt; boolean</code></a>
+<a href='#s10'>seek</a>
 </li>
 <li>
-<a href='#s11'> Method <code>io.Reader.tell() -&gt; number</code></a>
+<a href='#s11'>tell</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s12'> Class <code>io.Writer(path: string)</code></a>
+<a href='#s12'>Writer</a>
 <ul>
 <li>
-<a href='#s13'> Method <code>io.Writer.close()</code></a>
+<a href='#s13'>close</a>
 </li>
 <li>
-<a href='#s14'> Method <code>io.Writer.flush()</code></a>
+<a href='#s14'>flush</a>
 </li>
 <li>
-<a href='#s15'> Method <code>io.Writer.write(...) -&gt; boolean</code></a>
+<a href='#s15'>write</a>
 </li>
 <li>
-<a href='#s16'> Method <code>io.Writer.writeln(...) -&gt; boolean</code></a>
+<a href='#s16'>writeln</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s17'> Instance <code>io.stdin</code></a>
+<a href='#s17'> stdin </a>
 </li>
 <li>
-<a href='#s18'> Instance <code>io.stdout</code></a>
+<a href='#s18'> stdout </a>
 </li>
 <li>
-<a href='#s19'> Instance <code>io.stderr</code></a>
+<a href='#s19'> stderr </a>
 </li>
 </ul>
 </li>
@@ -895,41 +898,41 @@ Return a pseudorandom number between <code>0</code> and <code>1</code>.
 <a href='#s20'> OS</a>
 <ul>
 <li>
-<a href='#s21'> Function <code>os.exit(code: number)</code></a>
+<a href='#s21'>exit</a>
 </li>
 <li>
-<a href='#s22'> Functin <code>os.clock() -&gt; number</code></a>
+<a href='#s22'>clock</a>
 </li>
 <li>
-<a href='#s23'> Function <code>os.sleep(seconds: number)</code></a>
+<a href='#s23'>sleep</a>
 </li>
 <li>
-<a href='#s24'> Function <code>os.getenv(name: string) -&gt; string | nil</code></a>
+<a href='#s24'>getenv</a>
 </li>
 <li>
-<a href='#s25'> Function <code>os.setenv(name: string, value: string) -&gt; boolean</code></a>
+<a href='#s25'>setenv</a>
 </li>
 <li>
-<a href='#s26'> Array <code>os.args</code></a>
+<a href='#s26'> args </a>
 </li>
 <li>
-<a href='#s27'> Class <code>os.Process(args: [string])</code></a>
+<a href='#s27'>Process</a>
 <ul>
 <li>
-<a href='#s28'> Method <code>os.Process.kill(signal: number) -&gt; boolean</code></a>
+<a href='#s28'>kill</a>
 </li>
 <li>
-<a href='#s29'> Method <code>os.Process.wait() -&gt; number | nil</code></a>
+<a href='#s29'>wait</a>
 </li>
 </ul>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s30'> Regex</a>
+<a href='#s30'> Regular Expressions</a>
 <ul>
 <li>
-<a href='#s31'> Class <code>Regex(pattern: string)</code></a>
+<a href='#s31'>Regex</a>
 </li>
 </ul>
 </li>
@@ -937,43 +940,43 @@ Return a pseudorandom number between <code>0</code> and <code>1</code>.
 <a href='#s32'> String</a>
 <ul>
 <li>
-<a href='#s33'> Method <code>string.slice(start: number, end: number) -&gt; string</code></a>
+<a href='#s33'>slice</a>
 </li>
 <li>
-<a href='#s34'> Method <code>string.reverse() -&gt; string</code></a>
+<a href='#s34'>reverse</a>
 </li>
 <li>
-<a href='#s35'> Method <code>string.toupper() -&gt; string</code></a>
+<a href='#s35'>toupper</a>
 </li>
 <li>
-<a href='#s36'> Method <code>string.tolower() -&gt; string</code></a>
+<a href='#s36'>tolower</a>
 </li>
 <li>
-<a href='#s37'> Method <code>string.tonumber() -&gt; number | nil</code></a>
+<a href='#s37'>tonumber</a>
 </li>
 <li>
-<a href='#s38'> Method <code>string.find(pattern: string | Regex, start?: number) -&gt; number | nil</code></a>
+<a href='#s38'>find</a>
 </li>
 <li>
-<a href='#s39'> Method <code>string.split(pattern: string | Regex) -&gt; [string]</code></a>
+<a href='#s39'>split</a>
 </li>
 <li>
-<a href='#s40'> Method <code>string.replace(pattern: string | Regex, replacement: string) -&gt; string</code></a>
+<a href='#s40'>replace</a>
 </li>
 <li>
-<a href='#s41'> Method <code>string.ltrim(pattern: string) -&gt; string</code></a>
+<a href='#s41'>ltrim</a>
 </li>
 <li>
-<a href='#s42'> Method <code>string.rtrim(pattern: string) -&gt; string</code></a>
+<a href='#s42'>rtrim</a>
 </li>
 <li>
-<a href='#s43'> Method <code>string.trim(pattern: string) -&gt; string</code></a>
+<a href='#s43'>trim</a>
 </li>
 <li>
-<a href='#s44'> Method <code>string.lpad(pattern: string, count: number) -&gt; string</code></a>
+<a href='#s44'>lpad</a>
 </li>
 <li>
-<a href='#s45'> Method <code>string.rpad(pattern: string, count: number) -&gt; string</code></a>
+<a href='#s45'>rpad</a>
 </li>
 </ul>
 </li>
@@ -981,10 +984,10 @@ Return a pseudorandom number between <code>0</code> and <code>1</code>.
 <a href='#s46'> Bit</a>
 <ul>
 <li>
-<a href='#s47'> Function <code>bit.ceil(n: number) -&gt; number</code></a>
+<a href='#s47'>ceil</a>
 </li>
 <li>
-<a href='#s48'> Function <code>bit.floor(n: number) -&gt; number</code></a>
+<a href='#s48'>floor</a>
 </li>
 </ul>
 </li>
@@ -992,40 +995,40 @@ Return a pseudorandom number between <code>0</code> and <code>1</code>.
 <a href='#s49'> ASCII</a>
 <ul>
 <li>
-<a href='#s50'> Function <code>ascii.char(code: number) -&gt; string</code></a>
+<a href='#s50'>char</a>
 </li>
 <li>
-<a href='#s51'> Function <code>ascii.code(char: string) -&gt; number</code></a>
+<a href='#s51'>code</a>
 </li>
 <li>
-<a href='#s52'> Function <code>ascii.isalnum(char: string) -&gt; boolean</code></a>
+<a href='#s52'>isalnum</a>
 </li>
 <li>
-<a href='#s53'> Function <code>ascii.isalpha(char: string) -&gt; boolean</code></a>
+<a href='#s53'>isalpha</a>
 </li>
 <li>
-<a href='#s54'> Function <code>ascii.iscntrl(char: string) -&gt; boolean</code></a>
+<a href='#s54'>iscntrl</a>
 </li>
 <li>
-<a href='#s55'> Function <code>ascii.isdigit(char: string) -&gt; boolean</code></a>
+<a href='#s55'>isdigit</a>
 </li>
 <li>
-<a href='#s56'> Function <code>ascii.islower(char: string) -&gt; boolean</code></a>
+<a href='#s56'>islower</a>
 </li>
 <li>
-<a href='#s57'> Function <code>ascii.isupper(char: string) -&gt; boolean</code></a>
+<a href='#s57'>isupper</a>
 </li>
 <li>
-<a href='#s58'> Function <code>ascii.isgraph(char: string) -&gt; boolean</code></a>
+<a href='#s58'>isgraph</a>
 </li>
 <li>
-<a href='#s59'> Function <code>ascii.isprint(char: string) -&gt; boolean</code></a>
+<a href='#s59'>isprint</a>
 </li>
 <li>
-<a href='#s60'> Function <code>ascii.ispunct(char: string) -&gt; boolean</code></a>
+<a href='#s60'>ispunct</a>
 </li>
 <li>
-<a href='#s61'> Function <code>ascii.isspace(char: string) -&gt; boolean</code></a>
+<a href='#s61'>isspace</a>
 </li>
 </ul>
 </li>
@@ -1033,22 +1036,22 @@ Return a pseudorandom number between <code>0</code> and <code>1</code>.
 <a href='#s62'> Bytes</a>
 <ul>
 <li>
-<a href='#s63'> Class <code>Bytes()</code></a>
+<a href='#s63'>Bytes</a>
 </li>
 <li>
-<a href='#s64'> Method <code>Bytes.count() -&gt; number</code></a>
+<a href='#s64'>count</a>
 </li>
 <li>
-<a href='#s65'> Method <code>Bytes.reset(position: number) -&gt; string</code></a>
+<a href='#s65'>reset</a>
 </li>
 <li>
-<a href='#s66'> Method <code>Bytes.slice(start: number, end: number) -&gt; string</code></a>
+<a href='#s66'>slice</a>
 </li>
 <li>
-<a href='#s67'> Method <code>Bytes.write(value: string)</code></a>
+<a href='#s67'>write</a>
 </li>
 <li>
-<a href='#s68'> Method <code>Bytes.insert(position: number, value: string)</code></a>
+<a href='#s68'>insert</a>
 </li>
 </ul>
 </li>
@@ -1056,40 +1059,40 @@ Return a pseudorandom number between <code>0</code> and <code>1</code>.
 <a href='#s69'> Array</a>
 <ul>
 <li>
-<a href='#s70'> Method <code>array.map(f: function) -&gt; array</code></a>
+<a href='#s70'>map</a>
 </li>
 <li>
-<a href='#s71'> Method <code>array.filter(f: function) -&gt; array</code></a>
+<a href='#s71'>filter</a>
 </li>
 <li>
-<a href='#s72'> Method <code>array.reduce(f: function, accumulator?: any) -&gt; any</code></a>
+<a href='#s72'>reduce</a>
 </li>
 <li>
-<a href='#s73'> Method <code>array.copy() -&gt; array</code></a>
+<a href='#s73'>copy</a>
 </li>
 <li>
-<a href='#s74'> Method <code>array.join(separator: string) -&gt; string</code></a>
+<a href='#s74'>join</a>
 </li>
 <li>
-<a href='#s75'> Method <code>array.find(value: any, start?: number) -&gt; number | nil</code></a>
+<a href='#s75'>find</a>
 </li>
 <li>
-<a href='#s76'> Method <code>array.equal(that: array) -&gt; boolean</code></a>
+<a href='#s76'>equal</a>
 </li>
 <li>
-<a href='#s77'> Method <code>array.push(value: any)</code></a>
+<a href='#s77'>push</a>
 </li>
 <li>
-<a href='#s78'> Method <code>array.insert(position: number, value: any)</code></a>
+<a href='#s78'>insert</a>
 </li>
 <li>
-<a href='#s79'> Method <code>array.sort(compare: function) -&gt; array</code></a>
+<a href='#s79'>sort</a>
 </li>
 <li>
-<a href='#s80'> Method <code>array.resize(size: number) -&gt; array</code></a>
+<a href='#s80'>resize</a>
 </li>
 <li>
-<a href='#s81'> Method <code>array.reverse() -&gt; array</code></a>
+<a href='#s81'>reverse</a>
 </li>
 </ul>
 </li>
@@ -1097,10 +1100,10 @@ Return a pseudorandom number between <code>0</code> and <code>1</code>.
 <a href='#s82'> Table</a>
 <ul>
 <li>
-<a href='#s83'> Method <code>table.copy() -&gt; table</code></a>
+<a href='#s83'>copy</a>
 </li>
 <li>
-<a href='#s84'> Method <code>table.equal(that: table) -&gt; boolean</code></a>
+<a href='#s84'>equal</a>
 </li>
 </ul>
 </li>
@@ -1108,67 +1111,67 @@ Return a pseudorandom number between <code>0</code> and <code>1</code>.
 <a href='#s85'> Math</a>
 <ul>
 <li>
-<a href='#s86'> Method <code>number.sin() -&gt; number</code></a>
+<a href='#s86'>sin</a>
 </li>
 <li>
-<a href='#s87'> Method <code>number.cos() -&gt; number</code></a>
+<a href='#s87'>cos</a>
 </li>
 <li>
-<a href='#s88'> Method <code>number.tan() -&gt; number</code></a>
+<a href='#s88'>tan</a>
 </li>
 <li>
-<a href='#s89'> Method <code>number.asin() -&gt; number</code></a>
+<a href='#s89'>asin</a>
 </li>
 <li>
-<a href='#s90'> Method <code>number.acos() -&gt; number</code></a>
+<a href='#s90'>acos</a>
 </li>
 <li>
-<a href='#s91'> Method <code>number.atan() -&gt; number</code></a>
+<a href='#s91'>atan</a>
 </li>
 <li>
-<a href='#s92'> Method <code>number.exp() -&gt; number</code></a>
+<a href='#s92'>exp</a>
 </li>
 <li>
-<a href='#s93'> Method <code>number.log() -&gt; number</code></a>
+<a href='#s93'>log</a>
 </li>
 <li>
-<a href='#s94'> Method <code>number.log10() -&gt; number</code></a>
+<a href='#s94'>log10</a>
 </li>
 <li>
-<a href='#s95'> Method <code>number.pow(exponent: number) -&gt; number</code></a>
+<a href='#s95'>pow</a>
 </li>
 <li>
-<a href='#s96'> Method <code>number.sqrt() -&gt; number</code></a>
+<a href='#s96'>sqrt</a>
 </li>
 <li>
-<a href='#s97'> Method <code>number.ceil() -&gt; number</code></a>
+<a href='#s97'>ceil</a>
 </li>
 <li>
-<a href='#s98'> Method <code>number.floor() -&gt; number</code></a>
+<a href='#s98'>floor</a>
 </li>
 <li>
-<a href='#s99'> Method <code>number.round() -&gt; number</code></a>
+<a href='#s99'>round</a>
 </li>
 <li>
-<a href='#s100'> Method <code>number.max(those ...number) -&gt; number</code></a>
+<a href='#s100'>max</a>
 </li>
 <li>
-<a href='#s101'> Method <code>number.min(those ...number) -&gt; number</code></a>
+<a href='#s101'>min</a>
 </li>
 <li>
-<a href='#s102'> Method <code>number.clamp(low: number, high: number) -&gt; number</code></a>
+<a href='#s102'>clamp</a>
 </li>
 <li>
-<a href='#s103'> Method <code>number.lerp(a: number, b: number, t: number) -&gt; number</code></a>
+<a href='#s103'>lerp</a>
 </li>
 <li>
-<a href='#s104'> Number <code>math.E</code></a>
+<a href='#s104'> E </a>
 </li>
 <li>
-<a href='#s105'> Number <code>math.PI</code></a>
+<a href='#s105'> PI </a>
 </li>
 <li>
-<a href='#s106'> Function <code>math.random() -&gt; number</code></a>
+<a href='#s106'>random</a>
 </li>
 </ul>
 </li>
