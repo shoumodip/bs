@@ -351,37 +351,233 @@ This doesn't actually exit the process itself in embedded usecase.
 It just halts the BS interpreter, and the caller of the virtual
 machine can decide what to do.
 
+```bs
+os.exit(69);
+```
+```bsx
+os.exit(69) fr
+```
+
+```console
+$ bs demo.bs
+$ echo $? # `echo %errorlevel%` on windows
+69
+```
+
 ### clock() @function
 Get the monotonic time passed since boot.
 
 This function provides time with nanosecond level of precision but
 in the unit of seconds.
 
+```bs
+fn fib(n) {
+    if n < 2 {
+        return n;
+    }
+
+    return fib(n - 1) + fib(n - 2);
+}
+
+var start = os.clock();
+io.println(fib(30));
+
+var elapsed = os.clock() - start;
+io.println("Elapsed: \(elapsed)");
+```
+```bsx
+lit fib(n) {
+    ayo n < 2 {
+        bet n fr
+    }
+
+    bet fib(n - 1) + fib(n - 2) fr
+}
+
+mf start = os.clock() fr
+io.println(fib(30)) fr
+
+mf elapsed = os.clock() - start fr
+io.println("Elapsed: \(elapsed)") fr
+```
+
+```console
+$ bs demo.bs
+832040
+Elapsed: 0.137143968999226
+```
+
 ### sleep(seconds) @function
 Sleep for `seconds` interval, with nanosecond level of precision.
+
+```bs
+var start = os.clock();
+os.sleep(0.69);
+
+var elapsed = os.clock() - start;
+io.println("Elapsed: \(elapsed)");
+```
+```bsx
+mf start = os.clock() fr
+os.sleep(0.69) fr
+
+mf elapsed = os.clock() - start fr
+io.println("Elapsed: \(elapsed)") fr
+```
+
+```console
+$ bs demo.bs
+Elapsed: 0.690292477000185
+```
 
 ### getenv(name) @function
 Get the environment variable `name`.
 
 Returns `nil` if it doesn't exist.
 
+```bs
+io.println(os.getenv("FOO"));
+io.println(os.getenv("BAR"));
+```
+```bsx
+io.println(os.getenv("FOO")) fr
+io.println(os.getenv("BAR")) fr
+```
+
+```console
+$ export FOO=lmao # `set FOO=lmao` on windows
+$ bs demo.bs
+lmao
+nil
+```
+
 ### setenv(name, value) @function
 Set the environment variable `name` to `value`.
 
 Returns `true` if successful, else `false`.
 
+```bs
+os.setenv("FOO", "lmao");
+io.println(os.getenv("FOO"));
+```
+```bsx
+os.setenv("FOO", "lmao") fr
+io.println(os.getenv("FOO")) fr
+```
+
+```console
+$ bs demo.bs
+lmao
+```
+
 ### args @constant
 Array of command line arguments. First element is the program
 name.
 
-### Process(args) @class
+```bs
+io.println(os.args);
+```
+```bsx
+io.println(os.args) fr
+```
+
+```console
+$ bs demo.bs foo bar baz
+["demo.bs", "foo", "bar", "baz"]
+```
+
+### Process(args, capture_stdout?, capture_stderr?, capture_stdin?) @class
 Native C class that spawns a process. Expects `args` to be an
 array of strings that represent the command line arguments.
 
+If any of the optional capture arguments are provided to be true, then that
+corresponding file of the created process will be captured.
+
 Returns `nil` if failed.
+
+```bs
+var p = os.Process(["ls", "-l"]);
+if !p {
+    io.eprintln("ERROR: could not start process");
+    os.exit(1);
+}
+
+p.wait();
+```
+```bsx
+mf p = os.Process(["ls", "-l"]) fr
+ayo nah p {
+    io.eprintln("ERROR: could not start process") fr
+    os.exit(1) fr
+}
+
+p.wait() fr
+```
+
+```console
+$ bs demo.bs
+total 4
+-rw-r--r-- 1 shoumodip shoumodip 122 Oct  6 15:11 demo.bs
+```
+
+#### Process.stdout() @method
+Get the standard output of the process as an `io.Reader` instance.
+
+Returns `nil` if the process was spawned without capturing stdout.
+
+```bs
+var p = os.Process(["ls", "-l"], true);
+if !p {
+    io.eprintln("ERROR: could not start process");
+    os.exit(1);
+}
+
+var stdout = p.stdout();
+while !stdout.eof() {
+    var line = stdout.readln();
+    io.println("Line:", line);
+}
+
+p.wait();
+```
+```bsx
+mf p = os.Process(["ls", "-l"], nocap) fr
+ayo nah p {
+    io.eprintln("ERROR: could not start process") fr
+    os.exit(1) fr
+}
+
+mf stdout = p.stdout() fr
+yolo nah stdout.eof() {
+    mf line = stdout.readln() fr
+    io.println("Line:", line) fr
+}
+
+p.wait() fr
+```
+
+```console
+$ bs demo.bs
+Line: total 4
+Line: -rw-r--r-- 1 shoumodip shoumodip 241 Oct  6 15:44 demo.bs
+Line:
+```
+
+#### Process.stderr() @method
+Get the standard error of the process as an `io.Reader` instance.
+
+Returns `nil` if the process was spawned without capturing stderr.
+
+#### Process.stdin() @method
+Get the standard input of the process as an `io.Writer` instance.
+
+Returns `nil` if the process was spawned without capturing stdin.
 
 #### Process.kill(signal) @method
 Kill the process with `signal`.
+
+On windows the process is just killed, since there is no concept of kill
+signals there.
 
 Returns `false` if any errors were encountered, else `true`.
 
@@ -397,6 +593,20 @@ POSIX compatible regular expressions.
 Native C class that compiles a regular expression.
 
 Returns `nil` if failed.
+
+```bs
+var r = Regex("([0-9]+) ([a-z]+)");
+io.println("69 apples, 420 oranges".replace(r, "{fruit: '\\2', count: \\1}"));
+```
+```bsx
+mf r = Regex("([0-9]+) ([a-z]+)") fr
+io.println("69 apples, 420 oranges".replace(r, "{fruit: '\\2', count: \\1}")) fr
+```
+
+```console
+$ bs demo.bs
+{fruit: 'apples', count: 69}, {fruit: 'oranges', count: 420}
+```
 
 ## String
 Methods for the builtin string value.

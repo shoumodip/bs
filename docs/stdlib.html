@@ -669,6 +669,47 @@ This doesn't actually exit the process itself in embedded usecase.
 It just halts the BS interpreter, and the caller of the virtual
 machine can decide what to do.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+os.<span class='field'>exit</span>(<span class='constant'>69</span>);
+</pre>
+<pre class='code'>
+os.<span class='field'>exit</span>(<span class='constant'>69</span>) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+<span class='constant'>$ </span>echo $? <span class='comment'># `echo %errorlevel%` on windows</span>
+69
+</pre>
+</div>
 </section>
 <section id='s23'>
 <h3><code><span class='function'>clock</span>()</code></h3>
@@ -679,12 +720,125 @@ Get the monotonic time passed since boot.
 This function provides time with nanosecond level of precision but
 in the unit of seconds.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>fn</span> <span class='function'>fib</span>(n) {
+    <span class='keyword'>if</span> n &lt; <span class='constant'>2</span> {
+        <span class='keyword'>return</span> n;
+    }
+
+    <span class='keyword'>return</span> fib(n - <span class='constant'>1</span>) + fib(n - <span class='constant'>2</span>);
+}
+
+<span class='keyword'>var</span> start = os.<span class='field'>clock</span>();
+io.<span class='field'>println</span>(fib(<span class='constant'>30</span>));
+
+<span class='keyword'>var</span> elapsed = os.<span class='field'>clock</span>() - start;
+io.<span class='field'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>\</span><span class='escape'>(</span>elapsed<span class='escape'>)</span><span class='string'>"</span>);
+</pre>
+<pre class='code'>
+<span class='keyword'>lit</span> <span class='function'>fib</span>(n) {
+    <span class='keyword'>ayo</span> n &lt; <span class='constant'>2</span> {
+        <span class='keyword'>bet</span> n <span class='keyword'>fr</span>
+    }
+
+    <span class='keyword'>bet</span> fib(n - <span class='constant'>1</span>) + fib(n - <span class='constant'>2</span>) <span class='keyword'>fr</span>
+}
+
+<span class='keyword'>mf</span> start = os.<span class='field'>clock</span>() <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(fib(<span class='constant'>30</span>)) <span class='keyword'>fr</span>
+
+<span class='keyword'>mf</span> elapsed = os.<span class='field'>clock</span>() - start <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>\</span><span class='escape'>(</span>elapsed<span class='escape'>)</span><span class='string'>"</span>) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+832040
+Elapsed: 0.137143968999226
+</pre>
+</div>
 </section>
 <section id='s24'>
 <h3><code><span class='function'>sleep</span>(seconds)</code></h3>
 <p>
 Sleep for <code>seconds</code> interval, with nanosecond level of precision.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> start = os.<span class='field'>clock</span>();
+os.<span class='field'>sleep</span>(<span class='constant'>0.69</span>);
+
+<span class='keyword'>var</span> elapsed = os.<span class='field'>clock</span>() - start;
+io.<span class='field'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>\</span><span class='escape'>(</span>elapsed<span class='escape'>)</span><span class='string'>"</span>);
+</pre>
+<pre class='code'>
+<span class='keyword'>mf</span> start = os.<span class='field'>clock</span>() <span class='keyword'>fr</span>
+os.<span class='field'>sleep</span>(<span class='constant'>0.69</span>) <span class='keyword'>fr</span>
+
+<span class='keyword'>mf</span> elapsed = os.<span class='field'>clock</span>() - start <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>\</span><span class='escape'>(</span>elapsed<span class='escape'>)</span><span class='string'>"</span>) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+Elapsed: 0.690292477000185
+</pre>
+</div>
 </section>
 <section id='s25'>
 <h3><code><span class='function'>getenv</span>(name)</code></h3>
@@ -694,6 +848,50 @@ Get the environment variable <code>name</code>.
 <p>
 Returns <code>nil</code> if it doesn't exist.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+io.<span class='field'>println</span>(os.<span class='field'>getenv</span>(<span class='string'>"FOO"</span>));
+io.<span class='field'>println</span>(os.<span class='field'>getenv</span>(<span class='string'>"BAR"</span>));
+</pre>
+<pre class='code'>
+io.<span class='field'>println</span>(os.<span class='field'>getenv</span>(<span class='string'>"FOO"</span>)) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(os.<span class='field'>getenv</span>(<span class='string'>"BAR"</span>)) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>export FOO=lmao <span class='comment'># `set FOO=lmao` on windows</span>
+<span class='constant'>$ </span>bs demo.bs
+lmao
+nil
+</pre>
+</div>
 </section>
 <section id='s26'>
 <h3><code><span class='function'>setenv</span>(name, value)</code></h3>
@@ -703,6 +901,48 @@ Set the environment variable <code>name</code> to <code>value</code>.
 <p>
 Returns <code>true</code> if successful, else <code>false</code>.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+os.<span class='field'>setenv</span>(<span class='string'>"FOO"</span>, <span class='string'>"lmao"</span>);
+io.<span class='field'>println</span>(os.<span class='field'>getenv</span>(<span class='string'>"FOO"</span>));
+</pre>
+<pre class='code'>
+os.<span class='field'>setenv</span>(<span class='string'>"FOO"</span>, <span class='string'>"lmao"</span>) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(os.<span class='field'>getenv</span>(<span class='string'>"FOO"</span>)) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+lmao
+</pre>
+</div>
 </section>
 <section id='s27'>
 <h3><code><span class='constant'>args</span></code></h3>
@@ -710,26 +950,220 @@ Returns <code>true</code> if successful, else <code>false</code>.
 Array of command line arguments. First element is the program
 name.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+io.<span class='field'>println</span>(os.<span class='field'>args</span>);
+</pre>
+<pre class='code'>
+io.<span class='field'>println</span>(os.<span class='field'>args</span>) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs foo bar baz
+["demo.bs", "foo", "bar", "baz"]
+</pre>
+</div>
 </section>
 <section id='s28'>
-<h3><code><span class='class'>Process</span>(args)</code></h3>
+<h3><code><span class='class'>Process</span>(args, capture_stdout?, capture_stderr?, capture_stdin?)</code></h3>
 <p>
 Native C class that spawns a process. Expects <code>args</code> to be an
 array of strings that represent the command line arguments.
 </p>
 <p>
+If any of the optional capture arguments are provided to be true, then that
+corresponding file of the created process will be captured.
+</p>
+<p>
 Returns <code>nil</code> if failed.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> p = os.<span class='field'>Process</span>([<span class='string'>"ls"</span>, <span class='string'>"-l"</span>]);
+<span class='keyword'>if</span> !p {
+    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>);
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+}
+
+p.<span class='field'>wait</span>();
+</pre>
+<pre class='code'>
+<span class='keyword'>mf</span> p = os.<span class='field'>Process</span>([<span class='string'>"ls"</span>, <span class='string'>"-l"</span>]) <span class='keyword'>fr</span>
+<span class='keyword'>ayo</span> <span class='keyword'>nah</span> p {
+    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>) <span class='keyword'>fr</span>
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>) <span class='keyword'>fr</span>
+}
+
+p.<span class='field'>wait</span>() <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+total 4
+-rw-r--r-- 1 shoumodip shoumodip 122 Oct  6 15:11 demo.bs
+</pre>
+</div>
 <section id='s29'>
+<h4><code><span class='class'>Process</span>.<span class='field'>stdout</span>()</code></h4>
+<p>
+Get the standard output of the process as an <code>io.Reader</code> instance.
+</p>
+<p>
+Returns <code>nil</code> if the process was spawned without capturing stdout.
+</p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> p = os.<span class='field'>Process</span>([<span class='string'>"ls"</span>, <span class='string'>"-l"</span>], <span class='constant'>true</span>);
+<span class='keyword'>if</span> !p {
+    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>);
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+}
+
+<span class='keyword'>var</span> stdout = p.<span class='field'>stdout</span>();
+<span class='keyword'>while</span> !stdout.<span class='field'>eof</span>() {
+    <span class='keyword'>var</span> line = stdout.<span class='field'>readln</span>();
+    io.<span class='field'>println</span>(<span class='string'>"Line:"</span>, line);
+}
+
+p.<span class='field'>wait</span>();
+</pre>
+<pre class='code'>
+<span class='keyword'>mf</span> p = os.<span class='field'>Process</span>([<span class='string'>"ls"</span>, <span class='string'>"-l"</span>], <span class='constant'>nocap</span>) <span class='keyword'>fr</span>
+<span class='keyword'>ayo</span> <span class='keyword'>nah</span> p {
+    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>) <span class='keyword'>fr</span>
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>) <span class='keyword'>fr</span>
+}
+
+<span class='keyword'>mf</span> stdout = p.<span class='field'>stdout</span>() <span class='keyword'>fr</span>
+<span class='keyword'>yolo</span> <span class='keyword'>nah</span> stdout.<span class='field'>eof</span>() {
+    <span class='keyword'>mf</span> line = stdout.<span class='field'>readln</span>() <span class='keyword'>fr</span>
+    io.<span class='field'>println</span>(<span class='string'>"Line:"</span>, line) <span class='keyword'>fr</span>
+}
+
+p.<span class='field'>wait</span>() <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+Line: total 4
+Line: -rw-r--r-- 1 shoumodip shoumodip 241 Oct  6 15:44 demo.bs
+Line:
+</pre>
+</div>
+</section>
+<section id='s30'>
+<h4><code><span class='class'>Process</span>.<span class='field'>stderr</span>()</code></h4>
+<p>
+Get the standard error of the process as an <code>io.Reader</code> instance.
+</p>
+<p>
+Returns <code>nil</code> if the process was spawned without capturing stderr.
+</p>
+</section>
+<section id='s31'>
+<h4><code><span class='class'>Process</span>.<span class='field'>stdin</span>()</code></h4>
+<p>
+Get the standard input of the process as an <code>io.Writer</code> instance.
+</p>
+<p>
+Returns <code>nil</code> if the process was spawned without capturing stdin.
+</p>
+</section>
+<section id='s32'>
 <h4><code><span class='class'>Process</span>.<span class='field'>kill</span>(signal)</code></h4>
 <p>
 Kill the process with <code>signal</code>.
 </p>
 <p>
+On windows the process is just killed, since there is no concept of kill
+signals there.
+</p>
+<p>
 Returns <code>false</code> if any errors were encountered, else <code>true</code>.
 </p>
 </section>
-<section id='s30'>
+<section id='s33'>
 <h4><code><span class='class'>Process</span>.<span class='field'>wait</span>()</code></h4>
 <p>
 Wait for the process to exit, and return its exit code.
@@ -740,12 +1174,12 @@ Returns <code>nil</code> if failed.
 </section>
 </section>
 </section>
-<section id='s31'>
+<section id='s34'>
 <h2> Regular Expressions</h2>
 <p>
 POSIX compatible regular expressions.
 </p>
-<section id='s32'>
+<section id='s35'>
 <h3><code><span class='class'>Regex</span>(pattern)</code></h3>
 <p>
 Native C class that compiles a regular expression.
@@ -753,44 +1187,86 @@ Native C class that compiles a regular expression.
 <p>
 Returns <code>nil</code> if failed.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> r = Regex(<span class='string'>"([0-9]+) ([a-z]+)"</span>);
+io.<span class='field'>println</span>(<span class='string'>"69 apples, 420 oranges"</span>.<span class='field'>replace</span>(r, <span class='string'>"{fruit: '</span><span class='escape'>\\</span><span class='string'>2', count: </span><span class='escape'>\\</span><span class='string'>1}"</span>));
+</pre>
+<pre class='code'>
+<span class='keyword'>mf</span> r = Regex(<span class='string'>"([0-9]+) ([a-z]+)"</span>) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(<span class='string'>"69 apples, 420 oranges"</span>.<span class='field'>replace</span>(r, <span class='string'>"{fruit: '</span><span class='escape'>\\</span><span class='string'>2', count: </span><span class='escape'>\\</span><span class='string'>1}"</span>)) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+{fruit: 'apples', count: 69}, {fruit: 'oranges', count: 420}
+</pre>
+</div>
 </section>
 </section>
-<section id='s33'>
+<section id='s36'>
 <h2> String</h2>
 <p>
 Methods for the builtin string value.
 </p>
-<section id='s34'>
+<section id='s37'>
 <h3><code><span class='class'>string</span>.<span class='field'>slice</span>(start, end)</code></h3>
 <p>
 Slice a string from <code>start</code> (inclusive) to <code>end</code> (exclusive).
 </p>
 </section>
-<section id='s35'>
+<section id='s38'>
 <h3><code><span class='class'>string</span>.<span class='field'>reverse</span>()</code></h3>
 <p>
 Reverse a string.
 </p>
 </section>
-<section id='s36'>
+<section id='s39'>
 <h3><code><span class='class'>string</span>.<span class='field'>toupper</span>()</code></h3>
 <p>
 Convert a string to uppercase.
 </p>
 </section>
-<section id='s37'>
+<section id='s40'>
 <h3><code><span class='class'>string</span>.<span class='field'>tolower</span>()</code></h3>
 <p>
 Convert a string to lowercase.
 </p>
 </section>
-<section id='s38'>
+<section id='s41'>
 <h3><code><span class='class'>string</span>.<span class='field'>tonumber</span>()</code></h3>
 <p>
 Convert a string to a number.
 </p>
 </section>
-<section id='s39'>
+<section id='s42'>
 <h3><code><span class='class'>string</span>.<span class='field'>find</span>(pattern, start?)</code></h3>
 <p>
 Find <code>pattern</code> within a string starting from position <code>start</code> (which defaults
@@ -800,94 +1276,94 @@ to <code>0</code>).
 Returns the position if found, else <code>nil</code>.
 </p>
 </section>
-<section id='s40'>
+<section id='s43'>
 <h3><code><span class='class'>string</span>.<span class='field'>split</span>(pattern)</code></h3>
 <p>
 Split string by <code>pattern</code>.
 </p>
 </section>
-<section id='s41'>
+<section id='s44'>
 <h3><code><span class='class'>string</span>.<span class='field'>replace</span>(pattern, replacement)</code></h3>
 <p>
 Replace <code>pattern</code> with <code>replacement</code>.
 </p>
 </section>
-<section id='s42'>
+<section id='s45'>
 <h3><code><span class='class'>string</span>.<span class='field'>ltrim</span>(pattern)</code></h3>
 <p>
 Trim <code>pattern</code> from the left of a string.
 </p>
 </section>
-<section id='s43'>
+<section id='s46'>
 <h3><code><span class='class'>string</span>.<span class='field'>rtrim</span>(pattern)</code></h3>
 <p>
 Trim <code>pattern</code> from the right of a string.
 </p>
 </section>
-<section id='s44'>
+<section id='s47'>
 <h3><code><span class='class'>string</span>.<span class='field'>trim</span>(pattern)</code></h3>
 <p>
 Trim <code>pattern</code> from both sides of a string.
 </p>
 </section>
-<section id='s45'>
+<section id='s48'>
 <h3><code><span class='class'>string</span>.<span class='field'>lpad</span>(pattern, count)</code></h3>
 <p>
 Pad string with <code>pattern</code> on the left side, till the total length reaches
 <code>count</code>.
 </p>
 </section>
-<section id='s46'>
+<section id='s49'>
 <h3><code><span class='class'>string</span>.<span class='field'>rpad</span>(pattern, count)</code></h3>
 <p>
 Pad string with <code>pattern</code> on the right side, till the total length reaches
 <code>count</code>.
 </p>
 </section>
-<section id='s47'>
+<section id='s50'>
 <h3><code><span class='class'>string</span>.<span class='field'>prefix</span>(pattern)</code></h3>
 <p>
 Check whether string starts with <code>pattern</code>.
 </p>
 </section>
-<section id='s48'>
+<section id='s51'>
 <h3><code><span class='class'>string</span>.<span class='field'>suffix</span>(pattern)</code></h3>
 <p>
 Check whether string ends with <code>pattern</code>.
 </p>
 </section>
 </section>
-<section id='s49'>
+<section id='s52'>
 <h2> Bit</h2>
 <p>
 Contains bitwise operations which are not frequent enough to warrant a
 dedicated operator, but which still finds occasional uses.
 </p>
-<section id='s50'>
+<section id='s53'>
 <h3><code><span class='function'>ceil</span>(n)</code></h3>
 <p>
 Return the bitwise ceiling of a number.
 </p>
 </section>
-<section id='s51'>
+<section id='s54'>
 <h3><code><span class='function'>floor</span>(n)</code></h3>
 <p>
 Return the bitwise floor of a number.
 </p>
 </section>
 </section>
-<section id='s52'>
+<section id='s55'>
 <h2> ASCII</h2>
 <p>
 Contains functions for dealing with ASCII codes and characters.
 </p>
-<section id='s53'>
+<section id='s56'>
 <h3><code><span class='function'>char</span>(code)</code></h3>
 <p>
 Return the character associated with an ASCII code.
 </p>
 </section>
-<section id='s54'>
+<section id='s57'>
 <h3><code><span class='function'>code</span>(char)</code></h3>
 <p>
 Return the ASCII code associated with a character.
@@ -896,7 +1372,7 @@ Return the ASCII code associated with a character.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s55'>
+<section id='s58'>
 <h3><code><span class='function'>isalnum</span>(char)</code></h3>
 <p>
 Return whether a character is an alphabet or a digit.
@@ -905,7 +1381,7 @@ Return whether a character is an alphabet or a digit.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s56'>
+<section id='s59'>
 <h3><code><span class='function'>isalpha</span>(char)</code></h3>
 <p>
 Return whether a character is an alphabet.
@@ -914,7 +1390,7 @@ Return whether a character is an alphabet.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s57'>
+<section id='s60'>
 <h3><code><span class='function'>iscntrl</span>(char)</code></h3>
 <p>
 Return whether a character is a control character.
@@ -923,7 +1399,7 @@ Return whether a character is a control character.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s58'>
+<section id='s61'>
 <h3><code><span class='function'>isdigit</span>(char)</code></h3>
 <p>
 Return whether a character is a digit.
@@ -932,7 +1408,7 @@ Return whether a character is a digit.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s59'>
+<section id='s62'>
 <h3><code><span class='function'>islower</span>(char)</code></h3>
 <p>
 Return whether a character is lowercase.
@@ -941,7 +1417,7 @@ Return whether a character is lowercase.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s60'>
+<section id='s63'>
 <h3><code><span class='function'>isupper</span>(char)</code></h3>
 <p>
 Return whether a character is uppercase.
@@ -950,7 +1426,7 @@ Return whether a character is uppercase.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s61'>
+<section id='s64'>
 <h3><code><span class='function'>isgraph</span>(char)</code></h3>
 <p>
 Return whether a character is graphable.
@@ -959,7 +1435,7 @@ Return whether a character is graphable.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s62'>
+<section id='s65'>
 <h3><code><span class='function'>isprint</span>(char)</code></h3>
 <p>
 Return whether a character is printable.
@@ -968,7 +1444,7 @@ Return whether a character is printable.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s63'>
+<section id='s66'>
 <h3><code><span class='function'>ispunct</span>(char)</code></h3>
 <p>
 Return whether a character is a punctuation.
@@ -977,7 +1453,7 @@ Return whether a character is a punctuation.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s64'>
+<section id='s67'>
 <h3><code><span class='function'>isspace</span>(char)</code></h3>
 <p>
 Return whether a character is whitespace.
@@ -987,25 +1463,25 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 </section>
-<section id='s65'>
+<section id='s68'>
 <h2> Bytes</h2>
 <p>
 Strings are immutable in BS. The native class <code>Bytes</code> provides a mutable string
 builder for optimized string modification operations.
 </p>
-<section id='s66'>
+<section id='s69'>
 <h3><code><span class='class'>Bytes</span>()</code></h3>
 <p>
 Create a string builder.
 </p>
 </section>
-<section id='s67'>
+<section id='s70'>
 <h3><code><span class='class'>Bytes</span>.<span class='field'>count</span>()</code></h3>
 <p>
 Return the current number of bytes written.
 </p>
 </section>
-<section id='s68'>
+<section id='s71'>
 <h3><code><span class='class'>Bytes</span>.<span class='field'>reset</span>(position)</code></h3>
 <p>
 Move back the writer head to <code>position</code>.
@@ -1014,31 +1490,31 @@ Move back the writer head to <code>position</code>.
 Also create a string from <code>position</code> to the end of the <code>Bytes</code> instance and return it.
 </p>
 </section>
-<section id='s69'>
+<section id='s72'>
 <h3><code><span class='class'>Bytes</span>.<span class='field'>slice</span>(start, end)</code></h3>
 <p>
 Return a slice from <code>start</code> (inclusive) to <code>end</code> (exclusive).
 </p>
 </section>
-<section id='s70'>
+<section id='s73'>
 <h3><code><span class='class'>Bytes</span>.<span class='field'>write</span>(value)</code></h3>
 <p>
 Write <code>value</code> to the end.
 </p>
 </section>
-<section id='s71'>
+<section id='s74'>
 <h3><code><span class='class'>Bytes</span>.<span class='field'>insert</span>(position, value)</code></h3>
 <p>
 Write <code>value</code> at <code>position</code>.
 </p>
 </section>
 </section>
-<section id='s72'>
+<section id='s75'>
 <h2> Array</h2>
 <p>
 Methods for the builtin array value.
 </p>
-<section id='s73'>
+<section id='s76'>
 <h3><code><span class='class'>array</span>.<span class='field'>map</span>(f)</code></h3>
 <p>
 Functional map.
@@ -1047,7 +1523,7 @@ Functional map.
 The provided function <code>f</code> must take a single argument.
 </p>
 </section>
-<section id='s74'>
+<section id='s77'>
 <h3><code><span class='class'>array</span>.<span class='field'>filter</span>(f)</code></h3>
 <p>
 Functional filter.
@@ -1056,7 +1532,7 @@ Functional filter.
 The provided function <code>f</code> must take a single argument.
 </p>
 </section>
-<section id='s75'>
+<section id='s78'>
 <h3><code><span class='class'>array</span>.<span class='field'>reduce</span>(f, accumulator?)</code></h3>
 <p>
 Functional reduce.
@@ -1067,19 +1543,19 @@ argument shall be the accumulator, and the second shall be the
 current value.
 </p>
 </section>
-<section id='s76'>
+<section id='s79'>
 <h3><code><span class='class'>array</span>.<span class='field'>copy</span>()</code></h3>
 <p>
 Copy an array.
 </p>
 </section>
-<section id='s77'>
+<section id='s80'>
 <h3><code><span class='class'>array</span>.<span class='field'>join</span>(separator)</code></h3>
 <p>
 Join the elements of an array, separated by <code>separator</code> into a single string.
 </p>
 </section>
-<section id='s78'>
+<section id='s81'>
 <h3><code><span class='class'>array</span>.<span class='field'>find</span>(value, start?)</code></h3>
 <p>
 Find <code>value</code> within an array starting from position <code>start</code> (which defaults to
@@ -1089,13 +1565,13 @@ Find <code>value</code> within an array starting from position <code>start</code
 Returns the position if found, else <code>nil</code>.
 </p>
 </section>
-<section id='s79'>
+<section id='s82'>
 <h3><code><span class='class'>array</span>.<span class='field'>equal</span>(that)</code></h3>
 <p>
 Compare the elements of two arrays.
 </p>
 </section>
-<section id='s80'>
+<section id='s83'>
 <h3><code><span class='class'>array</span>.<span class='field'>push</span>(value)</code></h3>
 <p>
 Push <code>value</code> into an array.
@@ -1104,7 +1580,7 @@ Push <code>value</code> into an array.
 This modifies the array.
 </p>
 </section>
-<section id='s81'>
+<section id='s84'>
 <h3><code><span class='class'>array</span>.<span class='field'>insert</span>(position, value)</code></h3>
 <p>
 Insert <code>value</code> into an array at <code>position</code>.
@@ -1113,7 +1589,7 @@ Insert <code>value</code> into an array at <code>position</code>.
 This modifies the array.
 </p>
 </section>
-<section id='s82'>
+<section id='s85'>
 <h3><code><span class='class'>array</span>.<span class='field'>sort</span>(compare)</code></h3>
 <p>
 Sort an array inplace with <code>compare</code>, and return itself.
@@ -1153,7 +1629,7 @@ The compare function must take two arguments. If it returns <code>true</code>, t
 left argument shall be considered "less than", and vice versa for <code>false</code>.
 </p>
 </section>
-<section id='s83'>
+<section id='s86'>
 <h3><code><span class='class'>array</span>.<span class='field'>resize</span>(size)</code></h3>
 <p>
 Resize an array to one having <code>size</code> elements.
@@ -1166,7 +1642,7 @@ If <code>size</code> is larger than the original size, the extra elements shall 
 This modifies the array.
 </p>
 </section>
-<section id='s84'>
+<section id='s87'>
 <h3><code><span class='class'>array</span>.<span class='field'>reverse</span>()</code></h3>
 <p>
 Reverse an array.
@@ -1176,25 +1652,25 @@ This modifes the array.
 </p>
 </section>
 </section>
-<section id='s85'>
+<section id='s88'>
 <h2> Table</h2>
 <p>
 Methods for the builtin table value.
 </p>
-<section id='s86'>
+<section id='s89'>
 <h3><code><span class='class'>table</span>.<span class='field'>copy</span>()</code></h3>
 <p>
 Copy a table.
 </p>
 </section>
-<section id='s87'>
+<section id='s90'>
 <h3><code><span class='class'>table</span>.<span class='field'>equal</span>(that)</code></h3>
 <p>
 Compare the elements of two tables.
 </p>
 </section>
 </section>
-<section id='s88'>
+<section id='s91'>
 <h2> Math</h2>
 <p>
 Contains simple mathematical primitives.
@@ -1202,127 +1678,127 @@ Contains simple mathematical primitives.
 <p>
 The methods defined here work on numbers.
 </p>
-<section id='s89'>
+<section id='s92'>
 <h3><code><span class='class'>number</span>.<span class='field'>sin</span>()</code></h3>
 <p>
 Sine in radians.
 </p>
 </section>
-<section id='s90'>
+<section id='s93'>
 <h3><code><span class='class'>number</span>.<span class='field'>cos</span>()</code></h3>
 <p>
 Cosine in radians.
 </p>
 </section>
-<section id='s91'>
+<section id='s94'>
 <h3><code><span class='class'>number</span>.<span class='field'>tan</span>()</code></h3>
 <p>
 Tangent in radians.
 </p>
 </section>
-<section id='s92'>
+<section id='s95'>
 <h3><code><span class='class'>number</span>.<span class='field'>asin</span>()</code></h3>
 <p>
 Inverse sine in radians.
 </p>
 </section>
-<section id='s93'>
+<section id='s96'>
 <h3><code><span class='class'>number</span>.<span class='field'>acos</span>()</code></h3>
 <p>
 Inverse cosine in radians.
 </p>
 </section>
-<section id='s94'>
+<section id='s97'>
 <h3><code><span class='class'>number</span>.<span class='field'>atan</span>()</code></h3>
 <p>
 Inverse tangent in radians.
 </p>
 </section>
-<section id='s95'>
+<section id='s98'>
 <h3><code><span class='class'>number</span>.<span class='field'>exp</span>()</code></h3>
 <p>
 Return the exponential function of the number.
 </p>
 </section>
-<section id='s96'>
+<section id='s99'>
 <h3><code><span class='class'>number</span>.<span class='field'>log</span>()</code></h3>
 <p>
 Return the natural logarithm (base <code>e</code>) of the number.
 </p>
 </section>
-<section id='s97'>
+<section id='s100'>
 <h3><code><span class='class'>number</span>.<span class='field'>log10</span>()</code></h3>
 <p>
 Return the common logarithm (base <code>10</code>) of the number.
 </p>
 </section>
-<section id='s98'>
+<section id='s101'>
 <h3><code><span class='class'>number</span>.<span class='field'>pow</span>(exponent)</code></h3>
 <p>
 Raise the number to <code>exponent</code>.
 </p>
 </section>
-<section id='s99'>
+<section id='s102'>
 <h3><code><span class='class'>number</span>.<span class='field'>sqrt</span>()</code></h3>
 <p>
 Square root.
 </p>
 </section>
-<section id='s100'>
+<section id='s103'>
 <h3><code><span class='class'>number</span>.<span class='field'>ceil</span>()</code></h3>
 <p>
 Ceiling.
 </p>
 </section>
-<section id='s101'>
+<section id='s104'>
 <h3><code><span class='class'>number</span>.<span class='field'>floor</span>()</code></h3>
 <p>
 Floor.
 </p>
 </section>
-<section id='s102'>
+<section id='s105'>
 <h3><code><span class='class'>number</span>.<span class='field'>round</span>()</code></h3>
 <p>
 Return the nearest integer.
 </p>
 </section>
-<section id='s103'>
+<section id='s106'>
 <h3><code><span class='class'>number</span>.<span class='field'>max</span>(those ...)</code></h3>
 <p>
 Return the maximum between the method receiver and the provided arguments.
 </p>
 </section>
-<section id='s104'>
+<section id='s107'>
 <h3><code><span class='class'>number</span>.<span class='field'>min</span>(those ...)</code></h3>
 <p>
 Return the minimum between the method receiver and the provided arguments.
 </p>
 </section>
-<section id='s105'>
+<section id='s108'>
 <h3><code><span class='class'>number</span>.<span class='field'>clamp</span>(low, high)</code></h3>
 <p>
 Clamp the number between <code>low</code> and <code>high</code>.
 </p>
 </section>
-<section id='s106'>
+<section id='s109'>
 <h3><code><span class='class'>number</span>.<span class='field'>lerp</span>(a, b, t)</code></h3>
 <p>
 Linear interpolation.
 </p>
 </section>
-<section id='s107'>
+<section id='s110'>
 <h3><code><span class='constant'>E</span></code></h3>
 <p>
 Euler's constant.
 </p>
 </section>
-<section id='s108'>
+<section id='s111'>
 <h3><code><span class='constant'>PI</span></code></h3>
 <p>
 PI.
 </p>
 </section>
-<section id='s109'>
+<section id='s112'>
 <h3><code><span class='function'>random</span>()</code></h3>
 <p>
 Return a pseudorandom number between <code>0</code> and <code>1</code>.
@@ -1426,265 +1902,274 @@ Return a pseudorandom number between <code>0</code> and <code>1</code>.
 <a href='#s28'>Process</a>
 <ul>
 <li>
-<a href='#s29'>kill</a>
+<a href='#s29'>stdout</a>
 </li>
 <li>
-<a href='#s30'>wait</a>
+<a href='#s30'>stderr</a>
+</li>
+<li>
+<a href='#s31'>stdin</a>
+</li>
+<li>
+<a href='#s32'>kill</a>
+</li>
+<li>
+<a href='#s33'>wait</a>
 </li>
 </ul>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s31'> Regular Expressions</a>
+<a href='#s34'> Regular Expressions</a>
 <ul>
 <li>
-<a href='#s32'>Regex</a>
+<a href='#s35'>Regex</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s33'> String</a>
+<a href='#s36'> String</a>
 <ul>
 <li>
-<a href='#s34'>slice</a>
+<a href='#s37'>slice</a>
 </li>
 <li>
-<a href='#s35'>reverse</a>
+<a href='#s38'>reverse</a>
 </li>
 <li>
-<a href='#s36'>toupper</a>
+<a href='#s39'>toupper</a>
 </li>
 <li>
-<a href='#s37'>tolower</a>
+<a href='#s40'>tolower</a>
 </li>
 <li>
-<a href='#s38'>tonumber</a>
+<a href='#s41'>tonumber</a>
 </li>
 <li>
-<a href='#s39'>find</a>
+<a href='#s42'>find</a>
 </li>
 <li>
-<a href='#s40'>split</a>
+<a href='#s43'>split</a>
 </li>
 <li>
-<a href='#s41'>replace</a>
+<a href='#s44'>replace</a>
 </li>
 <li>
-<a href='#s42'>ltrim</a>
+<a href='#s45'>ltrim</a>
 </li>
 <li>
-<a href='#s43'>rtrim</a>
+<a href='#s46'>rtrim</a>
 </li>
 <li>
-<a href='#s44'>trim</a>
+<a href='#s47'>trim</a>
 </li>
 <li>
-<a href='#s45'>lpad</a>
+<a href='#s48'>lpad</a>
 </li>
 <li>
-<a href='#s46'>rpad</a>
+<a href='#s49'>rpad</a>
 </li>
 <li>
-<a href='#s47'>prefix</a>
+<a href='#s50'>prefix</a>
 </li>
 <li>
-<a href='#s48'>suffix</a>
+<a href='#s51'>suffix</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s49'> Bit</a>
+<a href='#s52'> Bit</a>
 <ul>
 <li>
-<a href='#s50'>ceil</a>
+<a href='#s53'>ceil</a>
 </li>
 <li>
-<a href='#s51'>floor</a>
+<a href='#s54'>floor</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s52'> ASCII</a>
+<a href='#s55'> ASCII</a>
 <ul>
 <li>
-<a href='#s53'>char</a>
+<a href='#s56'>char</a>
 </li>
 <li>
-<a href='#s54'>code</a>
+<a href='#s57'>code</a>
 </li>
 <li>
-<a href='#s55'>isalnum</a>
+<a href='#s58'>isalnum</a>
 </li>
 <li>
-<a href='#s56'>isalpha</a>
+<a href='#s59'>isalpha</a>
 </li>
 <li>
-<a href='#s57'>iscntrl</a>
+<a href='#s60'>iscntrl</a>
 </li>
 <li>
-<a href='#s58'>isdigit</a>
+<a href='#s61'>isdigit</a>
 </li>
 <li>
-<a href='#s59'>islower</a>
+<a href='#s62'>islower</a>
 </li>
 <li>
-<a href='#s60'>isupper</a>
+<a href='#s63'>isupper</a>
 </li>
 <li>
-<a href='#s61'>isgraph</a>
+<a href='#s64'>isgraph</a>
 </li>
 <li>
-<a href='#s62'>isprint</a>
+<a href='#s65'>isprint</a>
 </li>
 <li>
-<a href='#s63'>ispunct</a>
+<a href='#s66'>ispunct</a>
 </li>
 <li>
-<a href='#s64'>isspace</a>
+<a href='#s67'>isspace</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s65'> Bytes</a>
+<a href='#s68'> Bytes</a>
 <ul>
 <li>
-<a href='#s66'>Bytes</a>
+<a href='#s69'>Bytes</a>
 </li>
 <li>
-<a href='#s67'>count</a>
+<a href='#s70'>count</a>
 </li>
 <li>
-<a href='#s68'>reset</a>
+<a href='#s71'>reset</a>
 </li>
 <li>
-<a href='#s69'>slice</a>
+<a href='#s72'>slice</a>
 </li>
 <li>
-<a href='#s70'>write</a>
+<a href='#s73'>write</a>
 </li>
 <li>
-<a href='#s71'>insert</a>
+<a href='#s74'>insert</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s72'> Array</a>
+<a href='#s75'> Array</a>
 <ul>
 <li>
-<a href='#s73'>map</a>
+<a href='#s76'>map</a>
 </li>
 <li>
-<a href='#s74'>filter</a>
+<a href='#s77'>filter</a>
 </li>
 <li>
-<a href='#s75'>reduce</a>
+<a href='#s78'>reduce</a>
 </li>
 <li>
-<a href='#s76'>copy</a>
+<a href='#s79'>copy</a>
 </li>
 <li>
-<a href='#s77'>join</a>
+<a href='#s80'>join</a>
 </li>
 <li>
-<a href='#s78'>find</a>
+<a href='#s81'>find</a>
 </li>
 <li>
-<a href='#s79'>equal</a>
+<a href='#s82'>equal</a>
 </li>
 <li>
-<a href='#s80'>push</a>
+<a href='#s83'>push</a>
 </li>
 <li>
-<a href='#s81'>insert</a>
+<a href='#s84'>insert</a>
 </li>
 <li>
-<a href='#s82'>sort</a>
+<a href='#s85'>sort</a>
 </li>
 <li>
-<a href='#s83'>resize</a>
+<a href='#s86'>resize</a>
 </li>
 <li>
-<a href='#s84'>reverse</a>
+<a href='#s87'>reverse</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s85'> Table</a>
+<a href='#s88'> Table</a>
 <ul>
 <li>
-<a href='#s86'>copy</a>
+<a href='#s89'>copy</a>
 </li>
 <li>
-<a href='#s87'>equal</a>
+<a href='#s90'>equal</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s88'> Math</a>
+<a href='#s91'> Math</a>
 <ul>
 <li>
-<a href='#s89'>sin</a>
+<a href='#s92'>sin</a>
 </li>
 <li>
-<a href='#s90'>cos</a>
+<a href='#s93'>cos</a>
 </li>
 <li>
-<a href='#s91'>tan</a>
+<a href='#s94'>tan</a>
 </li>
 <li>
-<a href='#s92'>asin</a>
+<a href='#s95'>asin</a>
 </li>
 <li>
-<a href='#s93'>acos</a>
+<a href='#s96'>acos</a>
 </li>
 <li>
-<a href='#s94'>atan</a>
+<a href='#s97'>atan</a>
 </li>
 <li>
-<a href='#s95'>exp</a>
+<a href='#s98'>exp</a>
 </li>
 <li>
-<a href='#s96'>log</a>
+<a href='#s99'>log</a>
 </li>
 <li>
-<a href='#s97'>log10</a>
+<a href='#s100'>log10</a>
 </li>
 <li>
-<a href='#s98'>pow</a>
+<a href='#s101'>pow</a>
 </li>
 <li>
-<a href='#s99'>sqrt</a>
+<a href='#s102'>sqrt</a>
 </li>
 <li>
-<a href='#s100'>ceil</a>
+<a href='#s103'>ceil</a>
 </li>
 <li>
-<a href='#s101'>floor</a>
+<a href='#s104'>floor</a>
 </li>
 <li>
-<a href='#s102'>round</a>
+<a href='#s105'>round</a>
 </li>
 <li>
-<a href='#s103'>max</a>
+<a href='#s106'>max</a>
 </li>
 <li>
-<a href='#s104'>min</a>
+<a href='#s107'>min</a>
 </li>
 <li>
-<a href='#s105'>clamp</a>
+<a href='#s108'>clamp</a>
 </li>
 <li>
-<a href='#s106'>lerp</a>
+<a href='#s109'>lerp</a>
 </li>
 <li>
-<a href='#s107'> E </a>
+<a href='#s110'> E </a>
 </li>
 <li>
-<a href='#s108'> PI </a>
+<a href='#s111'> PI </a>
 </li>
 <li>
-<a href='#s109'>random</a>
+<a href='#s112'>random</a>
 </li>
 </ul>
 </li>

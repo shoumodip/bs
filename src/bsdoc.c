@@ -441,7 +441,7 @@ int main(int argc, char **argv) {
         "<main id='main'>\n");
 
     bool navigation = true;
-    for (size_t row = 1; sv.size; row++) {
+    for (size_t row = 2; sv.size; row++) {
         line = bs_sv_split(&sv, '\n');
         if (!line.size) {
             continue;
