@@ -140,6 +140,12 @@ Bs_Value bs_io_reader_readln(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
 }
 
+Bs_Value bs_io_reader_eof(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    FILE *f = bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, FILE *);
+    return bs_value_bool(f ? feof(f) : true);
+}
+
 Bs_Value bs_io_reader_seek(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_whole_number(bs, args, 0);
@@ -2015,6 +2021,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("read"), bs_io_reader_read);
         bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("readln"), bs_io_reader_readln);
 
+        bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("eof"), bs_io_reader_eof);
         bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("seek"), bs_io_reader_seek);
         bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("tell"), bs_io_reader_tell);
 
