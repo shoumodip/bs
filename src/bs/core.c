@@ -576,14 +576,6 @@ Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
         const Bs_Str *it_str = (const Bs_Str *)array->data[i].as.object;
         Bs_Sv it = Bs_Sv(it_str->data, it_str->size);
 
-        if (!i) {
-            // This is a very ugly hack needed because WinAPI is shit
-            // But what else can you expect from a video game OS?
-            if (bs_sv_prefix(it, Bs_Sv_Static("./"))) {
-                bs_sv_drop(&it, 2);
-            }
-        }
-
         const bool need_quoting = it.size == 0 || bs_sv_find(it, '\t', NULL) ||
                                   bs_sv_find(it, '\v', NULL) || bs_sv_find(it, ' ', NULL);
 
@@ -607,7 +599,11 @@ Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
                 break;
             }
 
-            bs_da_push(bs, b, it.data[j]);
+            if (!i && it.data[j] == '/') {
+                bs_da_push(bs, b, '\\');
+            } else {
+                bs_da_push(bs, b, it.data[j]);
+            }
         }
 
         if (need_quoting) {
