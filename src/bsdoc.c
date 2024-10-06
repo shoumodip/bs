@@ -313,6 +313,10 @@ void bsdoc_print_line(FILE *f, Bs_Sv line, bool newline, bool list) {
         if (c == '`') {
             code = !code;
             fputs(code ? "<code>" : "</code>", f);
+        } else if (c == '<') {
+            fputs("&lt;", f);
+        } else if (c == '>') {
+            fputs("&gt;", f);
         } else {
             fputc(c, f);
         }
@@ -325,6 +329,41 @@ void bsdoc_print_line(FILE *f, Bs_Sv line, bool newline, bool list) {
     if (newline) {
         fputc('\n', f);
     }
+}
+
+typedef struct {
+    Bs_Sv title;
+    size_t level;
+} Bsdoc_Section;
+
+typedef struct {
+    Bsdoc_Section data[256];
+    size_t count;
+} Bsdoc_Sections;
+
+void bsdoc_sections_push(Bsdoc_Sections *s, Bsdoc_Section section) {
+    assert(s->count < bs_c_array_size(s->data));
+    s->data[s->count++] = section;
+}
+
+void bsdoc_print_navigator(FILE *f, Bsdoc_Sections *sections, size_t *i) {
+    const size_t index = (*i)++;
+    const Bsdoc_Section *s = &sections->data[index];
+
+    fprintf(f, "<li>\n");
+    fprintf(f, "<a href='#s%zu'>", index);
+    bsdoc_print_line(f, s->title, false, false);
+    fprintf(f, "</a>\n");
+
+    if (*i < sections->count && sections->data[*i].level > s->level) {
+        fprintf(f, "<ul>\n");
+        while (*i < sections->count && sections->data[*i].level > s->level) {
+            bsdoc_print_navigator(f, sections, i);
+        }
+        fprintf(f, "</ul>\n");
+    }
+
+    fprintf(f, "</li>\n");
 }
 
 int main(int argc, char **argv) {
@@ -366,15 +405,39 @@ int main(int argc, char **argv) {
         "<!doctype html>\n"
         "<html>\n"
         "<head>\n"
-        "<link rel='stylesheet' href='style.css'>\n"
+        "<meta charset='UTF-8'>\n"
         "<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n"
-        "<script src='script.js'></script>\n"
+        "<link rel='stylesheet' href='style.css'>\n"
         "</head>\n"
         "<body>\n");
 
     Bs_Sv sv = Bs_Sv(contents, size);
+    size_t current_level = 0;
+
+    Bsdoc_Section section = {0};
+    Bsdoc_Sections sections = {0};
+
+    Bs_Sv line = bs_sv_split(&sv, '\n');
+    assert(bs_sv_prefix(line, Bs_Sv_Static("# "))); // TODO: proper error reporting
+    bs_sv_drop(&line, 2);
+
+    fprintf(
+        f,
+        "<header id='header'>\n"
+        "<button id='toggle-sidebar' aria-label='Toggle Sidebar'>☰</button>\n"
+        "<h1>");
+
+    bsdoc_print_line(f, line, false, false);
+
+    fprintf(
+        f,
+        "</h1>\n"
+        "</header>\n"
+        "<main id='main'>\n");
+
+    bool navigation = true;
     for (size_t row = 1; sv.size; row++) {
-        Bs_Sv line = bs_sv_split(&sv, '\n');
+        line = bs_sv_split(&sv, '\n');
         if (!line.size) {
             continue;
         }
@@ -400,9 +463,19 @@ int main(int argc, char **argv) {
 
             line.data += level;
             line.size -= level;
-            fprintf(f, "<h%zu>", level);
+
+            for (size_t i = level; i <= current_level; i++) {
+                fprintf(f, "</section>\n");
+            }
+            current_level = level;
+
+            fprintf(f, "<section id='s%zu'>\n<h%zu>", sections.count, level);
             bsdoc_print_line(f, line, false, false);
             fprintf(f, "</h%zu>\n", level);
+
+            section.title = line;
+            section.level = level;
+            bsdoc_sections_push(&sections, section);
             continue;
         }
 
@@ -416,7 +489,10 @@ int main(int argc, char **argv) {
             line.size -= 2;
 
             fprintf(
-                f, "<a href='" Bs_Sv_Fmt "'>" Bs_Sv_Fmt "</a>\n", Bs_Sv_Arg(line), Bs_Sv_Arg(name));
+                f,
+                "<a class='link' href='" Bs_Sv_Fmt "'>" Bs_Sv_Fmt "</a>\n",
+                Bs_Sv_Arg(line),
+                Bs_Sv_Arg(name));
             continue;
         }
 
@@ -508,6 +584,11 @@ int main(int argc, char **argv) {
             continue;
         }
 
+        if (bs_sv_eq(line, Bs_Sv_Static("<!-- no-navigation -->"))) {
+            navigation = false;
+            continue;
+        }
+
         if (*line.data == '<') {
             fprintf(f, Bs_Sv_Fmt "\n", Bs_Sv_Arg(line));
             continue;
@@ -539,8 +620,40 @@ int main(int argc, char **argv) {
         }
     }
 
+    for (size_t i = 1; i < current_level; i++) {
+        fprintf(f, "</section>\n");
+    }
+
+    fprintf(f, "</main>\n");
+
+    if (navigation) {
+        fprintf(
+            f,
+            "<nav id='sidebar' class='collapsed'>\n"
+            "<ul>\n");
+
+        size_t i = 0;
+        while (i < sections.count) {
+            bsdoc_print_navigator(f, &sections, &i);
+        }
+
+        fprintf(
+            f,
+            "</ul>\n"
+            "</nav>\n");
+    } else {
+        fprintf(
+            f,
+            "<style>\n"
+            "#toggle-sidebar {\n"
+            "    display: none;\n"
+            "}\n"
+            "</style>\n");
+    }
+
     fprintf(
         f,
+        "<script src='script.js'></script>\n"
         "</body>\n"
         "</html>\n");
 

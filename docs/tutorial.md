@@ -1,4 +1,6 @@
 # Tutorial
+
+## Introduction
 Let's start with a simple "Hello World" program.
 
 ```bs
@@ -139,10 +141,6 @@ io.println(false || false); # Output: false
 # Short circuiting
 io.println(nil && true);    # Output: nil
 io.println(0 || false);     # Output: 0
-
-# Logical XOR.
-io.println(true ^^ true);   # Output: false
-io.println(true ^^ false);  # Output: true
 ```
 ```bsx
 io.println(nah nocap) fr      # Output: cap
@@ -176,10 +174,6 @@ io.println(cap || cap) fr     # Output: cap
 # Short circuiting
 io.println(bruh && nocap) fr  # Output: bruh
 io.println(0 || cap) fr       # Output: 0
-
-# Logical XOR.
-io.println(nocap ^^ nocap) fr # Output: cap
-io.println(nocap ^^ cap) fr   # Output: nocap
 ```
 
 ### Strings
@@ -1638,24 +1632,13 @@ class Lol {
 io.println(Lol);
 ```
 ```bsx
-wannabe Foo {
-    init(x) {
-        ayo x == 69 {
-            bet bruh fr
-        }
-
-        deez.x = x fr
-    }
+wannabe Lol {
+    foo() {}
+    bar() {}
+    baz() {}
 }
 
-wannabe Bar {
-    init(x) {
-        deez.x = x fr
-    }
-}
-
-io.println(Foo) fr
-io.println(Bar) fr
+io.println(Lol) fr
 ```
 
 ```console

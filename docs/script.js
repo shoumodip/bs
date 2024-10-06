@@ -37,7 +37,7 @@ function copyClick(e, ok, text) {
         ok.classList.toggle("hidden")
     }
 
-    toggle();
+    toggle()
     setTimeout(toggle, 1000)
 }
 
@@ -49,4 +49,52 @@ function copyClickCode(e) {
 function copyClickShell(e) {
     const [, ok, a] = e.parentNode.children
     copyClick(e, ok, a.innerText)
+}
+
+window.onload = () => {
+    const sidebar = document.getElementById("sidebar")
+    const toggleSidebar = document.getElementById("toggle-sidebar")
+    if (sidebar) {
+        const header = document.getElementById("header")
+
+        toggleSidebar.onclick = () => {
+            sidebar.classList.toggle("collapsed")
+        }
+
+        document.onclick = (event) => {
+            if (!sidebar.contains(event.target) && !toggleSidebar.contains(event.target)) {
+                sidebar.classList.add("collapsed")
+            }
+        }
+
+        const padding = parseFloat(window.getComputedStyle(toggleSidebar).left) + header.offsetHeight
+
+        const links = document.querySelectorAll("#sidebar ul li a")
+        links.forEach(link => {
+            link.addEventListener("click", (e) => {
+                e.preventDefault()
+                const targetId = link.getAttribute("href")
+                const targetSection = document.querySelector(targetId)
+
+                window.scrollTo({
+                    top: window.scrollY + targetSection.getBoundingClientRect().top - padding,
+                    behavior: "smooth"
+                })
+
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.add("collapsed")
+                }
+            })
+        })
+
+        if (window.innerWidth > 768) {
+            sidebar.classList.remove("collapsed")
+        }
+    } else {
+        if (window.innerWidth > 768) {
+            const main = document.getElementById("main")
+            main.style.marginLeft = "10%"
+            main.style.marginRight = "10%"
+        }
+    }
 }

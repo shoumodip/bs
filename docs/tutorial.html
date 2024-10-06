@@ -1,12 +1,18 @@
 <!doctype html>
 <html>
 <head>
-<link rel='stylesheet' href='style.css'>
+<meta charset='UTF-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-<script src='script.js'></script>
+<link rel='stylesheet' href='style.css'>
 </head>
 <body>
-<h1> Tutorial</h1>
+<header id='header'>
+<button id='toggle-sidebar' aria-label='Toggle Sidebar'>☰</button>
+<h1>Tutorial</h1>
+</header>
+<main id='main'>
+<section id='s0'>
+<h2> Introduction</h2>
 <p>
 Let's start with a simple "Hello World" program.
 </p>
@@ -53,6 +59,8 @@ Save this to a file named <code>hello.bs</code> and run it as follows.
 Hello, world!
 </pre>
 </div>
+</section>
+<section id='s1'>
 <h2> BS and BSX</h2>
 <p>
 BS is more "mainstream" in its syntax, whereas BSX is a parody of Gen Z
@@ -80,7 +88,10 @@ it as before.
 Hello, world!
 </pre>
 </div>
+</section>
+<section id='s2'>
 <h2> Basic Types</h2>
+<section id='s3'>
 <h3> Nil</h3>
 <div>
 <div class='tabs'>
@@ -109,6 +120,8 @@ io.<span class='field'>println</span>(<span class='constant'>bruh</span>) <span 
 <p>
 Note that the output differs based on whether you are using BS or BSX.
 </p>
+</section>
+<section id='s4'>
 <h3> Numbers</h3>
 <p>
 BS supports 64-bit floating point numbers only.
@@ -200,6 +213,8 @@ io.<span class='field'>println</span>(<span class='constant'>69</span> ^ <span c
 </pre>
 </div>
 </div>
+</section>
+<section id='s5'>
 <h3> Booleans</h3>
 <div>
 <div class='tabs'>
@@ -278,10 +293,6 @@ io.<span class='field'>println</span>(<span class='constant'>false</span> || <sp
 <span class='comment'># Short circuiting</span>
 io.<span class='field'>println</span>(<span class='constant'>nil</span> && <span class='constant'>true</span>);    <span class='comment'># Output: nil</span>
 io.<span class='field'>println</span>(<span class='constant'>0</span> || <span class='constant'>false</span>);     <span class='comment'># Output: 0</span>
-
-<span class='comment'># Logical XOR.</span>
-io.<span class='field'>println</span>(<span class='constant'>true</span> ^^ <span class='constant'>true</span>);   <span class='comment'># Output: false</span>
-io.<span class='field'>println</span>(<span class='constant'>true</span> ^^ <span class='constant'>false</span>);  <span class='comment'># Output: true</span>
 </pre>
 <pre class='code'>
 io.<span class='field'>println</span>(<span class='keyword'>nah</span> <span class='constant'>nocap</span>) <span class='keyword'>fr</span>      <span class='comment'># Output: cap</span>
@@ -315,13 +326,11 @@ io.<span class='field'>println</span>(<span class='constant'>cap</span> || <span
 <span class='comment'># Short circuiting</span>
 io.<span class='field'>println</span>(<span class='constant'>bruh</span> && <span class='constant'>nocap</span>) <span class='keyword'>fr</span>  <span class='comment'># Output: bruh</span>
 io.<span class='field'>println</span>(<span class='constant'>0</span> || <span class='constant'>cap</span>) <span class='keyword'>fr</span>       <span class='comment'># Output: 0</span>
-
-<span class='comment'># Logical XOR.</span>
-io.<span class='field'>println</span>(<span class='constant'>nocap</span> ^^ <span class='constant'>nocap</span>) <span class='keyword'>fr</span> <span class='comment'># Output: cap</span>
-io.<span class='field'>println</span>(<span class='constant'>nocap</span> ^^ <span class='constant'>cap</span>) <span class='keyword'>fr</span>   <span class='comment'># Output: nocap</span>
 </pre>
 </div>
 </div>
+</section>
+<section id='s6'>
 <h3> Strings</h3>
 <div>
 <div class='tabs'>
@@ -383,6 +392,8 @@ io.<span class='field'>println</span>(<span class='keyword'>thicc</span>(<span c
 </pre>
 </div>
 </div>
+</section>
+<section id='s7'>
 <h3> Arrays</h3>
 <div>
 <div class='tabs'>
@@ -472,6 +483,8 @@ io.<span class='field'>println</span>(xs == zs) <span class='keyword'>fr</span> 
 </pre>
 </div>
 </div>
+</section>
+<section id='s8'>
 <h3> Tables</h3>
 <div>
 <div class='tabs'>
@@ -613,6 +626,8 @@ io.<span class='field'>println</span>(xs == zs) <span class='keyword'>fr</span> 
 </pre>
 </div>
 </div>
+</section>
+<section id='s9'>
 <h3> Typeof</h3>
 <div>
 <div class='tabs'>
@@ -654,7 +669,11 @@ io.<span class='field'>println</span>(<span class='keyword'>vibeof</span>(<span 
 </pre>
 </div>
 </div>
+</section>
+</section>
+<section id='s10'>
 <h2> Conditions</h2>
+<section id='s11'>
 <h3> If Statement</h3>
 <div>
 <div class='tabs'>
@@ -725,6 +744,8 @@ You are an adult
 Get a life
 </pre>
 </div>
+</section>
+<section id='s12'>
 <h3> If Expression</h3>
 <div>
 <div class='tabs'>
@@ -768,7 +789,11 @@ io.<span class='field'>println</span>(<span class='keyword'>ayo</span> age &gt;=
 Minor
 </pre>
 </div>
+</section>
+</section>
+<section id='s13'>
 <h2> Loops</h2>
+<section id='s14'>
 <h3> While Loop</h3>
 <div>
 <div class='tabs'>
@@ -822,6 +847,8 @@ Minor
 4
 </pre>
 </div>
+</section>
+<section id='s15'>
 <h3> For Loop</h3>
 <p>
 Iterate over range of numbers.
@@ -1090,6 +1117,8 @@ Key: bar; Value: 420
 Key: foo; Value: 69
 </pre>
 </div>
+</section>
+<section id='s16'>
 <h3> Break and Continue</h3>
 <div>
 <div class='tabs'>
@@ -1174,6 +1203,9 @@ io.<span class='field'>println</span>() <span class='keyword'>fr</span>
 4
 </pre>
 </div>
+</section>
+</section>
+<section id='s17'>
 <h2> Functions</h2>
 <div>
 <div class='tabs'>
@@ -1223,6 +1255,7 @@ greet(<span class='string'>"world"</span>) <span class='keyword'>fr</span>
 Hello, world!
 </pre>
 </div>
+<section id='s18'>
 <h3> Return</h3>
 <div>
 <div class='tabs'>
@@ -1280,6 +1313,8 @@ io.<span class='field'>println</span>(factorial(<span class='constant'>6</span>)
 720
 </pre>
 </div>
+</section>
+<section id='s19'>
 <h3> First Class Functions</h3>
 <div>
 <div class='tabs'>
@@ -1337,6 +1372,8 @@ io.<span class='field'>println</span>(combine(add, <span class='constant'>34</sp
 69
 </pre>
 </div>
+</section>
+<section id='s20'>
 <h3> Anonymous Functions</h3>
 <div>
 <div class='tabs'>
@@ -1390,6 +1427,8 @@ io.<span class='field'>println</span>(combine(<span class='keyword'>lit</span> (
 69
 </pre>
 </div>
+</section>
+<section id='s21'>
 <h3> Single Expression Function</h3>
 <p>
 Functions support a shorthand syntax for a single expression body.
@@ -1438,6 +1477,8 @@ io.<span class='field'>println</span>(combine(<span class='keyword'>lit</span> (
 69
 </pre>
 </div>
+</section>
+<section id='s22'>
 <h3> Closures</h3>
 <div>
 <div class='tabs'>
@@ -1500,6 +1541,8 @@ io.<span class='field'>println</span>(b()) <span class='keyword'>fr</span>
 420
 </pre>
 </div>
+</section>
+<section id='s23'>
 <h3> Looped Closures</h3>
 <p>
 The variables defined in the body of a loop, as well as the iterators, are
@@ -1571,6 +1614,9 @@ captured as unique values in the nested closure on each iteration of the loop.
 4 8
 </pre>
 </div>
+</section>
+</section>
+<section id='s24'>
 <h2> Variables</h2>
 <div>
 <div class='tabs'>
@@ -1600,6 +1646,7 @@ io.<span class='field'>println</span>(a + b) <span class='keyword'>fr</span> <sp
 </pre>
 </div>
 </div>
+<section id='s25'>
 <h3> Assignment</h3>
 <div>
 <div class='tabs'>
@@ -1686,6 +1733,8 @@ io.<span class='field'>println</span>(b) <span class='keyword'>fr</span> <span c
 </pre>
 </div>
 </div>
+</section>
+<section id='s26'>
 <h3> Scoped Variables</h3>
 <div>
 <div class='tabs'>
@@ -1727,6 +1776,8 @@ io.<span class='field'>println</span>(x) <span class='keyword'>fr</span>     <sp
 </pre>
 </div>
 </div>
+</section>
+<section id='s27'>
 <h3> Variable Shadowing</h3>
 <div>
 <div class='tabs'>
@@ -1760,6 +1811,8 @@ io.<span class='field'>println</span>(x) <span class='keyword'>fr</span> <span c
 </pre>
 </div>
 </div>
+</section>
+<section id='s28'>
 <h3> Local Variables</h3>
 <div>
 <div class='tabs'>
@@ -1818,6 +1871,8 @@ io.<span class='field'>println</span>(z) <span class='keyword'>fr</span>
 420
 </pre>
 </div>
+</section>
+<section id='s29'>
 <h3> File Local Variables</h3>
 <p>
 Here's a pitfall you might run into
@@ -1878,6 +1933,8 @@ variables.bs:7:2: in f()
 <p>
 What is going on?
 </p>
+</section>
+<section id='s30'>
 <h3> Global Variables</h3>
 <p>
 Variables defined at the toplevel are local to the scope of the file, which
@@ -1936,6 +1993,9 @@ f() <span class='keyword'>fr</span>
 69
 </pre>
 </div>
+</section>
+</section>
+<section id='s31'>
 <h2> Import</h2>
 <div>
 <div class='tabs'>
@@ -2022,6 +2082,7 @@ io.<span class='field'>println</span>(one.<span class='field'>dec</span>(<span c
 420
 </pre>
 </div>
+<section id='s32'>
 <h3> Singular Load</h3>
 <p>
 Modules are loaded only once.
@@ -2112,6 +2173,8 @@ Loading module 'one'
 420
 </pre>
 </div>
+</section>
+<section id='s33'>
 <h3> Main Module</h3>
 <div>
 <div class='tabs'>
@@ -2221,15 +2284,20 @@ But if the module <code>one</code> is executed directly...
 Loading module 'one'
 </pre>
 </div>
+</section>
+<section id='s34'>
 <h3> Extended Modules</h3>
 <p>
 Extended modules can be imported within normal ones, and vice versa. If there
 is an extended as well as a normal module with the same name, the normal one
 will be imported.
 </p>
+</section>
+</section>
+<section id='s35'>
 <h2> OOP</h2>
 <p>
-I refuse to showcase the <code>Animal > Dog, Cat</code> nonsense, so here's a
+I refuse to showcase the <code>Animal &gt; Dog, Cat</code> nonsense, so here's a
 more applicable, albeit involved, example.
 </p>
 <div>
@@ -2520,6 +2588,7 @@ Luffy has been defeated!
 Luffy lost :(
 </pre>
 </div>
+<section id='s36'>
 <h3> Constructor Failure</h3>
 <p>
 Typical OOP languages mandate that constructors must return the instance under
@@ -2603,6 +2672,8 @@ logger.<span class='field'>write</span>(<span class='string'>"Hello, world!"</sp
 </pre>
 </div>
 </div>
+</section>
+<section id='s37'>
 <h3> How to know if a class can fail?</h3>
 <p>
 Just print the class.
@@ -2684,6 +2755,8 @@ class Foo {
 class Bar {}
 </pre>
 </div>
+</section>
+<section id='s38'>
 <h3> How to know the methods in a class?</h3>
 <p>
 Just print the class.
@@ -2714,24 +2787,13 @@ Just print the class.
 io.<span class='field'>println</span>(Lol);
 </pre>
 <pre class='code'>
-<span class='keyword'>wannabe</span> <span class='class'>Foo</span> {
-    init(x) {
-        <span class='keyword'>ayo</span> x == <span class='constant'>69</span> {
-            <span class='keyword'>bet</span> <span class='constant'>bruh</span> <span class='keyword'>fr</span>
-        }
-
-        <span class='constant'>deez</span>.<span class='field'>x</span> = x <span class='keyword'>fr</span>
-    }
+<span class='keyword'>wannabe</span> <span class='class'>Lol</span> {
+    foo() {}
+    bar() {}
+    baz() {}
 }
 
-<span class='keyword'>wannabe</span> <span class='class'>Bar</span> {
-    init(x) {
-        <span class='constant'>deez</span>.<span class='field'>x</span> = x <span class='keyword'>fr</span>
-    }
-}
-
-io.<span class='field'>println</span>(Foo) <span class='keyword'>fr</span>
-io.<span class='field'>println</span>(Bar) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(Lol) <span class='keyword'>fr</span>
 </pre>
 </div>
 </div>
@@ -2755,5 +2817,144 @@ class Lol {
 }
 </pre>
 </div>
+</section>
+</section>
+</main>
+<nav id='sidebar' class='collapsed'>
+<ul>
+<li>
+<a href='#s0'> Introduction</a>
+</li>
+<li>
+<a href='#s1'> BS and BSX</a>
+</li>
+<li>
+<a href='#s2'> Basic Types</a>
+<ul>
+<li>
+<a href='#s3'> Nil</a>
+</li>
+<li>
+<a href='#s4'> Numbers</a>
+</li>
+<li>
+<a href='#s5'> Booleans</a>
+</li>
+<li>
+<a href='#s6'> Strings</a>
+</li>
+<li>
+<a href='#s7'> Arrays</a>
+</li>
+<li>
+<a href='#s8'> Tables</a>
+</li>
+<li>
+<a href='#s9'> Typeof</a>
+</li>
+</ul>
+</li>
+<li>
+<a href='#s10'> Conditions</a>
+<ul>
+<li>
+<a href='#s11'> If Statement</a>
+</li>
+<li>
+<a href='#s12'> If Expression</a>
+</li>
+</ul>
+</li>
+<li>
+<a href='#s13'> Loops</a>
+<ul>
+<li>
+<a href='#s14'> While Loop</a>
+</li>
+<li>
+<a href='#s15'> For Loop</a>
+</li>
+<li>
+<a href='#s16'> Break and Continue</a>
+</li>
+</ul>
+</li>
+<li>
+<a href='#s17'> Functions</a>
+<ul>
+<li>
+<a href='#s18'> Return</a>
+</li>
+<li>
+<a href='#s19'> First Class Functions</a>
+</li>
+<li>
+<a href='#s20'> Anonymous Functions</a>
+</li>
+<li>
+<a href='#s21'> Single Expression Function</a>
+</li>
+<li>
+<a href='#s22'> Closures</a>
+</li>
+<li>
+<a href='#s23'> Looped Closures</a>
+</li>
+</ul>
+</li>
+<li>
+<a href='#s24'> Variables</a>
+<ul>
+<li>
+<a href='#s25'> Assignment</a>
+</li>
+<li>
+<a href='#s26'> Scoped Variables</a>
+</li>
+<li>
+<a href='#s27'> Variable Shadowing</a>
+</li>
+<li>
+<a href='#s28'> Local Variables</a>
+</li>
+<li>
+<a href='#s29'> File Local Variables</a>
+</li>
+<li>
+<a href='#s30'> Global Variables</a>
+</li>
+</ul>
+</li>
+<li>
+<a href='#s31'> Import</a>
+<ul>
+<li>
+<a href='#s32'> Singular Load</a>
+</li>
+<li>
+<a href='#s33'> Main Module</a>
+</li>
+<li>
+<a href='#s34'> Extended Modules</a>
+</li>
+</ul>
+</li>
+<li>
+<a href='#s35'> OOP</a>
+<ul>
+<li>
+<a href='#s36'> Constructor Failure</a>
+</li>
+<li>
+<a href='#s37'> How to know if a class can fail?</a>
+</li>
+<li>
+<a href='#s38'> How to know the methods in a class?</a>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+<script src='script.js'></script>
 </body>
 </html>

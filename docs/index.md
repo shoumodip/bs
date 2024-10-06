@@ -1,15 +1,4 @@
-<header>
-
 # BS
-
-<div class="only-desktop">
-
-[Tutorial](tutorial.html)
-[Stdlib](stdlib.html)
-[GitHub](https://github.com/shoumodip/bs)
-
-</div>
-</header>
 
 A minimal embeddable scripting language with sane defaults and strong typing
 
@@ -51,8 +40,6 @@ $ ./build/macos.sh # If on macOS
 $ build\windows.bat # If on Windows
 ```
 
-<div class="only-mobile">
-
 ## Further Links
 
 <center>
@@ -62,4 +49,5 @@ $ build\windows.bat # If on Windows
 [GitHub](https://github.com/shoumodip/bs)
 
 </center>
-</div>
+
+<!-- no-navigation -->

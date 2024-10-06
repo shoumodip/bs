@@ -1,5 +1,4 @@
 # Stdlib Documentation
-BS has a very minimal standard library which just has the bare essentials. This keeps the core runtime simple and easy to embed.
 
 ## IO
 Contains simple I/O primitives.

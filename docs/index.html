@@ -1,19 +1,16 @@
 <!doctype html>
 <html>
 <head>
-<link rel='stylesheet' href='style.css'>
+<meta charset='UTF-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-<script src='script.js'></script>
+<link rel='stylesheet' href='style.css'>
 </head>
 <body>
-<header>
-<h1> BS</h1>
-<div class="only-desktop">
-<a href='tutorial.html'>Tutorial</a>
-<a href='stdlib.html'>Stdlib</a>
-<a href='https://github.com/shoumodip/bs'>GitHub</a>
-</div>
+<header id='header'>
+<button id='toggle-sidebar' aria-label='Toggle Sidebar'>☰</button>
+<h1>BS</h1>
 </header>
+<main id='main'>
 <p>
 A minimal embeddable scripting language with sane defaults and strong typing
 </p>
@@ -73,6 +70,7 @@ io.<span class='field'>println</span>(<span class='string'>"5! = </span><span cl
 5! = 120
 </pre>
 </div>
+<section id='s0'>
 <h2> Download</h2>
 <div class='codes shell'>
 <button class='copy' onclick='copyClickShell(this)'>
@@ -93,13 +91,21 @@ io.<span class='field'>println</span>(<span class='string'>"5! = </span><span cl
 <span class='constant'>$ </span>build\windows.bat <span class='comment'># If on Windows</span>
 </pre>
 </div>
-<div class="only-mobile">
+</section>
+<section id='s1'>
 <h2> Further Links</h2>
 <center>
-<a href='tutorial.html'>Tutorial</a>
-<a href='stdlib.html'>Stdlib</a>
-<a href='https://github.com/shoumodip/bs'>GitHub</a>
+<a class='link' href='tutorial.html'>Tutorial</a>
+<a class='link' href='stdlib.html'>Stdlib</a>
+<a class='link' href='https://github.com/shoumodip/bs'>GitHub</a>
 </center>
-</div>
+</section>
+</main>
+<style>
+#toggle-sidebar {
+    display: none;
+}
+</style>
+<script src='script.js'></script>
 </body>
 </html>
