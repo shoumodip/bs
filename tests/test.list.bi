@@ -2281,7 +2281,7 @@ builtin_methods/error_undefined_str.bsx:1:4: error: undefined method: foo
 :b shell 24
 ../bin/bs core/string.bs
 :i returncode 0
-:b stdout 221
+:b stdout 255
 Foo
 bar
 
@@ -2310,13 +2310,19 @@ foo
 foo6
 foo69
 foo696
+true
+false
+false
+true
+false
+false
 
 :b stderr 0
 
 :b shell 25
 ../bin/bs core/string.bsx
 :i returncode 0
-:b stdout 223
+:b stdout 251
 Foo
 bar
 
@@ -2345,6 +2351,12 @@ foo
 foo6
 foo69
 foo696
+nocap
+cap
+cap
+nocap
+cap
+cap
 
 :b stderr 0
 

@@ -33,3 +33,11 @@ io.println("foo".rpad("69", 3));
 io.println("foo".rpad("69", 4));
 io.println("foo".rpad("69", 5));
 io.println("foo".rpad("69", 6));
+
+io.println("foobar".prefix("foo"));
+io.println("foobar".prefix("Foo"));
+io.println("foobar".prefix("deez nuts"));
+
+io.println("foobar".suffix("bar"));
+io.println("foobar".suffix("Bar"));
+io.println("foobar".suffix("deez nuts"));

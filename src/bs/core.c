@@ -1319,6 +1319,28 @@ Bs_Value bs_str_rpad(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
 }
 
+Bs_Value bs_str_prefix(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Str *str = (const Bs_Str *)args[-1].as.object;
+    const Bs_Str *pattern = (const Bs_Str *)args[0].as.object;
+
+    return bs_value_bool(
+        bs_sv_prefix(Bs_Sv(str->data, str->size), Bs_Sv(pattern->data, pattern->size)));
+}
+
+Bs_Value bs_str_suffix(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Str *str = (const Bs_Str *)args[-1].as.object;
+    const Bs_Str *pattern = (const Bs_Str *)args[0].as.object;
+
+    return bs_value_bool(
+        bs_sv_suffix(Bs_Sv(str->data, str->size), Bs_Sv(pattern->data, pattern->size)));
+}
+
 // Bit
 Bs_Value bs_bit_ceil(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
@@ -2129,6 +2151,8 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
 
         bs_builtin_object_methods_add(bs, BS_OBJECT_STR, Bs_Sv_Static("lpad"), bs_str_lpad);
         bs_builtin_object_methods_add(bs, BS_OBJECT_STR, Bs_Sv_Static("rpad"), bs_str_rpad);
+        bs_builtin_object_methods_add(bs, BS_OBJECT_STR, Bs_Sv_Static("prefix"), bs_str_prefix);
+        bs_builtin_object_methods_add(bs, BS_OBJECT_STR, Bs_Sv_Static("suffix"), bs_str_suffix);
     }
 
     {
