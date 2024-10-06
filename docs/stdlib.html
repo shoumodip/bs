@@ -1089,6 +1089,11 @@ Returns <code>nil</code> if the process was spawned without capturing stdout.
 }
 
 <span class='keyword'>var</span> stdout = p.<span class='field'>stdout</span>();
+<span class='keyword'>if</span> !stdout {
+    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not capture standard output of process"</span>);
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+}
+
 <span class='keyword'>while</span> !stdout.<span class='field'>eof</span>() {
     <span class='keyword'>var</span> line = stdout.<span class='field'>readln</span>();
     io.<span class='field'>println</span>(<span class='string'>"Line:"</span>, line);
@@ -1104,6 +1109,11 @@ p.<span class='field'>wait</span>();
 }
 
 <span class='keyword'>mf</span> stdout = p.<span class='field'>stdout</span>() <span class='keyword'>fr</span>
+<span class='keyword'>ayo</span> <span class='keyword'>nah</span> stdout {
+    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not capture standard output of process"</span>) <span class='keyword'>fr</span>
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>) <span class='keyword'>fr</span>
+}
+
 <span class='keyword'>yolo</span> <span class='keyword'>nah</span> stdout.<span class='field'>eof</span>() {
     <span class='keyword'>mf</span> line = stdout.<span class='field'>readln</span>() <span class='keyword'>fr</span>
     io.<span class='field'>println</span>(<span class='string'>"Line:"</span>, line) <span class='keyword'>fr</span>
@@ -1149,6 +1159,79 @@ Get the standard input of the process as an <code>io.Writer</code> instance.
 <p>
 Returns <code>nil</code> if the process was spawned without capturing stdin.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> p = os.<span class='field'>Process</span>([<span class='string'>"grep"</span>, <span class='string'>"foobar"</span>], <span class='constant'>false</span>, <span class='constant'>false</span>, <span class='constant'>true</span>);
+<span class='keyword'>if</span> !p {
+    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>);
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+}
+
+<span class='keyword'>var</span> stdin = p.<span class='field'>stdin</span>();
+<span class='keyword'>if</span> !stdin {
+    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not capture standard input of process"</span>);
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+}
+
+stdin.<span class='field'>writeln</span>(<span class='string'>"First line foobar lmao"</span>);
+stdin.<span class='field'>writeln</span>(<span class='string'>"Second line lmao"</span>);
+stdin.<span class='field'>writeln</span>(<span class='string'>"Third line lets goooo foobar"</span>);
+stdin.<span class='field'>close</span>();
+p.<span class='field'>wait</span>();
+</pre>
+<pre class='code'>
+<span class='keyword'>mf</span> p = os.<span class='field'>Process</span>([<span class='string'>"grep"</span>, <span class='string'>"foobar"</span>], <span class='constant'>cap</span>, <span class='constant'>cap</span>, <span class='constant'>nocap</span>) <span class='keyword'>fr</span>
+<span class='keyword'>ayo</span> <span class='keyword'>nah</span> p {
+    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>) <span class='keyword'>fr</span>
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>) <span class='keyword'>fr</span>
+}
+
+<span class='keyword'>mf</span> stdin = p.<span class='field'>stdin</span>() <span class='keyword'>fr</span>
+<span class='keyword'>ayo</span> <span class='keyword'>nah</span> stdin {
+    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not capture standard input of process"</span>) <span class='keyword'>fr</span>
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>) <span class='keyword'>fr</span>
+}
+
+stdin.<span class='field'>writeln</span>(<span class='string'>"First line foobar lmao"</span>) <span class='keyword'>fr</span>
+stdin.<span class='field'>writeln</span>(<span class='string'>"Second line lmao"</span>) <span class='keyword'>fr</span>
+stdin.<span class='field'>writeln</span>(<span class='string'>"Third line lets goooo foobar"</span>) <span class='keyword'>fr</span>
+stdin.<span class='field'>close</span>() <span class='keyword'>fr</span>
+p.<span class='field'>wait</span>() <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+First line foobar lmao
+Third line lets goooo foobar
+</pre>
+</div>
 </section>
 <section id='s32'>
 <h4><code><span class='class'>Process</span>.<span class='field'>kill</span>(signal)</code></h4>
@@ -3489,13 +3572,56 @@ Just like arrays, tables are compared by reference with the <code>==</code> oper
 <p>
 Contains simple mathematical primitives.
 </p>
-<p>
-The methods defined here work on numbers.
-</p>
 <section id='s92'>
 <h3><code><span class='class'>number</span>.<span class='field'>sin</span>()</code></h3>
 <p>
 Sine in radians.
+</p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> theta = <span class='constant'>0.5</span>;
+io.<span class='field'>println</span>(theta.<span class='field'>sin</span>());
+</pre>
+<pre class='code'>
+<span class='keyword'>mf</span> theta = <span class='constant'>0.5</span> <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(theta.<span class='field'>sin</span>()) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+0.479425538604203
+</pre>
+</div>
+<p>
+Note that the precision of the mathematical functions may vary depending on the
+compiler and the platform. This is inherent to computing in general.
 </p>
 </section>
 <section id='s93'>
@@ -3533,6 +3659,46 @@ Inverse tangent in radians.
 <p>
 Return the exponential function of the number.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+io.<span class='field'>println</span>(<span class='constant'>2</span>.<span class='field'>exp</span>()); <span class='comment'># Basically e^2</span>
+</pre>
+<pre class='code'>
+io.<span class='field'>println</span>(<span class='constant'>2</span>.<span class='field'>exp</span>()) <span class='keyword'>fr</span> <span class='comment'># Basically e^2</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+7.38905609893065
+</pre>
+</div>
 </section>
 <section id='s99'>
 <h3><code><span class='class'>number</span>.<span class='field'>log</span>()</code></h3>
@@ -3577,16 +3743,102 @@ Return the nearest integer.
 </p>
 </section>
 <section id='s106'>
-<h3><code><span class='class'>number</span>.<span class='field'>max</span>(those ...)</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>max</span>(...)</code></h3>
 <p>
 Return the maximum between the method receiver and the provided arguments.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+io.<span class='field'>println</span>(<span class='constant'>1</span>.<span class='field'>max</span>(<span class='constant'>2</span>, <span class='constant'>3</span>));
+io.<span class='field'>println</span>(<span class='constant'>3</span>.<span class='field'>max</span>(<span class='constant'>0</span>, <span class='constant'>1</span>, <span class='constant'>2</span>));
+</pre>
+<pre class='code'>
+io.<span class='field'>println</span>(<span class='constant'>1</span>.<span class='field'>max</span>(<span class='constant'>2</span>, <span class='constant'>3</span>)) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(<span class='constant'>3</span>.<span class='field'>max</span>(<span class='constant'>0</span>, <span class='constant'>1</span>, <span class='constant'>2</span>)) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+3
+3
+</pre>
+</div>
 </section>
 <section id='s107'>
-<h3><code><span class='class'>number</span>.<span class='field'>min</span>(those ...)</code></h3>
+<h3><code><span class='class'>number</span>.<span class='field'>min</span>(...)</code></h3>
 <p>
 Return the minimum between the method receiver and the provided arguments.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+io.<span class='field'>println</span>(<span class='constant'>1</span>.<span class='field'>min</span>(<span class='constant'>2</span>, <span class='constant'>3</span>));
+io.<span class='field'>println</span>(<span class='constant'>3</span>.<span class='field'>min</span>(<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>));
+</pre>
+<pre class='code'>
+io.<span class='field'>println</span>(<span class='constant'>1</span>.<span class='field'>min</span>(<span class='constant'>2</span>, <span class='constant'>3</span>)) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(<span class='constant'>3</span>.<span class='field'>min</span>(<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>)) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+1
+1
+</pre>
+</div>
 </section>
 <section id='s108'>
 <h3><code><span class='class'>number</span>.<span class='field'>clamp</span>(low, high)</code></h3>
@@ -3613,10 +3865,62 @@ PI.
 </p>
 </section>
 <section id='s112'>
-<h3><code><span class='function'>random</span>()</code></h3>
+<h3><code><span class='function'>random</span>(low?, high?)</code></h3>
 <p>
-Return a pseudorandom number between <code>0</code> and <code>1</code>.
+Return a pseudorandom number between <code>low</code> and <code>high</code>.
 </p>
+<p>
+If no arguments are provided, a number between <code>0</code> and <code>1</code> is returned.
+</p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+io.<span class='field'>println</span>(math.<span class='field'>random</span>());
+io.<span class='field'>println</span>(math.<span class='field'>random</span>());
+io.<span class='field'>println</span>(math.<span class='field'>random</span>(<span class='constant'>69</span>, <span class='constant'>420</span>));
+io.<span class='field'>println</span>(math.<span class='field'>random</span>(<span class='constant'>69</span>, <span class='constant'>420</span>));
+</pre>
+<pre class='code'>
+io.<span class='field'>println</span>(math.<span class='field'>random</span>()) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(math.<span class='field'>random</span>()) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(math.<span class='field'>random</span>(<span class='constant'>69</span>, <span class='constant'>420</span>)) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(math.<span class='field'>random</span>(<span class='constant'>69</span>, <span class='constant'>420</span>)) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+0.0547563294203749
+0.833639462400991
+94.8939746794728
+193.56447644558
+</pre>
+</div>
 </section>
 </section>
 </main>

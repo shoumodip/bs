@@ -533,6 +533,11 @@ if !p {
 }
 
 var stdout = p.stdout();
+if !stdout {
+    io.eprintln("ERROR: could not capture standard output of process");
+    os.exit(1);
+}
+
 while !stdout.eof() {
     var line = stdout.readln();
     io.println("Line:", line);
@@ -548,6 +553,11 @@ ayo nah p {
 }
 
 mf stdout = p.stdout() fr
+ayo nah stdout {
+    io.eprintln("ERROR: could not capture standard output of process") fr
+    os.exit(1) fr
+}
+
 yolo nah stdout.eof() {
     mf line = stdout.readln() fr
     io.println("Line:", line) fr
@@ -572,6 +582,51 @@ Returns `nil` if the process was spawned without capturing stderr.
 Get the standard input of the process as an `io.Writer` instance.
 
 Returns `nil` if the process was spawned without capturing stdin.
+
+```bs
+var p = os.Process(["grep", "foobar"], false, false, true);
+if !p {
+    io.eprintln("ERROR: could not start process");
+    os.exit(1);
+}
+
+var stdin = p.stdin();
+if !stdin {
+    io.eprintln("ERROR: could not capture standard input of process");
+    os.exit(1);
+}
+
+stdin.writeln("First line foobar lmao");
+stdin.writeln("Second line lmao");
+stdin.writeln("Third line lets goooo foobar");
+stdin.close();
+p.wait();
+```
+```bsx
+mf p = os.Process(["grep", "foobar"], cap, cap, nocap) fr
+ayo nah p {
+    io.eprintln("ERROR: could not start process") fr
+    os.exit(1) fr
+}
+
+mf stdin = p.stdin() fr
+ayo nah stdin {
+    io.eprintln("ERROR: could not capture standard input of process") fr
+    os.exit(1) fr
+}
+
+stdin.writeln("First line foobar lmao") fr
+stdin.writeln("Second line lmao") fr
+stdin.writeln("Third line lets goooo foobar") fr
+stdin.close() fr
+p.wait() fr
+```
+
+```console
+$ bs demo.bs
+First line foobar lmao
+Third line lets goooo foobar
+```
 
 #### Process.kill(signal) @method
 Kill the process with `signal`.
@@ -1638,10 +1693,25 @@ Just like arrays, tables are compared by reference with the `==` operator.
 ## Math
 Contains simple mathematical primitives.
 
-The methods defined here work on numbers.
-
 ### number.sin() @method
 Sine in radians.
+
+```bs
+var theta = 0.5;
+io.println(theta.sin());
+```
+```bsx
+mf theta = 0.5 fr
+io.println(theta.sin()) fr
+```
+
+```console
+$ bs demo.bs
+0.479425538604203
+```
+
+Note that the precision of the mathematical functions may vary depending on the
+compiler and the platform. This is inherent to computing in general.
 
 ### number.cos() @method
 Cosine in radians.
@@ -1660,6 +1730,18 @@ Inverse tangent in radians.
 
 ### number.exp() @method
 Return the exponential function of the number.
+
+```bs
+io.println(2.exp()); # Basically e^2
+```
+```bsx
+io.println(2.exp()) fr # Basically e^2
+```
+
+```console
+$ bs demo.bs
+7.38905609893065
+```
 
 ### number.log() @method
 Return the natural logarithm (base `e`) of the number.
@@ -1682,11 +1764,41 @@ Floor.
 ### number.round() @method
 Return the nearest integer.
 
-### number.max(those ...) @method
+### number.max(...) @method
 Return the maximum between the method receiver and the provided arguments.
 
-### number.min(those ...) @method
+```bs
+io.println(1.max(2, 3));
+io.println(3.max(0, 1, 2));
+```
+```bsx
+io.println(1.max(2, 3)) fr
+io.println(3.max(0, 1, 2)) fr
+```
+
+```console
+$ bs demo.bs
+3
+3
+```
+
+### number.min(...) @method
 Return the minimum between the method receiver and the provided arguments.
+
+```bs
+io.println(1.min(2, 3));
+io.println(3.min(1, 2, 3));
+```
+```bsx
+io.println(1.min(2, 3)) fr
+io.println(3.min(1, 2, 3)) fr
+```
+
+```console
+$ bs demo.bs
+1
+1
+```
 
 ### number.clamp(low, high) @method
 Clamp the number between `low` and `high`.
@@ -1700,5 +1812,28 @@ Euler's constant.
 ### PI @constant
 PI.
 
-### random() @function
-Return a pseudorandom number between `0` and `1`.
+### random(low?, high?) @function
+Return a pseudorandom number between `low` and `high`.
+
+If no arguments are provided, a number between `0` and `1` is returned.
+
+```bs
+io.println(math.random());
+io.println(math.random());
+io.println(math.random(69, 420));
+io.println(math.random(69, 420));
+```
+```bsx
+io.println(math.random()) fr
+io.println(math.random()) fr
+io.println(math.random(69, 420)) fr
+io.println(math.random(69, 420)) fr
+```
+
+```console
+$ bs demo.bs
+0.0547563294203749
+0.833639462400991
+94.8939746794728
+193.56447644558
+```
