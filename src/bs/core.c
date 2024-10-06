@@ -8,6 +8,7 @@
 #ifdef _WIN32
 #    define WIN32_LEAN_AND_MEAN
 #    include <io.h>
+#    include <process.h>
 #    include <windows.h>
 
 #    define FD_OPEN _fdopen
@@ -1968,8 +1969,23 @@ Bs_Value bs_math_round(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 Bs_Value bs_math_random(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 0);
-    return bs_value_num((double)rand() / RAND_MAX);
+    if (arity != 0 && arity != 2) {
+        bs_error(bs, "expected 0 or 2 arguments, got %zu", arity);
+    }
+
+    if (arity) {
+        bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
+        bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
+    }
+
+    const double scale = (double)rand() / RAND_MAX;
+    if (!arity) {
+        return bs_value_num(scale);
+    }
+
+    const double min = bs_min(args[0].as.number, args[1].as.number);
+    const double max = bs_max(args[0].as.number, args[1].as.number);
+    return bs_value_num(min + scale * (max - min));
 }
 
 Bs_Value bs_math_max(Bs *bs, Bs_Value *args, size_t arity) {
@@ -2033,7 +2049,23 @@ static void bs_add_fn(Bs *bs, Bs_Table *table, const char *key, Bs_C_Fn_Ptr fn) 
 }
 
 void bs_core_init(Bs *bs, int argc, char **argv) {
-    srand(time(NULL));
+    {
+        unsigned int seed = time(NULL);
+
+#ifdef _WIN32
+        LARGE_INTEGER counter;
+        QueryPerformanceCounter(&counter);
+        seed ^= (unsigned int)(counter.QuadPart);
+        seed ^= (unsigned int)_getpid();
+#else
+        struct timespec ts;
+        clock_gettime(CLOCK_MONOTONIC, &ts);
+        seed ^= (unsigned int)(ts.tv_sec ^ ts.tv_nsec);
+        seed ^= (unsigned int)getpid();
+#endif
+
+        srand(seed);
+    }
 
     {
         bs_io_reader_class = bs_c_class_new(
