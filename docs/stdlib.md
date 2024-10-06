@@ -962,8 +962,44 @@ dedicated operator, but which still finds occasional uses.
 ### ceil(n) @function
 Return the bitwise ceiling of a number.
 
+```bs
+io.println(bit.ceil(7));
+io.println(bit.ceil(8));
+io.println(bit.ceil(9));
+```
+```bsx
+io.println(bit.ceil(7)) fr
+io.println(bit.ceil(8)) fr
+io.println(bit.ceil(9)) fr
+```
+
+```console
+$ bs demo.bs
+8
+8
+16
+```
+
 ### floor(n) @function
 Return the bitwise floor of a number.
+
+```bs
+io.println(bit.floor(7));
+io.println(bit.floor(8));
+io.println(bit.floor(9));
+```
+```bsx
+io.println(bit.floor(7)) fr
+io.println(bit.floor(8)) fr
+io.println(bit.floor(9)) fr
+```
+
+```console
+$ bs demo.bs
+4
+8
+8
+```
 
 ## ASCII
 Contains functions for dealing with ASCII codes and characters.
