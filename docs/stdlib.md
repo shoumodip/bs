@@ -1227,10 +1227,48 @@ Functional map.
 
 The provided function `f` must take a single argument.
 
+```bs
+var xs = [1, 2, 3, 4, 5];
+var ys = xs.map(fn (x) => x * 2);
+io.println(xs);
+io.println(ys);
+```
+```bsx
+mf xs = [1, 2, 3, 4, 5] fr
+mf ys = xs.map(lit (x) => x * 2) fr
+io.println(xs) fr
+io.println(ys) fr
+```
+
+```console
+$ bs demo.bs
+[1, 2, 3, 4, 5]
+[2, 4, 6, 8, 10]
+```
+
 ### array.filter(f) @method
 Functional filter.
 
 The provided function `f` must take a single argument.
+
+```bs
+var xs = [1, 2, 3, 4, 5];
+var ys = xs.filter(fn (x) => x % 2 == 0);
+io.println(xs);
+io.println(ys);
+```
+```bsx
+mf xs = [1, 2, 3, 4, 5] fr
+mf ys = xs.filter(lit (x) => x % 2 == 0) fr
+io.println(xs) fr
+io.println(ys) fr
+```
+
+```console
+$ bs demo.bs
+[1, 2, 3, 4, 5]
+[2, 4]
+```
 
 ### array.reduce(f, accumulator?) @method
 Functional reduce.
@@ -1239,11 +1277,78 @@ The provided function `f` must take two arguments. The first
 argument shall be the accumulator, and the second shall be the
 current value.
 
+```bs
+var xs = [1, 2, 3, 4, 5];
+
+var a = xs.reduce(fn (x, y) => x + y);
+io.println(a);
+
+var b = xs.reduce(fn (x, y) => x + y, 10);
+io.println(b);
+```
+```bsx
+mf xs = [1, 2, 3, 4, 5] fr
+
+mf a = xs.reduce(lit (x, y) => x + y) fr
+io.println(a) fr
+
+mf b = xs.reduce(lit (x, y) => x + y, 10) fr
+io.println(b) fr
+```
+
+```console
+$ bs demo.bs
+15
+25
+```
+
 ### array.copy() @method
 Copy an array.
 
+```bs
+var xs = [1, 2, 3, 4, 5];
+var ys = xs;
+var zs = xs.copy();
+
+xs[0] = 69;
+
+io.println(xs);
+io.println(ys);
+io.println(zs);
+```
+```bsx
+mf xs = [1, 2, 3, 4, 5] fr
+mf ys = xs fr
+mf zs = xs.copy() fr
+
+xs[0] = 69 fr
+
+io.println(xs) fr
+io.println(ys) fr
+io.println(zs) fr
+```
+
+```console
+$ bs demo.bs
+[69, 2, 3, 4, 5]
+[69, 2, 3, 4, 5]
+[1, 2, 3, 4, 5]
+```
+
 ### array.join(separator) @method
 Join the elements of an array, separated by `separator` into a single string.
+
+```bs
+io.println([1, 2, 3, 4, 5].join(" -> "));
+```
+```bsx
+io.println([1, 2, 3, 4, 5].join(" -> ")) fr
+```
+
+```console
+$ bs demo.bs
+1 -> 2 -> 3 -> 4 -> 5
+```
 
 ### array.find(value, start?) @method
 Find `value` within an array starting from position `start` (which defaults to
@@ -1251,33 +1356,146 @@ Find `value` within an array starting from position `start` (which defaults to
 
 Returns the position if found, else `nil`.
 
+```bs
+var xs = [1, 2, 3, 4, 5, 3];
+io.println(xs.find(3));
+io.println(xs.find(3, 3));
+io.println(xs.find(3, 6));
+io.println(xs.find(true, 6));
+```
+```bsx
+mf xs = [1, 2, 3, 4, 5, 3] fr
+io.println(xs.find(3)) fr
+io.println(xs.find(3, 3)) fr
+io.println(xs.find(3, 6)) fr
+io.println(xs.find(nocap, 6)) fr
+```
+
+```console
+$ bs demo.bs
+2
+5
+nil
+nil
+```
+
 ### array.equal(that) @method
 Compare the elements of two arrays.
+
+```bs
+var xs = [1, 2, 3, 4, 5];
+var ys = [1, 2, 3, 4, 5];
+
+io.println(xs == ys);
+io.println(xs.equal(ys));
+```
+```bsx
+mf xs = [1, 2, 3, 4, 5] fr
+mf ys = [1, 2, 3, 4, 5] fr
+
+io.println(xs == ys) fr
+io.println(xs.equal(ys)) fr
+```
+
+```console
+$ bs demo.bs
+false
+true
+```
+
+The first expression returns `false` because the `==` operator compares by
+reference.
 
 ### array.push(value) @method
 Push `value` into an array.
 
 This modifies the array.
 
+```bs
+var xs = [];
+
+for i in 0, 5 {
+    xs.push(i * 2);
+}
+
+io.println(xs);
+```
+```bsx
+mf xs = [] fr
+
+yall i amongus 0, 5 {
+    xs.push(i * 2) fr
+}
+
+io.println(xs) fr
+```
+
+```console
+$ bs demo.bs
+[0, 2, 4, 6, 8]
+```
+
 ### array.insert(position, value) @method
 Insert `value` into an array at `position`.
 
 This modifies the array.
+
+```bs
+var xs = [];
+
+for i in 0, 5 {
+    if i == 2 {
+        continue;
+    }
+
+    xs.push(i * 2);
+}
+io.println(xs);
+
+xs.insert(2, 4);
+io.println(xs);
+```
+```bsx
+mf xs = [] fr
+
+yall i amongus 0, 5 {
+    ayo i == 2 {
+        slickback fr
+    }
+
+    xs.push(i * 2) fr
+}
+io.println(xs) fr
+
+xs.insert(2, 4) fr
+io.println(xs) fr
+```
+
+```console
+$ bs demo.bs
+[0, 2, 6, 8]
+[0, 2, 4, 6, 6]
+```
 
 ### array.sort(compare) @method
 Sort an array inplace with `compare`, and return itself.
 
 ```bs
 var xs = [4, 2, 5, 1, 3];
-xs.sort(fn (x, y) => x < y);
+xs.sort(fn (x, y) => x < y); # This also returns the array so you can chain operations
 
-io.println(xs); # Output: [1, 2, 3, 4, 5]
+io.println(xs);
 ```
 ```bsx
 mf xs = [4, 2, 5, 1, 3] fr
-xs.sort(lit (x, y) => x < y) fr
+xs.sort(lit (x, y) => x < y) fr # This also returns the array so you can chain operations
 
-io.println(xs) fr # Output: [1, 2, 3, 4, 5]
+io.println(xs) fr
+```
+
+```console
+$ bs demo.bs
+[1, 2, 3, 4, 5]
 ```
 
 The compare function must take two arguments. If it returns `true`, then the
@@ -1291,10 +1509,52 @@ If `size` is larger than the original size, the extra elements shall default to
 
 This modifies the array.
 
+```bs
+var xs = [1, 2, 3, 4, 5];
+io.println(xs);
+
+xs.resize(3);
+io.println(xs);
+```
+```bsx
+mf xs = [1, 2, 3, 4, 5] fr
+io.println(xs) fr
+
+xs.resize(3) fr
+io.println(xs) fr
+```
+
+```console
+$ bs demo.bs
+[1, 2, 3, 4, 5]
+[1, 2, 3]
+```
+
 ### array.reverse() @method
 Reverse an array.
 
 This modifes the array.
+
+```bs
+var xs = [1, 2, 3, 4, 5];
+io.println(xs);
+
+xs.reverse(); # This also returns the array so you can chain operations
+io.println(xs);
+```
+```bsx
+mf xs = [1, 2, 3, 4, 5] fr
+io.println(xs) fr
+
+xs.reverse() fr # This also returns the array so you can chain operations
+io.println(xs) fr
+```
+
+```console
+$ bs demo.bs
+[1, 2, 3, 4, 5]
+[5, 4, 3, 2, 1]
+```
 
 ## Table
 Methods for the builtin table value.

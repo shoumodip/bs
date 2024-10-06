@@ -2629,6 +2629,53 @@ Functional map.
 <p>
 The provided function <code>f</code> must take a single argument.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
+<span class='keyword'>var</span> ys = xs.<span class='field'>map</span>(<span class='keyword'>fn</span> (x) =&gt; x * <span class='constant'>2</span>);
+io.<span class='field'>println</span>(xs);
+io.<span class='field'>println</span>(ys);
+</pre>
+<pre class='code'>
+<span class='keyword'>mf</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>] <span class='keyword'>fr</span>
+<span class='keyword'>mf</span> ys = xs.<span class='field'>map</span>(<span class='keyword'>lit</span> (x) =&gt; x * <span class='constant'>2</span>) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(xs) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(ys) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+[1, 2, 3, 4, 5]
+[2, 4, 6, 8, 10]
+</pre>
+</div>
 </section>
 <section id='s77'>
 <h3><code><span class='class'>array</span>.<span class='field'>filter</span>(f)</code></h3>
@@ -2638,6 +2685,53 @@ Functional filter.
 <p>
 The provided function <code>f</code> must take a single argument.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
+<span class='keyword'>var</span> ys = xs.<span class='field'>filter</span>(<span class='keyword'>fn</span> (x) =&gt; x % <span class='constant'>2</span> == <span class='constant'>0</span>);
+io.<span class='field'>println</span>(xs);
+io.<span class='field'>println</span>(ys);
+</pre>
+<pre class='code'>
+<span class='keyword'>mf</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>] <span class='keyword'>fr</span>
+<span class='keyword'>mf</span> ys = xs.<span class='field'>filter</span>(<span class='keyword'>lit</span> (x) =&gt; x % <span class='constant'>2</span> == <span class='constant'>0</span>) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(xs) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(ys) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+[1, 2, 3, 4, 5]
+[2, 4]
+</pre>
+</div>
 </section>
 <section id='s78'>
 <h3><code><span class='class'>array</span>.<span class='field'>reduce</span>(f, accumulator?)</code></h3>
@@ -2649,18 +2743,169 @@ The provided function <code>f</code> must take two arguments. The first
 argument shall be the accumulator, and the second shall be the
 current value.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
+
+<span class='keyword'>var</span> a = xs.<span class='field'>reduce</span>(<span class='keyword'>fn</span> (x, y) =&gt; x + y);
+io.<span class='field'>println</span>(a);
+
+<span class='keyword'>var</span> b = xs.<span class='field'>reduce</span>(<span class='keyword'>fn</span> (x, y) =&gt; x + y, <span class='constant'>10</span>);
+io.<span class='field'>println</span>(b);
+</pre>
+<pre class='code'>
+<span class='keyword'>mf</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>] <span class='keyword'>fr</span>
+
+<span class='keyword'>mf</span> a = xs.<span class='field'>reduce</span>(<span class='keyword'>lit</span> (x, y) =&gt; x + y) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(a) <span class='keyword'>fr</span>
+
+<span class='keyword'>mf</span> b = xs.<span class='field'>reduce</span>(<span class='keyword'>lit</span> (x, y) =&gt; x + y, <span class='constant'>10</span>) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(b) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+15
+25
+</pre>
+</div>
 </section>
 <section id='s79'>
 <h3><code><span class='class'>array</span>.<span class='field'>copy</span>()</code></h3>
 <p>
 Copy an array.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
+<span class='keyword'>var</span> ys = xs;
+<span class='keyword'>var</span> zs = xs.<span class='field'>copy</span>();
+
+xs[<span class='constant'>0</span>] = <span class='constant'>69</span>;
+
+io.<span class='field'>println</span>(xs);
+io.<span class='field'>println</span>(ys);
+io.<span class='field'>println</span>(zs);
+</pre>
+<pre class='code'>
+<span class='keyword'>mf</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>] <span class='keyword'>fr</span>
+<span class='keyword'>mf</span> ys = xs <span class='keyword'>fr</span>
+<span class='keyword'>mf</span> zs = xs.<span class='field'>copy</span>() <span class='keyword'>fr</span>
+
+xs[<span class='constant'>0</span>] = <span class='constant'>69</span> <span class='keyword'>fr</span>
+
+io.<span class='field'>println</span>(xs) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(ys) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(zs) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+[69, 2, 3, 4, 5]
+[69, 2, 3, 4, 5]
+[1, 2, 3, 4, 5]
+</pre>
+</div>
 </section>
 <section id='s80'>
 <h3><code><span class='class'>array</span>.<span class='field'>join</span>(separator)</code></h3>
 <p>
 Join the elements of an array, separated by <code>separator</code> into a single string.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+io.<span class='field'>println</span>([<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>].<span class='field'>join</span>(<span class='string'>" -&gt; "</span>));
+</pre>
+<pre class='code'>
+io.<span class='field'>println</span>([<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>].<span class='field'>join</span>(<span class='string'>" -&gt; "</span>)) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+1 -&gt; 2 -&gt; 3 -&gt; 4 -&gt; 5
+</pre>
+</div>
 </section>
 <section id='s81'>
 <h3><code><span class='class'>array</span>.<span class='field'>find</span>(value, start?)</code></h3>
@@ -2671,11 +2916,115 @@ Find <code>value</code> within an array starting from position <code>start</code
 <p>
 Returns the position if found, else <code>nil</code>.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>, <span class='constant'>3</span>];
+io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>3</span>));
+io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>3</span>, <span class='constant'>3</span>));
+io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>3</span>, <span class='constant'>6</span>));
+io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>true</span>, <span class='constant'>6</span>));
+</pre>
+<pre class='code'>
+<span class='keyword'>mf</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>, <span class='constant'>3</span>] <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>3</span>)) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>3</span>, <span class='constant'>3</span>)) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>3</span>, <span class='constant'>6</span>)) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>nocap</span>, <span class='constant'>6</span>)) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+2
+5
+nil
+nil
+</pre>
+</div>
 </section>
 <section id='s82'>
 <h3><code><span class='class'>array</span>.<span class='field'>equal</span>(that)</code></h3>
 <p>
 Compare the elements of two arrays.
+</p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
+<span class='keyword'>var</span> ys = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
+
+io.<span class='field'>println</span>(xs == ys);
+io.<span class='field'>println</span>(xs.<span class='field'>equal</span>(ys));
+</pre>
+<pre class='code'>
+<span class='keyword'>mf</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>] <span class='keyword'>fr</span>
+<span class='keyword'>mf</span> ys = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>] <span class='keyword'>fr</span>
+
+io.<span class='field'>println</span>(xs == ys) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(xs.<span class='field'>equal</span>(ys)) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+false
+true
+</pre>
+</div>
+<p>
+The first expression returns <code>false</code> because the <code>==</code> operator compares by
+reference.
 </p>
 </section>
 <section id='s83'>
@@ -2686,6 +3035,58 @@ Push <code>value</code> into an array.
 <p>
 This modifies the array.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> xs = [];
+
+<span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>5</span> {
+    xs.<span class='field'>push</span>(i * <span class='constant'>2</span>);
+}
+
+io.<span class='field'>println</span>(xs);
+</pre>
+<pre class='code'>
+<span class='keyword'>mf</span> xs = [] <span class='keyword'>fr</span>
+
+<span class='keyword'>yall</span> i <span class='keyword'>amongus</span> <span class='constant'>0</span>, <span class='constant'>5</span> {
+    xs.<span class='field'>push</span>(i * <span class='constant'>2</span>) <span class='keyword'>fr</span>
+}
+
+io.<span class='field'>println</span>(xs) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+[0, 2, 4, 6, 8]
+</pre>
+</div>
 </section>
 <section id='s84'>
 <h3><code><span class='class'>array</span>.<span class='field'>insert</span>(position, value)</code></h3>
@@ -2695,6 +3096,71 @@ Insert <code>value</code> into an array at <code>position</code>.
 <p>
 This modifies the array.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> xs = [];
+
+<span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>5</span> {
+    <span class='keyword'>if</span> i == <span class='constant'>2</span> {
+        <span class='keyword'>continue</span>;
+    }
+
+    xs.<span class='field'>push</span>(i * <span class='constant'>2</span>);
+}
+io.<span class='field'>println</span>(xs);
+
+xs.<span class='field'>insert</span>(<span class='constant'>2</span>, <span class='constant'>4</span>);
+io.<span class='field'>println</span>(xs);
+</pre>
+<pre class='code'>
+<span class='keyword'>mf</span> xs = [] <span class='keyword'>fr</span>
+
+<span class='keyword'>yall</span> i <span class='keyword'>amongus</span> <span class='constant'>0</span>, <span class='constant'>5</span> {
+    <span class='keyword'>ayo</span> i == <span class='constant'>2</span> {
+        <span class='keyword'>slickback</span> <span class='keyword'>fr</span>
+    }
+
+    xs.<span class='field'>push</span>(i * <span class='constant'>2</span>) <span class='keyword'>fr</span>
+}
+io.<span class='field'>println</span>(xs) <span class='keyword'>fr</span>
+
+xs.<span class='field'>insert</span>(<span class='constant'>2</span>, <span class='constant'>4</span>) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(xs) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+[0, 2, 6, 8]
+[0, 2, 4, 6, 6]
+</pre>
+</div>
 </section>
 <section id='s85'>
 <h3><code><span class='class'>array</span>.<span class='field'>sort</span>(compare)</code></h3>
@@ -2719,17 +3185,33 @@ Sort an array inplace with <code>compare</code>, and return itself.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> xs = [<span class='constant'>4</span>, <span class='constant'>2</span>, <span class='constant'>5</span>, <span class='constant'>1</span>, <span class='constant'>3</span>];
-xs.<span class='field'>sort</span>(<span class='keyword'>fn</span> (x, y) =&gt; x &lt; y);
+xs.<span class='field'>sort</span>(<span class='keyword'>fn</span> (x, y) =&gt; x &lt; y); <span class='comment'># This also returns the array so you can chain operations</span>
 
-io.<span class='field'>println</span>(xs); <span class='comment'># Output: [1, 2, 3, 4, 5]</span>
+io.<span class='field'>println</span>(xs);
 </pre>
 <pre class='code'>
 <span class='keyword'>mf</span> xs = [<span class='constant'>4</span>, <span class='constant'>2</span>, <span class='constant'>5</span>, <span class='constant'>1</span>, <span class='constant'>3</span>] <span class='keyword'>fr</span>
-xs.<span class='field'>sort</span>(<span class='keyword'>lit</span> (x, y) =&gt; x &lt; y) <span class='keyword'>fr</span>
+xs.<span class='field'>sort</span>(<span class='keyword'>lit</span> (x, y) =&gt; x &lt; y) <span class='keyword'>fr</span> <span class='comment'># This also returns the array so you can chain operations</span>
 
-io.<span class='field'>println</span>(xs) <span class='keyword'>fr</span> <span class='comment'># Output: [1, 2, 3, 4, 5]</span>
+io.<span class='field'>println</span>(xs) <span class='keyword'>fr</span>
 </pre>
 </div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+[1, 2, 3, 4, 5]
+</pre>
 </div>
 <p>
 The compare function must take two arguments. If it returns <code>true</code>, then the
@@ -2748,6 +3230,55 @@ If <code>size</code> is larger than the original size, the extra elements shall 
 <p>
 This modifies the array.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
+io.<span class='field'>println</span>(xs);
+
+xs.<span class='field'>resize</span>(<span class='constant'>3</span>);
+io.<span class='field'>println</span>(xs);
+</pre>
+<pre class='code'>
+<span class='keyword'>mf</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>] <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(xs) <span class='keyword'>fr</span>
+
+xs.<span class='field'>resize</span>(<span class='constant'>3</span>) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(xs) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+[1, 2, 3, 4, 5]
+[1, 2, 3]
+</pre>
+</div>
 </section>
 <section id='s87'>
 <h3><code><span class='class'>array</span>.<span class='field'>reverse</span>()</code></h3>
@@ -2757,6 +3288,55 @@ Reverse an array.
 <p>
 This modifes the array.
 </p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
+io.<span class='field'>println</span>(xs);
+
+xs.<span class='field'>reverse</span>(); <span class='comment'># This also returns the array so you can chain operations</span>
+io.<span class='field'>println</span>(xs);
+</pre>
+<pre class='code'>
+<span class='keyword'>mf</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>] <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(xs) <span class='keyword'>fr</span>
+
+xs.<span class='field'>reverse</span>() <span class='keyword'>fr</span> <span class='comment'># This also returns the array so you can chain operations</span>
+io.<span class='field'>println</span>(xs) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs demo.bs
+[1, 2, 3, 4, 5]
+[5, 4, 3, 2, 1]
+</pre>
+</div>
 </section>
 </section>
 <section id='s88'>
