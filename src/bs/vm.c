@@ -5,9 +5,13 @@
 #ifdef _WIN32
 #    define WIN32_LEAN_AND_MEAN
 #    include <windows.h>
+
+#    define bs_issep(c) ((c) == '/' || (c) == '\\')
 #else
 #    include <dlfcn.h>
 #    include <unistd.h>
+
+#    define bs_issep(c) ((c) == '/')
 #endif // _WIN32
 
 #include "bs/compiler.h"
@@ -656,7 +660,7 @@ Bs_Sv bs_buffer_reset(Bs_Buffer *b, size_t pos) {
 Bs_Sv bs_buffer_absolute_path(Bs_Buffer *b, Bs_Sv path) {
     const size_t start = b->count;
 
-    if (path.size && *path.data != '/') {
+    if (path.size && !bs_issep(*path.data)) {
         bs_da_push_many(b->bs, b, b->bs->cwd->data, b->bs->cwd->size);
         if (b->count != start + 1) {
             bs_da_push(b->bs, b, '/');
@@ -671,29 +675,29 @@ Bs_Sv bs_buffer_absolute_path(Bs_Buffer *b, Bs_Sv path) {
 
     while (*p) {
         // Skip consecutive slashes
-        while (*p == '/' && p[1] == '/') {
+        while (bs_issep(*p) && bs_issep(p[1])) {
             p++;
         }
 
         // Handle ./
-        if (*p == '.' && (p[1] == '/' || p[1] == '\0')) {
+        if (*p == '.' && (bs_issep(p[1]) || p[1] == '\0')) {
             p++;
-            if (*p == '/') {
+            if (bs_issep(*p)) {
                 p++;
             }
             continue;
         }
 
         // Handle ../
-        if (*p == '.' && p[1] == '.' && (p[2] == '/' || p[2] == '\0')) {
+        if (*p == '.' && p[1] == '.' && (bs_issep(p[2]) || p[2] == '\0')) {
             p += 2;
-            if (*p == '/') {
+            if (bs_issep(*p)) {
                 p++;
             }
 
             if (r != b->data + start + 1) {
                 r--;
-                while (r != b->data + start && r[-1] != '/') {
+                while (r != b->data + start && !bs_issep(r[-1])) {
                     r--;
                 }
             }
@@ -701,11 +705,11 @@ Bs_Sv bs_buffer_absolute_path(Bs_Buffer *b, Bs_Sv path) {
         }
 
         // Normal
-        while (*p != '/' && *p != '\0') {
+        while (!bs_issep(*p) && *p != '\0') {
             *r++ = *p++;
         }
 
-        if (*p == '/') {
+        if (bs_issep(*p)) {
             *r++ = *p++;
         }
     }
@@ -729,15 +733,15 @@ Bs_Sv bs_buffer_relative_path(Bs_Buffer *b, Bs_Sv path) {
         i++;
     }
 
-    if (i != cwd->size || path.data[i] != '/') {
+    if (i != cwd->size || !bs_issep(path.data[i])) {
         bs_da_push_many(b->bs, b, "../", 3);
         for (size_t j = i; j < cwd->size; j++) {
-            if (cwd->data[j] == '/') {
+            if (bs_issep(cwd->data[j])) {
                 bs_da_push_many(b->bs, b, "../", 3);
             }
         }
 
-        while (i && path.data[i - 1] != '/') {
+        while (i && !bs_issep(path.data[i - 1])) {
             i--;
         }
     } else {
