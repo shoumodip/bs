@@ -1562,8 +1562,78 @@ Methods for the builtin table value.
 ### table.copy() @method
 Copy a table.
 
+```bs
+var xs = {
+    foo = 69,
+    bar = 420
+};
+
+var ys = xs;
+var zs = xs.copy();
+
+xs.bar = 1337;
+
+io.println(xs);
+io.println(ys);
+io.println(zs);
+```
+```bsx
+mf xs = {
+    foo = 69,
+    bar = 420
+} fr
+
+mf ys = xs fr
+mf zs = xs.copy() fr
+
+xs.bar = 1337 fr
+
+io.println(xs) fr
+io.println(ys) fr
+io.println(zs) fr
+```
+
+```console
+$ bs demo.bs
+{
+    bar = 1337,
+    foo = 69
+}
+{
+    bar = 1337,
+    foo = 69
+}
+{
+    bar = 420,
+    foo = 69
+}
+```
+
 ### table.equal(that) @method
 Compare the elements of two tables.
+
+```bs
+var xs = { foo = 69, bar = 420 };
+var ys = { foo = 69, bar = 420 };
+
+io.println(xs == ys);
+io.println(xs.equal(ys));
+```
+```bsx
+mf xs = { foo = 69, bar = 420 } fr
+mf ys = { foo = 69, bar = 420 } fr
+
+io.println(xs == ys) fr
+io.println(xs.equal(ys)) fr
+```
+
+```console
+$ bs demo.bs
+false
+true
+```
+
+Just like arrays, tables are compared by reference with the `==` operator.
 
 ## Math
 Contains simple mathematical primitives.
