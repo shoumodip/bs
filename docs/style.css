@@ -164,20 +164,6 @@ a, button {
     padding-top: var(--padding);
 }
 
-.link {
-    color: var(--pagefg);
-    border: var(--border-size) solid var(--border);
-    display: inline-block;
-    padding: calc(1.5 * var(--padding)) calc(3 * var(--padding));
-    font-weight: bold;
-    border-radius: var(--border-radius);
-    text-decoration: none;
-}
-
-.link:hover {
-    background-color: var(--border);
-}
-
 .field {
     color: var(--field);
 }
@@ -299,5 +285,52 @@ main {
 
     #toggle-sidebar {
         display: block;
+    }
+}
+
+.links {
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.link {
+    border: var(--border-size) solid var(--border);
+    border-radius: var(--border-radius);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(33.33% - var(--padding));
+    aspect-ratio: 1;
+    margin: var(--padding) 0;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.link a {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    text-decoration: none;
+    color: var(--pagefg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.link:hover {
+    background-color: var(--border);
+}
+
+@media (min-width: 768px) {
+    .link {
+        aspect-ratio: none;
+        height: calc(var(--header) * 2);
     }
 }

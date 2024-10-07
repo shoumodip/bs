@@ -32,22 +32,39 @@ $ bs factorial.bs # or .bsx
 
 ## Download
 
-```console
-$ git clone https://github.com/shoumodip/bs
-$ cd bs
-$ ./build/linux.sh # If on Linux
-$ ./build/macos.sh # If on macOS
-$ build\windows.bat # If on Windows
-```
+<div class="links">
+<div class="link">
+<a href="https://github.com/shoumodip/bs/releases/latest/download/bs-linux-x86_64.zip" download>Linux<br>(x86_64)</a>
+</div>
+<div class="link">
+<a href="https://github.com/shoumodip/bs/releases/latest/download/bs-macos-x86_64.zip" download>MacOS<br>(x86_64)</a>
+</div>
+<div class="link">
+<a href="https://github.com/shoumodip/bs/releases/latest/download/bs-windows-x86_64.zip" download>Windows<br>(x86_64)</a>
+</div>
+<div class="link">
+<a href="https://github.com/shoumodip/bs/releases/latest/download/bs-linux-arm64.zip" download>Linux<br>(ARM64)</a>
+</div>
+<div class="link">
+<a href="https://github.com/shoumodip/bs/releases/latest/download/bs-macos-arm64.zip" download>MacOS<br>(ARM64)</a>
+</div>
+<div class="link">
+<a href="https://github.com/shoumodip/bs/releases/latest/download/bs-windows-arm64.zip" download>Windows<br>(ARM64)</a>
+</div>
+</div>
 
 ## Further Links
 
-<center>
-
-[Tutorial](tutorial.html)
-[Stdlib](stdlib.html)
-[GitHub](https://github.com/shoumodip/bs)
-
-</center>
+<div class="links">
+<div class="link">
+<a href="tutorial.html">Tutorial</a>
+</div>
+<div class="link">
+<a href="stdlib.html">Stdlib</a>
+</div>
+<div class="link">
+<a href="https://github.com/shoumodip/bs">GitHub</a>
+</div>
+</div>
 
 <!-- no-navigation -->
