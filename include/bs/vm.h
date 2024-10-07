@@ -17,6 +17,7 @@ typedef Bs_Value (*Bs_C_Fn_Ptr)(Bs *bs, Bs_Value *args, size_t arity);
 
 Bs *bs_new(void);
 void bs_free(Bs *bs);
+void bs_mark(Bs *bs, Bs_Object *object);
 void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size);
 
 Bs_Str *bs_str_new(Bs *bs, Bs_Sv sv);

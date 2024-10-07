@@ -1,3 +1,4 @@
+#include "bs/vm.h"
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -2091,10 +2092,12 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     }
 
     {
-        bs_io_reader_class = bs_c_class_new(
-            bs, Bs_Sv_Static("Reader"), sizeof(Bs_File), bs_io_reader_init, bs_io_file_free);
+        bs_io_reader_class =
+            bs_c_class_new(bs, Bs_Sv_Static("Reader"), sizeof(Bs_File), bs_io_reader_init);
 
         bs_io_reader_class->can_fail = true;
+        bs_io_reader_class->free = bs_io_file_free;
+
         bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("close"), bs_io_file_close);
         bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("read"), bs_io_reader_read);
         bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("readln"), bs_io_reader_readln);
@@ -2103,10 +2106,12 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("seek"), bs_io_reader_seek);
         bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("tell"), bs_io_reader_tell);
 
-        bs_io_writer_class = bs_c_class_new(
-            bs, Bs_Sv_Static("Writer"), sizeof(Bs_File), bs_io_writer_init, bs_io_file_free);
+        bs_io_writer_class =
+            bs_c_class_new(bs, Bs_Sv_Static("Writer"), sizeof(Bs_File), bs_io_writer_init);
 
         bs_io_writer_class->can_fail = true;
+        bs_io_writer_class->free = bs_io_file_free;
+
         bs_c_class_add(bs, bs_io_writer_class, Bs_Sv_Static("close"), bs_io_file_close);
         bs_c_class_add(bs, bs_io_writer_class, Bs_Sv_Static("flush"), bs_io_writer_flush);
         bs_c_class_add(bs, bs_io_writer_class, Bs_Sv_Static("write"), bs_io_writer_write);
@@ -2167,7 +2172,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_add(bs, os, "args", bs_value_object(args));
 
         Bs_C_Class *process_class =
-            bs_c_class_new(bs, Bs_Sv_Static("Process"), sizeof(Bs_Process), bs_process_init, NULL);
+            bs_c_class_new(bs, Bs_Sv_Static("Process"), sizeof(Bs_Process), bs_process_init);
 
         process_class->can_fail = true;
         bs_c_class_add(bs, process_class, Bs_Sv_Static("kill"), bs_process_kill);
@@ -2182,10 +2187,10 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     }
 
     {
-        bs_regex_class = bs_c_class_new(
-            bs, Bs_Sv_Static("Regex"), sizeof(Bs_Regex), bs_regex_init, bs_regex_free);
-
+        bs_regex_class = bs_c_class_new(bs, Bs_Sv_Static("Regex"), sizeof(Bs_Regex), bs_regex_init);
         bs_regex_class->can_fail = true;
+        bs_regex_class->free = bs_regex_free;
+
         bs_global_set(bs, Bs_Sv_Static("Regex"), bs_value_object(bs_regex_class));
     }
 
@@ -2236,8 +2241,10 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     }
 
     {
-        Bs_C_Class *bytes_class = bs_c_class_new(
-            bs, Bs_Sv_Static("Bytes"), sizeof(Bs_Buffer), bs_bytes_init, bs_bytes_free);
+        Bs_C_Class *bytes_class =
+            bs_c_class_new(bs, Bs_Sv_Static("Bytes"), sizeof(Bs_Buffer), bs_bytes_init);
+
+        bytes_class->free = bs_bytes_free;
 
         bs_c_class_add(bs, bytes_class, Bs_Sv_Static("count"), bs_bytes_count);
         bs_c_class_add(bs, bytes_class, Bs_Sv_Static("reset"), bs_bytes_reset);

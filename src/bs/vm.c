@@ -230,11 +230,9 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
     }
 }
 
-static void bs_mark_object(Bs *bs, Bs_Object *object);
-
 static void bs_mark_value(Bs *bs, Bs_Value value) {
     if (value.type == BS_VALUE_OBJECT) {
-        bs_mark_object(bs, value.as.object);
+        bs_mark(bs, value.as.object);
     }
 }
 
@@ -243,22 +241,6 @@ static void bs_mark_map(Bs *bs, Bs_Map *map) {
         bs_mark_value(bs, map->data[i].key);
         bs_mark_value(bs, map->data[i].value);
     }
-}
-
-static void bs_mark_object(Bs *bs, Bs_Object *object) {
-    if (!object || object->marked) {
-        return;
-    }
-
-#ifdef BS_GC_DEBUG_LOG
-    Bs_Writer *w = &bs->config.log;
-    bs_fmt(w, "[GC] Mark %p ", object);
-    bs_value_write(bs, w, bs_value_object(object));
-    bs_fmt(w, "\n");
-#endif // BS_GC_DEBUG_LOG
-
-    object->marked = true;
-    bs_object_list_push(&bs->grays, object);
 }
 
 static_assert(BS_COUNT_OBJECTS == 13, "Update bs_blacken_object()");
@@ -273,7 +255,7 @@ static void bs_blacken_object(Bs *bs, Bs_Object *object) {
     switch (object->type) {
     case BS_OBJECT_FN: {
         Bs_Fn *fn = (Bs_Fn *)object;
-        bs_mark_object(bs, (Bs_Object *)fn->name);
+        bs_mark(bs, (Bs_Object *)fn->name);
 
         for (size_t i = 0; i < fn->chunk.constants.count; i++) {
             bs_mark_value(bs, fn->chunk.constants.data[i]);
@@ -298,10 +280,10 @@ static void bs_blacken_object(Bs *bs, Bs_Object *object) {
 
     case BS_OBJECT_CLOSURE: {
         Bs_Closure *closure = (Bs_Closure *)object;
-        bs_mark_object(bs, (Bs_Object *)closure->fn);
+        bs_mark(bs, (Bs_Object *)closure->fn);
 
         for (size_t i = 0; i < closure->upvalues; i++) {
-            bs_mark_object(bs, (Bs_Object *)closure->data[i]);
+            bs_mark(bs, (Bs_Object *)closure->data[i]);
         }
     } break;
 
@@ -311,26 +293,29 @@ static void bs_blacken_object(Bs *bs, Bs_Object *object) {
 
     case BS_OBJECT_CLASS: {
         Bs_Class *class = (Bs_Class *)object;
-        bs_mark_object(bs, (Bs_Object *)class->name);
-        bs_mark_object(bs, (Bs_Object *)class->init);
+        bs_mark(bs, (Bs_Object *)class->name);
+        bs_mark(bs, (Bs_Object *)class->init);
         bs_mark_map(bs, &class->methods);
     } break;
 
     case BS_OBJECT_INSTANCE: {
         Bs_Instance *instance = (Bs_Instance *)object;
-        bs_mark_object(bs, (Bs_Object *)instance->class);
+        bs_mark(bs, (Bs_Object *)instance->class);
         bs_mark_map(bs, &instance->properties);
     } break;
 
     case BS_OBJECT_C_CLASS: {
         Bs_C_Class *class = (Bs_C_Class *)object;
-        bs_mark_object(bs, (Bs_Object *)class->init);
+        bs_mark(bs, (Bs_Object *)class->init);
         bs_mark_map(bs, &class->methods);
     } break;
 
     case BS_OBJECT_C_INSTANCE: {
         Bs_C_Instance *instance = (Bs_C_Instance *)object;
-        bs_mark_object(bs, (Bs_Object *)instance->class);
+        bs_mark(bs, (Bs_Object *)instance->class);
+        if (instance->class->mark) {
+            instance->class->mark(bs, instance->data);
+        }
     } break;
 
     case BS_OBJECT_BOUND_METHOD: {
@@ -365,25 +350,25 @@ static void bs_collect(Bs *bs) {
     }
 
     for (size_t i = 0; i < bs->frames.count; i++) {
-        bs_mark_object(bs, (Bs_Object *)bs->frames.data[i].closure);
+        bs_mark(bs, (Bs_Object *)bs->frames.data[i].closure);
     }
 
-    bs_mark_object(bs, (Bs_Object *)bs->cwd);
+    bs_mark(bs, (Bs_Object *)bs->cwd);
 
     for (size_t i = 0; i < bs->modules.count; i++) {
         Bs_Module *m = &bs->modules.data[i];
-        bs_mark_object(bs, (Bs_Object *)m->name);
+        bs_mark(bs, (Bs_Object *)m->name);
         bs_mark_value(bs, m->result);
     }
 
     for (Bs_Upvalue *upvalue = bs->upvalues; upvalue; upvalue = upvalue->next) {
-        bs_mark_object(bs, (Bs_Object *)upvalue);
+        bs_mark(bs, (Bs_Object *)upvalue);
     }
 
     bs_mark_map(bs, &bs->globals);
 
     for (size_t i = 0; i < bs->handles.count; i++) {
-        bs_mark_object(bs, bs->handles.data[i]);
+        bs_mark(bs, bs->handles.data[i]);
     }
 
     for (size_t i = 0; i < bs_c_array_size(bs->builtin_methods); i++) {
@@ -502,6 +487,22 @@ void bs_free(Bs *bs) {
 
     bs_pretty_printer_free(&bs->printer);
     free(bs);
+}
+
+void bs_mark(Bs *bs, Bs_Object *object) {
+    if (!object || object->marked) {
+        return;
+    }
+
+#ifdef BS_GC_DEBUG_LOG
+    Bs_Writer *w = &bs->config.log;
+    bs_fmt(w, "[GC] Mark %p ", object);
+    bs_value_write(bs, w, bs_value_object(object));
+    bs_fmt(w, "\n");
+#endif // BS_GC_DEBUG_LOG
+
+    object->marked = true;
+    bs_object_list_push(&bs->grays, object);
 }
 
 void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size) {
