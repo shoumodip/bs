@@ -533,11 +533,6 @@ if !p {
 }
 
 var stdout = p.stdout();
-if !stdout {
-    io.eprintln("ERROR: could not capture standard output of process");
-    os.exit(1);
-}
-
 while !stdout.eof() {
     var line = stdout.readln();
     io.println("Line:", line);
@@ -553,11 +548,6 @@ ayo nah p {
 }
 
 mf stdout = p.stdout() fr
-ayo nah stdout {
-    io.eprintln("ERROR: could not capture standard output of process") fr
-    os.exit(1) fr
-}
-
 yolo nah stdout.eof() {
     mf line = stdout.readln() fr
     io.println("Line:", line) fr
@@ -591,11 +581,6 @@ if !p {
 }
 
 var stdin = p.stdin();
-if !stdin {
-    io.eprintln("ERROR: could not capture standard input of process");
-    os.exit(1);
-}
-
 stdin.writeln("First line foobar lmao");
 stdin.writeln("Second line lmao");
 stdin.writeln("Third line lets goooo foobar");
@@ -610,11 +595,6 @@ ayo nah p {
 }
 
 mf stdin = p.stdin() fr
-ayo nah stdin {
-    io.eprintln("ERROR: could not capture standard input of process") fr
-    os.exit(1) fr
-}
-
 stdin.writeln("First line foobar lmao") fr
 stdin.writeln("Second line lmao") fr
 stdin.writeln("Third line lets goooo foobar") fr

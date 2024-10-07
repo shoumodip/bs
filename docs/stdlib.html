@@ -1089,11 +1089,6 @@ Returns <code>nil</code> if the process was spawned without capturing stdout.
 }
 
 <span class='keyword'>var</span> stdout = p.<span class='field'>stdout</span>();
-<span class='keyword'>if</span> !stdout {
-    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not capture standard output of process"</span>);
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
-}
-
 <span class='keyword'>while</span> !stdout.<span class='field'>eof</span>() {
     <span class='keyword'>var</span> line = stdout.<span class='field'>readln</span>();
     io.<span class='field'>println</span>(<span class='string'>"Line:"</span>, line);
@@ -1109,11 +1104,6 @@ p.<span class='field'>wait</span>();
 }
 
 <span class='keyword'>mf</span> stdout = p.<span class='field'>stdout</span>() <span class='keyword'>fr</span>
-<span class='keyword'>ayo</span> <span class='keyword'>nah</span> stdout {
-    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not capture standard output of process"</span>) <span class='keyword'>fr</span>
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>) <span class='keyword'>fr</span>
-}
-
 <span class='keyword'>yolo</span> <span class='keyword'>nah</span> stdout.<span class='field'>eof</span>() {
     <span class='keyword'>mf</span> line = stdout.<span class='field'>readln</span>() <span class='keyword'>fr</span>
     io.<span class='field'>println</span>(<span class='string'>"Line:"</span>, line) <span class='keyword'>fr</span>
@@ -1183,11 +1173,6 @@ Returns <code>nil</code> if the process was spawned without capturing stdin.
 }
 
 <span class='keyword'>var</span> stdin = p.<span class='field'>stdin</span>();
-<span class='keyword'>if</span> !stdin {
-    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not capture standard input of process"</span>);
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
-}
-
 stdin.<span class='field'>writeln</span>(<span class='string'>"First line foobar lmao"</span>);
 stdin.<span class='field'>writeln</span>(<span class='string'>"Second line lmao"</span>);
 stdin.<span class='field'>writeln</span>(<span class='string'>"Third line lets goooo foobar"</span>);
@@ -1202,11 +1187,6 @@ p.<span class='field'>wait</span>();
 }
 
 <span class='keyword'>mf</span> stdin = p.<span class='field'>stdin</span>() <span class='keyword'>fr</span>
-<span class='keyword'>ayo</span> <span class='keyword'>nah</span> stdin {
-    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not capture standard input of process"</span>) <span class='keyword'>fr</span>
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>) <span class='keyword'>fr</span>
-}
-
 stdin.<span class='field'>writeln</span>(<span class='string'>"First line foobar lmao"</span>) <span class='keyword'>fr</span>
 stdin.<span class='field'>writeln</span>(<span class='string'>"Second line lmao"</span>) <span class='keyword'>fr</span>
 stdin.<span class='field'>writeln</span>(<span class='string'>"Third line lets goooo foobar"</span>) <span class='keyword'>fr</span>
