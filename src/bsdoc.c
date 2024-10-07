@@ -690,6 +690,12 @@ int main(int argc, char **argv) {
             "#toggle-sidebar {\n"
             "    display: none;\n"
             "}\n"
+            "@media (min-width: 768px) {\n"
+            "    main {\n"
+            "        margin-left: 10%%;\n"
+            "        margin-right: 10%%;\n"
+            "    }\n"
+            "}\n"
             "</style>\n");
     }
 

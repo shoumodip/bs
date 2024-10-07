@@ -90,11 +90,5 @@ window.onload = () => {
         if (window.innerWidth > 768) {
             sidebar.classList.remove("collapsed")
         }
-    } else {
-        if (window.innerWidth > 768) {
-            const main = document.getElementById("main")
-            main.style.marginLeft = "10%"
-            main.style.marginRight = "10%"
-        }
     }
 }
