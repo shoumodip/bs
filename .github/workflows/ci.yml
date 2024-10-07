@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        arch: [x86_64]
+        arch: [x86_64, arm64]
 
     steps:
       - name: Checkout repository
@@ -114,5 +114,8 @@ jobs:
         with:
           files: |
             ubuntu-latest-x86_64-build/bs-linux-x86_64.zip
+            ubuntu-latest-arm64-build/bs-linux-arm64.zip
             macos-latest-x86_64-build/bs-macos-x86_64.zip
+            macos-latest-arm64-build/bs-macos-arm64.zip
             windows-latest-x86_64-build/bs-windows-x86_64.zip
+            windows-latest-arm64-build/bs-windows-arm64.zip
