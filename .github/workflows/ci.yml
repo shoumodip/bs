@@ -69,19 +69,15 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') && matrix.os != 'windows-latest'
         run: |
           if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            rm -r lib/.build
-
             name="bs-linux-${{ matrix.arch }}"
             mkdir $name
-            mv bin lib $name
+            mv bin/bs lib/libbs.a lib/libbs.so $name
 
             zip -r $name.zip $name
           elif [ "${{ matrix.os }}" == "macos-latest" ]; then
-            rm -r lib/.build
-
             name="bs-macos-${{ matrix.arch }}"
             mkdir $name
-            mv bin lib $name
+            mv bin/bs lib/libbs.a lib/libbs.dylib $name
 
             zip -r $name.zip $name
           fi
@@ -89,11 +85,9 @@ jobs:
       - name: Windows archive
         if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
         run: |
-          rm -r lib/.build
-
           $name="bs-windows-${{ matrix.arch }}"
           mkdir $name
-          Move-Item bin, lib -Destination $name
+          Move-Item "bin/bs.exe", "lib/libbs.dll", "lib/libbs.lib" -Destination $name
 
           Compress-Archive -Path $name -DestinationPath "$name.zip"
 
