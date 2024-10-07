@@ -493,10 +493,27 @@ typedef struct {
     pid_t pid;
 #endif // _WIN32
 
-    int stdout_read;
-    int stderr_read;
-    int stdin_write;
+    Bs_C_Instance *stdout_read;
+    Bs_C_Instance *stderr_read;
+    Bs_C_Instance *stdin_write;
 } Bs_Process;
+
+void bs_process_mark(Bs *bs, void *instance_data) {
+    Bs_Process *p = &bs_static_cast(instance_data, Bs_Process);
+    bs_mark(bs, (Bs_Object *)p->stdout_read);
+    bs_mark(bs, (Bs_Object *)p->stderr_read);
+    bs_mark(bs, (Bs_Object *)p->stdin_write);
+}
+
+static Bs_C_Instance *bs_pipe_new(Bs *bs, int fd, bool write) {
+    Bs_C_Instance *instance =
+        bs_c_instance_new(bs, write ? bs_io_writer_class : bs_io_reader_class);
+
+    Bs_File *f = &bs_static_cast(instance->data, Bs_File);
+    f->file = FD_OPEN(fd, write ? "wb" : "rb");
+    f->pipe = true;
+    return instance;
+}
 
 Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
     if (arity < 0 || arity > 4) {
@@ -642,17 +659,20 @@ Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
     CloseHandle(p->piProcInfo.hThread);
 
     if (capture_stdout) {
-        p->stdout_read = _open_osfhandle((intptr_t)stdout_pipe_read, _O_RDONLY);
+        p->stdout_read =
+            bs_pipe_new(bs, _open_osfhandle((intptr_t)stdout_pipe_read, _O_RDONLY), false);
         CloseHandle(stdout_pipe_write);
     }
 
     if (capture_stderr) {
-        p->stderr_read = _open_osfhandle((intptr_t)stderr_pipe_read, _O_RDONLY);
+        p->stderr_read =
+            bs_pipe_new(bs, _open_osfhandle((intptr_t)stderr_pipe_read, _O_RDONLY), false);
         CloseHandle(stderr_pipe_write);
     }
 
     if (capture_stdin) {
-        p->stdin_write = _open_osfhandle((intptr_t)stdin_pipe_write, _O_WRONLY);
+        p->stdin_write =
+            bs_pipe_new(bs, _open_osfhandle((intptr_t)stdin_pipe_write, _O_WRONLY), true);
         CloseHandle(stdin_pipe_read);
     }
 #else
@@ -761,17 +781,17 @@ Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
 
     if (capture_stdout) {
         close(stdout_pipe[1]);
-        p->stdout_read = stdout_pipe[0];
+        p->stdout_read = bs_pipe_new(bs, stdout_pipe[0], false);
     }
 
     if (capture_stderr) {
         close(stderr_pipe[1]);
-        p->stderr_read = stderr_pipe[0];
+        p->stderr_read = bs_pipe_new(bs, stderr_pipe[0], false);
     }
 
     if (capture_stdin) {
         close(stdin_pipe[0]);
-        p->stdin_write = stdin_pipe[1];
+        p->stdin_write = bs_pipe_new(bs, stdin_pipe[1], true);
     }
 #endif // _WIN32
 
@@ -795,9 +815,9 @@ Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
     p->pid = 0;
 #endif // _WIN32
 
-    p->stdout_read = 0;
-    p->stderr_read = 0;
-    p->stdin_write = 0;
+    p->stdout_read = NULL;
+    p->stderr_read = NULL;
+    p->stdin_write = NULL;
     return bs_value_bool(true);
 }
 
@@ -834,55 +854,28 @@ Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
         WIFEXITED(status) ? bs_value_num(WEXITSTATUS(status)) : bs_value_nil;
 #endif // _WIN32
 
-    p->stdout_read = 0;
-    p->stderr_read = 0;
-    p->stdin_write = 0;
+    p->stdout_read = NULL;
+    p->stderr_read = NULL;
+    p->stdin_write = NULL;
     return return_value;
 }
 
 Bs_Value bs_process_stdout(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-
     Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
-    if (!p->stdout_read) {
-        return bs_value_nil;
-    }
-
-    Bs_C_Instance *instance = bs_c_instance_new(bs, bs_io_reader_class);
-    Bs_File *f = &bs_static_cast(instance->data, Bs_File);
-    f->file = FD_OPEN(p->stdout_read, "rb");
-    f->pipe = true;
-    return bs_value_object(instance);
+    return p->stdout_read ? bs_value_object(p->stdout_read) : bs_value_nil;
 }
 
 Bs_Value bs_process_stderr(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-
     Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
-    if (!p->stderr_read) {
-        return bs_value_nil;
-    }
-
-    Bs_C_Instance *instance = bs_c_instance_new(bs, bs_io_reader_class);
-    Bs_File *f = &bs_static_cast(instance->data, Bs_File);
-    f->file = FD_OPEN(p->stderr_read, "rb");
-    f->pipe = true;
-    return bs_value_object(instance);
+    return p->stderr_read ? bs_value_object(p->stderr_read) : bs_value_nil;
 }
 
 Bs_Value bs_process_stdin(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-
     Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
-    if (!p->stdin_write) {
-        return bs_value_nil;
-    }
-
-    Bs_C_Instance *instance = bs_c_instance_new(bs, bs_io_writer_class);
-    Bs_File *f = &bs_static_cast(instance->data, Bs_File);
-    f->file = FD_OPEN(p->stdin_write, "wb");
-    f->pipe = true;
-    return bs_value_object(instance);
+    return p->stdin_write ? bs_value_object(p->stdin_write) : bs_value_nil;
 }
 
 // Regex
@@ -2175,6 +2168,8 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
             bs_c_class_new(bs, Bs_Sv_Static("Process"), sizeof(Bs_Process), bs_process_init);
 
         process_class->can_fail = true;
+        process_class->mark = bs_process_mark;
+
         bs_c_class_add(bs, process_class, Bs_Sv_Static("kill"), bs_process_kill);
         bs_c_class_add(bs, process_class, Bs_Sv_Static("wait"), bs_process_wait);
         bs_c_class_add(bs, process_class, Bs_Sv_Static("stdout"), bs_process_stdout);
