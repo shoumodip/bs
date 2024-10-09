@@ -1791,7 +1791,7 @@ Bs_Value rl_draw_text(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-void bs_library_init(Bs *bs, Bs_C_Lib *library) {
+BS_LIBRARY_INIT void bs_library_init(Bs *bs, Bs_C_Lib *library) {
     static const Bs_FFI ffi[] = {
         {"init_window", rl_init_window},
         {"close_window", rl_close_window},

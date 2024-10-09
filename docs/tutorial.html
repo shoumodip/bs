@@ -3030,7 +3030,7 @@ library.
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>void</span> bs_library_init(<span class='class'>Bs</span> *bs, <span class='class'>Bs_C_Lib</span> *library) {
+<span class='constant'>BS_LIBRARY_INIT</span> <span class='class'>void</span> bs_library_init(<span class='class'>Bs</span> *bs, <span class='class'>Bs_C_Lib</span> *library) {
     <span class='keyword'>static</span> <span class='keyword'>const</span> <span class='class'>Bs_FFI</span> ffi[] = {
         {<span class='string'>"init_window"</span>, rl_init_window},
         {<span class='string'>"close_window"</span>, rl_close_window},
