@@ -21,6 +21,7 @@ typedef struct {
 
 Bs_Lexer bs_lexer_new(Bs_Sv path, Bs_Sv input, Bs_Writer *error);
 void bs_lexer_error(Bs_Lexer *lexer);
+void bs_lexer_advance(Bs_Lexer *l);
 void bs_lexer_buffer(Bs_Lexer *lexer, Bs_Token token);
 
 Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc);

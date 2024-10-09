@@ -1245,35 +1245,35 @@ more applicable, albeit involved, example.
 ```bs
 class Sprite {
     # Constructor
-    init(name, health, attackPower) {
+    init(name, health, attack_power) {
         this.name = name;
         this.health = health;
-        this.attackPower = attackPower;
+        this.attack_power = attack_power;
     }
 
     attack(target) {
-        io.println("\(this.name) attacks \(target.name) for \(this.attackPower) damage!");
-        target.takeDamage(this.attackPower);
+        io.println("\(this.name) attacks \(target.name) for \(this.attack_power) damage!");
+        target.take_damage(this.attack_power);
     }
 
-    takeDamage(amount) {
+    take_damage(amount) {
         this.health -= amount;
-        if this.isAlive() {
+        if this.is_alive() {
             io.println("\(this.name) has \(this.health) health remaining.");
         } else {
             io.println("\(this.name) has been defeated!");
         }
     }
 
-    isAlive() {
+    is_alive() {
         return this.health > 0;
     }
 }
 
 # Inheritance
 class Hero < Sprite {
-    init(name, health, attackPower) {
-        super.init(name, health, attackPower);
+    init(name, health, attack_power) {
+        super.init(name, health, attack_power);
         this.poisoned = false;
         this.defending = false;
     }
@@ -1284,7 +1284,7 @@ class Hero < Sprite {
         this.defending = true;
     }
 
-    takeDamage(amount) {
+    take_damage(amount) {
         if this.defending {
             if this.poisoned {
                 # Hero will not be poisoned if defending
@@ -1297,20 +1297,20 @@ class Hero < Sprite {
             this.defending = false;
         }
 
-        super.takeDamage(amount);
+        super.take_damage(amount);
     }
 }
 
 class Enemy < Sprite {
-    init(name, health, attackPower) {
-        super.init(name, health, attackPower);
+    init(name, health, attack_power) {
+        super.init(name, health, attack_power);
     }
 
     # Special ability of enemy: poisoning
     poison(target) {
         io.println("\(this.name) poisons \(target.name)!");
         target.poisoned = true;
-        target.takeDamage(this.attackPower);
+        target.take_damage(this.attack_power);
     }
 }
 
@@ -1319,7 +1319,7 @@ class Enemy < Sprite {
 var hero = Hero(io.input("Enter hero's name> "), 30, 10);
 var enemy = Enemy(io.input("Enter enemy's name> "), 25, 8);
 
-while hero.isAlive() && enemy.isAlive() {
+while hero.is_alive() && enemy.is_alive() {
     io.println();
 
     # Hero cannot choose while poisoned
@@ -1330,14 +1330,14 @@ while hero.isAlive() && enemy.isAlive() {
         hero.poisoned = false;
         enemy.attack(hero);
     } else {
-        var heroChoice = io.input("Enter \(hero.name)'s choice (A: attack, D: defend)> ").toupper();
+        var choice = io.input("Enter \(hero.name)'s choice (A: attack, D: defend)> ").toupper();
 
-        if heroChoice == "A" {
+        if choice == "A" {
             hero.attack(enemy);
-            if !enemy.isAlive() {
+            if !enemy.is_alive() {
                 break;
             }
-        } else if heroChoice == "D" {
+        } else if choice == "D" {
             hero.defend();
         } else {
             io.println("ERROR: invalid choice! skipping \(hero.name)'s turn.");
@@ -1352,7 +1352,7 @@ while hero.isAlive() && enemy.isAlive() {
     }
 }
 
-if hero.isAlive() {
+if hero.is_alive() {
     io.println("\(hero.name) won!");
 } else {
     io.println("\(hero.name) lost :(");
@@ -1361,35 +1361,35 @@ if hero.isAlive() {
 ```bsx
 wannabe Sprite {
     # Constructor
-    init(name, health, attackPower) {
+    init(name, health, attack_power) {
         deez.name = name fr
         deez.health = health fr
-        deez.attackPower = attackPower fr
+        deez.attack_power = attack_power fr
     }
 
     attack(target) {
-        io.println("\(deez.name) attacks \(target.name) for \(deez.attackPower) damage!") fr
-        target.takeDamage(deez.attackPower) fr
+        io.println("\(deez.name) attacks \(target.name) for \(deez.attack_power) damage!") fr
+        target.take_damage(deez.attack_power) fr
     }
 
-    takeDamage(amount) {
+    take_damage(amount) {
         deez.health -= amount fr
-        ayo deez.isAlive() {
+        ayo deez.is_alive() {
             io.println("\(deez.name) has \(deez.health) health remaining.") fr
         } sike {
             io.println("\(deez.name) has been defeated!") fr
         }
     }
 
-    isAlive() {
+    is_alive() {
         bet deez.health > 0 fr
     }
 }
 
 # Inheritance
 wannabe Hero < Sprite {
-    init(name, health, attackPower) {
-        franky.init(name, health, attackPower) fr
+    init(name, health, attack_power) {
+        franky.init(name, health, attack_power) fr
         deez.poisoned = cap fr
         deez.defending = cap fr
     }
@@ -1400,7 +1400,7 @@ wannabe Hero < Sprite {
         deez.defending = nocap fr
     }
 
-    takeDamage(amount) {
+    take_damage(amount) {
         ayo deez.defending {
             ayo deez.poisoned {
                 # Hero will not be poisoned if defending
@@ -1413,20 +1413,20 @@ wannabe Hero < Sprite {
             deez.defending = cap fr
         }
 
-        franky.takeDamage(amount) fr
+        franky.take_damage(amount) fr
     }
 }
 
 wannabe Enemy < Sprite {
-    init(name, health, attackPower) {
-        franky.init(name, health, attackPower) fr
+    init(name, health, attack_power) {
+        franky.init(name, health, attack_power) fr
     }
 
     # Special ability of enemy: poisoning
     poison(target) {
         io.println("\(deez.name) poisons \(target.name)!") fr
         target.poisoned = nocap fr
-        target.takeDamage(deez.attackPower) fr
+        target.take_damage(deez.attack_power) fr
     }
 }
 
@@ -1435,7 +1435,7 @@ wannabe Enemy < Sprite {
 mf hero = Hero(io.input("Enter hero's name> "), 30, 10) fr
 mf enemy = Enemy(io.input("Enter enemy's name> "), 25, 8) fr
 
-yolo hero.isAlive() && enemy.isAlive() {
+yolo hero.is_alive() && enemy.is_alive() {
     io.println() fr
 
     # Hero cannot choose while poisoned
@@ -1446,14 +1446,14 @@ yolo hero.isAlive() && enemy.isAlive() {
         hero.poisoned = cap fr
         enemy.attack(hero) fr
     } sike {
-        mf heroChoice = io.input("Enter \(hero.name)'s choice (A: attack, D: defend)> ").toupper() fr
+        mf choice = io.input("Enter \(hero.name)'s choice (A: attack, D: defend)> ").toupper() fr
 
-        ayo heroChoice == "A" {
+        ayo choice == "A" {
             hero.attack(enemy) fr
-            ayo nah enemy.isAlive() {
+            ayo nah enemy.is_alive() {
                 yeet fr
             }
-        } sike ayo heroChoice == "D" {
+        } sike ayo choice == "D" {
             hero.defend() fr
         } sike {
             io.println("ERROR: invalid choice! skipping \(hero.name)'s turn.") fr
@@ -1468,7 +1468,7 @@ yolo hero.isAlive() && enemy.isAlive() {
     }
 }
 
-ayo hero.isAlive() {
+ayo hero.is_alive() {
     io.println("\(hero.name) won!") fr
 } sike {
     io.println("\(hero.name) lost :(") fr
@@ -1648,4 +1648,194 @@ class Lol {
     bar = <fn>,
     foo = <fn>
 }
+```
+
+## FFI
+BS supports loading of native modules at runtime.
+
+### Compiling a native module
+Create a file `arithmetic.c` with the following content
+
+```c
+// arithmetic.c
+
+#include <bs/object.h>
+
+Bs_Value arithmetic_add(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 2);
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
+    bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
+    return bs_value_num(args[0].as.number + args[1].as.number);
+}
+
+Bs_Value arithmetic_sub(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 2);
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
+    bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
+    return bs_value_num(args[0].as.number - args[1].as.number);
+}
+
+// This is the "entry point" of the library. This function will be called when
+// the native library is loaded into memory. Prepare the FFI here
+BS_LIBRARY_INIT void bs_library_init(Bs *bs, Bs_C_Lib *library) {
+    static const Bs_FFI ffi[] = {
+        {"add", arithmetic_add},
+        {"sub", arithmetic_sub},
+    };
+    bs_c_lib_ffi(bs, library, ffi, bs_c_array_size(ffi));
+}
+```
+
+Compile it into a dynamic library, linking against `bs`
+
+```console
+$ cc -o arithmetic.so -fPIC -shared arithmetic.c -lbs # On Linux
+$ cc -o arithmetic.dylib -fPIC -shared arithmetic.c -lbs # On macOS
+$ cl /LD /Fe:arithmetic.dll arithmetic.c bs.lib # On Windows
+```
+
+Finally, load it from BS.
+
+```bs
+# ffi.bs
+
+var arith = import("arithmetic");
+io.println(arith.add(34, 35));
+io.println(arith.sub(500, 80));
+```
+```bsx
+# ffi.bsx
+
+mf arith = redpill("arithmetic") fr
+io.println(arith.add(34, 35)) fr
+io.println(arith.sub(500, 80)) fr
+```
+
+```console
+$ bs ffi.bs
+69
+420
+```
+
+### Wrapping an existing C library
+As an example let's create a simple wrapper around the
+<a href="https://www.raylib.com/"><code>raylib</code></a>
+library.
+
+```c
+// raylib.c
+
+#include "raylib.h"
+#include "bs/object.h"
+
+Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 3);
+    bs_arg_check_whole_number(bs, args, 0);
+    bs_arg_check_whole_number(bs, args, 1);
+    bs_arg_check_object_type(bs, args, 2, BS_OBJECT_STR);
+
+    const int width = args[0].as.number;
+    const int height = args[1].as.number;
+    const Bs_Str *title = (const Bs_Str *)args[2].as.object;
+
+    // BS strings are null terminated by default for FFI convenience
+    InitWindow(width, height, title->data);
+    return bs_value_nil;
+}
+
+Bs_Value rl_close_window(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    CloseWindow();
+    return bs_value_nil;
+}
+
+Bs_Value rl_window_should_close(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    return bs_value_bool(WindowShouldClose());
+}
+
+Bs_Value rl_begin_drawing(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    BeginDrawing();
+    return bs_value_nil;
+}
+
+Bs_Value rl_end_drawing(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    EndDrawing();
+    return bs_value_nil;
+}
+
+Bs_Value rl_clear_background(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_whole_number(bs, args, 0);
+    ClearBackground(GetColor(args[0].as.number));
+    return bs_value_nil;
+}
+
+Bs_Value rl_draw_text(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 5);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    bs_arg_check_whole_number(bs, args, 1);
+    bs_arg_check_whole_number(bs, args, 2);
+    bs_arg_check_whole_number(bs, args, 3);
+    bs_arg_check_whole_number(bs, args, 4);
+
+    const Bs_Str *text = (const Bs_Str *)args[0].as.object;
+    const int x = args[1].as.number;
+    const int y = args[2].as.number;
+    const int size = args[3].as.number;
+    const Color color = GetColor(args[4].as.number);
+
+    DrawText(text->data, x, y, size, color);
+    return bs_value_nil;
+}
+
+void bs_library_init(Bs *bs, Bs_C_Lib *library) {
+    static const Bs_FFI ffi[] = {
+        {"init_window", rl_init_window},
+        {"close_window", rl_close_window},
+        {"window_should_close", rl_window_should_close},
+        {"begin_drawing", rl_begin_drawing},
+        {"end_drawing", rl_end_drawing},
+        {"clear_background", rl_clear_background},
+        {"draw_text", rl_draw_text},
+    };
+    bs_c_lib_ffi(bs, library, ffi, bs_c_array_size(ffi));
+}
+```
+
+Compile it into a dynamic library, linking against `bs` and `raylib`
+
+```console
+$ cc -o raylib.so -fPIC -shared raylib.c -lbs -lraylib # On Linux
+$ cc -o raylib.dylib -fPIC -shared raylib.c -lbs -lraylib # On macOS
+$ cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib # On Windows
+```
+
+Finally, load it from BS.
+
+```bs
+var rl = import("raylib");
+
+rl.init_window(800, 600, "Hello from BS!");
+while !rl.window_should_close() {
+    rl.begin_drawing();
+    rl.clear_background(0x282828FF);
+    rl.draw_text("Hello world!", 50, 50, 50, 0xD4BE98FF);
+    rl.end_drawing();
+}
+rl.close_window();
+```
+```bsx
+mf rl = redpill("raylib") fr
+
+rl.init_window(800, 600, "Hello from BS!") fr
+yolo nah rl.window_should_close() {
+    rl.begin_drawing() fr
+    rl.clear_background(0x282828FF) fr
+    rl.draw_text("Hello world!", 50, 50, 50, 0xD4BE98FF) fr
+    rl.end_drawing() fr
+}
+rl.close_window() fr
 ```

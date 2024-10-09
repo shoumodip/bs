@@ -2319,35 +2319,35 @@ more applicable, albeit involved, example.
 <pre class='code active'>
 <span class='keyword'>class</span> <span class='class'>Sprite</span> {
     <span class='comment'># Constructor</span>
-    init(name, health, attackPower) {
+    init(name, health, attack_power) {
         <span class='constant'>this</span>.<span class='field'>name</span> = name;
         <span class='constant'>this</span>.<span class='field'>health</span> = health;
-        <span class='constant'>this</span>.<span class='field'>attackPower</span> = attackPower;
+        <span class='constant'>this</span>.<span class='field'>attack_power</span> = attack_power;
     }
 
     attack(target) {
-        io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>this</span>.<span class='field'>name</span><span class='escape'>)</span><span class='string'> attacks </span><span class='escape'>\</span><span class='escape'>(</span>target.<span class='field'>name</span><span class='escape'>)</span><span class='string'> for </span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>this</span>.<span class='field'>attackPower</span><span class='escape'>)</span><span class='string'> damage!"</span>);
-        target.<span class='field'>takeDamage</span>(<span class='constant'>this</span>.<span class='field'>attackPower</span>);
+        io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>this</span>.<span class='field'>name</span><span class='escape'>)</span><span class='string'> attacks </span><span class='escape'>\</span><span class='escape'>(</span>target.<span class='field'>name</span><span class='escape'>)</span><span class='string'> for </span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>this</span>.<span class='field'>attack_power</span><span class='escape'>)</span><span class='string'> damage!"</span>);
+        target.<span class='field'>take_damage</span>(<span class='constant'>this</span>.<span class='field'>attack_power</span>);
     }
 
-    takeDamage(amount) {
+    take_damage(amount) {
         <span class='constant'>this</span>.<span class='field'>health</span> -= amount;
-        <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>isAlive</span>() {
+        <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>is_alive</span>() {
             io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>this</span>.<span class='field'>name</span><span class='escape'>)</span><span class='string'> has </span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>this</span>.<span class='field'>health</span><span class='escape'>)</span><span class='string'> health remaining."</span>);
         } <span class='keyword'>else</span> {
             io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>this</span>.<span class='field'>name</span><span class='escape'>)</span><span class='string'> has been defeated!"</span>);
         }
     }
 
-    isAlive() {
+    is_alive() {
         <span class='keyword'>return</span> <span class='constant'>this</span>.<span class='field'>health</span> &gt; <span class='constant'>0</span>;
     }
 }
 
 <span class='comment'># Inheritance</span>
 <span class='keyword'>class</span> <span class='class'>Hero</span> &lt; <span class='class'>Sprite</span> {
-    init(name, health, attackPower) {
-        <span class='constant'>super</span>.<span class='field'>init</span>(name, health, attackPower);
+    init(name, health, attack_power) {
+        <span class='constant'>super</span>.<span class='field'>init</span>(name, health, attack_power);
         <span class='constant'>this</span>.<span class='field'>poisoned</span> = <span class='constant'>false</span>;
         <span class='constant'>this</span>.<span class='field'>defending</span> = <span class='constant'>false</span>;
     }
@@ -2358,7 +2358,7 @@ more applicable, albeit involved, example.
         <span class='constant'>this</span>.<span class='field'>defending</span> = <span class='constant'>true</span>;
     }
 
-    takeDamage(amount) {
+    take_damage(amount) {
         <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>defending</span> {
             <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>poisoned</span> {
                 <span class='comment'># Hero will not be poisoned if defending</span>
@@ -2371,20 +2371,20 @@ more applicable, albeit involved, example.
             <span class='constant'>this</span>.<span class='field'>defending</span> = <span class='constant'>false</span>;
         }
 
-        <span class='constant'>super</span>.<span class='field'>takeDamage</span>(amount);
+        <span class='constant'>super</span>.<span class='field'>take_damage</span>(amount);
     }
 }
 
 <span class='keyword'>class</span> <span class='class'>Enemy</span> &lt; <span class='class'>Sprite</span> {
-    init(name, health, attackPower) {
-        <span class='constant'>super</span>.<span class='field'>init</span>(name, health, attackPower);
+    init(name, health, attack_power) {
+        <span class='constant'>super</span>.<span class='field'>init</span>(name, health, attack_power);
     }
 
     <span class='comment'># Special ability of enemy: poisoning</span>
     poison(target) {
         io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>this</span>.<span class='field'>name</span><span class='escape'>)</span><span class='string'> poisons </span><span class='escape'>\</span><span class='escape'>(</span>target.<span class='field'>name</span><span class='escape'>)</span><span class='string'>!"</span>);
         target.<span class='field'>poisoned</span> = <span class='constant'>true</span>;
-        target.<span class='field'>takeDamage</span>(<span class='constant'>this</span>.<span class='field'>attackPower</span>);
+        target.<span class='field'>take_damage</span>(<span class='constant'>this</span>.<span class='field'>attack_power</span>);
     }
 }
 
@@ -2393,7 +2393,7 @@ more applicable, albeit involved, example.
 <span class='keyword'>var</span> hero = Hero(io.<span class='field'>input</span>(<span class='string'>"Enter hero's name&gt; "</span>), <span class='constant'>30</span>, <span class='constant'>10</span>);
 <span class='keyword'>var</span> enemy = Enemy(io.<span class='field'>input</span>(<span class='string'>"Enter enemy's name&gt; "</span>), <span class='constant'>25</span>, <span class='constant'>8</span>);
 
-<span class='keyword'>while</span> hero.<span class='field'>isAlive</span>() &amp;&amp; enemy.<span class='field'>isAlive</span>() {
+<span class='keyword'>while</span> hero.<span class='field'>is_alive</span>() &amp;&amp; enemy.<span class='field'>is_alive</span>() {
     io.<span class='field'>println</span>();
 
     <span class='comment'># Hero cannot choose while poisoned</span>
@@ -2404,14 +2404,14 @@ more applicable, albeit involved, example.
         hero.<span class='field'>poisoned</span> = <span class='constant'>false</span>;
         enemy.<span class='field'>attack</span>(hero);
     } <span class='keyword'>else</span> {
-        <span class='keyword'>var</span> heroChoice = io.<span class='field'>input</span>(<span class='string'>"Enter </span><span class='escape'>\</span><span class='escape'>(</span>hero.<span class='field'>name</span><span class='escape'>)</span><span class='string'>'s choice (A: attack, D: defend)&gt; "</span>).<span class='field'>toupper</span>();
+        <span class='keyword'>var</span> choice = io.<span class='field'>input</span>(<span class='string'>"Enter </span><span class='escape'>\</span><span class='escape'>(</span>hero.<span class='field'>name</span><span class='escape'>)</span><span class='string'>'s choice (A: attack, D: defend)&gt; "</span>).<span class='field'>toupper</span>();
 
-        <span class='keyword'>if</span> heroChoice == <span class='string'>"A"</span> {
+        <span class='keyword'>if</span> choice == <span class='string'>"A"</span> {
             hero.<span class='field'>attack</span>(enemy);
-            <span class='keyword'>if</span> !enemy.<span class='field'>isAlive</span>() {
+            <span class='keyword'>if</span> !enemy.<span class='field'>is_alive</span>() {
                 <span class='keyword'>break</span>;
             }
-        } <span class='keyword'>else</span> <span class='keyword'>if</span> heroChoice == <span class='string'>"D"</span> {
+        } <span class='keyword'>else</span> <span class='keyword'>if</span> choice == <span class='string'>"D"</span> {
             hero.<span class='field'>defend</span>();
         } <span class='keyword'>else</span> {
             io.<span class='field'>println</span>(<span class='string'>"ERROR: invalid choice! skipping </span><span class='escape'>\</span><span class='escape'>(</span>hero.<span class='field'>name</span><span class='escape'>)</span><span class='string'>'s turn."</span>);
@@ -2426,7 +2426,7 @@ more applicable, albeit involved, example.
     }
 }
 
-<span class='keyword'>if</span> hero.<span class='field'>isAlive</span>() {
+<span class='keyword'>if</span> hero.<span class='field'>is_alive</span>() {
     io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span>hero.<span class='field'>name</span><span class='escape'>)</span><span class='string'> won!"</span>);
 } <span class='keyword'>else</span> {
     io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span>hero.<span class='field'>name</span><span class='escape'>)</span><span class='string'> lost :("</span>);
@@ -2435,35 +2435,35 @@ more applicable, albeit involved, example.
 <pre class='code'>
 <span class='keyword'>wannabe</span> <span class='class'>Sprite</span> {
     <span class='comment'># Constructor</span>
-    init(name, health, attackPower) {
+    init(name, health, attack_power) {
         <span class='constant'>deez</span>.<span class='field'>name</span> = name <span class='keyword'>fr</span>
         <span class='constant'>deez</span>.<span class='field'>health</span> = health <span class='keyword'>fr</span>
-        <span class='constant'>deez</span>.<span class='field'>attackPower</span> = attackPower <span class='keyword'>fr</span>
+        <span class='constant'>deez</span>.<span class='field'>attack_power</span> = attack_power <span class='keyword'>fr</span>
     }
 
     attack(target) {
-        io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>deez</span>.<span class='field'>name</span><span class='escape'>)</span><span class='string'> attacks </span><span class='escape'>\</span><span class='escape'>(</span>target.<span class='field'>name</span><span class='escape'>)</span><span class='string'> for </span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>deez</span>.<span class='field'>attackPower</span><span class='escape'>)</span><span class='string'> damage!"</span>) <span class='keyword'>fr</span>
-        target.<span class='field'>takeDamage</span>(<span class='constant'>deez</span>.<span class='field'>attackPower</span>) <span class='keyword'>fr</span>
+        io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>deez</span>.<span class='field'>name</span><span class='escape'>)</span><span class='string'> attacks </span><span class='escape'>\</span><span class='escape'>(</span>target.<span class='field'>name</span><span class='escape'>)</span><span class='string'> for </span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>deez</span>.<span class='field'>attack_power</span><span class='escape'>)</span><span class='string'> damage!"</span>) <span class='keyword'>fr</span>
+        target.<span class='field'>take_damage</span>(<span class='constant'>deez</span>.<span class='field'>attack_power</span>) <span class='keyword'>fr</span>
     }
 
-    takeDamage(amount) {
+    take_damage(amount) {
         <span class='constant'>deez</span>.<span class='field'>health</span> -= amount <span class='keyword'>fr</span>
-        <span class='keyword'>ayo</span> <span class='constant'>deez</span>.<span class='field'>isAlive</span>() {
+        <span class='keyword'>ayo</span> <span class='constant'>deez</span>.<span class='field'>is_alive</span>() {
             io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>deez</span>.<span class='field'>name</span><span class='escape'>)</span><span class='string'> has </span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>deez</span>.<span class='field'>health</span><span class='escape'>)</span><span class='string'> health remaining."</span>) <span class='keyword'>fr</span>
         } <span class='keyword'>sike</span> {
             io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>deez</span>.<span class='field'>name</span><span class='escape'>)</span><span class='string'> has been defeated!"</span>) <span class='keyword'>fr</span>
         }
     }
 
-    isAlive() {
+    is_alive() {
         <span class='keyword'>bet</span> <span class='constant'>deez</span>.<span class='field'>health</span> &gt; <span class='constant'>0</span> <span class='keyword'>fr</span>
     }
 }
 
 <span class='comment'># Inheritance</span>
 <span class='keyword'>wannabe</span> <span class='class'>Hero</span> &lt; <span class='class'>Sprite</span> {
-    init(name, health, attackPower) {
-        <span class='constant'>franky</span>.<span class='field'>init</span>(name, health, attackPower) <span class='keyword'>fr</span>
+    init(name, health, attack_power) {
+        <span class='constant'>franky</span>.<span class='field'>init</span>(name, health, attack_power) <span class='keyword'>fr</span>
         <span class='constant'>deez</span>.<span class='field'>poisoned</span> = <span class='constant'>cap</span> <span class='keyword'>fr</span>
         <span class='constant'>deez</span>.<span class='field'>defending</span> = <span class='constant'>cap</span> <span class='keyword'>fr</span>
     }
@@ -2474,7 +2474,7 @@ more applicable, albeit involved, example.
         <span class='constant'>deez</span>.<span class='field'>defending</span> = <span class='constant'>nocap</span> <span class='keyword'>fr</span>
     }
 
-    takeDamage(amount) {
+    take_damage(amount) {
         <span class='keyword'>ayo</span> <span class='constant'>deez</span>.<span class='field'>defending</span> {
             <span class='keyword'>ayo</span> <span class='constant'>deez</span>.<span class='field'>poisoned</span> {
                 <span class='comment'># Hero will not be poisoned if defending</span>
@@ -2487,20 +2487,20 @@ more applicable, albeit involved, example.
             <span class='constant'>deez</span>.<span class='field'>defending</span> = <span class='constant'>cap</span> <span class='keyword'>fr</span>
         }
 
-        <span class='constant'>franky</span>.<span class='field'>takeDamage</span>(amount) <span class='keyword'>fr</span>
+        <span class='constant'>franky</span>.<span class='field'>take_damage</span>(amount) <span class='keyword'>fr</span>
     }
 }
 
 <span class='keyword'>wannabe</span> <span class='class'>Enemy</span> &lt; <span class='class'>Sprite</span> {
-    init(name, health, attackPower) {
-        <span class='constant'>franky</span>.<span class='field'>init</span>(name, health, attackPower) <span class='keyword'>fr</span>
+    init(name, health, attack_power) {
+        <span class='constant'>franky</span>.<span class='field'>init</span>(name, health, attack_power) <span class='keyword'>fr</span>
     }
 
     <span class='comment'># Special ability of enemy: poisoning</span>
     poison(target) {
         io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>deez</span>.<span class='field'>name</span><span class='escape'>)</span><span class='string'> poisons </span><span class='escape'>\</span><span class='escape'>(</span>target.<span class='field'>name</span><span class='escape'>)</span><span class='string'>!"</span>) <span class='keyword'>fr</span>
         target.<span class='field'>poisoned</span> = <span class='constant'>nocap</span> <span class='keyword'>fr</span>
-        target.<span class='field'>takeDamage</span>(<span class='constant'>deez</span>.<span class='field'>attackPower</span>) <span class='keyword'>fr</span>
+        target.<span class='field'>take_damage</span>(<span class='constant'>deez</span>.<span class='field'>attack_power</span>) <span class='keyword'>fr</span>
     }
 }
 
@@ -2509,7 +2509,7 @@ more applicable, albeit involved, example.
 <span class='keyword'>mf</span> hero = Hero(io.<span class='field'>input</span>(<span class='string'>"Enter hero's name&gt; "</span>), <span class='constant'>30</span>, <span class='constant'>10</span>) <span class='keyword'>fr</span>
 <span class='keyword'>mf</span> enemy = Enemy(io.<span class='field'>input</span>(<span class='string'>"Enter enemy's name&gt; "</span>), <span class='constant'>25</span>, <span class='constant'>8</span>) <span class='keyword'>fr</span>
 
-<span class='keyword'>yolo</span> hero.<span class='field'>isAlive</span>() &amp;&amp; enemy.<span class='field'>isAlive</span>() {
+<span class='keyword'>yolo</span> hero.<span class='field'>is_alive</span>() &amp;&amp; enemy.<span class='field'>is_alive</span>() {
     io.<span class='field'>println</span>() <span class='keyword'>fr</span>
 
     <span class='comment'># Hero cannot choose while poisoned</span>
@@ -2520,14 +2520,14 @@ more applicable, albeit involved, example.
         hero.<span class='field'>poisoned</span> = <span class='constant'>cap</span> <span class='keyword'>fr</span>
         enemy.<span class='field'>attack</span>(hero) <span class='keyword'>fr</span>
     } <span class='keyword'>sike</span> {
-        <span class='keyword'>mf</span> heroChoice = io.<span class='field'>input</span>(<span class='string'>"Enter </span><span class='escape'>\</span><span class='escape'>(</span>hero.<span class='field'>name</span><span class='escape'>)</span><span class='string'>'s choice (A: attack, D: defend)&gt; "</span>).<span class='field'>toupper</span>() <span class='keyword'>fr</span>
+        <span class='keyword'>mf</span> choice = io.<span class='field'>input</span>(<span class='string'>"Enter </span><span class='escape'>\</span><span class='escape'>(</span>hero.<span class='field'>name</span><span class='escape'>)</span><span class='string'>'s choice (A: attack, D: defend)&gt; "</span>).<span class='field'>toupper</span>() <span class='keyword'>fr</span>
 
-        <span class='keyword'>ayo</span> heroChoice == <span class='string'>"A"</span> {
+        <span class='keyword'>ayo</span> choice == <span class='string'>"A"</span> {
             hero.<span class='field'>attack</span>(enemy) <span class='keyword'>fr</span>
-            <span class='keyword'>ayo</span> <span class='keyword'>nah</span> enemy.<span class='field'>isAlive</span>() {
+            <span class='keyword'>ayo</span> <span class='keyword'>nah</span> enemy.<span class='field'>is_alive</span>() {
                 <span class='keyword'>yeet</span> <span class='keyword'>fr</span>
             }
-        } <span class='keyword'>sike</span> <span class='keyword'>ayo</span> heroChoice == <span class='string'>"D"</span> {
+        } <span class='keyword'>sike</span> <span class='keyword'>ayo</span> choice == <span class='string'>"D"</span> {
             hero.<span class='field'>defend</span>() <span class='keyword'>fr</span>
         } <span class='keyword'>sike</span> {
             io.<span class='field'>println</span>(<span class='string'>"ERROR: invalid choice! skipping </span><span class='escape'>\</span><span class='escape'>(</span>hero.<span class='field'>name</span><span class='escape'>)</span><span class='string'>'s turn."</span>) <span class='keyword'>fr</span>
@@ -2542,7 +2542,7 @@ more applicable, albeit involved, example.
     }
 }
 
-<span class='keyword'>ayo</span> hero.<span class='field'>isAlive</span>() {
+<span class='keyword'>ayo</span> hero.<span class='field'>is_alive</span>() {
     io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span>hero.<span class='field'>name</span><span class='escape'>)</span><span class='string'> won!"</span>) <span class='keyword'>fr</span>
 } <span class='keyword'>sike</span> {
     io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span>hero.<span class='field'>name</span><span class='escape'>)</span><span class='string'> lost :("</span>) <span class='keyword'>fr</span>
@@ -2819,6 +2819,298 @@ class Lol {
 </div>
 </section>
 </section>
+<section id='s39'>
+<h2> FFI</h2>
+<p>
+BS supports loading of native modules at runtime.
+</p>
+<section id='s40'>
+<h3> Compiling a native module</h3>
+<p>
+Create a file <code>arithmetic.c</code> with the following content
+</p>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='comment'>// arithmetic.c
+</span>
+<span class='field'>#include</span> <span class='string'>&lt;bs/object.h&gt;</span>
+
+<span class='class'>Bs_Value</span> arithmetic_add(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>2</span>);
+    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_VALUE_NUM</span>);
+    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>1</span>, <span class='constant'>BS_VALUE_NUM</span>);
+    <span class='keyword'>return</span> <span class='function'>bs_value_num</span>(args[<span class='constant'>0</span>].as.number + args[<span class='constant'>1</span>].as.number);
+}
+
+<span class='class'>Bs_Value</span> arithmetic_sub(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>2</span>);
+    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_VALUE_NUM</span>);
+    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>1</span>, <span class='constant'>BS_VALUE_NUM</span>);
+    <span class='keyword'>return</span> <span class='function'>bs_value_num</span>(args[<span class='constant'>0</span>].as.number - args[<span class='constant'>1</span>].as.number);
+}
+
+<span class='comment'>// This is the "entry point" of the library. This function will be called when
+</span><span class='comment'>// the native library is loaded into memory. Prepare the FFI here
+</span><span class='constant'>BS_LIBRARY_INIT</span> <span class='class'>void</span> bs_library_init(<span class='class'>Bs</span> *bs, <span class='class'>Bs_C_Lib</span> *library) {
+    <span class='keyword'>static</span> <span class='keyword'>const</span> <span class='class'>Bs_FFI</span> ffi[] = {
+        {<span class='string'>"add"</span>, arithmetic_add},
+        {<span class='string'>"sub"</span>, arithmetic_sub},
+    };
+    <span class='function'>bs_c_lib_ffi</span>(bs, library, ffi, <span class='function'>bs_c_array_size</span>(ffi));
+}
+</pre>
+</div>
+<p>
+Compile it into a dynamic library, linking against <code>bs</code>
+</p>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>cc -o arithmetic.so -fPIC -shared arithmetic.c -lbs <span class='comment'># On Linux</span>
+<span class='constant'>$ </span>cc -o arithmetic.dylib -fPIC -shared arithmetic.c -lbs <span class='comment'># On macOS</span>
+<span class='constant'>$ </span>cl /LD /Fe:arithmetic.dll arithmetic.c bs.lib <span class='comment'># On Windows</span>
+</pre>
+</div>
+<p>
+Finally, load it from BS.
+</p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='comment'># ffi.bs</span>
+
+<span class='keyword'>var</span> arith = <span class='keyword'>import</span>(<span class='string'>"arithmetic"</span>);
+io.<span class='field'>println</span>(arith.<span class='field'>add</span>(<span class='constant'>34</span>, <span class='constant'>35</span>));
+io.<span class='field'>println</span>(arith.<span class='field'>sub</span>(<span class='constant'>500</span>, <span class='constant'>80</span>));
+</pre>
+<pre class='code'>
+<span class='comment'># ffi.bsx</span>
+
+<span class='keyword'>mf</span> arith = <span class='keyword'>redpill</span>(<span class='string'>"arithmetic"</span>) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(arith.<span class='field'>add</span>(<span class='constant'>34</span>, <span class='constant'>35</span>)) <span class='keyword'>fr</span>
+io.<span class='field'>println</span>(arith.<span class='field'>sub</span>(<span class='constant'>500</span>, <span class='constant'>80</span>)) <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>bs ffi.bs
+69
+420
+</pre>
+</div>
+</section>
+<section id='s41'>
+<h3> Wrapping an existing C library</h3>
+<p>
+As an example let's create a simple wrapper around the
+<a href="https://www.raylib.com/"><code>raylib</code></a>
+library.
+</p>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='comment'>// raylib.c
+</span>
+<span class='field'>#include</span> <span class='string'>"raylib.h"</span>
+<span class='field'>#include</span> <span class='string'>"bs/object.h"</span>
+
+<span class='class'>Bs_Value</span> rl_init_window(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>3</span>);
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>1</span>);
+    <span class='function'>bs_arg_check_object_type</span>(bs, args, <span class='constant'>2</span>, <span class='constant'>BS_OBJECT_STR</span>);
+
+    <span class='keyword'>const</span> <span class='class'>int</span> width = args[<span class='constant'>0</span>].as.number;
+    <span class='keyword'>const</span> <span class='class'>int</span> height = args[<span class='constant'>1</span>].as.number;
+    <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *title = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>2</span>].as.object;
+
+    <span class='comment'>// BS strings are null terminated by default for FFI convenience
+</span>    <span class='function'>InitWindow</span>(width, height, title-&gt;data);
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_close_window(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
+    <span class='function'>CloseWindow</span>();
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_window_should_close(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
+    <span class='keyword'>return</span> <span class='function'>bs_value_bool</span>(<span class='function'>WindowShouldClose</span>());
+}
+
+<span class='class'>Bs_Value</span> rl_begin_drawing(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
+    <span class='function'>BeginDrawing</span>();
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_end_drawing(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
+    <span class='function'>EndDrawing</span>();
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_clear_background(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
+    <span class='function'>ClearBackground</span>(<span class='function'>GetColor</span>(args[<span class='constant'>0</span>].as.number));
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_draw_text(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>5</span>);
+    <span class='function'>bs_arg_check_object_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_OBJECT_STR</span>);
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>1</span>);
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>2</span>);
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>3</span>);
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>4</span>);
+
+    <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *text = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>0</span>].as.object;
+    <span class='keyword'>const</span> <span class='class'>int</span> x = args[<span class='constant'>1</span>].as.number;
+    <span class='keyword'>const</span> <span class='class'>int</span> y = args[<span class='constant'>2</span>].as.number;
+    <span class='keyword'>const</span> <span class='class'>int</span> size = args[<span class='constant'>3</span>].as.number;
+    <span class='keyword'>const</span> <span class='class'>Color</span> color = <span class='function'>GetColor</span>(args[<span class='constant'>4</span>].as.number);
+
+    <span class='function'>DrawText</span>(text-&gt;data, x, y, size, color);
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>void</span> bs_library_init(<span class='class'>Bs</span> *bs, <span class='class'>Bs_C_Lib</span> *library) {
+    <span class='keyword'>static</span> <span class='keyword'>const</span> <span class='class'>Bs_FFI</span> ffi[] = {
+        {<span class='string'>"init_window"</span>, rl_init_window},
+        {<span class='string'>"close_window"</span>, rl_close_window},
+        {<span class='string'>"window_should_close"</span>, rl_window_should_close},
+        {<span class='string'>"begin_drawing"</span>, rl_begin_drawing},
+        {<span class='string'>"end_drawing"</span>, rl_end_drawing},
+        {<span class='string'>"clear_background"</span>, rl_clear_background},
+        {<span class='string'>"draw_text"</span>, rl_draw_text},
+    };
+    <span class='function'>bs_c_lib_ffi</span>(bs, library, ffi, <span class='function'>bs_c_array_size</span>(ffi));
+}
+</pre>
+</div>
+<p>
+Compile it into a dynamic library, linking against <code>bs</code> and <code>raylib</code>
+</p>
+<div class='codes shell'>
+<button class='copy' onclick='copyClickShell(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active shell'>
+<span class='constant'>$ </span>cc -o raylib.so -fPIC -shared raylib.c -lbs -lraylib <span class='comment'># On Linux</span>
+<span class='constant'>$ </span>cc -o raylib.dylib -fPIC -shared raylib.c -lbs -lraylib <span class='comment'># On macOS</span>
+<span class='constant'>$ </span>cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib <span class='comment'># On Windows</span>
+</pre>
+</div>
+<p>
+Finally, load it from BS.
+</p>
+<div>
+<div class='tabs'>
+<button class='tab active' onclick='tabClick(this)'>BS</button>
+<button class='tab' onclick='tabClick(this)'>BSX</button>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClickCode(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> rl = <span class='keyword'>import</span>(<span class='string'>"raylib"</span>);
+
+rl.<span class='field'>init_window</span>(<span class='constant'>800</span>, <span class='constant'>600</span>, <span class='string'>"Hello from BS!"</span>);
+<span class='keyword'>while</span> !rl.<span class='field'>window_should_close</span>() {
+    rl.<span class='field'>begin_drawing</span>();
+    rl.<span class='field'>clear_background</span>(<span class='constant'>0x282828FF</span>);
+    rl.<span class='field'>draw_text</span>(<span class='string'>"Hello world!"</span>, <span class='constant'>50</span>, <span class='constant'>50</span>, <span class='constant'>50</span>, <span class='constant'>0xD4BE98FF</span>);
+    rl.<span class='field'>end_drawing</span>();
+}
+rl.<span class='field'>close_window</span>();
+</pre>
+<pre class='code'>
+<span class='keyword'>mf</span> rl = <span class='keyword'>redpill</span>(<span class='string'>"raylib"</span>) <span class='keyword'>fr</span>
+
+rl.<span class='field'>init_window</span>(<span class='constant'>800</span>, <span class='constant'>600</span>, <span class='string'>"Hello from BS!"</span>) <span class='keyword'>fr</span>
+<span class='keyword'>yolo</span> <span class='keyword'>nah</span> rl.<span class='field'>window_should_close</span>() {
+    rl.<span class='field'>begin_drawing</span>() <span class='keyword'>fr</span>
+    rl.<span class='field'>clear_background</span>(<span class='constant'>0x282828FF</span>) <span class='keyword'>fr</span>
+    rl.<span class='field'>draw_text</span>(<span class='string'>"Hello world!"</span>, <span class='constant'>50</span>, <span class='constant'>50</span>, <span class='constant'>50</span>, <span class='constant'>0xD4BE98FF</span>) <span class='keyword'>fr</span>
+    rl.<span class='field'>end_drawing</span>() <span class='keyword'>fr</span>
+}
+rl.<span class='field'>close_window</span>() <span class='keyword'>fr</span>
+</pre>
+</div>
+</div>
+</section>
+</section>
 </main>
 <nav id='sidebar' class='collapsed'>
 <ul>
@@ -2950,6 +3242,17 @@ class Lol {
 </li>
 <li>
 <a href='#s38'> How to know the methods in a class?</a>
+</li>
+</ul>
+</li>
+<li>
+<a href='#s39'> FFI</a>
+<ul>
+<li>
+<a href='#s40'> Compiling a native module</a>
+</li>
+<li>
+<a href='#s41'> Wrapping an existing C library</a>
 </li>
 </ul>
 </li>

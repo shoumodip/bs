@@ -40,6 +40,10 @@
     font-family: "DM Sans";
 }
 
+a {
+    color: var(--constant);
+}
+
 li {
     line-height: calc(1.5 * var(--font-size));
 }

@@ -7,7 +7,7 @@ static bool ishex(char c) {
     return isdigit(c) || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f');
 }
 
-static void bs_lexer_advance(Bs_Lexer *l) {
+void bs_lexer_advance(Bs_Lexer *l) {
     if (*l->sv.data == '\n') {
         if (l->sv.size > 1) {
             l->loc.row += 1;
