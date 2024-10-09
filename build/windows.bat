@@ -11,5 +11,5 @@ for %%f in (src\bs\*) do (
 )
 
 cl %CFLAGS% /Fe:bin\bs.exe src\bs.c lib\.build\*.obj %LIBS%
-cl %CFLAGS% /LD /Fe:lib\libbs.dll lib\.build\*.obj %LIBS%
-lib /OUT:lib\libbs.lib lib\.build\*.obj
+cl %CFLAGS% /LD /Fe:lib\bs.dll lib\.build\*.obj %LIBS%
+lib /OUT:lib\bs.lib lib\.build\*.obj

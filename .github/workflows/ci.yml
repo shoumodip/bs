@@ -60,34 +60,35 @@ jobs:
           cd tests
           cl /Fe:executables\echo_args.exe executables\echo_args.c
           cl /Fe:executables\echo_stdin.exe executables\echo_stdin.c
-          cl /I..\include /LD /Foexecutables\ /Fe:executables\addsub.dll executables\addsub.c ..\lib\libbs.lib
-          cl /I..\include /LD /Foexecutables\ /Fe:executables\invalid.dll executables\invalid.c ..\lib\libbs.lib
+          cl /I..\include /LD /Foexecutables\ /Fe:executables\addsub.dll executables\addsub.c ..\lib\bs.lib
+          cl /I..\include /LD /Foexecutables\ /Fe:executables\invalid.dll executables\invalid.c ..\lib\bs.lib
           python3 rere.py replay test.list
         shell: cmd
 
-      - name: POSIX archive
-        if: startsWith(github.ref, 'refs/tags/') && matrix.os != 'windows-latest'
+      - name: Linux archive
+        if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-latest'
         run: |
-          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            name="bs-linux-${{ matrix.arch }}"
-            mkdir $name
-            mv bin/bs lib/libbs.a lib/libbs.so $name
+          name="bs-linux-${{ matrix.arch }}"
+          mkdir $name
+          mv bin/bs lib/libbs.a lib/libbs.so $name
 
-            zip -r $name.zip $name
-          elif [ "${{ matrix.os }}" == "macos-latest" ]; then
-            name="bs-macos-${{ matrix.arch }}"
-            mkdir $name
-            mv bin/bs lib/libbs.a lib/libbs.dylib $name
+          zip -r $name.zip $name
 
-            zip -r $name.zip $name
-          fi
+      - name: macOS archive
+        if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'macos-latest'
+        run: |
+          name="bs-macos-${{ matrix.arch }}"
+          mkdir $name
+          mv bin/bs lib/libbs.a lib/libbs.dylib $name
+
+          zip -r $name.zip $name
 
       - name: Windows archive
         if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
         run: |
           $name="bs-windows-${{ matrix.arch }}"
           mkdir $name
-          Move-Item "bin/bs.exe", "lib/libbs.dll", "lib/libbs.lib" -Destination $name
+          Move-Item "bin/bs.exe", "lib/bs.dll", "lib/bs.lib" -Destination $name
 
           Compress-Archive -Path $name -DestinationPath "$name.zip"
 
