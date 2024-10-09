@@ -69,8 +69,10 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'ubuntu-latest'
         run: |
           name="bs-linux-${{ matrix.arch }}"
+
+          rm -r lib/.build
           mkdir $name
-          mv bin/bs lib/libbs.a lib/libbs.so $name
+          mv bin lib include $name
 
           zip -r $name.zip $name
 
@@ -78,8 +80,10 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'macos-latest'
         run: |
           name="bs-macos-${{ matrix.arch }}"
+
+          rm -r lib/.build
           mkdir $name
-          mv bin/bs lib/libbs.a lib/libbs.dylib $name
+          mv bin lib include $name
 
           zip -r $name.zip $name
 
@@ -87,8 +91,10 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') && matrix.os == 'windows-latest'
         run: |
           $name="bs-windows-${{ matrix.arch }}"
+
+          rm -r lib/.build
           mkdir $name
-          Move-Item "bin/bs.exe", "lib/bs.dll", "lib/bs.lib" -Destination $name
+          Move-Item bin, lib, include -Destination $name
 
           Compress-Archive -Path $name -DestinationPath "$name.zip"
 
