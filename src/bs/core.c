@@ -58,14 +58,9 @@ Bs_Value bs_io_reader_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
-    Bs_Buffer *b = &bs_config(bs)->buffer;
-    const size_t start = b->count;
+    const Bs_Str *path = (const Bs_Str *)args[0].as.object;
 
-    Bs_Writer w = bs_buffer_writer(b);
-    bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
-    bs_da_push(b->bs, b, '\0');
-
-    FILE *file = fopen(bs_buffer_reset(b, start).data, "rb");
+    FILE *file = fopen(path->data, "rb");
     if (!file) {
         return bs_value_nil;
     }
@@ -200,14 +195,9 @@ Bs_Value bs_io_writer_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
-    Bs_Buffer *b = &bs_config(bs)->buffer;
-    const size_t start = b->count;
+    const Bs_Str *path = (const Bs_Str *)args[0].as.object;
 
-    Bs_Writer w = bs_buffer_writer(b);
-    bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
-    bs_da_push(b->bs, b, '\0');
-
-    FILE *file = fopen(bs_buffer_reset(b, start).data, "wb");
+    FILE *file = fopen(path->data, "wb");
     if (!file) {
         return bs_value_nil;
     }
@@ -420,29 +410,19 @@ Bs_Value bs_os_getenv(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
-    Bs_Buffer *b = &bs_config(bs)->buffer;
-    const size_t start = b->count;
-
-    Bs_Writer w = bs_buffer_writer(b);
-    bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
-    bs_da_push(b->bs, b, '\0');
+    const Bs_Str *name = (const Bs_Str *)args[0].as.object;
 
 #ifdef _WIN32
-    const DWORD size = GetEnvironmentVariableA(b->data + start, NULL, 0);
+    Bs_Buffer *b = &bs_config(bs)->buffer;
+    const DWORD size = GetEnvironmentVariableA(name->data, NULL, 0);
     if (size) {
         bs_da_push_many(bs, b, NULL, size);
-
-        if (GetEnvironmentVariableA(b->data + start, b->data + b->count, size)) {
-            const Bs_Str *value = bs_str_new(bs, bs_sv_from_cstr(b->data + b->count));
-            bs_buffer_reset(b, start);
-            return bs_value_object(value);
+        if (GetEnvironmentVariableA(name->data, b->data + b->count, size)) {
+            return bs_value_object(bs_str_new(bs, bs_sv_from_cstr(b->data + b->count)));
         }
-
-        bs_buffer_reset(b, start);
     }
 #else
-    const char *key = bs_buffer_reset(b, start).data;
-    const char *value = getenv(key);
+    const char *value = getenv(name->data);
     if (value) {
         return bs_value_object(bs_str_new(bs, bs_sv_from_cstr(value)));
     }
@@ -456,32 +436,13 @@ Bs_Value bs_os_setenv(Bs *bs, Bs_Value *args, size_t arity) {
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
 
-    const char *key;
-    const char *value;
-    {
-        Bs_Buffer *b = &bs_config(bs)->buffer;
-        const size_t start = b->count;
-
-        Bs_Writer w = bs_buffer_writer(b);
-
-        const size_t key_pos = b->count;
-        bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
-        bs_da_push(b->bs, b, '\0');
-
-        const size_t value_pos = b->count;
-        bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[1].as.object));
-        bs_da_push(b->bs, b, '\0');
-
-        key = b->data + key_pos;
-        value = b->data + value_pos;
-
-        bs_buffer_reset(b, start);
-    }
+    const Bs_Str *key = (const Bs_Str *)args[0].as.object;
+    const Bs_Str *value = (const Bs_Str *)args[1].as.object;
 
 #ifdef _WIN32
-    return bs_value_bool(SetEnvironmentVariable(key, value) != 0);
+    return bs_value_bool(SetEnvironmentVariable(key->data, value->data) != 0);
 #else
-    return bs_value_bool(setenv(key, value, true) == 0);
+    return bs_value_bool(setenv(key->data, value->data, true) == 0);
 #endif // _WIN32
 }
 
@@ -720,25 +681,14 @@ Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
     }
 
     if (pid == 0) {
-        Bs_Buffer *b = &bs_config(bs)->buffer;
-
         char **cargv = malloc((array->count + 1) * sizeof(char *));
         assert(cargv);
 
         for (size_t i = 0; i < array->count; i++) {
-            // Store the offset instead of the actual pointer, because the buffer might be
-            // reallocated
-            cargv[i] = (char *)b->count;
-
-            const Bs_Str *str = (const Bs_Str *)array->data[i].as.object;
-            bs_da_push_many(bs, b, str->data, str->size);
-            bs_da_push(bs, b, '\0');
+            Bs_Str *str = (Bs_Str *)array->data[i].as.object;
+            cargv[i] = str->data;
         }
 
-        // Resolve the pointer offsets
-        for (size_t i = 0; i < array->count; i++) {
-            cargv[i] = b->data + (size_t)cargv[i];
-        }
         cargv[array->count] = NULL;
 
         // TODO: error handling
@@ -893,15 +843,10 @@ Bs_Value bs_regex_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
-    Bs_Buffer *b = &bs_config(bs)->buffer;
-    const size_t start = b->count;
-
-    Bs_Writer w = bs_buffer_writer(b);
-    bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)args[0].as.object));
-    bs_da_push(b->bs, b, '\0');
+    const Bs_Str *pattern = (const Bs_Str *)args[0].as.object;
 
     regex_t regex;
-    if (regcomp(&regex, b->data + start, REG_EXTENDED)) {
+    if (regcomp(&regex, pattern->data, REG_EXTENDED)) {
         return bs_value_nil;
     }
 
@@ -976,17 +921,13 @@ Bs_Value bs_str_tonumber(Bs *bs, Bs_Value *args, size_t arity) {
 
     const Bs_Str *src = (const Bs_Str *)args[-1].as.object;
 
-    Bs_Buffer *b = &bs_config(bs)->buffer;
-    const size_t start = b->count;
-
-    bs_da_push_many(b->bs, b, src->data, src->size);
-    bs_da_push(b->bs, b, '\0');
-
-    const char *input = bs_buffer_reset(b, start).data;
     char *end;
+    const double value = strtod(src->data, &end);
 
-    const double value = strtod(input, &end);
-    return (end == input || *end != '\0' || errno == ERANGE) ? bs_value_nil : bs_value_num(value);
+    if (end == src->data || *end != '\0' || errno == ERANGE) {
+        return bs_value_nil;
+    }
+    return bs_value_num(value);
 }
 
 Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
@@ -1027,16 +968,10 @@ Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
             }
         }
     } else {
-        Bs_Buffer *b = &bs_config(bs)->buffer;
-        const size_t start = b->count;
-
-        bs_da_push_many(bs, b, str->data + offset, str->size - offset);
-        bs_da_push(bs, b, '\0');
-
         const regex_t regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, regex_t);
 
         regmatch_t match;
-        if (!regexec(&regex, bs_buffer_reset(b, start).data, 1, &match, 0)) {
+        if (!regexec(&regex, str->data + offset, 1, &match, 0)) {
             return bs_value_num(offset + match.rm_so);
         }
     }
@@ -1079,25 +1014,21 @@ Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
             }
         }
     } else {
-        Bs_Buffer *b = &bs_config(bs)->buffer;
-        const size_t start = b->count;
-
-        bs_da_push_many(bs, b, str->data, str->size);
-        bs_da_push(bs, b, '\0');
-
-        const char *pattern = bs_buffer_reset(b, start).data;
         const regex_t regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, regex_t);
 
         int eflags = 0;
         regmatch_t match;
-        while (!regexec(&regex, pattern + j, 1, &match, eflags)) {
+        while (!regexec(&regex, str->data + j, 1, &match, eflags)) {
             eflags = REG_NOTBOL;
             if (match.rm_so == match.rm_eo) {
                 break;
             }
 
             bs_array_set(
-                bs, a, a->count, bs_value_object(bs_str_new(bs, Bs_Sv(pattern + j, match.rm_so))));
+                bs,
+                a,
+                a->count,
+                bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, match.rm_so))));
 
             j += match.rm_eo;
         }
@@ -1151,32 +1082,25 @@ Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
         Bs_Buffer *b = &bs_config(bs)->buffer;
         const size_t start = b->count;
 
-        bs_da_push_many(bs, b, str->data, str->size);
-        bs_da_push(bs, b, '\0');
-
+        const char *cursor = str->data;
         const regex_t regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, regex_t);
-        const size_t result_pos = b->count;
 
-        size_t cursor = start;
         int eflags = 0;
         regmatch_t matches[10];
-        while (!regexec(&regex, b->data + cursor, bs_c_array_size(matches), matches, eflags)) {
+        while (!regexec(&regex, cursor, bs_c_array_size(matches), matches, eflags)) {
             eflags = REG_NOTBOL;
             if (matches[0].rm_so == matches[0].rm_eo) {
                 break;
             }
 
-            bs_da_push_many(bs, b, b->data + cursor, matches[0].rm_so);
+            bs_da_push_many(bs, b, cursor, matches[0].rm_so);
 
             for (size_t i = 0; i < replacement->size; i++) {
                 if (replacement->data[i] == '\\' && isdigit(replacement->data[i + 1])) {
                     const size_t j = replacement->data[++i] - '0';
                     if (j < bs_c_array_size(matches) && matches[j].rm_so != -1) {
                         bs_da_push_many(
-                            bs,
-                            b,
-                            b->data + cursor + matches[j].rm_so,
-                            matches[j].rm_eo - matches[j].rm_so);
+                            bs, b, cursor + matches[j].rm_so, matches[j].rm_eo - matches[j].rm_so);
                     }
                 } else {
                     bs_da_push(bs, b, replacement->data[i]);
@@ -1185,12 +1109,9 @@ Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
 
             cursor += matches[0].rm_eo;
         }
+        bs_da_push_many(bs, b, cursor, str->size - (cursor - str->data));
 
-        bs_da_push_many(bs, b, b->data + cursor, strlen(b->data + cursor));
-
-        const Bs_Str *result = bs_str_new(bs, bs_buffer_reset(b, result_pos));
-        bs_buffer_reset(b, start);
-        return bs_value_object(result);
+        return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
     }
 }
 

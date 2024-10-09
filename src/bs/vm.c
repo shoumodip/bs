@@ -155,7 +155,7 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
 
     case BS_OBJECT_STR: {
         Bs_Str *str = (Bs_Str *)object;
-        bs_realloc(bs, str, sizeof(*str) + str->size, 0);
+        bs_realloc(bs, str, sizeof(*str) + str->size + 1, 0);
     } break;
 
     case BS_OBJECT_ARRAY: {
@@ -553,10 +553,12 @@ Bs_Str *bs_str_new(Bs *bs, Bs_Sv sv) {
         return (Bs_Str *)entry->key.as.object;
     }
 
-    Bs_Str *str = (Bs_Str *)bs_object_new(bs, BS_OBJECT_STR, sizeof(Bs_Str) + sv.size);
+    Bs_Str *str = (Bs_Str *)bs_object_new(bs, BS_OBJECT_STR, sizeof(Bs_Str) + sv.size + 1);
     str->size = sv.size;
     str->hash = hash;
+
     memcpy(str->data, sv.data, sv.size);
+    str->data[str->size] = '\0';
 
     const bool gc_on_save = bs->gc_on;
     bs->gc_on = false;
