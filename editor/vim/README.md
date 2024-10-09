@@ -2,7 +2,7 @@
 Copy the `vim` folder into your `rpath`, or use vim/neovim packages.
 
 ## Using `rpath`
-```console
+```vim
 set rtp+=/path/to/this/folder
 ```
 
