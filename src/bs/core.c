@@ -446,6 +446,30 @@ Bs_Value bs_os_setenv(Bs *bs, Bs_Value *args, size_t arity) {
 #endif // _WIN32
 }
 
+Bs_Value bs_os_getcwd(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    return bs_value_object(bs_config(bs)->cwd);
+}
+
+Bs_Value bs_os_setcwd(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Str *path = (const Bs_Str *)args[0].as.object;
+
+#ifdef _WIN32
+    const bool ok = SetCurrentDirectory(path->data);
+#else
+    const bool ok = chdir(path->data) >= 0;
+#endif
+
+    if (ok) {
+        bs_update_cwd(bs);
+    }
+
+    return bs_value_bool(ok);
+}
+
 // Process
 typedef struct {
 #ifdef _WIN32
@@ -861,8 +885,12 @@ Bs_Value bs_str_slice(Bs *bs, Bs_Value *args, size_t arity) {
     bs_arg_check_whole_number(bs, args, 1);
 
     Bs_Str *str = (Bs_Str *)args[-1].as.object;
-    const size_t begin = bs_min(args[0].as.number, args[1].as.number);
-    const size_t end = bs_max(args[0].as.number, args[1].as.number);
+    const size_t begin = args[0].as.number;
+    const size_t end = args[1].as.number;
+
+    if (begin == end) {
+        return bs_value_object(bs_str_new(bs, Bs_Sv_Static("")));
+    }
 
     if (begin >= str->size || end > str->size) {
         bs_error(bs, "cannot slice string of length %zu from %zu to %zu", str->size, begin, end);
@@ -2078,6 +2106,9 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
 
         bs_add_fn(bs, os, "getenv", bs_os_getenv);
         bs_add_fn(bs, os, "setenv", bs_os_setenv);
+
+        bs_add_fn(bs, os, "getcwd", bs_os_getcwd);
+        bs_add_fn(bs, os, "setcwd", bs_os_setcwd);
 
         Bs_Array *args = bs_array_new(bs);
         for (int i = 0; i < argc; i++) {

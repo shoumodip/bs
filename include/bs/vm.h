@@ -52,6 +52,8 @@ typedef struct {
     Bs_Writer log;
     Bs_Writer error;
     Bs_Buffer buffer;
+
+    Bs_Str *cwd;
 } Bs_Config;
 
 Bs_Config *bs_config(Bs *bs);

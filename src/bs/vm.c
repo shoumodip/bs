@@ -101,7 +101,6 @@ struct Bs {
     Bs_Frames frames;
 
     // Filesystem
-    Bs_Str *cwd;
     Bs_Buffer paths;
     Bs_Modules modules;
 
@@ -353,7 +352,7 @@ static void bs_collect(Bs *bs) {
         bs_mark(bs, (Bs_Object *)bs->frames.data[i].closure);
     }
 
-    bs_mark(bs, (Bs_Object *)bs->cwd);
+    bs_mark(bs, (Bs_Object *)bs->config.cwd);
 
     for (size_t i = 0; i < bs->modules.count; i++) {
         Bs_Module *m = &bs->modules.data[i];
@@ -577,6 +576,9 @@ void bs_global_set(Bs *bs, Bs_Sv name, Bs_Value value) {
 bool bs_update_cwd(Bs *bs) {
     bool result = true;
 
+    const bool gc_on_save = bs->gc_on;
+    bs->gc_on = false;
+
     Bs_Buffer *b = &bs->paths;
     const size_t start = b->count;
 
@@ -603,10 +605,11 @@ bool bs_update_cwd(Bs *bs) {
     }
 #endif
 
-    bs->cwd = bs_str_new(bs, bs_sv_from_cstr(b->data + start));
+    bs->config.cwd = bs_str_new(bs, bs_sv_from_cstr(b->data + start));
 
 defer:
     b->count = start;
+    bs->gc_on = gc_on_save;
     return result;
 }
 
@@ -664,7 +667,7 @@ Bs_Sv bs_buffer_absolute_path(Bs_Buffer *b, Bs_Sv path) {
     const size_t start = b->count;
 
     if (path.size && !bs_issep(*path.data)) {
-        bs_da_push_many(b->bs, b, b->bs->cwd->data, b->bs->cwd->size);
+        bs_da_push_many(b->bs, b, b->bs->config.cwd->data, b->bs->config.cwd->size);
         if (b->count != start + 1) {
             bs_da_push(b->bs, b, '/');
         }
@@ -724,7 +727,7 @@ Bs_Sv bs_buffer_absolute_path(Bs_Buffer *b, Bs_Sv path) {
 Bs_Sv bs_buffer_relative_path(Bs_Buffer *b, Bs_Sv path) {
     const size_t start = b->count;
 
-    const Bs_Str *cwd = b->bs->cwd;
+    const Bs_Str *cwd = b->bs->config.cwd;
     const size_t max = bs_min(path.size, cwd->size);
 
     size_t i = 0;

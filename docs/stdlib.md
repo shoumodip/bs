@@ -470,6 +470,40 @@ $ bs demo.bs
 lmao
 ```
 
+### getcwd() @function
+Get the current working directory.
+
+```bs
+io.println(os.getcwd());
+```
+```bsx
+io.println(os.getcwd()) fr
+```
+
+```console
+$ bs demo.bs
+/home/sk/Git/bs
+```
+
+### setcwd(dir) @function
+Set the current working directory to `dir`.
+
+Returns `true` if successful, else `false`.
+
+```bs
+os.setcwd("/usr");
+io.println(os.getcwd());
+```
+```bsx
+os.setcwd("/usr") fr
+io.println(os.getcwd()) fr
+```
+
+```console
+$ bs demo.bs
+/usr
+```
+
 ### args @constant
 Array of command line arguments. First element is the program
 name.
