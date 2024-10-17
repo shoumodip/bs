@@ -338,3 +338,27 @@ main {
         height: calc(var(--header) * 2);
     }
 }
+
+/* Chromium */
+::-webkit-scrollbar {
+    width: calc(1.2 * var(--padding));
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: var(--border-radius);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--comment);
+}
+
+/* Firefox */
+html {
+    scrollbar-gutter: stable;
+}
+
+* {
+    scrollbar-color: var(--border) none;
+    scrollbar-width: calc(1.2 * var(--padding));
+}
