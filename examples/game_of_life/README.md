@@ -3,7 +3,7 @@
 ## Console Version
 
 ```console
-$ ./game_of_life_tui.bs
+$ bs game_of_life_tui.bs
 ```
 
 ## Raylib Version
@@ -18,5 +18,5 @@ $ cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib        # On Windows
 Run the program.
 
 ```console
-$ ./game_of_life_raylib.bs
+$ bs game_of_life_raylib.bs
 ```
