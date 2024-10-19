@@ -22,15 +22,6 @@ class GameOfLife {
         this.board[y * this.width + x] = v;
     }
 
-    show() {
-        for y in 0, this.height {
-            for x in 0, this.width {
-                io.print(if this.get(x, y) then "#" else ".");
-            }
-            io.println();
-        }
-    }
-
     step() {
         fn set(x, y, v) {
             x %= this.width;
@@ -71,20 +62,14 @@ class GameOfLife {
         this.buffer = t;
     }
 
-    run(interval) {
-        while true {
-            this.show();
-            this.step();
-            io.print("\e[\(this.height)A\e[\(this.width)D");
-            os.sleep(interval);
-        }
+    # (X, Y) is the center of the glider
+    glider(x, y) {
+        this.set(x + 0, y - 1, true);
+        this.set(x + 1, y + 0, true);
+        this.set(x - 1, y + 1, true);
+        this.set(x + 0, y + 1, true);
+        this.set(x + 1, y + 1, true);
     }
 }
 
-var gol = GameOfLife(20, 10);
-gol.set(1, 0, true);
-gol.set(2, 1, true);
-gol.set(0, 2, true);
-gol.set(1, 2, true);
-gol.set(2, 2, true);
-gol.run(0.1);
+return GameOfLife;

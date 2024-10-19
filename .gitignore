@@ -2,3 +2,6 @@
 /lib
 /tests/executables/*
 !/tests/executables/*.c
+*.so
+*.dll
+*.dylib
