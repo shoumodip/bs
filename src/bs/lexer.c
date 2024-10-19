@@ -66,7 +66,9 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc) {
             }
 
             switch (l->sv.data[1]) {
+            case 'e':
             case 'n':
+            case 'r':
             case 't':
             case '0':
             case '"':

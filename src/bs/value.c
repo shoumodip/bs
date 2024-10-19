@@ -215,14 +215,15 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
         bs_fmt(p->writer, "<fn>");
         break;
 
-    case BS_OBJECT_STR:
+    case BS_OBJECT_STR: {
+        const Bs_Str *str = (const Bs_Str *)object;
+        const Bs_Sv sv = Bs_Sv(str->data, str->size);
         if (p->depth) {
-            const Bs_Str *str = (const Bs_Str *)object;
-            bs_pretty_printer_quote(p, Bs_Sv(str->data, str->size));
+            bs_pretty_printer_quote(p, sv);
         } else {
-            bs_fmt(p->writer, Bs_Sv_Fmt, Bs_Sv_Arg(*(const Bs_Str *)object));
+            p->writer->write(p->writer, sv);
         }
-        break;
+    } break;
 
     case BS_OBJECT_ARRAY: {
         if (bs_pretty_printer_has(p, object)) {

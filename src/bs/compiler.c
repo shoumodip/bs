@@ -237,8 +237,16 @@ static void bs_compile_string(Bs_Compiler *c, Bs_Sv sv) {
         char ch = sv.data[i];
         if (ch == '\\') {
             switch (sv.data[++i]) {
+            case 'e':
+                ch = '\033';
+                break;
+
             case 'n':
                 ch = '\n';
+                break;
+
+            case 'r':
+                ch = '\r';
                 break;
 
             case 't':
