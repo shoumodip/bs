@@ -880,13 +880,18 @@ Bs_Value bs_regex_init(Bs *bs, Bs_Value *args, size_t arity) {
 
 // Str
 Bs_Value bs_str_slice(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 2);
-    bs_arg_check_whole_number(bs, args, 0);
-    bs_arg_check_whole_number(bs, args, 1);
+    if (arity != 1 && arity != 2) {
+        bs_error(bs, "expected 1 or 2 arguments, got %zu", arity);
+    }
 
-    Bs_Str *str = (Bs_Str *)args[-1].as.object;
+    bs_arg_check_whole_number(bs, args, 0);
+    if (arity == 2) {
+        bs_arg_check_whole_number(bs, args, 1);
+    }
+
+    const Bs_Str *str = (const Bs_Str *)args[-1].as.object;
     const size_t begin = args[0].as.number;
-    const size_t end = args[1].as.number;
+    const size_t end = (arity == 2) ? args[1].as.number : str->size;
 
     if (begin == end) {
         return bs_value_object(bs_str_new(bs, Bs_Sv_Static("")));
