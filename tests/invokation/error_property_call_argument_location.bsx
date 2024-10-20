@@ -1,5 +1,0 @@
-wannabe Foo {}
-
-mf foo = Foo() fr
-foo.f = "".slice fr
-foo.f(bruh, 0) fr

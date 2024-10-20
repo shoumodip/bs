@@ -14,7 +14,7 @@ typedef enum {
     BS_VALUE_OBJECT,
 } Bs_Value_Type;
 
-const char *bs_value_type_name(Bs_Value_Type type, bool extended);
+const char *bs_value_type_name(Bs_Value_Type type);
 
 typedef enum {
     BS_OBJECT_FN,
@@ -76,12 +76,11 @@ typedef struct {
 #define bs_value_object(v) ((Bs_Value){BS_VALUE_OBJECT, .as.object = (Bs_Object *)(v)})
 
 bool bs_value_is_falsey(Bs_Value value);
-Bs_Sv bs_value_type_name_full(Bs_Value value, bool extended);
+Bs_Sv bs_value_type_name_full(Bs_Value value);
 
 typedef struct {
     Bs_Writer *writer;
 
-    bool extended;
     size_t depth;
 
     const Bs_Object **data;

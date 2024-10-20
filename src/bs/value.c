@@ -6,16 +6,16 @@ bool bs_value_is_falsey(Bs_Value v) {
     return v.type == BS_VALUE_NIL || (v.type == BS_VALUE_BOOL && !v.as.boolean);
 }
 
-const char *bs_value_type_name(Bs_Value_Type type, bool extended) {
+const char *bs_value_type_name(Bs_Value_Type type) {
     switch (type) {
     case BS_VALUE_NIL:
-        return extended ? "bruh" : "nil";
+        return "nil";
 
     case BS_VALUE_NUM:
         return "number";
 
     case BS_VALUE_BOOL:
-        return extended ? "capness" : "boolean";
+        return "boolean";
 
     case BS_VALUE_OBJECT:
         return "object";
@@ -61,9 +61,9 @@ const char *bs_object_type_name(Bs_Object_Type type) {
     }
 }
 
-Bs_Sv bs_value_type_name_full(Bs_Value v, bool extended) {
+Bs_Sv bs_value_type_name_full(Bs_Value v) {
     if (v.type != BS_VALUE_OBJECT) {
-        return bs_sv_from_cstr(bs_value_type_name(v.type, extended));
+        return bs_sv_from_cstr(bs_value_type_name(v.type));
     }
 
     switch (v.as.object->type) {
@@ -312,11 +312,7 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
 void bs_value_write_impl(Bs_Pretty_Printer *p, Bs_Value value) {
     switch (value.type) {
     case BS_VALUE_NIL:
-        if (p->extended) {
-            bs_fmt(p->writer, "bruh");
-        } else {
-            bs_fmt(p->writer, "nil");
-        }
+        bs_fmt(p->writer, "nil");
         break;
 
     case BS_VALUE_NUM:
@@ -324,11 +320,7 @@ void bs_value_write_impl(Bs_Pretty_Printer *p, Bs_Value value) {
         break;
 
     case BS_VALUE_BOOL:
-        if (p->extended) {
-            bs_fmt(p->writer, "%s", value.as.boolean ? "nocap" : "cap");
-        } else {
-            bs_fmt(p->writer, "%s", value.as.boolean ? "true" : "false");
-        }
+        bs_fmt(p->writer, "%s", value.as.boolean ? "true" : "false");
         break;
 
     case BS_VALUE_OBJECT:

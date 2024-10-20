@@ -103,7 +103,7 @@ typedef enum {
     BS_COUNT_TOKENS
 } Bs_Token_Type;
 
-const char *bs_token_type_name(Bs_Token_Type type, bool extended);
+const char *bs_token_type_name(Bs_Token_Type type);
 
 typedef struct {
     Bs_Token_Type type;

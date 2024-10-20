@@ -1,4 +1,0 @@
-redpill("variables/global_extended") fr
-
-io.println(foo) fr
-io.println(bar) fr

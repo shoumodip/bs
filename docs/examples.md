@@ -23,9 +23,6 @@ for i in 1, len(os.args) {
 
 os.exit(code);
 ```
-```bsx
-# TODO: BSX will be removed soon
-```
 
 ```console
 $ bs cat.bs cat.bs # Poor man's quine
@@ -101,9 +98,6 @@ for i in 2, len(os.args) {
 }
 
 os.exit(code);
-```
-```bsx
-# TODO: BSX will be removed soon
 ```
 
 ```console
@@ -234,14 +228,11 @@ while !io.stdin.eof() {
 # In case of CTRL-d
 io.println();
 ```
-```bsx
-# TODO: BSX will be removed soon
-```
 
 ```console
 $ bs shell.bs
 ~/Git/bs/examples/shell $ ls -a
-.  ..  README.md  shell.bs  shell.bsx
+.  ..  README.md  shell.bs
 ```
 
 Use
@@ -336,9 +327,6 @@ class GameOfLife {
 
 return GameOfLife;
 ```
-```bsx
-# TODO: BSX will be removed soon
-```
 
 ### Console
 
@@ -373,9 +361,6 @@ while true {
     io.print("\e[\(gol.height)A\e[\(gol.width)D");
     os.sleep(INTERVAL);
 }
-```
-```bsx
-# TODO: BSX will be removed soon
 ```
 
 Run the program.
@@ -709,9 +694,6 @@ while !rl.window_should_close() {
 }
 
 rl.close_window();
-```
-```bsx
-# TODO: BSX will be removed soon
 ```
 
 Run the program.

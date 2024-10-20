@@ -1,3 +1,0 @@
-mf xs = [] fr
-
-io.println(xs[0]) fr

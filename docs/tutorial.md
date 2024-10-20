@@ -6,9 +6,6 @@ Let's start with a simple "Hello World" program.
 ```bs
 io.println("Hello, world!");
 ```
-```bsx
-io.println("Hello, world!") fr
-```
 
 Save this to a file named `hello.bs` and run it as follows.
 
@@ -17,30 +14,11 @@ $ bs hello.bs
 Hello, world!
 ```
 
-## BS and BSX
-BS is more "mainstream" in its syntax, whereas BSX is a parody of Gen Z
-brainrot. There are subtle differences between the two, even besides syntax
-alone, which will be introduced later in appropriate places in the tutorial.
-
-You can choose whether to use BS or BSX based on the extension of your file.
-Save the BSX version of the previous example to `hello.bsx` and run
-it as before.
-
-```console
-$ bs hello.bsx
-Hello, world!
-```
-
 ## Basic Types
 ### Nil
 ```bs
 io.println(nil); # Output: nil
 ```
-```bsx
-io.println(bruh) fr # Output: bruh
-```
-
-Note that the output differs based on whether you are using BS or BSX.
 
 ### Numbers
 BS supports 64-bit floating point numbers only.
@@ -49,11 +27,6 @@ BS supports 64-bit floating point numbers only.
 io.println(69);     # Output: 69
 io.println(420.69); # Output: 420.69
 io.println(0xff);   # Output: 255
-```
-```bsx
-io.println(69) fr     # Output: 69
-io.println(420.69) fr # Output: 420.69
-io.println(0xff) fr   # Output: 255
 ```
 
 Standard arithmetic as well as bitwise operations are supported.
@@ -77,37 +50,14 @@ io.println(77 & 103);       # Output: 69
 io.println(~-419 + 10 & 3); # Output: 420
 io.println(69 ^ 1404);      # Output: 1337
 ```
-```bsx
-io.println(34 + 35) fr        # Output: 69
-io.println(500 - 80) fr       # Output: 420
-io.println(23 * 3) fr         # Output: 69
-io.println(840 / 2) fr        # Output: 420
-io.println(209 % 70) fr       # Output: 69
-io.println(-420) fr           # Output: -420
-
-io.println(17 * 2 + 35) fr    # Output: 69
-io.println((900 - 60) / 2) fr # Output: 420
-
-io.println(276 >> 2) fr       # Output: 69
-io.println(105 << 2) fr       # Output: 420
-io.println(~-70) fr           # Output: 69
-io.println(160 | 260) fr      # Output: 420
-io.println(77 & 103) fr       # Output: 69
-io.println(~-419 + 10 & 3) fr # Output: 420
-io.println(69 ^ 1404) fr      # Output: 1337
-```
 
 ### Booleans
 ```bs
 io.println(true);  # Output: true
 io.println(false); # Output: false
 ```
-```bsx
-io.println(nocap) fr # Output: nocap
-io.println(cap) fr   # Output: cap
-```
 
-Again, note that the output differs depending on the mode.
+Standard logical operations are supported.
 
 ```bs
 io.println(!true);          # Output: false
@@ -142,39 +92,6 @@ io.println(false || false); # Output: false
 io.println(nil && true);    # Output: nil
 io.println(0 || false);     # Output: 0
 ```
-```bsx
-io.println(nah nocap) fr      # Output: cap
-io.println(nah cap) fr        # Output: nocap
-io.println(nah bruh) fr       # Output: nocap
-
-# All numbers are considered "nocap"
-io.println(nah 0) fr          # Output: cap
-io.println(nah 1) fr          # Output: cap
-
-# Ordering
-io.println(69 > 420) fr       # Output: cap
-io.println(69 >= 420) fr      # Output: cap
-io.println(69 < 420) fr       # Output: nocap
-io.println(69 <= 420) fr      # Output: nocap
-io.println(69 == 420) fr      # Output: cap
-io.println(69 != 420) fr      # Output: nocap
-
-# BSX is strongly typed
-io.println(bruh == bruh) fr   # Output: nocap
-io.println(bruh == nocap) fr  # Output: cap
-io.println(bruh == 0) fr      # Output: cap
-io.println(cap == 0) fr       # Output: cap
-
-# Logical AND, OR
-io.println(nocap && nocap) fr # Output: nocap
-io.println(nocap && cap) fr   # Output: cap
-io.println(nocap || cap) fr   # Output: nocap
-io.println(cap || cap) fr     # Output: cap
-
-# Short circuiting
-io.println(bruh && nocap) fr  # Output: bruh
-io.println(0 || cap) fr       # Output: 0
-```
 
 ### Strings
 ```bs
@@ -197,27 +114,6 @@ io.println("Hello, " ++ "world! " ++ 69);
 
 # Output: 6
 io.println(len("Hello!"));
-```
-```bsx
-# Output: Hello!
-io.println("Hello!") fr
-
-# Output:
-# Say "Hello"!
-# Here, a	 tab!
-io.println("Say \"Hello\"!\nHere, a\t tab!") fr
-
-# Output: Interpolation! 69
-io.println("Interpolation! \(34 + 35)") fr
-
-# Output: Nested interpolation! 420
-io.println("Nested \("interpolation! \(420)")") fr
-
-# Output: Hello, world! 69
-io.println("Hello, " ++ "world! " ++ 69) fr
-
-# Output: 6
-io.println(thicc("Hello!")) fr
 ```
 
 ### Arrays
@@ -255,41 +151,6 @@ var ys = [1, 2, 3];
 var zs = xs;
 io.println(xs == ys);   # Output: false
 io.println(xs == zs);   # Output: true
-```
-```bsx
-# Variables will be introduced later
-mf array = [69, 420] fr
-
-# Pretty printing by default!
-io.println(array) fr        # Output: [69, 420]
-
-# Array access
-io.println(array[0]) fr     # Output: 69
-
-# Array access out of bounds is an error
-io.println(array[2]) fr     # Error!
-
-# Array assignment
-array[1] = "nice!" fr
-io.println(array) fr        # Output: [69, "nice!"]
-
-# Array assignment out of bounds is NOT an error
-array[3] = "Are you serious?" fr
-io.println(array) fr        # Output: [69, "nice!", bruh, "Are you serious?"]
-
-# Array length
-io.println(thicc(array)) fr # Output: 4
-
-# Due to the assignment semantics, appending to arrays is quite easy
-array[thicc(array)] = 420 fr
-io.println(array) fr        # Output: [69, "nice!", bruh, "Are you serious?", 420]
-
-# Arrays are compared by reference, not value
-mf xs = [1, 2, 3] fr
-mf ys = [1, 2, 3] fr
-mf zs = xs fr
-io.println(xs == ys) fr   # Output: cap
-io.println(xs == zs) fr   # Output: nocap
 ```
 
 ### Tables
@@ -354,67 +215,6 @@ var zs = xs;
 io.println(xs == ys);             # Output: false
 io.println(xs == zs);             # Output: true
 ```
-```bsx
-mf table = {
-    foo = 69,
-    [34 + 35] = 420
-} fr
-
-# Output:
-# {
-#     foo = 69,
-#     [69] = 420
-# }
-io.println(table) fr
-
-# Key access
-io.println(table.foo) fr                 # Output: 69
-io.println(table[69]) fr                 # Output: 420
-
-# Key assignment
-table.key = "value" fr
-table["bar" ++ 69] = "eh" fr
-
-# Output:
-# {
-#     bar69 = "eh",
-#     foo = 69,
-#     key = "value",
-#     [69] = 420
-# }
-io.println(table) fr
-
-# Undefined key access is an error
-io.println(table.something) fr           # Error!
-
-# Check if key exists in a table
-io.println("foo" amongus table) fr       # Output: nocap
-io.println("something" amongus table) fr # Output: cap
-
-# Table length
-io.println(thicc(table)) fr              # Output: 4
-
-# Delete keys
-io.println(ghost(table[69])) fr          # Output: nocap
-
-# Output:
-# {
-#     bar69 = "eh",
-#     foo = 69,
-#     key = "value",
-# }
-io.println(table) fr
-
-# Deletion of non existent key
-io.println(ghost(table.wrong)) fr        # Output: cap
-
-# Tables are compared by reference, not value
-mf xs = {a = 1, b = 2} fr
-mf ys = {a = 1, b = 2} fr
-mf zs = xs fr
-io.println(xs == ys) fr                  # Output: cap
-io.println(xs == zs) fr                  # Output: nocap
-```
 
 ### Typeof
 ```bs
@@ -427,17 +227,6 @@ io.println(typeof({}));       # Output: table
 
 # Functions will be introduced later
 io.println(typeof(fn () {})); # Output: function
-```
-```bsx
-io.println(vibeof(bruh)) fr      # Output: bruh
-io.println(vibeof(nocap)) fr     # Output: capness
-io.println(vibeof(69)) fr        # Output: number
-io.println(vibeof("deez")) fr    # Output: string
-io.println(vibeof([])) fr        # Output: array
-io.println(vibeof({})) fr        # Output: table
-
-# Functions will be introduced later
-io.println(vibeof(lit () {})) fr # Output: function
 ```
 
 ## Conditions
@@ -459,26 +248,9 @@ if age != 18 {
     io.println("Go to school");
 }
 ```
-```bsx
-mf age = 18 fr
-
-ayo age >= 18 {
-    io.println("You are an adult") fr
-} sike {
-    io.println("Stay away from Drake") fr
-}
-
-ayo age == 18 {
-    io.println("Get a life") fr
-}
-
-ayo age != 18 {
-    io.println("Go to school") fr
-}
-```
 
 ```console
-$ bs conditions.bs # or.bsx
+$ bs conditions.bs
 You are an adult
 Get a life
 ```
@@ -488,13 +260,9 @@ Get a life
 var age = 17;
 io.println(if age >= 18 then "Adult" else "Minor");
 ```
-```bsx
-mf age = 17 fr
-io.println(ayo age >= 18 sayless "Adult" sike "Minor") fr
-```
 
 ```console
-$ bs conditions.bs # or.bsx
+$ bs conditions.bs
 Minor
 ```
 
@@ -507,16 +275,9 @@ while i < 5 {
     i = i + 1;
 }
 ```
-```bsx
-mf i = 0 fr
-yolo i < 5 {
-    io.println(i) fr
-    i = i + 1 fr
-}
-```
 
 ```console
-$ bs loops.bs # or .bsx
+$ bs loops.bs
 0
 1
 2
@@ -532,14 +293,9 @@ for i in 0, 5 {
     io.println(i);
 }
 ```
-```bsx
-yall i amongus 0, 5 {
-    io.println(i) fr
-}
-```
 
 ```console
-$ bs loops.bs # or .bsx
+$ bs loops.bs
 0
 1
 2
@@ -554,14 +310,9 @@ for i in 0, 5, 2 {
     io.println(i);
 }
 ```
-```bsx
-yall i amongus 0, 5, 2 {
-    io.println(i) fr
-}
-```
 
 ```console
-$ bs loops.bs # or .bsx
+$ bs loops.bs
 0
 2
 4
@@ -574,14 +325,9 @@ for i in 5, 0 {
     io.println(i);
 }
 ```
-```bsx
-yall i amongus 5, 0 {
-    io.println(i) fr
-}
-```
 
 ```console
-$ bs loops.bs # or .bsx
+$ bs loops.bs
 5
 4
 3
@@ -598,16 +344,9 @@ for i, v in xs {
     io.println("Index: \(i); Value: \(v)");
 }
 ```
-```bsx
-mf xs = [2, 4, 6, 8, 10] fr
-
-yall i, v amongus xs {
-    io.println("Index: \(i); Value: \(v)") fr
-}
-```
 
 ```console
-$ bs loops.bs # or .bsx
+$ bs loops.bs
 Index: 0; Value: 2
 Index: 1; Value: 4
 Index: 2; Value: 6
@@ -628,20 +367,9 @@ for k, v in xs {
     io.println("Key: \(k); Value: \(v)");
 }
 ```
-```bsx
-mf xs = {
-    foo = 69,
-    bar = 420,
-    [42] = 1337
-} fr
-
-yall k, v amongus xs {
-    io.println("Key: \(k); Value: \(v)") fr
-}
-```
 
 ```console
-$ bs loops.bs # or .bsx
+$ bs loops.bs
 Key: 42; Value: 1337
 Key: bar; Value: 420
 Key: foo; Value: 69
@@ -669,29 +397,9 @@ for i in 0, 5 {
     io.println(i);
 }
 ```
-```bsx
-mf i = 0 fr
-yolo i < 10 {
-    ayo i == 5 {
-        yeet fr
-    }
-
-    io.println(i) fr
-    i = i + 1 fr
-}
-
-io.println() fr
-
-yall i amongus 0, 5 {
-    ayo i == 3 {
-        slickback fr
-    }
-    io.println(i) fr
-}
-```
 
 ```console
-$ bs loops.bs # or .bsx
+$ bs loops.bs
 0
 1
 2
@@ -712,16 +420,9 @@ fn greet(name) {
 
 greet("world");
 ```
-```bsx
-lit greet(name) {
-    io.println("Hello, \(name)!") fr
-}
-
-greet("world") fr
-```
 
 ```console
-$ bs functions.bs # or .bsx
+$ bs functions.bs
 Hello, world!
 ```
 
@@ -737,20 +438,9 @@ fn factorial(n) {
 
 io.println(factorial(6));
 ```
-```bsx
-lit factorial(n) {
-    ayo n < 2 {
-        bet 1 fr
-    }
-
-    bet n * factorial(n - 1) fr
-}
-
-io.println(factorial(6)) fr
-```
 
 ```console
-$ bs functions.bs # or .bsx
+$ bs functions.bs
 720
 ```
 
@@ -766,20 +456,9 @@ fn combine(f, x, y) {
 
 io.println(combine(add, 34, 35));
 ```
-```bsx
-lit add(x, y) {
-    bet x + y fr
-}
-
-lit combine(f, x, y) {
-    bet f(x, y) fr
-}
-
-io.println(combine(add, 34, 35)) fr
-```
 
 ```console
-$ bs functions.bs # or .bsx
+$ bs functions.bs
 69
 ```
 
@@ -793,18 +472,9 @@ io.println(combine(fn (x, y) {
     return x + y;
 }, 34, 35));
 ```
-```bsx
-lit combine(f, x, y) {
-    bet f(x, y) fr
-}
-
-io.println(combine(lit (x, y) {
-    bet x + y fr
-}, 34, 35)) fr
-```
 
 ```console
-$ bs functions.bs # or .bsx
+$ bs functions.bs
 69
 ```
 
@@ -816,14 +486,9 @@ fn combine(f, x, y) => f(x, y);
 
 io.println(combine(fn (x, y) => x + y, 34, 35));
 ```
-```bsx
-lit combine(f, x, y) => f(x, y) fr
-
-io.println(combine(lit (x, y) => x + y, 34, 35)) fr
-```
 
 ```console
-$ bs functions.bs # or .bsx
+$ bs functions.bs
 69
 ```
 
@@ -842,22 +507,9 @@ var b = outer(210);
 io.println(a());
 io.println(b());
 ```
-```bsx
-lit outer(x) {
-    bet lit () {
-        bet x * 2 fr
-    } fr
-}
-
-mf a = outer(34.5) fr
-mf b = outer(210) fr
-
-io.println(a()) fr
-io.println(b()) fr
-```
 
 ```console
-$ bs functions.bs # or .bsx
+$ bs functions.bs
 69
 420
 ```
@@ -880,23 +532,9 @@ for _, f in closures {
     f();
 }
 ```
-```bsx
-mf closures = [] fr
-
-yall i amongus 0, 5 {
-    mf z = i * 2 fr
-    closures[thicc(closures)] = lit () {
-        io.println(i, z) fr
-    } fr
-}
-
-yall _, f amongus closures {
-    f() fr
-}
-```
 
 ```console
-$ bs functions.bs # or .bsx
+$ bs functions.bs
 0 0
 1 2
 2 4
@@ -910,11 +548,6 @@ var a = 34;
 var b = 35;
 io.println(a + b); # Output: 69
 ```
-```bsx
-mf a = 34 fr
-mf b = 35 fr
-io.println(a + b) fr # Output: 69
-```
 
 ### Assignment
 ```bs
@@ -925,15 +558,6 @@ a = a * 2;
 b = 35;
 
 io.println(a + b); # Output: 69
-```
-```bsx
-mf a = 17 fr
-mf b fr              # Assigned to 'bruh'
-
-a = a * 2 fr
-b = 35 fr
-
-io.println(a + b) fr # Output: 69
 ```
 
 Shorthand assignment operators also work.
@@ -952,20 +576,6 @@ b ++= a;
 
 io.println(b); # Output: Nice! 69
 ```
-```bsx
-mf a = 17 fr
-
-# All arithmetic operators are supported
-a *= 2 fr
-a += 35 fr
-
-mf b = "Nice! " fr
-
-# String concatenation is also supported
-b ++= a fr
-
-io.println(b) fr # Output: Nice! 69
-```
 
 ### Scoped Variables
 ```bs
@@ -979,17 +589,6 @@ io.println(x);     # Output: 69
 
 io.println(x);     # Output: 69
 ```
-```bsx
-mf x = 69 fr
-io.println(x) fr     # Output: 69
-
-{
-    mf x = 420 fr
-    io.println(x) fr # Output: 420
-}
-
-io.println(x) fr     # Output: 69
-```
 
 ### Variable Shadowing
 ```bs
@@ -998,13 +597,6 @@ io.println(x); # Output: 69
 
 var x = "x used to be \(x)";
 io.println(x); # Output: x used to be 69
-```
-```bsx
-mf x = 69 fr
-io.println(x) fr # Output: 69
-
-mf x = "x used to be \(x)" fr
-io.println(x) fr # Output: x used to be 69
 ```
 
 ### Local Variables
@@ -1019,20 +611,9 @@ fn add(x, y) {
 add(34, 35);
 io.println(z);
 ```
-```bsx
-mf z = 420 fr # Local to the scope of the file
-
-lit add(x, y) {
-    mf z = x + y fr # Local to the scope of the function
-    io.println(z) fr
-}
-
-add(34, 35) fr
-io.println(z) fr
-```
 
 ```console
-$ bs variables.bs # or .bsx
+$ bs variables.bs
 69
 420
 ```
@@ -1049,18 +630,9 @@ var x = 69;        # Variable 'x' now defined at the toplevel
 
 f();               # "Should" print 69
 ```
-```bsx
-lit f() {
-    io.println(x) fr # Refers to the variable 'x'
-}
-
-mf x = 69 fr         # Variable 'x' now defined at the toplevel
-
-f() fr               # "Should" print 69
-```
 
 ```console
-$ bs variables.bs # or .bsx
+$ bs variables.bs
 variables.bs:2:16: error: undefined identifier 'x'
 variables.bs:7:2: in f()
 ```
@@ -1081,18 +653,9 @@ pub var x = 69;    # Global variable 'x' now defined
 
 f();
 ```
-```bsx
-lit f() {
-    io.println(x) fr # Refers to the variable 'x'
-}
-
-fam mf x = 69 fr     # Global variable 'x' now defined
-
-f() fr
-```
 
 ```console
-$ bs variables.bs # or .bsx
+$ bs variables.bs
 69
 ```
 
@@ -1106,15 +669,6 @@ M.dec = fn (n) => n - 1;
 
 return M; # Any arbitrary value can be returned, this is just the usual pattern
 ```
-```bsx
-# one.bsx
-mf M = {} fr
-
-M.inc = lit (n) => n + 1 fr
-M.dec = lit (n) => n - 1 fr
-
-bet M fr # Any arbitrary value can be returned, this is just the usual pattern
-```
 
 ```bs
 # main.bs
@@ -1123,16 +677,9 @@ var one = import("one"); # Note that the extension is omitted
 io.println(one.inc(68));
 io.println(one.dec(421));
 ```
-```bsx
-# main.bsx
-mf one = redpill("one") fr # Note that the extension is omitted
-
-io.println(one.inc(68)) fr
-io.println(one.dec(421)) fr
-```
 
 ```console
-$ bs main.bs # or .bsx
+$ bs main.bs
 69
 420
 ```
@@ -1151,31 +698,15 @@ M.dec = fn (n) => n - 1;
 
 return M;
 ```
-```bsx
-# one.bsx
-mf M = {} fr
-
-io.println("Loading module 'one'") fr
-
-M.inc = lit (n) => n + 1 fr
-M.dec = lit (n) => n - 1 fr
-
-bet M fr
-```
 
 ```bs
 # main.bs
 io.println(import("one").inc(68));
 io.println(import("one").dec(421));
 ```
-```bsx
-# main.bsx
-io.println(redpill("one").inc(68)) fr
-io.println(redpill("one").dec(421)) fr
-```
 
 ```console
-$ bs main.bs # or .bsx
+$ bs main.bs
 Loading module 'one'
 69
 420
@@ -1195,33 +726,15 @@ M.dec = fn (n) => n - 1;
 
 return M;
 ```
-```bsx
-# one.bsx
-mf M = {} fr
-
-ayo is_big_boss {
-    io.println("Loading module 'one'") fr
-}
-
-M.inc = lit (n) => n + 1 fr
-M.dec = lit (n) => n - 1 fr
-
-bet M fr
-```
 
 ```bs
 # main.bs
 io.println(import("one").inc(68));
 io.println(import("one").dec(421));
 ```
-```bsx
-# main.bsx
-io.println(redpill("one").inc(68)) fr
-io.println(redpill("one").dec(421)) fr
-```
 
 ```console
-$ bs main.bs # or .bsx
+$ bs main.bs
 69
 420
 ```
@@ -1229,7 +742,7 @@ $ bs main.bs # or .bsx
 But if the module `one` is executed directly...
 
 ```console
-$ bs one.bs # or .bsx
+$ bs one.bs
 Loading module 'one'
 ```
 
@@ -1358,125 +871,9 @@ if hero.is_alive() {
     io.println("\(hero.name) lost :(");
 }
 ```
-```bsx
-wannabe Sprite {
-    # Constructor
-    init(name, health, attack_power) {
-        deez.name = name fr
-        deez.health = health fr
-        deez.attack_power = attack_power fr
-    }
-
-    attack(target) {
-        io.println("\(deez.name) attacks \(target.name) for \(deez.attack_power) damage!") fr
-        target.take_damage(deez.attack_power) fr
-    }
-
-    take_damage(amount) {
-        deez.health -= amount fr
-        ayo deez.is_alive() {
-            io.println("\(deez.name) has \(deez.health) health remaining.") fr
-        } sike {
-            io.println("\(deez.name) has been defeated!") fr
-        }
-    }
-
-    is_alive() {
-        bet deez.health > 0 fr
-    }
-}
-
-# Inheritance
-wannabe Hero < Sprite {
-    init(name, health, attack_power) {
-        franky.init(name, health, attack_power) fr
-        deez.poisoned = cap fr
-        deez.defending = cap fr
-    }
-
-    # Special ability of hero: defending
-    defend() {
-        io.println("\(deez.name) is defending!") fr
-        deez.defending = nocap fr
-    }
-
-    take_damage(amount) {
-        ayo deez.defending {
-            ayo deez.poisoned {
-                # Hero will not be poisoned if defending
-                deez.poisoned = cap fr
-            } sike {
-                # Hero will take half damage for a normal attack if defending
-                amount /= 2 fr
-            }
-
-            deez.defending = cap fr
-        }
-
-        franky.take_damage(amount) fr
-    }
-}
-
-wannabe Enemy < Sprite {
-    init(name, health, attack_power) {
-        franky.init(name, health, attack_power) fr
-    }
-
-    # Special ability of enemy: poisoning
-    poison(target) {
-        io.println("\(deez.name) poisons \(target.name)!") fr
-        target.poisoned = nocap fr
-        target.take_damage(deez.attack_power) fr
-    }
-}
-
-# io.input() is a core library function which optionally prints a prompt and
-# reads a line from standard input
-mf hero = Hero(io.input("Enter hero's name> "), 30, 10) fr
-mf enemy = Enemy(io.input("Enter enemy's name> "), 25, 8) fr
-
-yolo hero.is_alive() && enemy.is_alive() {
-    io.println() fr
-
-    # Hero cannot choose while poisoned
-    ayo hero.poisoned {
-        io.println("\(hero.name) has been poisoned! skipping turn.") fr
-
-        # Prevent consecutive poisoning
-        hero.poisoned = cap fr
-        enemy.attack(hero) fr
-    } sike {
-        mf choice = io.input("Enter \(hero.name)'s choice (A: attack, D: defend)> ").toupper() fr
-
-        ayo choice == "A" {
-            hero.attack(enemy) fr
-            ayo nah enemy.is_alive() {
-                yeet fr
-            }
-        } sike ayo choice == "D" {
-            hero.defend() fr
-        } sike {
-            io.println("ERROR: invalid choice! skipping \(hero.name)'s turn.") fr
-        }
-
-        # Enemy will either attack or poison the hero based on a 50-50 chance
-        ayo math.random() >= 0.5 {
-            enemy.poison(hero) fr
-        } sike {
-            enemy.attack(hero) fr
-        }
-    }
-}
-
-ayo hero.is_alive() {
-    io.println("\(hero.name) won!") fr
-} sike {
-    io.println("\(hero.name) lost :(") fr
-}
-```
 
 ```console
-$ bs oop.bs # or .bsx
+$ bs oop.bs
 Enter hero's name> Luffy
 Enter enemy's name> Magellan
 
@@ -1537,35 +934,6 @@ if !logger {
 
 logger.write("Hello, world!");
 ```
-```bsx
-wannabe Logger {
-    init(path) {
-        # io.Writer is a core C wannabe that handles writeable files. It can fail
-        deez.file = io.Writer(path) fr
-        ayo nah deez.file {
-            # Could not create logger file, return 'bruh' to indicate failure
-            bet bruh fr
-        }
-    }
-
-    write(s) {
-        # os.clock() returns the current monotonic time in seconds as a
-        # floating point number
-        deez.file.writeln("\(os.clock()): \(s)") fr
-    }
-}
-
-mf logger = Logger("log.txt") fr
-ayo nah logger {
-    # io.eprintln() prints to standard error
-    io.eprintln("Error: could not create logger") fr
-
-    # os.exit() exits the program with the provided exit code
-    os.exit(1) fr
-}
-
-logger.write("Hello, world!") fr
-```
 
 ### How to know if a class can fail?
 Just print the class.
@@ -1590,29 +958,9 @@ class Bar {
 io.println(Foo);
 io.println(Bar);
 ```
-```bsx
-wannabe Foo {
-    init(x) {
-        ayo x == 69 {
-            bet bruh fr
-        }
-
-        deez.x = x fr
-    }
-}
-
-wannabe Bar {
-    init(x) {
-        deez.x = x fr
-    }
-}
-
-io.println(Foo) fr
-io.println(Bar) fr
-```
 
 ```console
-$ bs oop.bs # or .bsx
+$ bs oop.bs
 class Foo {
     # Can fail
 }
@@ -1631,18 +979,9 @@ class Lol {
 
 io.println(Lol);
 ```
-```bsx
-wannabe Lol {
-    foo() {}
-    bar() {}
-    baz() {}
-}
-
-io.println(Lol) fr
-```
 
 ```console
-$ bs oop.bs # or .bsx
+$ bs oop.bs
 class Lol {
     baz = <fn>,
     bar = <fn>,
@@ -1702,13 +1041,6 @@ Finally, load it from BS.
 var arith = import("arithmetic");
 io.println(arith.add(34, 35));
 io.println(arith.sub(500, 80));
-```
-```bsx
-# ffi.bsx
-
-mf arith = redpill("arithmetic") fr
-io.println(arith.add(34, 35)) fr
-io.println(arith.sub(500, 80)) fr
 ```
 
 ```console
@@ -1808,9 +1140,9 @@ BS_LIBRARY_INIT void bs_library_init(Bs *bs, Bs_C_Lib *library) {
 Compile it into a dynamic library, linking against `bs` and `raylib`
 
 ```console
-$ cc -o raylib.so -fPIC -shared raylib.c -lbs -lraylib # On Linux
+$ cc -o raylib.so -fPIC -shared raylib.c -lbs -lraylib    # On Linux
 $ cc -o raylib.dylib -fPIC -shared raylib.c -lbs -lraylib # On macOS
-$ cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib # On Windows
+$ cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib        # On Windows
 ```
 
 Finally, load it from BS.
@@ -1826,16 +1158,4 @@ while !rl.window_should_close() {
     rl.end_drawing();
 }
 rl.close_window();
-```
-```bsx
-mf rl = redpill("raylib") fr
-
-rl.init_window(800, 600, "Hello from BS!") fr
-yolo nah rl.window_should_close() {
-    rl.begin_drawing() fr
-    rl.clear_background(0x282828FF) fr
-    rl.draw_text("Hello world!", 50, 50, 50, 0xD4BE98FF) fr
-    rl.end_drawing() fr
-}
-rl.close_window() fr
 ```

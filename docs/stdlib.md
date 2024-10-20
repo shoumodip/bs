@@ -14,10 +14,6 @@ provided.
 var name = io.input("Enter your name> ");
 io.println("Hello, \(name)!");
 ```
-```bsx
-mf name = io.input("Enter your name> ") fr
-io.println("Hello, \(name)!") fr
-```
 
 ```console
 $ bs demo.bs
@@ -30,9 +26,6 @@ Print all the arguments to standard output.
 
 ```bs
 io.print("Hello", "world", 69);
-```
-```bsx
-io.print("Hello", "world", 69) fr
 ```
 
 ```console
@@ -65,16 +58,6 @@ if !f {
 
 var contents = f.read();
 io.print(contents);
-```
-```bsx
-mf f = io.Reader("input.txt") fr
-ayo nah f {
-    io.eprintln("Error: could not read file!") fr
-    os.exit(1) fr
-}
-
-mf contents = f.read() fr
-io.print(contents) fr
 ```
 
 Create a file `input.txt` with some sample text and run it.
@@ -111,16 +94,6 @@ if !f {
 io.print("The first 16 bytes: [\(f.read(16))]\n");
 io.print("The rest:", f.read());
 ```
-```bsx
-mf f = io.Reader("input.txt") fr
-ayo nah f {
-    io.eprintln("Error: could not read file!") fr
-    os.exit(1) fr
-}
-
-io.print("The first 16 bytes: [\(f.read(16))]\n") fr
-io.print("The rest:", f.read()) fr
-```
 
 ```console
 $ bs demo.bs
@@ -146,18 +119,6 @@ if !f {
 while !f.eof() {
     var line = f.readln();
     io.println("Line:", line);
-}
-```
-```bsx
-mf f = io.Reader("input.txt") fr
-ayo nah f {
-    io.eprintln("Error: could not read file!") fr
-    os.exit(1) fr
-}
-
-yolo nah f.eof() {
-    mf line = f.readln() fr
-    io.println("Line:", line) fr
 }
 ```
 
@@ -203,20 +164,6 @@ f.seek(5, io.SEEK_SET);
 io.println("The full content offset by 5:");
 io.print(f.read());
 ```
-```bsx
-mf f = io.Reader("input.txt") fr
-ayo nah f {
-    io.eprintln("Error: could not read file!") fr
-    os.exit(1) fr
-}
-
-io.print("The first 16 bytes: [\(f.read(16))]\n") fr
-
-f.seek(5, io.SEEK_SET) fr
-
-io.println("The full content offset by 5:") fr
-io.print(f.read()) fr
-```
 
 ```console
 $ bs demo.bs
@@ -250,21 +197,6 @@ for i in 0, 3 {
 io.println();
 io.println("Read \(f.tell()) bytes so far.");
 ```
-```bsx
-mf f = io.Reader("input.txt") fr
-ayo nah f {
-    io.eprintln("Error: could not read file!") fr
-    os.exit(1) fr
-}
-
-io.println("The first 3 lines:") fr
-yall i amongus 0, 3 {
-    io.println(f.readln()) fr
-}
-
-io.println() fr
-io.println("Read \(f.tell()) bytes so far.") fr
-```
 
 ```console
 $ bs demo.bs
@@ -291,17 +223,6 @@ if !f {
 f.writeln("Hello there!");
 f.writeln("General Kenobi!");
 f.writeln(69, "Nice!");
-```
-```bsx
-mf f = io.Writer("output.txt") fr
-ayo nah f {
-    io.eprintln("Error: could not create file!") fr
-    os.exit(1) fr
-}
-
-f.writeln("Hello there!") fr
-f.writeln("General Kenobi!") fr
-f.writeln(69, "Nice!") fr
 ```
 
 ```console
@@ -354,9 +275,6 @@ machine can decide what to do.
 ```bs
 os.exit(69);
 ```
-```bsx
-os.exit(69) fr
-```
 
 ```console
 $ bs demo.bs
@@ -385,21 +303,6 @@ io.println(fib(30));
 var elapsed = os.clock() - start;
 io.println("Elapsed: \(elapsed)");
 ```
-```bsx
-lit fib(n) {
-    ayo n < 2 {
-        bet n fr
-    }
-
-    bet fib(n - 1) + fib(n - 2) fr
-}
-
-mf start = os.clock() fr
-io.println(fib(30)) fr
-
-mf elapsed = os.clock() - start fr
-io.println("Elapsed: \(elapsed)") fr
-```
 
 ```console
 $ bs demo.bs
@@ -417,13 +320,6 @@ os.sleep(0.69);
 var elapsed = os.clock() - start;
 io.println("Elapsed: \(elapsed)");
 ```
-```bsx
-mf start = os.clock() fr
-os.sleep(0.69) fr
-
-mf elapsed = os.clock() - start fr
-io.println("Elapsed: \(elapsed)") fr
-```
 
 ```console
 $ bs demo.bs
@@ -438,10 +334,6 @@ Returns `nil` if it doesn't exist.
 ```bs
 io.println(os.getenv("FOO"));
 io.println(os.getenv("BAR"));
-```
-```bsx
-io.println(os.getenv("FOO")) fr
-io.println(os.getenv("BAR")) fr
 ```
 
 ```console
@@ -460,10 +352,6 @@ Returns `true` if successful, else `false`.
 os.setenv("FOO", "lmao");
 io.println(os.getenv("FOO"));
 ```
-```bsx
-os.setenv("FOO", "lmao") fr
-io.println(os.getenv("FOO")) fr
-```
 
 ```console
 $ bs demo.bs
@@ -475,9 +363,6 @@ Get the current working directory.
 
 ```bs
 io.println(os.getcwd());
-```
-```bsx
-io.println(os.getcwd()) fr
 ```
 
 ```console
@@ -494,10 +379,6 @@ Returns `true` if successful, else `false`.
 os.setcwd("/usr");
 io.println(os.getcwd());
 ```
-```bsx
-os.setcwd("/usr") fr
-io.println(os.getcwd()) fr
-```
 
 ```console
 $ bs demo.bs
@@ -510,9 +391,6 @@ name.
 
 ```bs
 io.println(os.args);
-```
-```bsx
-io.println(os.args) fr
 ```
 
 ```console
@@ -537,15 +415,6 @@ if !p {
 }
 
 p.wait();
-```
-```bsx
-mf p = os.Process(["ls", "-l"]) fr
-ayo nah p {
-    io.eprintln("ERROR: could not start process") fr
-    os.exit(1) fr
-}
-
-p.wait() fr
 ```
 
 ```console
@@ -573,21 +442,6 @@ while !stdout.eof() {
 }
 
 p.wait();
-```
-```bsx
-mf p = os.Process(["ls", "-l"], nocap) fr
-ayo nah p {
-    io.eprintln("ERROR: could not start process") fr
-    os.exit(1) fr
-}
-
-mf stdout = p.stdout() fr
-yolo nah stdout.eof() {
-    mf line = stdout.readln() fr
-    io.println("Line:", line) fr
-}
-
-p.wait() fr
 ```
 
 ```console
@@ -621,20 +475,6 @@ stdin.writeln("Third line lets goooo foobar");
 stdin.close();
 p.wait();
 ```
-```bsx
-mf p = os.Process(["grep", "foobar"], cap, cap, nocap) fr
-ayo nah p {
-    io.eprintln("ERROR: could not start process") fr
-    os.exit(1) fr
-}
-
-mf stdin = p.stdin() fr
-stdin.writeln("First line foobar lmao") fr
-stdin.writeln("Second line lmao") fr
-stdin.writeln("Third line lets goooo foobar") fr
-stdin.close() fr
-p.wait() fr
-```
 
 ```console
 $ bs demo.bs
@@ -667,10 +507,6 @@ Returns `nil` if failed.
 var r = Regex("([0-9]+) ([a-z]+)");
 io.println("69 apples, 420 oranges".replace(r, "{fruit: '\\2', count: \\1}"));
 ```
-```bsx
-mf r = Regex("([0-9]+) ([a-z]+)") fr
-io.println("69 apples, 420 oranges".replace(r, "{fruit: '\\2', count: \\1}")) fr
-```
 
 ```console
 $ bs demo.bs
@@ -687,10 +523,6 @@ Slice a string from `start` (inclusive) to `end` (exclusive).
 io.println("deez nuts".slice(0, 4));
 io.println("deez nuts".slice(5, 9));
 ```
-```bsx
-io.println("deez nuts".slice(0, 4)) fr
-io.println("deez nuts".slice(5, 9)) fr
-```
 
 ```console
 $ bs demo.bs
@@ -704,9 +536,6 @@ Reverse a string.
 ```bs
 io.println("sllab amgil".reverse());
 ```
-```bsx
-io.println("sllab amgil".reverse()) fr
-```
 
 ```console
 $ bs demo.bs
@@ -719,9 +548,6 @@ Convert a string to uppercase.
 ```bs
 io.println("Urmom".toupper());
 ```
-```bsx
-io.println("Urmom".toupper()) fr
-```
 
 ```console
 $ bs demo.bs
@@ -733,9 +559,6 @@ Convert a string to lowercase.
 
 ```bs
 io.println("Urmom".tolower());
-```
-```bsx
-io.println("Urmom".tolower()) fr
 ```
 
 ```console
@@ -752,13 +575,6 @@ io.println("420.69".tonumber());
 io.println("0xff".tonumber());
 io.println("69e3".tonumber());
 io.println("nah".tonumber());
-```
-```bsx
-io.println("69".tonumber()) fr
-io.println("420.69".tonumber()) fr
-io.println("0xff".tonumber()) fr
-io.println("69e3".tonumber()) fr
-io.println("nah".tonumber()) fr
 ```
 
 ```console
@@ -788,18 +604,6 @@ io.println("69a".find(r, 1));
 io.println("69a".find(r, 2));
 io.println("yolol".find(r));
 ```
-```bsx
-io.println("foo bar baz".find("ba")) fr
-io.println("foo bar baz".find("ba", 5)) fr
-io.println("foo bar baz".find("ba", 9)) fr
-io.println("foo bar baz".find("lmao")) fr
-
-mf r = Regex("[0-9]") fr
-io.println("69a".find(r)) fr
-io.println("69a".find(r, 1)) fr
-io.println("69a".find(r, 2)) fr
-io.println("yolol".find(r)) fr
-```
 
 ```console
 $ bs demo.bs
@@ -826,16 +630,6 @@ io.println("foobar".split(r));
 io.println("foo bar".split(r));
 io.println("foo bar   baz".split(r));
 ```
-```bsx
-io.println("foo bar baz".split("")) fr
-io.println("foo bar baz".split(" ")) fr
-io.println("foo bar baz".split("  ")) fr
-
-mf r = Regex(" +") fr
-io.println("foobar".split(r)) fr
-io.println("foo bar".split(r)) fr
-io.println("foo bar   baz".split(r)) fr
-```
 
 ```console
 $ bs demo.bs
@@ -860,16 +654,6 @@ io.println("69 apples, 420 oranges".replace(r, "{type: \\2, count: \\1}"));
 io.println("69 apples, 420  oranges".replace(r, "{type: \\2, count: \\1}"));
 io.println("ayo noice!".replace(r, "{type: \\2, count: \\1}"));
 ```
-```bsx
-io.println("foo bar baz".replace("", "-")) fr
-io.println("foo bar baz".replace(" ", "---")) fr
-io.println("foo bar baz".replace("  ", "-")) fr
-
-mf r = Regex("([0-9]+) ([a-z]+)") fr
-io.println("69 apples, 420 oranges".replace(r, "{type: \\2, count: \\1}")) fr
-io.println("69 apples, 420  oranges".replace(r, "{type: \\2, count: \\1}")) fr
-io.println("ayo noice!".replace(r, "{type: \\2, count: \\1}")) fr
-```
 
 ```console
 $ bs demo.bs
@@ -887,9 +671,6 @@ Trim `pattern` from the left of a string.
 ```bs
 io.println("[" ++ "   foo bar baz  ".ltrim(" ") ++ "]");
 ```
-```bsx
-io.println("[" ++ "   foo bar baz  ".ltrim(" ") ++ "]") fr
-```
 
 ```console
 $ bs demo.bs
@@ -902,9 +683,6 @@ Trim `pattern` from the right of a string.
 ```bs
 io.println("[" ++ "   foo bar baz  ".rtrim(" ") ++ "]");
 ```
-```bsx
-io.println("[" ++ "   foo bar baz  ".rtrim(" ") ++ "]") fr
-```
 
 ```console
 $ bs demo.bs
@@ -916,9 +694,6 @@ Trim `pattern` from both sides of a string.
 
 ```bs
 io.println("[" ++ "   foo bar baz  ".trim(" ") ++ "]");
-```
-```bsx
-io.println("[" ++ "   foo bar baz  ".trim(" ") ++ "]") fr
 ```
 
 ```console
@@ -936,13 +711,6 @@ io.println("foo".lpad("69", 3));
 io.println("foo".lpad("69", 4));
 io.println("foo".lpad("69", 5));
 io.println("foo".lpad("69", 6));
-```
-```bsx
-io.println("foo".lpad("69", 0)) fr
-io.println("foo".lpad("69", 3)) fr
-io.println("foo".lpad("69", 4)) fr
-io.println("foo".lpad("69", 5)) fr
-io.println("foo".lpad("69", 6)) fr
 ```
 
 ```console
@@ -965,13 +733,6 @@ io.println("foo".rpad("69", 4));
 io.println("foo".rpad("69", 5));
 io.println("foo".rpad("69", 6));
 ```
-```bsx
-io.println("foo".rpad("69", 0)) fr
-io.println("foo".rpad("69", 3)) fr
-io.println("foo".rpad("69", 4)) fr
-io.println("foo".rpad("69", 5)) fr
-io.println("foo".rpad("69", 6)) fr
-```
 
 ```console
 $ bs demo.bs
@@ -990,11 +751,6 @@ io.println("foobar".prefix("foo"));
 io.println("foobar".prefix("Foo"));
 io.println("foobar".prefix("deez nuts"));
 ```
-```bsx
-io.println("foobar".prefix("foo")) fr
-io.println("foobar".prefix("Foo")) fr
-io.println("foobar".prefix("deez nuts")) fr
-```
 
 ```console
 $ bs demo.bs
@@ -1010,11 +766,6 @@ Check whether string ends with `pattern`.
 io.println("foobar".suffix("bar"));
 io.println("foobar".suffix("Bar"));
 io.println("foobar".suffix("deez nuts"));
-```
-```bsx
-io.println("foobar".suffix("bar")) fr
-io.println("foobar".suffix("Bar")) fr
-io.println("foobar".suffix("deez nuts")) fr
 ```
 
 ```console
@@ -1036,11 +787,6 @@ io.println(bit.ceil(7));
 io.println(bit.ceil(8));
 io.println(bit.ceil(9));
 ```
-```bsx
-io.println(bit.ceil(7)) fr
-io.println(bit.ceil(8)) fr
-io.println(bit.ceil(9)) fr
-```
 
 ```console
 $ bs demo.bs
@@ -1056,11 +802,6 @@ Return the bitwise floor of a number.
 io.println(bit.floor(7));
 io.println(bit.floor(8));
 io.println(bit.floor(9));
-```
-```bsx
-io.println(bit.floor(7)) fr
-io.println(bit.floor(8)) fr
-io.println(bit.floor(9)) fr
 ```
 
 ```console
@@ -1144,12 +885,6 @@ b.write("Hello, ");
 b.write("world!");
 io.println(b.slice());
 ```
-```bsx
-mf b = Bytes() fr
-b.write("Hello, ") fr
-b.write("world!") fr
-io.println(b.slice()) fr
-```
 
 ```console
 $ bs demo.bs
@@ -1167,15 +902,6 @@ io.println(b.slice());
 
 var n = b.count();
 io.println("\(n) bytes written.");
-```
-```bsx
-mf b = Bytes() fr
-b.write("Hello") fr
-b.write(" world!") fr
-io.println(b.slice()) fr
-
-mf n = b.count() fr
-io.println("\(n) bytes written.") fr
 ```
 
 ```console
@@ -1198,17 +924,6 @@ io.println(b.slice());
 b.reset(p);
 io.println(b.slice());
 ```
-```bsx
-mf b = Bytes() fr
-b.write("Hello") fr
-
-mf p = b.count() fr
-b.write(" world!") fr
-
-io.println(b.slice()) fr
-b.reset(p) fr
-io.println(b.slice()) fr
-```
 
 ```console
 $ bs demo.bs
@@ -1230,14 +945,6 @@ io.println(b.slice());
 io.println(b.slice(0, 5));
 io.println(b.slice(6, 12));
 ```
-```bsx
-mf b = Bytes() fr
-b.write("Hello world!") fr
-
-io.println(b.slice()) fr
-io.println(b.slice(0, 5)) fr
-io.println(b.slice(6, 12)) fr
-```
 
 ```console
 $ bs demo.bs
@@ -1255,12 +962,6 @@ b.write("Nice! ");
 b.write("" ++ 69); # Only strings can be written to a Bytes object
 io.println(b.slice());
 ```
-```bsx
-mf b = Bytes() fr
-b.write("Nice! ") fr
-b.write("" ++ 69) fr # Only strings can be written to a Bytes object
-io.println(b.slice()) fr
-```
 
 ```console
 $ bs demo.bs
@@ -1275,12 +976,6 @@ var b = Bytes();
 b.write("Helloworld!");
 b.insert(5, ", ");
 io.println(b.slice());
-```
-```bsx
-mf b = Bytes() fr
-b.write("Helloworld!") fr
-b.insert(5, ", ") fr
-io.println(b.slice()) fr
 ```
 
 ```console
@@ -1302,12 +997,6 @@ var ys = xs.map(fn (x) => x * 2);
 io.println(xs);
 io.println(ys);
 ```
-```bsx
-mf xs = [1, 2, 3, 4, 5] fr
-mf ys = xs.map(lit (x) => x * 2) fr
-io.println(xs) fr
-io.println(ys) fr
-```
 
 ```console
 $ bs demo.bs
@@ -1325,12 +1014,6 @@ var xs = [1, 2, 3, 4, 5];
 var ys = xs.filter(fn (x) => x % 2 == 0);
 io.println(xs);
 io.println(ys);
-```
-```bsx
-mf xs = [1, 2, 3, 4, 5] fr
-mf ys = xs.filter(lit (x) => x % 2 == 0) fr
-io.println(xs) fr
-io.println(ys) fr
 ```
 
 ```console
@@ -1355,15 +1038,6 @@ io.println(a);
 var b = xs.reduce(fn (x, y) => x + y, 10);
 io.println(b);
 ```
-```bsx
-mf xs = [1, 2, 3, 4, 5] fr
-
-mf a = xs.reduce(lit (x, y) => x + y) fr
-io.println(a) fr
-
-mf b = xs.reduce(lit (x, y) => x + y, 10) fr
-io.println(b) fr
-```
 
 ```console
 $ bs demo.bs
@@ -1385,17 +1059,6 @@ io.println(xs);
 io.println(ys);
 io.println(zs);
 ```
-```bsx
-mf xs = [1, 2, 3, 4, 5] fr
-mf ys = xs fr
-mf zs = xs.copy() fr
-
-xs[0] = 69 fr
-
-io.println(xs) fr
-io.println(ys) fr
-io.println(zs) fr
-```
 
 ```console
 $ bs demo.bs
@@ -1409,9 +1072,6 @@ Join the elements of an array, separated by `separator` into a single string.
 
 ```bs
 io.println([1, 2, 3, 4, 5].join(" -> "));
-```
-```bsx
-io.println([1, 2, 3, 4, 5].join(" -> ")) fr
 ```
 
 ```console
@@ -1432,13 +1092,6 @@ io.println(xs.find(3, 3));
 io.println(xs.find(3, 6));
 io.println(xs.find(true, 6));
 ```
-```bsx
-mf xs = [1, 2, 3, 4, 5, 3] fr
-io.println(xs.find(3)) fr
-io.println(xs.find(3, 3)) fr
-io.println(xs.find(3, 6)) fr
-io.println(xs.find(nocap, 6)) fr
-```
 
 ```console
 $ bs demo.bs
@@ -1457,13 +1110,6 @@ var ys = [1, 2, 3, 4, 5];
 
 io.println(xs == ys);
 io.println(xs.equal(ys));
-```
-```bsx
-mf xs = [1, 2, 3, 4, 5] fr
-mf ys = [1, 2, 3, 4, 5] fr
-
-io.println(xs == ys) fr
-io.println(xs.equal(ys)) fr
 ```
 
 ```console
@@ -1488,15 +1134,6 @@ for i in 0, 5 {
 }
 
 io.println(xs);
-```
-```bsx
-mf xs = [] fr
-
-yall i amongus 0, 5 {
-    xs.push(i * 2) fr
-}
-
-io.println(xs) fr
 ```
 
 ```console
@@ -1524,21 +1161,6 @@ io.println(xs);
 xs.insert(2, 4);
 io.println(xs);
 ```
-```bsx
-mf xs = [] fr
-
-yall i amongus 0, 5 {
-    ayo i == 2 {
-        slickback fr
-    }
-
-    xs.push(i * 2) fr
-}
-io.println(xs) fr
-
-xs.insert(2, 4) fr
-io.println(xs) fr
-```
 
 ```console
 $ bs demo.bs
@@ -1554,12 +1176,6 @@ var xs = [4, 2, 5, 1, 3];
 xs.sort(fn (x, y) => x < y); # This also returns the array so you can chain operations
 
 io.println(xs);
-```
-```bsx
-mf xs = [4, 2, 5, 1, 3] fr
-xs.sort(lit (x, y) => x < y) fr # This also returns the array so you can chain operations
-
-io.println(xs) fr
 ```
 
 ```console
@@ -1585,13 +1201,6 @@ io.println(xs);
 xs.resize(3);
 io.println(xs);
 ```
-```bsx
-mf xs = [1, 2, 3, 4, 5] fr
-io.println(xs) fr
-
-xs.resize(3) fr
-io.println(xs) fr
-```
 
 ```console
 $ bs demo.bs
@@ -1610,13 +1219,6 @@ io.println(xs);
 
 xs.reverse(); # This also returns the array so you can chain operations
 io.println(xs);
-```
-```bsx
-mf xs = [1, 2, 3, 4, 5] fr
-io.println(xs) fr
-
-xs.reverse() fr # This also returns the array so you can chain operations
-io.println(xs) fr
 ```
 
 ```console
@@ -1646,21 +1248,6 @@ io.println(xs);
 io.println(ys);
 io.println(zs);
 ```
-```bsx
-mf xs = {
-    foo = 69,
-    bar = 420
-} fr
-
-mf ys = xs fr
-mf zs = xs.copy() fr
-
-xs.bar = 1337 fr
-
-io.println(xs) fr
-io.println(ys) fr
-io.println(zs) fr
-```
 
 ```console
 $ bs demo.bs
@@ -1688,13 +1275,6 @@ var ys = { foo = 69, bar = 420 };
 io.println(xs == ys);
 io.println(xs.equal(ys));
 ```
-```bsx
-mf xs = { foo = 69, bar = 420 } fr
-mf ys = { foo = 69, bar = 420 } fr
-
-io.println(xs == ys) fr
-io.println(xs.equal(ys)) fr
-```
 
 ```console
 $ bs demo.bs
@@ -1713,10 +1293,6 @@ Sine in radians.
 ```bs
 var theta = 0.5;
 io.println(theta.sin());
-```
-```bsx
-mf theta = 0.5 fr
-io.println(theta.sin()) fr
 ```
 
 ```console
@@ -1747,9 +1323,6 @@ Return the exponential function of the number.
 
 ```bs
 io.println(2.exp()); # Basically e^2
-```
-```bsx
-io.println(2.exp()) fr # Basically e^2
 ```
 
 ```console
@@ -1785,10 +1358,6 @@ Return the maximum between the method receiver and the provided arguments.
 io.println(1.max(2, 3));
 io.println(3.max(0, 1, 2));
 ```
-```bsx
-io.println(1.max(2, 3)) fr
-io.println(3.max(0, 1, 2)) fr
-```
 
 ```console
 $ bs demo.bs
@@ -1802,10 +1371,6 @@ Return the minimum between the method receiver and the provided arguments.
 ```bs
 io.println(1.min(2, 3));
 io.println(3.min(1, 2, 3));
-```
-```bsx
-io.println(1.min(2, 3)) fr
-io.println(3.min(1, 2, 3)) fr
 ```
 
 ```console
@@ -1836,12 +1401,6 @@ io.println(math.random());
 io.println(math.random());
 io.println(math.random(69, 420));
 io.println(math.random(69, 420));
-```
-```bsx
-io.println(math.random()) fr
-io.println(math.random()) fr
-io.println(math.random(69, 420)) fr
-io.println(math.random(69, 420)) fr
 ```
 
 ```console

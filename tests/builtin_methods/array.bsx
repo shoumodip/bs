@@ -1,3 +1,0 @@
-io.println([1, 2, 3].map(lit (x) {
-    bet x * 2 fr
-})) fr

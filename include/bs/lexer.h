@@ -13,7 +13,6 @@ typedef struct {
     Bs_Token buffer;
 
     bool comments;
-    bool extended;
     jmp_buf unwind;
 
     Bs_Writer *error;

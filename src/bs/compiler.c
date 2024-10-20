@@ -222,7 +222,7 @@ static void bs_compile_error_unexpected(Bs_Compiler *c, const Bs_Token *token) {
         c->lexer.error,
         Bs_Loc_Fmt "error: unexpected %s\n",
         Bs_Loc_Arg(token->loc),
-        bs_token_type_name(token->type, c->lexer.extended));
+        bs_token_type_name(token->type));
 
     bs_lexer_error(&c->lexer);
 }
@@ -519,10 +519,9 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         } else if (*op == BS_OP_SUPER_GET) {
             bs_fmt(
                 c->lexer.error,
-                Bs_Loc_Fmt "error: cannot use %s on %s\n",
+                Bs_Loc_Fmt "error: cannot use %s on super\n",
                 Bs_Loc_Arg(loc),
-                bs_token_type_name(token.type, c->lexer.extended),
-                c->lexer.extended ? "franky" : "super");
+                bs_token_type_name(token.type));
 
             bs_lexer_error(&c->lexer);
         } else {
@@ -581,21 +580,20 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         bs_compile_lambda(c, BS_LAMBDA_FN, NULL);
         break;
 
-    case BS_TOKEN_THIS: {
+    case BS_TOKEN_THIS:
         if (!c->class) {
             bs_fmt(
                 c->lexer.error,
                 Bs_Loc_Fmt "error: cannot use %s outside of %s\n",
                 Bs_Loc_Arg(token.loc),
-                bs_token_type_name(token.type, c->lexer.extended),
-                bs_token_type_name(BS_TOKEN_CLASS, c->lexer.extended));
+                bs_token_type_name(token.type),
+                bs_token_type_name(BS_TOKEN_CLASS));
 
             bs_lexer_error(&c->lexer);
         }
 
-        const Bs_Sv sv = c->lexer.extended ? Bs_Sv_Static("deez") : Bs_Sv_Static("this");
-        bs_compile_receiver(c, sv, token.loc);
-    } break;
+        bs_compile_receiver(c, Bs_Sv_Static("this"), token.loc);
+        break;
 
     case BS_TOKEN_SUPER: {
         if (!c->class) {
@@ -603,8 +601,8 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
                 c->lexer.error,
                 Bs_Loc_Fmt "error: cannot use %s outside of %s\n",
                 Bs_Loc_Arg(token.loc),
-                bs_token_type_name(token.type, c->lexer.extended),
-                bs_token_type_name(BS_TOKEN_CLASS, c->lexer.extended));
+                bs_token_type_name(token.type),
+                bs_token_type_name(BS_TOKEN_CLASS));
 
             bs_lexer_error(&c->lexer);
         }
@@ -612,10 +610,9 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         if (!c->class->has_super) {
             bs_fmt(
                 c->lexer.error,
-                Bs_Loc_Fmt "error: cannot use %s outside of an inheriting %s\n",
+                Bs_Loc_Fmt "error: cannot use %s outside of an inheriting class\n",
                 Bs_Loc_Arg(token.loc),
-                bs_token_type_name(token.type, c->lexer.extended),
-                c->lexer.extended ? "wannabe" : "class");
+                bs_token_type_name(token.type));
 
             bs_lexer_error(&c->lexer);
         }
@@ -623,11 +620,8 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         bs_lexer_expect(&c->lexer, BS_TOKEN_DOT);
         const Bs_Token method = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
 
-        const Bs_Sv this = c->lexer.extended ? Bs_Sv_Static("deez") : Bs_Sv_Static("this");
-        const Bs_Sv super = c->lexer.extended ? Bs_Sv_Static("franky") : Bs_Sv_Static("super");
-
-        bs_compile_receiver(c, this, token.loc);
-        bs_compile_receiver(c, super, token.loc);
+        bs_compile_receiver(c, Bs_Sv_Static("this"), token.loc);
+        bs_compile_receiver(c, Bs_Sv_Static("super"), token.loc);
 
         if (bs_sv_eq(method.sv, Bs_Sv_Static("init"))) {
             bs_chunk_push_op_value(c->bs, c->chunk, BS_OP_SUPER_GET, bs_value_nil);
@@ -984,8 +978,7 @@ static void bs_compile_lambda_init(Bs_Compiler *c, Bs_Lambda *lambda, Bs_Sv name
     if (lambda->type == BS_LAMBDA_FN) {
         bs_lambda_push(c->bs, lambda, (Bs_Local){0});
     } else {
-        const Bs_Sv sv = c->lexer.extended ? Bs_Sv_Static("deez") : Bs_Sv_Static("this");
-        bs_lambda_push(c->bs, lambda, (Bs_Local){.name = sv});
+        bs_lambda_push(c->bs, lambda, (Bs_Local){.name = Bs_Sv_Static("this")});
     }
 }
 
@@ -1007,7 +1000,6 @@ static Bs_Fn *bs_compile_lambda_end(Bs_Compiler *c) {
         c->chunk = NULL;
     }
 
-    fn->extended = c->lexer.extended;
     return fn;
 }
 
@@ -1105,10 +1097,10 @@ static void bs_compile_class(Bs_Compiler *c, bool public) {
         bs_compile_identifier(c, &super);
 
         bs_compile_block_init(c);
-        {
-            const Bs_Sv sv = c->lexer.extended ? Bs_Sv_Static("franky") : Bs_Sv_Static("super");
-            bs_lambda_push(c->bs, c->lambda, ((Bs_Local){.name = sv, .depth = c->lambda->depth}));
-        }
+        bs_lambda_push(
+            c->bs,
+            c->lambda,
+            ((Bs_Local){.name = Bs_Sv_Static("super"), .depth = c->lambda->depth}));
 
         bs_compile_identifier(c, &token);
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_INHERIT);
@@ -1369,10 +1361,10 @@ static void bs_compile_stmt(Bs_Compiler *c) {
                 c->lexer.error,
                 Bs_Loc_Fmt "error: expected %s, %s or %s, got %s\n",
                 Bs_Loc_Arg(token.loc),
-                bs_token_type_name(BS_TOKEN_FN, c->lexer.extended),
-                bs_token_type_name(BS_TOKEN_VAR, c->lexer.extended),
-                bs_token_type_name(BS_TOKEN_CLASS, c->lexer.extended),
-                bs_token_type_name(token.type, c->lexer.extended));
+                bs_token_type_name(BS_TOKEN_FN),
+                bs_token_type_name(BS_TOKEN_VAR),
+                bs_token_type_name(BS_TOKEN_CLASS),
+                bs_token_type_name(token.type));
 
             bs_lexer_error(&c->lexer);
         }
@@ -1408,15 +1400,14 @@ static void bs_compile_stmt(Bs_Compiler *c) {
                 c->class->can_fail = true;
                 bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
             } else {
-                const char *label = bs_token_type_name(BS_TOKEN_NIL, c->lexer.extended);
                 bs_fmt(
                     c->lexer.error,
                     Bs_Loc_Fmt
-                    "error: can only explicity return %s from an initializer method\n\n"
-                    "When an initializer method explicitly returns %s, it indicates that the\n"
+                    "error: can only explicity return 'nil' from an initializer method\n\n"
+                    "When an initializer method explicitly returns 'nil', it indicates that the\n"
                     "initialization failed due to some reason, and the site of the "
                     "instantiation\n"
-                    "gets %s as the result. This is not strictly OOP, but I missed the part "
+                    "gets 'nil' as the result. This is not strictly OOP, but I missed the part "
                     "where\n"
                     "that's my problem.\n\n"
                     "```\n"
@@ -1428,10 +1419,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
                     "\n"
                     "io.print(f.read()); # Or whatever you want to do\n"
                     "```\n",
-                    Bs_Loc_Arg(loc),
-                    label,
-                    label,
-                    label);
+                    Bs_Loc_Arg(loc));
 
                 bs_lexer_error(&c->lexer);
             }
@@ -1465,7 +1453,6 @@ Bs_Fn *bs_compile_impl(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main) {
         // Own the path
         const Bs_Sv path = Bs_Sv(lambda.fn->name->data, lambda.fn->name->size);
         compiler.lexer = bs_lexer_new(path, input, &bs_config(bs)->error);
-        compiler.lexer.extended = bs_sv_suffix(path, Bs_Sv_Static(".bsx"));
     }
 
     if (setjmp(compiler.lexer.unwind)) {

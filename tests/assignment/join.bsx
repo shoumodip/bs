@@ -1,5 +1,0 @@
-mf s = "Hello" fr
-io.println(s) fr
-
-s ++= ", world!" fr
-io.println(s) fr

@@ -3,13 +3,13 @@
 #include "bs/token.h"
 
 static_assert(BS_COUNT_TOKENS == 72, "Update bs_token_type_name()");
-const char *bs_token_type_name(Bs_Token_Type type, bool extended) {
+const char *bs_token_type_name(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_EOF:
         return "end of file";
 
     case BS_TOKEN_EOL:
-        return extended ? "'fr'" : "';'";
+        return "';'";
 
     case BS_TOKEN_DOT:
         return "'.'";
@@ -21,7 +21,7 @@ const char *bs_token_type_name(Bs_Token_Type type, bool extended) {
         return "','";
 
     case BS_TOKEN_NIL:
-        return extended ? "'bruh'" : "'nil'";
+        return "'nil'";
 
     case BS_TOKEN_NUM:
         return "number";
@@ -31,10 +31,10 @@ const char *bs_token_type_name(Bs_Token_Type type, bool extended) {
         return "string";
 
     case BS_TOKEN_TRUE:
-        return extended ? "'nocap'" : "'true'";
+        return "'true'";
 
     case BS_TOKEN_FALSE:
-        return extended ? "'cap'" : "'false'";
+        return "'false'";
 
     case BS_TOKEN_IDENT:
         return "identifier";
@@ -91,7 +91,7 @@ const char *bs_token_type_name(Bs_Token_Type type, bool extended) {
         return "'&&'";
 
     case BS_TOKEN_LNOT:
-        return extended ? "'nah'" : "'!'";
+        return "'!'";
 
     case BS_TOKEN_SHL:
         return "'<<'";
@@ -118,19 +118,19 @@ const char *bs_token_type_name(Bs_Token_Type type, bool extended) {
         return "'!='";
 
     case BS_TOKEN_LEN:
-        return extended ? "'thicc'" : "'len'";
+        return "'len'";
 
     case BS_TOKEN_JOIN:
         return "'++'";
 
     case BS_TOKEN_DELETE:
-        return extended ? "'ghost'" : "'delete'";
+        return "'delete'";
 
     case BS_TOKEN_IMPORT:
-        return extended ? "'redpill'" : "'import'";
+        return "'import'";
 
     case BS_TOKEN_TYPEOF:
-        return extended ? "'vibeof'" : "'typeof'";
+        return "'typeof'";
 
     case BS_TOKEN_SET:
         return "'='";
@@ -169,52 +169,52 @@ const char *bs_token_type_name(Bs_Token_Type type, bool extended) {
         return "'++='";
 
     case BS_TOKEN_IF:
-        return extended ? "'ayo'" : "'if'";
+        return "'if'";
 
     case BS_TOKEN_THEN:
-        return extended ? "'sayless'" : "'then'";
+        return "'then'";
 
     case BS_TOKEN_ELSE:
-        return extended ? "'sike'" : "'else'";
+        return "'else'";
 
     case BS_TOKEN_IN:
-        return extended ? "'amongus'" : "'in'";
+        return "'in'";
 
     case BS_TOKEN_FOR:
-        return extended ? "'yall'" : "'for'";
+        return "'for'";
 
     case BS_TOKEN_WHILE:
-        return extended ? "'yolo'" : "'while'";
+        return "'while'";
 
     case BS_TOKEN_BREAK:
-        return extended ? "'yeet'" : "'break'";
+        return "'break'";
 
     case BS_TOKEN_CONTINUE:
-        return extended ? "'slickback'" : "'continue'";
+        return "'continue'";
 
     case BS_TOKEN_FN:
-        return extended ? "'lit'" : "'fn'";
+        return "'fn'";
 
     case BS_TOKEN_PUB:
-        return extended ? "'fam'" : "'pub'";
+        return "'pub'";
 
     case BS_TOKEN_VAR:
-        return extended ? "'mf'" : "'var'";
+        return "'var'";
 
     case BS_TOKEN_RETURN:
-        return extended ? "'bet'" : "'return'";
+        return "'return'";
 
     case BS_TOKEN_THIS:
-        return extended ? "'deez'" : "'this'";
+        return "'this'";
 
     case BS_TOKEN_SUPER:
-        return extended ? "'franky'" : "'super'";
+        return "'super'";
 
     case BS_TOKEN_CLASS:
-        return extended ? "'wannabe'" : "'class'";
+        return "'class'";
 
     case BS_TOKEN_IS_MAIN_MODULE:
-        return extended ? "'is_big_boss'" : "'is_main_module'";
+        return "'is_main_module'";
 
     default:
         assert(false && "unreachable");

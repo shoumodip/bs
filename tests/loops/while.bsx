@@ -1,6 +1,0 @@
-mf i = 0 fr
-
-yolo i < 10 {
-    io.println(i) fr
-    i = i + 1 fr
-}

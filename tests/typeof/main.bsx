@@ -1,8 +1,0 @@
-io.println(vibeof(bruh)) fr
-io.println(vibeof(nocap)) fr
-io.println(vibeof(69)) fr
-io.println(vibeof(lit () {})) fr
-io.println(vibeof("deez")) fr
-io.println(vibeof([])) fr
-io.println(vibeof({})) fr
-io.println(vibeof("".reverse)) fr

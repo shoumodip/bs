@@ -6,7 +6,7 @@ A simple UNIX shell.
 ```console
 $ bs shell.bs
 ~/Git/bs/examples/shell $ ls -a
-.  ..  README.md  shell.bs  shell.bsx
+.  ..  README.md  shell.bs
 ```
 
 Use

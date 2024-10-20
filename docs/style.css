@@ -95,44 +95,18 @@ a, button {
     -webkit-tap-highlight-color: transparent;
 }
 
-.tab {
-    border: var(--border-size) solid var(--border);
-    cursor: pointer;
-    padding: var(--padding) calc(3 * var(--padding));
-    font-size: calc(0.8 * var(--font-size));
-    font-weight: bold;
-    margin-right: -1px;
-    border-radius: var(--border-radius) var(--border-radius) 0 0;
-    border-bottom: none;
-    background-color: var(--border);
-}
-
-.tab.active {
-    z-index: 1;
-    background-color: var(--codebg);
-}
-
-.tabs {
-    display: flex;
-    padding-top: var(--padding);
-}
-
 .copy, .copied {
     top: var(--padding);
     right: var(--padding);
     border: none;
     cursor: pointer;
-    padding: calc(0.5 * var(--padding)) calc(0.5 * var(--padding));
+    padding: calc(1.1 * var(--padding)) calc(0.5 * var(--padding));
     position: absolute;
     font-size: calc(0.7 * var(--font-size));
     border-radius: var(--border-radius);
 
     fill: var(--copyfg);
     background: transparent;
-}
-
-.shell .copy {
-    padding: calc(1.1 * var(--padding)) calc(0.5 * var(--padding));
 }
 
 .copied {
@@ -156,15 +130,8 @@ a, button {
     background-color: var(--codebg);
 }
 
-.code.active:not(.shell) {
-    border-top-left-radius: 0;
-}
-
 .codes {
     position: relative;
-}
-
-.codes.shell {
     padding-top: var(--padding);
 }
 

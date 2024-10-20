@@ -1,7 +1,0 @@
-mf t = {
-    v = 17
-} fr
-
-t.v *= 2 fr
-t["v"] += 35 fr
-io.println(t.v) fr

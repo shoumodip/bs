@@ -1,7 +1,0 @@
-mf p = os.Process(["executables/echo_stdin"], cap, cap, nocap) fr
-mf f = p.stdin() fr
-f.writeln("foo") fr
-f.writeln("bar") fr
-f.writeln("baz") fr
-f.close() fr
-p.wait() fr

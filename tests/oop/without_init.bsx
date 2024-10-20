@@ -1,6 +1,0 @@
-wannabe Pair {}
-
-mf pair = Pair() fr
-pair.first = 34 fr
-pair.second = 35 fr
-io.println(pair.first + pair.second) fr

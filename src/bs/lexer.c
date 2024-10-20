@@ -201,106 +201,52 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
         }
         token.sv.size -= l->sv.size;
 
-        if (l->extended) {
-            if (bs_sv_eq(token.sv, Bs_Sv_Static("fr"))) {
-                token.type = BS_TOKEN_EOL;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("bruh"))) {
-                token.type = BS_TOKEN_NIL;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("nocap"))) {
-                token.type = BS_TOKEN_TRUE;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("cap"))) {
-                token.type = BS_TOKEN_FALSE;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("nah"))) {
-                token.type = BS_TOKEN_LNOT;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("thicc"))) {
-                token.type = BS_TOKEN_LEN;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("ghost"))) {
-                token.type = BS_TOKEN_DELETE;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("redpill"))) {
-                token.type = BS_TOKEN_IMPORT;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("vibeof"))) {
-                token.type = BS_TOKEN_TYPEOF;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("ayo"))) {
-                token.type = BS_TOKEN_IF;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("sayless"))) {
-                token.type = BS_TOKEN_THEN;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("sike"))) {
-                token.type = BS_TOKEN_ELSE;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("amongus"))) {
-                token.type = BS_TOKEN_IN;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("yall"))) {
-                token.type = BS_TOKEN_FOR;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("yolo"))) {
-                token.type = BS_TOKEN_WHILE;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("yeet"))) {
-                token.type = BS_TOKEN_BREAK;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("slickback"))) {
-                token.type = BS_TOKEN_CONTINUE;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("lit"))) {
-                token.type = BS_TOKEN_FN;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("fam"))) {
-                token.type = BS_TOKEN_PUB;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("mf"))) {
-                token.type = BS_TOKEN_VAR;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("bet"))) {
-                token.type = BS_TOKEN_RETURN;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("deez"))) {
-                token.type = BS_TOKEN_THIS;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("franky"))) {
-                token.type = BS_TOKEN_SUPER;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("wannabe"))) {
-                token.type = BS_TOKEN_CLASS;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("is_big_boss"))) {
-                token.type = BS_TOKEN_IS_MAIN_MODULE;
-            }
-        } else {
-            if (bs_sv_eq(token.sv, Bs_Sv_Static("nil"))) {
-                token.type = BS_TOKEN_NIL;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("true"))) {
-                token.type = BS_TOKEN_TRUE;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("false"))) {
-                token.type = BS_TOKEN_FALSE;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("len"))) {
-                token.type = BS_TOKEN_LEN;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("delete"))) {
-                token.type = BS_TOKEN_DELETE;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("import"))) {
-                token.type = BS_TOKEN_IMPORT;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("typeof"))) {
-                token.type = BS_TOKEN_TYPEOF;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("if"))) {
-                token.type = BS_TOKEN_IF;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("then"))) {
-                token.type = BS_TOKEN_THEN;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("else"))) {
-                token.type = BS_TOKEN_ELSE;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("in"))) {
-                token.type = BS_TOKEN_IN;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("for"))) {
-                token.type = BS_TOKEN_FOR;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("while"))) {
-                token.type = BS_TOKEN_WHILE;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("break"))) {
-                token.type = BS_TOKEN_BREAK;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("continue"))) {
-                token.type = BS_TOKEN_CONTINUE;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("fn"))) {
-                token.type = BS_TOKEN_FN;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("pub"))) {
-                token.type = BS_TOKEN_PUB;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("var"))) {
-                token.type = BS_TOKEN_VAR;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("return"))) {
-                token.type = BS_TOKEN_RETURN;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("this"))) {
-                token.type = BS_TOKEN_THIS;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("super"))) {
-                token.type = BS_TOKEN_SUPER;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("class"))) {
-                token.type = BS_TOKEN_CLASS;
-            } else if (bs_sv_eq(token.sv, Bs_Sv_Static("is_main_module"))) {
-                token.type = BS_TOKEN_IS_MAIN_MODULE;
-            }
+        if (bs_sv_eq(token.sv, Bs_Sv_Static("nil"))) {
+            token.type = BS_TOKEN_NIL;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("true"))) {
+            token.type = BS_TOKEN_TRUE;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("false"))) {
+            token.type = BS_TOKEN_FALSE;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("len"))) {
+            token.type = BS_TOKEN_LEN;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("delete"))) {
+            token.type = BS_TOKEN_DELETE;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("import"))) {
+            token.type = BS_TOKEN_IMPORT;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("typeof"))) {
+            token.type = BS_TOKEN_TYPEOF;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("if"))) {
+            token.type = BS_TOKEN_IF;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("then"))) {
+            token.type = BS_TOKEN_THEN;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("else"))) {
+            token.type = BS_TOKEN_ELSE;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("in"))) {
+            token.type = BS_TOKEN_IN;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("for"))) {
+            token.type = BS_TOKEN_FOR;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("while"))) {
+            token.type = BS_TOKEN_WHILE;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("break"))) {
+            token.type = BS_TOKEN_BREAK;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("continue"))) {
+            token.type = BS_TOKEN_CONTINUE;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("fn"))) {
+            token.type = BS_TOKEN_FN;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("pub"))) {
+            token.type = BS_TOKEN_PUB;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("var"))) {
+            token.type = BS_TOKEN_VAR;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("return"))) {
+            token.type = BS_TOKEN_RETURN;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("this"))) {
+            token.type = BS_TOKEN_THIS;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("super"))) {
+            token.type = BS_TOKEN_SUPER;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("class"))) {
+            token.type = BS_TOKEN_CLASS;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("is_main_module"))) {
+            token.type = BS_TOKEN_IS_MAIN_MODULE;
         }
 
         return token;
@@ -312,9 +258,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
 
     switch (bs_lexer_consume(l)) {
     case ';':
-        if (!l->extended) {
-            token.type = BS_TOKEN_EOL;
-        }
+        token.type = BS_TOKEN_EOL;
         break;
 
     case '.':
@@ -430,7 +374,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
     case '!':
         if (bs_lexer_match(l, '=')) {
             token.type = BS_TOKEN_NE;
-        } else if (!l->extended) {
+        } else {
             token.type = BS_TOKEN_LNOT;
         }
         break;
@@ -509,8 +453,8 @@ Bs_Token bs_lexer_expect(Bs_Lexer *l, Bs_Token_Type type) {
             l->error,
             Bs_Loc_Fmt "error: expected %s, got %s\n",
             Bs_Loc_Arg(token.loc),
-            bs_token_type_name(type, l->extended),
-            bs_token_type_name(token.type, l->extended));
+            bs_token_type_name(type),
+            bs_token_type_name(token.type));
 
         bs_lexer_error(l);
     }
@@ -524,9 +468,9 @@ Bs_Token bs_lexer_either(Bs_Lexer *l, Bs_Token_Type a, Bs_Token_Type b) {
             l->error,
             Bs_Loc_Fmt "error: expected %s or %s, got %s\n",
             Bs_Loc_Arg(token.loc),
-            bs_token_type_name(a, l->extended),
-            bs_token_type_name(b, l->extended),
-            bs_token_type_name(token.type, l->extended));
+            bs_token_type_name(a),
+            bs_token_type_name(b),
+            bs_token_type_name(token.type));
 
         bs_lexer_error(l);
     }

@@ -1,8 +1,0 @@
-wannabe Foo {}
-
-mf foo = Foo() fr
-foo.f = lit () {
-    io.println("Hello, world!") fr
-} fr
-
-foo.f(69) fr

@@ -1,1 +1,0 @@
-os.Process(["executables/echo_args", "foo", "bar", "baz"]).wait() fr

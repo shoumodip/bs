@@ -1,9 +1,0 @@
-lit foo(s) {
-    bet os.getenv(s) fr
-}
-
-lit main() {
-    [1, 2].map(foo) fr
-}
-
-main() fr

@@ -1,5 +1,0 @@
-wannabe Foo {
-    init(x) {}
-}
-
-Foo() fr

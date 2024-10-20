@@ -1,8 +1,0 @@
-wannabe B {}
-wannabe A < B {
-    init() {
-        franky.foo() fr
-    }
-}
-
-A() fr

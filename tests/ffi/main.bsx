@@ -1,3 +1,0 @@
-mf addsub = redpill("executables/addsub") fr
-io.println(addsub.add(34, 35)) fr
-io.println(addsub.sub(500, 80)) fr

@@ -22,12 +22,6 @@ process() {
             print line
         }
         close(filename)
-
-        if (basename ~ /\.bs$/) {
-            print "```"
-            print "```bsx"
-            print "# TODO: BSX will be removed soon"
-        }
     }
 
     {

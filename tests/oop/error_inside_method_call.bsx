@@ -1,7 +1,0 @@
-wannabe Foo {
-    foo() {
-        -bruh fr
-    }
-}
-
-Foo().foo() fr

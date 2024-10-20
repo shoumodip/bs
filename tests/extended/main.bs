@@ -1,5 +1,0 @@
-var normal = import("extended/common");
-var extended = import("extended/common_extended");
-
-normal.noice();
-extended.noice();

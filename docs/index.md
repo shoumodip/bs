@@ -19,20 +19,9 @@ fn factorial(n) {
 
 io.println("5! = \(factorial(5))");
 ```
-```bsx
-lit factorial(n) {
-    ayo n < 2 {
-        bet 1 fr
-    }
-
-    bet n * factorial(n - 1) fr
-}
-
-io.println("5! = \(factorial(5))") fr
-```
 
 ```console
-$ bs factorial.bs # or .bsx
+$ bs factorial.bs
 5! = 120
 ```
 

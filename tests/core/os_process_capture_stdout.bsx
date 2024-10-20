@@ -1,3 +1,0 @@
-mf p = os.Process(["executables/echo_args", "foo", "bar"], nocap) fr
-io.eprint(p.stdout().read(256)) fr
-p.wait() fr

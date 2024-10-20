@@ -1,7 +1,0 @@
-mf t = {
-    f = lit () {
-        io.println("Hello, world!") fr
-    }
-} fr
-
-t.f() fr

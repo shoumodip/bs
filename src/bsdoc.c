@@ -11,12 +11,6 @@ static void bsdoc_writer(Bs_Writer *w, Bs_Sv sv) {
 }
 
 typedef enum {
-    BSDOC_LANG_C,
-    BSDOC_LANG_BS,
-    BSDOC_LANG_BSX,
-} Bsdoc_Lang;
-
-typedef enum {
     BSDOC_STYLE_NONE,
     BSDOC_STYLE_CLASS,
     BSDOC_STYLE_FIELD,
@@ -28,7 +22,7 @@ typedef enum {
     BSDOC_STYLE_FUNCTION,
 } Bsdoc_Style;
 
-static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type, Bsdoc_Lang lang) {
+static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_STR:
     case BS_TOKEN_ISTR:
@@ -55,10 +49,6 @@ static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type, Bsdoc_Lang lang) {
     case BS_TOKEN_CLASS:
     case BS_TOKEN_RETURN:
         return BSDOC_STYLE_KEYWORD;
-
-    case BS_TOKEN_EOL:
-    case BS_TOKEN_LNOT:
-        return lang == BSDOC_LANG_BSX ? BSDOC_STYLE_KEYWORD : BSDOC_STYLE_NONE;
 
     case BS_TOKEN_NIL:
     case BS_TOKEN_NUM:
@@ -220,15 +210,13 @@ static const Bsdoc_Style_Pair style_pairs[] = {
 };
 #undef p
 
-static bool
-bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t start, Bsdoc_Lang lang) {
+static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t start, bool c) {
     Bsdoc_Parens parens = {0};
     Bs_Writer error = {stderr, bsdoc_writer};
 
     Bs_Lexer lexer = bs_lexer_new(bs_sv_from_cstr(path), input, &error);
     lexer.loc.row = start;
     lexer.comments = true;
-    lexer.extended = lang == BSDOC_LANG_BSX;
 
     if (setjmp(lexer.unwind)) {
         return false;
@@ -238,7 +226,7 @@ bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t start, Bsdoc_Lan
     const char *last = input.data;
     while (lexer.sv.size) {
         Bs_Token token = bs_lexer_next(&lexer);
-        if (lang != BSDOC_LANG_C) {
+        if (!c) {
             if (next != BSDOC_STYLE_NONE && token.type != BS_TOKEN_IDENT &&
                 token.type != BS_TOKEN_COMMENT) {
                 if (token.type != BS_TOKEN_LT || next != BSDOC_STYLE_CLASS) {
@@ -248,8 +236,8 @@ bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t start, Bsdoc_Lan
         }
 
         Bsdoc_Style style;
-        if (lang == BSDOC_LANG_C) {
-            style = bsdoc_token_type_style(token.type, lang);
+        if (c) {
+            style = bsdoc_token_type_style(token.type);
             if (token.type == BS_TOKEN_IDENT) {
                 for (size_t i = 0; i < bs_c_array_size(style_pairs); i++) {
                     const Bsdoc_Style_Pair *pair = &style_pairs[i];
@@ -291,7 +279,7 @@ bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t start, Bsdoc_Lan
                 next = BSDOC_STYLE_NONE;
             }
         } else {
-            style = bsdoc_token_type_style(token.type, lang);
+            style = bsdoc_token_type_style(token.type);
         }
 
         switch (token.type) {
@@ -315,7 +303,7 @@ bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t start, Bsdoc_Lan
                 bsdoc_print_token(f, token, BSDOC_STYLE_ESCAPE, &last);
 
                 token = bs_lexer_str(&lexer, lexer.loc);
-                bsdoc_print_token(f, token, bsdoc_token_type_style(token.type, lang), &last);
+                bsdoc_print_token(f, token, bsdoc_token_type_style(token.type), &last);
 
                 if (token.type == BS_TOKEN_ISTR) {
                     token = bs_lexer_expect(&lexer, BS_TOKEN_LPAREN);
@@ -631,52 +619,19 @@ int main(int argc, char **argv) {
         if (bs_sv_eq(line, Bs_Sv_Static("```bs"))) {
             size_t start = row + 1;
 
-            fprintf(
-                f,
-                "<div>\n"
-                "<div class='tabs'>\n"
-                "<button class='tab active' onclick='tabClick(this)'>BS</button>\n"
-                "<button class='tab' onclick='tabClick(this)'>BSX</button>\n"
-                "</div>\n"
-                "<div class='codes'>\n");
-
-            bsdoc_print_copy(f, "copyClickCode");
-
+            fprintf(f, "<div class='codes'>\n");
+            bsdoc_print_copy(f, "copyClick");
             fprintf(f, "<pre class='code active'>\n");
+
             if (!bsdoc_print_code(
-                    f,
-                    input,
-                    bsdoc_split_code(&sv, &row, Bs_Sv_Static("```")),
-                    start,
-                    BSDOC_LANG_BS)) {
+                    f, input, bsdoc_split_code(&sv, &row, Bs_Sv_Static("```")), start, false)) {
                 bs_return_defer(1);
             }
             fprintf(f, "</pre>\n");
 
-            row++;
-            if (!bs_sv_eq(bs_sv_split(&sv, '\n'), Bs_Sv_Static("```bsx"))) {
-                fprintf(
-                    stderr,
-                    "%s:%zu:1: error: expected line after BS block to be \"```bsx\"\n",
-                    input,
-                    row);
-                bs_return_defer(1);
-            }
-            start = row + 1;
-
-            fprintf(f, "<pre class='code'>\n");
-            if (!bsdoc_print_code(
-                    f,
-                    input,
-                    bsdoc_split_code(&sv, &row, Bs_Sv_Static("```")),
-                    start,
-                    BSDOC_LANG_BSX)) {
-                bs_return_defer(1);
-            }
             fprintf(
                 f,
                 "</pre>\n"
-                "</div>\n"
                 "</div>\n");
 
             continue;
@@ -685,16 +640,12 @@ int main(int argc, char **argv) {
         if (bs_sv_eq(line, Bs_Sv_Static("```c"))) {
             size_t start = row + 1;
 
-            fprintf(f, "<div class='codes shell'>\n");
-            bsdoc_print_copy(f, "copyClickShell");
-            fprintf(f, "<pre class='code active shell'>\n");
+            fprintf(f, "<div class='codes'>\n");
+            bsdoc_print_copy(f, "copyClick");
+            fprintf(f, "<pre class='code active'>\n");
 
             if (!bsdoc_print_code(
-                    f,
-                    input,
-                    bsdoc_split_code(&sv, &row, Bs_Sv_Static("```")),
-                    start,
-                    BSDOC_LANG_C)) {
+                    f, input, bsdoc_split_code(&sv, &row, Bs_Sv_Static("```")), start, true)) {
                 bs_return_defer(1);
             }
 
@@ -707,9 +658,9 @@ int main(int argc, char **argv) {
         }
 
         if (bs_sv_eq(line, Bs_Sv_Static("```console"))) {
-            fprintf(f, "<div class='codes shell'>\n");
-            bsdoc_print_copy(f, "copyClickShell");
-            fprintf(f, "<pre class='code active shell'>\n");
+            fprintf(f, "<div class='codes'>\n");
+            bsdoc_print_copy(f, "copyClick");
+            fprintf(f, "<pre class='code active'>\n");
 
             while (sv.size) {
                 row++;

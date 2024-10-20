@@ -1,5 +1,0 @@
-mf t = {
-    f = "".slice
-} fr
-
-t.f(bruh, 0) fr

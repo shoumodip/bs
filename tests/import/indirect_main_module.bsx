@@ -1,3 +1,0 @@
-mf foo = redpill("import/main_module_extended") fr
-
-io.println(foo) fr

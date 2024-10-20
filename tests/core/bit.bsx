@@ -1,7 +1,0 @@
-io.println(bit.ceil(7)) fr
-io.println(bit.ceil(8)) fr
-io.println(bit.ceil(9)) fr
-
-io.println(bit.floor(7)) fr
-io.println(bit.floor(8)) fr
-io.println(bit.floor(9)) fr

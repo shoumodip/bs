@@ -61,8 +61,6 @@ struct Bs_Fn {
 
     size_t arity;
     size_t upvalues;
-
-    bool extended;
 };
 
 Bs_Fn *bs_fn_new(Bs *bs);

@@ -1,5 +1,0 @@
-wannabe Foo {}
-
-mf foo = Foo() fr
-foo.f = 69 fr
-foo.f() fr

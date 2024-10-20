@@ -1,5 +1,0 @@
-mf xs = {
-    foo = 69
-} fr
-
-xs.bar fr
