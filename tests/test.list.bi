@@ -1,4 +1,4 @@
-:i count 118
+:i count 119
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -288,6 +288,15 @@ arrays/error_invalid_index_assign.bs:2:4: error: expected array index to be posi
 
 :b stderr 111
 arrays/error_invalid_index_const_assign.bs:2:4: error: expected array index to be positive integer, got string
+
+:b shell 32
+../bin/bs arrays/compare_sort.bs
+:i returncode 0
+:b stdout 80
+["foo", "bar", "lol", "lmao", "foobar"]
+["bar", "foo", "foobar", "lmao", "lol"]
+
+:b stderr 0
 
 :b shell 24
 ../bin/bs tables/main.bs

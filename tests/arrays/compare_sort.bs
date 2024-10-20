@@ -1,0 +1,11 @@
+var xs = [
+    "foo",
+    "bar",
+    "lol",
+    "lmao",
+    "foobar",
+];
+
+io.println(xs);
+xs.sort(fn (a, b) => a.compare(b) == -1);
+io.println(xs);
