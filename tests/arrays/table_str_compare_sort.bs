@@ -10,5 +10,10 @@ var xs = [
 ];
 
 io.println(xs);
-xs.sort(fn (a, b) => a.name < b.name);
+xs.sort(fn (a, b) {
+    io.println("Compare:");
+    io.println("First: \(a)");
+    io.println("Second: \(b)");
+    return a.name < b.name;
+});
 io.println(xs);

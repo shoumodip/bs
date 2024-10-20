@@ -301,7 +301,7 @@ arrays/error_invalid_index_const_assign.bs:2:4: error: expected array index to b
 :b shell 42
 ../bin/bs arrays/table_str_compare_sort.bs
 :i returncode 0
-:b stdout 852
+:b stdout 2289
 [
     {
         isdir = false,
@@ -336,6 +336,141 @@ arrays/error_invalid_index_const_assign.bs:2:4: error: expected array index to b
         name = 7
     }
 ]
+Compare:
+First: {
+    isdir = false,
+    name = 4
+}
+Second: {
+    isdir = false,
+    name = 9
+}
+Compare:
+First: {
+    isdir = false,
+    name = 2
+}
+Second: {
+    isdir = false,
+    name = 3
+}
+Compare:
+First: {
+    isdir = false,
+    name = 4
+}
+Second: {
+    isdir = false,
+    name = 2
+}
+Compare:
+First: {
+    isdir = false,
+    name = 4
+}
+Second: {
+    isdir = false,
+    name = 3
+}
+Compare:
+First: {
+    isdir = true,
+    name = 1
+}
+Second: {
+    isdir = false,
+    name = 5
+}
+Compare:
+First: {
+    isdir = true,
+    name = 10
+}
+Second: {
+    isdir = false,
+    name = 7
+}
+Compare:
+First: {
+    isdir = true,
+    name = 1
+}
+Second: {
+    isdir = false,
+    name = 7
+}
+Compare:
+First: {
+    isdir = false,
+    name = 5
+}
+Second: {
+    isdir = false,
+    name = 7
+}
+Compare:
+First: {
+    isdir = false,
+    name = 2
+}
+Second: {
+    isdir = true,
+    name = 1
+}
+Compare:
+First: {
+    isdir = false,
+    name = 2
+}
+Second: {
+    isdir = false,
+    name = 5
+}
+Compare:
+First: {
+    isdir = false,
+    name = 3
+}
+Second: {
+    isdir = false,
+    name = 5
+}
+Compare:
+First: {
+    isdir = false,
+    name = 4
+}
+Second: {
+    isdir = false,
+    name = 5
+}
+Compare:
+First: {
+    isdir = false,
+    name = 9
+}
+Second: {
+    isdir = false,
+    name = 5
+}
+Compare:
+First: {
+    isdir = false,
+    name = 9
+}
+Second: {
+    isdir = false,
+    name = 7
+}
+Compare:
+First: {
+    isdir = false,
+    name = 9
+}
+Second: {
+    isdir = true,
+    name = 10
+}
 [
     {
         isdir = true,
