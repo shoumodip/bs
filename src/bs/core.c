@@ -1950,6 +1950,16 @@ Bs_Value bs_array_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(src);
 }
 
+Bs_Value bs_array_fill(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+
+    Bs_Array *src = (Bs_Array *)args[-1].as.object;
+    for (size_t i = 0; i < src->count; i++) {
+        src->data[i] = args[0];
+    }
+    return bs_value_object(src);
+}
+
 // Table
 Bs_Value bs_table_copy(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
@@ -2366,6 +2376,8 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("resize"), bs_array_resize);
         bs_builtin_object_methods_add(
             bs, BS_OBJECT_ARRAY, Bs_Sv_Static("reverse"), bs_array_reverse);
+
+        bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("fill"), bs_array_fill);
     }
 
     {

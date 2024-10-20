@@ -243,6 +243,64 @@ in order to get readline bindings and filename autocompletion.
 $ rlwrap -c bs shell.bs # Like so
 ```
 
+## Rule110
+
+An implementation of
+<a href="https://en.wikipedia.org/wiki/Rule_110">Rule110</a>
+for proof of Turing Completeness.
+
+```bs
+# rule110.bs
+
+var board = [].resize(30).fill(0);
+board[len(board) - 2] = 1;
+
+for i in 0, len(board) - 2 {
+    for _, j in board {
+        io.print(if j != 0 then "*" else " ");
+    }
+    io.println();
+
+    var pattern = (board[0] << 1) | board[1];
+    for j in 1, len(board) - 1 {
+        pattern = ((pattern << 1) & 7) | board[j + 1];
+        board[j] = (110 >> pattern) & 1;
+    }
+}
+```
+
+```console
+$ bs rule110.bs
+                            *
+                           **
+                          ***
+                         ** *
+                        *****
+                       **   *
+                      ***  **
+                     ** * ***
+                    ******* *
+                   **     ***
+                  ***    ** *
+                 ** *   *****
+                *****  **   *
+               **   * ***  **
+              ***  **** * ***
+             ** * **  ***** *
+            ******** **   ***
+           **      ****  ** *
+          ***     **  * *****
+         ** *    *** ****   *
+        *****   ** ***  *  **
+       **   *  ***** * ** ***
+      ***  ** **   ******** *
+     ** * ******  **      ***
+    *******    * ***     ** *
+   **     *   **** *    *****
+  ***    **  **  ***   **   *
+ ** *   *** *** ** *  ***  **
+```
+
 ## Game Of Life
 
 An implementation of

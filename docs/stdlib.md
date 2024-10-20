@@ -1326,6 +1326,38 @@ $ bs demo.bs
 [5, 4, 3, 2, 1]
 ```
 
+### array.fill(value) @method
+Fill an array with `value`.
+
+This modifes the array.
+
+```bs
+var xs = [1, 2, 3, 4, 5];
+io.println(xs);
+
+xs.fill(69); # This also returns the array so you can chain operations
+io.println(xs);
+```
+
+```console
+$ bs demo.bs
+[1, 2, 3, 4, 5]
+[69, 69, 69, 69, 69]
+```
+
+This can also be used along with `array.resize()` to quickly create new arrays
+with a preset size and value.
+
+```bs
+var xs = [].resize(5).fill("foo");
+io.println(xs);
+```
+
+```console
+$ bs demo.bs
+["foo", "foo", "foo", "foo", "foo"]
+```
+
 ## Table
 Methods for the builtin table value.
 
