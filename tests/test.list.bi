@@ -1,4 +1,4 @@
-:i count 112
+:i count 113
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -1470,4 +1470,12 @@ Echo stdin!
 Done!
 
 :b stderr 0
+
+:b shell 24
+../bin/bs panic/panic.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 23
+panic/panic.bs:1:1: 69
 

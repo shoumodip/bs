@@ -799,7 +799,7 @@ static bool bs_value_has_builtin_methods(Bs_Value value) {
     }
 }
 
-static bool bs_error_print_before_at(Bs *bs, size_t location) {
+static bool bs_error_print_before_at(Bs *bs, size_t location, bool suppress_error_label) {
     fflush(stdout); // Flush stdout beforehand *just in case*
 
     bs->gc_on = false;
@@ -816,7 +816,9 @@ static bool bs_error_print_before_at(Bs *bs, size_t location) {
         bs_fmt(w, "[C]: ");
     }
 
-    bs_fmt(w, "error: ");
+    if (!suppress_error_label) {
+        bs_fmt(w, "error: ");
+    }
     return printed_location;
 }
 
@@ -896,7 +898,7 @@ static void bs_error_print_after_at(Bs *bs, size_t location, bool printed_locati
 }
 
 void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
-    const bool printed_location = bs_error_print_before_at(bs, location);
+    const bool printed_location = bs_error_print_before_at(bs, location, false);
 
     va_list args;
     va_start(args, fmt);
@@ -991,7 +993,7 @@ void bs_check_multi_at(
         }
     }
 
-    const bool printed_location = bs_error_print_before_at(bs, location);
+    const bool printed_location = bs_error_print_before_at(bs, location, false);
 
     Bs_Writer *w = &bs->config.error;
     if (label) {
@@ -1635,7 +1637,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 64, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 65, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const bool handles_on_save = bs->handles_on;
@@ -2205,6 +2207,17 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Sv sv = bs_buffer_reset(buffer, start);
             bs_stack_set(bs, 1, bs_value_object(bs_str_new(bs, sv)));
             bs->stack.count--;
+        } break;
+
+        case BS_OP_PANIC: {
+            const bool printed_location = bs_error_print_before_at(bs, 0, true);
+
+            const Bs_Value value = bs_stack_peek(bs, 0);
+            bs_value_write(bs, &bs->config.error, value);
+            bs->stack.count--;
+
+            bs_fmt(&bs->config.error, "\n");
+            bs_error_print_after_at(bs, 0, printed_location);
         } break;
 
         case BS_OP_IMPORT:

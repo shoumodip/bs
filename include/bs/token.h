@@ -61,6 +61,7 @@ typedef enum {
 
     BS_TOKEN_LEN,
     BS_TOKEN_JOIN,
+    BS_TOKEN_PANIC,
     BS_TOKEN_DELETE,
     BS_TOKEN_IMPORT,
     BS_TOKEN_TYPEOF,

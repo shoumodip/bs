@@ -15,7 +15,7 @@ typedef enum {
     BS_POWER_DOT,
 } Bs_Power;
 
-static_assert(BS_COUNT_TOKENS == 72, "Update bs_token_type_power()");
+static_assert(BS_COUNT_TOKENS == 73, "Update bs_token_type_power()");
 static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_IN:
@@ -374,7 +374,7 @@ static void bs_compile_assignment(Bs_Compiler *c, const Bs_Token *token, Bs_Op a
     }
 }
 
-static_assert(BS_COUNT_TOKENS == 72, "Update bs_compile_expr()");
+static_assert(BS_COUNT_TOKENS == 73, "Update bs_compile_expr()");
 static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
     Bs_Loc loc = token.loc;
@@ -501,6 +501,24 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         bs_lexer_expect(&c->lexer, BS_TOKEN_RPAREN);
 
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_LEN);
+        bs_chunk_push_op_loc(c->bs, c->chunk, loc);
+        break;
+
+    case BS_TOKEN_PANIC:
+        bs_lexer_expect(&c->lexer, BS_TOKEN_LPAREN);
+
+        if (bs_lexer_read(&c->lexer, BS_TOKEN_RPAREN)) {
+            bs_chunk_push_op_value(
+                c->bs,
+                c->chunk,
+                BS_OP_CONST,
+                bs_value_object(bs_str_new(c->bs, Bs_Sv_Static("Panic"))));
+        } else {
+            bs_compile_expr(c, BS_POWER_SET);
+            bs_lexer_expect(&c->lexer, BS_TOKEN_RPAREN);
+        }
+
+        bs_chunk_push_op(c->bs, c->chunk, BS_OP_PANIC);
         bs_chunk_push_op_loc(c->bs, c->chunk, loc);
         break;
 
@@ -1192,7 +1210,7 @@ static void bs_compile_jumps_reset(Bs_Compiler *c, Bs_Jumps save) {
     c->jumps.start = save.start;
 }
 
-static_assert(BS_COUNT_TOKENS == 72, "Update bs_compile_stmt()");
+static_assert(BS_COUNT_TOKENS == 73, "Update bs_compile_stmt()");
 static void bs_compile_stmt(Bs_Compiler *c) {
     Bs_Token token = bs_lexer_next(&c->lexer);
 

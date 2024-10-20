@@ -989,6 +989,27 @@ class Lol {
 }
 ```
 
+## Panic
+```bs
+panic();
+```
+
+```console
+$ bs panic.bs
+panic/panic.bs:1:1: Panic
+```
+
+An optional message can also be provided.
+
+```bs
+panic("TODO");
+```
+
+```console
+$ bs panic.bs
+panic/panic.bs:1:1: TODO
+```
+
 ## FFI
 BS supports loading of native modules at runtime.
 

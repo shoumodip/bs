@@ -32,6 +32,7 @@ static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type) {
         return BSDOC_STYLE_COMMENT;
 
     case BS_TOKEN_LEN:
+    case BS_TOKEN_PANIC:
     case BS_TOKEN_IMPORT:
     case BS_TOKEN_TYPEOF:
     case BS_TOKEN_DELETE:

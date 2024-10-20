@@ -110,3 +110,4 @@
 ../bin/bs core/os_process_capture_stdout.bs
 ../bin/bs core/os_process_capture_stderr.bs
 ../bin/bs core/os_process_capture_stdin.bs
+../bin/bs panic/panic.bs
