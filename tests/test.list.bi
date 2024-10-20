@@ -301,73 +301,73 @@ arrays/error_invalid_index_const_assign.bs:2:4: error: expected array index to b
 :b shell 42
 ../bin/bs arrays/table_str_compare_sort.bs
 :i returncode 0
-:b stdout 956
+:b stdout 852
 [
     {
         isdir = false,
-        name = "typeof"
+        name = 4
     },
     {
         isdir = false,
-        name = "strings"
+        name = 9
     },
     {
         isdir = false,
-        name = "executables"
+        name = 2
     },
     {
         isdir = false,
-        name = "assert"
+        name = 3
     },
     {
         isdir = true,
-        name = "foo"
+        name = 1
     },
     {
         isdir = false,
-        name = "bar"
+        name = 5
     },
     {
         isdir = true,
-        name = "lol"
+        name = 10
     },
     {
         isdir = false,
-        name = "foobar"
+        name = 7
     }
 ]
 [
     {
-        isdir = false,
-        name = "assert"
+        isdir = true,
+        name = 1
     },
     {
         isdir = false,
-        name = "bar"
+        name = 2
     },
     {
         isdir = false,
-        name = "executables"
+        name = 3
+    },
+    {
+        isdir = false,
+        name = 4
+    },
+    {
+        isdir = false,
+        name = 5
+    },
+    {
+        isdir = false,
+        name = 7
+    },
+    {
+        isdir = false,
+        name = 9
     },
     {
         isdir = true,
-        name = "foo"
-    },
-    {
-        isdir = false,
-        name = "foobar"
-    },
-    {
-        isdir = true,
-        name = "lol"
-    },
-    {
-        isdir = false,
-        name = "strings"
-    },
-    {
-        isdir = false,
-        name = "typeof"
+        name = 10
     }
 ]
 
