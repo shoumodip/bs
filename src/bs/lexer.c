@@ -107,7 +107,7 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc) {
     return token;
 }
 
-static_assert(BS_COUNT_TOKENS == 73, "Update bs_lexer_next()");
+static_assert(BS_COUNT_TOKENS == 74, "Update bs_lexer_next()");
 Bs_Token bs_lexer_next(Bs_Lexer *l) {
     if (l->peeked) {
         l->peeked = false;
@@ -211,6 +211,8 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
             token.type = BS_TOKEN_LEN;
         } else if (bs_sv_eq(token.sv, Bs_Sv_Static("panic"))) {
             token.type = BS_TOKEN_PANIC;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("assert"))) {
+            token.type = BS_TOKEN_ASSERT;
         } else if (bs_sv_eq(token.sv, Bs_Sv_Static("delete"))) {
             token.type = BS_TOKEN_DELETE;
         } else if (bs_sv_eq(token.sv, Bs_Sv_Static("import"))) {

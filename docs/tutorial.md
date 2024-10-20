@@ -1010,6 +1010,29 @@ $ bs panic.bs
 panic/panic.bs:1:1: TODO
 ```
 
+## Assert
+```bs
+assert(true);
+assert(false);
+```
+
+```console
+$ bs assert.bs
+assert.bs:2:1: assertion failed
+```
+
+An optional message can also be provided.
+
+```bs
+assert(true, "Ligma");
+assert(false, "Ligma");
+```
+
+```console
+$ bs assert.bs
+assert.bs:2:1: Ligma
+```
+
 ## FFI
 BS supports loading of native modules at runtime.
 

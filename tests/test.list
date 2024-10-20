@@ -111,3 +111,6 @@
 ../bin/bs core/os_process_capture_stderr.bs
 ../bin/bs core/os_process_capture_stdin.bs
 ../bin/bs panic/panic.bs
+../bin/bs panic/with_message.bs
+../bin/bs assert/assert.bs
+../bin/bs assert/with_message.bs

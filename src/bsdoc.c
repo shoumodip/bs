@@ -33,6 +33,7 @@ static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type) {
 
     case BS_TOKEN_LEN:
     case BS_TOKEN_PANIC:
+    case BS_TOKEN_ASSERT:
     case BS_TOKEN_IMPORT:
     case BS_TOKEN_TYPEOF:
     case BS_TOKEN_DELETE:

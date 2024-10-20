@@ -1,0 +1,2 @@
+assert(true, "Ligma");
+assert(false, "Ligma");

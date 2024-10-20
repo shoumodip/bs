@@ -1,4 +1,4 @@
-:i count 113
+:i count 116
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -1476,6 +1476,30 @@ Done!
 :i returncode 1
 :b stdout 0
 
-:b stderr 23
-panic/panic.bs:1:1: 69
+:b stderr 26
+panic/panic.bs:1:1: panic
+
+:b shell 31
+../bin/bs panic/with_message.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 32
+panic/with_message.bs:1:1: Here
+
+:b shell 26
+../bin/bs assert/assert.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 39
+assert/assert.bs:2:1: assertion failed
+
+:b shell 32
+../bin/bs assert/with_message.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 34
+assert/with_message.bs:2:1: Ligma
 

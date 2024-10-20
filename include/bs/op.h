@@ -53,6 +53,7 @@ typedef enum {
     BS_OP_LEN,
     BS_OP_JOIN,
     BS_OP_PANIC,
+    BS_OP_ASSERT,
     BS_OP_IMPORT,
     BS_OP_TYPEOF,
 
