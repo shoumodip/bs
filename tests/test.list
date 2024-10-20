@@ -114,3 +114,4 @@
 ../bin/bs panic/with_message.bs
 ../bin/bs assert/assert.bs
 ../bin/bs assert/with_message.bs
+../bin/bs core/readdir.bs

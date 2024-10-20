@@ -1,4 +1,4 @@
-:i count 116
+:i count 117
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -1502,4 +1502,38 @@ assert/assert.bs:2:1: assertion failed
 
 :b stderr 34
 assert/with_message.bs:2:1: Ligma
+
+:b shell 25
+../bin/bs core/readdir.bs
+:i returncode 0
+:b stdout 358
+arithmetics DIR
+arrays DIR
+assert DIR
+assignment DIR
+builtin_methods DIR
+closures DIR
+comparisons DIR
+conditions DIR
+containers DIR
+core DIR
+delete DIR
+executables DIR
+ffi DIR
+functions DIR
+import DIR
+invokation DIR
+loops DIR
+oop DIR
+panic DIR
+pretty_printing DIR
+rere.py FILE
+strings DIR
+tables DIR
+test.list FILE
+test.list.bi FILE
+typeof DIR
+variables DIR
+
+:b stderr 0
 

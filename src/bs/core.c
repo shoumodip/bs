@@ -14,7 +14,9 @@
 
 #    define FD_OPEN _fdopen
 #else
+#    include <dirent.h>
 #    include <signal.h>
+#    include <sys/stat.h>
 #    include <sys/wait.h>
 #    include <unistd.h>
 
@@ -255,6 +257,45 @@ Bs_Value bs_io_writer_writeln(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_bool(!ferror(f->file));
 }
 
+// DirEntry
+typedef struct {
+    Bs_Str *name;
+    bool isdir;
+} Bs_Dir_Entry;
+
+Bs_C_Class *bs_io_direntry_class;
+
+void bs_io_direntry_mark(Bs *bs, void *instance_data) {
+    Bs_Dir_Entry *e = &bs_static_cast(instance_data, Bs_Dir_Entry);
+    bs_mark(bs, (Bs_Object *)e->name);
+}
+
+Bs_Value bs_io_direntry_init(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 2);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    bs_arg_check_value_type(bs, args, 1, BS_VALUE_BOOL);
+
+    Bs_Dir_Entry *e = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Dir_Entry);
+    e->name = (Bs_Str *)args[0].as.object;
+    e->isdir = args[1].as.boolean;
+    return bs_value_nil;
+}
+
+Bs_Value bs_io_direntry_name(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+
+    Bs_Dir_Entry *e = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Dir_Entry);
+    return bs_value_object(e->name);
+}
+
+Bs_Value bs_io_direntry_isdir(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+
+    Bs_Dir_Entry *e = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Dir_Entry);
+    return bs_value_bool(e->isdir);
+}
+
+// IO Functions
 Bs_Value bs_io_input(Bs *bs, Bs_Value *args, size_t arity) {
     if (arity > 1) {
         bs_error(bs, "expected 0 or 1 arguments, got %zu", arity);
@@ -324,6 +365,69 @@ Bs_Value bs_io_eprintln(Bs *bs, Bs_Value *args, size_t arity) {
     }
     bs_fmt(&w, "\n");
     return bs_value_nil;
+}
+
+Bs_Value bs_io_readdir(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Str *path = (const Bs_Str *)args[0].as.object;
+    Bs_Array *a = bs_array_new(bs);
+
+#ifdef _WIN32
+    char searchPath[MAX_PATH];
+    snprintf(searchPath, sizeof(searchPath), "%s\\*", path->data);
+
+    WIN32_FIND_DATA findFileData;
+    HANDLE hFind = FindFirstFile(searchPath, &findFileData);
+    do {
+        if (hFind == INVALID_HANDLE_VALUE) {
+            return bs_value_nil;
+        }
+
+        if (strcmp(findFileData.cFileName, ".") == 0 || strcmp(findFileData.cFileName, "..") == 0) {
+            continue;
+        }
+
+        Bs_C_Instance *instance = bs_c_instance_new(bs, bs_io_direntry_class);
+
+        Bs_Dir_Entry *e = &bs_static_cast(instance->data, Bs_Dir_Entry);
+        e->name = bs_str_new(bs, bs_sv_from_cstr(findFileData.cFileName));
+        e->isdir = (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+        bs_array_set(bs, a, a->count, bs_value_object(instance));
+    } while (FindNextFile(hFind, &findFileData) != 0);
+
+    FindClose(hFind);
+#else
+    DIR *dir = opendir(path->data);
+    if (!dir) {
+        return bs_value_nil;
+    }
+
+    errno = 0;
+    struct dirent *entry = NULL;
+    while ((entry = readdir(dir))) {
+        if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")) {
+            continue;
+        }
+
+        Bs_C_Instance *instance = bs_c_instance_new(bs, bs_io_direntry_class);
+
+        Bs_Dir_Entry *e = &bs_static_cast(instance->data, Bs_Dir_Entry);
+        e->name = bs_str_new(bs, bs_sv_from_cstr(entry->d_name));
+        e->isdir = entry->d_type == DT_DIR;
+        bs_array_set(bs, a, a->count, bs_value_object(instance));
+    }
+
+    if (errno) {
+        closedir(dir);
+        return bs_value_nil;
+    }
+
+    closedir(dir);
+#endif
+
+    return bs_value_object(a);
 }
 
 // OS
@@ -1146,6 +1250,29 @@ Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
 
         return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
     }
+}
+
+Bs_Value bs_str_compare(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Str *this = (const Bs_Str *)args[-1].as.object;
+    const Bs_Str *that = (const Bs_Str *)args[0].as.object;
+
+    const size_t min = bs_min(this->size, that->size);
+    for (size_t i = 0; i < min; i++) {
+        if (this->data[i] != that->data[i]) {
+            return bs_value_num((this->data[i] < that->data[i]) ? -1 : 1);
+        }
+    }
+
+    if (this->size < that->size) {
+        return bs_value_num(-1);
+    } else if (this->size > that->size) {
+        return bs_value_num(1);
+    }
+
+    return bs_value_num(0);
 }
 
 Bs_Value bs_str_trim(Bs *bs, Bs_Value *args, size_t arity) {
@@ -2064,9 +2191,18 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_c_class_add(bs, bs_io_writer_class, Bs_Sv_Static("write"), bs_io_writer_write);
         bs_c_class_add(bs, bs_io_writer_class, Bs_Sv_Static("writeln"), bs_io_writer_writeln);
 
+        bs_io_direntry_class =
+            bs_c_class_new(bs, Bs_Sv_Static("DirEntry"), sizeof(Bs_Dir_Entry), bs_io_direntry_init);
+
+        bs_io_direntry_class->mark = bs_io_direntry_mark;
+
+        bs_c_class_add(bs, bs_io_direntry_class, Bs_Sv_Static("name"), bs_io_direntry_name);
+        bs_c_class_add(bs, bs_io_direntry_class, Bs_Sv_Static("isdir"), bs_io_direntry_isdir);
+
         Bs_Table *io = bs_table_new(bs);
         bs_add(bs, io, "Reader", bs_value_object(bs_io_reader_class));
         bs_add(bs, io, "Writer", bs_value_object(bs_io_writer_class));
+        bs_add(bs, io, "DirEntry", bs_value_object(bs_io_direntry_class));
 
         bs_add_fn(bs, io, "input", bs_io_input);
 
@@ -2075,6 +2211,8 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
 
         bs_add_fn(bs, io, "println", bs_io_println);
         bs_add_fn(bs, io, "eprintln", bs_io_eprintln);
+
+        bs_add_fn(bs, io, "readdir", bs_io_readdir);
 
         {
             Bs_C_Instance *io_stdin = bs_c_instance_new(bs, bs_io_reader_class);
@@ -2157,6 +2295,8 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_builtin_object_methods_add(bs, BS_OBJECT_STR, Bs_Sv_Static("find"), bs_str_find);
         bs_builtin_object_methods_add(bs, BS_OBJECT_STR, Bs_Sv_Static("split"), bs_str_split);
         bs_builtin_object_methods_add(bs, BS_OBJECT_STR, Bs_Sv_Static("replace"), bs_str_replace);
+
+        bs_builtin_object_methods_add(bs, BS_OBJECT_STR, Bs_Sv_Static("compare"), bs_str_compare);
 
         bs_builtin_object_methods_add(bs, BS_OBJECT_STR, Bs_Sv_Static("trim"), bs_str_trim);
         bs_builtin_object_methods_add(bs, BS_OBJECT_STR, Bs_Sv_Static("ltrim"), bs_str_ltrim);
