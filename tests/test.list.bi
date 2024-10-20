@@ -1,4 +1,4 @@
-:i count 119
+:i count 120
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -295,6 +295,81 @@ arrays/error_invalid_index_const_assign.bs:2:4: error: expected array index to b
 :b stdout 80
 ["foo", "bar", "lol", "lmao", "foobar"]
 ["bar", "foo", "foobar", "lmao", "lol"]
+
+:b stderr 0
+
+:b shell 42
+../bin/bs arrays/table_str_compare_sort.bs
+:i returncode 0
+:b stdout 956
+[
+    {
+        isdir = false,
+        name = "typeof"
+    },
+    {
+        isdir = false,
+        name = "strings"
+    },
+    {
+        isdir = false,
+        name = "executables"
+    },
+    {
+        isdir = false,
+        name = "assert"
+    },
+    {
+        isdir = true,
+        name = "foo"
+    },
+    {
+        isdir = false,
+        name = "bar"
+    },
+    {
+        isdir = true,
+        name = "lol"
+    },
+    {
+        isdir = false,
+        name = "foobar"
+    }
+]
+[
+    {
+        isdir = false,
+        name = "assert"
+    },
+    {
+        isdir = false,
+        name = "bar"
+    },
+    {
+        isdir = false,
+        name = "executables"
+    },
+    {
+        isdir = true,
+        name = "foo"
+    },
+    {
+        isdir = false,
+        name = "foobar"
+    },
+    {
+        isdir = true,
+        name = "lol"
+    },
+    {
+        isdir = false,
+        name = "strings"
+    },
+    {
+        isdir = false,
+        name = "typeof"
+    }
+]
 
 :b stderr 0
 

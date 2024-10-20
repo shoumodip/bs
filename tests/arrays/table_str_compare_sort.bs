@@ -1,0 +1,14 @@
+var xs = [
+    { name = "typeof", isdir = false },
+    { name = "strings", isdir = false },
+    { name = "executables", isdir = false },
+    { name = "assert", isdir = false },
+    { name = "foo", isdir = true },
+    { name = "bar", isdir = false },
+    { name = "lol", isdir = true },
+    { name = "foobar", isdir = false },
+];
+
+io.println(xs);
+xs.sort(fn (a, b) => a.name.compare(b.name) == -1);
+io.println(xs);

@@ -20,6 +20,7 @@
 ../bin/bs arrays/error_invalid_index_assign.bs
 ../bin/bs arrays/error_invalid_index_const_assign.bs
 ../bin/bs arrays/compare_sort.bs
+../bin/bs arrays/table_str_compare_sort.bs
 ../bin/bs tables/main.bs
 ../bin/bs tables/error_invalid_key.bs
 ../bin/bs tables/error_invalid_key_assign.bs
