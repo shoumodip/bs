@@ -2231,7 +2231,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 bs_fmt(&bs->config.error, "\n");
                 bs_error_print_after_at(bs, 0, printed_location);
             } else {
-                bs->stack.count -= 2;
+                bs->stack.count--;
             }
         } break;
 

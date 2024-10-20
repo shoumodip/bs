@@ -1033,6 +1033,18 @@ $ bs assert.bs
 assert.bs:2:1: Ligma
 ```
 
+Assert returns the value being checked.
+
+```bs
+var x = assert(69, "Ligma");
+io.println(x);
+```
+
+```console
+$ bs assert.bs
+69
+```
+
 ## FFI
 BS supports loading of native modules at runtime.
 
