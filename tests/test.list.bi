@@ -301,7 +301,7 @@ arrays/error_invalid_index_const_assign.bs:2:4: error: expected array index to b
 :b shell 42
 ../bin/bs arrays/table_str_compare_sort.bs
 :i returncode 0
-:b stdout 1100
+:b stdout 852
 [
     {
         isdir = false,
@@ -336,21 +336,6 @@ arrays/error_invalid_index_const_assign.bs:2:4: error: expected array index to b
         name = 7
     }
 ]
-(4 < 9) => true
-(2 < 3) => true
-(4 < 2) => false
-(4 < 3) => false
-(1 < 5) => true
-(10 < 7) => false
-(1 < 7) => true
-(5 < 7) => true
-(2 < 1) => false
-(2 < 5) => true
-(3 < 5) => true
-(4 < 5) => true
-(9 < 5) => false
-(9 < 7) => false
-(9 < 10) => true
 [
     {
         isdir = true,

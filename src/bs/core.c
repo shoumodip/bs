@@ -25,6 +25,7 @@
 
 #include "bs/core.h"
 #include "bs/object.h"
+
 #include "bs/regex.h"
 
 // IO
@@ -1884,25 +1885,36 @@ Bs_Value bs_array_insert(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-typedef struct {
-    Bs *bs;
-    Bs_Value fn;
-} Bs_Array_Sort_Context;
+static inline void bs_quicksort_swap(Bs_Value *a, Bs_Value *b) {
+    const Bs_Value t = *a;
+    *a = *b;
+    *b = t;
+}
 
-int bs_array_sort_compare(const void *a, const void *b) {
-    static Bs_Array_Sort_Context context;
-    if (!a) {
-        context = *(const Bs_Array_Sort_Context *)b;
-        return 0;
+static inline void bs_quicksort(Bs *bs, Bs_Value *data, size_t count, Bs_Value fn) {
+    if (count < 2) {
+        return;
     }
 
-    const Bs_Value args[] = {
-        *(const Bs_Value *)a,
-        *(const Bs_Value *)b,
-    };
+    Bs_Value *pivot = &data[count - 1];
+    size_t i = 0;
 
-    const Bs_Value output = bs_call(context.bs, context.fn, args, bs_c_array_size(args));
-    return 1 - !bs_value_is_falsey(output);
+    for (size_t j = 0; j < count - 1; j++) {
+        Bs_Value *current = &data[j];
+
+        const Bs_Value args[] = {*current, *pivot};
+        const Bs_Value output = bs_call(bs, fn, args, bs_c_array_size(args));
+
+        if (!bs_value_is_falsey(output)) {
+            bs_quicksort_swap(&data[i], current);
+            i++;
+        }
+    }
+
+    bs_quicksort_swap(&data[i], pivot);
+
+    bs_quicksort(bs, data, i, fn);
+    bs_quicksort(bs, &data[i + 1], count - i - 1, fn);
 }
 
 Bs_Value bs_array_sort(Bs *bs, Bs_Value *args, size_t arity) {
@@ -1912,14 +1924,7 @@ Bs_Value bs_array_sort(Bs *bs, Bs_Value *args, size_t arity) {
     Bs_Array *src = (Bs_Array *)args[-1].as.object;
     const Bs_Value fn = args[0];
 
-    // Prepare the context
-    const Bs_Array_Sort_Context context = {
-        .bs = bs,
-        .fn = fn,
-    };
-    bs_array_sort_compare(NULL, &context);
-
-    qsort(src->data, src->count, sizeof(*src->data), bs_array_sort_compare);
+    bs_quicksort(bs, src->data, src->count, fn);
     return bs_value_object(src);
 }
 
