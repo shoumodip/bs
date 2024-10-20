@@ -5,7 +5,7 @@ entries = entries.map(fn (e) => {
     type = if e.isdir() then "DIR" else "FILE",
 });
 
-entries.sort(fn (a, b) => a.name.compare(b.name) <= 0);
+entries.sort(fn (a, b) => a.name.compare(b.name) == -1);
 
 for _, e in entries {
     io.println(e.name, e.type);

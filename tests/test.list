@@ -8,6 +8,7 @@
 ../bin/bs conditions/main.bs
 ../bin/bs strings/main.bs
 ../bin/bs strings/error_invalid_addition.bs
+../bin/bs strings/compare.bs
 ../bin/bs variables/local.bs
 ../bin/bs variables/global_use.bs
 ../bin/bs variables/error_undefined.bs

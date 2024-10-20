@@ -1,4 +1,4 @@
-:i count 117
+:i count 118
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -173,6 +173,18 @@ Use (++) for string concatenation, or use string interpolation instead
 "Hello, " ++ 69;
 "Hello, \(34 + 35) nice!";
 ```
+
+:b shell 28
+../bin/bs strings/compare.bs
+:i returncode 0
+:b stdout 12
+1
+-1
+0
+-1
+1
+
+:b stderr 0
 
 :b shell 28
 ../bin/bs variables/local.bs
