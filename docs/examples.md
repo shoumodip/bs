@@ -122,12 +122,20 @@ grep.bs:38:15:     var f = io.Reader(path);
 grep.bs:40:11:         io.println("Error: could not open file '\(path)'");
 grep.bs:48:3: os.exit(code);
 
-$ bs cat.bs cat.bs | bs grep.bs '\.[A-z]+\(' # DON'T CAT INTO GREP!!!
-<stdin>:5:15:     var f = io.Reader(path);
-<stdin>:7:11:         io.eprintln("Error: could not read file '\(path)'");
-<stdin>:12:7:     io.print(f.read());
-<stdin>:14:6:     f.close();
-<stdin>:17:3: os.exit(code);
+$ cat grep.bs | bs grep.bs '\.[A-z]+\(' # DON'T CAT INTO GREP!!!
+<stdin>:3:13:     while !f.eof() {
+<stdin>:4:21:         var line = f.readln();
+<stdin>:6:23:         var col = line.find(pattern);
+<stdin>:8:15:             io.println("\(path):\(row + 1):\(col + 1): \(line)");
+<stdin>:16:7:     io.eprintln("Usage: \(os.args[0]) <pattern> [file...]");
+<stdin>:17:7:     io.eprintln("Error: pattern not provided");
+<stdin>:18:7:     os.exit(1);
+<stdin>:23:7:     io.eprintln("Error: invalid pattern");
+<stdin>:24:7:     os.exit(1);
+<stdin>:36:15:     var f = io.Reader(path);
+<stdin>:38:11:         io.println("Error: could not open file '\(path)'");
+<stdin>:44:6:     f.close();
+<stdin>:47:3: os.exit(code);
 ```
 
 ## Shell
@@ -530,6 +538,12 @@ Bs_Value rl_is_mouse_button_released(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_bool(IsMouseButtonReleased(args[0].as.number));
 }
 
+Bs_Value rl_is_key_pressed(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_whole_number(bs, args, 0);
+    return bs_value_bool(IsKeyPressed(args[0].as.number));
+}
+
 Bs_Value rl_measure_text(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
@@ -560,6 +574,7 @@ BS_LIBRARY_INIT void bs_library_init(Bs *bs, Bs_C_Lib *library) {
         {"get_mouse_x", rl_get_mouse_x},
         {"get_mouse_y", rl_get_mouse_y},
         {"is_mouse_button_released", rl_is_mouse_button_released},
+        {"is_key_pressed", rl_is_key_pressed},
         {"measure_text", rl_measure_text},
     };
     bs_c_lib_ffi(bs, library, ffi, bs_c_array_size(ffi));
@@ -579,8 +594,6 @@ $ cc -o raylib.dylib -fPIC -shared raylib.c -lbs -lraylib # On macOS
 $ cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib        # On Windows
 ```
 
-Load it from BS.
-
 ```bs
 # game_of_life_raylib.bs
 
@@ -592,7 +605,7 @@ var BACKGROUND = 0x282828FF;
 var FOREGROUND = 0x89B482FF;
 
 var INTERVAL = 0.1;
-var FONT_SIZE = 40;
+var FONT_SIZE = 30;
 
 var width = 800;
 var height = 600;
@@ -605,6 +618,7 @@ class GameOfLifeRaylib < GameOfLife {
     init(width, height) {
         super.init(width, height);
         this.clock = 0;
+        this.paused = false;
     }
 
     show() {
@@ -621,36 +635,36 @@ class GameOfLifeRaylib < GameOfLife {
         rl.draw_rectangle(
             padding_x,
             padding_y,
-            (this.width * cell_size),
-            (this.height * cell_size),
+            this.width * cell_size,
+            this.height * cell_size,
             BACKGROUND);
 
         {
-            var label = "Click to spawn glider";
+            var label = "Click to toggle cell, Space to play/pause";
             rl.draw_text(
                 label,
                 (width - rl.measure_text(label, FONT_SIZE)) / 2,
-                (this.height * cell_size + FONT_SIZE * 0.1),
+                this.height * cell_size + FONT_SIZE * 0.1,
                 FONT_SIZE,
                 FOREGROUND);
         }
 
         for i in 0, this.width + 1 {
-            var x = (padding_x + i * cell_size);
-            rl.draw_line(x, 0, x, (this.height * cell_size), GRID);
+            var x = padding_x + i * cell_size;
+            rl.draw_line(x, 0, x, this.height * cell_size, GRID);
         }
 
         for i in 0, this.height + 1 {
-            var y = (padding_y + i * cell_size);
-            rl.draw_line(padding_x, y, (padding_x + this.width * cell_size), y, GRID);
+            var y = padding_y + i * cell_size;
+            rl.draw_line(padding_x, y, padding_x + this.width * cell_size, y, GRID);
         }
 
         for y in 0, this.height {
             for x in 0, this.width {
                 if this.get(x, y) {
                     rl.draw_rectangle(
-                        (padding_x + x * cell_size),
-                        (padding_y + y * cell_size),
+                        padding_x + x * cell_size,
+                        padding_y + y * cell_size,
                         cell_size,
                         cell_size,
                         FOREGROUND);
@@ -673,16 +687,22 @@ while !rl.window_should_close() {
 
     gol.show();
 
-    gol.clock += rl.get_frame_time();
-    if gol.clock >= INTERVAL {
-        gol.clock = 0;
-        gol.step();
+    if !gol.paused {
+        gol.clock += rl.get_frame_time();
+        if gol.clock >= INTERVAL {
+            gol.clock = 0;
+            gol.step();
+        }
+    }
+
+    if rl.is_key_pressed(ascii.code(" ")) {
+        gol.paused = !gol.paused;
     }
 
     if rl.is_mouse_button_released(rl.MOUSE_BUTTON_LEFT) {
-        var x = ((rl.get_mouse_x() - padding_x) / cell_size).round();
-        var y = ((rl.get_mouse_y() - padding_y) / cell_size).round();
-        gol.glider(x, y);
+        var x = ((rl.get_mouse_x() - padding_x) / cell_size).floor();
+        var y = ((rl.get_mouse_y() - padding_y) / cell_size).floor();
+        gol.set(x, y, !gol.get(x, y));
     }
 
     rl.end_drawing();

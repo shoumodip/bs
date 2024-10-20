@@ -194,12 +194,20 @@ grep.bs:38:15:     var f = io.Reader(path);
 grep.bs:40:11:         io.println("Error: could not open file '\(path)'");
 grep.bs:48:3: os.exit(code);
 
-<span class='constant'>$ </span>bs cat.bs cat.bs | bs grep.bs '\.[A-z]+\(' <span class='comment'># DON'T CAT INTO GREP!!!</span>
-&lt;stdin&gt;:5:15:     var f = io.Reader(path);
-&lt;stdin&gt;:7:11:         io.eprintln("Error: could not read file '\(path)'");
-&lt;stdin&gt;:12:7:     io.print(f.read());
-&lt;stdin&gt;:14:6:     f.close();
-&lt;stdin&gt;:17:3: os.exit(code);
+<span class='constant'>$ </span>cat grep.bs | bs grep.bs '\.[A-z]+\(' <span class='comment'># DON'T CAT INTO GREP!!!</span>
+&lt;stdin&gt;:3:13:     while !f.eof() {
+&lt;stdin&gt;:4:21:         var line = f.readln();
+&lt;stdin&gt;:6:23:         var col = line.find(pattern);
+&lt;stdin&gt;:8:15:             io.println("\(path):\(row + 1):\(col + 1): \(line)");
+&lt;stdin&gt;:16:7:     io.eprintln("Usage: \(os.args[0]) &lt;pattern&gt; [file...]");
+&lt;stdin&gt;:17:7:     io.eprintln("Error: pattern not provided");
+&lt;stdin&gt;:18:7:     os.exit(1);
+&lt;stdin&gt;:23:7:     io.eprintln("Error: invalid pattern");
+&lt;stdin&gt;:24:7:     os.exit(1);
+&lt;stdin&gt;:36:15:     var f = io.Reader(path);
+&lt;stdin&gt;:38:11:         io.println("Error: could not open file '\(path)'");
+&lt;stdin&gt;:44:6:     f.close();
+&lt;stdin&gt;:47:3: os.exit(code);
 </pre>
 </div>
 </section>
@@ -705,6 +713,12 @@ Run the program.
     <span class='keyword'>return</span> <span class='function'>bs_value_bool</span>(IsMouseButtonReleased(args[<span class='constant'>0</span>].as.number));
 }
 
+<span class='class'>Bs_Value</span> rl_is_key_pressed(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
+    <span class='keyword'>return</span> <span class='function'>bs_value_bool</span>(IsKeyPressed(args[<span class='constant'>0</span>].as.number));
+}
+
 <span class='class'>Bs_Value</span> rl_measure_text(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>2</span>);
     <span class='function'>bs_arg_check_object_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_OBJECT_STR</span>);
@@ -735,6 +749,7 @@ Run the program.
         {<span class='string'>"get_mouse_x"</span>, rl_get_mouse_x},
         {<span class='string'>"get_mouse_y"</span>, rl_get_mouse_y},
         {<span class='string'>"is_mouse_button_released"</span>, rl_is_mouse_button_released},
+        {<span class='string'>"is_key_pressed"</span>, rl_is_key_pressed},
         {<span class='string'>"measure_text"</span>, rl_measure_text},
     };
     <span class='function'>bs_c_lib_ffi</span>(bs, library, ffi, <span class='function'>bs_c_array_size</span>(ffi));
@@ -766,9 +781,6 @@ Compile the raylib module.
 <span class='constant'>$ </span>cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib        <span class='comment'># On Windows</span>
 </pre>
 </div>
-<p>
-Load it from BS.
-</p>
 <div>
 <div class='tabs'>
 <button class='tab active' onclick='tabClick(this)'>BS</button>
@@ -796,7 +808,7 @@ Load it from BS.
 <span class='keyword'>var</span> FOREGROUND = <span class='constant'>0x89B482FF</span>;
 
 <span class='keyword'>var</span> INTERVAL = <span class='constant'>0.1</span>;
-<span class='keyword'>var</span> FONT_SIZE = <span class='constant'>40</span>;
+<span class='keyword'>var</span> FONT_SIZE = <span class='constant'>30</span>;
 
 <span class='keyword'>var</span> width = <span class='constant'>800</span>;
 <span class='keyword'>var</span> height = <span class='constant'>600</span>;
@@ -809,6 +821,7 @@ Load it from BS.
     init(width, height) {
         <span class='constant'>super</span>.<span class='field'>init</span>(width, height);
         <span class='constant'>this</span>.<span class='field'>clock</span> = <span class='constant'>0</span>;
+        <span class='constant'>this</span>.<span class='field'>paused</span> = <span class='constant'>false</span>;
     }
 
     show() {
@@ -825,36 +838,36 @@ Load it from BS.
         rl.<span class='field'>draw_rectangle</span>(
             padding_x,
             padding_y,
-            (<span class='constant'>this</span>.<span class='field'>width</span> * cell_size),
-            (<span class='constant'>this</span>.<span class='field'>height</span> * cell_size),
+            <span class='constant'>this</span>.<span class='field'>width</span> * cell_size,
+            <span class='constant'>this</span>.<span class='field'>height</span> * cell_size,
             BACKGROUND);
 
         {
-            <span class='keyword'>var</span> label = <span class='string'>"Click to spawn glider"</span>;
+            <span class='keyword'>var</span> label = <span class='string'>"Click to toggle cell, Space to play/pause"</span>;
             rl.<span class='field'>draw_text</span>(
                 label,
                 (width - rl.<span class='field'>measure_text</span>(label, FONT_SIZE)) / <span class='constant'>2</span>,
-                (<span class='constant'>this</span>.<span class='field'>height</span> * cell_size + FONT_SIZE * <span class='constant'>0.1</span>),
+                <span class='constant'>this</span>.<span class='field'>height</span> * cell_size + FONT_SIZE * <span class='constant'>0.1</span>,
                 FONT_SIZE,
                 FOREGROUND);
         }
 
         <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>this</span>.<span class='field'>width</span> + <span class='constant'>1</span> {
-            <span class='keyword'>var</span> x = (padding_x + i * cell_size);
-            rl.<span class='field'>draw_line</span>(x, <span class='constant'>0</span>, x, (<span class='constant'>this</span>.<span class='field'>height</span> * cell_size), GRID);
+            <span class='keyword'>var</span> x = padding_x + i * cell_size;
+            rl.<span class='field'>draw_line</span>(x, <span class='constant'>0</span>, x, <span class='constant'>this</span>.<span class='field'>height</span> * cell_size, GRID);
         }
 
         <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>this</span>.<span class='field'>height</span> + <span class='constant'>1</span> {
-            <span class='keyword'>var</span> y = (padding_y + i * cell_size);
-            rl.<span class='field'>draw_line</span>(padding_x, y, (padding_x + <span class='constant'>this</span>.<span class='field'>width</span> * cell_size), y, GRID);
+            <span class='keyword'>var</span> y = padding_y + i * cell_size;
+            rl.<span class='field'>draw_line</span>(padding_x, y, padding_x + <span class='constant'>this</span>.<span class='field'>width</span> * cell_size, y, GRID);
         }
 
         <span class='keyword'>for</span> y <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>this</span>.<span class='field'>height</span> {
             <span class='keyword'>for</span> x <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>this</span>.<span class='field'>width</span> {
                 <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>get</span>(x, y) {
                     rl.<span class='field'>draw_rectangle</span>(
-                        (padding_x + x * cell_size),
-                        (padding_y + y * cell_size),
+                        padding_x + x * cell_size,
+                        padding_y + y * cell_size,
                         cell_size,
                         cell_size,
                         FOREGROUND);
@@ -877,16 +890,22 @@ gol.<span class='field'>glider</span>(<span class='constant'>2</span>, <span cla
 
     gol.<span class='field'>show</span>();
 
-    gol.<span class='field'>clock</span> += rl.<span class='field'>get_frame_time</span>();
-    <span class='keyword'>if</span> gol.<span class='field'>clock</span> &gt;= INTERVAL {
-        gol.<span class='field'>clock</span> = <span class='constant'>0</span>;
-        gol.<span class='field'>step</span>();
+    <span class='keyword'>if</span> !gol.<span class='field'>paused</span> {
+        gol.<span class='field'>clock</span> += rl.<span class='field'>get_frame_time</span>();
+        <span class='keyword'>if</span> gol.<span class='field'>clock</span> &gt;= INTERVAL {
+            gol.<span class='field'>clock</span> = <span class='constant'>0</span>;
+            gol.<span class='field'>step</span>();
+        }
+    }
+
+    <span class='keyword'>if</span> rl.<span class='field'>is_key_pressed</span>(ascii.<span class='field'>code</span>(<span class='string'>" "</span>)) {
+        gol.<span class='field'>paused</span> = !gol.<span class='field'>paused</span>;
     }
 
     <span class='keyword'>if</span> rl.<span class='field'>is_mouse_button_released</span>(rl.<span class='field'>MOUSE_BUTTON_LEFT</span>) {
-        <span class='keyword'>var</span> x = ((rl.<span class='field'>get_mouse_x</span>() - padding_x) / cell_size).<span class='field'>round</span>();
-        <span class='keyword'>var</span> y = ((rl.<span class='field'>get_mouse_y</span>() - padding_y) / cell_size).<span class='field'>round</span>();
-        gol.<span class='field'>glider</span>(x, y);
+        <span class='keyword'>var</span> x = ((rl.<span class='field'>get_mouse_x</span>() - padding_x) / cell_size).<span class='field'>floor</span>();
+        <span class='keyword'>var</span> y = ((rl.<span class='field'>get_mouse_y</span>() - padding_y) / cell_size).<span class='field'>floor</span>();
+        gol.<span class='field'>set</span>(x, y, !gol.<span class='field'>get</span>(x, y));
     }
 
     rl.<span class='field'>end_drawing</span>();
