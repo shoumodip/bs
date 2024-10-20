@@ -6,7 +6,7 @@ var BACKGROUND = 0x282828FF;
 var FOREGROUND = 0x89B482FF;
 
 var INTERVAL = 0.1;
-var FONT_SIZE = 40;
+var FONT_SIZE = 30;
 
 var width = 800;
 var height = 600;
@@ -19,6 +19,7 @@ class GameOfLifeRaylib < GameOfLife {
     init(width, height) {
         super.init(width, height);
         this.clock = 0;
+        this.paused = false;
     }
 
     show() {
@@ -33,40 +34,40 @@ class GameOfLifeRaylib < GameOfLife {
         padding_y = (height - this.height * cell_size) / 2;
 
         rl.draw_rectangle(
-            padding_x.round(),
-            padding_y.round(),
-            (this.width * cell_size).round(),
-            (this.height * cell_size).round(),
+            padding_x,
+            padding_y,
+            this.width * cell_size,
+            this.height * cell_size,
             BACKGROUND);
 
         {
-            var label = "Click to spawn glider";
+            var label = "Click to toggle cell, Space to play/pause";
             rl.draw_text(
                 label,
                 (width - rl.measure_text(label, FONT_SIZE)) / 2,
-                (this.height * cell_size + FONT_SIZE * 0.1).round(),
+                this.height * cell_size + FONT_SIZE * 0.1,
                 FONT_SIZE,
                 FOREGROUND);
         }
 
         for i in 0, this.width + 1 {
-            var x = (padding_x + i * cell_size).round();
-            rl.draw_line(x, 0, x, (this.height * cell_size).round(), GRID);
+            var x = padding_x + i * cell_size;
+            rl.draw_line(x, 0, x, this.height * cell_size, GRID);
         }
 
         for i in 0, this.height + 1 {
-            var y = (padding_y + i * cell_size).round();
-            rl.draw_line(padding_x.round(), y, (padding_x + this.width * cell_size).round(), y, GRID);
+            var y = padding_y + i * cell_size;
+            rl.draw_line(padding_x, y, padding_x + this.width * cell_size, y, GRID);
         }
 
         for y in 0, this.height {
             for x in 0, this.width {
                 if this.get(x, y) {
                     rl.draw_rectangle(
-                        (padding_x + x * cell_size).round(),
-                        (padding_y + y * cell_size).round(),
-                        cell_size.round(),
-                        cell_size.round(),
+                        padding_x + x * cell_size,
+                        padding_y + y * cell_size,
+                        cell_size,
+                        cell_size,
                         FOREGROUND);
                 }
             }
@@ -87,16 +88,22 @@ while !rl.window_should_close() {
 
     gol.show();
 
-    gol.clock += rl.get_frame_time();
-    if gol.clock >= INTERVAL {
-        gol.clock = 0;
-        gol.step();
+    if !gol.paused {
+        gol.clock += rl.get_frame_time();
+        if gol.clock >= INTERVAL {
+            gol.clock = 0;
+            gol.step();
+        }
+    }
+
+    if rl.is_key_pressed(ascii.code(" ")) {
+        gol.paused = !gol.paused;
     }
 
     if rl.is_mouse_button_released(rl.MOUSE_BUTTON_LEFT) {
-        var x = ((rl.get_mouse_x() - padding_x) / cell_size).round();
-        var y = ((rl.get_mouse_y() - padding_y) / cell_size).round();
-        gol.glider(x, y);
+        var x = ((rl.get_mouse_x() - padding_x) / cell_size).floor();
+        var y = ((rl.get_mouse_y() - padding_y) / cell_size).floor();
+        gol.set(x, y, !gol.get(x, y));
     }
 
     rl.end_drawing();

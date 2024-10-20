@@ -184,8 +184,7 @@ typedef struct {
     Bs_Sv name;
 } Bsdoc_Style_Pair;
 
-#define p(style, name)                                                                             \
-    { style, Bs_Sv_Static(name) }
+#define p(style, name) {style, Bs_Sv_Static(name)}
 static const Bsdoc_Style_Pair style_pairs[] = {
     p(BSDOC_STYLE_KEYWORD, "static"),
     p(BSDOC_STYLE_KEYWORD, "const"),

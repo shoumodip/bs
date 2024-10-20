@@ -18,7 +18,7 @@ syntax match Comment "#.*" contains=Todo
 syntax match Identifier "\.\a\w*\>"hs=s+1
 
 syntax keyword Todo TODO XXX FIXME NOTE
-syntax keyword Keyword fr fuck nah thicc error redpill vibeof ghost be ayo sayless sike amongus yall yolo yeet slickback fam mf bet
+syntax keyword Keyword fr fuck nah thicc redpill vibeof ghost be ayo sayless sike amongus yall yolo yeet slickback fam mf bet
 syntax keyword Boolean nocap cap
 syntax keyword Constant bruh deez franky is_big_boss
 

@@ -1,7 +1,7 @@
-// raylib.c
+#include <math.h>
 
-#include "raylib.h"
 #include "bs/object.h"
+#include "raylib.h"
 
 Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
@@ -64,16 +64,16 @@ Bs_Value rl_set_config_flags(Bs *bs, Bs_Value *args, size_t arity) {
 
 Bs_Value rl_draw_line(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 5);
-    bs_arg_check_whole_number(bs, args, 0);
-    bs_arg_check_whole_number(bs, args, 1);
-    bs_arg_check_whole_number(bs, args, 2);
-    bs_arg_check_whole_number(bs, args, 3);
-    bs_arg_check_whole_number(bs, args, 4);
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
+    bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
+    bs_arg_check_value_type(bs, args, 2, BS_VALUE_NUM);
+    bs_arg_check_value_type(bs, args, 3, BS_VALUE_NUM);
+    bs_arg_check_value_type(bs, args, 4, BS_VALUE_NUM);
 
-    const int startPosX = args[0].as.number;
-    const int startPosY = args[1].as.number;
-    const int endPosX = args[2].as.number;
-    const int endPosY = args[3].as.number;
+    const int startPosX = round(args[0].as.number);
+    const int startPosY = round(args[1].as.number);
+    const int endPosX = round(args[2].as.number);
+    const int endPosY = round(args[3].as.number);
     const Color color = GetColor(args[4].as.number);
 
     DrawLine(startPosX, startPosY, endPosX, endPosY, color);
@@ -83,14 +83,14 @@ Bs_Value rl_draw_line(Bs *bs, Bs_Value *args, size_t arity) {
 Bs_Value rl_draw_text(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 5);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
-    bs_arg_check_whole_number(bs, args, 1);
-    bs_arg_check_whole_number(bs, args, 2);
+    bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
+    bs_arg_check_value_type(bs, args, 2, BS_VALUE_NUM);
     bs_arg_check_whole_number(bs, args, 3);
     bs_arg_check_whole_number(bs, args, 4);
 
     const Bs_Str *text = (const Bs_Str *)args[0].as.object;
-    const int x = args[1].as.number;
-    const int y = args[2].as.number;
+    const int x = round(args[1].as.number);
+    const int y = round(args[2].as.number);
     const int size = args[3].as.number;
     const Color color = GetColor(args[4].as.number);
 
@@ -100,16 +100,16 @@ Bs_Value rl_draw_text(Bs *bs, Bs_Value *args, size_t arity) {
 
 Bs_Value rl_draw_rectangle(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 5);
-    bs_arg_check_whole_number(bs, args, 0);
-    bs_arg_check_whole_number(bs, args, 1);
-    bs_arg_check_whole_number(bs, args, 2);
-    bs_arg_check_whole_number(bs, args, 3);
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
+    bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
+    bs_arg_check_value_type(bs, args, 2, BS_VALUE_NUM);
+    bs_arg_check_value_type(bs, args, 3, BS_VALUE_NUM);
     bs_arg_check_whole_number(bs, args, 4);
 
-    const int posX = args[0].as.number;
-    const int posY = args[1].as.number;
-    const int width = args[2].as.number;
-    const int height = args[3].as.number;
+    const int posX = round(args[0].as.number);
+    const int posY = round(args[1].as.number);
+    const int width = round(args[2].as.number);
+    const int height = round(args[3].as.number);
     const Color color = GetColor(args[4].as.number);
 
     DrawRectangle(posX, posY, width, height, color);
@@ -147,6 +147,12 @@ Bs_Value rl_is_mouse_button_released(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_bool(IsMouseButtonReleased(args[0].as.number));
 }
 
+Bs_Value rl_is_key_pressed(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_whole_number(bs, args, 0);
+    return bs_value_bool(IsKeyPressed(args[0].as.number));
+}
+
 Bs_Value rl_measure_text(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
@@ -177,6 +183,7 @@ BS_LIBRARY_INIT void bs_library_init(Bs *bs, Bs_C_Lib *library) {
         {"get_mouse_x", rl_get_mouse_x},
         {"get_mouse_y", rl_get_mouse_y},
         {"is_mouse_button_released", rl_is_mouse_button_released},
+        {"is_key_pressed", rl_is_key_pressed},
         {"measure_text", rl_measure_text},
     };
     bs_c_lib_ffi(bs, library, ffi, bs_c_array_size(ffi));

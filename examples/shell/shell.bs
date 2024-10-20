@@ -4,7 +4,7 @@ var home = os.getenv("HOME");
 fn pwd() {
     var cwd = os.getcwd();
     if cwd.prefix(home) {
-        return "~" ++ cwd.slice(len(home), len(cwd));
+        return "~" ++ cwd.slice(len(home));
     }
 
     return cwd;
@@ -12,6 +12,9 @@ fn pwd() {
 
 # Rawdogging shell lexing with regex any%
 var delim = Regex("[ \n\t]+");
+
+# Previous working directory
+var previous = nil;
 
 while !io.stdin.eof() {
     var args = io.input("\(pwd()) $ ").split(delim);
@@ -44,6 +47,7 @@ while !io.stdin.eof() {
     # Usage:
     #   cd        -> Go to HOME
     #   cd <DIR>  -> Go to DIR
+    #   cd -      -> Go to previous location
     if cmd == "cd" {
         if len(args) > 2 {
             io.eprintln("Error: too many arguments to command '\(cmd)'");
@@ -51,14 +55,25 @@ while !io.stdin.eof() {
         }
 
         var path = if len(args) == 2 then args[1] else "~";
+        if path == "-" {
+            if !previous {
+                io.eprintln("Error: no previous directory to go into");
+                continue;
+            }
+
+            path = previous;
+        }
+
         if path.prefix("~") {
-            path = home ++ path.slice(1, len(path));
+            path = home ++ path.slice(1);
         }
 
+        var current = os.getcwd();
         if !os.setcwd(path) {
-            io.eprintln("Error: the directory '\(args[1])' does not exist");
+            io.eprintln("Error: the directory '\(path)' does not exist");
         }
 
+        previous = current;
         continue;
     }
 

@@ -62,7 +62,7 @@ body {
 }
 
 code {
-    font-size: calc(0.9 * var(--font-size));
+    font-size: 90%;
     whitespace: pre;
     font-family: "JetBrains Mono";
     border-radius: var(--border-radius);
@@ -361,4 +361,15 @@ html {
 * {
     scrollbar-color: var(--border) none;
     scrollbar-width: calc(1.2 * var(--padding));
+}
+
+.github-icon {
+    top: calc((var(--header) - 40px) / 2);
+    right: calc((var(--header) - 40px) / 2);
+    z-index: 9000;
+    position: fixed;
+}
+
+.github-icon:hover {
+    opacity: 0.7;
 }
