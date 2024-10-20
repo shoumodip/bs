@@ -11,9 +11,7 @@ var xs = [
 
 io.println(xs);
 xs.sort(fn (a, b) {
-    io.println("Compare:");
-    io.println("First: \(a)");
-    io.println("Second: \(b)");
+    io.println("(\(a.name) < \(b.name)) => \(a.name < b.name)");
     return a.name < b.name;
 });
 io.println(xs);
