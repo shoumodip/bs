@@ -27,8 +27,6 @@ $ cc -o raylib.dylib -fPIC -shared raylib.c -lbs -lraylib # On macOS
 $ cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib        # On Windows
 ```
 
-Load it from BS.
-
 <!-- embed: examples/game_of_life/game_of_life_raylib.bs -->
 
 Run the program.
