@@ -44,6 +44,40 @@ Print all the arguments to standard error.
 ### eprintln(...) @function
 Print all the arguments to standard error, with a following newline.
 
+### readdir(path) @function
+Read a directory into an array of `DirEntry`.
+
+Returns `nil` if failed.
+
+```bs
+var entries = assert(io.readdir("."));
+
+for _, e in entries {
+    io.println(e.name(), e.isdir());
+}
+```
+
+```console
+$ bs demo.bs
+.git true
+include true
+demo.bs false
+compile_flags.txt false
+lib true
+tests true
+.gitattributes false
+README.md false
+bin true
+docs true
+editor true
+build true
+.gitignore false
+examples true
+src true
+LICENSE false
+.github true
+```
+
 ### Reader(path) @class
 Native C class that opens `path` in readable mode.
 
@@ -252,6 +286,47 @@ Returns `false` if any errors were encountered, else `true`.
 Write all the arguments into the file, with a following newline.
 
 Returns `false` if any errors were encountered, else `true`.
+
+### DirEntry(name, isdir) @class
+Native C class that wraps over a directory entry. This doesn't really do
+anything, and only serves as an implementation detail for `readdir()`.
+
+Example usecase:
+
+```bs
+var entries = assert(io.readdir("."));
+
+for _, e in entries {
+    io.println(e.name(), e.isdir());
+}
+```
+
+```console
+$ bs demo.bs
+.git true
+include true
+demo.bs false
+compile_flags.txt false
+lib true
+tests true
+.gitattributes false
+README.md false
+bin true
+docs true
+editor true
+build true
+.gitignore false
+examples true
+src true
+LICENSE false
+.github true
+```
+
+#### DirEntry.name() @method
+Get the name of the entry.
+
+#### DirEntry.isdir() @method
+Get whether the entry is a directory.
 
 ### stdin @constant
 `Reader` for standard input.
@@ -663,6 +738,30 @@ foo bar ba
 {type: apples, count: 69}, {type: oranges, count: 420}
 {type: apples, count: 69}, 420  oranges
 ayo noice!
+```
+
+### string.compare(other) @method
+Compare two strings together.
+
+- `0` means the string is equal to the other string
+- `1` means the string is "greater than" the other string
+- `-1` means the string is "less than" the other string
+
+```bs
+io.println("foo".compare("bar"));
+io.println("foo".compare("lol"));
+io.println("foo".compare("foo"));
+io.println("foo".compare("food"));
+io.println("food".compare("foo"));
+```
+
+```console
+$ bs demo.bs
+1
+-1
+0
+-1
+1
 ```
 
 ### string.ltrim(pattern) @method
