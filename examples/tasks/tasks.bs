@@ -1,0 +1,458 @@
+var TASKS_PATH = os.getenv("HOME") ++ "/.tasks";
+
+fn date(d) {
+    if !d {
+        return "";
+    }
+
+    var year = "\(d[0])".lpad("0", 4);
+    var month = "\(d[1])".lpad("0", 2);
+    var day = "\(d[2])".lpad("0", 2);
+    return "\(year)-\(month)-\(day)";
+}
+
+fn flags(start, template) {
+    var parsed = {};
+
+    var i = start;
+    while i < len(os.args) {
+        var arg = os.args[i]; i += 1;
+        if !arg.prefix("-") || !(arg.slice(1) in template) {
+            io.eprintln("Error: unexpected argument '\(arg)'");
+            io.eprintln("Expected:");
+
+            var length = 0;
+            for flag, _ in template {
+                length = length.max(len(flag));
+            }
+
+            for flag, desc in template {
+                io.eprintln("    -\(flag.rpad(" ", length))    \(desc)");
+            }
+
+            os.exit(1);
+        }
+        var flag = arg.slice(1);
+
+        if i >= len(os.args) {
+            io.eprintln("Error: value not provided for flag '\(arg)'");
+            io.eprintln("Usage:");
+            io.eprintln("    \(arg) <value>    \(template[flag])");
+            os.exit(1);
+        }
+        var value = os.args[i]; i += 1;
+
+        parsed[flag] = value;
+    }
+
+    return parsed;
+}
+
+fn currently(n, label) {
+    if n == 1 {
+        io.eprintln("Note: there is currently \(n) \(label)");
+    } else {
+        io.eprintln("Note: there are currently \(n) \(label)s");
+    }
+}
+
+var FLAGS = {
+    due = "The due date for the completion of the task. Expected format is 'YYYY-MM-DD'",
+    tag = "The tags associated with the task. Expects a comma separated list of names",
+    priority = "The priority of the task. Can be 'low', 'medium', or 'high' (Default: 'medium')",
+};
+
+var PRIORITIES = ["low", "medium", "high"];
+
+class Task {
+    init(title) {
+        this.title = title;
+        this.due = nil;
+        this.tags = [];
+        this.priority = 1;
+    }
+
+    set_due(date) {
+        if len(date) == 0 {
+            this.due = nil;
+            return;
+        }
+
+        var format = "YYYY-MM-DD";
+        if len(date) != len(format) {
+            io.eprintln("Error: invalid due date '\(date)'. Expected format '\(format)'");
+            os.exit(1);
+        }
+
+        var year = date.slice(0, 4).tonumber();
+        var month = date.slice(5, 7).tonumber();
+        var day = date.slice(8, 10).tonumber();
+
+        if !year || !month || !day {
+            io.eprintln("Error: invalid due date '\(date)'. Expected format '\(format)'");
+            os.exit(1);
+        }
+
+        this.due = [year, month, day];
+    }
+
+    set_tag(labels) {
+        for _, tag in labels.split(",") {
+            this.tags.push(tag.trim(" "));
+        }
+    }
+
+    set_priority(value) {
+        this.priority = PRIORITIES.find(value);
+        if !this.priority {
+            io.eprintln("Error: invalid priority '\(value)'");
+            io.eprintln("Expected:");
+            io.eprintln("    low");
+            io.eprintln("    medium    (Default)");
+            io.eprintln("    high");
+            os.exit(1);
+        }
+    }
+
+    show() {
+        var final = this.title;
+
+        if this.due {
+            final ++= " (Due: \(date(this.due)))";
+        }
+
+        final ++= " [Priority: \(PRIORITIES[this.priority])]";
+
+        if len(this.tags) > 0 {
+            final ++= " [Tags: \(this.tags.join(", "))]";
+        }
+
+        return final;
+    }
+}
+
+class Tasks {
+    init(path) {
+        this.path = path;
+        this.pending = [];
+        this.completed = [];
+
+        var f = io.Reader(path);
+        if !f {
+            return;
+        }
+
+        var lines = f.read().split("\n");
+        var i = 0;
+        while i < len(lines) {
+            var line = lines[i]; i += 1;
+
+            var task;
+            if line.prefix("PENDING:") {
+                task = Task(line.slice(len("PENDING:")));
+                this.pending.push(task);
+            } else if line.prefix("COMPLETED:") {
+                task = Task(line.slice(len("COMPLETED:")));
+                this.completed.push(task);
+            }
+
+            fn expect(expected) {
+                if i >= len(lines) {
+                    io.eprintln("Error: corrupted '\(path)'. Expected '\(expected)' on line \(i + 1), got EOF");
+                    os.exit(1);
+                }
+
+                line = lines[i]; i += 1;
+                if !line.prefix(expected) {
+                    io.eprintln("Error: corrupted '\(path)'. Expected '\(expected)' on line \(i + 1), got '\(line)'");
+                    os.exit(1);
+                }
+            }
+
+            expect("DUE:");
+            task.set_due(line.slice(len("DUE:")));
+
+            expect("TAGS:");
+            task.set_tag(line.slice(len("TAGS:")));
+
+            expect("PRIORITY:");
+            task.set_priority(line.slice(len("PRIORITY:")));
+        }
+
+        f.close();
+    }
+
+    add(title, flags) {
+        var task = Task(title);
+
+        if "due" in flags {
+            task.set_due(flags.due);
+        }
+
+        if "tag" in flags {
+            task.set_tag(flags.tag);
+        }
+
+        if "priority" in flags {
+            task.set_priority(flags.priority);
+        }
+
+        this.pending.push(task);
+        io.println("Added: \(task.show())");
+    }
+
+    list(flags) {
+        var pending = false;
+
+        var match = Task("");
+        if "due" in flags {
+            match.set_due(flags.due);
+        }
+
+        if "tag" in flags {
+            match.set_tag(flags.tag);
+        }
+
+        if "priority" in flags {
+            match.set_priority(flags.priority);
+        }
+
+        fn skip(task) {
+            if "due" in flags && (!task.due || !task.due.equal(match.due)) {
+                return true;
+            }
+
+            if "tag" in flags {
+                for _, tag in match.tags {
+                    if !task.tags.find(tag) {
+                        return true;
+                    }
+                }
+            }
+
+            if "priority" in flags && task.priority != match.priority {
+                return true;
+            }
+
+            return false;
+        }
+
+        for i, t in this.pending {
+            if skip(t) {
+                continue;
+            }
+
+            if !pending {
+                pending = true;
+                io.println("Pending Tasks:");
+            }
+
+            io.println("[\(i)]", t.show());
+        }
+
+        var completed = false;
+
+        for i, t in this.completed {
+            if skip(t) {
+                continue;
+            }
+
+            if !completed {
+                completed = true;
+
+                if pending {
+                    io.println();
+                }
+                io.println("Completed Tasks:");
+            }
+
+            io.println("[\(i)]", t.show());
+        }
+    }
+
+    done(index) {
+        if index >= len(this.pending) {
+            io.eprintln("Error: invalid task index '\(index)'");
+            currently(len(this.pending), "pending task");
+            os.exit(1);
+        }
+
+        var task = this.pending.remove(index);
+        this.completed.push(task);
+
+        io.println("Completed: \(task.show())");
+    }
+
+    remove(index) {
+        if index >= len(this.completed) {
+            io.eprintln("Error: invalid task index '\(index)'");
+            currently(len(this.completed), "completed task");
+            os.exit(1);
+        }
+
+        var task = this.completed.remove(index);
+        io.println("Removed: \(task.show())");
+    }
+
+    search(query) {
+        var pending = false;
+
+        for i, t in this.pending {
+            if !t.title.find(query) {
+                continue;
+            }
+
+            if !pending {
+                pending = true;
+                io.println("Pending Tasks:");
+            }
+
+            io.println("[\(i)]", t.show());
+        }
+
+        var completed = false;
+
+        for i, t in this.completed {
+            if !t.title.find(query) {
+                continue;
+            }
+
+            if !completed {
+                completed = true;
+
+                if pending {
+                    io.println();
+                }
+                io.println("Completed Tasks:");
+            }
+
+            io.println("[\(i)]", t.show());
+        }
+    }
+
+    save() {
+        var f = io.Writer(this.path);
+        if !f {
+            io.eprintln("Error: could not save tasks to file '\(this.path)'");
+            os.exit(1);
+        }
+
+        var i = 0;
+        fn save(task, prefix) {
+            f.writeln("\(prefix):\(task.title)");
+            f.writeln("DUE:\(date(task.due))");
+            f.writeln("TAGS:\(task.tags.join(","))");
+            f.writeln("PRIORITY:\(PRIORITIES[task.priority])");
+        }
+
+        i = 0;
+        while i < len(this.pending) {
+            var task = this.pending[i]; i += 1;
+            save(task, "PENDING");
+        }
+
+        i = 0;
+        while i < len(this.completed) {
+            var task = this.completed[i]; i += 1;
+            save(task, "COMPLETED");
+        }
+
+        f.close();
+    }
+}
+
+if is_main_module {
+    var tasks = Tasks(TASKS_PATH);
+
+    if len(os.args) < 2 {
+        io.eprintln("Error: command not provided");
+        io.eprintln("Usage: \(os.args[0]) <command> [args...]");
+        io.eprintln("Commands:");
+        io.eprintln("    add");
+        io.eprintln("    list");
+        io.eprintln("    done");
+        io.eprintln("    remove");
+        io.eprintln("    search");
+        os.exit(1);
+    }
+    var command = os.args[1];
+
+    if command == "add" {
+        if len(os.args) < 3 {
+            io.eprintln("Error: task title not provided");
+            io.eprintln("Usage: \(os.args[0]) add <title> [flags...]");
+            os.exit(1);
+        }
+
+        tasks.add(os.args[2], flags(3, FLAGS));
+        tasks.save();
+        return;
+    }
+
+    if command == "list" {
+        tasks.list(flags(2, FLAGS));
+        return;
+    }
+
+    if command == "done" {
+        if len(os.args) < 3 {
+            io.eprintln("Error: task index not provided");
+            io.eprintln("Usage: \(os.args[0]) done <index>");
+            os.exit(1);
+        }
+
+        var index = os.args[2].tonumber();
+        if !index {
+            io.eprintln("Error: invalid task index '\(os.args[2])'");
+            os.exit(1);
+        }
+
+        tasks.done(index);
+        tasks.save();
+        return;
+    }
+
+    if command == "remove" {
+        if len(os.args) < 3 {
+            io.eprintln("Error: task index not provided");
+            io.eprintln("Usage: \(os.args[0]) remove <index>");
+            os.exit(1);
+        }
+
+        var index = os.args[2].tonumber();
+        if !index {
+            io.eprintln("Error: invalid task index '\(os.args[2])'");
+            os.exit(1);
+        }
+
+        tasks.remove(index);
+        tasks.save();
+        return;
+    }
+
+    if command == "search" {
+        if len(os.args) < 3 {
+            io.eprintln("Error: search query not provided");
+            io.eprintln("Usage: \(os.args[0]) search <query>");
+            os.exit(1);
+        }
+
+        var query = Regex(os.args[2]);
+        if !query {
+            io.eprintln("Error: invalid search query '\(os.args[2])'");
+            os.exit(1);
+        }
+
+        tasks.search(query);
+        return;
+    }
+
+    io.eprintln("Error: invalid command '\(command)'");
+    io.eprintln("Available commands:");
+    io.eprintln("    add");
+    io.eprintln("    list");
+    io.eprintln("    done");
+    io.eprintln("    remove");
+    io.eprintln("    search");
+    os.exit(1);
+}

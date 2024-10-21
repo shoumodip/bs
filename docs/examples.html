@@ -973,6 +973,553 @@ Run the program.
 </div>
 </section>
 </section>
+<section id='s7'>
+<h2> CLI Task Management APP</h2>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='comment'># tasks.bs</span>
+
+<span class='keyword'>var</span> TASKS_PATH = os.<span class='field'>getenv</span>(<span class='string'>"HOME"</span>) ++ <span class='string'>"/.tasks"</span>;
+
+<span class='keyword'>fn</span> <span class='function'>date</span>(d) {
+    <span class='keyword'>if</span> !d {
+        <span class='keyword'>return</span> <span class='string'>""</span>;
+    }
+
+    <span class='keyword'>var</span> year = <span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span>d[<span class='constant'>0</span>]<span class='escape'>)</span><span class='string'>"</span>.<span class='field'>lpad</span>(<span class='string'>"0"</span>, <span class='constant'>4</span>);
+    <span class='keyword'>var</span> month = <span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span>d[<span class='constant'>1</span>]<span class='escape'>)</span><span class='string'>"</span>.<span class='field'>lpad</span>(<span class='string'>"0"</span>, <span class='constant'>2</span>);
+    <span class='keyword'>var</span> day = <span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span>d[<span class='constant'>2</span>]<span class='escape'>)</span><span class='string'>"</span>.<span class='field'>lpad</span>(<span class='string'>"0"</span>, <span class='constant'>2</span>);
+    <span class='keyword'>return</span> <span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span>year<span class='escape'>)</span><span class='string'>-</span><span class='escape'>\</span><span class='escape'>(</span>month<span class='escape'>)</span><span class='string'>-</span><span class='escape'>\</span><span class='escape'>(</span>day<span class='escape'>)</span><span class='string'>"</span>;
+}
+
+<span class='keyword'>fn</span> <span class='function'>flags</span>(start, template) {
+    <span class='keyword'>var</span> parsed = {};
+
+    <span class='keyword'>var</span> i = start;
+    <span class='keyword'>while</span> i &lt; <span class='keyword'>len</span>(os.<span class='field'>args</span>) {
+        <span class='keyword'>var</span> arg = os.<span class='field'>args</span>[i]; i += <span class='constant'>1</span>;
+        <span class='keyword'>if</span> !arg.<span class='field'>prefix</span>(<span class='string'>"-"</span>) || !(arg.<span class='field'>slice</span>(<span class='constant'>1</span>) <span class='keyword'>in</span> template) {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: unexpected argument '</span><span class='escape'>\</span><span class='escape'>(</span>arg<span class='escape'>)</span><span class='string'>'"</span>);
+            io.<span class='field'>eprintln</span>(<span class='string'>"Expected:"</span>);
+
+            <span class='keyword'>var</span> length = <span class='constant'>0</span>;
+            <span class='keyword'>for</span> flag, _ <span class='keyword'>in</span> template {
+                length = length.<span class='field'>max</span>(<span class='keyword'>len</span>(flag));
+            }
+
+            <span class='keyword'>for</span> flag, desc <span class='keyword'>in</span> template {
+                io.<span class='field'>eprintln</span>(<span class='string'>"    -</span><span class='escape'>\</span><span class='escape'>(</span>flag.<span class='field'>rpad</span>(<span class='string'>" "</span>, length)<span class='escape'>)</span><span class='string'>    </span><span class='escape'>\</span><span class='escape'>(</span>desc<span class='escape'>)</span><span class='string'>"</span>);
+            }
+
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        }
+        <span class='keyword'>var</span> flag = arg.<span class='field'>slice</span>(<span class='constant'>1</span>);
+
+        <span class='keyword'>if</span> i &gt;= <span class='keyword'>len</span>(os.<span class='field'>args</span>) {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: value not provided for flag '</span><span class='escape'>\</span><span class='escape'>(</span>arg<span class='escape'>)</span><span class='string'>'"</span>);
+            io.<span class='field'>eprintln</span>(<span class='string'>"Usage:"</span>);
+            io.<span class='field'>eprintln</span>(<span class='string'>"    </span><span class='escape'>\</span><span class='escape'>(</span>arg<span class='escape'>)</span><span class='string'> &lt;value&gt;    </span><span class='escape'>\</span><span class='escape'>(</span>template[flag]<span class='escape'>)</span><span class='string'>"</span>);
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        }
+        <span class='keyword'>var</span> value = os.<span class='field'>args</span>[i]; i += <span class='constant'>1</span>;
+
+        parsed[flag] = value;
+    }
+
+    <span class='keyword'>return</span> parsed;
+}
+
+<span class='keyword'>fn</span> <span class='function'>currently</span>(n, label) {
+    <span class='keyword'>if</span> n == <span class='constant'>1</span> {
+        io.<span class='field'>eprintln</span>(<span class='string'>"Note: there is currently </span><span class='escape'>\</span><span class='escape'>(</span>n<span class='escape'>)</span><span class='string'> </span><span class='escape'>\</span><span class='escape'>(</span>label<span class='escape'>)</span><span class='string'>"</span>);
+    } <span class='keyword'>else</span> {
+        io.<span class='field'>eprintln</span>(<span class='string'>"Note: there are currently </span><span class='escape'>\</span><span class='escape'>(</span>n<span class='escape'>)</span><span class='string'> </span><span class='escape'>\</span><span class='escape'>(</span>label<span class='escape'>)</span><span class='string'>s"</span>);
+    }
+}
+
+<span class='keyword'>var</span> FLAGS = {
+    due = <span class='string'>"The due date for the completion of the task. Expected format is 'YYYY-MM-DD'"</span>,
+    tag = <span class='string'>"The tags associated with the task. Expects a comma separated list of names"</span>,
+    priority = <span class='string'>"The priority of the task. Can be 'low', 'medium', or 'high' (Default: 'medium')"</span>,
+};
+
+<span class='keyword'>var</span> PRIORITIES = [<span class='string'>"low"</span>, <span class='string'>"medium"</span>, <span class='string'>"high"</span>];
+
+<span class='keyword'>class</span> <span class='class'>Task</span> {
+    init(title) {
+        <span class='constant'>this</span>.<span class='field'>title</span> = title;
+        <span class='constant'>this</span>.<span class='field'>due</span> = <span class='constant'>nil</span>;
+        <span class='constant'>this</span>.<span class='field'>tags</span> = [];
+        <span class='constant'>this</span>.<span class='field'>priority</span> = <span class='constant'>1</span>;
+    }
+
+    set_due(date) {
+        <span class='keyword'>if</span> <span class='keyword'>len</span>(date) == <span class='constant'>0</span> {
+            <span class='constant'>this</span>.<span class='field'>due</span> = <span class='constant'>nil</span>;
+            <span class='keyword'>return</span>;
+        }
+
+        <span class='keyword'>var</span> format = <span class='string'>"YYYY-MM-DD"</span>;
+        <span class='keyword'>if</span> <span class='keyword'>len</span>(date) != <span class='keyword'>len</span>(format) {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid due date '</span><span class='escape'>\</span><span class='escape'>(</span>date<span class='escape'>)</span><span class='string'>'. Expected format '</span><span class='escape'>\</span><span class='escape'>(</span>format<span class='escape'>)</span><span class='string'>'"</span>);
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        }
+
+        <span class='keyword'>var</span> year = date.<span class='field'>slice</span>(<span class='constant'>0</span>, <span class='constant'>4</span>).<span class='field'>tonumber</span>();
+        <span class='keyword'>var</span> month = date.<span class='field'>slice</span>(<span class='constant'>5</span>, <span class='constant'>7</span>).<span class='field'>tonumber</span>();
+        <span class='keyword'>var</span> day = date.<span class='field'>slice</span>(<span class='constant'>8</span>, <span class='constant'>10</span>).<span class='field'>tonumber</span>();
+
+        <span class='keyword'>if</span> !year || !month || !day {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid due date '</span><span class='escape'>\</span><span class='escape'>(</span>date<span class='escape'>)</span><span class='string'>'. Expected format '</span><span class='escape'>\</span><span class='escape'>(</span>format<span class='escape'>)</span><span class='string'>'"</span>);
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        }
+
+        <span class='constant'>this</span>.<span class='field'>due</span> = [year, month, day];
+    }
+
+    set_tag(labels) {
+        <span class='keyword'>for</span> _, tag <span class='keyword'>in</span> labels.<span class='field'>split</span>(<span class='string'>","</span>) {
+            <span class='constant'>this</span>.<span class='field'>tags</span>.<span class='field'>push</span>(tag.<span class='field'>trim</span>(<span class='string'>" "</span>));
+        }
+    }
+
+    set_priority(value) {
+        <span class='constant'>this</span>.<span class='field'>priority</span> = PRIORITIES.<span class='field'>find</span>(value);
+        <span class='keyword'>if</span> !<span class='constant'>this</span>.<span class='field'>priority</span> {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid priority '</span><span class='escape'>\</span><span class='escape'>(</span>value<span class='escape'>)</span><span class='string'>'"</span>);
+            io.<span class='field'>eprintln</span>(<span class='string'>"Expected:"</span>);
+            io.<span class='field'>eprintln</span>(<span class='string'>"    low"</span>);
+            io.<span class='field'>eprintln</span>(<span class='string'>"    medium    (Default)"</span>);
+            io.<span class='field'>eprintln</span>(<span class='string'>"    high"</span>);
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        }
+    }
+
+    show() {
+        <span class='keyword'>var</span> final = <span class='constant'>this</span>.<span class='field'>title</span>;
+
+        <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>due</span> {
+            final ++= <span class='string'>" (Due: </span><span class='escape'>\</span><span class='escape'>(</span>date(<span class='constant'>this</span>.<span class='field'>due</span>)<span class='escape'>)</span><span class='string'>)"</span>;
+        }
+
+        final ++= <span class='string'>" [Priority: </span><span class='escape'>\</span><span class='escape'>(</span>PRIORITIES[<span class='constant'>this</span>.<span class='field'>priority</span>]<span class='escape'>)</span><span class='string'>]"</span>;
+
+        <span class='keyword'>if</span> <span class='keyword'>len</span>(<span class='constant'>this</span>.<span class='field'>tags</span>) &gt; <span class='constant'>0</span> {
+            final ++= <span class='string'>" [Tags: </span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>this</span>.<span class='field'>tags</span>.<span class='field'>join</span>(<span class='string'>", "</span>)<span class='escape'>)</span><span class='string'>]"</span>;
+        }
+
+        <span class='keyword'>return</span> final;
+    }
+}
+
+<span class='keyword'>class</span> <span class='class'>Tasks</span> {
+    init(path) {
+        <span class='constant'>this</span>.<span class='field'>path</span> = path;
+        <span class='constant'>this</span>.<span class='field'>pending</span> = [];
+        <span class='constant'>this</span>.<span class='field'>completed</span> = [];
+
+        <span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(path);
+        <span class='keyword'>if</span> !f {
+            <span class='keyword'>return</span>;
+        }
+
+        <span class='keyword'>var</span> lines = f.<span class='field'>read</span>().<span class='field'>split</span>(<span class='string'>"</span><span class='escape'>\n</span><span class='string'>"</span>);
+        <span class='keyword'>var</span> i = <span class='constant'>0</span>;
+        <span class='keyword'>while</span> i &lt; <span class='keyword'>len</span>(lines) {
+            <span class='keyword'>var</span> line = lines[i]; i += <span class='constant'>1</span>;
+
+            <span class='keyword'>var</span> task;
+            <span class='keyword'>if</span> line.<span class='field'>prefix</span>(<span class='string'>"PENDING:"</span>) {
+                task = Task(line.<span class='field'>slice</span>(<span class='keyword'>len</span>(<span class='string'>"PENDING:"</span>)));
+                <span class='constant'>this</span>.<span class='field'>pending</span>.<span class='field'>push</span>(task);
+            } <span class='keyword'>else</span> <span class='keyword'>if</span> line.<span class='field'>prefix</span>(<span class='string'>"COMPLETED:"</span>) {
+                task = Task(line.<span class='field'>slice</span>(<span class='keyword'>len</span>(<span class='string'>"COMPLETED:"</span>)));
+                <span class='constant'>this</span>.<span class='field'>completed</span>.<span class='field'>push</span>(task);
+            }
+
+            <span class='keyword'>fn</span> <span class='function'>expect</span>(expected) {
+                <span class='keyword'>if</span> i &gt;= <span class='keyword'>len</span>(lines) {
+                    io.<span class='field'>eprintln</span>(<span class='string'>"Error: corrupted '</span><span class='escape'>\</span><span class='escape'>(</span>path<span class='escape'>)</span><span class='string'>'. Expected '</span><span class='escape'>\</span><span class='escape'>(</span>expected<span class='escape'>)</span><span class='string'>' on line </span><span class='escape'>\</span><span class='escape'>(</span>i + <span class='constant'>1</span><span class='escape'>)</span><span class='string'>, got EOF"</span>);
+                    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+                }
+
+                line = lines[i]; i += <span class='constant'>1</span>;
+                <span class='keyword'>if</span> !line.<span class='field'>prefix</span>(expected) {
+                    io.<span class='field'>eprintln</span>(<span class='string'>"Error: corrupted '</span><span class='escape'>\</span><span class='escape'>(</span>path<span class='escape'>)</span><span class='string'>'. Expected '</span><span class='escape'>\</span><span class='escape'>(</span>expected<span class='escape'>)</span><span class='string'>' on line </span><span class='escape'>\</span><span class='escape'>(</span>i + <span class='constant'>1</span><span class='escape'>)</span><span class='string'>, got '</span><span class='escape'>\</span><span class='escape'>(</span>line<span class='escape'>)</span><span class='string'>'"</span>);
+                    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+                }
+            }
+
+            expect(<span class='string'>"DUE:"</span>);
+            task.<span class='field'>set_due</span>(line.<span class='field'>slice</span>(<span class='keyword'>len</span>(<span class='string'>"DUE:"</span>)));
+
+            expect(<span class='string'>"TAGS:"</span>);
+            task.<span class='field'>set_tag</span>(line.<span class='field'>slice</span>(<span class='keyword'>len</span>(<span class='string'>"TAGS:"</span>)));
+
+            expect(<span class='string'>"PRIORITY:"</span>);
+            task.<span class='field'>set_priority</span>(line.<span class='field'>slice</span>(<span class='keyword'>len</span>(<span class='string'>"PRIORITY:"</span>)));
+        }
+
+        f.<span class='field'>close</span>();
+    }
+
+    add(title, flags) {
+        <span class='keyword'>var</span> task = Task(title);
+
+        <span class='keyword'>if</span> <span class='string'>"due"</span> <span class='keyword'>in</span> flags {
+            task.<span class='field'>set_due</span>(flags.<span class='field'>due</span>);
+        }
+
+        <span class='keyword'>if</span> <span class='string'>"tag"</span> <span class='keyword'>in</span> flags {
+            task.<span class='field'>set_tag</span>(flags.<span class='field'>tag</span>);
+        }
+
+        <span class='keyword'>if</span> <span class='string'>"priority"</span> <span class='keyword'>in</span> flags {
+            task.<span class='field'>set_priority</span>(flags.<span class='field'>priority</span>);
+        }
+
+        <span class='constant'>this</span>.<span class='field'>pending</span>.<span class='field'>push</span>(task);
+        io.<span class='field'>println</span>(<span class='string'>"Added: </span><span class='escape'>\</span><span class='escape'>(</span>task.<span class='field'>show</span>()<span class='escape'>)</span><span class='string'>"</span>);
+    }
+
+    list(flags) {
+        <span class='keyword'>var</span> pending = <span class='constant'>false</span>;
+
+        <span class='keyword'>var</span> match = Task(<span class='string'>""</span>);
+        <span class='keyword'>if</span> <span class='string'>"due"</span> <span class='keyword'>in</span> flags {
+            match.<span class='field'>set_due</span>(flags.<span class='field'>due</span>);
+        }
+
+        <span class='keyword'>if</span> <span class='string'>"tag"</span> <span class='keyword'>in</span> flags {
+            match.<span class='field'>set_tag</span>(flags.<span class='field'>tag</span>);
+        }
+
+        <span class='keyword'>if</span> <span class='string'>"priority"</span> <span class='keyword'>in</span> flags {
+            match.<span class='field'>set_priority</span>(flags.<span class='field'>priority</span>);
+        }
+
+        <span class='keyword'>fn</span> <span class='function'>skip</span>(task) {
+            <span class='keyword'>if</span> <span class='string'>"due"</span> <span class='keyword'>in</span> flags &amp;&amp; (!task.<span class='field'>due</span> || !task.<span class='field'>due</span>.<span class='field'>equal</span>(match.<span class='field'>due</span>)) {
+                <span class='keyword'>return</span> <span class='constant'>true</span>;
+            }
+
+            <span class='keyword'>if</span> <span class='string'>"tag"</span> <span class='keyword'>in</span> flags {
+                <span class='keyword'>for</span> _, tag <span class='keyword'>in</span> match.<span class='field'>tags</span> {
+                    <span class='keyword'>if</span> !task.<span class='field'>tags</span>.<span class='field'>find</span>(tag) {
+                        <span class='keyword'>return</span> <span class='constant'>true</span>;
+                    }
+                }
+            }
+
+            <span class='keyword'>if</span> <span class='string'>"priority"</span> <span class='keyword'>in</span> flags &amp;&amp; task.<span class='field'>priority</span> != match.<span class='field'>priority</span> {
+                <span class='keyword'>return</span> <span class='constant'>true</span>;
+            }
+
+            <span class='keyword'>return</span> <span class='constant'>false</span>;
+        }
+
+        <span class='keyword'>for</span> i, t <span class='keyword'>in</span> <span class='constant'>this</span>.<span class='field'>pending</span> {
+            <span class='keyword'>if</span> skip(t) {
+                <span class='keyword'>continue</span>;
+            }
+
+            <span class='keyword'>if</span> !pending {
+                pending = <span class='constant'>true</span>;
+                io.<span class='field'>println</span>(<span class='string'>"Pending Tasks:"</span>);
+            }
+
+            io.<span class='field'>println</span>(<span class='string'>"[</span><span class='escape'>\</span><span class='escape'>(</span>i<span class='escape'>)</span><span class='string'>]"</span>, t.<span class='field'>show</span>());
+        }
+
+        <span class='keyword'>var</span> completed = <span class='constant'>false</span>;
+
+        <span class='keyword'>for</span> i, t <span class='keyword'>in</span> <span class='constant'>this</span>.<span class='field'>completed</span> {
+            <span class='keyword'>if</span> skip(t) {
+                <span class='keyword'>continue</span>;
+            }
+
+            <span class='keyword'>if</span> !completed {
+                completed = <span class='constant'>true</span>;
+
+                <span class='keyword'>if</span> pending {
+                    io.<span class='field'>println</span>();
+                }
+                io.<span class='field'>println</span>(<span class='string'>"Completed Tasks:"</span>);
+            }
+
+            io.<span class='field'>println</span>(<span class='string'>"[</span><span class='escape'>\</span><span class='escape'>(</span>i<span class='escape'>)</span><span class='string'>]"</span>, t.<span class='field'>show</span>());
+        }
+    }
+
+    done(index) {
+        <span class='keyword'>if</span> index &gt;= <span class='keyword'>len</span>(<span class='constant'>this</span>.<span class='field'>pending</span>) {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid task index '</span><span class='escape'>\</span><span class='escape'>(</span>index<span class='escape'>)</span><span class='string'>'"</span>);
+            currently(<span class='keyword'>len</span>(<span class='constant'>this</span>.<span class='field'>pending</span>), <span class='string'>"pending task"</span>);
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        }
+
+        <span class='keyword'>var</span> task = <span class='constant'>this</span>.<span class='field'>pending</span>.<span class='field'>remove</span>(index);
+        <span class='constant'>this</span>.<span class='field'>completed</span>.<span class='field'>push</span>(task);
+
+        io.<span class='field'>println</span>(<span class='string'>"Completed: </span><span class='escape'>\</span><span class='escape'>(</span>task.<span class='field'>show</span>()<span class='escape'>)</span><span class='string'>"</span>);
+    }
+
+    remove(index) {
+        <span class='keyword'>if</span> index &gt;= <span class='keyword'>len</span>(<span class='constant'>this</span>.<span class='field'>completed</span>) {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid task index '</span><span class='escape'>\</span><span class='escape'>(</span>index<span class='escape'>)</span><span class='string'>'"</span>);
+            currently(<span class='keyword'>len</span>(<span class='constant'>this</span>.<span class='field'>completed</span>), <span class='string'>"completed task"</span>);
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        }
+
+        <span class='keyword'>var</span> task = <span class='constant'>this</span>.<span class='field'>completed</span>.<span class='field'>remove</span>(index);
+        io.<span class='field'>println</span>(<span class='string'>"Removed: </span><span class='escape'>\</span><span class='escape'>(</span>task.<span class='field'>show</span>()<span class='escape'>)</span><span class='string'>"</span>);
+    }
+
+    search(query) {
+        <span class='keyword'>var</span> pending = <span class='constant'>false</span>;
+
+        <span class='keyword'>for</span> i, t <span class='keyword'>in</span> <span class='constant'>this</span>.<span class='field'>pending</span> {
+            <span class='keyword'>if</span> !t.<span class='field'>title</span>.<span class='field'>find</span>(query) {
+                <span class='keyword'>continue</span>;
+            }
+
+            <span class='keyword'>if</span> !pending {
+                pending = <span class='constant'>true</span>;
+                io.<span class='field'>println</span>(<span class='string'>"Pending Tasks:"</span>);
+            }
+
+            io.<span class='field'>println</span>(<span class='string'>"[</span><span class='escape'>\</span><span class='escape'>(</span>i<span class='escape'>)</span><span class='string'>]"</span>, t.<span class='field'>show</span>());
+        }
+
+        <span class='keyword'>var</span> completed = <span class='constant'>false</span>;
+
+        <span class='keyword'>for</span> i, t <span class='keyword'>in</span> <span class='constant'>this</span>.<span class='field'>completed</span> {
+            <span class='keyword'>if</span> !t.<span class='field'>title</span>.<span class='field'>find</span>(query) {
+                <span class='keyword'>continue</span>;
+            }
+
+            <span class='keyword'>if</span> !completed {
+                completed = <span class='constant'>true</span>;
+
+                <span class='keyword'>if</span> pending {
+                    io.<span class='field'>println</span>();
+                }
+                io.<span class='field'>println</span>(<span class='string'>"Completed Tasks:"</span>);
+            }
+
+            io.<span class='field'>println</span>(<span class='string'>"[</span><span class='escape'>\</span><span class='escape'>(</span>i<span class='escape'>)</span><span class='string'>]"</span>, t.<span class='field'>show</span>());
+        }
+    }
+
+    save() {
+        <span class='keyword'>var</span> f = io.<span class='field'>Writer</span>(<span class='constant'>this</span>.<span class='field'>path</span>);
+        <span class='keyword'>if</span> !f {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not save tasks to file '</span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>this</span>.<span class='field'>path</span><span class='escape'>)</span><span class='string'>'"</span>);
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        }
+
+        <span class='keyword'>var</span> i = <span class='constant'>0</span>;
+        <span class='keyword'>fn</span> <span class='function'>save</span>(task, prefix) {
+            f.<span class='field'>writeln</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span>prefix<span class='escape'>)</span><span class='string'>:</span><span class='escape'>\</span><span class='escape'>(</span>task.<span class='field'>title</span><span class='escape'>)</span><span class='string'>"</span>);
+            f.<span class='field'>writeln</span>(<span class='string'>"DUE:</span><span class='escape'>\</span><span class='escape'>(</span>date(task.<span class='field'>due</span>)<span class='escape'>)</span><span class='string'>"</span>);
+            f.<span class='field'>writeln</span>(<span class='string'>"TAGS:</span><span class='escape'>\</span><span class='escape'>(</span>task.<span class='field'>tags</span>.<span class='field'>join</span>(<span class='string'>","</span>)<span class='escape'>)</span><span class='string'>"</span>);
+            f.<span class='field'>writeln</span>(<span class='string'>"PRIORITY:</span><span class='escape'>\</span><span class='escape'>(</span>PRIORITIES[task.<span class='field'>priority</span>]<span class='escape'>)</span><span class='string'>"</span>);
+        }
+
+        i = <span class='constant'>0</span>;
+        <span class='keyword'>while</span> i &lt; <span class='keyword'>len</span>(<span class='constant'>this</span>.<span class='field'>pending</span>) {
+            <span class='keyword'>var</span> task = <span class='constant'>this</span>.<span class='field'>pending</span>[i]; i += <span class='constant'>1</span>;
+            save(task, <span class='string'>"PENDING"</span>);
+        }
+
+        i = <span class='constant'>0</span>;
+        <span class='keyword'>while</span> i &lt; <span class='keyword'>len</span>(<span class='constant'>this</span>.<span class='field'>completed</span>) {
+            <span class='keyword'>var</span> task = <span class='constant'>this</span>.<span class='field'>completed</span>[i]; i += <span class='constant'>1</span>;
+            save(task, <span class='string'>"COMPLETED"</span>);
+        }
+
+        f.<span class='field'>close</span>();
+    }
+}
+
+<span class='keyword'>if</span> <span class='constant'>is_main_module</span> {
+    <span class='keyword'>var</span> tasks = Tasks(TASKS_PATH);
+
+    <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>2</span> {
+        io.<span class='field'>eprintln</span>(<span class='string'>"Error: command not provided"</span>);
+        io.<span class='field'>eprintln</span>(<span class='string'>"Usage: </span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>0</span>]<span class='escape'>)</span><span class='string'> &lt;command&gt; [args...]"</span>);
+        io.<span class='field'>eprintln</span>(<span class='string'>"Commands:"</span>);
+        io.<span class='field'>eprintln</span>(<span class='string'>"    add"</span>);
+        io.<span class='field'>eprintln</span>(<span class='string'>"    list"</span>);
+        io.<span class='field'>eprintln</span>(<span class='string'>"    done"</span>);
+        io.<span class='field'>eprintln</span>(<span class='string'>"    remove"</span>);
+        io.<span class='field'>eprintln</span>(<span class='string'>"    search"</span>);
+        os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+    }
+    <span class='keyword'>var</span> command = os.<span class='field'>args</span>[<span class='constant'>1</span>];
+
+    <span class='keyword'>if</span> command == <span class='string'>"add"</span> {
+        <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>3</span> {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: task title not provided"</span>);
+            io.<span class='field'>eprintln</span>(<span class='string'>"Usage: </span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>0</span>]<span class='escape'>)</span><span class='string'> add &lt;title&gt; [flags...]"</span>);
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        }
+
+        tasks.<span class='field'>add</span>(os.<span class='field'>args</span>[<span class='constant'>2</span>], flags(<span class='constant'>3</span>, FLAGS));
+        tasks.<span class='field'>save</span>();
+        <span class='keyword'>return</span>;
+    }
+
+    <span class='keyword'>if</span> command == <span class='string'>"list"</span> {
+        tasks.<span class='field'>list</span>(flags(<span class='constant'>2</span>, FLAGS));
+        <span class='keyword'>return</span>;
+    }
+
+    <span class='keyword'>if</span> command == <span class='string'>"done"</span> {
+        <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>3</span> {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: task index not provided"</span>);
+            io.<span class='field'>eprintln</span>(<span class='string'>"Usage: </span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>0</span>]<span class='escape'>)</span><span class='string'> done &lt;index&gt;"</span>);
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        }
+
+        <span class='keyword'>var</span> index = os.<span class='field'>args</span>[<span class='constant'>2</span>].<span class='field'>tonumber</span>();
+        <span class='keyword'>if</span> !index {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid task index '</span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>)</span><span class='string'>'"</span>);
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        }
+
+        tasks.<span class='field'>done</span>(index);
+        tasks.<span class='field'>save</span>();
+        <span class='keyword'>return</span>;
+    }
+
+    <span class='keyword'>if</span> command == <span class='string'>"remove"</span> {
+        <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>3</span> {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: task index not provided"</span>);
+            io.<span class='field'>eprintln</span>(<span class='string'>"Usage: </span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>0</span>]<span class='escape'>)</span><span class='string'> remove &lt;index&gt;"</span>);
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        }
+
+        <span class='keyword'>var</span> index = os.<span class='field'>args</span>[<span class='constant'>2</span>].<span class='field'>tonumber</span>();
+        <span class='keyword'>if</span> !index {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid task index '</span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>)</span><span class='string'>'"</span>);
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        }
+
+        tasks.<span class='field'>remove</span>(index);
+        tasks.<span class='field'>save</span>();
+        <span class='keyword'>return</span>;
+    }
+
+    <span class='keyword'>if</span> command == <span class='string'>"search"</span> {
+        <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>3</span> {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: search query not provided"</span>);
+            io.<span class='field'>eprintln</span>(<span class='string'>"Usage: </span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>0</span>]<span class='escape'>)</span><span class='string'> search &lt;query&gt;"</span>);
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        }
+
+        <span class='keyword'>var</span> query = Regex(os.<span class='field'>args</span>[<span class='constant'>2</span>]);
+        <span class='keyword'>if</span> !query {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid search query '</span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>)</span><span class='string'>'"</span>);
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        }
+
+        tasks.<span class='field'>search</span>(query);
+        <span class='keyword'>return</span>;
+    }
+
+    io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid command '</span><span class='escape'>\</span><span class='escape'>(</span>command<span class='escape'>)</span><span class='string'>'"</span>);
+    io.<span class='field'>eprintln</span>(<span class='string'>"Available commands:"</span>);
+    io.<span class='field'>eprintln</span>(<span class='string'>"    add"</span>);
+    io.<span class='field'>eprintln</span>(<span class='string'>"    list"</span>);
+    io.<span class='field'>eprintln</span>(<span class='string'>"    done"</span>);
+    io.<span class='field'>eprintln</span>(<span class='string'>"    remove"</span>);
+    io.<span class='field'>eprintln</span>(<span class='string'>"    search"</span>);
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+}
+</pre>
+</pre>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='comment'># Adding a new task (Default priority is medium)</span>
+<span class='constant'>$ </span>bs tasks.bs add "Finish reading book"
+Added: Finish reading book [Priority: medium]
+
+<span class='comment'># Adding a task with a high priority and tag</span>
+<span class='constant'>$ </span>bs tasks.bs add "Submit project report" -due "2024-10-22" -priority high -tag work
+Added: Submit project report (Due: 2024-10-22) [Priority: high] [Tags: work]
+
+<span class='comment'># Listing all tasks</span>
+<span class='constant'>$ </span>bs tasks.bs list
+Pending Tasks:
+[0] Finish reading book [Priority: medium]
+[1] Submit project report (Due: 2024-10-22) [Priority: high] [Tags: work]
+
+<span class='comment'># Marking a task as complete</span>
+<span class='constant'>$ </span>bs tasks.bs done 1
+Completed: Submit project report (Due: 2024-10-22) [Priority: high] [Tags: work]
+
+<span class='comment'># Listing all tasks</span>
+<span class='constant'>$ </span>bs tasks.bs list
+Pending Tasks:
+[0] Finish reading book [Priority: medium]
+
+Completed Tasks:
+[0] Submit project report (Due: 2024-10-22) [Priority: high] [Tags: work]
+
+<span class='comment'># Filtering tasks by tag</span>
+<span class='constant'>$ </span>bs tasks.bs list -tag work
+Completed Tasks:
+[0] Submit project report (Due: 2024-10-22) [Priority: high] [Tags: work]
+
+<span class='comment'># Remove a completed task</span>
+<span class='constant'>$ </span>bs tasks.bs remove 0
+Removed: Submit project report (Due: 2024-10-22) [Priority: high] [Tags: work]
+
+<span class='constant'>$ </span>bs tasks.bs add Finish
+Added: Finish [Priority: medium]
+
+<span class='constant'>$ </span>bs tasks.bs add foo
+Added: foo [Priority: medium]
+
+<span class='constant'>$ </span>bs tasks.bs add bar
+Added: bar [Priority: medium]
+
+<span class='constant'>$ </span>bs tasks.bs done 2
+Completed: Finish [Priority: medium]
+
+<span class='comment'># Search content of tasks using Regex</span>
+<span class='constant'>$ </span>bs tasks.bs search '[fF]'
+Pending Tasks:
+[0] Finish reading book [Priority: medium]
+[1] foo [Priority: medium]
+
+Completed Tasks:
+[0] Finish [Priority: medium]
+</pre>
+</div>
+</section>
 </main>
 <nav id='sidebar' class='collapsed'>
 <ul>
@@ -998,6 +1545,9 @@ Run the program.
 <a href='#s6'> Raylib</a>
 </li>
 </ul>
+</li>
+<li>
+<a href='#s7'> CLI Task Management APP</a>
 </li>
 </ul>
 </nav>

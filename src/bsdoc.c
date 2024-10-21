@@ -686,6 +686,11 @@ int main(int argc, char **argv) {
                         comment.size++;
                         bsdoc_print_styled_sv(f, BSDOC_STYLE_COMMENT, comment);
                     }
+                } else if (bs_sv_prefix(line, Bs_Sv_Static("##"))) {
+                    bs_sv_drop(&line, 1);
+                    bsdoc_print_styled_sv(f, BSDOC_STYLE_COMMENT, line);
+                } else if (bs_sv_prefix(line, Bs_Sv_Static("#"))) {
+                    bsdoc_print_styled_sv(f, BSDOC_STYLE_COMMENT, line);
                 } else {
                     bsdoc_print_styled_sv(f, BSDOC_STYLE_NONE, line);
                 }
