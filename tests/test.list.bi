@@ -1,4 +1,4 @@
-:i count 120
+:i count 121
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -372,6 +372,15 @@ arrays/error_invalid_index_const_assign.bs:2:4: error: expected array index to b
 ]
 
 :b stderr 0
+
+:b shell 46
+../bin/bs arrays/error_remove_out_of_bounds.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 126
+[C]: error: cannot remove item at index 0 from array of length 0
+arrays/error_remove_out_of_bounds.bs:2:10: in array.remove()
 
 :b shell 24
 ../bin/bs tables/main.bs
@@ -1252,7 +1261,7 @@ false
 :b shell 23
 ../bin/bs core/array.bs
 :i returncode 0
-:b stdout 562
+:b stdout 593
 [2, 4, 6, 8, 10]
 [2, 4]
 15
@@ -1301,6 +1310,9 @@ Final:  [3, 4, 1, 5, 2]
     nil,
     nil
 ]
+[1, 2, 3, 4, 5]
+3
+[1, 2, 4, 5]
 
 :b stderr 0
 

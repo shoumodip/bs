@@ -63,3 +63,11 @@ io.println([1, 2, 3, 4, 2].find(2, 2));
     xs.resize(count * 2);
     io.println(xs);
 }
+
+{
+    var xs = [1, 2, 3, 4, 5];
+    io.println(xs);
+
+    io.println(xs.remove(2));
+    io.println(xs);
+}
