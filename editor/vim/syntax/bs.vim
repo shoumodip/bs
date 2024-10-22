@@ -7,7 +7,7 @@ endif
 
 setlocal cindent
 setlocal cinkeys-=0#
-setlocal cinoptions+=+0,p0,(0,W4
+setlocal cinoptions+=(0,W4
 setlocal suffixesadd=.bs
 setlocal commentstring=#%s
 

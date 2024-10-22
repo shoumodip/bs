@@ -94,8 +94,16 @@ static bool bs_should_print_multi(const Bs_Object *object) {
         for (size_t i = 0; i < array->count; i++) {
             const Bs_Value v = array->data[i];
             if (v.type == BS_VALUE_OBJECT) {
-                if (v.as.object->type == BS_OBJECT_ARRAY || v.as.object->type == BS_OBJECT_TABLE) {
+                switch (v.as.object->type) {
+                case BS_OBJECT_ARRAY:
+                case BS_OBJECT_TABLE:
+                case BS_OBJECT_CLASS:
+                case BS_OBJECT_INSTANCE:
+                case BS_OBJECT_C_CLASS:
                     return true;
+
+                default:
+                    break;
                 }
             }
         }

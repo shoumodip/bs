@@ -591,17 +591,19 @@ $ bs demo.bs
 ## String
 Methods for the builtin string value.
 
-### string.slice(start, end) @method
+### string.slice(start, end?) @method
 Slice a string from `start` (inclusive) to `end` (exclusive).
 
 ```bs
 io.println("deez nuts".slice(0, 4));
 io.println("deez nuts".slice(5, 9));
+io.println("deez nuts".slice(5)); # No end defaults to string end
 ```
 
 ```console
 $ bs demo.bs
 deez
+nuts
 nuts
 ```
 
@@ -1376,6 +1378,52 @@ io.println(xs);
 ```console
 $ bs demo.bs
 ["foo", "foo", "foo", "foo", "foo"]
+```
+
+### array.slice(start, end?) @method
+Slice an array from `start` (inclusive) to `end` (exclusive).
+
+```bs
+var xs = [1, 2, 3, 4, 5];
+io.println(xs);
+io.println(xs.slice(2));
+io.println(xs.slice(1, 3));
+```
+
+```console
+$ bs demo.bs
+[1, 2, 3, 4, 5]
+[3, 4, 5]
+[2, 3]
+```
+
+### array.append(other) @method
+Append an array.
+
+This modifies the array.
+
+```bs
+var xs = [1, 2, 3, 4, 5];
+var ys = [6, 7, 8, 9, 10];
+io.println(xs);
+io.println(xs.append(ys));
+```
+
+```console
+$ bs demo.bs
+[1, 2, 3, 4, 5]
+[
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+]
 ```
 
 ## Table

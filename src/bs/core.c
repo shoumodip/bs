@@ -1860,7 +1860,7 @@ Bs_Value bs_array_push(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     Bs_Array *a = (Bs_Array *)args[-1].as.object;
     bs_array_set(bs, a, a->count, args[0]);
-    return bs_value_nil;
+    return args[-1];
 }
 
 Bs_Value bs_array_insert(Bs *bs, Bs_Value *args, size_t arity) {
@@ -1977,6 +1977,48 @@ Bs_Value bs_array_fill(Bs *bs, Bs_Value *args, size_t arity) {
         src->data[i] = args[0];
     }
     return bs_value_object(src);
+}
+
+Bs_Value bs_array_slice(Bs *bs, Bs_Value *args, size_t arity) {
+    if (arity != 1 && arity != 2) {
+        bs_error(bs, "expected 1 or 2 arguments, got %zu", arity);
+    }
+
+    bs_arg_check_whole_number(bs, args, 0);
+    if (arity == 2) {
+        bs_arg_check_whole_number(bs, args, 1);
+    }
+
+    const Bs_Array *src = (const Bs_Array *)args[-1].as.object;
+    const size_t begin = args[0].as.number;
+    const size_t end = (arity == 2) ? args[1].as.number : src->count;
+
+    Bs_Array *dst = bs_array_new(bs);
+    if (begin == end) {
+        return bs_value_object(dst);
+    }
+
+    if (begin >= src->count || end > src->count) {
+        bs_error(bs, "cannot slice array of length %zu from %zu to %zu", src->count, begin, end);
+    }
+
+    for (size_t i = begin; i < end; i++) {
+        bs_array_set(bs, dst, i - begin, src->data[i]);
+    }
+    return bs_value_object(dst);
+}
+
+Bs_Value bs_array_append(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
+
+    Bs_Array *dst = (Bs_Array *)args[-1].as.object;
+    const Bs_Array *src = (const Bs_Array *)args[0].as.object;
+
+    for (size_t i = 0; i < src->count; i++) {
+        bs_array_set(bs, dst, dst->count, src->data[i]);
+    }
+    return bs_value_object(dst);
 }
 
 // Table
@@ -2398,6 +2440,8 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
             bs, BS_OBJECT_ARRAY, Bs_Sv_Static("reverse"), bs_array_reverse);
 
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("fill"), bs_array_fill);
+        bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("slice"), bs_array_slice);
+        bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("append"), bs_array_append);
     }
 
     {
