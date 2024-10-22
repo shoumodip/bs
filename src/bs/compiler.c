@@ -12,17 +12,20 @@ typedef enum {
     BS_POWER_BOR,
     BS_POWER_MUL,
     BS_POWER_PRE,
+    BS_POWER_IN,
     BS_POWER_DOT,
 } Bs_Power;
 
 static_assert(BS_COUNT_TOKENS == 74, "Update bs_token_type_power()");
 static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     switch (type) {
-    case BS_TOKEN_IN:
     case BS_TOKEN_DOT:
     case BS_TOKEN_LPAREN:
     case BS_TOKEN_LBRACKET:
         return BS_POWER_DOT;
+
+    case BS_TOKEN_IN:
+        return BS_POWER_IN;
 
     case BS_TOKEN_ADD:
     case BS_TOKEN_SUB:
