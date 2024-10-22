@@ -1,0 +1,20 @@
+io.println(nil is "nil");
+io.println(true is "boolean");
+io.println(69 is "number");
+io.println(fn () {} is "function");
+io.println("deez" is "string");
+io.println([] is "array");
+io.println({} is "table");
+io.println("".reverse is "function");
+io.println(Regex is "class");
+io.println(Regex("") is "Regex");
+
+io.println(true is "nil");
+io.println(69 is "nil");
+io.println(fn () {} is "nil");
+io.println("deez" is "nil");
+io.println([] is "nil");
+io.println({} is "nil");
+io.println("".reverse is "nil");
+io.println(Regex is "nil");
+io.println(Regex("") is "nil");

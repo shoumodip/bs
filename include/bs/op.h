@@ -50,6 +50,7 @@ typedef enum {
     BS_OP_NE,
 
     BS_OP_IN,
+    BS_OP_IS,
     BS_OP_LEN,
     BS_OP_JOIN,
     BS_OP_PANIC,

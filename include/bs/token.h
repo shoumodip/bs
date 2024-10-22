@@ -86,6 +86,7 @@ typedef enum {
     BS_TOKEN_THEN,
     BS_TOKEN_ELSE,
     BS_TOKEN_IN,
+    BS_TOKEN_IS,
     BS_TOKEN_FOR,
     BS_TOKEN_WHILE,
     BS_TOKEN_BREAK,

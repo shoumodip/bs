@@ -57,6 +57,7 @@
 ../bin/bs closures/main.bs
 ../bin/bs closures/loops.bs
 ../bin/bs typeof/main.bs
+../bin/bs typeof/is.bs
 ../bin/bs pretty_printing/main.bs
 ../bin/bs oop/error_cannot_return_from_init.bs
 ../bin/bs oop/error_this_outside_class.bs

@@ -1,4 +1,4 @@
-:i count 121
+:i count 122
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -754,6 +754,32 @@ string
 array
 table
 function
+
+:b stderr 0
+
+:b shell 22
+../bin/bs typeof/is.bs
+:i returncode 0
+:b stdout 104
+true
+true
+true
+true
+true
+true
+true
+true
+true
+true
+false
+false
+false
+false
+false
+false
+false
+false
+false
 
 :b stderr 0
 

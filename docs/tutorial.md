@@ -229,6 +229,19 @@ io.println(typeof({}));       # Output: table
 io.println(typeof(fn () {})); # Output: function
 ```
 
+#### Is
+```bs
+io.println(nil is "nil");           # Output: true
+io.println(true is "boolean");      # Output: true
+io.println(69 is "number");         # Output: true
+io.println("deez" is "string");     # Output: true
+io.println([] is "array");          # Output: true
+io.println({} is "table");          # Output: true
+io.println(fn () {} is "function"); # Output: true
+
+io.println(420 is "nil");           # Output: false
+```
+
 ## Conditions
 ### If Statement
 ```bs

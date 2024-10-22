@@ -1637,7 +1637,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 66, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 67, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const bool handles_on_save = bs->handles_on;
@@ -2160,6 +2160,18 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
             assert(map);
             bs_stack_push(bs, bs_value_bool(bs_map_get(bs, map, key, NULL)));
+        } break;
+
+        case BS_OP_IS: {
+            const Bs_Value type = bs_stack_pop(bs);
+            bs_check_object_type(bs, type, BS_OBJECT_STR, "type name");
+
+            const Bs_Str *str = (const Bs_Str *)type.as.object;
+            const Bs_Value value = bs_stack_pop(bs);
+            bs_stack_push(
+                bs,
+                bs_value_bool(
+                    bs_sv_eq(bs_value_type_name_full(value), Bs_Sv(str->data, str->size))));
         } break;
 
         case BS_OP_LEN: {

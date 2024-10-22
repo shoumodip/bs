@@ -41,6 +41,7 @@ static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type) {
     case BS_TOKEN_THEN:
     case BS_TOKEN_ELSE:
     case BS_TOKEN_IN:
+    case BS_TOKEN_IS:
     case BS_TOKEN_FOR:
     case BS_TOKEN_WHILE:
     case BS_TOKEN_BREAK:
