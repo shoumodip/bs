@@ -139,6 +139,8 @@ struct Bs_Lambda {
 
     Bs_Fn *fn;
     Bs_Uplocals uplocals;
+
+    bool is_repl;
 };
 
 #define bs_lambda_push bs_da_push
@@ -207,6 +209,7 @@ typedef struct {
     Bs_Op_Locs locations;
 
     bool is_main;
+    bool last_stmt_was_expr;
 } Bs_Compiler;
 
 static size_t bs_compile_jump_start(Bs_Compiler *c, Bs_Op op) {
@@ -1400,7 +1403,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
     } break;
 
     case BS_TOKEN_FN:
-        bs_compile_function(c, false);
+        bs_compile_function(c, c->lambda->is_repl && c->lambda->depth == 1);
         break;
 
     case BS_TOKEN_PUB:
@@ -1435,11 +1438,11 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         break;
 
     case BS_TOKEN_VAR:
-        bs_compile_variable(c, false);
+        bs_compile_variable(c, c->lambda->is_repl && c->lambda->depth == 1);
         break;
 
     case BS_TOKEN_CLASS:
-        bs_compile_class(c, false);
+        bs_compile_class(c, c->lambda->is_repl && c->lambda->depth == 1);
         break;
 
     case BS_TOKEN_RETURN:
@@ -1500,16 +1503,22 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         bs_compile_expr(c, BS_POWER_NIL);
         bs_lexer_expect(&c->lexer, BS_TOKEN_EOL);
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
+
+        c->last_stmt_was_expr = c->lambda->is_repl && c->lambda->depth == 1;
+        break;
     }
 }
 
-Bs_Fn *bs_compile_impl(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main) {
+Bs_Fn *bs_compile_impl(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl) {
     Bs_Compiler compiler = {
         .bs = bs,
         .is_main = is_main,
     };
 
-    Bs_Lambda lambda = {.type = BS_LAMBDA_FN};
+    Bs_Lambda lambda = {
+        .type = BS_LAMBDA_FN,
+        .is_repl = is_repl,
+    };
     bs_compile_lambda_init(&compiler, &lambda, path);
     bs_compile_block_init(&compiler);
 
@@ -1536,7 +1545,12 @@ Bs_Fn *bs_compile_impl(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main) {
     }
 
     while (!bs_lexer_read(&compiler.lexer, BS_TOKEN_EOF)) {
+        compiler.last_stmt_was_expr = false;
         bs_compile_stmt(&compiler);
+    }
+
+    if (is_repl && compiler.last_stmt_was_expr) {
+        compiler.chunk->data[compiler.chunk->last] = BS_OP_RET;
     }
 
     Bs_Fn *fn = bs_compile_lambda_end(&compiler);

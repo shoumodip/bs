@@ -1016,7 +1016,7 @@ panic();
 
 ```console
 $ bs panic.bs
-panic/panic.bs:1:1: Panic
+panic/panic.bs:1:1: panic
 ```
 
 An optional message can also be provided.
