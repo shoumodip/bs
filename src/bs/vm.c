@@ -1302,8 +1302,19 @@ const Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_r
         return NULL;
     }
 
-    bs_modules_push(bs, &bs->modules, module);
-    fn->module = bs->modules.count;
+    static size_t repl_module_index;
+    if (is_repl) {
+        if (repl_module_index) {
+            bs->modules.data[repl_module_index - 1] = module;
+        } else {
+            bs_modules_push(bs, &bs->modules, module);
+            repl_module_index = bs->modules.count;
+        }
+        fn->module = repl_module_index;
+    } else {
+        bs_modules_push(bs, &bs->modules, module);
+        fn->module = bs->modules.count;
+    }
     return fn;
 }
 
