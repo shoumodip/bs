@@ -26,6 +26,7 @@ static Bs_Power bs_token_type_power(Bs_Token_Type type) {
 
     case BS_TOKEN_IN:
     case BS_TOKEN_IS:
+    case BS_TOKEN_LNOT:
         return BS_POWER_IN;
 
     case BS_TOKEN_ADD:
@@ -981,6 +982,21 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             bs_compile_expr(c, lbp);
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_IS);
             bs_chunk_push_op_loc(c->bs, c->chunk, loc);
+            break;
+
+        case BS_TOKEN_LNOT:
+            token = bs_lexer_either(&c->lexer, BS_TOKEN_IN, BS_TOKEN_IS);
+            if (token.type == BS_TOKEN_IN) {
+                bs_compile_expr(c, lbp);
+                bs_chunk_push_op(c->bs, c->chunk, BS_OP_IN);
+                bs_chunk_push_op_loc(c->bs, c->chunk, loc);
+            } else {
+                loc = bs_lexer_peek(&c->lexer).loc;
+                bs_compile_expr(c, lbp);
+                bs_chunk_push_op(c->bs, c->chunk, BS_OP_IS);
+                bs_chunk_push_op_loc(c->bs, c->chunk, loc);
+            }
+            bs_chunk_push_op(c->bs, c->chunk, BS_OP_LNOT);
             break;
 
         default:

@@ -170,8 +170,8 @@ var table = {
 io.println(table);
 
 # Key access
-io.println(table.foo);            # Output: 69
-io.println(table[69]);            # Output: 420
+io.println(table.foo);             # Output: 69
+io.println(table[69]);             # Output: 420
 
 # Key assignment
 table.key = "value";
@@ -187,17 +187,21 @@ table["bar" ++ 69] = "eh";
 io.println(table);
 
 # Undefined key access is an error
-io.println(table.something);      # Error!
+io.println(table.something);       # Error!
 
 # Check if key exists in a table
-io.println("foo" in table);       # Output: true
-io.println("something" in table); # Output: false
+io.println("foo" in table);        # Output: true
+io.println("something" in table);  # Output: false
+
+# Check if key doesn't exist in a table
+io.println("foo" !in table);       # Output: false
+io.println("something" !in table); # Output: true
 
 # Table length
-io.println(len(table));           # Output: 4
+io.println(len(table));            # Output: 4
 
 # Delete keys
-io.println(delete(table[69]));    # Output: true
+io.println(delete(table[69]));     # Output: true
 
 # Output:
 # {
@@ -208,14 +212,14 @@ io.println(delete(table[69]));    # Output: true
 io.println(table);
 
 # Deletion of non existent key
-io.println(delete(table.wrong));  # Output: false
+io.println(delete(table.wrong));   # Output: false
 
 # Tables are compared by reference, not value
 var xs = {a = 1, b = 2};
 var ys = {a = 1, b = 2};
 var zs = xs;
-io.println(xs == ys);             # Output: false
-io.println(xs == zs);             # Output: true
+io.println(xs == ys);              # Output: false
+io.println(xs == zs);              # Output: true
 ```
 
 ### Typeof
@@ -242,6 +246,7 @@ io.println({} is "table");          # Output: true
 io.println(fn () {} is "function"); # Output: true
 
 io.println(420 is "nil");           # Output: false
+io.println(420 !is "nil");          # Output: true
 ```
 
 ## Conditions

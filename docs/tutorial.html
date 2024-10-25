@@ -323,8 +323,8 @@ io.<span class='field'>println</span>(xs == zs);   <span class='comment'># Outpu
 io.<span class='field'>println</span>(table);
 
 <span class='comment'># Key access</span>
-io.<span class='field'>println</span>(table.<span class='field'>foo</span>);            <span class='comment'># Output: 69</span>
-io.<span class='field'>println</span>(table[<span class='constant'>69</span>]);            <span class='comment'># Output: 420</span>
+io.<span class='field'>println</span>(table.<span class='field'>foo</span>);             <span class='comment'># Output: 69</span>
+io.<span class='field'>println</span>(table[<span class='constant'>69</span>]);             <span class='comment'># Output: 420</span>
 
 <span class='comment'># Key assignment</span>
 table.<span class='field'>key</span> = <span class='string'>"value"</span>;
@@ -340,17 +340,21 @@ table[<span class='string'>"bar"</span> ++ <span class='constant'>69</span>] = <
 io.<span class='field'>println</span>(table);
 
 <span class='comment'># Undefined key access is an error</span>
-io.<span class='field'>println</span>(table.<span class='field'>something</span>);      <span class='comment'># Error!</span>
+io.<span class='field'>println</span>(table.<span class='field'>something</span>);       <span class='comment'># Error!</span>
 
 <span class='comment'># Check if key exists in a table</span>
-io.<span class='field'>println</span>(<span class='string'>"foo"</span> <span class='keyword'>in</span> table);       <span class='comment'># Output: true</span>
-io.<span class='field'>println</span>(<span class='string'>"something"</span> <span class='keyword'>in</span> table); <span class='comment'># Output: false</span>
+io.<span class='field'>println</span>(<span class='string'>"foo"</span> <span class='keyword'>in</span> table);        <span class='comment'># Output: true</span>
+io.<span class='field'>println</span>(<span class='string'>"something"</span> <span class='keyword'>in</span> table);  <span class='comment'># Output: false</span>
+
+<span class='comment'># Check if key doesn't exist in a table</span>
+io.<span class='field'>println</span>(<span class='string'>"foo"</span> !<span class='keyword'>in</span> table);       <span class='comment'># Output: false</span>
+io.<span class='field'>println</span>(<span class='string'>"something"</span> !<span class='keyword'>in</span> table); <span class='comment'># Output: true</span>
 
 <span class='comment'># Table length</span>
-io.<span class='field'>println</span>(<span class='keyword'>len</span>(table));           <span class='comment'># Output: 4</span>
+io.<span class='field'>println</span>(<span class='keyword'>len</span>(table));            <span class='comment'># Output: 4</span>
 
 <span class='comment'># Delete keys</span>
-io.<span class='field'>println</span>(<span class='keyword'>delete</span>(table[<span class='constant'>69</span>]));    <span class='comment'># Output: true</span>
+io.<span class='field'>println</span>(<span class='keyword'>delete</span>(table[<span class='constant'>69</span>]));     <span class='comment'># Output: true</span>
 
 <span class='comment'># Output:</span>
 <span class='comment'># {</span>
@@ -361,14 +365,14 @@ io.<span class='field'>println</span>(<span class='keyword'>delete</span>(table[
 io.<span class='field'>println</span>(table);
 
 <span class='comment'># Deletion of non existent key</span>
-io.<span class='field'>println</span>(<span class='keyword'>delete</span>(table.<span class='field'>wrong</span>));  <span class='comment'># Output: false</span>
+io.<span class='field'>println</span>(<span class='keyword'>delete</span>(table.<span class='field'>wrong</span>));   <span class='comment'># Output: false</span>
 
 <span class='comment'># Tables are compared by reference, not value</span>
 <span class='keyword'>var</span> xs = {a = <span class='constant'>1</span>, b = <span class='constant'>2</span>};
 <span class='keyword'>var</span> ys = {a = <span class='constant'>1</span>, b = <span class='constant'>2</span>};
 <span class='keyword'>var</span> zs = xs;
-io.<span class='field'>println</span>(xs == ys);             <span class='comment'># Output: false</span>
-io.<span class='field'>println</span>(xs == zs);             <span class='comment'># Output: true</span>
+io.<span class='field'>println</span>(xs == ys);              <span class='comment'># Output: false</span>
+io.<span class='field'>println</span>(xs == zs);              <span class='comment'># Output: true</span>
 </pre>
 </pre>
 </div>
@@ -422,6 +426,7 @@ io.<span class='field'>println</span>({} <span class='keyword'>is</span> <span c
 io.<span class='field'>println</span>(<span class='keyword'>fn</span> () {} <span class='keyword'>is</span> <span class='string'>"function"</span>); <span class='comment'># Output: true</span>
 
 io.<span class='field'>println</span>(<span class='constant'>420</span> <span class='keyword'>is</span> <span class='string'>"nil"</span>);           <span class='comment'># Output: false</span>
+io.<span class='field'>println</span>(<span class='constant'>420</span> !<span class='keyword'>is</span> <span class='string'>"nil"</span>);          <span class='comment'># Output: true</span>
 </pre>
 </pre>
 </div>

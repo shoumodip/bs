@@ -1,4 +1,4 @@
-:i count 122
+:i count 123
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -1656,7 +1656,7 @@ assert/with_message.bs:2:1: Ligma
 :b shell 25
 ../bin/bs core/readdir.bs
 :i returncode 0
-:b stdout 358
+:b stdout 382
 arithmetics DIR
 arrays DIR
 assert DIR
@@ -1674,6 +1674,7 @@ functions DIR
 import DIR
 invokation DIR
 loops DIR
+not_is_in_binary_op DIR
 oop DIR
 panic DIR
 pretty_printing DIR
@@ -1684,6 +1685,17 @@ test.list FILE
 test.list.bi FILE
 typeof DIR
 variables DIR
+
+:b stderr 0
+
+:b shell 37
+../bin/bs not_is_in_binary_op/main.bs
+:i returncode 0
+:b stdout 22
+false
+true
+false
+true
 
 :b stderr 0
 

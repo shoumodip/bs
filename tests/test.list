@@ -120,3 +120,4 @@
 ../bin/bs assert/assert.bs
 ../bin/bs assert/with_message.bs
 ../bin/bs core/readdir.bs
+../bin/bs not_is_in_binary_op/main.bs
