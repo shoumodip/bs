@@ -1,5 +1,7 @@
 # Examples
 
+<!-- home-icon -->
+
 ## `cat`
 The UNIX `cat` coreutil.
 

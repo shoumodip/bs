@@ -1,5 +1,7 @@
 # Tutorial
 
+<!-- home-icon -->
+
 ## Introduction
 Let's start with a simple "Hello World" program.
 

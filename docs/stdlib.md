@@ -1,5 +1,7 @@
 # Stdlib
 
+<!-- home-icon -->
+
 ## I/O
 Contains simple I/O primitives.
 

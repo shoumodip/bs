@@ -330,13 +330,13 @@ html {
     scrollbar-width: calc(1.2 * var(--padding));
 }
 
-.github-icon {
+.navigation-icon {
     top: calc((var(--header) - 40px) / 2);
     right: calc((var(--header) - 40px) / 2);
     z-index: 9000;
     position: fixed;
 }
 
-.github-icon:hover {
+.navigation-icon:hover {
     opacity: 0.7;
 }
