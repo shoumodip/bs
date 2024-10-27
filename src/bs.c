@@ -11,6 +11,24 @@ int main(int argc, char **argv) {
 
         static char line[8 * 1024]; // 8KB is enough for all repl related tasks
         Bs_Writer *w = &bs_config(bs)->log;
+
+        bs_fmt(
+            w,
+            "Welcome to the BS Repl!\n"
+            "You can type BS statements here that will be evaluated.\n\n"
+            "Use :q or CTRL-d to quit.\n\n"
+            "Use :! to execute shell commands:\n\n"
+            ":!ls -A\n"
+            ":!vim main.bs\n\n"
+            "Use :{ and :} to execute multiple lines at once:\n\n"
+            ":{\n"
+            "for _ in 0, 5 {\n"
+            "    io.println(\"Hello, world!\");\n"
+            "}\n"
+            ":}\n\n"
+            "Website: https://shoumodip.github.io/bs/\n\n");
+
+        bool print_newline = true;
         while (true) {
             bs_fmt(w, "> ");
             fflush(stdout);
@@ -19,9 +37,18 @@ int main(int argc, char **argv) {
             }
 
             Bs_Sv input = bs_sv_from_cstr(line);
+            if (input.size == 1) {
+                continue;
+            }
+
             if (bs_sv_prefix(input, Bs_Sv_Static(":!"))) {
                 system(line + 2);
                 continue;
+            }
+
+            if (bs_sv_eq(input, Bs_Sv_Static(":q\n"))) {
+                print_newline = false;
+                break;
             }
 
             if (bs_sv_eq(input, Bs_Sv_Static(":{\n"))) {
@@ -53,7 +80,9 @@ int main(int argc, char **argv) {
             }
         }
 
-        bs_fmt(w, "\n");
+        if (print_newline) {
+            bs_fmt(w, "\n");
+        }
         bs_free(bs);
         return result.exit == -1 ? !result.ok : result.exit;
     }
