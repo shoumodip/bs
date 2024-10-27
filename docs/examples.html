@@ -1163,6 +1163,835 @@ Done: Finish reading book
 </pre>
 </div>
 </section>
+<section id='s8'>
+<h2> Flappy Bird</h2>
+<p>
+Flappy Bird using Raylib.
+</p>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='comment'>// raylib.c
+</span>
+<span class='field'>#include</span> <span class='string'>"raylib.h"</span>
+<span class='field'>#include</span> <span class='string'>"bs/object.h"</span>
+
+<span class='class'>Bs_Value</span> rl_init_window(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>3</span>);
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>1</span>);
+    <span class='function'>bs_arg_check_object_type</span>(bs, args, <span class='constant'>2</span>, <span class='constant'>BS_OBJECT_STR</span>);
+
+    <span class='keyword'>const</span> <span class='class'>int</span> width = args[<span class='constant'>0</span>].as.number;
+    <span class='keyword'>const</span> <span class='class'>int</span> height = args[<span class='constant'>1</span>].as.number;
+    <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *title = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>2</span>].as.object;
+
+    <span class='function'>InitWindow</span>(width, height, title-&gt;data);
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_init_audio_device(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
+    InitAudioDevice();
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_set_target_fps(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
+    SetTargetFPS(args[<span class='constant'>0</span>].as.number);
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_close_window(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
+    <span class='function'>CloseWindow</span>();
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_close_audio_device(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
+    CloseAudioDevice();
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_window_should_close(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
+    <span class='keyword'>return</span> <span class='function'>bs_value_bool</span>(<span class='function'>WindowShouldClose</span>());
+}
+
+<span class='class'>Bs_Value</span> rl_begin_drawing(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
+    <span class='function'>BeginDrawing</span>();
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_end_drawing(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
+    <span class='function'>EndDrawing</span>();
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_clear_background(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
+    <span class='function'>ClearBackground</span>(<span class='function'>GetColor</span>(args[<span class='constant'>0</span>].as.number));
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_draw_rectangle(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>5</span>);
+    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_VALUE_NUM</span>);
+    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>1</span>, <span class='constant'>BS_VALUE_NUM</span>);
+    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>2</span>, <span class='constant'>BS_VALUE_NUM</span>);
+    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>3</span>, <span class='constant'>BS_VALUE_NUM</span>);
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>4</span>);
+
+    <span class='keyword'>const</span> <span class='class'>int</span> x = args[<span class='constant'>0</span>].as.number;
+    <span class='keyword'>const</span> <span class='class'>int</span> y = args[<span class='constant'>1</span>].as.number;
+    <span class='keyword'>const</span> <span class='class'>int</span> width = args[<span class='constant'>2</span>].as.number;
+    <span class='keyword'>const</span> <span class='class'>int</span> height = args[<span class='constant'>3</span>].as.number;
+    <span class='keyword'>const</span> <span class='class'>Color</span> color = <span class='function'>GetColor</span>(args[<span class='constant'>4</span>].as.number);
+
+    DrawRectangleLines(x, y, width, height, color);
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_is_key_pressed(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
+    <span class='keyword'>return</span> <span class='function'>bs_value_bool</span>(IsKeyPressed(args[<span class='constant'>0</span>].as.number));
+}
+
+<span class='class'>Bs_Value</span> rl_get_frame_time(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
+    <span class='keyword'>return</span> <span class='function'>bs_value_num</span>(GetFrameTime());
+}
+
+<span class='class'>Bs_Value</span> rl_texture_init(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
+    <span class='function'>bs_arg_check_object_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_OBJECT_STR</span>);
+
+    <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *path = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>0</span>].as.object;
+
+    Texture texture = LoadTexture(path-&gt;data);
+    <span class='keyword'>if</span> (!IsTextureReady(texture)) {
+        <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+    }
+
+    bs_this_as(args, Texture) = texture;
+    <span class='keyword'>return</span> args[-<span class='constant'>1</span>];
+}
+
+<span class='class'>Bs_Value</span> rl_texture_draw(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>5</span>);
+    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_VALUE_NUM</span>);
+    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>1</span>, <span class='constant'>BS_VALUE_NUM</span>);
+    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>2</span>, <span class='constant'>BS_VALUE_NUM</span>);
+    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>3</span>, <span class='constant'>BS_VALUE_NUM</span>);
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>4</span>);
+
+    <span class='keyword'>const</span> float scale = args[<span class='constant'>3</span>].as.number;
+
+    <span class='keyword'>const</span> Texture texture = bs_this_as(args, Texture);
+    <span class='keyword'>const</span> Rectangle src = {<span class='constant'>0</span>, <span class='constant'>0</span>, texture.width, texture.height};
+    <span class='keyword'>const</span> Rectangle dst = {
+        args[<span class='constant'>0</span>].as.number + (texture.width * scale) / <span class='constant'>2.0</span>,
+        args[<span class='constant'>1</span>].as.number + (texture.height * scale) / <span class='constant'>2.0</span>,
+        texture.width * scale,
+        texture.height * scale,
+    };
+
+    <span class='keyword'>const</span> Vector2 origin = {texture.width * scale / <span class='constant'>2.0</span>, texture.height * scale / <span class='constant'>2.0</span>};
+    <span class='keyword'>const</span> float rotation = args[<span class='constant'>2</span>].as.number;
+    <span class='keyword'>const</span> <span class='class'>Color</span> tint = <span class='function'>GetColor</span>(args[<span class='constant'>4</span>].as.number);
+
+    DrawTexturePro(texture, src, dst, origin, rotation, tint);
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_texture_width(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
+    <span class='keyword'>return</span> <span class='function'>bs_value_num</span>(bs_this_as(args, Texture).width);
+}
+
+<span class='class'>Bs_Value</span> rl_texture_height(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
+    <span class='keyword'>return</span> <span class='function'>bs_value_num</span>(bs_this_as(args, Texture).height);
+}
+
+<span class='class'>Bs_Value</span> rl_texture_unload(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
+    UnloadTexture(bs_this_as(args, Texture));
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_sound_init(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
+    <span class='function'>bs_arg_check_object_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_OBJECT_STR</span>);
+
+    <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *path = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>0</span>].as.object;
+
+    Sound sound = LoadSound(path-&gt;data);
+    <span class='keyword'>if</span> (!IsSoundReady(sound)) {
+        <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+    }
+
+    bs_this_as(args, Sound) = sound;
+    <span class='keyword'>return</span> args[-<span class='constant'>1</span>];
+}
+
+<span class='class'>Bs_Value</span> rl_sound_play(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
+    PlaySound(bs_this_as(args, Sound));
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_sound_unload(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
+    UnloadSound(bs_this_as(args, Sound));
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_music_init(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
+    <span class='function'>bs_arg_check_object_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_OBJECT_STR</span>);
+
+    <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *path = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>0</span>].as.object;
+
+    Music music = LoadMusicStream(path-&gt;data);
+    <span class='keyword'>if</span> (!IsMusicReady(music)) {
+        <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+    }
+
+    <span class='comment'>// An official binding would never do this, but do I care?
+</span>    music.looping = <span class='constant'>true</span>;
+    PlayMusicStream(music);
+    SetMusicVolume(music, <span class='constant'>0.2</span>);
+
+    bs_this_as(args, Music) = music;
+    <span class='keyword'>return</span> args[-<span class='constant'>1</span>];
+}
+
+<span class='class'>Bs_Value</span> rl_music_toggle(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
+    Music music = bs_this_as(args, Music);
+    <span class='keyword'>if</span> (IsMusicStreamPlaying(music)) {
+        StopMusicStream(music);
+    } <span class='keyword'>else</span> {
+        PlayMusicStream(music);
+    }
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_music_update(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
+    UpdateMusicStream(bs_this_as(args, Music));
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='class'>Bs_Value</span> rl_music_unload(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
+    UnloadMusicStream(bs_this_as(args, Music));
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+}
+
+<span class='constant'>BS_LIBRARY_INIT</span> <span class='class'>void</span> bs_library_init(<span class='class'>Bs</span> *bs, <span class='class'>Bs_C_Lib</span> *library) {
+    <span class='keyword'>static</span> <span class='keyword'>const</span> <span class='class'>Bs_FFI</span> ffi[] = {
+        {<span class='string'>"init_window"</span>, rl_init_window},
+        {<span class='string'>"init_audio_device"</span>, rl_init_audio_device},
+        {<span class='string'>"set_target_fps"</span>, rl_set_target_fps},
+        {<span class='string'>"close_window"</span>, rl_close_window},
+        {<span class='string'>"close_audio_device"</span>, rl_close_audio_device},
+        {<span class='string'>"window_should_close"</span>, rl_window_should_close},
+        {<span class='string'>"begin_drawing"</span>, rl_begin_drawing},
+        {<span class='string'>"end_drawing"</span>, rl_end_drawing},
+        {<span class='string'>"clear_background"</span>, rl_clear_background},
+        {<span class='string'>"draw_rectangle"</span>, rl_draw_rectangle},
+        {<span class='string'>"is_key_pressed"</span>, rl_is_key_pressed},
+        {<span class='string'>"get_frame_time"</span>, rl_get_frame_time},
+    };
+    <span class='function'>bs_c_lib_ffi</span>(bs, library, ffi, <span class='function'>bs_c_array_size</span>(ffi));
+
+    Bs_C_Class *texture_class =
+        bs_c_class_new(bs, Bs_Sv_Static(<span class='string'>"Texture"</span>), sizeof(Texture), rl_texture_init);
+
+    texture_class-&gt;can_fail = <span class='constant'>true</span>;
+    bs_c_class_add(bs, texture_class, Bs_Sv_Static(<span class='string'>"draw"</span>), rl_texture_draw);
+    bs_c_class_add(bs, texture_class, Bs_Sv_Static(<span class='string'>"width"</span>), rl_texture_width);
+    bs_c_class_add(bs, texture_class, Bs_Sv_Static(<span class='string'>"height"</span>), rl_texture_height);
+    bs_c_class_add(bs, texture_class, Bs_Sv_Static(<span class='string'>"unload"</span>), rl_texture_unload);
+    bs_c_lib_set(bs, library, texture_class-&gt;name, bs_value_object(texture_class));
+
+    Bs_C_Class *sound_class =
+        bs_c_class_new(bs, Bs_Sv_Static(<span class='string'>"Sound"</span>), sizeof(Sound), rl_sound_init);
+
+    sound_class-&gt;can_fail = <span class='constant'>true</span>;
+    bs_c_class_add(bs, sound_class, Bs_Sv_Static(<span class='string'>"play"</span>), rl_sound_play);
+    bs_c_class_add(bs, sound_class, Bs_Sv_Static(<span class='string'>"unload"</span>), rl_sound_unload);
+    bs_c_lib_set(bs, library, sound_class-&gt;name, bs_value_object(sound_class));
+
+    Bs_C_Class *music_class =
+        bs_c_class_new(bs, Bs_Sv_Static(<span class='string'>"Music"</span>), sizeof(Music), rl_music_init);
+
+    music_class-&gt;can_fail = <span class='constant'>true</span>;
+    bs_c_class_add(bs, music_class, Bs_Sv_Static(<span class='string'>"toggle"</span>), rl_music_toggle);
+    bs_c_class_add(bs, music_class, Bs_Sv_Static(<span class='string'>"update"</span>), rl_music_update);
+    bs_c_class_add(bs, music_class, Bs_Sv_Static(<span class='string'>"unload"</span>), rl_music_unload);
+    bs_c_lib_set(bs, library, music_class-&gt;name, bs_value_object(music_class));
+}
+</pre>
+</div>
+<p>
+Compile the raylib module.
+</p>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='constant'>$ </span>cc -o raylib.so -fPIC -shared raylib.c -lbs -lraylib    <span class='comment'># On Linux</span>
+<span class='constant'>$ </span>cc -o raylib.dylib -fPIC -shared raylib.c -lbs -lraylib <span class='comment'># On macOS</span>
+<span class='constant'>$ </span>cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib        <span class='comment'># On Windows</span>
+</pre>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='comment'># flappy_bird.bs</span>
+
+<span class='keyword'>var</span> rl = <span class='keyword'>import</span>(<span class='string'>"raylib"</span>);
+<span class='keyword'>var</span> game = {};
+
+<span class='keyword'>var</span> WIDTH = <span class='constant'>800</span>;
+<span class='keyword'>var</span> HEIGHT = <span class='constant'>600</span>;
+
+<span class='keyword'>var</span> GRAVITY = <span class='constant'>0.5</span>;
+<span class='keyword'>var</span> IMPULSE = -<span class='constant'>7</span>;
+
+<span class='keyword'>var</span> BIRD_TILT = <span class='constant'>20</span>;
+<span class='keyword'>var</span> BIRD_STARTOFF_SPEED = <span class='constant'>7</span>;
+<span class='keyword'>var</span> BIRD_ANIMATION_SPEED = <span class='constant'>0.2</span>;
+
+<span class='keyword'>var</span> BIRD_MIN_X = <span class='constant'>100</span>;
+<span class='keyword'>var</span> BIRD_MIN_Y = <span class='constant'>50</span>;
+
+<span class='keyword'>var</span> PIPE_GAP = <span class='constant'>120</span>;
+<span class='keyword'>var</span> PIPE_SPEED = -<span class='constant'>4</span>;
+<span class='keyword'>var</span> PIPE_SPAWN_DELAY = <span class='constant'>1.5</span>;
+<span class='keyword'>var</span> PIPE_SPAWN_RANGE = HEIGHT / <span class='constant'>5</span>;
+
+<span class='keyword'>var</span> BACKGROUND_SCROLL_SPEED = <span class='constant'>0.5</span>;
+
+<span class='keyword'>var</span> MESSAGE_PADDING = <span class='constant'>30</span>;
+<span class='keyword'>var</span> OVER_MESSAGE_SCALE = <span class='constant'>1.2</span>;
+<span class='keyword'>var</span> TITLE_MESSAGE_SCALE = <span class='constant'>1.2</span>;
+<span class='keyword'>var</span> CONTINUE_MESSAGE_SCALE = <span class='constant'>0.7</span>;
+
+<span class='keyword'>var</span> BACKGROUND_MUSIC_DELAY = <span class='constant'>1.2</span>;
+
+<span class='keyword'>var</span> DEBUG_COLOR = <span class='constant'>0xFF0000FF</span>;
+<span class='keyword'>var</span> DEBUG_HITBOX = <span class='constant'>false</span>;
+
+<span class='keyword'>class</span> <span class='class'>Assets</span> {
+    init() {
+        <span class='constant'>this</span>.<span class='field'>sounds</span> = {};
+        <span class='constant'>this</span>.<span class='field'>textures</span> = {};
+    }
+
+    sound(path, loader) {
+        path = <span class='string'>"assets/sounds/"</span> ++ path;
+        <span class='keyword'>if</span> path <span class='keyword'>in</span> <span class='constant'>this</span>.<span class='field'>sounds</span> {
+            <span class='keyword'>return</span> <span class='constant'>this</span>.<span class='field'>sounds</span>[path];
+        }
+
+        <span class='keyword'>var</span> sound = loader(path);
+        <span class='keyword'>if</span> !sound {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not load sound '</span><span class='escape'>\</span><span class='escape'>(</span>path<span class='escape'>)</span><span class='string'>'"</span>);
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        }
+
+        <span class='constant'>this</span>.<span class='field'>sounds</span>[path] = sound;
+        <span class='keyword'>return</span> sound;
+    }
+
+    texture(path) {
+        path = <span class='string'>"assets/images/"</span> ++ path;
+        <span class='keyword'>if</span> path <span class='keyword'>in</span> <span class='constant'>this</span>.<span class='field'>textures</span> {
+            <span class='keyword'>return</span> <span class='constant'>this</span>.<span class='field'>textures</span>[path];
+        }
+
+        <span class='keyword'>var</span> texture = rl.<span class='field'>Texture</span>(path);
+        <span class='keyword'>if</span> !texture {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not load image '</span><span class='escape'>\</span><span class='escape'>(</span>path<span class='escape'>)</span><span class='string'>'"</span>);
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        }
+
+        <span class='constant'>this</span>.<span class='field'>textures</span>[path] = texture;
+        <span class='keyword'>return</span> texture;
+    }
+
+    unload() {
+        <span class='keyword'>for</span> _, sound <span class='keyword'>in</span> <span class='constant'>this</span>.<span class='field'>sounds</span> {
+            sound.<span class='field'>unload</span>();
+        }
+
+        <span class='keyword'>for</span> _, texture <span class='keyword'>in</span> <span class='constant'>this</span>.<span class='field'>textures</span> {
+            texture.<span class='field'>unload</span>();
+        }
+    }
+}
+
+<span class='keyword'>class</span> <span class='class'>Hitbox</span> {
+    init(x, y, width, height) {
+        <span class='constant'>this</span>.<span class='field'>x</span> = x;
+        <span class='constant'>this</span>.<span class='field'>y</span> = y;
+        <span class='constant'>this</span>.<span class='field'>width</span> = width;
+        <span class='constant'>this</span>.<span class='field'>height</span> = height;
+    }
+
+    move(x, y) {
+        <span class='constant'>this</span>.<span class='field'>x</span> = x;
+        <span class='constant'>this</span>.<span class='field'>y</span> = y;
+    }
+
+    debug() {
+        <span class='keyword'>if</span> DEBUG_HITBOX {
+            rl.<span class='field'>draw_rectangle</span>(<span class='constant'>this</span>.<span class='field'>x</span>, <span class='constant'>this</span>.<span class='field'>y</span>, <span class='constant'>this</span>.<span class='field'>width</span>, <span class='constant'>this</span>.<span class='field'>height</span>, DEBUG_COLOR);
+        }
+    }
+
+    collides(that) {
+        <span class='keyword'>return</span>
+            <span class='constant'>this</span>.<span class='field'>x</span> &lt; that.<span class='field'>x</span> + that.<span class='field'>width</span> &amp;&amp; <span class='constant'>this</span>.<span class='field'>x</span> + <span class='constant'>this</span>.<span class='field'>width</span> &gt; that.<span class='field'>x</span> &amp;&amp;
+            <span class='constant'>this</span>.<span class='field'>y</span> &lt; that.<span class='field'>y</span> + that.<span class='field'>height</span> &amp;&amp; <span class='constant'>this</span>.<span class='field'>y</span> + <span class='constant'>this</span>.<span class='field'>height</span> &gt; that.<span class='field'>y</span>;
+    }
+}
+
+<span class='keyword'>class</span> <span class='class'>Bird</span> {
+    init() {
+        <span class='constant'>this</span>.<span class='field'>dy</span> = <span class='constant'>0</span>;
+        <span class='constant'>this</span>.<span class='field'>current</span> = <span class='constant'>0</span>;
+        <span class='constant'>this</span>.<span class='field'>textures</span> = [
+            game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"bird0.png"</span>),
+            game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"bird1.png"</span>),
+            game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"bird2.png"</span>),
+        ];
+
+        <span class='keyword'>var</span> w = <span class='constant'>this</span>.<span class='field'>textures</span>[<span class='constant'>0</span>].<span class='field'>width</span>() * game.<span class='field'>scale</span>;
+        <span class='keyword'>var</span> h = <span class='constant'>this</span>.<span class='field'>textures</span>[<span class='constant'>0</span>].<span class='field'>height</span>() * game.<span class='field'>scale</span>;
+        <span class='constant'>this</span>.<span class='field'>hitbox</span> = Hitbox((WIDTH - w) / <span class='constant'>2</span>, HEIGHT / <span class='constant'>3</span>, w, h);
+    }
+
+    update() {
+        <span class='keyword'>if</span> game.<span class='field'>started</span> {
+            <span class='keyword'>if</span> !game.<span class='field'>over</span> &amp;&amp; <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>x</span> &gt; BIRD_MIN_X {
+                <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>x</span> -= BIRD_STARTOFF_SPEED;
+                <span class='constant'>this</span>.<span class='field'>dy</span> -= <span class='constant'>0.3</span> * GRAVITY;
+            }
+
+            <span class='keyword'>var</span> needs_dy = !game.<span class='field'>over</span> || <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span> + <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>height</span> * game.<span class='field'>scale</span> &lt; game.<span class='field'>base</span>.<span class='field'>y</span>;
+            <span class='keyword'>if</span> needs_dy {
+                <span class='constant'>this</span>.<span class='field'>dy</span> += GRAVITY;
+            }
+
+            <span class='keyword'>if</span> !game.<span class='field'>over</span> &amp;&amp; rl.<span class='field'>is_key_pressed</span>(<span class='constant'>32</span>) {
+                <span class='constant'>this</span>.<span class='field'>dy</span> = IMPULSE;
+            }
+
+            <span class='keyword'>if</span> needs_dy {
+                <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span> += <span class='constant'>this</span>.<span class='field'>dy</span>;
+                <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span> &lt; BIRD_MIN_Y {
+                    <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span> = BIRD_MIN_Y;
+                }
+            }
+
+            <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span> + <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>height</span> &gt;= game.<span class='field'>base</span>.<span class='field'>y</span> {
+                game.<span class='field'>die</span>();
+            }
+        }
+
+        <span class='keyword'>if</span> !game.<span class='field'>over</span> {
+            <span class='constant'>this</span>.<span class='field'>current</span> += rl.<span class='field'>get_frame_time</span>();
+            <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>current</span> &gt;= BIRD_ANIMATION_SPEED * <span class='keyword'>len</span>(<span class='constant'>this</span>.<span class='field'>textures</span>) {
+                <span class='constant'>this</span>.<span class='field'>current</span> %= BIRD_ANIMATION_SPEED * <span class='keyword'>len</span>(<span class='constant'>this</span>.<span class='field'>textures</span>);
+            }
+        }
+
+        <span class='constant'>this</span>.<span class='field'>textures</span>[(<span class='constant'>this</span>.<span class='field'>current</span> / BIRD_ANIMATION_SPEED).<span class='field'>floor</span>()].<span class='field'>draw</span>(
+            <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>x</span>,
+            <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span>,
+            <span class='constant'>this</span>.<span class='field'>dy</span>.<span class='field'>sign</span>() * BIRD_TILT,
+            game.<span class='field'>scale</span>,
+            <span class='constant'>0xFFFFFFFF</span>);
+
+        <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>debug</span>();
+    }
+}
+
+<span class='keyword'>class</span> <span class='class'>Background</span> {
+    init() {
+        <span class='constant'>this</span>.<span class='field'>x</span> = <span class='constant'>0</span>;
+        <span class='constant'>this</span>.<span class='field'>texture</span> = game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"background.png"</span>);
+        <span class='constant'>this</span>.<span class='field'>width</span> = <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>width</span>();
+        game.<span class='field'>scale</span> = HEIGHT / <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>height</span>();
+    }
+
+    update() {
+        <span class='keyword'>if</span> !game.<span class='field'>over</span> {
+            <span class='constant'>this</span>.<span class='field'>x</span> -= BACKGROUND_SCROLL_SPEED;
+            <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>x</span> &lt; -<span class='constant'>this</span>.<span class='field'>width</span> {
+                <span class='constant'>this</span>.<span class='field'>x</span> = <span class='constant'>0</span>;
+            }
+        }
+
+        <span class='keyword'>var</span> i = <span class='constant'>0</span>;
+        <span class='keyword'>while</span> <span class='constant'>this</span>.<span class='field'>x</span> + <span class='constant'>this</span>.<span class='field'>width</span> * i &lt; WIDTH {
+            <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>draw</span>(<span class='constant'>this</span>.<span class='field'>x</span> + <span class='constant'>this</span>.<span class='field'>width</span> * i, <span class='constant'>0</span>, <span class='constant'>0</span>, game.<span class='field'>scale</span>, <span class='constant'>0xFFFFFFFF</span>);
+            i += <span class='constant'>1</span>;
+        }
+    }
+}
+
+<span class='keyword'>class</span> <span class='class'>Base</span> {
+    init() {
+        <span class='constant'>this</span>.<span class='field'>x</span> = <span class='constant'>0</span>;
+        <span class='constant'>this</span>.<span class='field'>texture</span> = game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"base.png"</span>);
+        <span class='constant'>this</span>.<span class='field'>width</span> = <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>width</span>();
+        <span class='constant'>this</span>.<span class='field'>y</span> = HEIGHT - <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>height</span>() * game.<span class='field'>scale</span> * <span class='constant'>0.9</span>;
+    }
+
+    update() {
+        <span class='keyword'>if</span> !game.<span class='field'>over</span> {
+            <span class='constant'>this</span>.<span class='field'>x</span> += PIPE_SPEED;
+            <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>x</span> &lt; -<span class='constant'>this</span>.<span class='field'>width</span> {
+                <span class='constant'>this</span>.<span class='field'>x</span> = <span class='constant'>0</span>;
+            }
+        }
+
+        <span class='keyword'>var</span> i = <span class='constant'>0</span>;
+        <span class='keyword'>while</span> <span class='constant'>this</span>.<span class='field'>x</span> + <span class='constant'>this</span>.<span class='field'>width</span> * i &lt; WIDTH {
+            <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>draw</span>(
+                <span class='constant'>this</span>.<span class='field'>x</span> + <span class='constant'>this</span>.<span class='field'>width</span> * i,
+                <span class='constant'>this</span>.<span class='field'>y</span>,
+                <span class='constant'>0</span>,
+                game.<span class='field'>scale</span>,
+                <span class='constant'>0xFFFFFFFF</span>);
+
+            i += <span class='constant'>1</span>;
+        }
+    }
+}
+
+<span class='keyword'>class</span> <span class='class'>Pipe</span> {
+    init(y) {
+        <span class='constant'>this</span>.<span class='field'>dx</span> = PIPE_SPEED;
+        <span class='constant'>this</span>.<span class='field'>texture</span> = game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"pipe.png"</span>);
+        <span class='constant'>this</span>.<span class='field'>hitbox</span> = Hitbox(
+            WIDTH,
+            y,
+            <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>width</span>() * game.<span class='field'>scale</span>,
+            <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>height</span>() * game.<span class='field'>scale</span>);
+
+        <span class='constant'>this</span>.<span class='field'>scored</span> = <span class='constant'>false</span>;
+    }
+
+    top() {
+        <span class='keyword'>return</span> Hitbox(
+            <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>x</span>,
+            <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span> - <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>height</span> / <span class='constant'>2</span>,
+            <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>width</span>,
+            <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>height</span>);
+    }
+
+    bottom() {
+        <span class='keyword'>return</span> Hitbox(
+            <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>x</span>,
+            <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span> + <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>height</span> / <span class='constant'>2</span> + PIPE_GAP,
+            <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>width</span>,
+            <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>height</span>);
+    }
+
+    update() {
+        <span class='keyword'>if</span> !game.<span class='field'>over</span> {
+            <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>x</span> += <span class='constant'>this</span>.<span class='field'>dx</span>;
+            <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>x</span> + <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>width</span> &lt; BIRD_MIN_X &amp;&amp; !<span class='constant'>this</span>.<span class='field'>scored</span> {
+                game.<span class='field'>point</span>();
+                <span class='constant'>this</span>.<span class='field'>scored</span> = <span class='constant'>true</span>;
+            }
+        }
+
+        <span class='keyword'>var</span> top = <span class='constant'>this</span>.<span class='field'>top</span>();
+        <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>draw</span>(top.<span class='field'>x</span>, top.<span class='field'>y</span>, <span class='constant'>180</span>, game.<span class='field'>scale</span>, <span class='constant'>0xFFFFFFFF</span>);
+
+        <span class='keyword'>var</span> bottom = <span class='constant'>this</span>.<span class='field'>bottom</span>();
+        <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>draw</span>(bottom.<span class='field'>x</span>, bottom.<span class='field'>y</span>, <span class='constant'>0</span>, game.<span class='field'>scale</span>, <span class='constant'>0xFFFFFFFF</span>);
+
+        top.<span class='field'>debug</span>();
+        bottom.<span class='field'>debug</span>();
+    }
+}
+
+<span class='keyword'>class</span> <span class='class'>Pipes</span> {
+    init() {
+        <span class='constant'>this</span>.<span class='field'>items</span> = [];
+        <span class='constant'>this</span>.<span class='field'>clock</span> = <span class='constant'>0</span>;
+    }
+
+    update() {
+        <span class='keyword'>if</span> !game.<span class='field'>started</span> {
+            <span class='keyword'>return</span> <span class='constant'>true</span>;
+        }
+
+        <span class='keyword'>if</span> !game.<span class='field'>over</span> {
+            <span class='constant'>this</span>.<span class='field'>clock</span> += rl.<span class='field'>get_frame_time</span>();
+            <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>clock</span> &gt;= PIPE_SPAWN_DELAY {
+                <span class='constant'>this</span>.<span class='field'>items</span>.<span class='field'>push</span>(Pipe(math.<span class='field'>random</span>(-PIPE_SPAWN_RANGE, PIPE_SPAWN_RANGE)));
+                <span class='constant'>this</span>.<span class='field'>clock</span> %= PIPE_SPAWN_DELAY;
+            }
+
+            <span class='constant'>this</span>.<span class='field'>items</span> = <span class='constant'>this</span>.<span class='field'>items</span>.<span class='field'>filter</span>(<span class='keyword'>fn</span> (p) =&gt; p.<span class='field'>hitbox</span>.<span class='field'>x</span> &gt;= -p.<span class='field'>hitbox</span>.<span class='field'>width</span>);
+        }
+
+        <span class='keyword'>for</span> _, pipe <span class='keyword'>in</span> <span class='constant'>this</span>.<span class='field'>items</span> {
+            pipe.<span class='field'>update</span>();
+            <span class='keyword'>if</span> !game.<span class='field'>over</span> &amp;&amp;
+                (pipe.<span class='field'>top</span>().<span class='field'>collides</span>(game.<span class='field'>bird</span>.<span class='field'>hitbox</span>) ||
+                 pipe.<span class='field'>bottom</span>().<span class='field'>collides</span>(game.<span class='field'>bird</span>.<span class='field'>hitbox</span>)) {
+                <span class='keyword'>return</span> <span class='constant'>false</span>;
+            }
+        }
+
+        <span class='keyword'>return</span> <span class='constant'>true</span>;
+    }
+}
+
+<span class='keyword'>class</span> <span class='class'>Score</span> {
+    init() {
+        <span class='constant'>this</span>.<span class='field'>best</span> = <span class='constant'>nil</span>;
+        <span class='constant'>this</span>.<span class='field'>current</span> = <span class='constant'>0</span>;
+        <span class='constant'>this</span>.<span class='field'>textures</span> = [
+            game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"0.png"</span>),
+            game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"1.png"</span>),
+            game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"2.png"</span>),
+            game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"3.png"</span>),
+            game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"4.png"</span>),
+            game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"5.png"</span>),
+            game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"6.png"</span>),
+            game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"7.png"</span>),
+            game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"8.png"</span>),
+            game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"9.png"</span>),
+        ];
+    }
+
+    reset() {
+        <span class='constant'>this</span>.<span class='field'>current</span> = <span class='constant'>0</span>;
+    }
+
+    display() {
+        <span class='keyword'>if</span> game.<span class='field'>started</span> {
+            <span class='keyword'>fn</span> <span class='function'>show</span>(n, y, scale, tint) {
+                <span class='keyword'>var</span> digits = [];
+                <span class='keyword'>if</span> n &lt; <span class='constant'>10</span> {
+                    digits.<span class='field'>push</span>(n);
+                } <span class='keyword'>else</span> {
+                    <span class='keyword'>while</span> n != <span class='constant'>0</span> {
+                        digits.<span class='field'>push</span>(n % <span class='constant'>10</span>);
+                        n = (n / <span class='constant'>10</span>).<span class='field'>floor</span>();
+                    }
+                }
+                digits.<span class='field'>reverse</span>();
+
+                scale *= game.<span class='field'>scale</span>;
+                <span class='keyword'>var</span> width = digits.<span class='field'>reduce</span>(<span class='keyword'>fn</span> (a, b) =&gt; a + <span class='constant'>this</span>.<span class='field'>textures</span>[b].<span class='field'>width</span>() * scale, <span class='constant'>0</span>);
+                <span class='keyword'>var</span> x = (WIDTH - width) / <span class='constant'>2</span>;
+                <span class='keyword'>for</span> _, n <span class='keyword'>in</span> digits {
+                    <span class='constant'>this</span>.<span class='field'>textures</span>[n].<span class='field'>draw</span>(x, y, <span class='constant'>0</span>, scale, tint);
+                    x += <span class='constant'>this</span>.<span class='field'>textures</span>[n].<span class='field'>width</span>();
+                }
+            }
+
+            show(<span class='constant'>this</span>.<span class='field'>current</span>, HEIGHT / <span class='constant'>3.6</span>, <span class='constant'>1.0</span>, <span class='constant'>0xFFFFFFFF</span>);
+            <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>best</span> {
+                show(<span class='constant'>this</span>.<span class='field'>best</span>, HEIGHT / <span class='constant'>2.8</span>, <span class='constant'>0.7</span>, <span class='constant'>0xDDDDDDFF</span>);
+            }
+        }
+    }
+}
+
+rl.<span class='field'>init_window</span>(WIDTH, HEIGHT, <span class='string'>"Hello from BS!"</span>);
+rl.<span class='field'>init_audio_device</span>();
+rl.<span class='field'>set_target_fps</span>(<span class='constant'>60</span>);
+
+game.<span class='field'>assets</span> = Assets();
+game.<span class='field'>started</span> = <span class='constant'>false</span>;
+game.<span class='field'>over</span> = <span class='constant'>false</span>;
+
+game.<span class='field'>die</span> = <span class='keyword'>fn</span> () {
+    <span class='keyword'>if</span> game.<span class='field'>over</span> {
+        <span class='keyword'>return</span>;
+    }
+
+    game.<span class='field'>over</span> = <span class='constant'>true</span>;
+    <span class='keyword'>if</span> !game.<span class='field'>score</span>.<span class='field'>best</span> || game.<span class='field'>score</span>.<span class='field'>current</span> &gt; game.<span class='field'>score</span>.<span class='field'>best</span> {
+        game.<span class='field'>score</span>.<span class='field'>best</span> = game.<span class='field'>score</span>.<span class='field'>current</span>;
+    }
+
+    game.<span class='field'>die_sound</span>.<span class='field'>play</span>();
+    game.<span class='field'>background_music_delay</span> = BACKGROUND_MUSIC_DELAY;
+};
+
+game.<span class='field'>point</span> = <span class='keyword'>fn</span> () {
+    game.<span class='field'>score</span>.<span class='field'>current</span> += <span class='constant'>1</span>;
+    game.<span class='field'>point_sound</span>.<span class='field'>play</span>();
+};
+
+game.<span class='field'>start</span> = <span class='keyword'>fn</span> () {
+    game.<span class='field'>start_sound</span>.<span class='field'>play</span>();
+    game.<span class='field'>background_music</span>.<span class='field'>toggle</span>();
+};
+
+game.<span class='field'>background</span> = Background();
+game.<span class='field'>base</span> = Base();
+game.<span class='field'>bird</span> = Bird();
+game.<span class='field'>pipes</span> = Pipes();
+game.<span class='field'>score</span> = Score();
+
+game.<span class='field'>over_message</span> = game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"gameover.png"</span>);
+game.<span class='field'>title_message</span> = game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"title.png"</span>);
+game.<span class='field'>continue_message</span> = game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"continue.png"</span>);
+
+game.<span class='field'>die_sound</span> = game.<span class='field'>assets</span>.<span class='field'>sound</span>(<span class='string'>"die.wav"</span>, rl.<span class='field'>Sound</span>);
+game.<span class='field'>point_sound</span> = game.<span class='field'>assets</span>.<span class='field'>sound</span>(<span class='string'>"point.wav"</span>, rl.<span class='field'>Sound</span>);
+game.<span class='field'>start_sound</span> = game.<span class='field'>assets</span>.<span class='field'>sound</span>(<span class='string'>"start.wav"</span>, rl.<span class='field'>Sound</span>);
+game.<span class='field'>background_music</span> = game.<span class='field'>assets</span>.<span class='field'>sound</span>(<span class='string'>"background.mp3"</span>, rl.<span class='field'>Music</span>);
+
+game.<span class='field'>background_music_delay</span> = <span class='constant'>0</span>;
+
+<span class='keyword'>while</span> !rl.<span class='field'>window_should_close</span>() {
+    rl.<span class='field'>begin_drawing</span>();
+    game.<span class='field'>background</span>.<span class='field'>update</span>();
+
+    <span class='keyword'>if</span> game.<span class='field'>background_music_delay</span> &gt; <span class='constant'>0</span> {
+        game.<span class='field'>background_music_delay</span> -= rl.<span class='field'>get_frame_time</span>();
+        <span class='keyword'>if</span> game.<span class='field'>background_music_delay</span> &lt;= <span class='constant'>0</span> {
+            game.<span class='field'>background_music</span>.<span class='field'>toggle</span>();
+        }
+    }
+
+    game.<span class='field'>background_music</span>.<span class='field'>update</span>();
+
+    <span class='keyword'>if</span> !game.<span class='field'>pipes</span>.<span class='field'>update</span>() {
+        game.<span class='field'>die</span>();
+    }
+
+    game.<span class='field'>base</span>.<span class='field'>update</span>();
+    game.<span class='field'>bird</span>.<span class='field'>update</span>();
+
+    <span class='keyword'>if</span> !game.<span class='field'>started</span> {
+        <span class='keyword'>var</span> x = (WIDTH - game.<span class='field'>title_message</span>.<span class='field'>width</span>() * TITLE_MESSAGE_SCALE) / <span class='constant'>2</span>;
+        game.<span class='field'>title_message</span>.<span class='field'>draw</span>(x, HEIGHT / <span class='constant'>7</span>, <span class='constant'>0</span>, TITLE_MESSAGE_SCALE, <span class='constant'>0xFFFFFFFF</span>);
+
+        <span class='keyword'>var</span> x = (WIDTH - game.<span class='field'>continue_message</span>.<span class='field'>width</span>() * CONTINUE_MESSAGE_SCALE) / <span class='constant'>2</span>;
+        game.<span class='field'>continue_message</span>.<span class='field'>draw</span>(
+            x,
+            HEIGHT / <span class='constant'>3</span> + game.<span class='field'>continue_message</span>.<span class='field'>height</span>() * CONTINUE_MESSAGE_SCALE + MESSAGE_PADDING,
+            <span class='constant'>0</span>,
+            CONTINUE_MESSAGE_SCALE,
+            <span class='constant'>0xFFFFFFFF</span>);
+
+        <span class='keyword'>if</span> rl.<span class='field'>is_key_pressed</span>(<span class='constant'>32</span>) {
+            game.<span class='field'>started</span> = <span class='constant'>true</span>;
+            game.<span class='field'>bird</span>.<span class='field'>dy</span> = IMPULSE;
+            game.<span class='field'>start</span>();
+        }
+    }
+
+    <span class='keyword'>if</span> game.<span class='field'>over</span> {
+        <span class='keyword'>var</span> x = (WIDTH - game.<span class='field'>over_message</span>.<span class='field'>width</span>() * OVER_MESSAGE_SCALE) / <span class='constant'>2</span>;
+        game.<span class='field'>over_message</span>.<span class='field'>draw</span>(x, HEIGHT / <span class='constant'>7</span>, <span class='constant'>0</span>, OVER_MESSAGE_SCALE, <span class='constant'>0xFFFFFFFF</span>);
+
+        <span class='keyword'>var</span> x = (WIDTH - game.<span class='field'>continue_message</span>.<span class='field'>width</span>() * CONTINUE_MESSAGE_SCALE) / <span class='constant'>2</span>;
+        game.<span class='field'>continue_message</span>.<span class='field'>draw</span>(
+            x,
+            HEIGHT / <span class='constant'>3</span> + game.<span class='field'>continue_message</span>.<span class='field'>height</span>() * CONTINUE_MESSAGE_SCALE + MESSAGE_PADDING,
+            <span class='constant'>0</span>,
+            CONTINUE_MESSAGE_SCALE,
+            <span class='constant'>0xFFFFFFFF</span>);
+
+        <span class='keyword'>if</span> rl.<span class='field'>is_key_pressed</span>(<span class='constant'>32</span>) {
+            game.<span class='field'>over</span> = <span class='constant'>false</span>;
+            game.<span class='field'>score</span>.<span class='field'>reset</span>();
+
+            game.<span class='field'>bird</span> = Bird();
+            game.<span class='field'>pipes</span> = Pipes();
+
+            game.<span class='field'>bird</span>.<span class='field'>dy</span> = IMPULSE;
+            game.<span class='field'>start</span>();
+        }
+    }
+
+    game.<span class='field'>score</span>.<span class='field'>display</span>();
+    rl.<span class='field'>end_drawing</span>();
+}
+
+game.<span class='field'>assets</span>.<span class='field'>unload</span>();
+
+rl.<span class='field'>close_window</span>();
+</pre>
+</pre>
+</div>
+<p>
+Run the program.
+</p>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='constant'>$ </span>bs flappy_bird.bs
+</pre>
+</div>
+<section id='s9'>
+<h3> Assets</h3>
+<ul>
+<li><a href="https://github.com/samuelcust/flappy-bird-assets">Images and Sound Effects</a></li>
+<li><a href="https://pixabay.com/music/video-games-retro-game-arcade-short-236130/">Background Music</a></li>
+</ul>
+</section>
+</section>
 </main>
 <nav id='sidebar' class='collapsed'>
 <ul>
@@ -1191,6 +2020,14 @@ Done: Finish reading book
 </li>
 <li>
 <a href='#s7'> CLI Task Management APP</a>
+</li>
+<li>
+<a href='#s8'> Flappy Bird</a>
+<ul>
+<li>
+<a href='#s9'> Assets</a>
+</li>
+</ul>
 </li>
 </ul>
 </nav>
