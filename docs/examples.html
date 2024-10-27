@@ -630,37 +630,37 @@ Run the program.
     <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *title = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>2</span>].as.object;
 
     <span class='comment'>// BS strings are null terminated by default for FFI convenience
-</span>    <span class='function'>InitWindow</span>(width, height, title-&gt;data);
+</span>    InitWindow(width, height, title-&gt;data);
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
 <span class='class'>Bs_Value</span> rl_close_window(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='function'>CloseWindow</span>();
+    CloseWindow();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
 <span class='class'>Bs_Value</span> rl_window_should_close(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='keyword'>return</span> <span class='function'>bs_value_bool</span>(<span class='function'>WindowShouldClose</span>());
+    <span class='keyword'>return</span> <span class='constant'>bs_value_bool</span>(WindowShouldClose());
 }
 
 <span class='class'>Bs_Value</span> rl_begin_drawing(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='function'>BeginDrawing</span>();
+    BeginDrawing();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
 <span class='class'>Bs_Value</span> rl_end_drawing(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='function'>EndDrawing</span>();
+    EndDrawing();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
 <span class='class'>Bs_Value</span> rl_clear_background(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
     <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
-    <span class='function'>ClearBackground</span>(<span class='function'>GetColor</span>(args[<span class='constant'>0</span>].as.number));
+    ClearBackground(GetColor(args[<span class='constant'>0</span>].as.number));
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
@@ -690,7 +690,7 @@ Run the program.
     <span class='keyword'>const</span> <span class='class'>int</span> startPosY = round(args[<span class='constant'>1</span>].as.number);
     <span class='keyword'>const</span> <span class='class'>int</span> endPosX = round(args[<span class='constant'>2</span>].as.number);
     <span class='keyword'>const</span> <span class='class'>int</span> endPosY = round(args[<span class='constant'>3</span>].as.number);
-    <span class='keyword'>const</span> <span class='class'>Color</span> color = <span class='function'>GetColor</span>(args[<span class='constant'>4</span>].as.number);
+    <span class='keyword'>const</span> <span class='class'>Color</span> color = GetColor(args[<span class='constant'>4</span>].as.number);
 
     DrawLine(startPosX, startPosY, endPosX, endPosY, color);
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
@@ -708,9 +708,9 @@ Run the program.
     <span class='keyword'>const</span> <span class='class'>int</span> x = round(args[<span class='constant'>1</span>].as.number);
     <span class='keyword'>const</span> <span class='class'>int</span> y = round(args[<span class='constant'>2</span>].as.number);
     <span class='keyword'>const</span> <span class='class'>int</span> size = args[<span class='constant'>3</span>].as.number;
-    <span class='keyword'>const</span> <span class='class'>Color</span> color = <span class='function'>GetColor</span>(args[<span class='constant'>4</span>].as.number);
+    <span class='keyword'>const</span> <span class='class'>Color</span> color = GetColor(args[<span class='constant'>4</span>].as.number);
 
-    <span class='function'>DrawText</span>(text-&gt;data, x, y, size, color);
+    DrawText(text-&gt;data, x, y, size, color);
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
@@ -726,7 +726,7 @@ Run the program.
     <span class='keyword'>const</span> <span class='class'>int</span> posY = round(args[<span class='constant'>1</span>].as.number);
     <span class='keyword'>const</span> <span class='class'>int</span> width = round(args[<span class='constant'>2</span>].as.number);
     <span class='keyword'>const</span> <span class='class'>int</span> height = round(args[<span class='constant'>3</span>].as.number);
-    <span class='keyword'>const</span> <span class='class'>Color</span> color = <span class='function'>GetColor</span>(args[<span class='constant'>4</span>].as.number);
+    <span class='keyword'>const</span> <span class='class'>Color</span> color = GetColor(args[<span class='constant'>4</span>].as.number);
 
     DrawRectangle(posX, posY, width, height, color);
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
@@ -734,39 +734,39 @@ Run the program.
 
 <span class='class'>Bs_Value</span> rl_get_screen_width(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='keyword'>return</span> <span class='function'>bs_value_num</span>(GetScreenWidth());
+    <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(GetScreenWidth());
 }
 
 <span class='class'>Bs_Value</span> rl_get_screen_height(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='keyword'>return</span> <span class='function'>bs_value_num</span>(GetScreenHeight());
+    <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(GetScreenHeight());
 }
 
 <span class='class'>Bs_Value</span> rl_get_frame_time(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='keyword'>return</span> <span class='function'>bs_value_num</span>(GetFrameTime());
+    <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(GetFrameTime());
 }
 
 <span class='class'>Bs_Value</span> rl_get_mouse_x(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='keyword'>return</span> <span class='function'>bs_value_num</span>(GetMouseX());
+    <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(GetMouseX());
 }
 
 <span class='class'>Bs_Value</span> rl_get_mouse_y(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='keyword'>return</span> <span class='function'>bs_value_num</span>(GetMouseY());
+    <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(GetMouseY());
 }
 
 <span class='class'>Bs_Value</span> rl_is_mouse_button_released(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
     <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
-    <span class='keyword'>return</span> <span class='function'>bs_value_bool</span>(IsMouseButtonReleased(args[<span class='constant'>0</span>].as.number));
+    <span class='keyword'>return</span> <span class='constant'>bs_value_bool</span>(IsMouseButtonReleased(args[<span class='constant'>0</span>].as.number));
 }
 
 <span class='class'>Bs_Value</span> rl_is_key_pressed(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
     <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
-    <span class='keyword'>return</span> <span class='function'>bs_value_bool</span>(IsKeyPressed(args[<span class='constant'>0</span>].as.number));
+    <span class='keyword'>return</span> <span class='constant'>bs_value_bool</span>(IsKeyPressed(args[<span class='constant'>0</span>].as.number));
 }
 
 <span class='class'>Bs_Value</span> rl_measure_text(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
@@ -777,7 +777,7 @@ Run the program.
     <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *text = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>0</span>].as.object;
     <span class='keyword'>const</span> <span class='class'>int</span> size = args[<span class='constant'>1</span>].as.number;
 
-    <span class='keyword'>return</span> <span class='function'>bs_value_num</span>(MeasureText(text-&gt;data, size));
+    <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(MeasureText(text-&gt;data, size));
 }
 
 <span class='constant'>BS_LIBRARY_INIT</span> <span class='class'>void</span> bs_library_init(<span class='class'>Bs</span> *bs, <span class='class'>Bs_C_Lib</span> *library) {
@@ -804,10 +804,10 @@ Run the program.
     };
     <span class='function'>bs_c_lib_ffi</span>(bs, library, ffi, <span class='function'>bs_c_array_size</span>(ffi));
 
-    bs_c_lib_set(bs, library, Bs_Sv_Static(<span class='string'>"MOUSE_BUTTON_LEFT"</span>), <span class='function'>bs_value_num</span>(MOUSE_BUTTON_LEFT));
+    <span class='function'>bs_c_lib_set</span>(bs, library, <span class='constant'>Bs_Sv_Static</span>(<span class='string'>"MOUSE_BUTTON_LEFT"</span>), <span class='constant'>bs_value_num</span>(MOUSE_BUTTON_LEFT));
 
-    bs_c_lib_set(
-        bs, library, Bs_Sv_Static(<span class='string'>"FLAG_WINDOW_RESIZABLE"</span>), <span class='function'>bs_value_num</span>(FLAG_WINDOW_RESIZABLE));
+    <span class='function'>bs_c_lib_set</span>(
+        bs, library, <span class='constant'>Bs_Sv_Static</span>(<span class='string'>"FLAG_WINDOW_RESIZABLE"</span>), <span class='constant'>bs_value_num</span>(FLAG_WINDOW_RESIZABLE));
 }
 </pre>
 </div>
@@ -1195,7 +1195,7 @@ Flappy Bird using Raylib.
     <span class='keyword'>const</span> <span class='class'>int</span> height = args[<span class='constant'>1</span>].as.number;
     <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *title = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>2</span>].as.object;
 
-    <span class='function'>InitWindow</span>(width, height, title-&gt;data);
+    InitWindow(width, height, title-&gt;data);
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
@@ -1214,7 +1214,7 @@ Flappy Bird using Raylib.
 
 <span class='class'>Bs_Value</span> rl_close_window(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='function'>CloseWindow</span>();
+    CloseWindow();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
@@ -1226,25 +1226,25 @@ Flappy Bird using Raylib.
 
 <span class='class'>Bs_Value</span> rl_window_should_close(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='keyword'>return</span> <span class='function'>bs_value_bool</span>(<span class='function'>WindowShouldClose</span>());
+    <span class='keyword'>return</span> <span class='constant'>bs_value_bool</span>(WindowShouldClose());
 }
 
 <span class='class'>Bs_Value</span> rl_begin_drawing(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='function'>BeginDrawing</span>();
+    BeginDrawing();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
 <span class='class'>Bs_Value</span> rl_end_drawing(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='function'>EndDrawing</span>();
+    EndDrawing();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
 <span class='class'>Bs_Value</span> rl_clear_background(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
     <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
-    <span class='function'>ClearBackground</span>(<span class='function'>GetColor</span>(args[<span class='constant'>0</span>].as.number));
+    ClearBackground(GetColor(args[<span class='constant'>0</span>].as.number));
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
@@ -1260,7 +1260,7 @@ Flappy Bird using Raylib.
     <span class='keyword'>const</span> <span class='class'>int</span> y = args[<span class='constant'>1</span>].as.number;
     <span class='keyword'>const</span> <span class='class'>int</span> width = args[<span class='constant'>2</span>].as.number;
     <span class='keyword'>const</span> <span class='class'>int</span> height = args[<span class='constant'>3</span>].as.number;
-    <span class='keyword'>const</span> <span class='class'>Color</span> color = <span class='function'>GetColor</span>(args[<span class='constant'>4</span>].as.number);
+    <span class='keyword'>const</span> <span class='class'>Color</span> color = GetColor(args[<span class='constant'>4</span>].as.number);
 
     DrawRectangleLines(x, y, width, height, color);
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
@@ -1269,12 +1269,12 @@ Flappy Bird using Raylib.
 <span class='class'>Bs_Value</span> rl_is_key_pressed(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
     <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
-    <span class='keyword'>return</span> <span class='function'>bs_value_bool</span>(IsKeyPressed(args[<span class='constant'>0</span>].as.number));
+    <span class='keyword'>return</span> <span class='constant'>bs_value_bool</span>(IsKeyPressed(args[<span class='constant'>0</span>].as.number));
 }
 
 <span class='class'>Bs_Value</span> rl_get_frame_time(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='keyword'>return</span> <span class='function'>bs_value_num</span>(GetFrameTime());
+    <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(GetFrameTime());
 }
 
 <span class='class'>Bs_Value</span> rl_texture_init(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
@@ -1283,12 +1283,12 @@ Flappy Bird using Raylib.
 
     <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *path = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>0</span>].as.object;
 
-    Texture texture = LoadTexture(path-&gt;data);
+    <span class='class'>Texture</span> texture = LoadTexture(path-&gt;data);
     <span class='keyword'>if</span> (!IsTextureReady(texture)) {
         <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
     }
 
-    bs_this_as(args, Texture) = texture;
+    <span class='constant'>bs_this_as</span>(args, <span class='class'>Texture</span>) = texture;
     <span class='keyword'>return</span> args[-<span class='constant'>1</span>];
 }
 
@@ -1300,20 +1300,20 @@ Flappy Bird using Raylib.
     <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>3</span>, <span class='constant'>BS_VALUE_NUM</span>);
     <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>4</span>);
 
-    <span class='keyword'>const</span> float scale = args[<span class='constant'>3</span>].as.number;
+    <span class='keyword'>const</span> <span class='class'>float</span> scale = args[<span class='constant'>3</span>].as.number;
 
-    <span class='keyword'>const</span> Texture texture = bs_this_as(args, Texture);
-    <span class='keyword'>const</span> Rectangle src = {<span class='constant'>0</span>, <span class='constant'>0</span>, texture.width, texture.height};
-    <span class='keyword'>const</span> Rectangle dst = {
+    <span class='keyword'>const</span> <span class='class'>Texture</span> texture = <span class='constant'>bs_this_as</span>(args, <span class='class'>Texture</span>);
+    <span class='keyword'>const</span> <span class='class'>Rectangle</span> src = {<span class='constant'>0</span>, <span class='constant'>0</span>, texture.width, texture.height};
+    <span class='keyword'>const</span> <span class='class'>Rectangle</span> dst = {
         args[<span class='constant'>0</span>].as.number + (texture.width * scale) / <span class='constant'>2.0</span>,
         args[<span class='constant'>1</span>].as.number + (texture.height * scale) / <span class='constant'>2.0</span>,
         texture.width * scale,
         texture.height * scale,
     };
 
-    <span class='keyword'>const</span> Vector2 origin = {texture.width * scale / <span class='constant'>2.0</span>, texture.height * scale / <span class='constant'>2.0</span>};
-    <span class='keyword'>const</span> float rotation = args[<span class='constant'>2</span>].as.number;
-    <span class='keyword'>const</span> <span class='class'>Color</span> tint = <span class='function'>GetColor</span>(args[<span class='constant'>4</span>].as.number);
+    <span class='keyword'>const</span> <span class='class'>Vector2</span> origin = {texture.width * scale / <span class='constant'>2.0</span>, texture.height * scale / <span class='constant'>2.0</span>};
+    <span class='keyword'>const</span> <span class='class'>float</span> rotation = args[<span class='constant'>2</span>].as.number;
+    <span class='keyword'>const</span> <span class='class'>Color</span> tint = GetColor(args[<span class='constant'>4</span>].as.number);
 
     DrawTexturePro(texture, src, dst, origin, rotation, tint);
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
@@ -1321,17 +1321,17 @@ Flappy Bird using Raylib.
 
 <span class='class'>Bs_Value</span> rl_texture_width(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='keyword'>return</span> <span class='function'>bs_value_num</span>(bs_this_as(args, Texture).width);
+    <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(<span class='constant'>bs_this_as</span>(args, <span class='class'>Texture</span>).width);
 }
 
 <span class='class'>Bs_Value</span> rl_texture_height(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='keyword'>return</span> <span class='function'>bs_value_num</span>(bs_this_as(args, Texture).height);
+    <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(<span class='constant'>bs_this_as</span>(args, <span class='class'>Texture</span>).height);
 }
 
 <span class='class'>Bs_Value</span> rl_texture_unload(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    UnloadTexture(bs_this_as(args, Texture));
+    UnloadTexture(<span class='constant'>bs_this_as</span>(args, <span class='class'>Texture</span>));
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
@@ -1341,24 +1341,24 @@ Flappy Bird using Raylib.
 
     <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *path = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>0</span>].as.object;
 
-    Sound sound = LoadSound(path-&gt;data);
+    <span class='class'>Sound</span> sound = LoadSound(path-&gt;data);
     <span class='keyword'>if</span> (!IsSoundReady(sound)) {
         <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
     }
 
-    bs_this_as(args, Sound) = sound;
+    <span class='constant'>bs_this_as</span>(args, <span class='class'>Sound</span>) = sound;
     <span class='keyword'>return</span> args[-<span class='constant'>1</span>];
 }
 
 <span class='class'>Bs_Value</span> rl_sound_play(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    PlaySound(bs_this_as(args, Sound));
+    PlaySound(<span class='constant'>bs_this_as</span>(args, <span class='class'>Sound</span>));
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
 <span class='class'>Bs_Value</span> rl_sound_unload(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    UnloadSound(bs_this_as(args, Sound));
+    UnloadSound(<span class='constant'>bs_this_as</span>(args, <span class='class'>Sound</span>));
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
@@ -1368,7 +1368,7 @@ Flappy Bird using Raylib.
 
     <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *path = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>0</span>].as.object;
 
-    Music music = LoadMusicStream(path-&gt;data);
+    <span class='class'>Music</span> music = LoadMusicStream(path-&gt;data);
     <span class='keyword'>if</span> (!IsMusicReady(music)) {
         <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
     }
@@ -1378,13 +1378,13 @@ Flappy Bird using Raylib.
     PlayMusicStream(music);
     SetMusicVolume(music, <span class='constant'>0.2</span>);
 
-    bs_this_as(args, Music) = music;
+    <span class='constant'>bs_this_as</span>(args, <span class='class'>Music</span>) = music;
     <span class='keyword'>return</span> args[-<span class='constant'>1</span>];
 }
 
 <span class='class'>Bs_Value</span> rl_music_toggle(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    Music music = bs_this_as(args, Music);
+    <span class='class'>Music</span> music = <span class='constant'>bs_this_as</span>(args, <span class='class'>Music</span>);
     <span class='keyword'>if</span> (IsMusicStreamPlaying(music)) {
         StopMusicStream(music);
     } <span class='keyword'>else</span> {
@@ -1395,13 +1395,13 @@ Flappy Bird using Raylib.
 
 <span class='class'>Bs_Value</span> rl_music_update(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    UpdateMusicStream(bs_this_as(args, Music));
+    UpdateMusicStream(<span class='constant'>bs_this_as</span>(args, <span class='class'>Music</span>));
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
 <span class='class'>Bs_Value</span> rl_music_unload(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    UnloadMusicStream(bs_this_as(args, Music));
+    UnloadMusicStream(<span class='constant'>bs_this_as</span>(args, <span class='class'>Music</span>));
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
@@ -1422,32 +1422,32 @@ Flappy Bird using Raylib.
     };
     <span class='function'>bs_c_lib_ffi</span>(bs, library, ffi, <span class='function'>bs_c_array_size</span>(ffi));
 
-    Bs_C_Class *texture_class =
-        bs_c_class_new(bs, Bs_Sv_Static(<span class='string'>"Texture"</span>), sizeof(Texture), rl_texture_init);
+    <span class='class'>Bs_C_Class</span> *texture_class =
+        <span class='function'>bs_c_class_new</span>(bs, <span class='constant'>Bs_Sv_Static</span>(<span class='string'>"Texture"</span>), <span class='keyword'>sizeof</span>(<span class='class'>Texture</span>), rl_texture_init);
 
     texture_class-&gt;can_fail = <span class='constant'>true</span>;
-    bs_c_class_add(bs, texture_class, Bs_Sv_Static(<span class='string'>"draw"</span>), rl_texture_draw);
-    bs_c_class_add(bs, texture_class, Bs_Sv_Static(<span class='string'>"width"</span>), rl_texture_width);
-    bs_c_class_add(bs, texture_class, Bs_Sv_Static(<span class='string'>"height"</span>), rl_texture_height);
-    bs_c_class_add(bs, texture_class, Bs_Sv_Static(<span class='string'>"unload"</span>), rl_texture_unload);
-    bs_c_lib_set(bs, library, texture_class-&gt;name, bs_value_object(texture_class));
+    <span class='function'>bs_c_class_add</span>(bs, texture_class, <span class='constant'>Bs_Sv_Static</span>(<span class='string'>"draw"</span>), rl_texture_draw);
+    <span class='function'>bs_c_class_add</span>(bs, texture_class, <span class='constant'>Bs_Sv_Static</span>(<span class='string'>"width"</span>), rl_texture_width);
+    <span class='function'>bs_c_class_add</span>(bs, texture_class, <span class='constant'>Bs_Sv_Static</span>(<span class='string'>"height"</span>), rl_texture_height);
+    <span class='function'>bs_c_class_add</span>(bs, texture_class, <span class='constant'>Bs_Sv_Static</span>(<span class='string'>"unload"</span>), rl_texture_unload);
+    <span class='function'>bs_c_lib_set</span>(bs, library, texture_class-&gt;name, <span class='constant'>bs_value_object</span>(texture_class));
 
-    Bs_C_Class *sound_class =
-        bs_c_class_new(bs, Bs_Sv_Static(<span class='string'>"Sound"</span>), sizeof(Sound), rl_sound_init);
+    <span class='class'>Bs_C_Class</span> *sound_class =
+        <span class='function'>bs_c_class_new</span>(bs, <span class='constant'>Bs_Sv_Static</span>(<span class='string'>"Sound"</span>), <span class='keyword'>sizeof</span>(<span class='class'>Sound</span>), rl_sound_init);
 
     sound_class-&gt;can_fail = <span class='constant'>true</span>;
-    bs_c_class_add(bs, sound_class, Bs_Sv_Static(<span class='string'>"play"</span>), rl_sound_play);
-    bs_c_class_add(bs, sound_class, Bs_Sv_Static(<span class='string'>"unload"</span>), rl_sound_unload);
-    bs_c_lib_set(bs, library, sound_class-&gt;name, bs_value_object(sound_class));
+    <span class='function'>bs_c_class_add</span>(bs, sound_class, <span class='constant'>Bs_Sv_Static</span>(<span class='string'>"play"</span>), rl_sound_play);
+    <span class='function'>bs_c_class_add</span>(bs, sound_class, <span class='constant'>Bs_Sv_Static</span>(<span class='string'>"unload"</span>), rl_sound_unload);
+    <span class='function'>bs_c_lib_set</span>(bs, library, sound_class-&gt;name, <span class='constant'>bs_value_object</span>(sound_class));
 
-    Bs_C_Class *music_class =
-        bs_c_class_new(bs, Bs_Sv_Static(<span class='string'>"Music"</span>), sizeof(Music), rl_music_init);
+    <span class='class'>Bs_C_Class</span> *music_class =
+        <span class='function'>bs_c_class_new</span>(bs, <span class='constant'>Bs_Sv_Static</span>(<span class='string'>"Music"</span>), <span class='keyword'>sizeof</span>(<span class='class'>Music</span>), rl_music_init);
 
     music_class-&gt;can_fail = <span class='constant'>true</span>;
-    bs_c_class_add(bs, music_class, Bs_Sv_Static(<span class='string'>"toggle"</span>), rl_music_toggle);
-    bs_c_class_add(bs, music_class, Bs_Sv_Static(<span class='string'>"update"</span>), rl_music_update);
-    bs_c_class_add(bs, music_class, Bs_Sv_Static(<span class='string'>"unload"</span>), rl_music_unload);
-    bs_c_lib_set(bs, library, music_class-&gt;name, bs_value_object(music_class));
+    <span class='function'>bs_c_class_add</span>(bs, music_class, <span class='constant'>Bs_Sv_Static</span>(<span class='string'>"toggle"</span>), rl_music_toggle);
+    <span class='function'>bs_c_class_add</span>(bs, music_class, <span class='constant'>Bs_Sv_Static</span>(<span class='string'>"update"</span>), rl_music_update);
+    <span class='function'>bs_c_class_add</span>(bs, music_class, <span class='constant'>Bs_Sv_Static</span>(<span class='string'>"unload"</span>), rl_music_unload);
+    <span class='function'>bs_c_lib_set</span>(bs, library, music_class-&gt;name, <span class='constant'>bs_value_object</span>(music_class));
 }
 </pre>
 </div>

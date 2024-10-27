@@ -2169,14 +2169,14 @@ Create a file <code>arithmetic.c</code> with the following content
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>2</span>);
     <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_VALUE_NUM</span>);
     <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>1</span>, <span class='constant'>BS_VALUE_NUM</span>);
-    <span class='keyword'>return</span> <span class='function'>bs_value_num</span>(args[<span class='constant'>0</span>].as.number + args[<span class='constant'>1</span>].as.number);
+    <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(args[<span class='constant'>0</span>].as.number + args[<span class='constant'>1</span>].as.number);
 }
 
 <span class='class'>Bs_Value</span> arithmetic_sub(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>2</span>);
     <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_VALUE_NUM</span>);
     <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>1</span>, <span class='constant'>BS_VALUE_NUM</span>);
-    <span class='keyword'>return</span> <span class='function'>bs_value_num</span>(args[<span class='constant'>0</span>].as.number - args[<span class='constant'>1</span>].as.number);
+    <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(args[<span class='constant'>0</span>].as.number - args[<span class='constant'>1</span>].as.number);
 }
 
 <span class='comment'>// This is the "entry point" of the library. This function will be called when
@@ -2286,37 +2286,37 @@ library.
     <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *title = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>2</span>].as.object;
 
     <span class='comment'>// BS strings are null terminated by default for FFI convenience
-</span>    <span class='function'>InitWindow</span>(width, height, title-&gt;data);
+</span>    InitWindow(width, height, title-&gt;data);
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
 <span class='class'>Bs_Value</span> rl_close_window(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='function'>CloseWindow</span>();
+    CloseWindow();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
 <span class='class'>Bs_Value</span> rl_window_should_close(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='keyword'>return</span> <span class='function'>bs_value_bool</span>(<span class='function'>WindowShouldClose</span>());
+    <span class='keyword'>return</span> <span class='constant'>bs_value_bool</span>(WindowShouldClose());
 }
 
 <span class='class'>Bs_Value</span> rl_begin_drawing(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='function'>BeginDrawing</span>();
+    BeginDrawing();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
 <span class='class'>Bs_Value</span> rl_end_drawing(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='function'>EndDrawing</span>();
+    EndDrawing();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
 <span class='class'>Bs_Value</span> rl_clear_background(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
     <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
-    <span class='function'>ClearBackground</span>(<span class='function'>GetColor</span>(args[<span class='constant'>0</span>].as.number));
+    ClearBackground(GetColor(args[<span class='constant'>0</span>].as.number));
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
@@ -2332,9 +2332,9 @@ library.
     <span class='keyword'>const</span> <span class='class'>int</span> x = args[<span class='constant'>1</span>].as.number;
     <span class='keyword'>const</span> <span class='class'>int</span> y = args[<span class='constant'>2</span>].as.number;
     <span class='keyword'>const</span> <span class='class'>int</span> size = args[<span class='constant'>3</span>].as.number;
-    <span class='keyword'>const</span> <span class='class'>Color</span> color = <span class='function'>GetColor</span>(args[<span class='constant'>4</span>].as.number);
+    <span class='keyword'>const</span> <span class='class'>Color</span> color = GetColor(args[<span class='constant'>4</span>].as.number);
 
-    <span class='function'>DrawText</span>(text-&gt;data, x, y, size, color);
+    DrawText(text-&gt;data, x, y, size, color);
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 

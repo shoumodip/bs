@@ -188,7 +188,7 @@ header {
     display: none;
     position: absolute;
     transform: translateY(-50%);
-    font-size: var(--font-size);
+    font-size: calc(2 * var(--font-size));
     background: none;
     margin-right: auto;
 }
