@@ -50,3 +50,7 @@ io.println(0.clamp(1, 6));
 io.println(7.clamp(1, 6));
 
 io.println(4.lerp(8, 0.5));
+
+io.println((0).sign());
+io.println((69).sign());
+io.println((-420).sign());

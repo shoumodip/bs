@@ -2138,6 +2138,12 @@ Bs_Value bs_math_round(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_num(round(args[-1].as.number));
 }
 
+Bs_Value bs_math_sign(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    const double x = args[-1].as.number;
+    return bs_value_num((x > 0) - (x < 0));
+}
+
 Bs_Value bs_math_random(Bs *bs, Bs_Value *args, size_t arity) {
     if (arity != 0 && arity != 2) {
         bs_error(bs, "expected 0 or 2 arguments, got %zu", arity);
@@ -2466,6 +2472,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("ceil"), bs_math_ceil);
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("floor"), bs_math_floor);
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("round"), bs_math_round);
+        bs_builtin_number_methods_add(bs, Bs_Sv_Static("sign"), bs_math_sign);
 
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("max"), bs_math_max);
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("min"), bs_math_min);

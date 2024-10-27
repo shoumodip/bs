@@ -149,6 +149,8 @@ void bs_check_whole_number_at(Bs *bs, size_t location, Bs_Value value, const cha
 #define bs_arg_check_whole_number(bs, args, index)                                                 \
     bs_check_whole_number_at(bs, (index) + 1, (args)[index], NULL)
 
+#define bs_this_as(args, T) (*(T *)((Bs_C_Instance *)(args)[-1].as.object)->data)
+
 // Interpreter
 typedef struct {
     bool ok;

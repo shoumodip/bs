@@ -41,6 +41,8 @@ process() {
 
 {
     echo "# Examples"
+    echo ""
+    echo "<!-- home-icon -->"
     for dir in $DIRS; do
         echo ""
         process "examples/$dir/README.md"

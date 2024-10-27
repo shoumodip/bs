@@ -13,6 +13,7 @@ int main(int argc, char **argv) {
         Bs_Writer *w = &bs_config(bs)->log;
         while (true) {
             bs_fmt(w, "> ");
+            fflush(stdout);
             if (!fgets(line, sizeof(line), stdin)) {
                 break;
             }
@@ -29,6 +30,7 @@ int main(int argc, char **argv) {
                     assert(size);
 
                     bs_fmt(w, "| ");
+                    fflush(stdout);
                     if (!fgets(line + input.size, size, stdin)) {
                         break;
                     }

@@ -1395,7 +1395,7 @@ false
 :b shell 22
 ../bin/bs core/math.bs
 :i returncode 0
-:b stdout 236
+:b stdout 243
 2.71828182845905
 3.14159265358979
 0
@@ -1434,6 +1434,9 @@ false
 1
 6
 6
+0
+1
+-1
 
 :b stderr 0
 

@@ -1552,6 +1552,22 @@ Floor.
 ### number.round() @method
 Return the nearest integer.
 
+### number.sign() @method
+Return the sign of the number.
+
+```bs
+io.println((0).sign());
+io.println((69).sign());
+io.println((-420).sign());
+```
+
+```console
+$ bs demo.bs
+0
+1
+-1
+```
+
 ### number.max(...) @method
 Return the maximum between the method receiver and the provided arguments.
 
