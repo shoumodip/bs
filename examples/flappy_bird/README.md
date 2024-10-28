@@ -14,13 +14,16 @@ $ cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib        # On Windows
 
 <!-- embed: examples/flappy_bird/flappy_bird.bs -->
 
+Download and extract the
+<a href="https://raw.githubusercontent.com/shoumodip/bs/refs/heads/main/examples/flappy_bird/assets.zip">assets</a>
+
 Run the program.
 
 ```console
 $ bs flappy_bird.bs
 ```
 
-## Assets
+## Asset Sources (Reference)
 <ul>
 <li><a href="https://github.com/samuelcust/flappy-bird-assets">Images and Sound Effects</a></li>
 <li><a href="https://pixabay.com/music/video-games-retro-game-arcade-short-236130/">Background Music</a></li>
