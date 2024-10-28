@@ -2,7 +2,7 @@
 
 set -xe
 
-CFLAGS="-I./include -O3"
+CFLAGS="-I./include -I./thirdparty -O3"
 LIBS="-lm"
 
 rm -rf bin lib

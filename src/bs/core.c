@@ -25,8 +25,7 @@
 
 #include "bs/core.h"
 #include "bs/object.h"
-
-#include "bs/regex.h"
+#include "regex/regex.h"
 
 // IO
 typedef struct {

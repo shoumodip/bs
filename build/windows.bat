@@ -1,6 +1,6 @@
 @echo off
 
-set CFLAGS=/Iinclude /O2
+set CFLAGS=/Iinclude /Ithirdparty /O2
 set LIBS=/link /DEFAULTLIB:libcmt.lib
 
 rmdir /S /Q bin lib

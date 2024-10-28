@@ -2,6 +2,9 @@
 
 #include "bs/core.h"
 
+#define CROSSLINE_IMPLEMENTATION
+#include "crossline/crossline.h"
+
 int main(int argc, char **argv) {
     if (argc < 2 || !strcmp(argv[1], "-")) {
         Bs_Result result = {0};
@@ -28,16 +31,13 @@ int main(int argc, char **argv) {
             ":}\n\n"
             "Website: https://shoumodip.github.io/bs/\n\n");
 
-        bool print_newline = true;
         while (true) {
-            bs_fmt(w, "> ");
-            fflush(stdout);
-            if (!fgets(line, sizeof(line), stdin)) {
+            if (!crossline_readline("> ", line, sizeof(line))) {
                 break;
             }
 
             Bs_Sv input = bs_sv_from_cstr(line);
-            if (input.size == 1) {
+            if (!input.size) {
                 continue;
             }
 
@@ -46,27 +46,29 @@ int main(int argc, char **argv) {
                 continue;
             }
 
-            if (bs_sv_eq(input, Bs_Sv_Static(":q\n"))) {
-                print_newline = false;
+            if (bs_sv_eq(input, Bs_Sv_Static(":q"))) {
                 break;
             }
 
-            if (bs_sv_eq(input, Bs_Sv_Static(":{\n"))) {
-                do {
+            if (bs_sv_eq(input, Bs_Sv_Static(":{"))) {
+                while (true) {
                     const size_t size = sizeof(line) - input.size;
                     assert(size);
 
-                    bs_fmt(w, "| ");
-                    fflush(stdout);
-                    if (!fgets(line + input.size, size, stdin)) {
+                    if (!crossline_readline("| ", line + input.size, size)) {
                         break;
                     }
 
                     input = bs_sv_from_cstr(line);
-                } while (!bs_sv_suffix(input, Bs_Sv_Static(":}\n")));
+                    if (bs_sv_suffix(input, Bs_Sv_Static(":}"))) {
+                        break;
+                    }
 
-                input.data += 3;
-                input.size -= 6;
+                    line[input.size++] = '\n';
+                }
+
+                input.data += 2;
+                input.size -= 4;
             }
 
             result = bs_run(bs, Bs_Sv_Static("<stdin>.bs"), input, true);
@@ -80,9 +82,6 @@ int main(int argc, char **argv) {
             }
         }
 
-        if (print_newline) {
-            bs_fmt(w, "\n");
-        }
         bs_free(bs);
         return result.exit == -1 ? !result.ok : result.exit;
     }
