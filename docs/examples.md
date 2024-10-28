@@ -782,12 +782,12 @@ class Tasks {
         }
     }
 
-    add(task) {
-        this.tasks.push(task);
-        io.println("Added: \(task)");
+    add(title) {
+        this.tasks.push(title);
+        io.println("Added: \(title)");
     }
 
-    done(index) {
+    verify(index) {
         var total = len(this.tasks);
         if index >= total {
             io.eprintln("Error: invalid index '\(index)'");
@@ -800,9 +800,18 @@ class Tasks {
 
             os.exit(1);
         }
+    }
 
-        var task = this.tasks.remove(index);
-        io.println("Done: \(task)");
+    done(index) {
+        this.verify(index);
+        var title = this.tasks.remove(index);
+        io.println("Done #\(index): \(title)");
+    }
+
+    edit(index, title) {
+        this.verify(index);
+        this.tasks[index] = title;
+        io.println("Edit #\(index): \(title)");
     }
 
     list(query) {
@@ -830,9 +839,10 @@ class Tasks {
 fn usage(f) {
     f.writeln("Usage: \(os.args[0]) <command> [args...]");
     f.writeln("Commands:");
-    f.writeln("    add  <task>     Add a task");
-    f.writeln("    done <index>    Mark task as done");
-    f.writeln("    list [query]    List tasks, with optional query");
+    f.writeln("    add  <title>            Add a task");
+    f.writeln("    done <index>            Mark task as done");
+    f.writeln("    edit <index> <title>    Edit a task");
+    f.writeln("    list [query]            List tasks, with optional query");
 }
 
 if len(os.args) < 2 {
@@ -871,6 +881,25 @@ if command == "done" {
 
     var tasks = Tasks(TASKS_PATH);
     tasks.done(index);
+    tasks.save();
+    return;
+}
+
+if command == "edit" {
+    if len(os.args) < 3 {
+        io.eprintln("Error: task index and title not provided");
+        usage(io.stderr);
+        os.exit(1);
+    }
+
+    var index = os.args[2].tonumber();
+    if !index {
+        io.eprintln("Error: invalid index '\(os.args[2])'");
+        os.exit(1);
+    }
+
+    var tasks = Tasks(TASKS_PATH);
+    tasks.edit(index, os.args[3]);
     tasks.save();
     return;
 }
