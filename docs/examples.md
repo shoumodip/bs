@@ -1659,23 +1659,25 @@ while !rl.window_should_close() {
         var x = (WIDTH - game.over_message.width() * OVER_MESSAGE_SCALE) / 2;
         game.over_message.draw(x, HEIGHT / 7, 0, OVER_MESSAGE_SCALE, 0xFFFFFFFF);
 
-        var x = (WIDTH - game.continue_message.width() * CONTINUE_MESSAGE_SCALE) / 2;
-        game.continue_message.draw(
-            x,
-            HEIGHT / 3 + game.continue_message.height() * CONTINUE_MESSAGE_SCALE + MESSAGE_PADDING,
-            0,
-            CONTINUE_MESSAGE_SCALE,
-            0xFFFFFFFF);
+        if game.background_music_delay <= 0 {
+            var x = (WIDTH - game.continue_message.width() * CONTINUE_MESSAGE_SCALE) / 2;
+            game.continue_message.draw(
+                x,
+                HEIGHT / 3 + game.continue_message.height() * CONTINUE_MESSAGE_SCALE + MESSAGE_PADDING,
+                0,
+                CONTINUE_MESSAGE_SCALE,
+                0xFFFFFFFF);
 
-        if rl.is_key_pressed(32) {
-            game.over = false;
-            game.score.reset();
+            if rl.is_key_pressed(32) {
+                game.over = false;
+                game.score.reset();
 
-            game.bird = Bird();
-            game.pipes = Pipes();
+                game.bird = Bird();
+                game.pipes = Pipes();
 
-            game.bird.dy = IMPULSE;
-            game.start();
+                game.bird.dy = IMPULSE;
+                game.start();
+            }
         }
     }
 
@@ -1685,6 +1687,7 @@ while !rl.window_should_close() {
 
 game.assets.unload();
 
+rl.close_audio_device();
 rl.close_window();
 ```
 

@@ -1936,23 +1936,25 @@ game.<span class='field'>background_music_delay</span> = <span class='constant'>
         <span class='keyword'>var</span> x = (WIDTH - game.<span class='field'>over_message</span>.<span class='field'>width</span>() * OVER_MESSAGE_SCALE) / <span class='constant'>2</span>;
         game.<span class='field'>over_message</span>.<span class='field'>draw</span>(x, HEIGHT / <span class='constant'>7</span>, <span class='constant'>0</span>, OVER_MESSAGE_SCALE, <span class='constant'>0xFFFFFFFF</span>);
 
-        <span class='keyword'>var</span> x = (WIDTH - game.<span class='field'>continue_message</span>.<span class='field'>width</span>() * CONTINUE_MESSAGE_SCALE) / <span class='constant'>2</span>;
-        game.<span class='field'>continue_message</span>.<span class='field'>draw</span>(
-            x,
-            HEIGHT / <span class='constant'>3</span> + game.<span class='field'>continue_message</span>.<span class='field'>height</span>() * CONTINUE_MESSAGE_SCALE + MESSAGE_PADDING,
-            <span class='constant'>0</span>,
-            CONTINUE_MESSAGE_SCALE,
-            <span class='constant'>0xFFFFFFFF</span>);
+        <span class='keyword'>if</span> game.<span class='field'>background_music_delay</span> &lt;= <span class='constant'>0</span> {
+            <span class='keyword'>var</span> x = (WIDTH - game.<span class='field'>continue_message</span>.<span class='field'>width</span>() * CONTINUE_MESSAGE_SCALE) / <span class='constant'>2</span>;
+            game.<span class='field'>continue_message</span>.<span class='field'>draw</span>(
+                x,
+                HEIGHT / <span class='constant'>3</span> + game.<span class='field'>continue_message</span>.<span class='field'>height</span>() * CONTINUE_MESSAGE_SCALE + MESSAGE_PADDING,
+                <span class='constant'>0</span>,
+                CONTINUE_MESSAGE_SCALE,
+                <span class='constant'>0xFFFFFFFF</span>);
 
-        <span class='keyword'>if</span> rl.<span class='field'>is_key_pressed</span>(<span class='constant'>32</span>) {
-            game.<span class='field'>over</span> = <span class='constant'>false</span>;
-            game.<span class='field'>score</span>.<span class='field'>reset</span>();
+            <span class='keyword'>if</span> rl.<span class='field'>is_key_pressed</span>(<span class='constant'>32</span>) {
+                game.<span class='field'>over</span> = <span class='constant'>false</span>;
+                game.<span class='field'>score</span>.<span class='field'>reset</span>();
 
-            game.<span class='field'>bird</span> = Bird();
-            game.<span class='field'>pipes</span> = Pipes();
+                game.<span class='field'>bird</span> = Bird();
+                game.<span class='field'>pipes</span> = Pipes();
 
-            game.<span class='field'>bird</span>.<span class='field'>dy</span> = IMPULSE;
-            game.<span class='field'>start</span>();
+                game.<span class='field'>bird</span>.<span class='field'>dy</span> = IMPULSE;
+                game.<span class='field'>start</span>();
+            }
         }
     }
 
@@ -1962,6 +1964,7 @@ game.<span class='field'>background_music_delay</span> = <span class='constant'>
 
 game.<span class='field'>assets</span>.<span class='field'>unload</span>();
 
+rl.<span class='field'>close_audio_device</span>();
 rl.<span class='field'>close_window</span>();
 </pre>
 </pre>
