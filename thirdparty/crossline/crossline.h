@@ -1,3 +1,5 @@
+// Taken from https://github.com/jcwangxp/Crossline
+
 /* crossline.h -- Version 1.0
  *
  * Crossline is a small, self-contained, zero-config, MIT licensed,
