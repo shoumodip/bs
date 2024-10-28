@@ -477,4 +477,5 @@ while !rl.window_should_close() {
 
 game.assets.unload();
 
+rl.close_audio_device();
 rl.close_window();
