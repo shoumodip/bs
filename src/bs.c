@@ -14,6 +14,8 @@
 #endif
 
 int main(int argc, char **argv) {
+    bs_try_stderr_colors();
+
     if (argc < 2 || !strcmp(argv[1], "-")) {
         Bs *bs = bs_new();
         bs_core_init(bs, argc - 1, argv + 1);
@@ -65,7 +67,8 @@ int main(int argc, char **argv) {
                         assert(size);
 
                         if (!crossline_readline("| ", line + input.size, size)) {
-                            break;
+                            bs_free(bs);
+                            return result.exit == -1 ? !result.ok : result.exit;
                         }
 
                         input = bs_sv_from_cstr(line);
@@ -111,7 +114,8 @@ int main(int argc, char **argv) {
     size_t size = 0;
     char *contents = bs_read_file(path, &size);
     if (!contents) {
-        fprintf(stderr, "error: could not read file '%s'\n", path);
+        Bs_Writer w = bs_file_writer(stderr);
+        bs_efmt(&w, "could not read file '%s'\n", path);
         return 1;
     }
 

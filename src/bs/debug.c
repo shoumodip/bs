@@ -324,7 +324,7 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
         break;
 
     default:
-        bs_fmt(p->writer, "error: unknown opcode %d at offset %zu\n", op, *offset);
+        bs_efmt(p->writer, "unknown opcode %d at offset %zu\n", op, *offset);
         return;
     }
 }

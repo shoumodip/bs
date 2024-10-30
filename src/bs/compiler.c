@@ -149,7 +149,17 @@ static void bs_lambda_free(Bs *bs, Bs_Lambda *l) {
     if (l) {
         bs_uplocals_free(bs, &l->uplocals);
         bs_da_free(bs, l);
+        free(l);
     }
+}
+
+// The lambdas need to stored on the heap since the error handling mechanism uses longjumps which
+// changes the stack pointer
+static Bs_Lambda *bs_lambda_new(Bs_Lambda_Type type, bool is_repl) {
+    Bs_Lambda *p = malloc(sizeof(Bs_Lambda));
+    assert(p);
+    *p = (Bs_Lambda){.type = type, .is_repl = is_repl};
+    return p;
 }
 
 static bool bs_lambda_find_local(Bs_Lambda *l, Bs_Sv name, size_t *index) {
@@ -226,13 +236,7 @@ static void bs_compile_jump_direct(Bs_Compiler *c, Bs_Op op, size_t addr) {
 }
 
 static void bs_compile_error_unexpected(Bs_Compiler *c, const Bs_Token *token) {
-    bs_fmt(
-        c->lexer.error,
-        Bs_Loc_Fmt "error: unexpected %s\n",
-        Bs_Loc_Arg(token->loc),
-        bs_token_type_name(token->type));
-
-    bs_lexer_error(&c->lexer);
+    bs_lexer_error(&c->lexer, token->loc, "unexpected %s\n", bs_token_type_name(token->type));
 }
 
 static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Token *name);
@@ -562,25 +566,30 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         } else if (*op == BS_OP_IGET_CONST) {
             *op = BS_OP_DELETE_CONST;
         } else if (*op == BS_OP_SUPER_GET) {
-            bs_fmt(
-                c->lexer.error,
-                Bs_Loc_Fmt "error: cannot use %s on super\n",
-                Bs_Loc_Arg(loc),
-                bs_token_type_name(token.type));
-
-            bs_lexer_error(&c->lexer);
+            bs_lexer_error(&c->lexer, loc, "cannot use 'delete' on super\n");
         } else {
-            bs_fmt(
-                c->lexer.error,
-                Bs_Loc_Fmt "error: expected index expression\n\n"
-                           "Index expression can be any of the following\n\n"
-                           "```\n"
-                           "xs.foo;    # Constant index\n"
-                           "xs[\"bar\"]; # Expression based index\n"
-                           "```\n",
-                Bs_Loc_Arg(loc));
+            const char *before1 = "";
+            const char *before2 = "";
+            const char *after = "";
+            if (bs_get_stderr_colors()) {
+                before1 = "\033[1;33m";
+                before2 = "\033[32m";
+                after = "\033[0m";
+            }
 
-            bs_lexer_error(&c->lexer);
+            bs_lexer_error(
+                &c->lexer,
+                loc,
+                "expected index expression\n\n"
+                "%sIndex expression can be any of the following:%s\n\n"
+                "%s```\n"
+                "xs.foo;    # Constant index\n"
+                "xs[\"bar\"]; # Expression based index\n"
+                "```%s\n",
+                before1,
+                after,
+                before2,
+                after);
         }
     } break;
 
@@ -627,14 +636,12 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
     case BS_TOKEN_THIS:
         if (!c->class) {
-            bs_fmt(
-                c->lexer.error,
-                Bs_Loc_Fmt "error: cannot use %s outside of %s\n",
-                Bs_Loc_Arg(token.loc),
+            bs_lexer_error(
+                &c->lexer,
+                token.loc,
+                "cannot use %s outside of %s\n",
                 bs_token_type_name(token.type),
                 bs_token_type_name(BS_TOKEN_CLASS));
-
-            bs_lexer_error(&c->lexer);
         }
 
         bs_compile_receiver(c, Bs_Sv_Static("this"), token.loc);
@@ -642,24 +649,20 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
     case BS_TOKEN_SUPER: {
         if (!c->class) {
-            bs_fmt(
-                c->lexer.error,
-                Bs_Loc_Fmt "error: cannot use %s outside of %s\n",
-                Bs_Loc_Arg(token.loc),
+            bs_lexer_error(
+                &c->lexer,
+                token.loc,
+                "cannot use %s outside of %s\n",
                 bs_token_type_name(token.type),
                 bs_token_type_name(BS_TOKEN_CLASS));
-
-            bs_lexer_error(&c->lexer);
         }
 
         if (!c->class->has_super) {
-            bs_fmt(
-                c->lexer.error,
-                Bs_Loc_Fmt "error: cannot use %s outside of an inheriting class\n",
-                Bs_Loc_Arg(token.loc),
+            bs_lexer_error(
+                &c->lexer,
+                token.loc,
+                "cannot use %s outside of an inheriting class\n",
                 bs_token_type_name(token.type));
-
-            bs_lexer_error(&c->lexer);
         }
 
         bs_lexer_expect(&c->lexer, BS_TOKEN_DOT);
@@ -861,13 +864,10 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             while (!bs_lexer_read(&c->lexer, BS_TOKEN_RPAREN)) {
                 token = bs_lexer_peek(&c->lexer);
                 if (arity == 0xFF) {
-                    bs_fmt(
-                        c->lexer.error,
-                        Bs_Loc_Fmt
-                        "error: too many arguments to function call (maximum 255 allowed)\n",
-                        Bs_Loc_Arg(token.loc));
-
-                    bs_lexer_error(&c->lexer);
+                    bs_lexer_error(
+                        &c->lexer,
+                        token.loc,
+                        "too many arguments to function call (maximum 255 allowed)\n");
                 }
 
                 bs_op_locs_push(c->bs, &c->locations, (Bs_Op_Loc){.loc = token.loc});
@@ -1085,8 +1085,8 @@ static size_t bs_compile_definition(Bs_Compiler *c, Bs_Token *name, bool public)
 static void bs_compile_stmt(Bs_Compiler *c);
 
 static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Token *name) {
-    Bs_Lambda lambda = {.type = type};
-    bs_compile_lambda_init(c, &lambda, name ? name->sv : (Bs_Sv){0});
+    Bs_Lambda *lambda = bs_lambda_new(type, false);
+    bs_compile_lambda_init(c, lambda, name ? name->sv : (Bs_Sv){0});
     bs_compile_block_init(c);
 
     bs_lexer_expect(&c->lexer, BS_TOKEN_LPAREN);
@@ -1094,12 +1094,8 @@ static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Toke
         const Bs_Token arg = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
 
         if (c->lambda->fn->arity == 0xFF) {
-            bs_fmt(
-                c->lexer.error,
-                Bs_Loc_Fmt "error: too many arguments in function (maximum 255 allowed)\n",
-                Bs_Loc_Arg(arg.loc));
-
-            bs_lexer_error(&c->lexer);
+            bs_lexer_error(
+                &c->lexer, arg.loc, "too many arguments in function (maximum 255 allowed)\n");
         }
         c->lambda->fn->arity++;
 
@@ -1125,12 +1121,15 @@ static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Toke
     const Bs_Fn *fn = bs_compile_lambda_end(c);
     bs_chunk_push_op_value(c->bs, c->chunk, BS_OP_CLOSURE, bs_value_object(fn));
 
-    for (size_t i = 0; i < lambda.fn->upvalues; i++) {
+    for (size_t i = 0; i < lambda->fn->upvalues; i++) {
         bs_chunk_push_op_int(
-            c->bs, c->chunk, lambda.uplocals.data[i].local ? 1 : 0, lambda.uplocals.data[i].index);
+            c->bs,
+            c->chunk,
+            lambda->uplocals.data[i].local ? 1 : 0,
+            lambda->uplocals.data[i].index);
     }
 
-    bs_lambda_free(c->bs, &lambda);
+    bs_lambda_free(c->bs, lambda);
 }
 
 static void bs_compile_class(Bs_Compiler *c, bool public) {
@@ -1154,12 +1153,7 @@ static void bs_compile_class(Bs_Compiler *c, bool public) {
     if (bs_lexer_read(&c->lexer, BS_TOKEN_LT)) {
         const Bs_Token super = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
         if (bs_sv_eq(super.sv, token.sv)) {
-            bs_fmt(
-                c->lexer.error,
-                Bs_Loc_Fmt "error: a class cannot inherit from itself\n",
-                Bs_Loc_Arg(super.loc));
-
-            bs_lexer_error(&c->lexer);
+            bs_lexer_error(&c->lexer, super.loc, "a class cannot inherit from itself\n");
         }
         bs_compile_identifier(c, &super);
 
@@ -1408,12 +1402,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
 
     case BS_TOKEN_PUB:
         if (c->lambda->depth != 1) {
-            bs_fmt(
-                c->lexer.error,
-                Bs_Loc_Fmt "error: cannot define public values in local scope\n",
-                Bs_Loc_Arg(token.loc));
-
-            bs_lexer_error(&c->lexer);
+            bs_lexer_error(&c->lexer, token.loc, "cannot define public values in local scope\n");
         }
 
         token = bs_lexer_next(&c->lexer);
@@ -1424,16 +1413,14 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         } else if (token.type == BS_TOKEN_CLASS) {
             bs_compile_class(c, true);
         } else {
-            bs_fmt(
-                c->lexer.error,
-                Bs_Loc_Fmt "error: expected %s, %s or %s, got %s\n",
-                Bs_Loc_Arg(token.loc),
+            bs_lexer_error(
+                &c->lexer,
+                token.loc,
+                "expected %s, %s or %s, got %s\n",
                 bs_token_type_name(BS_TOKEN_FN),
                 bs_token_type_name(BS_TOKEN_VAR),
                 bs_token_type_name(BS_TOKEN_CLASS),
                 bs_token_type_name(token.type));
-
-            bs_lexer_error(&c->lexer);
         }
         break;
 
@@ -1467,17 +1454,26 @@ static void bs_compile_stmt(Bs_Compiler *c) {
                 c->class->can_fail = true;
                 bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
             } else {
-                bs_fmt(
-                    c->lexer.error,
-                    Bs_Loc_Fmt
-                    "error: can only explicity return 'nil' from an initializer method\n\n"
-                    "When an initializer method explicitly returns 'nil', it indicates that the\n"
+                const char *before1 = "";
+                const char *before2 = "";
+                const char *after = "";
+                if (bs_get_stderr_colors()) {
+                    before1 = "\033[1;33m";
+                    before2 = "\033[32m";
+                    after = "\033[0m";
+                }
+
+                bs_lexer_error(
+                    &c->lexer,
+                    loc,
+                    "can only explicity return 'nil' from an initializer method\n\n"
+                    "%sWhen an initializer method explicitly returns 'nil', it indicates that the\n"
                     "initialization failed due to some reason, and the site of the "
                     "instantiation\n"
                     "gets 'nil' as the result. This is not strictly OOP, but I missed the part "
                     "where\n"
-                    "that's my problem.\n\n"
-                    "```\n"
+                    "that's my problem.%s\n\n"
+                    "%s```\n"
                     "var f = io.Reader(\"does_not_exist.txt\");\n"
                     "if !f {\n"
                     "    io.eprintln(\"Error: could not read file!\");\n"
@@ -1485,10 +1481,11 @@ static void bs_compile_stmt(Bs_Compiler *c) {
                     "}\n"
                     "\n"
                     "io.print(f.read()); # Or whatever you want to do\n"
-                    "```\n",
-                    Bs_Loc_Arg(loc));
-
-                bs_lexer_error(&c->lexer);
+                    "```%s\n",
+                    before1,
+                    after,
+                    before2,
+                    after);
             }
         } else {
             bs_compile_expr(c, BS_POWER_SET);
@@ -1515,16 +1512,13 @@ Bs_Fn *bs_compile_impl(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_re
         .is_main = is_main,
     };
 
-    Bs_Lambda lambda = {
-        .type = BS_LAMBDA_FN,
-        .is_repl = is_repl,
-    };
-    bs_compile_lambda_init(&compiler, &lambda, path);
+    Bs_Lambda *lambda = bs_lambda_new(BS_LAMBDA_FN, is_repl);
+    bs_compile_lambda_init(&compiler, lambda, path);
     bs_compile_block_init(&compiler);
 
     {
         // Own the path
-        const Bs_Sv path = Bs_Sv(lambda.fn->name->data, lambda.fn->name->size);
+        const Bs_Sv path = Bs_Sv(lambda->fn->name->data, lambda->fn->name->size);
         compiler.lexer = bs_lexer_new(path, input, &bs_config(bs)->error);
     }
 
@@ -1554,7 +1548,7 @@ Bs_Fn *bs_compile_impl(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_re
     }
 
     Bs_Fn *fn = bs_compile_lambda_end(&compiler);
-    bs_lambda_free(compiler.bs, &lambda);
+    bs_lambda_free(compiler.bs, lambda);
     bs_jumps_free(compiler.bs, &compiler.jumps);
     bs_op_locs_free(compiler.bs, &compiler.locations);
     return fn;

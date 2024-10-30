@@ -811,13 +811,22 @@ static bool bs_error_print_before_at(Bs *bs, size_t location, bool suppress_erro
         const Bs_Op_Loc *oploc = bs_chunk_get_op_loc(
             &bs->frame->closure->fn->chunk, bs->frame->ip - bs->frame->closure->fn->chunk.data);
 
-        bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(oploc[location].loc));
+        const Bs_Loc loc = oploc[location].loc;
+        if (bs_get_stderr_colors()) {
+            bs_fmt(w, "\033[1m" Bs_Loc_Fmt "\033[0m", Bs_Loc_Arg(loc));
+        } else {
+            bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(loc));
+        }
     } else {
-        bs_fmt(w, "[C]: ");
+        if (bs_get_stderr_colors()) {
+            bs_fmt(w, "\033[1m[C]: \033[0m");
+        } else {
+            bs_fmt(w, "[C]: ");
+        }
     }
 
     if (!suppress_error_label) {
-        bs_fmt(w, "error: ");
+        bs_efmt(w, "");
     }
     return printed_location;
 }
@@ -827,6 +836,8 @@ static void bs_error_print_after_at(Bs *bs, size_t location, bool printed_locati
 
     // Stack trace
     Bs_Pretty_Printer *p = bs_pretty_printer(bs, &bs->config.error);
+
+    const bool colors = bs_get_stderr_colors();
     for (size_t i = bs->frames.count; i > 1; i--) {
         const Bs_Frame *callee = &bs->frames.data[i - 1];
         const Bs_Frame *caller = &bs->frames.data[i - 2];
@@ -839,13 +850,26 @@ static void bs_error_print_after_at(Bs *bs, size_t location, bool printed_locati
             }
 
             oploc += callee->locations_offset;
-            bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(oploc->loc));
+
+            if (colors) {
+                bs_fmt(w, "\033[1m" Bs_Loc_Fmt "\033[0m", Bs_Loc_Arg(oploc->loc));
+            } else {
+                bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(oploc->loc));
+            }
         } else {
-            bs_fmt(w, "[C]: ");
+            if (colors) {
+                bs_fmt(w, "\033[1m[C]: \033[0m");
+            } else {
+                bs_fmt(w, "[C]: ");
+            }
         }
         printed_location = true;
 
-        bs_fmt(w, "in ");
+        if (colors) {
+            bs_fmt(w, "\033[1;33min \033[0m");
+        } else {
+            bs_fmt(w, "in ");
+        }
         if (callee->ip) {
             if (callee->closure->fn->module) {
                 const Bs_Str *module = callee->closure->fn->name;
@@ -1077,7 +1101,7 @@ void bs_check_whole_number_at(Bs *bs, size_t location, Bs_Value value, const cha
 // Interpreter
 static void bs_stack_push(Bs *bs, Bs_Value value) {
     if (bs->stack.count >= BS_STACK_CAPACITY) {
-        bs_fmt(&bs->config.error, "error: stack overflow\n");
+        bs_efmt(&bs->config.error, "stack overflow\n");
 
         bs->ok = false;
         bs_unwind(bs, 1);
@@ -1088,7 +1112,7 @@ static void bs_stack_push(Bs *bs, Bs_Value value) {
 
 static void bs_frames_push(Bs *bs, Bs_Frame frame) {
     if (bs->frames.count >= BS_FRAMES_CAPACITY) {
-        bs_fmt(&bs->config.error, "error: call stack overflow\n");
+        bs_efmt(&bs->config.error, "call stack overflow\n");
 
         bs->ok = false;
         bs_unwind(bs, 1);
@@ -1289,9 +1313,9 @@ const Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_r
     if (bs_sv_suffix(path, Bs_Sv_Static(".bs"))) {
         module.length = path.size - 3;
     } else {
-        bs_fmt(
+        bs_efmt(
             &bs->config.error,
-            "error: invalid input path '" Bs_Sv_Fmt "', expected '.bs' extension\n",
+            "invalid input path '" Bs_Sv_Fmt "', expected '.bs' extension\n",
             Bs_Sv_Arg(relative));
 
         return NULL;
@@ -2521,9 +2545,9 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         } break;
 
         default:
-            bs_fmt(
+            bs_efmt(
                 &bs->config.error,
-                "error: invalid op %d at offset %zu\n",
+                "invalid op %d at offset %zu\n",
                 op,
                 bs->frame->ip - bs->frame->closure->fn->chunk.data - 1);
         }
@@ -2579,9 +2603,9 @@ end:
 
 Bs_Value bs_call(Bs *bs, Bs_Value fn, const Bs_Value *args, size_t arity) {
     if (!bs->running) {
-        bs_fmt(
+        bs_efmt(
             &bs->config.error,
-            "error: cannot call bs_call() while BS is not running; call bs_run() first\n");
+            "cannot call bs_call() while BS is not running; call bs_run() first\n");
         return bs_value_nil;
     }
 

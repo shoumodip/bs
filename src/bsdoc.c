@@ -6,10 +6,6 @@
 
 #include "bs/lexer.h"
 
-static void bsdoc_writer(Bs_Writer *w, Bs_Sv sv) {
-    fwrite(sv.data, sv.size, 1, w->data);
-}
-
 typedef enum {
     BSDOC_STYLE_NONE,
     BSDOC_STYLE_CLASS,
@@ -221,7 +217,7 @@ static const Bsdoc_Style_Pair style_pairs[] = {
 
 static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t start, bool c) {
     Bsdoc_Parens parens = {0};
-    Bs_Writer error = {stderr, bsdoc_writer};
+    Bs_Writer error = bs_file_writer(stderr);
 
     Bs_Lexer lexer = bs_lexer_new(bs_sv_from_cstr(path), input, &error);
     lexer.loc.row = start;
@@ -455,20 +451,25 @@ void bsdoc_print_navigator(FILE *f, Bsdoc_Sections *sections, size_t *i) {
     fprintf(f, "</li>\n");
 }
 
-int main(int argc, char **argv) {
+void bsdoc_error_row(Bs_Writer *w, const char *path, size_t row, const char *message) {
+    if (bs_get_stderr_colors()) {
+        bs_fmt(w, "\033[1m%s:%zu:1: \033[0m", path, row);
+    } else {
+        bs_fmt(w, "%s:%zu:1: ", path, row);
+    }
+
+    bs_efmt(w, "%s", message);
+}
+
+int bsdoc_run_file(const char *input) {
     int result = 0;
 
-    if (argc < 2) {
-        fprintf(stderr, "error: file path not provided\n");
-        fprintf(stderr, "usage: %s <path>\n", *argv);
-        exit(1);
-    }
-    const char *input = argv[1];
+    Bs_Writer error = bs_file_writer(stderr);
 
     size_t size;
     char *contents = bs_read_file(input, &size);
     if (!contents) {
-        fprintf(stderr, "error: could not read file '%s'\n", input);
+        bs_efmt(&error, "could not read file '%s'\n", input);
         exit(1);
     }
 
@@ -485,7 +486,7 @@ int main(int argc, char **argv) {
 
     FILE *f = fopen(output, "wb");
     if (!f) {
-        fprintf(stderr, "error: could not write file '%s'\n", output);
+        bs_efmt(&error, "could not write file '%s'\n", output);
         exit(1);
     }
 
@@ -508,7 +509,7 @@ int main(int argc, char **argv) {
 
     Bs_Sv line = bs_sv_split(&sv, '\n');
     if (!bs_sv_prefix(line, Bs_Sv_Static("# "))) {
-        fprintf(stderr, "%s:1:1: error: expected '#' on first line\n", input);
+        bsdoc_error_row(&error, input, 1, "expected '#' on first line\n");
         bs_return_defer(1);
     }
     bs_sv_drop(&line, 2);
@@ -545,11 +546,7 @@ int main(int argc, char **argv) {
             }
 
             if (level > 6) {
-                fprintf(
-                    stderr,
-                    "%s:%zu:1: error: invalid heading depth, number of '#' must be less than 6\n",
-                    input,
-                    row);
+                bsdoc_error_row(&error, input, row, "invalid heading depth, maximum 6 allowed\n");
                 bs_return_defer(1);
             }
 
@@ -850,4 +847,15 @@ defer:
     free(output);
     free(contents);
     return result;
+}
+
+int main(int argc, char **argv) {
+    bs_try_stderr_colors();
+
+    for (int i = 1; i < argc; i++) {
+        const int result = bsdoc_run_file(argv[i]);
+        if (result) {
+            return result;
+        }
+    }
 }

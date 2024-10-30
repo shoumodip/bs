@@ -1092,10 +1092,10 @@ delete/error_cannot_delete_super.bs:4:16: error: cannot use 'delete' on super
 :i returncode 1
 :b stdout 0
 
-:b stderr 199
+:b stderr 200
 delete/error_expected_index_expression.bs:2:8: error: expected index expression
 
-Index expression can be any of the following
+Index expression can be any of the following:
 
 ```
 xs.foo;    # Constant index

@@ -44,10 +44,6 @@ Bs_Lexer bs_lexer_new(Bs_Sv path, Bs_Sv input, Bs_Writer *error) {
     };
 }
 
-void bs_lexer_error(Bs_Lexer *l) {
-    longjmp(l->unwind, 1);
-}
-
 void bs_lexer_buffer(Bs_Lexer *l, Bs_Token token) {
     l->peeked = true;
     l->buffer = token;
@@ -83,10 +79,7 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc) {
                 return token;
 
             default:
-                bs_fmt(
-                    l->error, Bs_Loc_Fmt "error: invalid escape character\n", Bs_Loc_Arg(l->loc));
-
-                bs_lexer_error(l);
+                bs_lexer_error(l, l->loc, "invalid escape character\n");
             }
 
             bs_lexer_advance(l);
@@ -96,8 +89,7 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc) {
     }
 
     if (!l->sv.size) {
-        bs_fmt(l->error, Bs_Loc_Fmt "error: unterminated string\n", Bs_Loc_Arg(l->loc));
-        bs_lexer_error(l);
+        bs_lexer_error(l, l->loc, "unterminated string\n");
     }
 
     token.type = BS_TOKEN_STR;
@@ -154,13 +146,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
         }
 
         if (isalpha(*l->sv.data) || *l->sv.data == '_') {
-            bs_fmt(
-                l->error,
-                Bs_Loc_Fmt "error: invalid digit '%c' in number\n",
-                Bs_Loc_Arg(l->loc),
-                *l->sv.data);
-
-            bs_lexer_error(l);
+            bs_lexer_error(l, l->loc, "invalid digit '%c' in number\n", *l->sv.data);
         }
 
         token.sv.size -= l->sv.size;
@@ -181,13 +167,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
         }
 
         if (isalpha(*l->sv.data) || *l->sv.data == '_') {
-            bs_fmt(
-                l->error,
-                Bs_Loc_Fmt "error: invalid digit '%c' in number\n",
-                Bs_Loc_Arg(l->loc),
-                *l->sv.data);
-
-            bs_lexer_error(l);
+            bs_lexer_error(l, l->loc, "invalid digit '%c' in number\n", *l->sv.data);
         }
 
         token.sv.size -= l->sv.size;
@@ -425,14 +405,8 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
     }
 
     if (token.type == BS_TOKEN_EOF) {
-        bs_fmt(
-            l->error,
-            Bs_Loc_Fmt "error: invalid character '%c' (%d)\n",
-            Bs_Loc_Arg(token.loc),
-            *token.sv.data,
-            *token.sv.data);
-
-        bs_lexer_error(l);
+        bs_lexer_error(
+            l, token.loc, "invalid character '%c' (%d)\n", *token.sv.data, *token.sv.data);
     }
 
     token.sv.size -= l->sv.size;
@@ -455,14 +429,12 @@ bool bs_lexer_read(Bs_Lexer *l, Bs_Token_Type type) {
 Bs_Token bs_lexer_expect(Bs_Lexer *l, Bs_Token_Type type) {
     const Bs_Token token = bs_lexer_next(l);
     if (token.type != type) {
-        bs_fmt(
-            l->error,
-            Bs_Loc_Fmt "error: expected %s, got %s\n",
-            Bs_Loc_Arg(token.loc),
+        bs_lexer_error(
+            l,
+            token.loc,
+            "expected %s, got %s\n",
             bs_token_type_name(type),
             bs_token_type_name(token.type));
-
-        bs_lexer_error(l);
     }
     return token;
 }
@@ -470,15 +442,28 @@ Bs_Token bs_lexer_expect(Bs_Lexer *l, Bs_Token_Type type) {
 Bs_Token bs_lexer_either(Bs_Lexer *l, Bs_Token_Type a, Bs_Token_Type b) {
     const Bs_Token token = bs_lexer_next(l);
     if (token.type != a && token.type != b) {
-        bs_fmt(
-            l->error,
-            Bs_Loc_Fmt "error: expected %s or %s, got %s\n",
-            Bs_Loc_Arg(token.loc),
+        bs_lexer_error(
+            l,
+            token.loc,
+            "expected %s or %s, got %s\n",
             bs_token_type_name(a),
             bs_token_type_name(b),
             bs_token_type_name(token.type));
-
-        bs_lexer_error(l);
     }
     return token;
+}
+
+void bs_lexer_error(Bs_Lexer *l, Bs_Loc loc, const char *fmt, ...) {
+    if (bs_get_stderr_colors()) {
+        bs_fmt(l->error, "\033[1m" Bs_Loc_Fmt "\033[0m", Bs_Loc_Arg(loc));
+    } else {
+        bs_fmt(l->error, Bs_Loc_Fmt, Bs_Loc_Arg(loc));
+    }
+
+    va_list args;
+    va_start(args, fmt);
+    bs_evfmt(l->error, fmt, args);
+    va_end(args);
+
+    longjmp(l->unwind, 1);
 }
