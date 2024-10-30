@@ -605,8 +605,8 @@ static Bs_C_Instance *bs_pipe_new(Bs *bs, int fd, bool write) {
 }
 
 Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
-    if (arity < 0 || arity > 4) {
-        bs_error(bs, "error: expected 1 to 4 arguments, got %zu", arity);
+    if (arity < 1 || arity > 4) {
+        bs_error(bs, "expected 1 to 4 arguments, got %zu", arity);
     }
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
 
