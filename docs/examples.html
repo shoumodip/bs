@@ -1861,7 +1861,7 @@ Compile the raylib module.
                 <span class='keyword'>var</span> x = (WIDTH - width) / <span class='constant'>2</span>;
                 <span class='keyword'>for</span> _, n <span class='keyword'>in</span> digits {
                     <span class='constant'>this</span>.<span class='field'>textures</span>[n].<span class='field'>draw</span>(x, y, <span class='constant'>0</span>, scale, tint);
-                    x += <span class='constant'>this</span>.<span class='field'>textures</span>[n].<span class='field'>width</span>();
+                    x += <span class='constant'>this</span>.<span class='field'>textures</span>[n].<span class='field'>width</span>() * scale;
                 }
             }
 

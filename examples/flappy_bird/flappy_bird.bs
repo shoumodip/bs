@@ -345,7 +345,7 @@ class Score {
                 var x = (WIDTH - width) / 2;
                 for _, n in digits {
                     this.textures[n].draw(x, y, 0, scale, tint);
-                    x += this.textures[n].width();
+                    x += this.textures[n].width() * scale;
                 }
             }
 
