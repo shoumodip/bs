@@ -46,7 +46,7 @@ void bs_fmt(Bs_Writer *writer, const char *fmt, ...) __attribute__((__format__(_
 
 bool bs_get_stderr_colors(void);
 void bs_set_stderr_colors(bool on);
-void bs_try_stderr_colors(void); // Autodetect whether stderr supports colors
+bool bs_try_stderr_colors(void); // Autodetect whether stderr supports colors
 
 // Helper for printing 'error:' with colors conditionally
 void bs_evfmt(Bs_Writer *w, const char *fmt, va_list args);

@@ -1440,11 +1440,20 @@ static void bs_import(Bs *bs) {
 #endif
 
         if (!init) {
+            const char *before1 = "";
+            const char *before2 = "";
+            const char *after = "";
+            if (bs_get_stderr_colors()) {
+                before1 = "\033[1;33m";
+                before2 = "\033[32m";
+                after = "\033[0m";
+            }
+
             bs_error(
                 bs,
                 "invalid native library '" Bs_Sv_Fmt "'\n\n"
-                "A BS native library must define 'bs_library_init'\n\n"
-                "```\n"
+                "%sA BS native library must define 'bs_library_init'%s\n\n"
+                "%s```\n"
                 "BS_LIBRARY_INIT void bs_library_init(Bs *bs, Bs_C_Lib *library) {\n"
                 "    // Perform any initialization you wish to do\n"
                 "    // lolcat_init();\n"
@@ -1461,9 +1470,12 @@ static void bs_import(Bs *bs) {
                 "    // };\n"
                 "    // bs_c_lib_ffi(bs, library, ffi, bs_c_array_size(ffi));\n"
                 "}\n"
-                "```\n",
-
-                Bs_Sv_Arg(*path));
+                "```%s\n",
+                Bs_Sv_Arg(*path),
+                before1,
+                after,
+                before2,
+                after);
         }
         init(bs, library);
 
@@ -1977,18 +1989,31 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 const Bs_Sv sb = bs_value_type_name_full(b);
                 if ((a.type == BS_VALUE_OBJECT && a.as.object->type == BS_OBJECT_STR) ||
                     (b.type == BS_VALUE_OBJECT && b.as.object->type == BS_OBJECT_STR)) {
+                    const char *before1 = "";
+                    const char *before2 = "";
+                    const char *after = "";
+                    if (bs_get_stderr_colors()) {
+                        before1 = "\033[1;33m";
+                        before2 = "\033[32m";
+                        after = "\033[0m";
+                    }
+
                     bs_error(
                         bs,
                         "invalid operands to binary (+): " Bs_Sv_Fmt ", " Bs_Sv_Fmt "\n\n"
-                        "Use (++) for string concatenation, or use string interpolation instead\n\n"
-                        "```\n"
+                        "%sUse (++) for string concatenation, or use string interpolation "
+                        "instead%s\n\n"
+                        "%s```\n"
                         "\"Hello, \" ++ \"world!\";\n"
                         "\"Hello, \" ++ 69;\n"
                         "\"Hello, \\(34 + 35) nice!\";\n"
-                        "```\n",
-
+                        "```%s\n",
                         Bs_Sv_Arg(sa),
-                        Bs_Sv_Arg(sb));
+                        Bs_Sv_Arg(sb),
+                        before1,
+                        after,
+                        before2,
+                        after);
                 } else {
                     bs_error(
                         bs,

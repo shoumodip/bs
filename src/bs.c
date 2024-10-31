@@ -14,7 +14,17 @@
 #endif
 
 int main(int argc, char **argv) {
-    bs_try_stderr_colors();
+    const char *help_format = "";
+    const char *sample_format = "";
+    const char *result_format = "";
+    const char *normal_format = "";
+    if (bs_try_stderr_colors()) {
+        help_format = "\033[33;1m";
+        sample_format = "\033[32m";
+        result_format = "\033[35;1m";
+        normal_format = "\033[0m";
+        crossline_prompt_color_set(CROSSLINE_FGCOLOR_BLUE);
+    }
 
     if (argc < 2 || !strcmp(argv[1], "-")) {
         Bs *bs = bs_new();
@@ -24,22 +34,8 @@ int main(int argc, char **argv) {
 
         if (isatty(fileno(stdin))) {
             Bs_Writer *w = &bs_config(bs)->log;
-
             bs_fmt(
-                w,
-                "Welcome to the BS Repl!\n"
-                "You can type BS statements here that will be evaluated.\n\n"
-                "Use :q or CTRL-d to quit.\n\n"
-                "Use :! to execute shell commands:\n\n"
-                ":!ls -A\n"
-                ":!vim main.bs\n\n"
-                "Use :{ and :} to execute multiple lines at once:\n\n"
-                ":{\n"
-                "for _ in 0, 5 {\n"
-                "    io.println(\"Hello, world!\");\n"
-                "}\n"
-                ":}\n\n"
-                "Website: https://shoumodip.github.io/bs/\n\n");
+                w, "%sWelcome to the BS Repl! Use :h to get help.%s\n", help_format, normal_format);
 
             static char line[8 * 1024]; // 8KB is enough for all repl related tasks
             while (true) {
@@ -52,13 +48,40 @@ int main(int argc, char **argv) {
                     continue;
                 }
 
-                if (bs_sv_prefix(input, Bs_Sv_Static(":!"))) {
-                    system(line + 2);
+                if (bs_sv_eq(input, Bs_Sv_Static(":q"))) {
+                    break;
+                }
+
+                if (bs_sv_eq(input, Bs_Sv_Static(":h"))) {
+                    bs_fmt(
+                        w,
+                        "%sUse :q or CTRL-d to quit.\n\n"
+                        "Use :! to execute shell commands:%s\n"
+                        "%s:!ls -A\n"
+                        ":!vim main.bs%s\n\n"
+                        "%sUse :{ and :} to execute multiple lines at once:%s\n"
+                        "%s:{\n"
+                        "for _ in 0, 5 {\n"
+                        "    io.println(\"Hello, world!\");\n"
+                        "}\n"
+                        ":}%s\n\n"
+                        "%sWebsite: https://shoumodip.github.io/bs%s\n",
+                        help_format,
+                        normal_format,
+                        sample_format,
+                        normal_format,
+                        help_format,
+                        normal_format,
+                        sample_format,
+                        normal_format,
+                        help_format,
+                        normal_format);
                     continue;
                 }
 
-                if (bs_sv_eq(input, Bs_Sv_Static(":q"))) {
-                    break;
+                if (bs_sv_prefix(input, Bs_Sv_Static(":!"))) {
+                    system(line + 2);
+                    continue;
                 }
 
                 if (bs_sv_eq(input, Bs_Sv_Static(":{"))) {
@@ -89,8 +112,9 @@ int main(int argc, char **argv) {
                         break;
                     }
 
+                    bs_fmt(w, "%s", result_format);
                     bs_value_write(bs, w, result.value);
-                    bs_fmt(w, "\n");
+                    bs_fmt(w, "%s\n", normal_format);
                 }
             }
         } else {

@@ -110,7 +110,7 @@ void bs_set_stderr_colors(bool on) {
 #    include <unistd.h>
 #endif // _WIN32
 
-void bs_try_stderr_colors(void) {
+bool bs_try_stderr_colors(void) {
     bs_stderr_colors = false;
 
 #ifdef _WIN32
@@ -131,6 +131,7 @@ void bs_try_stderr_colors(void) {
 #endif // _WIN32
 
     bs_stderr_colors = isatty(fileno(stderr));
+    return bs_stderr_colors;
 }
 
 void bs_evfmt(Bs_Writer *w, const char *fmt, va_list args) {
