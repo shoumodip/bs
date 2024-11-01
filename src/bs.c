@@ -120,11 +120,21 @@ int main(int argc, char **argv) {
                 }
 
                 if (bs_sv_eq(input, Bs_Sv_Static(":{"))) {
+                    size_t indent = 0;
                     while (true) {
                         const size_t size = sizeof(line) - input.size;
-                        assert(size);
+                        assert(size > indent * CROSSLINE_INDENT_SIZE);
 
-                        if (!crossline_readline("| ", line + input.size, size)) {
+                        const size_t start = input.size;
+                        for (size_t i = 0; i < indent; i++) {
+                            memcpy(
+                                &line[start + i * CROSSLINE_INDENT_SIZE],
+                                CROSSLINE_INDENT,
+                                CROSSLINE_INDENT_SIZE);
+                        }
+                        line[start + indent * CROSSLINE_INDENT_SIZE] = '\0';
+
+                        if (!crossline_readline2("| ", line + start, size)) {
                             bs_free(bs);
                             return result.exit == -1 ? !result.ok : result.exit;
                         }
@@ -132,6 +142,15 @@ int main(int argc, char **argv) {
                         input = bs_sv_from_cstr(line);
                         if (bs_sv_suffix(input, Bs_Sv_Static(":}"))) {
                             break;
+                        }
+
+                        size_t new_indent = 0;
+                        for (size_t i = start; i < input.size && line[i] == ' '; i++) {
+                            new_indent++;
+                        }
+
+                        if (new_indent % CROSSLINE_INDENT_SIZE == 0) {
+                            indent = new_indent / CROSSLINE_INDENT_SIZE;
                         }
 
                         line[input.size++] = '\n';

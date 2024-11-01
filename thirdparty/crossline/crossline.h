@@ -175,6 +175,9 @@ extern void crossline_color_set_on (int on_stdout, crossline_color_e color);
 // Set default prompt color
 extern void crossline_prompt_color_set (crossline_color_e color);
 
+#define CROSSLINE_INDENT "    "
+#define CROSSLINE_INDENT_SIZE (sizeof(CROSSLINE_INDENT) - 1)
+
 #ifdef __cplusplus
 }
 #endif
@@ -1336,7 +1339,11 @@ static char* crossline_readline_edit (char *buf, int size, const char *prompt, i
 
 /* Edit Commands */
 		case KEY_BACKSPACE: // Delete char to left of cursor (same with CTRL_KEY('H'))
-			if (pos > 0) {
+			if (pos >= CROSSLINE_INDENT_SIZE &&
+					!memcmp (&buf[pos-CROSSLINE_INDENT_SIZE], CROSSLINE_INDENT, CROSSLINE_INDENT_SIZE)) {
+				memmove (&buf[pos-CROSSLINE_INDENT_SIZE], &buf[pos], num - pos);
+				crossline_refreash (prompt, buf, &pos, &num, pos-CROSSLINE_INDENT_SIZE, num-CROSSLINE_INDENT_SIZE, 1);
+			} else if (pos > 0) {
 				memmove (&buf[pos-1], &buf[pos], num - pos);
 				crossline_refreash (prompt, buf, &pos, &num, pos-1, num-1, 1);
 			}
@@ -1461,8 +1468,16 @@ static char* crossline_readline_edit (char *buf, int size, const char *prompt, i
 			}
 			break;
 
+		case KEY_TAB:
+			if (num < size-CROSSLINE_INDENT_SIZE) {
+				memmove (&buf[pos+CROSSLINE_INDENT_SIZE], &buf[pos], CROSSLINE_INDENT_SIZE);
+				memcpy (&buf[pos], CROSSLINE_INDENT, CROSSLINE_INDENT_SIZE);
+				crossline_refreash (prompt, buf, &pos, &num, pos+CROSSLINE_INDENT_SIZE, num+CROSSLINE_INDENT_SIZE, 1);
+				copy_buf = 0;
+			}
+			break;
+
 /* Complete Commands */
-		case KEY_TAB:		// Autocomplete (same with CTRL_KEY('I'))
 		case ALT_KEY('='):	// List possible completions.
 		case ALT_KEY('?'):
 			if (in_his || (NULL == s_completion_callback) || (pos != num))
