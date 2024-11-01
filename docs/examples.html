@@ -802,7 +802,7 @@ Run the program.
         {<span class='string'>"is_key_pressed"</span>, rl_is_key_pressed},
         {<span class='string'>"measure_text"</span>, rl_measure_text},
     };
-    <span class='function'>bs_c_lib_ffi</span>(bs, library, ffi, <span class='function'>bs_c_array_size</span>(ffi));
+    <span class='function'>bs_c_lib_ffi</span>(bs, library, ffi, <span class='constant'>bs_c_array_size</span>(ffi));
 
     <span class='function'>bs_c_lib_set</span>(bs, library, <span class='constant'>Bs_Sv_Static</span>(<span class='string'>"MOUSE_BUTTON_LEFT"</span>), <span class='constant'>bs_value_num</span>(MOUSE_BUTTON_LEFT));
 
@@ -1449,7 +1449,7 @@ Flappy Bird using Raylib.
         {<span class='string'>"is_key_pressed"</span>, rl_is_key_pressed},
         {<span class='string'>"get_frame_time"</span>, rl_get_frame_time},
     };
-    <span class='function'>bs_c_lib_ffi</span>(bs, library, ffi, <span class='function'>bs_c_array_size</span>(ffi));
+    <span class='function'>bs_c_lib_ffi</span>(bs, library, ffi, <span class='constant'>bs_c_array_size</span>(ffi));
 
     <span class='class'>Bs_C_Class</span> *texture_class =
         <span class='function'>bs_c_class_new</span>(bs, <span class='constant'>Bs_Sv_Static</span>(<span class='string'>"Texture"</span>), <span class='keyword'>sizeof</span>(<span class='class'>Texture</span>), rl_texture_init);
