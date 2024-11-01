@@ -433,7 +433,7 @@ void bs_buffer_write(Bs_Writer *w, Bs_Sv sv) {
     bs_da_push_many(b->bs, b, sv.data, sv.size);
 }
 
-Bs *bs_new(void) {
+Bs *bs_new(Bs_Error_Writer error) {
     Bs *bs = calloc(1, sizeof(Bs));
     assert(bs);
 
@@ -449,7 +449,7 @@ Bs *bs_new(void) {
     bs->config.buffer.bs = bs;
 
     bs->config.log = bs_file_writer(stdout);
-    bs->config.error = bs_file_writer(stderr);
+    bs->config.error = error;
 
     bs_update_cwd(bs);
     return bs;
@@ -799,60 +799,47 @@ static bool bs_value_has_builtin_methods(Bs_Value value) {
     }
 }
 
-static bool bs_error_print_before_at(Bs *bs, size_t location, bool suppress_error_label) {
+static Bs_Error bs_error_begin(Bs *bs, size_t location) {
     fflush(stdout); // Flush stdout beforehand *just in case*
-
     bs->gc_on = false;
-    bool printed_location = false;
 
-    Bs_Writer *w = &bs->config.error;
+    Bs_Error error = {.type = BS_ERROR_MAIN};
     if (bs->frame->ip) {
-        printed_location = true;
         const Bs_Op_Loc *oploc = bs_chunk_get_op_loc(
             &bs->frame->closure->fn->chunk, bs->frame->ip - bs->frame->closure->fn->chunk.data);
 
-        const Bs_Loc loc = oploc[location].loc;
-        bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(loc));
+        error.loc = oploc[location].loc;
     } else {
-        bs_fmt(w, "[C]: ");
+        error.native = true;
     }
 
-    if (!suppress_error_label) {
-        bs_efmt(w, "");
-    }
-    return printed_location;
+    return error;
 }
 
-static void bs_error_print_after_at(Bs *bs, size_t location, bool printed_location) {
-    Bs_Writer *w = &bs->config.error;
+static void bs_error_end(Bs *bs, size_t location, bool native) {
+    const size_t start = bs->config.buffer.count;
+    Bs_Writer w = bs_buffer_writer(&bs->config.buffer);
 
-    // Stack trace
-    Bs_Pretty_Printer *p = bs_pretty_printer(bs, &bs->config.error);
-
-    const bool colors = bs_get_stderr_colors();
     for (size_t i = bs->frames.count; i > 1; i--) {
         const Bs_Frame *callee = &bs->frames.data[i - 1];
         const Bs_Frame *caller = &bs->frames.data[i - 2];
 
+        Bs_Error error = {.type = BS_ERROR_TRACE};
+
         if (caller->ip) {
             const Bs_Fn *fn = caller->closure->fn;
             const Bs_Op_Loc *oploc = bs_chunk_get_op_loc(&fn->chunk, caller->ip - fn->chunk.data);
-            if (!printed_location) {
+            if (native) {
                 oploc += location;
             }
 
             oploc += callee->locations_offset;
-            bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(oploc->loc));
+            error.loc = oploc->loc;
         } else {
-            bs_fmt(w, "[C]: ");
+            error.native = true;
         }
-        printed_location = true;
+        native = false;
 
-        if (colors) {
-            bs_fmt(w, "\033[33min \033[0m");
-        } else {
-            bs_fmt(w, "in ");
-        }
         if (callee->ip) {
             if (callee->closure->fn->module) {
                 const Bs_Str *module = callee->closure->fn->name;
@@ -862,24 +849,33 @@ static void bs_error_print_after_at(Bs *bs, size_t location, bool printed_locati
                     sv.size -= 3;
                 }
 
-                bs_fmt(w, "import(");
-                bs_pretty_printer_quote(p, sv);
-                bs_fmt(w, ")");
+                bs_fmt(&w, "import(\"");
+                while (sv.size) {
+                    size_t index;
+                    if (bs_sv_find(sv, '"', &index)) {
+                        w.write(&w, bs_sv_drop(&sv, index));
+                        w.write(&w, Bs_Sv_Static("\\\""));
+                        bs_sv_drop(&sv, 1);
+                    } else {
+                        w.write(&w, bs_sv_drop(&sv, sv.size));
+                    }
+                }
+                bs_fmt(&w, "\")");
             } else if (callee->closure->fn->name) {
                 const Bs_Value this = *callee->base;
                 if (this.type == BS_VALUE_OBJECT && this.as.object->type == BS_OBJECT_INSTANCE) {
                     const Bs_Instance *instance = (const Bs_Instance *)this.as.object;
                     if (callee->closure != instance->class->init) {
-                        bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(*instance->class->name));
+                        bs_fmt(&w, Bs_Sv_Fmt ".", Bs_Sv_Arg(*instance->class->name));
                     }
                 } else if (bs_value_has_builtin_methods(this)) {
                     const Bs_Sv sv = bs_value_type_name_full(this);
-                    bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(sv));
+                    bs_fmt(&w, Bs_Sv_Fmt ".", Bs_Sv_Arg(sv));
                 }
 
-                bs_fmt(w, Bs_Sv_Fmt "()", Bs_Sv_Arg(*callee->closure->fn->name));
+                bs_fmt(&w, Bs_Sv_Fmt "()", Bs_Sv_Arg(*callee->closure->fn->name));
             } else {
-                bs_fmt(w, "<anonymous>()");
+                bs_fmt(&w, "<anonymous>()");
             }
         } else {
             const Bs_C_Fn *fn = callee->native;
@@ -887,36 +883,42 @@ static void bs_error_print_after_at(Bs *bs, size_t location, bool printed_locati
             if (this.type == BS_VALUE_OBJECT && this.as.object->type == BS_OBJECT_C_INSTANCE) {
                 const Bs_C_Instance *instance = (const Bs_C_Instance *)this.as.object;
                 if (fn != instance->class->init) {
-                    bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(instance->class->name));
+                    bs_fmt(&w, Bs_Sv_Fmt ".", Bs_Sv_Arg(instance->class->name));
                 }
             } else if (bs_value_has_builtin_methods(this)) {
                 const Bs_Sv sv = bs_value_type_name_full(this);
-                bs_fmt(w, Bs_Sv_Fmt ".", Bs_Sv_Arg(sv));
+                bs_fmt(&w, Bs_Sv_Fmt ".", Bs_Sv_Arg(sv));
             }
 
-            bs_fmt(w, Bs_Sv_Fmt "()", Bs_Sv_Arg(fn->name));
+            bs_fmt(&w, Bs_Sv_Fmt "()", Bs_Sv_Arg(fn->name));
         }
 
-        bs_fmt(w, "\n");
+        error.message = bs_buffer_reset(&bs->config.buffer, start);
+        bs->config.error.write(&bs->config.error, error);
     }
 
     bs->ok = false;
     bs_unwind(bs, 1);
 }
 
-void bs_error_at(Bs *bs, size_t location, const char *fmt, ...) {
-    const bool printed_location = bs_error_print_before_at(bs, location, false);
+void bs_error_full_at(
+    Bs *bs, size_t location, Bs_Sv explanation, Bs_Sv example, const char *fmt, ...) {
+    const size_t start = bs->config.buffer.count;
+    Bs_Writer w = bs_buffer_writer(&bs->config.buffer);
 
     va_list args;
     va_start(args, fmt);
-    bs_vfmt(&bs->config.error, fmt, args);
+    bs_vfmt(&w, fmt, args);
     va_end(args);
 
-    if (fmt[strlen(fmt) - 1] != '\n' || bs->frames.count > 1) {
-        bs_fmt(&bs->config.error, "\n");
-    }
+    Bs_Error error = bs_error_begin(bs, location);
+    error.message = bs_buffer_reset(&bs->config.buffer, start);
+    error.explanation = explanation;
+    error.example = example;
+    error.continued = (explanation.size || example.size) && bs->frames.count > 1;
 
-    bs_error_print_after_at(bs, location, printed_location);
+    bs->config.error.write(&bs->config.error, error);
+    bs_error_end(bs, location, error.native);
 }
 
 // Checks
@@ -1002,48 +1004,48 @@ void bs_check_multi_at(
         }
     }
 
-    const bool printed_location = bs_error_print_before_at(bs, location, false);
+    const size_t start = bs->config.buffer.count;
+    Bs_Writer w = bs_buffer_writer(&bs->config.buffer);
 
-    Bs_Writer *w = &bs->config.error;
     if (label) {
-        bs_fmt(w, "expected %s to be ", label);
+        bs_fmt(&w, "expected %s to be ", label);
     } else {
-        bs_fmt(w, "expected argument #%zu to be ", location);
+        bs_fmt(&w, "expected argument #%zu to be ", location);
     }
 
     for (size_t i = 0; i < count; i++) {
         if (i) {
             if (i + 1 == count) {
-                bs_fmt(w, " or ");
+                bs_fmt(&w, " or ");
             } else {
-                bs_fmt(w, ", ");
+                bs_fmt(&w, ", ");
             }
         }
 
         const Bs_Check c = checks[i];
         switch (c.type) {
         case BS_CHECK_VALUE:
-            bs_fmt(w, "%s", bs_value_type_name(c.as.value));
+            bs_fmt(&w, "%s", bs_value_type_name(c.as.value));
             break;
 
         case BS_CHECK_OBJECT:
-            bs_fmt(w, "%s", bs_object_type_name(c.as.object));
+            bs_fmt(&w, "%s", bs_object_type_name(c.as.object));
             break;
 
         case BS_CHECK_C_INSTANCE:
-            bs_fmt(w, Bs_Sv_Fmt, Bs_Sv_Arg(c.as.c_instance->name));
+            bs_fmt(&w, Bs_Sv_Fmt, Bs_Sv_Arg(c.as.c_instance->name));
             break;
 
         case BS_CHECK_FN:
-            bs_fmt(w, "function");
+            bs_fmt(&w, "function");
             break;
 
         case BS_CHECK_INT:
-            bs_fmt(w, "integer");
+            bs_fmt(&w, "integer");
             break;
 
         case BS_CHECK_WHOLE:
-            bs_fmt(w, "positive integer");
+            bs_fmt(&w, "positive integer");
             break;
 
         default:
@@ -1052,8 +1054,13 @@ void bs_check_multi_at(
     }
 
     const Bs_Sv sv = bs_value_type_name_full(value);
-    bs_fmt(w, ", got " Bs_Sv_Fmt "\n", Bs_Sv_Arg(sv));
-    bs_error_print_after_at(bs, location, printed_location);
+    bs_fmt(&w, ", got " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
+
+    Bs_Error error = bs_error_begin(bs, location);
+    error.message = bs_buffer_reset(&bs->config.buffer, start);
+
+    bs->config.error.write(&bs->config.error, error);
+    bs_error_end(bs, location, error.native);
 }
 
 void bs_check_callable_at(Bs *bs, size_t location, Bs_Value value, const char *label) {
@@ -1086,10 +1093,7 @@ void bs_check_whole_number_at(Bs *bs, size_t location, Bs_Value value, const cha
 // Interpreter
 static void bs_stack_push(Bs *bs, Bs_Value value) {
     if (bs->stack.count >= BS_STACK_CAPACITY) {
-        bs_efmt(&bs->config.error, "stack overflow\n");
-
-        bs->ok = false;
-        bs_unwind(bs, 1);
+        bs_error(bs, "stack overflow");
     }
 
     bs->stack.data[bs->stack.count++] = value;
@@ -1097,10 +1101,7 @@ static void bs_stack_push(Bs *bs, Bs_Value value) {
 
 static void bs_frames_push(Bs *bs, Bs_Frame frame) {
     if (bs->frames.count >= BS_FRAMES_CAPACITY) {
-        bs_efmt(&bs->config.error, "call stack overflow\n");
-
-        bs->ok = false;
-        bs_unwind(bs, 1);
+        bs_error(bs, "call stack overflow");
     }
 
     bs->frames.data[bs->frames.count++] = frame;
@@ -1298,11 +1299,20 @@ const Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_r
     if (bs_sv_suffix(path, Bs_Sv_Static(".bs"))) {
         module.length = path.size - 3;
     } else {
-        bs_efmt(
-            &bs->config.error,
-            "invalid input path '" Bs_Sv_Fmt "', expected '.bs' extension\n",
+        const size_t start = bs->config.buffer.count;
+        Bs_Writer w = bs_buffer_writer(&bs->config.buffer);
+
+        bs_fmt(
+            &w,
+            "invalid input path '" Bs_Sv_Fmt "', expected '.bs' extension",
             Bs_Sv_Arg(relative));
 
+        const Bs_Error error = {
+            .type = BS_ERROR_USAGE,
+            .message = bs_buffer_reset(&bs->config.buffer, start),
+        };
+
+        bs->config.error.write(&bs->config.error, error);
         return NULL;
     }
 
@@ -1425,42 +1435,29 @@ static void bs_import(Bs *bs) {
 #endif
 
         if (!init) {
-            const char *before1 = "";
-            const char *before2 = "";
-            const char *after = "";
-            if (bs_get_stderr_colors()) {
-                before1 = "\033[33m";
-                before2 = "\033[32m";
-                after = "\033[0m";
-            }
-
-            bs_error(
+            bs_error_full(
                 bs,
-                "invalid native library '" Bs_Sv_Fmt "'\n\n"
-                "%sA BS native library must define 'bs_library_init'%s\n\n"
-                "%s```\n"
-                "BS_LIBRARY_INIT void bs_library_init(Bs *bs, Bs_C_Lib *library) {\n"
-                "    // Perform any initialization you wish to do\n"
-                "    // lolcat_init();\n"
-                "\n"
-                "    // Add BS values to the library\n"
-                "    // bs_c_lib_set(bs, library, Bs_Sv_Static(\"foo\"), "
-                "bs_value_object(lolcat_foo));\n"
-                "\n"
-                "    // Add multiple BS native functions to the library at once\n"
-                "    // static const Bs_FFI ffi[] = {\n"
-                "    //     {\"hello\", lolcat_hello},\n"
-                "    //     {\"urmom\", lolcat_urmom},\n"
-                "    //     /* ... */\n"
-                "    // };\n"
-                "    // bs_c_lib_ffi(bs, library, ffi, bs_c_array_size(ffi));\n"
-                "}\n"
-                "```%s\n",
-                Bs_Sv_Arg(*path),
-                before1,
-                after,
-                before2,
-                after);
+
+                Bs_Sv_Static("A BS native library must define 'bs_library_init'"),
+                Bs_Sv_Static("BS_LIBRARY_INIT void bs_library_init(Bs *bs, Bs_C_Lib *library) {\n"
+                             "    // Perform any initialization you wish to do\n"
+                             "    // lolcat_init();\n"
+                             "\n"
+                             "    // Add BS values to the library\n"
+                             "    // bs_c_lib_set(bs, library, Bs_Sv_Static(\"foo\"), "
+                             "bs_value_object(lolcat_foo));\n"
+                             "\n"
+                             "    // Add multiple BS native functions to the library at once\n"
+                             "    // static const Bs_FFI ffi[] = {\n"
+                             "    //     {\"hello\", lolcat_hello},\n"
+                             "    //     {\"urmom\", lolcat_urmom},\n"
+                             "    //     /* ... */\n"
+                             "    // };\n"
+                             "    // bs_c_lib_ffi(bs, library, ffi, bs_c_array_size(ffi));\n"
+                             "}"),
+
+                "invalid native library '" Bs_Sv_Fmt "'",
+                Bs_Sv_Arg(*path));
         }
         init(bs, library);
 
@@ -1974,31 +1971,19 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 const Bs_Sv sb = bs_value_type_name_full(b);
                 if ((a.type == BS_VALUE_OBJECT && a.as.object->type == BS_OBJECT_STR) ||
                     (b.type == BS_VALUE_OBJECT && b.as.object->type == BS_OBJECT_STR)) {
-                    const char *before1 = "";
-                    const char *before2 = "";
-                    const char *after = "";
-                    if (bs_get_stderr_colors()) {
-                        before1 = "\033[33m";
-                        before2 = "\033[32m";
-                        after = "\033[0m";
-                    }
-
-                    bs_error(
+                    bs_error_full(
                         bs,
-                        "invalid operands to binary (+): " Bs_Sv_Fmt ", " Bs_Sv_Fmt "\n\n"
-                        "%sUse (++) for string concatenation, or use string interpolation "
-                        "instead%s\n\n"
-                        "%s```\n"
-                        "\"Hello, \" ++ \"world!\";\n"
-                        "\"Hello, \" ++ 69;\n"
-                        "\"Hello, \\(34 + 35) nice!\";\n"
-                        "```%s\n",
+
+                        Bs_Sv_Static("Use (++) for string concatenation, or use string "
+                                     "interpolation instead"),
+
+                        Bs_Sv_Static("\"Hello, \" ++ \"world!\";\n"
+                                     "\"Hello, \" ++ 69;\n"
+                                     "\"Hello, \\(34 + 35) nice!\";"),
+
+                        "invalid operands to binary (+): " Bs_Sv_Fmt ", " Bs_Sv_Fmt,
                         Bs_Sv_Arg(sa),
-                        Bs_Sv_Arg(sb),
-                        before1,
-                        after,
-                        before2,
-                        after);
+                        Bs_Sv_Arg(sb));
                 } else {
                     bs_error(
                         bs,
@@ -2267,26 +2252,36 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         } break;
 
         case BS_OP_PANIC: {
-            const bool printed_location = bs_error_print_before_at(bs, 0, true);
+            const size_t start = bs->config.buffer.count;
+            Bs_Writer w = bs_buffer_writer(&bs->config.buffer);
 
             const Bs_Value value = bs_stack_peek(bs, 0);
-            bs_value_write(bs, &bs->config.error, value);
+            bs_value_write(bs, &w, value);
             bs->stack.count--;
 
-            bs_fmt(&bs->config.error, "\n");
-            bs_error_print_after_at(bs, 0, printed_location);
+            Bs_Error error = bs_error_begin(bs, 0);
+            error.type = BS_ERROR_PANIC;
+            error.message = bs_buffer_reset(&bs->config.buffer, start);
+
+            bs->config.error.write(&bs->config.error, error);
+            bs_error_end(bs, 0, error.native);
         } break;
 
         case BS_OP_ASSERT: {
             if (bs_value_is_falsey(bs_stack_peek(bs, 1))) {
-                const bool printed_location = bs_error_print_before_at(bs, 0, true);
+                const size_t start = bs->config.buffer.count;
+                Bs_Writer w = bs_buffer_writer(&bs->config.buffer);
 
                 const Bs_Value message = bs_stack_peek(bs, 0);
-                bs_value_write(bs, &bs->config.error, message);
+                bs_value_write(bs, &w, message);
                 bs->stack.count -= 2;
 
-                bs_fmt(&bs->config.error, "\n");
-                bs_error_print_after_at(bs, 0, printed_location);
+                Bs_Error error = bs_error_begin(bs, 0);
+                error.type = BS_ERROR_PANIC;
+                error.message = bs_buffer_reset(&bs->config.buffer, start);
+
+                bs->config.error.write(&bs->config.error, error);
+                bs_error_end(bs, 0, error.native);
             } else {
                 bs->stack.count--;
             }
@@ -2555,9 +2550,9 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         } break;
 
         default:
-            bs_efmt(
-                &bs->config.error,
-                "invalid op %d at offset %zu\n",
+            bs_error(
+                bs,
+                "invalid op %d at offset %zu",
                 op,
                 bs->frame->ip - bs->frame->closure->fn->chunk.data - 1);
         }
@@ -2613,9 +2608,12 @@ end:
 
 Bs_Value bs_call(Bs *bs, Bs_Value fn, const Bs_Value *args, size_t arity) {
     if (!bs->running) {
-        bs_efmt(
-            &bs->config.error,
-            "cannot call bs_call() while BS is not running; call bs_run() first\n");
+        const Bs_Error error = {
+            .type = BS_ERROR_USAGE,
+            .message = "cannot call bs_call() while BS is not running; call bs_run() first",
+        };
+
+        bs->config.error.write(&bs->config.error, error);
         return bs_value_nil;
     }
 

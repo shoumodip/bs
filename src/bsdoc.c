@@ -215,9 +215,17 @@ static const Bsdoc_Style_Pair style_pairs[] = {
 };
 #undef p
 
+static void bs_error_write(Bs_Error_Writer *w, Bs_Error error) {
+    fprintf(
+        stderr,
+        Bs_Loc_Fmt "error: " Bs_Sv_Fmt "\n",
+        Bs_Loc_Arg(error.loc),
+        Bs_Sv_Arg(error.message));
+}
+
 static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t start, bool c) {
     Bsdoc_Parens parens = {0};
-    Bs_Writer error = bs_file_writer(stderr);
+    Bs_Error_Writer error = {.write = bs_error_write};
 
     Bs_Lexer lexer = bs_lexer_new(bs_sv_from_cstr(path), input, &error);
     lexer.loc.row = start;
@@ -453,7 +461,7 @@ void bsdoc_print_navigator(FILE *f, Bsdoc_Sections *sections, size_t *i) {
 
 void bsdoc_error_row(Bs_Writer *w, const char *path, size_t row, const char *message) {
     bs_fmt(w, "%s:%zu:1: ", path, row);
-    bs_efmt(w, "%s", message);
+    bs_fmt(w, "error: %s", message);
 }
 
 int bsdoc_run_file(const char *input) {
@@ -464,7 +472,7 @@ int bsdoc_run_file(const char *input) {
     size_t size;
     char *contents = bs_read_file(input, &size);
     if (!contents) {
-        bs_efmt(&error, "could not read file '%s'\n", input);
+        bs_fmt(&error, "error: could not read file '%s'\n", input);
         exit(1);
     }
 
@@ -481,7 +489,7 @@ int bsdoc_run_file(const char *input) {
 
     FILE *f = fopen(output, "wb");
     if (!f) {
-        bs_efmt(&error, "could not write file '%s'\n", output);
+        bs_fmt(&error, "error: could not write file '%s'\n", output);
         exit(1);
     }
 
@@ -845,8 +853,6 @@ defer:
 }
 
 int main(int argc, char **argv) {
-    bs_try_stderr_colors();
-
     for (int i = 1; i < argc; i++) {
         const int result = bsdoc_run_file(argv[i]);
         if (result) {

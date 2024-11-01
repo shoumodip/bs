@@ -75,78 +75,18 @@ Bs_Writer bs_file_writer(FILE *f) {
     return (Bs_Writer){.data = f, .write = bs_file_write};
 }
 
-static char bs_fmt_buffer[1024];
+static char buffer[1024];
 
 void bs_vfmt(Bs_Writer *w, const char *fmt, va_list args) {
-    const int count = vsnprintf(bs_fmt_buffer, sizeof(bs_fmt_buffer), fmt, args);
-    assert(count >= 0 && count + 1 < sizeof(bs_fmt_buffer));
-    w->write(w, Bs_Sv(bs_fmt_buffer, count));
+    const int count = vsnprintf(buffer, sizeof(buffer), fmt, args);
+    assert(count >= 0 && count + 1 < sizeof(buffer));
+    w->write(w, Bs_Sv(buffer, count));
 }
 
 void bs_fmt(Bs_Writer *w, const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
     bs_vfmt(w, fmt, args);
-    va_end(args);
-}
-
-static bool bs_stderr_colors;
-
-bool bs_get_stderr_colors(void) {
-    return bs_stderr_colors;
-}
-
-void bs_set_stderr_colors(bool on) {
-    bs_stderr_colors = on;
-}
-
-#ifdef _WIN32
-#    include <io.h>
-#    include <windows.h>
-
-#    define isatty _isatty
-#    define fileno _fileno
-#else
-#    include <unistd.h>
-#endif // _WIN32
-
-bool bs_try_stderr_colors(void) {
-    bs_stderr_colors = false;
-
-#ifdef _WIN32
-    HANDLE hOut = GetStdHandle(STD_ERROR_HANDLE);
-    if (hOut == INVALID_HANDLE_VALUE) {
-        return;
-    }
-
-    DWORD mode = 0;
-    if (!GetConsoleMode(hOut, &mode)) {
-        return;
-    }
-
-    mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-    if (!SetConsoleMode(hOut, mode)) {
-        return;
-    }
-#endif // _WIN32
-
-    bs_stderr_colors = isatty(fileno(stderr));
-    return bs_stderr_colors;
-}
-
-void bs_evfmt(Bs_Writer *w, const char *fmt, va_list args) {
-    const int count = vsnprintf(bs_fmt_buffer, sizeof(bs_fmt_buffer), fmt, args);
-    assert(count >= 0 && count + 1 < sizeof(bs_fmt_buffer));
-
-    w->write(
-        w, bs_stderr_colors ? Bs_Sv_Static("\033[31merror:\033[0m ") : Bs_Sv_Static("error: "));
-    w->write(w, Bs_Sv(bs_fmt_buffer, count));
-}
-
-void bs_efmt(Bs_Writer *w, const char *fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-    bs_evfmt(w, fmt, args);
     va_end(args);
 }
 

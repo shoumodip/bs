@@ -168,7 +168,9 @@ extern void crossline_cursor_hide (int bHide);
 
 // Set text color, CROSSLINE_COLOR_DEFAULT will revert to default setting
 // `\t` is not supported in Linux terminal, same below. Don't use `\n` in Linux terminal, same below.
-extern void crossline_color_set (crossline_color_e color);
+extern void crossline_color_set_on (int on_stdout, crossline_color_e color);
+
+#define crossline_color_set(color) crossline_color_set_on(1, color)
 
 // Set default prompt color
 extern void crossline_prompt_color_set (crossline_color_e color);
@@ -728,13 +730,13 @@ void crossline_cursor_hide (int bHide)
 	SetConsoleCursorInfo (GetStdHandle(STD_OUTPUT_HANDLE), &inf);
 }
 
-void crossline_color_set (crossline_color_e color)
+void crossline_color_set_on (int on_stdout, crossline_color_e color)
 {
     CONSOLE_SCREEN_BUFFER_INFO info;
 	static WORD dft_wAttributes = 0;
 	WORD wAttributes = 0;
 	if (!dft_wAttributes) {
-		GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
+		GetConsoleScreenBufferInfo(GetStdHandle(on_stdout ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE), &info);
 		dft_wAttributes = info.wAttributes;
 	}
 	if (CROSSLINE_FGCOLOR_DEFAULT == (color&CROSSLINE_FGCOLOR_MASK)) {
@@ -767,7 +769,7 @@ void crossline_color_set (crossline_color_e color)
 	}
 	if (color & CROSSLINE_UNDERLINE)
 		{ wAttributes |= COMMON_LVB_UNDERSCORE; }
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), wAttributes);
+	SetConsoleTextAttribute(GetStdHandle(on_stdout ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE), wAttributes);
 }
 
 #else // Linux
@@ -826,16 +828,17 @@ void crossline_cursor_hide (int bHide)
 	printf("\e[?25%c", bHide?'l':'h');
 }
 
-void crossline_color_set (crossline_color_e color)
+void crossline_color_set_on (int on_stdout, crossline_color_e color)
 {
-	if (!isatty(STDOUT_FILENO))		{ return; }
-	printf ("\033[m");
+	if (!isatty(on_stdout ? STDOUT_FILENO : STDERR_FILENO))		{ return; }
+    FILE *f = on_stdout ? stdout : stderr;
+	fprintf (f, "\033[m");
 	if (CROSSLINE_FGCOLOR_DEFAULT != (color&CROSSLINE_FGCOLOR_MASK)) 
-		{ printf ("\033[%dm", 29 + (color&CROSSLINE_FGCOLOR_MASK) + ((color&CROSSLINE_FGCOLOR_BRIGHT)?60:0)); }
+		{ fprintf (f, "\033[%dm", 29 + (color&CROSSLINE_FGCOLOR_MASK) + ((color&CROSSLINE_FGCOLOR_BRIGHT)?60:0)); }
 	if (CROSSLINE_BGCOLOR_DEFAULT != (color&CROSSLINE_BGCOLOR_MASK)) 
-		{ printf ("\033[%dm", 39 + ((color&CROSSLINE_BGCOLOR_MASK)>>8) + ((color&CROSSLINE_BGCOLOR_BRIGHT)?60:0)); }
+		{ fprintf (f, "\033[%dm", 39 + ((color&CROSSLINE_BGCOLOR_MASK)>>8) + ((color&CROSSLINE_BGCOLOR_BRIGHT)?60:0)); }
 	if (color & CROSSLINE_UNDERLINE)
-		{ printf ("\033[4m"); }
+		{ fprintf (f, "\033[4m"); }
 }
 
 #endif // #ifdef _WIN32

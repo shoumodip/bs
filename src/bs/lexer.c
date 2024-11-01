@@ -34,7 +34,7 @@ static bool bs_lexer_match(Bs_Lexer *l, char ch) {
     return false;
 }
 
-Bs_Lexer bs_lexer_new(Bs_Sv path, Bs_Sv input, Bs_Writer *error) {
+Bs_Lexer bs_lexer_new(Bs_Sv path, Bs_Sv input, Bs_Error_Writer *error) {
     return (Bs_Lexer){
         .sv = input,
         .loc.path = path,
@@ -79,7 +79,7 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc) {
                 return token;
 
             default:
-                bs_lexer_error(l, l->loc, "invalid escape character\n");
+                bs_lexer_error(l, l->loc, "invalid escape character");
             }
 
             bs_lexer_advance(l);
@@ -89,7 +89,7 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc) {
     }
 
     if (!l->sv.size) {
-        bs_lexer_error(l, l->loc, "unterminated string\n");
+        bs_lexer_error(l, l->loc, "unterminated string");
     }
 
     token.type = BS_TOKEN_STR;
@@ -146,7 +146,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
         }
 
         if (isalpha(*l->sv.data) || *l->sv.data == '_') {
-            bs_lexer_error(l, l->loc, "invalid digit '%c' in number\n", *l->sv.data);
+            bs_lexer_error(l, l->loc, "invalid digit '%c' in number", *l->sv.data);
         }
 
         token.sv.size -= l->sv.size;
@@ -167,7 +167,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
         }
 
         if (isalpha(*l->sv.data) || *l->sv.data == '_') {
-            bs_lexer_error(l, l->loc, "invalid digit '%c' in number\n", *l->sv.data);
+            bs_lexer_error(l, l->loc, "invalid digit '%c' in number", *l->sv.data);
         }
 
         token.sv.size -= l->sv.size;
@@ -405,8 +405,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
     }
 
     if (token.type == BS_TOKEN_EOF) {
-        bs_lexer_error(
-            l, token.loc, "invalid character '%c' (%d)\n", *token.sv.data, *token.sv.data);
+        bs_lexer_error(l, token.loc, "invalid character '%c' (%d)", *token.sv.data, *token.sv.data);
     }
 
     token.sv.size -= l->sv.size;
@@ -432,7 +431,7 @@ Bs_Token bs_lexer_expect(Bs_Lexer *l, Bs_Token_Type type) {
         bs_lexer_error(
             l,
             token.loc,
-            "expected %s, got %s\n",
+            "expected %s, got %s",
             bs_token_type_name(type),
             bs_token_type_name(token.type));
     }
@@ -445,7 +444,7 @@ Bs_Token bs_lexer_either(Bs_Lexer *l, Bs_Token_Type a, Bs_Token_Type b) {
         bs_lexer_error(
             l,
             token.loc,
-            "expected %s or %s, got %s\n",
+            "expected %s or %s, got %s",
             bs_token_type_name(a),
             bs_token_type_name(b),
             bs_token_type_name(token.type));
@@ -453,13 +452,23 @@ Bs_Token bs_lexer_either(Bs_Lexer *l, Bs_Token_Type a, Bs_Token_Type b) {
     return token;
 }
 
-void bs_lexer_error(Bs_Lexer *l, Bs_Loc loc, const char *fmt, ...) {
-    bs_fmt(l->error, Bs_Loc_Fmt, Bs_Loc_Arg(loc));
+void bs_lexer_error_full(
+    Bs_Lexer *l, Bs_Loc loc, Bs_Sv explanation, Bs_Sv example, const char *fmt, ...) {
+    Bs_Error error = {0};
+    error.loc = loc;
+    error.type = BS_ERROR_MAIN;
 
     va_list args;
     va_start(args, fmt);
-    bs_evfmt(l->error, fmt, args);
+    static char buffer[1024];
+    const int count = vsnprintf(buffer, sizeof(buffer), fmt, args);
     va_end(args);
 
+    assert(count >= 0 && count + 1 < sizeof(buffer));
+    error.message = Bs_Sv(buffer, count);
+    error.explanation = explanation;
+    error.example = example;
+
+    l->error->write(l->error, error);
     longjmp(l->unwind, 1);
 }

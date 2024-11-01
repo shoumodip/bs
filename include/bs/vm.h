@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "lexer.h"
 #include "value.h"
 
 #define BS_STACK_CAPACITY (128 * 1024)
@@ -15,7 +16,7 @@
 typedef struct Bs Bs;
 typedef Bs_Value (*Bs_C_Fn_Ptr)(Bs *bs, Bs_Value *args, size_t arity);
 
-Bs *bs_new(void);
+Bs *bs_new(Bs_Error_Writer error);
 void bs_free(Bs *bs);
 void bs_mark(Bs *bs, Bs_Object *object);
 void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size);
@@ -45,13 +46,13 @@ Bs_Sv bs_buffer_reset(Bs_Buffer *buffer, size_t pos);
 Bs_Sv bs_buffer_absolute_path(Bs_Buffer *buffer, Bs_Sv path);
 Bs_Sv bs_buffer_relative_path(Bs_Buffer *buffer, Bs_Sv path);
 
-// Context
+// Config
 typedef struct {
     void *userdata;
 
     Bs_Writer log;
-    Bs_Writer error;
     Bs_Buffer buffer;
+    Bs_Error_Writer error;
 
     Bs_Str *cwd;
 } Bs_Config;
@@ -61,10 +62,15 @@ Bs_Config *bs_config(Bs *bs);
 // Errors
 void bs_unwind(Bs *bs, unsigned char exit);
 
-void bs_error_at(Bs *bs, size_t location, const char *fmt, ...)
-    __attribute__((__format__(__printf__, 3, 4)));
+void bs_error_full_at(
+    Bs *bs, size_t location, Bs_Sv explanation, Bs_Sv example, const char *fmt, ...)
+    __attribute__((__format__(__printf__, 5, 6)));
+
+#define bs_error_at(bs, location, ...)                                                             \
+    bs_error_full_at(bs, location, (Bs_Sv){0}, (Bs_Sv){0}, __VA_ARGS__)
 
 #define bs_error(bs, ...) bs_error_at(bs, 0, __VA_ARGS__)
+#define bs_error_full(bs, ...) bs_error_full_at(bs, 0, __VA_ARGS__)
 
 // Checks
 void bs_check_arity_at(Bs *bs, size_t location, size_t actual, size_t expected);

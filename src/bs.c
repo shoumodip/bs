@@ -13,29 +13,56 @@
 #    include <unistd.h>
 #endif
 
-int main(int argc, char **argv) {
-    const char *help_format = "";
-    const char *sample_format = "";
-    const char *result_format = "";
-    const char *normal_format = "";
-    if (bs_try_stderr_colors()) {
-        help_format = "\033[33m";
-        sample_format = "\033[32m";
-        result_format = "\033[35m";
-        normal_format = "\033[0m";
-        crossline_prompt_color_set(CROSSLINE_FGCOLOR_BLUE);
+static void bs_error_write(Bs_Error_Writer *w, Bs_Error error) {
+    if (error.native) {
+        fprintf(stderr, "[C]: ");
+    } else if (error.type != BS_ERROR_USAGE) {
+        fprintf(stderr, Bs_Loc_Fmt, Bs_Loc_Arg(error.loc));
     }
 
+    if (error.type == BS_ERROR_TRACE) {
+        crossline_color_set_on(0, CROSSLINE_FGCOLOR_YELLOW);
+        fprintf(stderr, "in ");
+        crossline_color_set_on(0, CROSSLINE_FGCOLOR_DEFAULT);
+    } else if (error.type != BS_ERROR_PANIC) {
+        crossline_color_set_on(0, CROSSLINE_FGCOLOR_RED);
+        fprintf(stderr, "error: ");
+        crossline_color_set_on(0, CROSSLINE_FGCOLOR_DEFAULT);
+    }
+
+    fprintf(stderr, Bs_Sv_Fmt "\n", Bs_Sv_Arg(error.message));
+
+    if (error.explanation.size) {
+        crossline_color_set_on(0, CROSSLINE_FGCOLOR_YELLOW);
+        fprintf(stderr, "\n" Bs_Sv_Fmt "\n", Bs_Sv_Arg(error.explanation));
+        crossline_color_set_on(0, CROSSLINE_FGCOLOR_DEFAULT);
+    }
+
+    if (error.example.size) {
+        crossline_color_set_on(0, CROSSLINE_FGCOLOR_GREEN);
+        fprintf(stderr, "\n```\n" Bs_Sv_Fmt "\n```\n", Bs_Sv_Arg(error.example));
+        crossline_color_set_on(0, CROSSLINE_FGCOLOR_DEFAULT);
+    }
+
+    if (error.continued) {
+        fprintf(stderr, "\n");
+    }
+}
+
+int main(int argc, char **argv) {
+    crossline_prompt_color_set(CROSSLINE_FGCOLOR_BLUE);
+
+    Bs *bs = bs_new((Bs_Error_Writer){.write = bs_error_write});
+    bs_core_init(bs, argc - 1, argv + 1);
+
     if (argc < 2 || !strcmp(argv[1], "-")) {
-        Bs *bs = bs_new();
-        bs_core_init(bs, argc - 1, argv + 1);
-
         Bs_Result result = {0};
-
         if (isatty(fileno(stdin))) {
             Bs_Writer *w = &bs_config(bs)->log;
-            bs_fmt(
-                w, "%sWelcome to the BS Repl! Use :h to get help.%s\n", help_format, normal_format);
+
+            crossline_color_set(CROSSLINE_FGCOLOR_YELLOW);
+            bs_fmt(w, "Welcome to the BS Repl! Use :h to get help.\n");
+            crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
 
             static char line[8 * 1024]; // 8KB is enough for all repl related tasks
             while (true) {
@@ -53,29 +80,37 @@ int main(int argc, char **argv) {
                 }
 
                 if (bs_sv_eq(input, Bs_Sv_Static(":h"))) {
+                    crossline_color_set(CROSSLINE_FGCOLOR_YELLOW);
                     bs_fmt(
                         w,
-                        "%sUse :q or CTRL-d to quit.\n\n"
-                        "Use :! to execute shell commands:%s\n"
-                        "%s:!ls -A\n"
-                        ":!vim main.bs%s\n\n"
-                        "%sUse :{ and :} to execute multiple lines at once:%s\n"
-                        "%s:{\n"
+                        "Use :q or CTRL-d to quit.\n\n"
+                        "Use :! to execute shell commands:\n");
+                    crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
+
+                    crossline_color_set(CROSSLINE_FGCOLOR_GREEN);
+                    bs_fmt(
+                        w,
+                        ":!ls -A\n"
+                        ":!vim main.bs\n\n");
+                    crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
+
+                    crossline_color_set(CROSSLINE_FGCOLOR_YELLOW);
+                    bs_fmt(w, "Use :{ and :} to execute multiple lines at once:\n");
+                    crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
+
+                    crossline_color_set(CROSSLINE_FGCOLOR_GREEN);
+                    bs_fmt(
+                        w,
+                        ":{\n"
                         "for _ in 0, 5 {\n"
                         "    io.println(\"Hello, world!\");\n"
                         "}\n"
-                        ":}%s\n\n"
-                        "%sWebsite: https://shoumodip.github.io/bs%s\n",
-                        help_format,
-                        normal_format,
-                        sample_format,
-                        normal_format,
-                        help_format,
-                        normal_format,
-                        sample_format,
-                        normal_format,
-                        help_format,
-                        normal_format);
+                        ":}\n\n");
+                    crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
+
+                    crossline_color_set(CROSSLINE_FGCOLOR_YELLOW);
+                    bs_fmt(w, "Website: https://shoumodip.github.io/bs\n");
+                    crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
                     continue;
                 }
 
@@ -112,9 +147,10 @@ int main(int argc, char **argv) {
                         break;
                     }
 
-                    bs_fmt(w, "%s", result_format);
+                    crossline_color_set(CROSSLINE_BGCOLOR_MAGENTA);
                     bs_value_write(bs, w, result.value);
-                    bs_fmt(w, "%s\n", normal_format);
+                    crossline_color_set(CROSSLINE_BGCOLOR_DEFAULT);
+                    bs_fmt(w, "\n");
                 }
             }
         } else {
@@ -138,13 +174,23 @@ int main(int argc, char **argv) {
     size_t size = 0;
     char *contents = bs_read_file(path, &size);
     if (!contents) {
-        Bs_Writer w = bs_file_writer(stderr);
-        bs_efmt(&w, "could not read file '%s'\n", path);
+        Bs_Buffer *b = &bs_config(bs)->buffer;
+        const size_t start = b->count;
+
+        Bs_Writer w = bs_buffer_writer(b);
+        bs_fmt(&w, "could not read file '%s'", path);
+
+        const Bs_Error error = {
+            .type = BS_ERROR_USAGE,
+            .message = bs_buffer_reset(b, start),
+        };
+
+        Bs_Error_Writer *e = &bs_config(bs)->error;
+        e->write(e, error);
+
+        bs_free(bs);
         return 1;
     }
-
-    Bs *bs = bs_new();
-    bs_core_init(bs, argc - 1, argv + 1);
 
     const Bs_Result result = bs_run(bs, bs_sv_from_cstr(path), Bs_Sv(contents, size), false);
     free(contents);
