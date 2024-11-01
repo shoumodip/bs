@@ -147,9 +147,9 @@ int main(int argc, char **argv) {
                         break;
                     }
 
-                    crossline_color_set(CROSSLINE_BGCOLOR_MAGENTA);
+                    crossline_color_set(CROSSLINE_FGCOLOR_MAGENTA);
                     bs_value_write(bs, w, result.value);
-                    crossline_color_set(CROSSLINE_BGCOLOR_DEFAULT);
+                    crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
                     bs_fmt(w, "\n");
                 }
             }
