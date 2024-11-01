@@ -572,7 +572,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             const char *before2 = "";
             const char *after = "";
             if (bs_get_stderr_colors()) {
-                before1 = "\033[1;33m";
+                before1 = "\033[33m";
                 before2 = "\033[32m";
                 after = "\033[0m";
             }
@@ -1458,7 +1458,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
                 const char *before2 = "";
                 const char *after = "";
                 if (bs_get_stderr_colors()) {
-                    before1 = "\033[1;33m";
+                    before1 = "\033[33m";
                     before2 = "\033[32m";
                     after = "\033[0m";
                 }

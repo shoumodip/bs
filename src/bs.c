@@ -19,9 +19,9 @@ int main(int argc, char **argv) {
     const char *result_format = "";
     const char *normal_format = "";
     if (bs_try_stderr_colors()) {
-        help_format = "\033[33;1m";
+        help_format = "\033[33m";
         sample_format = "\033[32m";
-        result_format = "\033[35;1m";
+        result_format = "\033[35m";
         normal_format = "\033[0m";
         crossline_prompt_color_set(CROSSLINE_FGCOLOR_BLUE);
     }

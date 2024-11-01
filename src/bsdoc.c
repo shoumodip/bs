@@ -452,12 +452,7 @@ void bsdoc_print_navigator(FILE *f, Bsdoc_Sections *sections, size_t *i) {
 }
 
 void bsdoc_error_row(Bs_Writer *w, const char *path, size_t row, const char *message) {
-    if (bs_get_stderr_colors()) {
-        bs_fmt(w, "\033[1m%s:%zu:1: \033[0m", path, row);
-    } else {
-        bs_fmt(w, "%s:%zu:1: ", path, row);
-    }
-
+    bs_fmt(w, "%s:%zu:1: ", path, row);
     bs_efmt(w, "%s", message);
 }
 

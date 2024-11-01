@@ -454,11 +454,7 @@ Bs_Token bs_lexer_either(Bs_Lexer *l, Bs_Token_Type a, Bs_Token_Type b) {
 }
 
 void bs_lexer_error(Bs_Lexer *l, Bs_Loc loc, const char *fmt, ...) {
-    if (bs_get_stderr_colors()) {
-        bs_fmt(l->error, "\033[1m" Bs_Loc_Fmt "\033[0m", Bs_Loc_Arg(loc));
-    } else {
-        bs_fmt(l->error, Bs_Loc_Fmt, Bs_Loc_Arg(loc));
-    }
+    bs_fmt(l->error, Bs_Loc_Fmt, Bs_Loc_Arg(loc));
 
     va_list args;
     va_start(args, fmt);

@@ -139,7 +139,7 @@ void bs_evfmt(Bs_Writer *w, const char *fmt, va_list args) {
     assert(count >= 0 && count + 1 < sizeof(bs_fmt_buffer));
 
     w->write(
-        w, bs_stderr_colors ? Bs_Sv_Static("\033[1;31merror:\033[0m ") : Bs_Sv_Static("error: "));
+        w, bs_stderr_colors ? Bs_Sv_Static("\033[31merror:\033[0m ") : Bs_Sv_Static("error: "));
     w->write(w, Bs_Sv(bs_fmt_buffer, count));
 }
 

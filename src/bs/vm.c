@@ -812,17 +812,9 @@ static bool bs_error_print_before_at(Bs *bs, size_t location, bool suppress_erro
             &bs->frame->closure->fn->chunk, bs->frame->ip - bs->frame->closure->fn->chunk.data);
 
         const Bs_Loc loc = oploc[location].loc;
-        if (bs_get_stderr_colors()) {
-            bs_fmt(w, "\033[1m" Bs_Loc_Fmt "\033[0m", Bs_Loc_Arg(loc));
-        } else {
-            bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(loc));
-        }
+        bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(loc));
     } else {
-        if (bs_get_stderr_colors()) {
-            bs_fmt(w, "\033[1m[C]: \033[0m");
-        } else {
-            bs_fmt(w, "[C]: ");
-        }
+        bs_fmt(w, "[C]: ");
     }
 
     if (!suppress_error_label) {
@@ -850,23 +842,14 @@ static void bs_error_print_after_at(Bs *bs, size_t location, bool printed_locati
             }
 
             oploc += callee->locations_offset;
-
-            if (colors) {
-                bs_fmt(w, "\033[1m" Bs_Loc_Fmt "\033[0m", Bs_Loc_Arg(oploc->loc));
-            } else {
-                bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(oploc->loc));
-            }
+            bs_fmt(w, Bs_Loc_Fmt, Bs_Loc_Arg(oploc->loc));
         } else {
-            if (colors) {
-                bs_fmt(w, "\033[1m[C]: \033[0m");
-            } else {
-                bs_fmt(w, "[C]: ");
-            }
+            bs_fmt(w, "[C]: ");
         }
         printed_location = true;
 
         if (colors) {
-            bs_fmt(w, "\033[1;33min \033[0m");
+            bs_fmt(w, "\033[33min \033[0m");
         } else {
             bs_fmt(w, "in ");
         }
@@ -991,6 +974,8 @@ void bs_check_multi_at(
                 case BS_OBJECT_CLOSURE:
                 case BS_OBJECT_BOUND_METHOD:
                 case BS_OBJECT_C_FN:
+                case BS_OBJECT_CLASS:
+                case BS_OBJECT_C_CLASS:
                     return;
 
                 default:
@@ -1444,7 +1429,7 @@ static void bs_import(Bs *bs) {
             const char *before2 = "";
             const char *after = "";
             if (bs_get_stderr_colors()) {
-                before1 = "\033[1;33m";
+                before1 = "\033[33m";
                 before2 = "\033[32m";
                 after = "\033[0m";
             }
@@ -1993,7 +1978,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                     const char *before2 = "";
                     const char *after = "";
                     if (bs_get_stderr_colors()) {
-                        before1 = "\033[1;33m";
+                        before1 = "\033[33m";
                         before2 = "\033[32m";
                         after = "\033[0m";
                     }
