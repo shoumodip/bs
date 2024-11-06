@@ -270,8 +270,8 @@ arrays/error_index_out_of_bounds.bs:3:14: error: cannot get value at index 0 in 
 :i returncode 1
 :b stdout 0
 
-:b stderr 99
-arrays/error_invalid_index.bs:2:4: error: expected array index to be positive integer, got boolean
+:b stderr 124
+arrays/error_invalid_index.bs:2:4: error: expected array index or method name to be positive integer or string, got boolean
 
 :b shell 46
 ../bin/bs arrays/error_invalid_index_assign.bs
@@ -959,8 +959,8 @@ invokation/error_call_invalid_container.bs:2:2: error: cannot invoke or index in
 :i returncode 1
 :b stdout 0
 
-:b stderr 102
-invokation/error_call_invalid_key.bs:2:4: error: expected array index to be positive integer, got nil
+:b stderr 127
+invokation/error_call_invalid_key.bs:2:4: error: expected array index or method name to be positive integer or string, got nil
 
 :b shell 42
 ../bin/bs invokation/error_invoked_body.bs

@@ -1529,33 +1529,37 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
 
     switch (container.as.object->type) {
     case BS_OBJECT_ARRAY: {
-        if (index.type == BS_VALUE_OBJECT && index.as.object->type == BS_OBJECT_STR) {
-            bs_check_object_type_at(bs, 1, index, BS_OBJECT_STR, "method name");
-            return bs_value_object(bs_bound_method_new(
-                bs,
-                container,
-                bs_check_map_get_at(
+        const Bs_Check checks[] = {
+            bs_check_whole,
+            bs_check_object(BS_OBJECT_STR),
+        };
+
+        bs_check_multi_at(
+            bs, 1, index, checks, bs_c_array_size(checks), "array index or method name");
+
+        if (index.type == BS_VALUE_NUM) {
+            Bs_Array *array = (Bs_Array *)container.as.object;
+
+            Bs_Value value;
+            if (!bs_array_get(bs, array, index.as.number, &value)) {
+                bs_error(
                     bs,
-                    1,
-                    bs_builtin_object_methods_map(bs, container.as.object->type),
-                    index,
-                    "method")));
+                    "cannot get value at index %zu in array of length %zu",
+                    (size_t)index.as.number,
+                    array->count);
+            }
+            return value;
         }
 
-        // The only non mapped container
-        bs_check_whole_number_at(bs, 1, index, "array index");
-        Bs_Array *array = (Bs_Array *)container.as.object;
-
-        Bs_Value value;
-        if (!bs_array_get(bs, array, index.as.number, &value)) {
-            bs_error(
+        return bs_value_object(bs_bound_method_new(
+            bs,
+            container,
+            bs_check_map_get_at(
                 bs,
-                "cannot get value at index %zu in array of length %zu",
-                (size_t)index.as.number,
-                array->count);
-        }
-
-        return value;
+                1,
+                bs_builtin_object_methods_map(bs, container.as.object->type),
+                index,
+                "method")));
     } break;
 
     case BS_OBJECT_STR:
