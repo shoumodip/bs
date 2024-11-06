@@ -355,6 +355,26 @@ $ bs loops.bs
 1
 ```
 
+Iterate over a string.
+
+```bs
+var str = "foobar";
+
+for i, c in str {
+    io.println("Index: \(i); Char: \(c)");
+}
+```
+
+```console
+$ bs loops.bs
+Index: 0; Char: f
+Index: 1; Char: o
+Index: 2; Char: o
+Index: 3; Char: b
+Index: 4; Char: a
+Index: 5; Char: r
+```
+
 Iterate over an array.
 
 ```bs

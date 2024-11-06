@@ -328,7 +328,7 @@ static void bs_compile_assignment(Bs_Compiler *c, const Bs_Token *token, Bs_Op a
     Bs_Loc locs[2];
     locs[0] = c->chunk->locations.data[--c->chunk->locations.count].loc;
     if (assign_op == BS_OP_ISET || assign_op == BS_OP_ISET_CONST) {
-        assert(c->chunk->locations.count > 1);
+        assert(c->chunk->locations.count);
         locs[1] = locs[0];
         locs[0] = c->chunk->locations.data[--c->chunk->locations.count].loc;
     }

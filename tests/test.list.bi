@@ -1,4 +1,4 @@
-:i count 123
+:i count 124
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -1699,6 +1699,25 @@ false
 true
 false
 true
+
+:b stderr 0
+
+:b shell 26
+../bin/bs strings/index.bs
+:i returncode 0
+:b stdout 48
+0 f
+1 o
+2 o
+3 b
+4 a
+5 r
+0 f
+1 o
+2 o
+3 b
+4 a
+5 r
 
 :b stderr 0
 

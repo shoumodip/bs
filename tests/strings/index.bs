@@ -1,0 +1,8 @@
+var str = "foobar";
+for i in 0, len(str) {
+    io.println(i, str[i]);
+}
+
+for i, c in str {
+    io.println(i, str[i]);
+}

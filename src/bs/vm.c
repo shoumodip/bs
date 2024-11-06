@@ -1562,8 +1562,27 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
                 "method")));
     } break;
 
-    case BS_OBJECT_STR:
-        bs_check_object_type_at(bs, 1, index, BS_OBJECT_STR, "method name");
+    case BS_OBJECT_STR: {
+        const Bs_Check checks[] = {
+            bs_check_whole,
+            bs_check_object(BS_OBJECT_STR),
+        };
+
+        bs_check_multi_at(
+            bs, 1, index, checks, bs_c_array_size(checks), "string index or method name");
+
+        if (index.type == BS_VALUE_NUM) {
+            Bs_Str *str = (Bs_Str *)container.as.object;
+            const size_t at = index.as.number;
+
+            if (at >= str->size) {
+                bs_error(
+                    bs, "cannot get substring at index %zu in string of length %zu", at, str->size);
+            }
+
+            return bs_value_object(bs_str_new(bs, Bs_Sv(&str->data[at], 1)));
+        }
+
         return bs_value_object(bs_bound_method_new(
             bs,
             container,
@@ -1573,7 +1592,7 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
                 bs_builtin_object_methods_map(bs, container.as.object->type),
                 index,
                 "method")));
-        break;
+    } break;
 
     case BS_OBJECT_TABLE: {
         Bs_Value value;
@@ -2514,6 +2533,24 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                     bs_stack_set(bs, 0, bs_value_num(index)); // Iterator
                     bs_stack_push(bs, bs_value_num(index));   // Key
                     bs_stack_push(bs, array->data[index]);    // Value
+                }
+            } else if (container.as.object->type == BS_OBJECT_STR) {
+                const Bs_Str *str = (const Bs_Str *)container.as.object;
+
+                size_t index;
+                if (iterator.type == BS_VALUE_NIL) {
+                    index = 0;
+                } else {
+                    index = iterator.as.number + 1;
+                }
+
+                if (index >= str->size) {
+                    bs->frame->ip += offset;
+                } else {
+                    bs_stack_set(bs, 0, bs_value_num(index)); // Iterator
+                    bs_stack_push(bs, bs_value_num(index));   // Key
+                    bs_stack_push(
+                        bs, bs_value_object(bs_str_new(bs, Bs_Sv(&str->data[index], 1)))); // Value
                 }
             } else if (container.as.object->type == BS_OBJECT_TABLE) {
                 const Bs_Table *table = (const Bs_Table *)container.as.object;
