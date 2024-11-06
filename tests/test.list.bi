@@ -1,4 +1,4 @@
-:i count 124
+:i count 123
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -213,14 +213,6 @@ Use (++) for string concatenation, or use string interpolation instead
 
 :b stderr 68
 variables/error_undefined.bs:1:1: error: undefined identifier 'foo'
-
-:b shell 48
-../bin/bs variables/error_global_redefinition.bs
-:i returncode 1
-:b stdout 0
-
-:b stderr 91
-variables/error_global_redefinition.bs:2:9: error: redefinition of global identifier 'foo'
 
 :b shell 24
 ../bin/bs arrays/main.bs

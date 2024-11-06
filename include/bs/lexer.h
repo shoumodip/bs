@@ -9,7 +9,7 @@ typedef enum {
     BS_ERROR_MAIN,
     BS_ERROR_PANIC,
     BS_ERROR_TRACE,
-    BS_ERROR_USAGE,
+    BS_ERROR_STANDALONE,
 } Bs_Error_Type;
 
 typedef struct {

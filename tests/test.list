@@ -12,7 +12,6 @@
 ../bin/bs variables/local.bs
 ../bin/bs variables/global_use.bs
 ../bin/bs variables/error_undefined.bs
-../bin/bs variables/error_global_redefinition.bs
 ../bin/bs arrays/main.bs
 ../bin/bs arrays/assign_out_of_bounds.bs
 ../bin/bs arrays/error_index_out_of_bounds.bs

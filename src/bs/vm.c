@@ -921,6 +921,22 @@ void bs_error_full_at(
     bs_error_end(bs, location, error.native);
 }
 
+void bs_error_standalone(Bs *bs, const char *fmt, ...) {
+    const size_t start = bs->config.buffer.count;
+    Bs_Writer w = bs_buffer_writer(&bs->config.buffer);
+
+    va_list args;
+    va_start(args, fmt);
+    bs_vfmt(&w, fmt, args);
+    va_end(args);
+
+    const Bs_Error error = {
+        .type = BS_ERROR_STANDALONE,
+        .message = bs_buffer_reset(&bs->config.buffer, start),
+    };
+    bs->config.error.write(&bs->config.error, error);
+}
+
 // Checks
 void bs_check_arity_at(Bs *bs, size_t location, size_t actual, size_t expected) {
     if (actual != expected) {
@@ -1299,20 +1315,10 @@ const Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_r
     if (bs_sv_suffix(path, Bs_Sv_Static(".bs"))) {
         module.length = path.size - 3;
     } else {
-        const size_t start = bs->config.buffer.count;
-        Bs_Writer w = bs_buffer_writer(&bs->config.buffer);
-
-        bs_fmt(
-            &w,
+        bs_error_standalone(
+            bs,
             "invalid input path '" Bs_Sv_Fmt "', expected '.bs' extension",
             Bs_Sv_Arg(relative));
-
-        const Bs_Error error = {
-            .type = BS_ERROR_USAGE,
-            .message = bs_buffer_reset(&bs->config.buffer, start),
-        };
-
-        bs->config.error.write(&bs->config.error, error);
         return NULL;
     }
 
@@ -2399,18 +2405,10 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             bs_stack_push(bs, bs_value_bool(bs_map_remove(bs, map, index)));
         } break;
 
-        case BS_OP_GDEF: {
-            const Bs_Value name = bs_chunk_read_const(bs);
-
-            if (!bs_map_set(bs, &bs->globals, name, bs_stack_peek(bs, 0))) {
-                bs_error(
-                    bs,
-                    "redefinition of global identifier '" Bs_Sv_Fmt "'",
-                    Bs_Sv_Arg(*(const Bs_Str *)name.as.object));
-            }
-
+        case BS_OP_GDEF:
+            bs_map_set(bs, &bs->globals, bs_chunk_read_const(bs), bs_stack_peek(bs, 0));
             bs_stack_pop(bs);
-        } break;
+            break;
 
         case BS_OP_GGET: {
             const Bs_Value name = bs_chunk_read_const(bs);
@@ -2649,12 +2647,8 @@ end:
 
 Bs_Value bs_call(Bs *bs, Bs_Value fn, const Bs_Value *args, size_t arity) {
     if (!bs->running) {
-        const Bs_Error error = {
-            .type = BS_ERROR_USAGE,
-            .message = "cannot call bs_call() while BS is not running; call bs_run() first",
-        };
-
-        bs->config.error.write(&bs->config.error, error);
+        bs_error_standalone(
+            bs, "cannot call bs_call() while BS is not running; call bs_run() first");
         return bs_value_nil;
     }
 

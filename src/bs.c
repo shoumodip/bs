@@ -16,7 +16,7 @@
 static void bs_error_write(Bs_Error_Writer *w, Bs_Error error) {
     if (error.native) {
         fprintf(stderr, "[C]: ");
-    } else if (error.type != BS_ERROR_USAGE) {
+    } else if (error.type != BS_ERROR_STANDALONE) {
         fprintf(stderr, Bs_Loc_Fmt, Bs_Loc_Arg(error.loc));
     }
 
@@ -47,6 +47,56 @@ static void bs_error_write(Bs_Error_Writer *w, Bs_Error error) {
     if (error.continued) {
         fprintf(stderr, "\n");
     }
+}
+
+bool bs_repl_block(char *line, size_t size, Bs_Sv *input, Bs_Sv ending, bool do_indent) {
+    size_t indent = 0;
+    while (true) {
+        const size_t available = size - input->size;
+        const size_t start = input->size;
+
+        if (do_indent) {
+            assert(available > indent * CROSSLINE_INDENT_SIZE);
+            for (size_t i = 0; i < indent; i++) {
+                memcpy(
+                    &line[start + i * CROSSLINE_INDENT_SIZE],
+                    CROSSLINE_INDENT,
+                    CROSSLINE_INDENT_SIZE);
+            }
+            line[start + indent * CROSSLINE_INDENT_SIZE] = '\0';
+
+            if (!crossline_readline2("| ", line + start, available)) {
+                return false;
+            }
+        } else {
+            assert(available);
+            if (!crossline_readline("| ", line + start, available)) {
+                return false;
+            }
+        }
+
+        *input = bs_sv_from_cstr(line);
+        if (bs_sv_suffix(*input, ending)) {
+            break;
+        }
+
+        if (do_indent) {
+            size_t new_indent = 0;
+            for (size_t i = start; i < input->size && line[i] == ' '; i++) {
+                new_indent++;
+            }
+
+            if (new_indent % CROSSLINE_INDENT_SIZE == 0) {
+                indent = new_indent / CROSSLINE_INDENT_SIZE;
+            }
+        }
+
+        line[input->size++] = '\n';
+    }
+
+    input->data += 2;
+    input->size -= 4;
+    return true;
 }
 
 int main(int argc, char **argv) {
@@ -109,6 +159,14 @@ int main(int argc, char **argv) {
                     crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
 
                     crossline_color_set(CROSSLINE_FGCOLOR_YELLOW);
+                    bs_fmt(
+                        w,
+                        "Use :[ and :] to execute multiple lines without auto indentation (in case "
+                        "of copy "
+                        "pasting)\n\n");
+                    crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
+
+                    crossline_color_set(CROSSLINE_FGCOLOR_YELLOW);
                     bs_fmt(w, "Website: https://shoumodip.github.io/bs\n");
                     crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
                     continue;
@@ -120,44 +178,19 @@ int main(int argc, char **argv) {
                 }
 
                 if (bs_sv_eq(input, Bs_Sv_Static(":{"))) {
-                    size_t indent = 0;
-                    while (true) {
-                        const size_t size = sizeof(line) - input.size;
-                        assert(size > indent * CROSSLINE_INDENT_SIZE);
-
-                        const size_t start = input.size;
-                        for (size_t i = 0; i < indent; i++) {
-                            memcpy(
-                                &line[start + i * CROSSLINE_INDENT_SIZE],
-                                CROSSLINE_INDENT,
-                                CROSSLINE_INDENT_SIZE);
-                        }
-                        line[start + indent * CROSSLINE_INDENT_SIZE] = '\0';
-
-                        if (!crossline_readline2("| ", line + start, size)) {
-                            bs_free(bs);
-                            return result.exit == -1 ? !result.ok : result.exit;
-                        }
-
-                        input = bs_sv_from_cstr(line);
-                        if (bs_sv_suffix(input, Bs_Sv_Static(":}"))) {
-                            break;
-                        }
-
-                        size_t new_indent = 0;
-                        for (size_t i = start; i < input.size && line[i] == ' '; i++) {
-                            new_indent++;
-                        }
-
-                        if (new_indent % CROSSLINE_INDENT_SIZE == 0) {
-                            indent = new_indent / CROSSLINE_INDENT_SIZE;
-                        }
-
-                        line[input.size++] = '\n';
+                    if (!bs_repl_block(line, sizeof(line), &input, Bs_Sv_Static(":}"), true)) {
+                        bs_error_standalone(bs, "could not read from standard input");
+                        bs_free(bs);
+                        return 1;
                     }
+                }
 
-                    input.data += 2;
-                    input.size -= 4;
+                if (bs_sv_eq(input, Bs_Sv_Static(":["))) {
+                    if (!bs_repl_block(line, sizeof(line), &input, Bs_Sv_Static(":]"), false)) {
+                        bs_error_standalone(bs, "could not read from standard input");
+                        bs_free(bs);
+                        return 1;
+                    }
                 }
 
                 result = bs_run(bs, Bs_Sv_Static("<stdin>.bs"), input, true);
@@ -193,20 +226,7 @@ int main(int argc, char **argv) {
     size_t size = 0;
     char *contents = bs_read_file(path, &size);
     if (!contents) {
-        Bs_Buffer *b = &bs_config(bs)->buffer;
-        const size_t start = b->count;
-
-        Bs_Writer w = bs_buffer_writer(b);
-        bs_fmt(&w, "could not read file '%s'", path);
-
-        const Bs_Error error = {
-            .type = BS_ERROR_USAGE,
-            .message = bs_buffer_reset(b, start),
-        };
-
-        Bs_Error_Writer *e = &bs_config(bs)->error;
-        e->write(e, error);
-
+        bs_error_standalone(bs, "could not read file '%s'", path);
         bs_free(bs);
         return 1;
     }
