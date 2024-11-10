@@ -116,6 +116,9 @@ io.println("Hello, " ++ "world! " ++ 69);
 
 # Output: 6
 io.println(len("Hello!"));
+
+# Output: b
+io.println("foobar"[3]);
 ```
 
 ### Arrays
