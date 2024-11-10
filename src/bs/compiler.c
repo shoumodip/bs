@@ -153,8 +153,8 @@ static void bs_lambda_free(Bs *bs, Bs_Lambda *l) {
     }
 }
 
-// The lambdas need to stored on the heap since the error handling mechanism uses longjumps which
-// changes the stack pointer
+// The lambdas need to stored on the heap since the error handling mechanism
+// uses longjumps which changes the stack pointer
 static Bs_Lambda *bs_lambda_new(Bs_Lambda_Type type, bool is_repl) {
     Bs_Lambda *p = malloc(sizeof(Bs_Lambda));
     assert(p);
@@ -1443,14 +1443,15 @@ static void bs_compile_stmt(Bs_Compiler *c) {
                     &c->lexer,
                     loc,
 
-                    Bs_Sv_Static(
-                        "When an initializer method explicitly returns 'nil', it indicates that "
-                        "the\n"
-                        "initialization failed due to some reason, and the site of the "
-                        "instantiation\n"
-                        "gets 'nil' as the result. This is not strictly OOP, but I missed the part "
-                        "where\n"
-                        "that's my problem."),
+                    Bs_Sv_Static("When an initializer method explicitly returns 'nil', it "
+                                 "indicates that "
+                                 "the\n"
+                                 "initialization failed due to some reason, and the site of the "
+                                 "instantiation\n"
+                                 "gets 'nil' as the result. This is not strictly OOP, but I "
+                                 "missed the part "
+                                 "where\n"
+                                 "that's my problem."),
 
                     Bs_Sv_Static("var f = io.Reader(\"does_not_exist.txt\");\n"
                                  "if !f {\n"
@@ -1514,6 +1515,11 @@ Bs_Fn *bs_compile_impl(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_re
     }
 
     while (!bs_lexer_read(&compiler.lexer, BS_TOKEN_EOF)) {
+        while (bs_lexer_read(&compiler.lexer, BS_TOKEN_EOL)) {}
+        if (bs_lexer_read(&compiler.lexer, BS_TOKEN_EOF)) {
+            break;
+        }
+
         compiler.last_stmt_was_expr = false;
         bs_compile_stmt(&compiler);
     }
