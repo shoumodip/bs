@@ -183,14 +183,14 @@ int main(int argc, char **argv) {
                         bs_free(bs);
                         return 1;
                     }
-                }
-
-                if (bs_sv_eq(input, Bs_Sv_Static(":["))) {
+                } else if (bs_sv_eq(input, Bs_Sv_Static(":["))) {
                     if (!bs_repl_block(line, sizeof(line), &input, Bs_Sv_Static(":]"), false)) {
                         bs_error_standalone(bs, "could not read from standard input");
                         bs_free(bs);
                         return 1;
                     }
+                } else if (input.size < sizeof(line) && line[input.size - 1] != ';') {
+                    line[input.size++] = ';';
                 }
 
                 result = bs_run(bs, Bs_Sv_Static("<stdin>.bs"), input, true);
