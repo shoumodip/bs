@@ -1307,20 +1307,16 @@ static void bs_close_upvalues(Bs *bs, Bs_Value *last) {
 const Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl) {
     Bs_Module module = {
         .name = bs_str_new(bs, path),
+        .length = path.size,
     };
 
+    if (bs_sv_suffix(path, Bs_Sv_Static(".bs"))) {
+        module.length -= 3;
+    }
+
+    // Do not use the paramater 'path' directly as the same buffer is being written into
     const Bs_Sv relative =
         bs_buffer_relative_path(&bs->paths, Bs_Sv(module.name->data, module.name->size));
-
-    if (bs_sv_suffix(path, Bs_Sv_Static(".bs"))) {
-        module.length = path.size - 3;
-    } else {
-        bs_error_standalone(
-            bs,
-            "invalid input path '" Bs_Sv_Fmt "', expected '.bs' extension",
-            Bs_Sv_Arg(relative));
-        return NULL;
-    }
 
     Bs_Fn *fn = bs_compile_impl(bs, relative, input, is_main, is_repl);
     if (!fn) {
