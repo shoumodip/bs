@@ -1,36 +1,36 @@
 # Basic
-io.println("Basic");
-io.println(34 + 35);
-io.println(500 - 80);
-io.println(23 * 3);
-io.println(840 / 2);
-io.println(100 % 3);
-io.println(-100 % 3);
-io.println(-100.4 % 3);
-io.println(-100.4 % 3.6);
-io.println(-1337);
+io.println("Basic")
+io.println(34 + 35)
+io.println(500 - 80)
+io.println(23 * 3)
+io.println(840 / 2)
+io.println(100 % 3)
+io.println(-100 % 3)
+io.println(-100.4 % 3)
+io.println(-100.4 % 3.6)
+io.println(-1337)
 
 # Grouping
-io.println("Grouping");
-io.println(17 * 2 + 35);
-io.println((900 - 60) / 2);
+io.println("Grouping")
+io.println(17 * 2 + 35)
+io.println((900 - 60) / 2)
 
 # Decimals
-io.println("Decimals");
-io.println(17.25 * 4);
-io.println(840 * 0.5);
+io.println("Decimals")
+io.println(17.25 * 4)
+io.println(840 * 0.5)
 
 # Bitwise
-io.println("Bitwise");
-io.println(276 >> 2);
-io.println(105 << 2);
-io.println(~-70);
-io.println(160 | 260);
-io.println(77 & 103);
-io.println(~-419 + 10 & 3);
-io.println(69 ^ 1404);
+io.println("Bitwise")
+io.println(276 >> 2)
+io.println(105 << 2)
+io.println(~-70)
+io.println(160 | 260)
+io.println(77 & 103)
+io.println(~-419 + 10 & 3)
+io.println(69 ^ 1404)
 
 # Hex
-io.println("Hex");
-io.println(0x69ABCDEF);
-io.println(0xab69cdef);
+io.println("Hex")
+io.println(0x69ABCDEF)
+io.println(0xab69cdef)

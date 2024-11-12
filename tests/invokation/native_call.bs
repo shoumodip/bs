@@ -1,1 +1,1 @@
-io.println("Hello!".reverse());
+io.println("Hello!".reverse())

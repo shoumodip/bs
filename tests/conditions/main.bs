@@ -1,36 +1,36 @@
 if true {
-    io.println(1);
+    io.println(1)
 }
 
 if true {
-    io.println(1);
+    io.println(1)
 } else {
-    io.println(2);
+    io.println(2)
 }
 
 if false {
-    io.println(1);
+    io.println(1)
 }
 
 if false {
-    io.println(1);
+    io.println(1)
 } else {
-    io.println(2);
+    io.println(2)
 }
 
 if false {
-    io.println(1);
+    io.println(1)
 } else if true {
-    io.println(2);
+    io.println(2)
 }
 
 if false {
-    io.println(1);
+    io.println(1)
 } else if nil {
-    io.println(2);
+    io.println(2)
 } else {
-    io.println(3);
+    io.println(3)
 }
 
-io.println(if true then 69 else 420);
-io.println(if false then 69 else 420);
+io.println(if true then 69 else 420)
+io.println(if false then 69 else 420)

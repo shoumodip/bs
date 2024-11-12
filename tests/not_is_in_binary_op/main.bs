@@ -1,7 +1,7 @@
-var xs = { foo = 69 };
+var xs = { foo = 69 }
 
-io.println("foo" !in xs);
-io.println("bar" !in xs);
+io.println("foo" !in xs)
+io.println("bar" !in xs)
 
-io.println(69 !is "number");
-io.println(69 !is "nil");
+io.println(69 !is "number")
+io.println(69 !is "nil")

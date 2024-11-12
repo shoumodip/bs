@@ -1,8 +1,8 @@
 class Foo {
     f() {
-        io.println("Hello, world!");
+        io.println("Hello, world!")
     }
 }
 
-var foo = Foo();
-foo.f(69);
+var foo = Foo()
+foo.f(69)

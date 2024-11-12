@@ -1,8 +1,8 @@
 class B {}
 class A < B {
     init() {
-        super.foo();
+        super.foo()
     }
 }
 
-A();
+A()

@@ -13,8 +13,8 @@ Read a line from standard input, printing the optional argument `prompt` if
 provided.
 
 ```bs
-var name = io.input("Enter your name> ");
-io.println("Hello, \(name)!");
+var name = io.input("Enter your name> ")
+io.println("Hello, \(name)!")
 ```
 
 ```console
@@ -27,7 +27,7 @@ Hello, Batman!
 Print all the arguments to standard output.
 
 ```bs
-io.print("Hello", "world", 69);
+io.print("Hello", "world", 69)
 ```
 
 ```console
@@ -52,10 +52,10 @@ Read a directory into an array of `DirEntry`.
 Returns `nil` if failed.
 
 ```bs
-var entries = assert(io.readdir("."));
+var entries = assert(io.readdir("."))
 
 for _, e in entries {
-    io.println(e.name(), e.isdir());
+    io.println(e.name(), e.isdir())
 }
 ```
 
@@ -86,14 +86,14 @@ Native C class that opens `path` in readable mode.
 Returns `nil` if failed.
 
 ```bs
-var f = io.Reader("input.txt");
+var f = io.Reader("input.txt")
 if !f {
-    io.eprintln("Error: could not read file!");
-    os.exit(1);
+    io.eprintln("Error: could not read file!")
+    os.exit(1)
 }
 
-var contents = f.read();
-io.print(contents);
+var contents = f.read()
+io.print(contents)
 ```
 
 Create a file `input.txt` with some sample text and run it.
@@ -121,14 +121,14 @@ provided, it reads all of the available bytes.
 Returns `nil` if failed.
 
 ```bs
-var f = io.Reader("input.txt");
+var f = io.Reader("input.txt")
 if !f {
-    io.eprintln("Error: could not read file!");
-    os.exit(1);
+    io.eprintln("Error: could not read file!")
+    os.exit(1)
 }
 
-io.print("The first 16 bytes: [\(f.read(16))]\n");
-io.print("The rest:", f.read());
+io.print("The first 16 bytes: [\(f.read(16))]\n")
+io.print("The rest:", f.read())
 ```
 
 ```console
@@ -146,15 +146,15 @@ People's dreams have no end! ~ Blackbeard
 Read a line.
 
 ```bs
-var f = io.Reader("input.txt");
+var f = io.Reader("input.txt")
 if !f {
-    io.eprintln("Error: could not read file!");
-    os.exit(1);
+    io.eprintln("Error: could not read file!")
+    os.exit(1)
 }
 
 while !f.eof() {
-    var line = f.readln();
-    io.println("Line:", line);
+    var line = f.readln()
+    io.println("Line:", line)
 }
 ```
 
@@ -187,18 +187,18 @@ Any of the following values can be used for `whence`.
 Returns `true` if succeeded and `false` if failed
 
 ```bs
-var f = io.Reader("input.txt");
+var f = io.Reader("input.txt")
 if !f {
-    io.eprintln("Error: could not read file!");
-    os.exit(1);
+    io.eprintln("Error: could not read file!")
+    os.exit(1)
 }
 
-io.print("The first 16 bytes: [\(f.read(16))]\n");
+io.print("The first 16 bytes: [\(f.read(16))]\n")
 
-f.seek(5, io.SEEK_SET);
+f.seek(5, io.SEEK_SET)
 
-io.println("The full content offset by 5:");
-io.print(f.read());
+io.println("The full content offset by 5:")
+io.print(f.read())
 ```
 
 ```console
@@ -219,19 +219,19 @@ Get the current position of the file.
 Returns `nil` if failed
 
 ```bs
-var f = io.Reader("input.txt");
+var f = io.Reader("input.txt")
 if !f {
-    io.eprintln("Error: could not read file!");
-    os.exit(1);
+    io.eprintln("Error: could not read file!")
+    os.exit(1)
 }
 
-io.println("The first 3 lines:");
+io.println("The first 3 lines:")
 for i in 0, 3 {
-    io.println(f.readln());
+    io.println(f.readln())
 }
 
-io.println();
-io.println("Read \(f.tell()) bytes so far.");
+io.println()
+io.println("Read \(f.tell()) bytes so far.")
 ```
 
 ```console
@@ -250,15 +250,15 @@ Native C class that opens `path` in writeable mode.
 Returns `nil` if failed.
 
 ```bs
-var f = io.Writer("output.txt");
+var f = io.Writer("output.txt")
 if !f {
-    io.eprintln("Error: could not create file!");
-    os.exit(1);
+    io.eprintln("Error: could not create file!")
+    os.exit(1)
 }
 
-f.writeln("Hello there!");
-f.writeln("General Kenobi!");
-f.writeln(69, "Nice!");
+f.writeln("Hello there!")
+f.writeln("General Kenobi!")
+f.writeln(69, "Nice!")
 ```
 
 ```console
@@ -296,10 +296,10 @@ anything, and only serves as an implementation detail for `readdir()`.
 Example usecase:
 
 ```bs
-var entries = assert(io.readdir("."));
+var entries = assert(io.readdir("."))
 
 for _, e in entries {
-    io.println(e.name(), e.isdir());
+    io.println(e.name(), e.isdir())
 }
 ```
 
@@ -350,7 +350,7 @@ It just halts the BS interpreter, and the caller of the virtual
 machine can decide what to do.
 
 ```bs
-os.exit(69);
+os.exit(69)
 ```
 
 ```console
@@ -368,17 +368,17 @@ in the unit of seconds.
 ```bs
 fn fib(n) {
     if n < 2 {
-        return n;
+        return n
     }
 
-    return fib(n - 1) + fib(n - 2);
+    return fib(n - 1) + fib(n - 2)
 }
 
-var start = os.clock();
-io.println(fib(30));
+var start = os.clock()
+io.println(fib(30))
 
-var elapsed = os.clock() - start;
-io.println("Elapsed: \(elapsed)");
+var elapsed = os.clock() - start
+io.println("Elapsed: \(elapsed)")
 ```
 
 ```console
@@ -391,11 +391,11 @@ Elapsed: 0.137143968999226
 Sleep for `seconds` interval, with nanosecond level of precision.
 
 ```bs
-var start = os.clock();
-os.sleep(0.69);
+var start = os.clock()
+os.sleep(0.69)
 
-var elapsed = os.clock() - start;
-io.println("Elapsed: \(elapsed)");
+var elapsed = os.clock() - start
+io.println("Elapsed: \(elapsed)")
 ```
 
 ```console
@@ -409,8 +409,8 @@ Get the environment variable `name`.
 Returns `nil` if it doesn't exist.
 
 ```bs
-io.println(os.getenv("FOO"));
-io.println(os.getenv("BAR"));
+io.println(os.getenv("FOO"))
+io.println(os.getenv("BAR"))
 ```
 
 ```console
@@ -426,8 +426,8 @@ Set the environment variable `name` to `value`.
 Returns `true` if successful, else `false`.
 
 ```bs
-os.setenv("FOO", "lmao");
-io.println(os.getenv("FOO"));
+os.setenv("FOO", "lmao")
+io.println(os.getenv("FOO"))
 ```
 
 ```console
@@ -439,7 +439,7 @@ lmao
 Get the current working directory.
 
 ```bs
-io.println(os.getcwd());
+io.println(os.getcwd())
 ```
 
 ```console
@@ -453,8 +453,8 @@ Set the current working directory to `dir`.
 Returns `true` if successful, else `false`.
 
 ```bs
-os.setcwd("/usr");
-io.println(os.getcwd());
+os.setcwd("/usr")
+io.println(os.getcwd())
 ```
 
 ```console
@@ -467,7 +467,7 @@ Array of command line arguments. First element is the program
 name.
 
 ```bs
-io.println(os.args);
+io.println(os.args)
 ```
 
 ```console
@@ -485,13 +485,13 @@ corresponding file of the created process will be captured.
 Returns `nil` if failed.
 
 ```bs
-var p = os.Process(["ls", "-l"]);
+var p = os.Process(["ls", "-l"])
 if !p {
-    io.eprintln("ERROR: could not start process");
-    os.exit(1);
+    io.eprintln("ERROR: could not start process")
+    os.exit(1)
 }
 
-p.wait();
+p.wait()
 ```
 
 ```console
@@ -506,19 +506,19 @@ Get the standard output of the process as an `io.Reader` instance.
 Returns `nil` if the process was spawned without capturing stdout.
 
 ```bs
-var p = os.Process(["ls", "-l"], true);
+var p = os.Process(["ls", "-l"], true)
 if !p {
-    io.eprintln("ERROR: could not start process");
-    os.exit(1);
+    io.eprintln("ERROR: could not start process")
+    os.exit(1)
 }
 
-var stdout = p.stdout();
+var stdout = p.stdout()
 while !stdout.eof() {
-    var line = stdout.readln();
-    io.println("Line:", line);
+    var line = stdout.readln()
+    io.println("Line:", line)
 }
 
-p.wait();
+p.wait()
 ```
 
 ```console
@@ -539,18 +539,18 @@ Get the standard input of the process as an `io.Writer` instance.
 Returns `nil` if the process was spawned without capturing stdin.
 
 ```bs
-var p = os.Process(["grep", "foobar"], false, false, true);
+var p = os.Process(["grep", "foobar"], false, false, true)
 if !p {
-    io.eprintln("ERROR: could not start process");
-    os.exit(1);
+    io.eprintln("ERROR: could not start process")
+    os.exit(1)
 }
 
-var stdin = p.stdin();
-stdin.writeln("First line foobar lmao");
-stdin.writeln("Second line lmao");
-stdin.writeln("Third line lets goooo foobar");
-stdin.close();
-p.wait();
+var stdin = p.stdin()
+stdin.writeln("First line foobar lmao")
+stdin.writeln("Second line lmao")
+stdin.writeln("Third line lets goooo foobar")
+stdin.close()
+p.wait()
 ```
 
 ```console
@@ -581,8 +581,8 @@ Native C class that compiles a regular expression.
 Returns `nil` if failed.
 
 ```bs
-var r = Regex("([0-9]+) ([a-z]+)");
-io.println("69 apples, 420 oranges".replace(r, "{fruit: '\\2', count: \\1}"));
+var r = Regex("([0-9]+) ([a-z]+)")
+io.println("69 apples, 420 oranges".replace(r, "{fruit: '\\2', count: \\1}"))
 ```
 
 ```console
@@ -597,9 +597,9 @@ Methods for the builtin string value.
 Slice a string from `start` (inclusive) to `end` (exclusive).
 
 ```bs
-io.println("deez nuts".slice(0, 4));
-io.println("deez nuts".slice(5, 9));
-io.println("deez nuts".slice(5)); # No end defaults to string end
+io.println("deez nuts".slice(0, 4))
+io.println("deez nuts".slice(5, 9))
+io.println("deez nuts".slice(5)) # No end defaults to string end
 ```
 
 ```console
@@ -613,7 +613,7 @@ nuts
 Reverse a string.
 
 ```bs
-io.println("sllab amgil".reverse());
+io.println("sllab amgil".reverse())
 ```
 
 ```console
@@ -625,7 +625,7 @@ ligma balls
 Convert a string to uppercase.
 
 ```bs
-io.println("Urmom".toupper());
+io.println("Urmom".toupper())
 ```
 
 ```console
@@ -637,7 +637,7 @@ URMOM
 Convert a string to lowercase.
 
 ```bs
-io.println("Urmom".tolower());
+io.println("Urmom".tolower())
 ```
 
 ```console
@@ -649,11 +649,11 @@ urmom
 Convert a string to a number.
 
 ```bs
-io.println("69".tonumber());
-io.println("420.69".tonumber());
-io.println("0xff".tonumber());
-io.println("69e3".tonumber());
-io.println("nah".tonumber());
+io.println("69".tonumber())
+io.println("420.69".tonumber())
+io.println("0xff".tonumber())
+io.println("69e3".tonumber())
+io.println("nah".tonumber())
 ```
 
 ```console
@@ -672,16 +672,16 @@ to `0`).
 Returns the position if found, else `nil`.
 
 ```bs
-io.println("foo bar baz".find("ba"));
-io.println("foo bar baz".find("ba", 5));
-io.println("foo bar baz".find("ba", 9));
-io.println("foo bar baz".find("lmao"));
+io.println("foo bar baz".find("ba"))
+io.println("foo bar baz".find("ba", 5))
+io.println("foo bar baz".find("ba", 9))
+io.println("foo bar baz".find("lmao"))
 
-var r = Regex("[0-9]");
-io.println("69a".find(r));
-io.println("69a".find(r, 1));
-io.println("69a".find(r, 2));
-io.println("yolol".find(r));
+var r = Regex("[0-9]")
+io.println("69a".find(r))
+io.println("69a".find(r, 1))
+io.println("69a".find(r, 2))
+io.println("yolol".find(r))
 ```
 
 ```console
@@ -700,14 +700,14 @@ nil
 Split string by `pattern`.
 
 ```bs
-io.println("foo bar baz".split(""));
-io.println("foo bar baz".split(" "));
-io.println("foo bar baz".split("  "));
+io.println("foo bar baz".split(""))
+io.println("foo bar baz".split(" "))
+io.println("foo bar baz".split("  "))
 
-var r = Regex(" +");
-io.println("foobar".split(r));
-io.println("foo bar".split(r));
-io.println("foo bar   baz".split(r));
+var r = Regex(" +")
+io.println("foobar".split(r))
+io.println("foo bar".split(r))
+io.println("foo bar   baz".split(r))
 ```
 
 ```console
@@ -724,14 +724,14 @@ $ bs demo.bs
 Replace `pattern` with `replacement`.
 
 ```bs
-io.println("foo bar baz".replace("", "-"));
-io.println("foo bar baz".replace(" ", "---"));
-io.println("foo bar baz".replace("  ", "-"));
+io.println("foo bar baz".replace("", "-"))
+io.println("foo bar baz".replace(" ", "---"))
+io.println("foo bar baz".replace("  ", "-"))
 
-var r = Regex("([0-9]+) ([a-z]+)");
-io.println("69 apples, 420 oranges".replace(r, "{type: \\2, count: \\1}"));
-io.println("69 apples, 420  oranges".replace(r, "{type: \\2, count: \\1}"));
-io.println("ayo noice!".replace(r, "{type: \\2, count: \\1}"));
+var r = Regex("([0-9]+) ([a-z]+)")
+io.println("69 apples, 420 oranges".replace(r, "{type: \\2, count: \\1}"))
+io.println("69 apples, 420  oranges".replace(r, "{type: \\2, count: \\1}"))
+io.println("ayo noice!".replace(r, "{type: \\2, count: \\1}"))
 ```
 
 ```console
@@ -752,11 +752,11 @@ Compare two strings together.
 - `-1` means the string is "less than" the other string
 
 ```bs
-io.println("foo".compare("bar"));
-io.println("foo".compare("lol"));
-io.println("foo".compare("foo"));
-io.println("foo".compare("food"));
-io.println("food".compare("foo"));
+io.println("foo".compare("bar"))
+io.println("foo".compare("lol"))
+io.println("foo".compare("foo"))
+io.println("foo".compare("food"))
+io.println("food".compare("foo"))
 ```
 
 ```console
@@ -772,7 +772,7 @@ $ bs demo.bs
 Trim `pattern` from the left of a string.
 
 ```bs
-io.println("[" ++ "   foo bar baz  ".ltrim(" ") ++ "]");
+io.println("[" ++ "   foo bar baz  ".ltrim(" ") ++ "]")
 ```
 
 ```console
@@ -784,7 +784,7 @@ $ bs demo.bs
 Trim `pattern` from the right of a string.
 
 ```bs
-io.println("[" ++ "   foo bar baz  ".rtrim(" ") ++ "]");
+io.println("[" ++ "   foo bar baz  ".rtrim(" ") ++ "]")
 ```
 
 ```console
@@ -796,7 +796,7 @@ $ bs demo.bs
 Trim `pattern` from both sides of a string.
 
 ```bs
-io.println("[" ++ "   foo bar baz  ".trim(" ") ++ "]");
+io.println("[" ++ "   foo bar baz  ".trim(" ") ++ "]")
 ```
 
 ```console
@@ -809,11 +809,11 @@ Pad string with `pattern` on the left side, till the total length reaches
 `count`.
 
 ```bs
-io.println("foo".lpad("69", 0));
-io.println("foo".lpad("69", 3));
-io.println("foo".lpad("69", 4));
-io.println("foo".lpad("69", 5));
-io.println("foo".lpad("69", 6));
+io.println("foo".lpad("69", 0))
+io.println("foo".lpad("69", 3))
+io.println("foo".lpad("69", 4))
+io.println("foo".lpad("69", 5))
+io.println("foo".lpad("69", 6))
 ```
 
 ```console
@@ -830,11 +830,11 @@ Pad string with `pattern` on the right side, till the total length reaches
 `count`.
 
 ```bs
-io.println("foo".rpad("69", 0));
-io.println("foo".rpad("69", 3));
-io.println("foo".rpad("69", 4));
-io.println("foo".rpad("69", 5));
-io.println("foo".rpad("69", 6));
+io.println("foo".rpad("69", 0))
+io.println("foo".rpad("69", 3))
+io.println("foo".rpad("69", 4))
+io.println("foo".rpad("69", 5))
+io.println("foo".rpad("69", 6))
 ```
 
 ```console
@@ -850,9 +850,9 @@ foo696
 Check whether string starts with `pattern`.
 
 ```bs
-io.println("foobar".prefix("foo"));
-io.println("foobar".prefix("Foo"));
-io.println("foobar".prefix("deez nuts"));
+io.println("foobar".prefix("foo"))
+io.println("foobar".prefix("Foo"))
+io.println("foobar".prefix("deez nuts"))
 ```
 
 ```console
@@ -866,9 +866,9 @@ false
 Check whether string ends with `pattern`.
 
 ```bs
-io.println("foobar".suffix("bar"));
-io.println("foobar".suffix("Bar"));
-io.println("foobar".suffix("deez nuts"));
+io.println("foobar".suffix("bar"))
+io.println("foobar".suffix("Bar"))
+io.println("foobar".suffix("deez nuts"))
 ```
 
 ```console
@@ -886,9 +886,9 @@ dedicated operator, but which still finds occasional uses.
 Return the bitwise ceiling of a number.
 
 ```bs
-io.println(bit.ceil(7));
-io.println(bit.ceil(8));
-io.println(bit.ceil(9));
+io.println(bit.ceil(7))
+io.println(bit.ceil(8))
+io.println(bit.ceil(9))
 ```
 
 ```console
@@ -902,9 +902,9 @@ $ bs demo.bs
 Return the bitwise floor of a number.
 
 ```bs
-io.println(bit.floor(7));
-io.println(bit.floor(8));
-io.println(bit.floor(9));
+io.println(bit.floor(7))
+io.println(bit.floor(8))
+io.println(bit.floor(9))
 ```
 
 ```console
@@ -983,10 +983,10 @@ builder for optimized string modification operations.
 Create a string builder.
 
 ```bs
-var b = Bytes();
-b.write("Hello, ");
-b.write("world!");
-io.println(b.slice());
+var b = Bytes()
+b.write("Hello, ")
+b.write("world!")
+io.println(b.slice())
 ```
 
 ```console
@@ -998,13 +998,13 @@ Hello, world!
 Return the current number of bytes written.
 
 ```bs
-var b = Bytes();
-b.write("Hello");
-b.write(" world!");
-io.println(b.slice());
+var b = Bytes()
+b.write("Hello")
+b.write(" world!")
+io.println(b.slice())
 
-var n = b.count();
-io.println("\(n) bytes written.");
+var n = b.count()
+io.println("\(n) bytes written.")
 ```
 
 ```console
@@ -1017,15 +1017,15 @@ Hello world!
 Move back the writer head to `position`.
 
 ```bs
-var b = Bytes();
-b.write("Hello");
+var b = Bytes()
+b.write("Hello")
 
-var p = b.count();
-b.write(" world!");
+var p = b.count()
+b.write(" world!")
 
-io.println(b.slice());
-b.reset(p);
-io.println(b.slice());
+io.println(b.slice())
+b.reset(p)
+io.println(b.slice())
 ```
 
 ```console
@@ -1041,12 +1041,12 @@ If no arguments are provided to this function, the whole builder is returned as
 a string.
 
 ```bs
-var b = Bytes();
-b.write("Hello world!");
+var b = Bytes()
+b.write("Hello world!")
 
-io.println(b.slice());
-io.println(b.slice(0, 5));
-io.println(b.slice(6, 12));
+io.println(b.slice())
+io.println(b.slice(0, 5))
+io.println(b.slice(6, 12))
 ```
 
 ```console
@@ -1060,10 +1060,10 @@ world!
 Write `str` to the end.
 
 ```bs
-var b = Bytes();
-b.write("Nice! ");
-b.write("" ++ 69); # Only strings can be written to a Bytes object
-io.println(b.slice());
+var b = Bytes()
+b.write("Nice! ")
+b.write("" ++ 69) # Only strings can be written to a Bytes object
+io.println(b.slice())
 ```
 
 ```console
@@ -1075,10 +1075,10 @@ Nice! 69
 Write `value` at `position`.
 
 ```bs
-var b = Bytes();
-b.write("Helloworld!");
-b.insert(5, ", ");
-io.println(b.slice());
+var b = Bytes()
+b.write("Helloworld!")
+b.insert(5, ", ")
+io.println(b.slice())
 ```
 
 ```console
@@ -1095,10 +1095,10 @@ Functional map.
 The provided function `f` must take a single argument.
 
 ```bs
-var xs = [1, 2, 3, 4, 5];
-var ys = xs.map(fn (x) => x * 2);
-io.println(xs);
-io.println(ys);
+var xs = [1, 2, 3, 4, 5]
+var ys = xs.map(fn (x) => x * 2)
+io.println(xs)
+io.println(ys)
 ```
 
 ```console
@@ -1113,10 +1113,10 @@ Functional filter.
 The provided function `f` must take a single argument.
 
 ```bs
-var xs = [1, 2, 3, 4, 5];
-var ys = xs.filter(fn (x) => x % 2 == 0);
-io.println(xs);
-io.println(ys);
+var xs = [1, 2, 3, 4, 5]
+var ys = xs.filter(fn (x) => x % 2 == 0)
+io.println(xs)
+io.println(ys)
 ```
 
 ```console
@@ -1133,13 +1133,13 @@ argument shall be the accumulator, and the second shall be the
 current value.
 
 ```bs
-var xs = [1, 2, 3, 4, 5];
+var xs = [1, 2, 3, 4, 5]
 
-var a = xs.reduce(fn (x, y) => x + y);
-io.println(a);
+var a = xs.reduce(fn (x, y) => x + y)
+io.println(a)
 
-var b = xs.reduce(fn (x, y) => x + y, 10);
-io.println(b);
+var b = xs.reduce(fn (x, y) => x + y, 10)
+io.println(b)
 ```
 
 ```console
@@ -1152,15 +1152,15 @@ $ bs demo.bs
 Copy an array.
 
 ```bs
-var xs = [1, 2, 3, 4, 5];
-var ys = xs;
-var zs = xs.copy();
+var xs = [1, 2, 3, 4, 5]
+var ys = xs
+var zs = xs.copy()
 
-xs[0] = 69;
+xs[0] = 69
 
-io.println(xs);
-io.println(ys);
-io.println(zs);
+io.println(xs)
+io.println(ys)
+io.println(zs)
 ```
 
 ```console
@@ -1174,7 +1174,7 @@ $ bs demo.bs
 Join the elements of an array, separated by `separator` into a single string.
 
 ```bs
-io.println([1, 2, 3, 4, 5].join(" -> "));
+io.println([1, 2, 3, 4, 5].join(" -> "))
 ```
 
 ```console
@@ -1189,11 +1189,11 @@ Find `value` within an array starting from position `start` (which defaults to
 Returns the position if found, else `nil`.
 
 ```bs
-var xs = [1, 2, 3, 4, 5, 3];
-io.println(xs.find(3));
-io.println(xs.find(3, 3));
-io.println(xs.find(3, 6));
-io.println(xs.find(true, 6));
+var xs = [1, 2, 3, 4, 5, 3]
+io.println(xs.find(3))
+io.println(xs.find(3, 3))
+io.println(xs.find(3, 6))
+io.println(xs.find(true, 6))
 ```
 
 ```console
@@ -1208,11 +1208,11 @@ nil
 Compare the elements of two arrays.
 
 ```bs
-var xs = [1, 2, 3, 4, 5];
-var ys = [1, 2, 3, 4, 5];
+var xs = [1, 2, 3, 4, 5]
+var ys = [1, 2, 3, 4, 5]
 
-io.println(xs == ys);
-io.println(xs.equal(ys));
+io.println(xs == ys)
+io.println(xs.equal(ys))
 ```
 
 ```console
@@ -1230,13 +1230,13 @@ Push `value` into an array.
 This modifies the array.
 
 ```bs
-var xs = [];
+var xs = []
 
 for i in 0, 5 {
-    xs.push(i * 2);
+    xs.push(i * 2)
 }
 
-io.println(xs);
+io.println(xs)
 ```
 
 ```console
@@ -1250,19 +1250,19 @@ Insert `value` into an array at `position`.
 This modifies the array.
 
 ```bs
-var xs = [];
+var xs = []
 
 for i in 0, 5 {
     if i == 2 {
-        continue;
+        continue
     }
 
-    xs.push(i * 2);
+    xs.push(i * 2)
 }
-io.println(xs);
+io.println(xs)
 
-xs.insert(2, 4);
-io.println(xs);
+xs.insert(2, 4)
+io.println(xs)
 ```
 
 ```console
@@ -1275,10 +1275,10 @@ $ bs demo.bs
 Sort an array inplace with `compare`, and return itself.
 
 ```bs
-var xs = [4, 2, 5, 1, 3];
-xs.sort(fn (x, y) => x < y); # This also returns the array so you can chain operations
+var xs = [4, 2, 5, 1, 3]
+xs.sort(fn (x, y) => x < y) # This also returns the array so you can chain operations
 
-io.println(xs);
+io.println(xs)
 ```
 
 ```console
@@ -1298,11 +1298,11 @@ If `size` is larger than the original size, the extra elements shall default to
 This modifies the array.
 
 ```bs
-var xs = [1, 2, 3, 4, 5];
-io.println(xs);
+var xs = [1, 2, 3, 4, 5]
+io.println(xs)
 
-xs.resize(3);
-io.println(xs);
+xs.resize(3)
+io.println(xs)
 ```
 
 ```console
@@ -1317,11 +1317,11 @@ Removes the item at `index` and returns it.
 This modifies the array.
 
 ```bs
-var xs = [1, 2, 3, 4, 5];
-io.println(xs);
+var xs = [1, 2, 3, 4, 5]
+io.println(xs)
 
-io.println(xs.remove(2));
-io.println(xs);
+io.println(xs.remove(2))
+io.println(xs)
 ```
 
 ```console
@@ -1337,11 +1337,11 @@ Reverse an array.
 This modifies the array.
 
 ```bs
-var xs = [1, 2, 3, 4, 5];
-io.println(xs);
+var xs = [1, 2, 3, 4, 5]
+io.println(xs)
 
-xs.reverse(); # This also returns the array so you can chain operations
-io.println(xs);
+xs.reverse() # This also returns the array so you can chain operations
+io.println(xs)
 ```
 
 ```console
@@ -1356,11 +1356,11 @@ Fill an array with `value`.
 This modifies the array.
 
 ```bs
-var xs = [1, 2, 3, 4, 5];
-io.println(xs);
+var xs = [1, 2, 3, 4, 5]
+io.println(xs)
 
-xs.fill(69); # This also returns the array so you can chain operations
-io.println(xs);
+xs.fill(69) # This also returns the array so you can chain operations
+io.println(xs)
 ```
 
 ```console
@@ -1373,8 +1373,8 @@ This can also be used along with `array.resize()` to quickly create new arrays
 with a preset size and value.
 
 ```bs
-var xs = [].resize(5).fill("foo");
-io.println(xs);
+var xs = [].resize(5).fill("foo")
+io.println(xs)
 ```
 
 ```console
@@ -1386,10 +1386,10 @@ $ bs demo.bs
 Slice an array from `start` (inclusive) to `end` (exclusive).
 
 ```bs
-var xs = [1, 2, 3, 4, 5];
-io.println(xs);
-io.println(xs.slice(2));
-io.println(xs.slice(1, 3));
+var xs = [1, 2, 3, 4, 5]
+io.println(xs)
+io.println(xs.slice(2))
+io.println(xs.slice(1, 3))
 ```
 
 ```console
@@ -1405,10 +1405,10 @@ Append an array.
 This modifies the array.
 
 ```bs
-var xs = [1, 2, 3, 4, 5];
-var ys = [6, 7, 8, 9, 10];
-io.println(xs);
-io.println(xs.append(ys));
+var xs = [1, 2, 3, 4, 5]
+var ys = [6, 7, 8, 9, 10]
+io.println(xs)
+io.println(xs.append(ys))
 ```
 
 ```console
@@ -1438,16 +1438,16 @@ Copy a table.
 var xs = {
     foo = 69,
     bar = 420
-};
+}
 
-var ys = xs;
-var zs = xs.copy();
+var ys = xs
+var zs = xs.copy()
 
-xs.bar = 1337;
+xs.bar = 1337
 
-io.println(xs);
-io.println(ys);
-io.println(zs);
+io.println(xs)
+io.println(ys)
+io.println(zs)
 ```
 
 ```console
@@ -1470,11 +1470,11 @@ $ bs demo.bs
 Compare the elements of two tables.
 
 ```bs
-var xs = { foo = 69, bar = 420 };
-var ys = { foo = 69, bar = 420 };
+var xs = { foo = 69, bar = 420 }
+var ys = { foo = 69, bar = 420 }
 
-io.println(xs == ys);
-io.println(xs.equal(ys));
+io.println(xs == ys)
+io.println(xs.equal(ys))
 ```
 
 ```console
@@ -1492,8 +1492,8 @@ Contains simple mathematical primitives.
 Sine in radians.
 
 ```bs
-var theta = 0.5;
-io.println(theta.sin());
+var theta = 0.5
+io.println(theta.sin())
 ```
 
 ```console
@@ -1523,7 +1523,7 @@ Inverse tangent in radians.
 Return the exponential function of the number.
 
 ```bs
-io.println(2.exp()); # Basically e^2
+io.println(2.exp()) # Basically e^2
 ```
 
 ```console
@@ -1556,9 +1556,9 @@ Return the nearest integer.
 Return the sign of the number.
 
 ```bs
-io.println((0).sign());
-io.println((69).sign());
-io.println((-420).sign());
+io.println((0).sign())
+io.println((69).sign())
+io.println((-420).sign())
 ```
 
 ```console
@@ -1572,8 +1572,8 @@ $ bs demo.bs
 Return the maximum between the method receiver and the provided arguments.
 
 ```bs
-io.println(1.max(2, 3));
-io.println(3.max(0, 1, 2));
+io.println(1.max(2, 3))
+io.println(3.max(0, 1, 2))
 ```
 
 ```console
@@ -1586,8 +1586,8 @@ $ bs demo.bs
 Return the minimum between the method receiver and the provided arguments.
 
 ```bs
-io.println(1.min(2, 3));
-io.println(3.min(1, 2, 3));
+io.println(1.min(2, 3))
+io.println(3.min(1, 2, 3))
 ```
 
 ```console
@@ -1614,10 +1614,10 @@ Return a pseudorandom number between `low` and `high`.
 If no arguments are provided, a number between `0` and `1` is returned.
 
 ```bs
-io.println(math.random());
-io.println(math.random());
-io.println(math.random(69, 420));
-io.println(math.random(69, 420));
+io.println(math.random())
+io.println(math.random())
+io.println(math.random(69, 420))
+io.println(math.random(69, 420))
 ```
 
 ```console

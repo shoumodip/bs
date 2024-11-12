@@ -1,2 +1,2 @@
-assert(true, "Ligma");
-assert(false, "Ligma");
+assert(true, "Ligma")
+assert(false, "Ligma")

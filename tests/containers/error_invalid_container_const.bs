@@ -1,2 +1,2 @@
-var x = nil;
-x.foo;
+var x = nil
+x.foo

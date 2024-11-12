@@ -1,7 +1,7 @@
 class Foo {
     foo() {
-        -nil;
+        -nil
     }
 }
 
-Foo().foo();
+Foo().foo()

@@ -1,28 +1,28 @@
-var GameOfLife = import("GameOfLife");
+var GameOfLife = import("GameOfLife")
 
-var INTERVAL = 0.1;
+var INTERVAL = 0.1
 
 class GameOfLifeTUI < GameOfLife {
     init(width, height) {
-        super.init(width, height);
+        super.init(width, height)
     }
 
     show() {
         for y in 0, this.height {
             for x in 0, this.width {
-                io.print(if this.get(x, y) then "#" else ".");
+                io.print(if this.get(x, y) then "#" else ".")
             }
-            io.println();
+            io.println()
         }
     }
 }
 
-var gol = GameOfLifeTUI(20, 10);
-gol.glider(1, 1);
+var gol = GameOfLifeTUI(20, 10)
+gol.glider(1, 1)
 
 while true {
-    gol.show();
-    gol.step();
-    io.print("\e[\(gol.height)A\e[\(gol.width)D");
-    os.sleep(INTERVAL);
+    gol.show()
+    gol.step()
+    io.print("\e[\(gol.height)A\e[\(gol.width)D")
+    os.sleep(INTERVAL)
 }

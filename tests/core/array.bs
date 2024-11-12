@@ -1,87 +1,87 @@
-io.println([1, 2, 3, 4, 5].map(fn (x) => x * 2));
-io.println([1, 2, 3, 4, 5].filter(fn (x) => x % 2 == 0));
-io.println([1, 2, 3, 4, 5].reduce(fn (x, y) => x + y));
-io.println([1, 2, 3, 4, 5].reduce(fn (x, y) => x + y, 20));
+io.println([1, 2, 3, 4, 5].map(fn (x) => x * 2))
+io.println([1, 2, 3, 4, 5].filter(fn (x) => x % 2 == 0))
+io.println([1, 2, 3, 4, 5].reduce(fn (x, y) => x + y))
+io.println([1, 2, 3, 4, 5].reduce(fn (x, y) => x + y, 20))
 
 {
-    var xs = [1, 2, 3, 4, 5];
-    var ys = xs.copy();
-    var zs = xs;
+    var xs = [1, 2, 3, 4, 5]
+    var ys = xs.copy()
+    var zs = xs
 
-    io.println("xs = \(xs);");
-    io.println("ys = \(ys);");
-    io.println("zs = \(zs);");
+    io.println("xs = \(xs)")
+    io.println("ys = \(ys)")
+    io.println("zs = \(zs)")
 
-    xs[0] = 69;
+    xs[0] = 69
 
-    io.println("xs = \(xs);");
-    io.println("ys = \(ys);");
-    io.println("zs = \(zs);");
+    io.println("xs = \(xs)")
+    io.println("ys = \(ys)")
+    io.println("zs = \(zs)")
 }
 
-io.println([1, 2, 3, 4, 2].find(2));
-io.println([1, 2, 3, 4, 2].find(2, 2));
+io.println([1, 2, 3, 4, 2].find(2))
+io.println([1, 2, 3, 4, 2].find(2, 2))
 
 {
-    var xs = [1, 2, 3, 4, 5];
-    var ys = [1, 2, 3, 4, 5];
+    var xs = [1, 2, 3, 4, 5]
+    var ys = [1, 2, 3, 4, 5]
 
-    io.println(xs == ys);
-    io.println(xs.equal(xs));
-    io.println(xs.equal(ys));
+    io.println(xs == ys)
+    io.println(xs.equal(xs))
+    io.println(xs.equal(ys))
 
-    xs[0] = 69;
-    io.println(xs.equal(ys));
-}
-
-{
-    var xs = [2, 5, 1, 4, 3];
-    io.println("Before:", xs);
-    io.println("Return:", xs.sort(fn (x, y) => x < y));
-    io.println("Final: ", xs);
+    xs[0] = 69
+    io.println(xs.equal(ys))
 }
 
 {
-    var xs = [2, 5, 1, 4, 3];
-    io.println("Before:", xs);
-    io.println("Return:", xs.reverse());
-    io.println("Final: ", xs);
+    var xs = [2, 5, 1, 4, 3]
+    io.println("Before:", xs)
+    io.println("Return:", xs.sort(fn (x, y) => x < y))
+    io.println("Final: ", xs)
 }
 
 {
-    var xs = [1, 2, 3, 4, 5];
-    var count = len(xs);
+    var xs = [2, 5, 1, 4, 3]
+    io.println("Before:", xs)
+    io.println("Return:", xs.reverse())
+    io.println("Final: ", xs)
+}
 
-    io.println(xs);
+{
+    var xs = [1, 2, 3, 4, 5]
+    var count = len(xs)
+
+    io.println(xs)
     for i in 0, 5 {
-        xs[len(xs)] = "Temp #" ++ i;
+        xs[len(xs)] = "Temp #" ++ i
     }
 
-    io.println(xs);
-    xs.resize(count);
-    io.println(xs);
-    xs.resize(count * 2);
-    io.println(xs);
+    io.println(xs)
+    xs.resize(count)
+    io.println(xs)
+    xs.resize(count * 2)
+    io.println(xs)
 }
 
 {
-    var xs = [1, 2, 3, 4, 5];
-    io.println(xs);
+    var xs = [1, 2, 3, 4, 5]
+    io.println(xs)
 
-    io.println(xs.remove(2));
-    io.println(xs);
+    io.println(xs.remove(2))
+    io.println(xs)
 }
 
 {
-    var xs = [1, 2, 3, 4, 5];
-    io.println(xs);
-    io.println(xs.slice(2));
-    io.println(xs.slice(1, 3));
+    var xs = [1, 2, 3, 4, 5]
+    io.println(xs)
+    io.println(xs.slice(2))
+    io.println(xs.slice(1, 3))
 }
 
 {
-    var xs = [1, 2, 3, 4, 5];
-    var ys = [6, 7, 8, 9, 10];
-    io.println(xs);
-    io.println(xs.append(ys));
+    var xs = [1, 2, 3, 4, 5]
+    var ys = [6, 7, 8, 9, 10]
+    io.println(xs)
+    io.println(xs.append(ys))
 }

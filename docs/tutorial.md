@@ -6,7 +6,7 @@
 Let's start with a simple "Hello World" program.
 
 ```bs
-io.println("Hello, world!");
+io.println("Hello, world!")
 ```
 
 Save this to a file named `hello.bs` and run it as follows.
@@ -19,143 +19,143 @@ Hello, world!
 ## Basic Types
 ### Nil
 ```bs
-io.println(nil); # Output: nil
+io.println(nil) # Output: nil
 ```
 
 ### Numbers
 BS supports 64-bit floating point numbers only.
 
 ```bs
-io.println(69);     # Output: 69
-io.println(420.69); # Output: 420.69
-io.println(0xff);   # Output: 255
+io.println(69)     # Output: 69
+io.println(420.69) # Output: 420.69
+io.println(0xff)   # Output: 255
 ```
 
 Standard arithmetic as well as bitwise operations are supported.
 
 ```bs
-io.println(34 + 35);        # Output: 69
-io.println(500 - 80);       # Output: 420
-io.println(23 * 3);         # Output: 69
-io.println(840 / 2);        # Output: 420
-io.println(209 % 70);       # Output: 69
-io.println(-420);           # Output: -420
+io.println(34 + 35)        # Output: 69
+io.println(500 - 80)       # Output: 420
+io.println(23 * 3)         # Output: 69
+io.println(840 / 2)        # Output: 420
+io.println(209 % 70)       # Output: 69
+io.println(-420)           # Output: -420
 
-io.println(17 * 2 + 35);    # Output: 69
-io.println((900 - 60) / 2); # Output: 420
+io.println(17 * 2 + 35)    # Output: 69
+io.println((900 - 60) / 2) # Output: 420
 
-io.println(276 >> 2);       # Output: 69
-io.println(105 << 2);       # Output: 420
-io.println(~-70);           # Output: 69
-io.println(160 | 260);      # Output: 420
-io.println(77 & 103);       # Output: 69
-io.println(~-419 + 10 & 3); # Output: 420
-io.println(69 ^ 1404);      # Output: 1337
+io.println(276 >> 2)       # Output: 69
+io.println(105 << 2)       # Output: 420
+io.println(~-70)           # Output: 69
+io.println(160 | 260)      # Output: 420
+io.println(77 & 103)       # Output: 69
+io.println(~-419 + 10 & 3) # Output: 420
+io.println(69 ^ 1404)      # Output: 1337
 ```
 
 ### Booleans
 ```bs
-io.println(true);  # Output: true
-io.println(false); # Output: false
+io.println(true)  # Output: true
+io.println(false) # Output: false
 ```
 
 Standard logical operations are supported.
 
 ```bs
-io.println(!true);          # Output: false
-io.println(!false);         # Output: true
-io.println(!nil);           # Output: true
+io.println(!true)          # Output: false
+io.println(!false)         # Output: true
+io.println(!nil)           # Output: true
 
 # All numbers are considered "true"
-io.println(!0);             # Output: false
-io.println(!1);             # Output: false
+io.println(!0)             # Output: false
+io.println(!1)             # Output: false
 
 # Ordering
-io.println(69 > 420);       # Output: false
-io.println(69 >= 420);      # Output: false
-io.println(69 < 420);       # Output: true
-io.println(69 <= 420);      # Output: true
-io.println(69 == 420);      # Output: false
-io.println(69 != 420);      # Output: true
+io.println(69 > 420)       # Output: false
+io.println(69 >= 420)      # Output: false
+io.println(69 < 420)       # Output: true
+io.println(69 <= 420)      # Output: true
+io.println(69 == 420)      # Output: false
+io.println(69 != 420)      # Output: true
 
 # BS is strongly typed
-io.println(nil == nil);     # Output: true
-io.println(nil == true);    # Output: false
-io.println(nil == 0);       # Output: false
-io.println(false == 0);     # Output: false
+io.println(nil == nil)     # Output: true
+io.println(nil == true)    # Output: false
+io.println(nil == 0)       # Output: false
+io.println(false == 0)     # Output: false
 
 # Logical AND, OR
-io.println(true && true);   # Output: true
-io.println(true && false);  # Output: false
-io.println(true || false);  # Output: true
-io.println(false || false); # Output: false
+io.println(true && true)   # Output: true
+io.println(true && false)  # Output: false
+io.println(true || false)  # Output: true
+io.println(false || false) # Output: false
 
 # Short circuiting
-io.println(nil && true);    # Output: nil
-io.println(0 || false);     # Output: 0
+io.println(nil && true)    # Output: nil
+io.println(0 || false)     # Output: 0
 ```
 
 ### Strings
 ```bs
 # Output: Hello!
-io.println("Hello!");
+io.println("Hello!")
 
 # Output:
 # Say "Hello"!
 # Here, a	 tab!
-io.println("Say \"Hello\"!\nHere, a\t tab!");
+io.println("Say \"Hello\"!\nHere, a\t tab!")
 
 # Output: Interpolation! 69
-io.println("Interpolation! \(34 + 35)");
+io.println("Interpolation! \(34 + 35)")
 
 # Output: Nested interpolation! 420
-io.println("Nested \("interpolation! \(420)")");
+io.println("Nested \("interpolation! \(420)")")
 
 # Output: Hello, world! 69
-io.println("Hello, " ++ "world! " ++ 69);
+io.println("Hello, " ++ "world! " ++ 69)
 
 # Output: 6
-io.println(len("Hello!"));
+io.println(len("Hello!"))
 
 # Output: b
-io.println("foobar"[3]);
+io.println("foobar"[3])
 ```
 
 ### Arrays
 ```bs
 # Variables will be introduced later
-var array = [69, 420];
+var array = [69, 420]
 
 # Pretty printing by default!
-io.println(array);      # Output: [69, 420]
+io.println(array)      # Output: [69, 420]
 
 # Array access
-io.println(array[0]);   # Output: 69
+io.println(array[0])   # Output: 69
 
 # Array access out of bounds is an error
-io.println(array[2]);   # Error!
+io.println(array[2])   # Error!
 
 # Array assignment
-array[1] = "nice!";
-io.println(array);      # Output: [69, "nice!"]
+array[1] = "nice!"
+io.println(array)      # Output: [69, "nice!"]
 
 # Array assignment out of bounds is NOT an error
-array[3] = "Are you serious?";
-io.println(array);      # Output: [69, "nice!", nil, "Are you serious?"]
+array[3] = "Are you serious?"
+io.println(array)      # Output: [69, "nice!", nil, "Are you serious?"]
 
 # Array length
-io.println(len(array)); # Output: 4
+io.println(len(array)) # Output: 4
 
 # Due to the assignment semantics, appending to arrays is quite easy
-array[len(array)] = 420;
-io.println(array);      # Output: [69, "nice!", nil, "Are you serious?", 420]
+array[len(array)] = 420
+io.println(array)      # Output: [69, "nice!", nil, "Are you serious?", 420]
 
 # Arrays are compared by reference, not value
-var xs = [1, 2, 3];
-var ys = [1, 2, 3];
-var zs = xs;
-io.println(xs == ys);   # Output: false
-io.println(xs == zs);   # Output: true
+var xs = [1, 2, 3]
+var ys = [1, 2, 3]
+var zs = xs
+io.println(xs == ys)   # Output: false
+io.println(xs == zs)   # Output: true
 ```
 
 ### Tables
@@ -163,22 +163,22 @@ io.println(xs == zs);   # Output: true
 var table = {
     foo = 69,
     [34 + 35] = 420
-};
+}
 
 # Output:
 # {
 #     foo = 69,
 #     [69] = 420
 # }
-io.println(table);
+io.println(table)
 
 # Key access
-io.println(table.foo);             # Output: 69
-io.println(table[69]);             # Output: 420
+io.println(table.foo)             # Output: 69
+io.println(table[69])             # Output: 420
 
 # Key assignment
-table.key = "value";
-table["bar" ++ 69] = "eh";
+table.key = "value"
+table["bar" ++ 69] = "eh"
 
 # Output:
 # {
@@ -187,24 +187,24 @@ table["bar" ++ 69] = "eh";
 #     key = "value",
 #     [69] = 420
 # }
-io.println(table);
+io.println(table)
 
 # Undefined key access is an error
-io.println(table.something);       # Error!
+io.println(table.something)       # Error!
 
 # Check if key exists in a table
-io.println("foo" in table);        # Output: true
-io.println("something" in table);  # Output: false
+io.println("foo" in table)        # Output: true
+io.println("something" in table)  # Output: false
 
 # Check if key doesn't exist in a table
-io.println("foo" !in table);       # Output: false
-io.println("something" !in table); # Output: true
+io.println("foo" !in table)       # Output: false
+io.println("something" !in table) # Output: true
 
 # Table length
-io.println(len(table));            # Output: 4
+io.println(len(table))            # Output: 4
 
 # Delete keys
-io.println(delete(table[69]));     # Output: true
+io.println(delete(table[69]))     # Output: true
 
 # Output:
 # {
@@ -212,63 +212,63 @@ io.println(delete(table[69]));     # Output: true
 #     foo = 69,
 #     key = "value",
 # }
-io.println(table);
+io.println(table)
 
 # Deletion of non existent key
-io.println(delete(table.wrong));   # Output: false
+io.println(delete(table.wrong))   # Output: false
 
 # Tables are compared by reference, not value
-var xs = {a = 1, b = 2};
-var ys = {a = 1, b = 2};
-var zs = xs;
-io.println(xs == ys);              # Output: false
-io.println(xs == zs);              # Output: true
+var xs = {a = 1, b = 2}
+var ys = {a = 1, b = 2}
+var zs = xs
+io.println(xs == ys)              # Output: false
+io.println(xs == zs)              # Output: true
 ```
 
 ### Typeof
 ```bs
-io.println(typeof(nil));      # Output: nil
-io.println(typeof(true));     # Output: boolean
-io.println(typeof(69));       # Output: number
-io.println(typeof("deez"));   # Output: string
-io.println(typeof([]));       # Output: array
-io.println(typeof({}));       # Output: table
+io.println(typeof(nil))      # Output: nil
+io.println(typeof(true))     # Output: boolean
+io.println(typeof(69))       # Output: number
+io.println(typeof("deez"))   # Output: string
+io.println(typeof([]))       # Output: array
+io.println(typeof({}))       # Output: table
 
 # Functions will be introduced later
-io.println(typeof(fn () {})); # Output: function
+io.println(typeof(fn () {})) # Output: function
 ```
 
 #### Is
 ```bs
-io.println(nil is "nil");           # Output: true
-io.println(true is "boolean");      # Output: true
-io.println(69 is "number");         # Output: true
-io.println("deez" is "string");     # Output: true
-io.println([] is "array");          # Output: true
-io.println({} is "table");          # Output: true
-io.println(fn () {} is "function"); # Output: true
+io.println(nil is "nil")           # Output: true
+io.println(true is "boolean")      # Output: true
+io.println(69 is "number")         # Output: true
+io.println("deez" is "string")     # Output: true
+io.println([] is "array")          # Output: true
+io.println({} is "table")          # Output: true
+io.println(fn () {} is "function") # Output: true
 
-io.println(420 is "nil");           # Output: false
-io.println(420 !is "nil");          # Output: true
+io.println(420 is "nil")           # Output: false
+io.println(420 !is "nil")          # Output: true
 ```
 
 ## Conditions
 ### If Statement
 ```bs
-var age = 18;
+var age = 18
 
 if age >= 18 {
-    io.println("You are an adult");
+    io.println("You are an adult")
 } else {
-    io.println("Stay away from Drake");
+    io.println("Stay away from Drake")
 }
 
 if age == 18 {
-    io.println("Get a life");
+    io.println("Get a life")
 }
 
 if age != 18 {
-    io.println("Go to school");
+    io.println("Go to school")
 }
 ```
 
@@ -280,8 +280,8 @@ Get a life
 
 ### If Expression
 ```bs
-var age = 17;
-io.println(if age >= 18 then "Adult" else "Minor");
+var age = 17
+io.println(if age >= 18 then "Adult" else "Minor")
 ```
 
 ```console
@@ -292,10 +292,10 @@ Minor
 ## Loops
 ### While Loop
 ```bs
-var i = 0;
+var i = 0
 while i < 5 {
-    io.println(i);
-    i = i + 1;
+    io.println(i)
+    i = i + 1
 }
 ```
 
@@ -313,7 +313,7 @@ Iterate over range of numbers.
 
 ```bs
 for i in 0, 5 {
-    io.println(i);
+    io.println(i)
 }
 ```
 
@@ -330,7 +330,7 @@ Iterate over range of numbers with custom step.
 
 ```bs
 for i in 0, 5, 2 {
-    io.println(i);
+    io.println(i)
 }
 ```
 
@@ -345,7 +345,7 @@ Direction of the range iteration is automatically selected.
 
 ```bs
 for i in 5, 0 {
-    io.println(i);
+    io.println(i)
 }
 ```
 
@@ -361,40 +361,40 @@ $ bs loops.bs
 Iterate over a string.
 
 ```bs
-var str = "foobar";
+var str = "foobar"
 
 for i, c in str {
-    io.println("Index: \(i); Char: \(c)");
+    io.println("Index: \(i) Char: \(c)")
 }
 ```
 
 ```console
 $ bs loops.bs
-Index: 0; Char: f
-Index: 1; Char: o
-Index: 2; Char: o
-Index: 3; Char: b
-Index: 4; Char: a
-Index: 5; Char: r
+Index: 0 Char: f
+Index: 1 Char: o
+Index: 2 Char: o
+Index: 3 Char: b
+Index: 4 Char: a
+Index: 5 Char: r
 ```
 
 Iterate over an array.
 
 ```bs
-var xs = [2, 4, 6, 8, 10];
+var xs = [2, 4, 6, 8, 10]
 
 for i, v in xs {
-    io.println("Index: \(i); Value: \(v)");
+    io.println("Index: \(i) Value: \(v)")
 }
 ```
 
 ```console
 $ bs loops.bs
-Index: 0; Value: 2
-Index: 1; Value: 4
-Index: 2; Value: 6
-Index: 3; Value: 8
-Index: 4; Value: 10
+Index: 0 Value: 2
+Index: 1 Value: 4
+Index: 2 Value: 6
+Index: 3 Value: 8
+Index: 4 Value: 10
 ```
 
 Iterate over a table.
@@ -404,40 +404,40 @@ var xs = {
     foo = 69,
     bar = 420,
     [42] = 1337
-};
+}
 
 for k, v in xs {
-    io.println("Key: \(k); Value: \(v)");
+    io.println("Key: \(k) Value: \(v)")
 }
 ```
 
 ```console
 $ bs loops.bs
-Key: 42; Value: 1337
-Key: bar; Value: 420
-Key: foo; Value: 69
+Key: 42 Value: 1337
+Key: bar Value: 420
+Key: foo Value: 69
 ```
 
 ### Break and Continue
 
 ```bs
-var i = 0;
+var i = 0
 while i < 10 {
     if i == 5 {
-        break;
+        break
     }
 
-    io.println(i);
-    i = i + 1;
+    io.println(i)
+    i = i + 1
 }
 
-io.println();
+io.println()
 
 for i in 0, 5 {
     if i == 3 {
-        continue;
+        continue
     }
-    io.println(i);
+    io.println(i)
 }
 ```
 
@@ -458,10 +458,10 @@ $ bs loops.bs
 ## Functions
 ```bs
 fn greet(name) {
-    io.println("Hello, \(name)!");
+    io.println("Hello, \(name)!")
 }
 
-greet("world");
+greet("world")
 ```
 
 ```console
@@ -473,13 +473,13 @@ Hello, world!
 ```bs
 fn factorial(n) {
     if n < 2 {
-        return 1;
+        return 1
     }
 
-    return n * factorial(n - 1);
+    return n * factorial(n - 1)
 }
 
-io.println(factorial(6));
+io.println(factorial(6))
 ```
 
 ```console
@@ -490,14 +490,14 @@ $ bs functions.bs
 ### First Class Functions
 ```bs
 fn add(x, y) {
-    return x + y;
+    return x + y
 }
 
 fn combine(f, x, y) {
-    return f(x, y);
+    return f(x, y)
 }
 
-io.println(combine(add, 34, 35));
+io.println(combine(add, 34, 35))
 ```
 
 ```console
@@ -508,12 +508,12 @@ $ bs functions.bs
 ### Anonymous Functions
 ```bs
 fn combine(f, x, y) {
-    return f(x, y);
+    return f(x, y)
 }
 
 io.println(combine(fn (x, y) {
-    return x + y;
-}, 34, 35));
+    return x + y
+}, 34, 35))
 ```
 
 ```console
@@ -525,9 +525,9 @@ $ bs functions.bs
 Functions support a shorthand syntax for a single expression body.
 
 ```bs
-fn combine(f, x, y) => f(x, y);
+fn combine(f, x, y) => f(x, y)
 
-io.println(combine(fn (x, y) => x + y, 34, 35));
+io.println(combine(fn (x, y) => x + y, 34, 35))
 ```
 
 ```console
@@ -540,15 +540,15 @@ $ bs functions.bs
 ```bs
 fn outer(x) {
     return fn () {
-        return x * 2;
-    };
+        return x * 2
+    }
 }
 
-var a = outer(34.5);
-var b = outer(210);
+var a = outer(34.5)
+var b = outer(210)
 
-io.println(a());
-io.println(b());
+io.println(a())
+io.println(b())
 ```
 
 ```console
@@ -562,17 +562,17 @@ The variables defined in the body of a loop, as well as the iterators, are
 captured as unique values in the nested closure on each iteration of the loop.
 
 ```bs
-var closures = [];
+var closures = []
 
 for i in 0, 5 {
-    var z = i * 2;
+    var z = i * 2
     closures[len(closures)] = fn () {
-        io.println(i, z);
-    };
+        io.println(i, z)
+    }
 }
 
 for _, f in closures {
-    f();
+    f()
 }
 ```
 
@@ -587,72 +587,72 @@ $ bs functions.bs
 
 ## Variables
 ```bs
-var a = 34;
-var b = 35;
-io.println(a + b); # Output: 69
+var a = 34
+var b = 35
+io.println(a + b) # Output: 69
 ```
 
 ### Assignment
 ```bs
-var a = 17;
-var b;             # Assigned to 'nil'
+var a = 17
+var b             # Assigned to 'nil'
 
-a = a * 2;
-b = 35;
+a = a * 2
+b = 35
 
-io.println(a + b); # Output: 69
+io.println(a + b) # Output: 69
 ```
 
 Shorthand assignment operators also work.
 
 ```bs
-var a = 17;
+var a = 17
 
 # All arithmetic operators are supported
-a *= 2;
-a += 35;
+a *= 2
+a += 35
 
-var b = "Nice! ";
+var b = "Nice! "
 
 # String concatenation is also supported
-b ++= a;
+b ++= a
 
-io.println(b); # Output: Nice! 69
+io.println(b) # Output: Nice! 69
 ```
 
 ### Scoped Variables
 ```bs
-var x = 69;
-io.println(x);     # Output: 69
+var x = 69
+io.println(x)     # Output: 69
 
 {
-    var x = 420;
-    io.println(x); # Output: 420
+    var x = 420
+    io.println(x) # Output: 420
 }
 
-io.println(x);     # Output: 69
+io.println(x)     # Output: 69
 ```
 
 ### Variable Shadowing
 ```bs
-var x = 69;
-io.println(x); # Output: 69
+var x = 69
+io.println(x) # Output: 69
 
-var x = "x used to be \(x)";
-io.println(x); # Output: x used to be 69
+var x = "x used to be \(x)"
+io.println(x) # Output: x used to be 69
 ```
 
 ### Local Variables
 ```bs
-var z = 420; # Local to the scope of the file
+var z = 420 # Local to the scope of the file
 
 fn add(x, y) {
-    var z = x + y; # Local to the scope of the function
-    io.println(z);
+    var z = x + y # Local to the scope of the function
+    io.println(z)
 }
 
-add(34, 35);
-io.println(z);
+add(34, 35)
+io.println(z)
 ```
 
 ```console
@@ -666,12 +666,12 @@ Here's a pitfall you might run into
 
 ```bs
 fn f() {
-    io.println(x); # Refers to the variable 'x'
+    io.println(x) # Refers to the variable 'x'
 }
 
-var x = 69;        # Variable 'x' now defined at the toplevel
+var x = 69        # Variable 'x' now defined at the toplevel
 
-f();               # "Should" print 69
+f()               # "Should" print 69
 ```
 
 ```console
@@ -689,12 +689,12 @@ they are declared. This is where global variables come into play.
 
 ```bs
 fn f() {
-    io.println(x); # Refers to the variable 'x'
+    io.println(x) # Refers to the variable 'x'
 }
 
-pub var x = 69;    # Global variable 'x' now defined
+pub var x = 69    # Global variable 'x' now defined
 
-f();
+f()
 ```
 
 ```console
@@ -705,20 +705,20 @@ $ bs variables.bs
 ## Import
 ```bs
 # one.bs
-var M = {};
+var M = {}
 
-M.inc = fn (n) => n + 1;
-M.dec = fn (n) => n - 1;
+M.inc = fn (n) => n + 1
+M.dec = fn (n) => n - 1
 
-return M; # Any arbitrary value can be returned, this is just the usual pattern
+return M # Any arbitrary value can be returned, this is just the usual pattern
 ```
 
 ```bs
 # main.bs
-var one = import("one"); # Note that the extension is omitted
+var one = import("one") # Note that the extension is omitted
 
-io.println(one.inc(68));
-io.println(one.dec(421));
+io.println(one.inc(68))
+io.println(one.dec(421))
 ```
 
 ```console
@@ -732,20 +732,20 @@ Modules are loaded only once.
 
 ```bs
 # one.bs
-var M = {};
+var M = {}
 
-io.println("Loading module 'one'");
+io.println("Loading module 'one'")
 
-M.inc = fn (n) => n + 1;
-M.dec = fn (n) => n - 1;
+M.inc = fn (n) => n + 1
+M.dec = fn (n) => n - 1
 
-return M;
+return M
 ```
 
 ```bs
 # main.bs
-io.println(import("one").inc(68));
-io.println(import("one").dec(421));
+io.println(import("one").inc(68))
+io.println(import("one").dec(421))
 ```
 
 ```console
@@ -758,22 +758,22 @@ Loading module 'one'
 ### Main Module
 ```bs
 # one.bs
-var M = {};
+var M = {}
 
 if is_main_module {
-    io.println("Loading module 'one'");
+    io.println("Loading module 'one'")
 }
 
-M.inc = fn (n) => n + 1;
-M.dec = fn (n) => n - 1;
+M.inc = fn (n) => n + 1
+M.dec = fn (n) => n - 1
 
-return M;
+return M
 ```
 
 ```bs
 # main.bs
-io.println(import("one").inc(68));
-io.println(import("one").dec(421));
+io.println(import("one").inc(68))
+io.println(import("one").dec(421))
 ```
 
 ```console
@@ -802,116 +802,116 @@ more applicable, albeit involved, example.
 class Sprite {
     # Constructor
     init(name, health, attack_power) {
-        this.name = name;
-        this.health = health;
-        this.attack_power = attack_power;
+        this.name = name
+        this.health = health
+        this.attack_power = attack_power
     }
 
     attack(target) {
-        io.println("\(this.name) attacks \(target.name) for \(this.attack_power) damage!");
-        target.take_damage(this.attack_power);
+        io.println("\(this.name) attacks \(target.name) for \(this.attack_power) damage!")
+        target.take_damage(this.attack_power)
     }
 
     take_damage(amount) {
-        this.health -= amount;
+        this.health -= amount
         if this.is_alive() {
-            io.println("\(this.name) has \(this.health) health remaining.");
+            io.println("\(this.name) has \(this.health) health remaining.")
         } else {
-            io.println("\(this.name) has been defeated!");
+            io.println("\(this.name) has been defeated!")
         }
     }
 
     is_alive() {
-        return this.health > 0;
+        return this.health > 0
     }
 }
 
 # Inheritance
 class Hero < Sprite {
     init(name, health, attack_power) {
-        super.init(name, health, attack_power);
-        this.poisoned = false;
-        this.defending = false;
+        super.init(name, health, attack_power)
+        this.poisoned = false
+        this.defending = false
     }
 
     # Special ability of hero: defending
     defend() {
-        io.println("\(this.name) is defending!");
-        this.defending = true;
+        io.println("\(this.name) is defending!")
+        this.defending = true
     }
 
     take_damage(amount) {
         if this.defending {
             if this.poisoned {
                 # Hero will not be poisoned if defending
-                this.poisoned = false;
+                this.poisoned = false
             } else {
                 # Hero will take half damage for a normal attack if defending
-                amount /= 2;
+                amount /= 2
             }
 
-            this.defending = false;
+            this.defending = false
         }
 
-        super.take_damage(amount);
+        super.take_damage(amount)
     }
 }
 
 class Enemy < Sprite {
     init(name, health, attack_power) {
-        super.init(name, health, attack_power);
+        super.init(name, health, attack_power)
     }
 
     # Special ability of enemy: poisoning
     poison(target) {
-        io.println("\(this.name) poisons \(target.name)!");
-        target.poisoned = true;
-        target.take_damage(this.attack_power);
+        io.println("\(this.name) poisons \(target.name)!")
+        target.poisoned = true
+        target.take_damage(this.attack_power)
     }
 }
 
 # io.input() is a core library function which optionally prints a prompt and
 # reads a line from standard input
-var hero = Hero(io.input("Enter hero's name> "), 30, 10);
-var enemy = Enemy(io.input("Enter enemy's name> "), 25, 8);
+var hero = Hero(io.input("Enter hero's name> "), 30, 10)
+var enemy = Enemy(io.input("Enter enemy's name> "), 25, 8)
 
 while hero.is_alive() && enemy.is_alive() {
-    io.println();
+    io.println()
 
     # Hero cannot choose while poisoned
     if hero.poisoned {
-        io.println("\(hero.name) has been poisoned! skipping turn.");
+        io.println("\(hero.name) has been poisoned! skipping turn.")
 
         # Prevent consecutive poisoning
-        hero.poisoned = false;
-        enemy.attack(hero);
+        hero.poisoned = false
+        enemy.attack(hero)
     } else {
-        var choice = io.input("Enter \(hero.name)'s choice (A: attack, D: defend)> ").toupper();
+        var choice = io.input("Enter \(hero.name)'s choice (A: attack, D: defend)> ").toupper()
 
         if choice == "A" {
-            hero.attack(enemy);
+            hero.attack(enemy)
             if !enemy.is_alive() {
-                break;
+                break
             }
         } else if choice == "D" {
-            hero.defend();
+            hero.defend()
         } else {
-            io.println("ERROR: invalid choice! skipping \(hero.name)'s turn.");
+            io.println("ERROR: invalid choice! skipping \(hero.name)'s turn.")
         }
 
         # Enemy will either attack or poison the hero based on a 50-50 chance
         if math.random() >= 0.5 {
-            enemy.poison(hero);
+            enemy.poison(hero)
         } else {
-            enemy.attack(hero);
+            enemy.attack(hero)
         }
     }
 }
 
 if hero.is_alive() {
-    io.println("\(hero.name) won!");
+    io.println("\(hero.name) won!")
 } else {
-    io.println("\(hero.name) lost :(");
+    io.println("\(hero.name) lost :(")
 }
 ```
 
@@ -952,30 +952,30 @@ constructor failed. Any other return value is strictly forbidden, however.
 class Logger {
     init(path) {
         # io.Writer is a core C class that handles writeable files. It can fail
-        this.file = io.Writer(path);
+        this.file = io.Writer(path)
         if !this.file {
             # Could not create logger file, return 'nil' to indicate failure
-            return nil;
+            return nil
         }
     }
 
     write(s) {
         # os.clock() returns the current monotonic time in seconds as a
         # floating point number
-        this.file.writeln("\(os.clock()): \(s)");
+        this.file.writeln("\(os.clock()): \(s)")
     }
 }
 
-var logger = Logger("log.txt");
+var logger = Logger("log.txt")
 if !logger {
     # io.eprintln() prints to standard error
-    io.eprintln("Error: could not create logger");
+    io.eprintln("Error: could not create logger")
 
     # os.exit() exits the program with the provided exit code
-    os.exit(1);
+    os.exit(1)
 }
 
-logger.write("Hello, world!");
+logger.write("Hello, world!")
 ```
 
 ### How to know if a class can fail?
@@ -985,21 +985,21 @@ Just print the class.
 class Foo {
     init(x) {
         if x == 69 {
-            return nil;
+            return nil
         }
 
-        this.x = x;
+        this.x = x
     }
 }
 
 class Bar {
     init(x) {
-        this.x = x;
+        this.x = x
     }
 }
 
-io.println(Foo);
-io.println(Bar);
+io.println(Foo)
+io.println(Bar)
 ```
 
 ```console
@@ -1020,7 +1020,7 @@ class Lol {
     baz() {}
 }
 
-io.println(Lol);
+io.println(Lol)
 ```
 
 ```console
@@ -1034,7 +1034,7 @@ class Lol {
 
 ## Panic
 ```bs
-panic();
+panic()
 ```
 
 ```console
@@ -1045,7 +1045,7 @@ panic/panic.bs:1:1: panic
 An optional message can also be provided.
 
 ```bs
-panic("TODO");
+panic("TODO")
 ```
 
 ```console
@@ -1055,8 +1055,8 @@ panic/panic.bs:1:1: TODO
 
 ## Assert
 ```bs
-assert(true);
-assert(false);
+assert(true)
+assert(false)
 ```
 
 ```console
@@ -1067,8 +1067,8 @@ assert.bs:2:1: assertion failed
 An optional message can also be provided.
 
 ```bs
-assert(true, "Ligma");
-assert(false, "Ligma");
+assert(true, "Ligma")
+assert(false, "Ligma")
 ```
 
 ```console
@@ -1079,8 +1079,8 @@ assert.bs:2:1: Ligma
 Assert returns the value being checked.
 
 ```bs
-var x = assert(69, "Ligma");
-io.println(x);
+var x = assert(69, "Ligma")
+io.println(x)
 ```
 
 ```console
@@ -1137,9 +1137,9 @@ Finally, load it from BS.
 ```bs
 # ffi.bs
 
-var arith = import("arithmetic");
-io.println(arith.add(34, 35));
-io.println(arith.sub(500, 80));
+var arith = import("arithmetic")
+io.println(arith.add(34, 35))
+io.println(arith.sub(500, 80))
 ```
 
 ```console
@@ -1247,14 +1247,14 @@ $ cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib        # On Windows
 Finally, load it from BS.
 
 ```bs
-var rl = import("raylib");
+var rl = import("raylib")
 
-rl.init_window(800, 600, "Hello from BS!");
+rl.init_window(800, 600, "Hello from BS!")
 while !rl.window_should_close() {
-    rl.begin_drawing();
-    rl.clear_background(0x282828FF);
-    rl.draw_text("Hello world!", 50, 50, 50, 0xD4BE98FF);
-    rl.end_drawing();
+    rl.begin_drawing()
+    rl.clear_background(0x282828FF)
+    rl.draw_text("Hello world!", 50, 50, 50, 0xD4BE98FF)
+    rl.end_drawing()
 }
-rl.close_window();
+rl.close_window()
 ```

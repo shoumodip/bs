@@ -1,27 +1,27 @@
 fn outer(x) {
     fn set(nx) {
-        x = nx;
+        x = nx
     }
 
     fn show() {
-        io.println("Captured value is \(x)!");
+        io.println("Captured value is \(x)!")
     }
 
     return {
         get = fn () {
-            return x;
+            return x
         },
 
         set = set,
         show = show
-    };
+    }
 }
 
-var v = outer(69);
-io.println(v.get());
+var v = outer(69)
+io.println(v.get())
 
-v.set(420);
-io.println(v.get());
+v.set(420)
+io.println(v.get())
 
-v.set(69);
-v.show();
+v.set(69)
+v.show()

@@ -1,15 +1,15 @@
-var board = [].resize(30).fill(0);
-board[len(board) - 2] = 1;
+var board = [].resize(30).fill(0)
+board[len(board) - 2] = 1
 
 for i in 0, len(board) - 2 {
     for _, j in board {
-        io.print(if j != 0 then "*" else " ");
+        io.print(if j != 0 then "*" else " ")
     }
-    io.println();
+    io.println()
 
-    var pattern = (board[0] << 1) | board[1];
+    var pattern = (board[0] << 1) | board[1]
     for j in 1, len(board) - 1 {
-        pattern = ((pattern << 1) & 7) | board[j + 1];
-        board[j] = (110 >> pattern) & 1;
+        pattern = ((pattern << 1) & 7) | board[j + 1]
+        board[j] = (110 >> pattern) & 1
     }
 }

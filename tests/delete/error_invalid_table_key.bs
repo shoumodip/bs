@@ -1,2 +1,2 @@
-var xs = {};
-delete(xs[nil]);
+var xs = {}
+delete(xs[nil])

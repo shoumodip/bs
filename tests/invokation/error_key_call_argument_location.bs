@@ -1,5 +1,5 @@
 var t = {
     f = "".slice
-};
+}
 
-t.f(nil, 0);
+t.f(nil, 0)

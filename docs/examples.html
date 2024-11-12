@@ -37,22 +37,22 @@ The UNIX <code>cat</code> coreutil.
 <pre class='code active'>
 <span class='comment'># cat.bs</span>
 
-<span class='keyword'>var</span> code = <span class='constant'>0</span>;
+<span class='keyword'>var</span> code = <span class='constant'>0</span>
 
 <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>1</span>, <span class='keyword'>len</span>(os.<span class='field'>args</span>) {
-    <span class='keyword'>var</span> path = os.<span class='field'>args</span>[i];
-    <span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(path);
+    <span class='keyword'>var</span> path = os.<span class='field'>args</span>[i]
+    <span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(path)
     <span class='keyword'>if</span> !f {
-        io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file '</span><span class='escape'>\</span><span class='escape'>(</span>path<span class='escape'>)</span><span class='string'>'"</span>);
-        code = <span class='constant'>1</span>;
-        <span class='keyword'>continue</span>;
+        io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file '</span><span class='escape'>\</span><span class='escape'>(</span>path<span class='escape'>)</span><span class='string'>'"</span>)
+        code = <span class='constant'>1</span>
+        <span class='keyword'>continue</span>
     }
 
-    io.<span class='field'>print</span>(f.<span class='field'>read</span>());
-    f.<span class='field'>close</span>();
+    io.<span class='field'>print</span>(f.<span class='field'>read</span>())
+    f.<span class='field'>close</span>()
 }
 
-os.<span class='field'>exit</span>(code);
+os.<span class='field'>exit</span>(code)
 </pre>
 </pre>
 </div>
@@ -69,23 +69,22 @@ os.<span class='field'>exit</span>(code);
 </button>
 <pre class='code active'>
 <span class='constant'>$ </span>bs cat.bs cat.bs <span class='comment'># Poor man's quine</span>
-var code = 0;
+var code = 0
 
 for i in 1, len(os.args) {
-    var path = os.args[i];
-    var f = io.Reader(path);
+    var path = os.args[i]
+    var f = io.Reader(path)
     if !f {
-        io.eprintln("Error: could not read file '\(path)'");
-        code = 1;
-        continue;
+        io.eprintln("Error: could not read file '\(path)'")
+        code = 1
+        continue
     }
 
-    io.print(f.read());
-
-    f.close();
+    io.print(f.read())
+    f.close()
 }
 
-os.exit(code);
+os.exit(code)
 </pre>
 </div>
 </section>
@@ -109,52 +108,52 @@ The UNIX <code>grep</code> coreutil.
 <span class='comment'># grep.bs</span>
 
 <span class='keyword'>fn</span> <span class='function'>grep</span>(f, path, pattern) {
-    <span class='keyword'>var</span> row = <span class='constant'>0</span>;
+    <span class='keyword'>var</span> row = <span class='constant'>0</span>
     <span class='keyword'>while</span> !f.<span class='field'>eof</span>() {
-        <span class='keyword'>var</span> line = f.<span class='field'>readln</span>();
+        <span class='keyword'>var</span> line = f.<span class='field'>readln</span>()
 
-        <span class='keyword'>var</span> col = line.<span class='field'>find</span>(pattern);
+        <span class='keyword'>var</span> col = line.<span class='field'>find</span>(pattern)
         <span class='keyword'>if</span> col {
-            io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span>path<span class='escape'>)</span><span class='string'>:</span><span class='escape'>\</span><span class='escape'>(</span>row + <span class='constant'>1</span><span class='escape'>)</span><span class='string'>:</span><span class='escape'>\</span><span class='escape'>(</span>col + <span class='constant'>1</span><span class='escape'>)</span><span class='string'>: </span><span class='escape'>\</span><span class='escape'>(</span>line<span class='escape'>)</span><span class='string'>"</span>);
+            io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span>path<span class='escape'>)</span><span class='string'>:</span><span class='escape'>\</span><span class='escape'>(</span>row + <span class='constant'>1</span><span class='escape'>)</span><span class='string'>:</span><span class='escape'>\</span><span class='escape'>(</span>col + <span class='constant'>1</span><span class='escape'>)</span><span class='string'>: </span><span class='escape'>\</span><span class='escape'>(</span>line<span class='escape'>)</span><span class='string'>"</span>)
         }
 
-        row += <span class='constant'>1</span>;
+        row += <span class='constant'>1</span>
     }
 }
 
 <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>2</span> {
-    io.<span class='field'>eprintln</span>(<span class='string'>"Usage: </span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>0</span>]<span class='escape'>)</span><span class='string'> &lt;pattern&gt; [file...]"</span>);
-    io.<span class='field'>eprintln</span>(<span class='string'>"Error: pattern not provided"</span>);
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+    io.<span class='field'>eprintln</span>(<span class='string'>"Usage: </span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>0</span>]<span class='escape'>)</span><span class='string'> &lt;pattern&gt; [file...]"</span>)
+    io.<span class='field'>eprintln</span>(<span class='string'>"Error: pattern not provided"</span>)
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
 }
 
-<span class='keyword'>var</span> pattern = Regex(os.<span class='field'>args</span>[<span class='constant'>1</span>]);
+<span class='keyword'>var</span> pattern = Regex(os.<span class='field'>args</span>[<span class='constant'>1</span>])
 <span class='keyword'>if</span> !pattern {
-    io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid pattern"</span>);
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+    io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid pattern"</span>)
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
 }
 
 <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) == <span class='constant'>2</span> {
-    <span class='keyword'>return</span> grep(io.<span class='field'>stdin</span>, <span class='string'>"&lt;stdin&gt;"</span>, pattern);
+    <span class='keyword'>return</span> grep(io.<span class='field'>stdin</span>, <span class='string'>"&lt;stdin&gt;"</span>, pattern)
 }
 
-<span class='keyword'>var</span> code = <span class='constant'>0</span>;
+<span class='keyword'>var</span> code = <span class='constant'>0</span>
 
 <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>2</span>, <span class='keyword'>len</span>(os.<span class='field'>args</span>) {
-    <span class='keyword'>var</span> path = os.<span class='field'>args</span>[i];
+    <span class='keyword'>var</span> path = os.<span class='field'>args</span>[i]
 
-    <span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(path);
+    <span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(path)
     <span class='keyword'>if</span> !f {
-        io.<span class='field'>println</span>(<span class='string'>"Error: could not open file '</span><span class='escape'>\</span><span class='escape'>(</span>path<span class='escape'>)</span><span class='string'>'"</span>);
-        code = <span class='constant'>1</span>;
-        <span class='keyword'>continue</span>;
+        io.<span class='field'>println</span>(<span class='string'>"Error: could not open file '</span><span class='escape'>\</span><span class='escape'>(</span>path<span class='escape'>)</span><span class='string'>'"</span>)
+        code = <span class='constant'>1</span>
+        <span class='keyword'>continue</span>
     }
 
-    grep(f, path, pattern);
-    f.<span class='field'>close</span>();
+    grep(f, path, pattern)
+    f.<span class='field'>close</span>()
 }
 
-os.<span class='field'>exit</span>(code);
+os.<span class='field'>exit</span>(code)
 </pre>
 </pre>
 </div>
@@ -172,33 +171,33 @@ os.<span class='field'>exit</span>(code);
 <pre class='code active'>
 <span class='constant'>$ </span>bs grep.bs '\.[A-z]+\(' grep.bs
 grep.bs:3:13:     while !f.eof() {
-grep.bs:4:21:         var line = f.readln();
-grep.bs:6:23:         var col = line.find(pattern);
-grep.bs:8:15:             io.println("\(path):\(row + 1):\(col + 1): \(line)");
-grep.bs:14:6:     f.close();
-grep.bs:18:7:     io.eprintln("Usage: \(os.args[0]) &lt;pattern&gt; [file...]");
-grep.bs:19:7:     io.eprintln("Error: pattern not provided");
-grep.bs:20:7:     os.exit(1);
-grep.bs:25:7:     io.eprintln("Error: invalid pattern");
-grep.bs:26:7:     os.exit(1);
-grep.bs:38:15:     var f = io.Reader(path);
-grep.bs:40:11:         io.println("Error: could not open file '\(path)'");
-grep.bs:48:3: os.exit(code);
+grep.bs:4:21:         var line = f.readln()
+grep.bs:6:23:         var col = line.find(pattern)
+grep.bs:8:15:             io.println("\(path):\(row + 1):\(col + 1): \(line)")
+grep.bs:14:6:     f.close()
+grep.bs:18:7:     io.eprintln("Usage: \(os.args[0]) &lt;pattern&gt; [file...]")
+grep.bs:19:7:     io.eprintln("Error: pattern not provided")
+grep.bs:20:7:     os.exit(1)
+grep.bs:25:7:     io.eprintln("Error: invalid pattern")
+grep.bs:26:7:     os.exit(1)
+grep.bs:38:15:     var f = io.Reader(path)
+grep.bs:40:11:         io.println("Error: could not open file '\(path)'")
+grep.bs:48:3: os.exit(code)
 
 <span class='constant'>$ </span>cat grep.bs | bs grep.bs '\.[A-z]+\(' <span class='comment'># DON'T CAT INTO GREP!!!</span>
 &lt;stdin&gt;:3:13:     while !f.eof() {
-&lt;stdin&gt;:4:21:         var line = f.readln();
-&lt;stdin&gt;:6:23:         var col = line.find(pattern);
-&lt;stdin&gt;:8:15:             io.println("\(path):\(row + 1):\(col + 1): \(line)");
-&lt;stdin&gt;:16:7:     io.eprintln("Usage: \(os.args[0]) &lt;pattern&gt; [file...]");
-&lt;stdin&gt;:17:7:     io.eprintln("Error: pattern not provided");
-&lt;stdin&gt;:18:7:     os.exit(1);
-&lt;stdin&gt;:23:7:     io.eprintln("Error: invalid pattern");
-&lt;stdin&gt;:24:7:     os.exit(1);
-&lt;stdin&gt;:36:15:     var f = io.Reader(path);
-&lt;stdin&gt;:38:11:         io.println("Error: could not open file '\(path)'");
-&lt;stdin&gt;:44:6:     f.close();
-&lt;stdin&gt;:47:3: os.exit(code);
+&lt;stdin&gt;:4:21:         var line = f.readln()
+&lt;stdin&gt;:6:23:         var col = line.find(pattern)
+&lt;stdin&gt;:8:15:             io.println("\(path):\(row + 1):\(col + 1): \(line)")
+&lt;stdin&gt;:16:7:     io.eprintln("Usage: \(os.args[0]) &lt;pattern&gt; [file...]")
+&lt;stdin&gt;:17:7:     io.eprintln("Error: pattern not provided")
+&lt;stdin&gt;:18:7:     os.exit(1)
+&lt;stdin&gt;:23:7:     io.eprintln("Error: invalid pattern")
+&lt;stdin&gt;:24:7:     os.exit(1)
+&lt;stdin&gt;:36:15:     var f = io.Reader(path)
+&lt;stdin&gt;:38:11:         io.println("Error: could not open file '\(path)'")
+&lt;stdin&gt;:44:6:     f.close()
+&lt;stdin&gt;:47:3: os.exit(code)
 </pre>
 </div>
 </section>
@@ -221,31 +220,31 @@ A simple UNIX shell.
 <pre class='code active'>
 <span class='comment'># shell.bs</span>
 
-<span class='keyword'>var</span> home = os.<span class='field'>getenv</span>(<span class='string'>"HOME"</span>);
+<span class='keyword'>var</span> home = os.<span class='field'>getenv</span>(<span class='string'>"HOME"</span>)
 
 <span class='comment'># Return a pretty current working directory</span>
 <span class='keyword'>fn</span> <span class='function'>pwd</span>() {
-    <span class='keyword'>var</span> cwd = os.<span class='field'>getcwd</span>();
+    <span class='keyword'>var</span> cwd = os.<span class='field'>getcwd</span>()
     <span class='keyword'>if</span> cwd.<span class='field'>prefix</span>(home) {
-        <span class='keyword'>return</span> <span class='string'>"~"</span> ++ cwd.<span class='field'>slice</span>(<span class='keyword'>len</span>(home));
+        <span class='keyword'>return</span> <span class='string'>"~"</span> ++ cwd.<span class='field'>slice</span>(<span class='keyword'>len</span>(home))
     }
 
-    <span class='keyword'>return</span> cwd;
+    <span class='keyword'>return</span> cwd
 }
 
 <span class='comment'># Rawdogging shell lexing with regex any%</span>
-<span class='keyword'>var</span> delim = Regex(<span class='string'>"[ </span><span class='escape'>\n</span><span class='string'></span><span class='escape'>\t</span><span class='string'>]+"</span>);
+<span class='keyword'>var</span> delim = Regex(<span class='string'>"[ </span><span class='escape'>\n</span><span class='string'></span><span class='escape'>\t</span><span class='string'>]+"</span>)
 
 <span class='comment'># Previous working directory</span>
-<span class='keyword'>var</span> previous = <span class='constant'>nil</span>;
+<span class='keyword'>var</span> previous = <span class='constant'>nil</span>
 
 <span class='keyword'>while</span> !io.<span class='field'>stdin</span>.<span class='field'>eof</span>() {
-    <span class='keyword'>var</span> args = io.<span class='field'>input</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span>pwd()<span class='escape'>)</span><span class='string'> $ "</span>).<span class='field'>split</span>(delim);
+    <span class='keyword'>var</span> args = io.<span class='field'>input</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span>pwd()<span class='escape'>)</span><span class='string'> $ "</span>).<span class='field'>split</span>(delim)
     <span class='keyword'>if</span> <span class='keyword'>len</span>(args) == <span class='constant'>0</span> {
-        <span class='keyword'>continue</span>;
+        <span class='keyword'>continue</span>
     }
 
-    <span class='keyword'>var</span> cmd = args[<span class='constant'>0</span>];
+    <span class='keyword'>var</span> cmd = args[<span class='constant'>0</span>]
 
     <span class='comment'># Builtin 'exit'</span>
     <span class='comment'># Usage:</span>
@@ -253,17 +252,17 @@ A simple UNIX shell.
     <span class='comment'>#   exit &lt;CODE&gt;  -&gt; Exits with CODE</span>
     <span class='keyword'>if</span> cmd == <span class='string'>"exit"</span> {
         <span class='keyword'>if</span> <span class='keyword'>len</span>(args) &gt; <span class='constant'>2</span> {
-            io.<span class='field'>eprintln</span>(<span class='string'>"Error: too many arguments to command '</span><span class='escape'>\</span><span class='escape'>(</span>cmd<span class='escape'>)</span><span class='string'>'"</span>);
-            <span class='keyword'>continue</span>;
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: too many arguments to command '</span><span class='escape'>\</span><span class='escape'>(</span>cmd<span class='escape'>)</span><span class='string'>'"</span>)
+            <span class='keyword'>continue</span>
         }
 
-        <span class='keyword'>var</span> code = <span class='keyword'>if</span> <span class='keyword'>len</span>(args) == <span class='constant'>2</span> <span class='keyword'>then</span> args[<span class='constant'>1</span>].<span class='field'>tonumber</span>() <span class='keyword'>else</span> <span class='constant'>0</span>;
+        <span class='keyword'>var</span> code = <span class='keyword'>if</span> <span class='keyword'>len</span>(args) == <span class='constant'>2</span> <span class='keyword'>then</span> args[<span class='constant'>1</span>].<span class='field'>tonumber</span>() <span class='keyword'>else</span> <span class='constant'>0</span>
         <span class='keyword'>if</span> !code {
-            io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid exit code '</span><span class='escape'>\</span><span class='escape'>(</span>args[<span class='constant'>1</span>]<span class='escape'>)</span><span class='string'>'"</span>);
-            <span class='keyword'>continue</span>;
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid exit code '</span><span class='escape'>\</span><span class='escape'>(</span>args[<span class='constant'>1</span>]<span class='escape'>)</span><span class='string'>'"</span>)
+            <span class='keyword'>continue</span>
         }
 
-        os.<span class='field'>exit</span>(code);
+        os.<span class='field'>exit</span>(code)
     }
 
     <span class='comment'># Builtin 'cd'</span>
@@ -273,43 +272,43 @@ A simple UNIX shell.
     <span class='comment'>#   cd -      -&gt; Go to previous location</span>
     <span class='keyword'>if</span> cmd == <span class='string'>"cd"</span> {
         <span class='keyword'>if</span> <span class='keyword'>len</span>(args) &gt; <span class='constant'>2</span> {
-            io.<span class='field'>eprintln</span>(<span class='string'>"Error: too many arguments to command '</span><span class='escape'>\</span><span class='escape'>(</span>cmd<span class='escape'>)</span><span class='string'>'"</span>);
-            <span class='keyword'>continue</span>;
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: too many arguments to command '</span><span class='escape'>\</span><span class='escape'>(</span>cmd<span class='escape'>)</span><span class='string'>'"</span>)
+            <span class='keyword'>continue</span>
         }
 
-        <span class='keyword'>var</span> path = <span class='keyword'>if</span> <span class='keyword'>len</span>(args) == <span class='constant'>2</span> <span class='keyword'>then</span> args[<span class='constant'>1</span>] <span class='keyword'>else</span> <span class='string'>"~"</span>;
+        <span class='keyword'>var</span> path = <span class='keyword'>if</span> <span class='keyword'>len</span>(args) == <span class='constant'>2</span> <span class='keyword'>then</span> args[<span class='constant'>1</span>] <span class='keyword'>else</span> <span class='string'>"~"</span>
         <span class='keyword'>if</span> path == <span class='string'>"-"</span> {
             <span class='keyword'>if</span> !previous {
-                io.<span class='field'>eprintln</span>(<span class='string'>"Error: no previous directory to go into"</span>);
-                <span class='keyword'>continue</span>;
+                io.<span class='field'>eprintln</span>(<span class='string'>"Error: no previous directory to go into"</span>)
+                <span class='keyword'>continue</span>
             }
 
-            path = previous;
+            path = previous
         }
 
         <span class='keyword'>if</span> path.<span class='field'>prefix</span>(<span class='string'>"~"</span>) {
-            path = home ++ path.<span class='field'>slice</span>(<span class='constant'>1</span>);
+            path = home ++ path.<span class='field'>slice</span>(<span class='constant'>1</span>)
         }
 
-        <span class='keyword'>var</span> current = os.<span class='field'>getcwd</span>();
+        <span class='keyword'>var</span> current = os.<span class='field'>getcwd</span>()
         <span class='keyword'>if</span> !os.<span class='field'>setcwd</span>(path) {
-            io.<span class='field'>eprintln</span>(<span class='string'>"Error: the directory '</span><span class='escape'>\</span><span class='escape'>(</span>path<span class='escape'>)</span><span class='string'>' does not exist"</span>);
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: the directory '</span><span class='escape'>\</span><span class='escape'>(</span>path<span class='escape'>)</span><span class='string'>' does not exist"</span>)
         }
 
-        previous = current;
-        <span class='keyword'>continue</span>;
+        previous = current
+        <span class='keyword'>continue</span>
     }
 
-    <span class='keyword'>var</span> p = os.<span class='field'>Process</span>(args);
+    <span class='keyword'>var</span> p = os.<span class='field'>Process</span>(args)
     <span class='keyword'>if</span> !p {
-        io.<span class='field'>eprintln</span>(<span class='string'>"Error: unknown command '</span><span class='escape'>\</span><span class='escape'>(</span>cmd<span class='escape'>)</span><span class='string'>'"</span>);
-        <span class='keyword'>continue</span>;
+        io.<span class='field'>eprintln</span>(<span class='string'>"Error: unknown command '</span><span class='escape'>\</span><span class='escape'>(</span>cmd<span class='escape'>)</span><span class='string'>'"</span>)
+        <span class='keyword'>continue</span>
     }
-    p.<span class='field'>wait</span>();
+    p.<span class='field'>wait</span>()
 }
 
 <span class='comment'># In case of CTRL-d</span>
-io.<span class='field'>println</span>();
+io.<span class='field'>println</span>()
 </pre>
 </pre>
 </div>
@@ -372,19 +371,19 @@ for proof of Turing Completeness.
 <pre class='code active'>
 <span class='comment'># rule110.bs</span>
 
-<span class='keyword'>var</span> board = [].<span class='field'>resize</span>(<span class='constant'>30</span>).<span class='field'>fill</span>(<span class='constant'>0</span>);
-board[<span class='keyword'>len</span>(board) - <span class='constant'>2</span>] = <span class='constant'>1</span>;
+<span class='keyword'>var</span> board = [].<span class='field'>resize</span>(<span class='constant'>30</span>).<span class='field'>fill</span>(<span class='constant'>0</span>)
+board[<span class='keyword'>len</span>(board) - <span class='constant'>2</span>] = <span class='constant'>1</span>
 
 <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='keyword'>len</span>(board) - <span class='constant'>2</span> {
     <span class='keyword'>for</span> _, j <span class='keyword'>in</span> board {
-        io.<span class='field'>print</span>(<span class='keyword'>if</span> j != <span class='constant'>0</span> <span class='keyword'>then</span> <span class='string'>"*"</span> <span class='keyword'>else</span> <span class='string'>" "</span>);
+        io.<span class='field'>print</span>(<span class='keyword'>if</span> j != <span class='constant'>0</span> <span class='keyword'>then</span> <span class='string'>"*"</span> <span class='keyword'>else</span> <span class='string'>" "</span>)
     }
-    io.<span class='field'>println</span>();
+    io.<span class='field'>println</span>()
 
-    <span class='keyword'>var</span> pattern = (board[<span class='constant'>0</span>] &lt;&lt; <span class='constant'>1</span>) | board[<span class='constant'>1</span>];
+    <span class='keyword'>var</span> pattern = (board[<span class='constant'>0</span>] &lt;&lt; <span class='constant'>1</span>) | board[<span class='constant'>1</span>]
     <span class='keyword'>for</span> j <span class='keyword'>in</span> <span class='constant'>1</span>, <span class='keyword'>len</span>(board) - <span class='constant'>1</span> {
-        pattern = ((pattern &lt;&lt; <span class='constant'>1</span>) &amp; <span class='constant'>7</span>) | board[j + <span class='constant'>1</span>];
-        board[j] = (<span class='constant'>110</span> &gt;&gt; pattern) &amp; <span class='constant'>1</span>;
+        pattern = ((pattern &lt;&lt; <span class='constant'>1</span>) &amp; <span class='constant'>7</span>) | board[j + <span class='constant'>1</span>]
+        board[j] = (<span class='constant'>110</span> &gt;&gt; pattern) &amp; <span class='constant'>1</span>
     }
 }
 </pre>
@@ -456,79 +455,79 @@ An implementation of
 
 <span class='keyword'>class</span> <span class='class'>GameOfLife</span> {
     init(width, height) {
-        <span class='constant'>this</span>.<span class='field'>width</span> = width;
-        <span class='constant'>this</span>.<span class='field'>height</span> = height;
+        <span class='constant'>this</span>.<span class='field'>width</span> = width
+        <span class='constant'>this</span>.<span class='field'>height</span> = height
 
-        <span class='constant'>this</span>.<span class='field'>board</span> = [];
-        <span class='constant'>this</span>.<span class='field'>buffer</span> = [];
+        <span class='constant'>this</span>.<span class='field'>board</span> = []
+        <span class='constant'>this</span>.<span class='field'>buffer</span> = []
 
-        <span class='constant'>this</span>.<span class='field'>board</span>.<span class='field'>resize</span>(width * height);
-        <span class='constant'>this</span>.<span class='field'>buffer</span>.<span class='field'>resize</span>(width * height);
+        <span class='constant'>this</span>.<span class='field'>board</span>.<span class='field'>resize</span>(width * height)
+        <span class='constant'>this</span>.<span class='field'>buffer</span>.<span class='field'>resize</span>(width * height)
     }
 
     get(x, y) {
-        x %= <span class='constant'>this</span>.<span class='field'>width</span>;
-        y %= <span class='constant'>this</span>.<span class='field'>height</span>;
-        <span class='keyword'>return</span> <span class='constant'>this</span>.<span class='field'>board</span>[y * <span class='constant'>this</span>.<span class='field'>width</span> + x];
+        x %= <span class='constant'>this</span>.<span class='field'>width</span>
+        y %= <span class='constant'>this</span>.<span class='field'>height</span>
+        <span class='keyword'>return</span> <span class='constant'>this</span>.<span class='field'>board</span>[y * <span class='constant'>this</span>.<span class='field'>width</span> + x]
     }
 
     set(x, y, v) {
-        x %= <span class='constant'>this</span>.<span class='field'>width</span>;
-        y %= <span class='constant'>this</span>.<span class='field'>height</span>;
-        <span class='constant'>this</span>.<span class='field'>board</span>[y * <span class='constant'>this</span>.<span class='field'>width</span> + x] = v;
+        x %= <span class='constant'>this</span>.<span class='field'>width</span>
+        y %= <span class='constant'>this</span>.<span class='field'>height</span>
+        <span class='constant'>this</span>.<span class='field'>board</span>[y * <span class='constant'>this</span>.<span class='field'>width</span> + x] = v
     }
 
     step() {
         <span class='keyword'>fn</span> <span class='function'>set</span>(x, y, v) {
-            x %= <span class='constant'>this</span>.<span class='field'>width</span>;
-            y %= <span class='constant'>this</span>.<span class='field'>height</span>;
-            <span class='constant'>this</span>.<span class='field'>buffer</span>[y * <span class='constant'>this</span>.<span class='field'>width</span> + x] = v;
+            x %= <span class='constant'>this</span>.<span class='field'>width</span>
+            y %= <span class='constant'>this</span>.<span class='field'>height</span>
+            <span class='constant'>this</span>.<span class='field'>buffer</span>[y * <span class='constant'>this</span>.<span class='field'>width</span> + x] = v
         }
 
         <span class='keyword'>fn</span> <span class='function'>nbors</span>(x, y) {
-            <span class='keyword'>var</span> count = <span class='constant'>0</span>;
+            <span class='keyword'>var</span> count = <span class='constant'>0</span>
             <span class='keyword'>for</span> dy <span class='keyword'>in</span> -<span class='constant'>1</span>, <span class='constant'>2</span> {
                 <span class='keyword'>for</span> dx <span class='keyword'>in</span> -<span class='constant'>1</span>, <span class='constant'>2</span> {
                     <span class='keyword'>if</span> dx == <span class='constant'>0</span> &amp;&amp; dy == <span class='constant'>0</span> {
-                        <span class='keyword'>continue</span>;
+                        <span class='keyword'>continue</span>
                     }
 
                     <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>get</span>(x + dx, y + dy) {
-                        count += <span class='constant'>1</span>;
+                        count += <span class='constant'>1</span>
                     }
                 }
             }
-            <span class='keyword'>return</span> count;
+            <span class='keyword'>return</span> count
         }
 
         <span class='keyword'>for</span> y <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>this</span>.<span class='field'>height</span> {
             <span class='keyword'>for</span> x <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>this</span>.<span class='field'>width</span> {
-                <span class='keyword'>var</span> n = nbors(x, y);
+                <span class='keyword'>var</span> n = nbors(x, y)
                 <span class='keyword'>if</span> n == <span class='constant'>2</span> {
-                    set(x, y, <span class='constant'>this</span>.<span class='field'>get</span>(x, y));
+                    set(x, y, <span class='constant'>this</span>.<span class='field'>get</span>(x, y))
                 } <span class='keyword'>else</span> {
-                    set(x, y, n == <span class='constant'>3</span>);
+                    set(x, y, n == <span class='constant'>3</span>)
                 }
             }
         }
 
         <span class='comment'># Swap buffers</span>
-        <span class='keyword'>var</span> t = <span class='constant'>this</span>.<span class='field'>board</span>;
-        <span class='constant'>this</span>.<span class='field'>board</span> = <span class='constant'>this</span>.<span class='field'>buffer</span>;
-        <span class='constant'>this</span>.<span class='field'>buffer</span> = t;
+        <span class='keyword'>var</span> t = <span class='constant'>this</span>.<span class='field'>board</span>
+        <span class='constant'>this</span>.<span class='field'>board</span> = <span class='constant'>this</span>.<span class='field'>buffer</span>
+        <span class='constant'>this</span>.<span class='field'>buffer</span> = t
     }
 
     <span class='comment'># (X, Y) is the center of the glider</span>
     glider(x, y) {
-        <span class='constant'>this</span>.<span class='field'>set</span>(x + <span class='constant'>0</span>, y - <span class='constant'>1</span>, <span class='constant'>true</span>);
-        <span class='constant'>this</span>.<span class='field'>set</span>(x + <span class='constant'>1</span>, y + <span class='constant'>0</span>, <span class='constant'>true</span>);
-        <span class='constant'>this</span>.<span class='field'>set</span>(x - <span class='constant'>1</span>, y + <span class='constant'>1</span>, <span class='constant'>true</span>);
-        <span class='constant'>this</span>.<span class='field'>set</span>(x + <span class='constant'>0</span>, y + <span class='constant'>1</span>, <span class='constant'>true</span>);
-        <span class='constant'>this</span>.<span class='field'>set</span>(x + <span class='constant'>1</span>, y + <span class='constant'>1</span>, <span class='constant'>true</span>);
+        <span class='constant'>this</span>.<span class='field'>set</span>(x + <span class='constant'>0</span>, y - <span class='constant'>1</span>, <span class='constant'>true</span>)
+        <span class='constant'>this</span>.<span class='field'>set</span>(x + <span class='constant'>1</span>, y + <span class='constant'>0</span>, <span class='constant'>true</span>)
+        <span class='constant'>this</span>.<span class='field'>set</span>(x - <span class='constant'>1</span>, y + <span class='constant'>1</span>, <span class='constant'>true</span>)
+        <span class='constant'>this</span>.<span class='field'>set</span>(x + <span class='constant'>0</span>, y + <span class='constant'>1</span>, <span class='constant'>true</span>)
+        <span class='constant'>this</span>.<span class='field'>set</span>(x + <span class='constant'>1</span>, y + <span class='constant'>1</span>, <span class='constant'>true</span>)
     }
 }
 
-<span class='keyword'>return</span> GameOfLife;
+<span class='keyword'>return</span> GameOfLife
 </pre>
 </pre>
 </div>
@@ -548,33 +547,33 @@ An implementation of
 <pre class='code active'>
 <span class='comment'># game_of_life_tui.bs</span>
 
-<span class='keyword'>var</span> GameOfLife = <span class='keyword'>import</span>(<span class='string'>"GameOfLife"</span>);
+<span class='keyword'>var</span> GameOfLife = <span class='keyword'>import</span>(<span class='string'>"GameOfLife"</span>)
 
-<span class='keyword'>var</span> INTERVAL = <span class='constant'>0.1</span>;
+<span class='keyword'>var</span> INTERVAL = <span class='constant'>0.1</span>
 
 <span class='keyword'>class</span> <span class='class'>GameOfLifeTUI</span> &lt; <span class='class'>GameOfLife</span> {
     init(width, height) {
-        <span class='constant'>super</span>.<span class='field'>init</span>(width, height);
+        <span class='constant'>super</span>.<span class='field'>init</span>(width, height)
     }
 
     show() {
         <span class='keyword'>for</span> y <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>this</span>.<span class='field'>height</span> {
             <span class='keyword'>for</span> x <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>this</span>.<span class='field'>width</span> {
-                io.<span class='field'>print</span>(<span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>get</span>(x, y) <span class='keyword'>then</span> <span class='string'>"#"</span> <span class='keyword'>else</span> <span class='string'>"."</span>);
+                io.<span class='field'>print</span>(<span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>get</span>(x, y) <span class='keyword'>then</span> <span class='string'>"#"</span> <span class='keyword'>else</span> <span class='string'>"."</span>)
             }
-            io.<span class='field'>println</span>();
+            io.<span class='field'>println</span>()
         }
     }
 }
 
-<span class='keyword'>var</span> gol = GameOfLifeTUI(<span class='constant'>20</span>, <span class='constant'>10</span>);
-gol.<span class='field'>glider</span>(<span class='constant'>1</span>, <span class='constant'>1</span>);
+<span class='keyword'>var</span> gol = GameOfLifeTUI(<span class='constant'>20</span>, <span class='constant'>10</span>)
+gol.<span class='field'>glider</span>(<span class='constant'>1</span>, <span class='constant'>1</span>)
 
 <span class='keyword'>while</span> <span class='constant'>true</span> {
-    gol.<span class='field'>show</span>();
-    gol.<span class='field'>step</span>();
-    io.<span class='field'>print</span>(<span class='string'>"</span><span class='escape'>\e</span><span class='string'>[</span><span class='escape'>\</span><span class='escape'>(</span>gol.<span class='field'>height</span><span class='escape'>)</span><span class='string'>A</span><span class='escape'>\e</span><span class='string'>[</span><span class='escape'>\</span><span class='escape'>(</span>gol.<span class='field'>width</span><span class='escape'>)</span><span class='string'>D"</span>);
-    os.<span class='field'>sleep</span>(INTERVAL);
+    gol.<span class='field'>show</span>()
+    gol.<span class='field'>step</span>()
+    io.<span class='field'>print</span>(<span class='string'>"</span><span class='escape'>\e</span><span class='string'>[</span><span class='escape'>\</span><span class='escape'>(</span>gol.<span class='field'>height</span><span class='escape'>)</span><span class='string'>A</span><span class='escape'>\e</span><span class='string'>[</span><span class='escape'>\</span><span class='escape'>(</span>gol.<span class='field'>width</span><span class='escape'>)</span><span class='string'>D"</span>)
+    os.<span class='field'>sleep</span>(INTERVAL)
 }
 </pre>
 </pre>
@@ -845,66 +844,66 @@ Compile the raylib module.
 <pre class='code active'>
 <span class='comment'># game_of_life_raylib.bs</span>
 
-<span class='keyword'>var</span> rl = <span class='keyword'>import</span>(<span class='string'>"raylib"</span>);
-<span class='keyword'>var</span> GameOfLife = <span class='keyword'>import</span>(<span class='string'>"GameOfLife"</span>);
+<span class='keyword'>var</span> rl = <span class='keyword'>import</span>(<span class='string'>"raylib"</span>)
+<span class='keyword'>var</span> GameOfLife = <span class='keyword'>import</span>(<span class='string'>"GameOfLife"</span>)
 
-<span class='keyword'>var</span> GRID = <span class='constant'>0x5A524CFF</span>;
-<span class='keyword'>var</span> BACKGROUND = <span class='constant'>0x282828FF</span>;
-<span class='keyword'>var</span> FOREGROUND = <span class='constant'>0x89B482FF</span>;
+<span class='keyword'>var</span> GRID = <span class='constant'>0x5A524CFF</span>
+<span class='keyword'>var</span> BACKGROUND = <span class='constant'>0x282828FF</span>
+<span class='keyword'>var</span> FOREGROUND = <span class='constant'>0x89B482FF</span>
 
-<span class='keyword'>var</span> INTERVAL = <span class='constant'>0.1</span>;
-<span class='keyword'>var</span> FONT_SIZE = <span class='constant'>30</span>;
+<span class='keyword'>var</span> INTERVAL = <span class='constant'>0.1</span>
+<span class='keyword'>var</span> FONT_SIZE = <span class='constant'>30</span>
 
-<span class='keyword'>var</span> width = <span class='constant'>800</span>;
-<span class='keyword'>var</span> height = <span class='constant'>600</span>;
+<span class='keyword'>var</span> width = <span class='constant'>800</span>
+<span class='keyword'>var</span> height = <span class='constant'>600</span>
 
-<span class='keyword'>var</span> cell_size = <span class='constant'>0</span>;
-<span class='keyword'>var</span> padding_x = <span class='constant'>0</span>;
-<span class='keyword'>var</span> padding_y = <span class='constant'>0</span>;
+<span class='keyword'>var</span> cell_size = <span class='constant'>0</span>
+<span class='keyword'>var</span> padding_x = <span class='constant'>0</span>
+<span class='keyword'>var</span> padding_y = <span class='constant'>0</span>
 
 <span class='keyword'>class</span> <span class='class'>GameOfLifeRaylib</span> &lt; <span class='class'>GameOfLife</span> {
     init(width, height) {
-        <span class='constant'>super</span>.<span class='field'>init</span>(width, height);
-        <span class='constant'>this</span>.<span class='field'>clock</span> = <span class='constant'>0</span>;
-        <span class='constant'>this</span>.<span class='field'>paused</span> = <span class='constant'>false</span>;
+        <span class='constant'>super</span>.<span class='field'>init</span>(width, height)
+        <span class='constant'>this</span>.<span class='field'>clock</span> = <span class='constant'>0</span>
+        <span class='constant'>this</span>.<span class='field'>paused</span> = <span class='constant'>false</span>
     }
 
     show() {
-        width = rl.<span class='field'>get_screen_width</span>();
-        height = rl.<span class='field'>get_screen_height</span>() - FONT_SIZE * <span class='constant'>1.2</span>;
+        width = rl.<span class='field'>get_screen_width</span>()
+        height = rl.<span class='field'>get_screen_height</span>() - FONT_SIZE * <span class='constant'>1.2</span>
 
-        <span class='keyword'>var</span> cw = width / <span class='constant'>this</span>.<span class='field'>width</span>;
-        <span class='keyword'>var</span> ch = height / <span class='constant'>this</span>.<span class='field'>height</span>;
-        cell_size = cw.<span class='field'>min</span>(ch);
+        <span class='keyword'>var</span> cw = width / <span class='constant'>this</span>.<span class='field'>width</span>
+        <span class='keyword'>var</span> ch = height / <span class='constant'>this</span>.<span class='field'>height</span>
+        cell_size = cw.<span class='field'>min</span>(ch)
 
-        padding_x = (width - <span class='constant'>this</span>.<span class='field'>width</span> * cell_size) / <span class='constant'>2</span>;
-        padding_y = (height - <span class='constant'>this</span>.<span class='field'>height</span> * cell_size) / <span class='constant'>2</span>;
+        padding_x = (width - <span class='constant'>this</span>.<span class='field'>width</span> * cell_size) / <span class='constant'>2</span>
+        padding_y = (height - <span class='constant'>this</span>.<span class='field'>height</span> * cell_size) / <span class='constant'>2</span>
 
         rl.<span class='field'>draw_rectangle</span>(
             padding_x,
             padding_y,
             <span class='constant'>this</span>.<span class='field'>width</span> * cell_size,
             <span class='constant'>this</span>.<span class='field'>height</span> * cell_size,
-            BACKGROUND);
+            BACKGROUND)
 
         {
-            <span class='keyword'>var</span> label = <span class='string'>"Click to toggle cell, Space to play/pause"</span>;
+            <span class='keyword'>var</span> label = <span class='string'>"Click to toggle cell, Space to play/pause"</span>
             rl.<span class='field'>draw_text</span>(
                 label,
                 (width - rl.<span class='field'>measure_text</span>(label, FONT_SIZE)) / <span class='constant'>2</span>,
                 <span class='constant'>this</span>.<span class='field'>height</span> * cell_size + FONT_SIZE * <span class='constant'>0.1</span>,
                 FONT_SIZE,
-                FOREGROUND);
+                FOREGROUND)
         }
 
         <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>this</span>.<span class='field'>width</span> + <span class='constant'>1</span> {
-            <span class='keyword'>var</span> x = padding_x + i * cell_size;
-            rl.<span class='field'>draw_line</span>(x, <span class='constant'>0</span>, x, <span class='constant'>this</span>.<span class='field'>height</span> * cell_size, GRID);
+            <span class='keyword'>var</span> x = padding_x + i * cell_size
+            rl.<span class='field'>draw_line</span>(x, <span class='constant'>0</span>, x, <span class='constant'>this</span>.<span class='field'>height</span> * cell_size, GRID)
         }
 
         <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>this</span>.<span class='field'>height</span> + <span class='constant'>1</span> {
-            <span class='keyword'>var</span> y = padding_y + i * cell_size;
-            rl.<span class='field'>draw_line</span>(padding_x, y, padding_x + <span class='constant'>this</span>.<span class='field'>width</span> * cell_size, y, GRID);
+            <span class='keyword'>var</span> y = padding_y + i * cell_size
+            rl.<span class='field'>draw_line</span>(padding_x, y, padding_x + <span class='constant'>this</span>.<span class='field'>width</span> * cell_size, y, GRID)
         }
 
         <span class='keyword'>for</span> y <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>this</span>.<span class='field'>height</span> {
@@ -915,48 +914,48 @@ Compile the raylib module.
                         padding_y + y * cell_size,
                         cell_size,
                         cell_size,
-                        FOREGROUND);
+                        FOREGROUND)
                 }
             }
         }
     }
 }
 
-rl.<span class='field'>init_window</span>(width, height, <span class='string'>"Game Of Life"</span>);
-rl.<span class='field'>set_exit_key</span>(ascii.<span class='field'>code</span>(<span class='string'>"Q"</span>));
-rl.<span class='field'>set_config_flags</span>(rl.<span class='field'>FLAG_WINDOW_RESIZABLE</span>);
+rl.<span class='field'>init_window</span>(width, height, <span class='string'>"Game Of Life"</span>)
+rl.<span class='field'>set_exit_key</span>(ascii.<span class='field'>code</span>(<span class='string'>"Q"</span>))
+rl.<span class='field'>set_config_flags</span>(rl.<span class='field'>FLAG_WINDOW_RESIZABLE</span>)
 
-<span class='keyword'>var</span> gol = GameOfLifeRaylib(<span class='constant'>20</span>, <span class='constant'>20</span>);
-gol.<span class='field'>glider</span>(<span class='constant'>2</span>, <span class='constant'>2</span>);
+<span class='keyword'>var</span> gol = GameOfLifeRaylib(<span class='constant'>20</span>, <span class='constant'>20</span>)
+gol.<span class='field'>glider</span>(<span class='constant'>2</span>, <span class='constant'>2</span>)
 
 <span class='keyword'>while</span> !rl.<span class='field'>window_should_close</span>() {
-    rl.<span class='field'>begin_drawing</span>();
-    rl.<span class='field'>clear_background</span>(<span class='constant'>0x181818FF</span>);
+    rl.<span class='field'>begin_drawing</span>()
+    rl.<span class='field'>clear_background</span>(<span class='constant'>0x181818FF</span>)
 
-    gol.<span class='field'>show</span>();
+    gol.<span class='field'>show</span>()
 
     <span class='keyword'>if</span> !gol.<span class='field'>paused</span> {
-        gol.<span class='field'>clock</span> += rl.<span class='field'>get_frame_time</span>();
+        gol.<span class='field'>clock</span> += rl.<span class='field'>get_frame_time</span>()
         <span class='keyword'>if</span> gol.<span class='field'>clock</span> &gt;= INTERVAL {
-            gol.<span class='field'>clock</span> = <span class='constant'>0</span>;
-            gol.<span class='field'>step</span>();
+            gol.<span class='field'>clock</span> = <span class='constant'>0</span>
+            gol.<span class='field'>step</span>()
         }
     }
 
     <span class='keyword'>if</span> rl.<span class='field'>is_key_pressed</span>(ascii.<span class='field'>code</span>(<span class='string'>" "</span>)) {
-        gol.<span class='field'>paused</span> = !gol.<span class='field'>paused</span>;
+        gol.<span class='field'>paused</span> = !gol.<span class='field'>paused</span>
     }
 
     <span class='keyword'>if</span> rl.<span class='field'>is_mouse_button_released</span>(rl.<span class='field'>MOUSE_BUTTON_LEFT</span>) {
-        <span class='keyword'>var</span> x = ((rl.<span class='field'>get_mouse_x</span>() - padding_x) / cell_size).<span class='field'>floor</span>();
-        <span class='keyword'>var</span> y = ((rl.<span class='field'>get_mouse_y</span>() - padding_y) / cell_size).<span class='field'>floor</span>();
-        gol.<span class='field'>set</span>(x, y, !gol.<span class='field'>get</span>(x, y));
+        <span class='keyword'>var</span> x = ((rl.<span class='field'>get_mouse_x</span>() - padding_x) / cell_size).<span class='field'>floor</span>()
+        <span class='keyword'>var</span> y = ((rl.<span class='field'>get_mouse_y</span>() - padding_y) / cell_size).<span class='field'>floor</span>()
+        gol.<span class='field'>set</span>(x, y, !gol.<span class='field'>get</span>(x, y))
     }
 
-    rl.<span class='field'>end_drawing</span>();
+    rl.<span class='field'>end_drawing</span>()
 }
 
-rl.<span class='field'>close_window</span>();
+rl.<span class='field'>close_window</span>()
 </pre>
 </pre>
 </div>
@@ -996,161 +995,167 @@ Run the program.
 <pre class='code active'>
 <span class='comment'># tasks.bs</span>
 
-<span class='keyword'>var</span> TASKS_PATH = os.<span class='field'>getenv</span>(<span class='string'>"HOME"</span>) ++ <span class='string'>"/.tasks"</span>;
+<span class='keyword'>var</span> TASKS_PATH = os.<span class='field'>getenv</span>(<span class='string'>"HOME"</span>) ++ <span class='string'>"/.tasks"</span>
 
 <span class='keyword'>class</span> <span class='class'>Tasks</span> {
     init(path) {
-        <span class='constant'>this</span>.<span class='field'>path</span> = path;
+        <span class='constant'>this</span>.<span class='field'>path</span> = path
 
-        <span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='constant'>this</span>.<span class='field'>path</span>);
+        <span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='constant'>this</span>.<span class='field'>path</span>)
         <span class='keyword'>if</span> f {
-            <span class='constant'>this</span>.<span class='field'>tasks</span> = f.<span class='field'>read</span>().<span class='field'>split</span>(<span class='string'>"</span><span class='escape'>\n</span><span class='string'>"</span>);
-            f.<span class='field'>close</span>();
+            <span class='constant'>this</span>.<span class='field'>tasks</span> = f.<span class='field'>read</span>().<span class='field'>split</span>(<span class='string'>"</span><span class='escape'>\n</span><span class='string'>"</span>)
+            f.<span class='field'>close</span>()
         } <span class='keyword'>else</span> {
-            <span class='constant'>this</span>.<span class='field'>tasks</span> = [];
+            <span class='constant'>this</span>.<span class='field'>tasks</span> = []
         }
     }
 
     add(title) {
-        <span class='constant'>this</span>.<span class='field'>tasks</span>.<span class='field'>push</span>(title);
-        io.<span class='field'>println</span>(<span class='string'>"Added: </span><span class='escape'>\</span><span class='escape'>(</span>title<span class='escape'>)</span><span class='string'>"</span>);
+        <span class='constant'>this</span>.<span class='field'>tasks</span>.<span class='field'>push</span>(title)
+        io.<span class='field'>println</span>(<span class='string'>"Added: </span><span class='escape'>\</span><span class='escape'>(</span>title<span class='escape'>)</span><span class='string'>"</span>)
     }
 
     verify(index) {
-        <span class='keyword'>var</span> total = <span class='keyword'>len</span>(<span class='constant'>this</span>.<span class='field'>tasks</span>);
+        <span class='keyword'>var</span> total = <span class='keyword'>len</span>(<span class='constant'>this</span>.<span class='field'>tasks</span>)
         <span class='keyword'>if</span> index &gt;= total {
-            io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid index '</span><span class='escape'>\</span><span class='escape'>(</span>index<span class='escape'>)</span><span class='string'>'"</span>);
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid index '</span><span class='escape'>\</span><span class='escape'>(</span>index<span class='escape'>)</span><span class='string'>'"</span>)
 
             <span class='keyword'>if</span> total == <span class='constant'>1</span> {
-                io.<span class='field'>eprintln</span>(<span class='string'>"Note: there is currently 1 task"</span>);
+                io.<span class='field'>eprintln</span>(<span class='string'>"Note: there is currently 1 task"</span>)
             } <span class='keyword'>else</span> {
-                io.<span class='field'>eprintln</span>(<span class='string'>"Note: there are currently </span><span class='escape'>\</span><span class='escape'>(</span>total<span class='escape'>)</span><span class='string'> tasks"</span>);
+                io.<span class='field'>eprintln</span>(<span class='string'>"Note: there are currently </span><span class='escape'>\</span><span class='escape'>(</span>total<span class='escape'>)</span><span class='string'> tasks"</span>)
             }
 
-            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>)
         }
     }
 
     done(index) {
-        <span class='constant'>this</span>.<span class='field'>verify</span>(index);
-        <span class='keyword'>var</span> title = <span class='constant'>this</span>.<span class='field'>tasks</span>.<span class='field'>remove</span>(index);
-        io.<span class='field'>println</span>(<span class='string'>"Done #</span><span class='escape'>\</span><span class='escape'>(</span>index<span class='escape'>)</span><span class='string'>: </span><span class='escape'>\</span><span class='escape'>(</span>title<span class='escape'>)</span><span class='string'>"</span>);
+        <span class='constant'>this</span>.<span class='field'>verify</span>(index)
+        <span class='keyword'>var</span> title = <span class='constant'>this</span>.<span class='field'>tasks</span>.<span class='field'>remove</span>(index)
+        io.<span class='field'>println</span>(<span class='string'>"Done #</span><span class='escape'>\</span><span class='escape'>(</span>index<span class='escape'>)</span><span class='string'>: </span><span class='escape'>\</span><span class='escape'>(</span>title<span class='escape'>)</span><span class='string'>"</span>)
     }
 
     edit(index, title) {
-        <span class='constant'>this</span>.<span class='field'>verify</span>(index);
-        <span class='constant'>this</span>.<span class='field'>tasks</span>[index] = title;
-        io.<span class='field'>println</span>(<span class='string'>"Edit #</span><span class='escape'>\</span><span class='escape'>(</span>index<span class='escape'>)</span><span class='string'>: </span><span class='escape'>\</span><span class='escape'>(</span>title<span class='escape'>)</span><span class='string'>"</span>);
+        <span class='constant'>this</span>.<span class='field'>verify</span>(index)
+        <span class='constant'>this</span>.<span class='field'>tasks</span>[index] = title
+        io.<span class='field'>println</span>(<span class='string'>"Edit #</span><span class='escape'>\</span><span class='escape'>(</span>index<span class='escape'>)</span><span class='string'>: </span><span class='escape'>\</span><span class='escape'>(</span>title<span class='escape'>)</span><span class='string'>"</span>)
     }
 
     list(query) {
         <span class='keyword'>for</span> i, t <span class='keyword'>in</span> <span class='constant'>this</span>.<span class='field'>tasks</span> {
             <span class='keyword'>if</span> query &amp;&amp; !t.<span class='field'>find</span>(query) {
-                <span class='keyword'>continue</span>;
+                <span class='keyword'>continue</span>
             }
 
-            io.<span class='field'>println</span>(<span class='string'>"[</span><span class='escape'>\</span><span class='escape'>(</span>i<span class='escape'>)</span><span class='string'>] </span><span class='escape'>\</span><span class='escape'>(</span>t<span class='escape'>)</span><span class='string'>"</span>);
+            io.<span class='field'>println</span>(<span class='string'>"[</span><span class='escape'>\</span><span class='escape'>(</span>i<span class='escape'>)</span><span class='string'>] </span><span class='escape'>\</span><span class='escape'>(</span>t<span class='escape'>)</span><span class='string'>"</span>)
         }
     }
 
     save() {
-        <span class='keyword'>var</span> f = io.<span class='field'>Writer</span>(<span class='constant'>this</span>.<span class='field'>path</span>);
+        <span class='keyword'>var</span> f = io.<span class='field'>Writer</span>(<span class='constant'>this</span>.<span class='field'>path</span>)
         <span class='keyword'>if</span> !f {
-            io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not save tasks to '</span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>this</span>.<span class='field'>path</span><span class='escape'>)</span><span class='string'>'"</span>);
-            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not save tasks to '</span><span class='escape'>\</span><span class='escape'>(</span><span class='constant'>this</span>.<span class='field'>path</span><span class='escape'>)</span><span class='string'>'"</span>)
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>)
         }
 
-        f.<span class='field'>write</span>(<span class='constant'>this</span>.<span class='field'>tasks</span>.<span class='field'>join</span>(<span class='string'>"</span><span class='escape'>\n</span><span class='string'>"</span>));
-        f.<span class='field'>close</span>();
+        f.<span class='field'>write</span>(<span class='constant'>this</span>.<span class='field'>tasks</span>.<span class='field'>join</span>(<span class='string'>"</span><span class='escape'>\n</span><span class='string'>"</span>))
+        f.<span class='field'>close</span>()
     }
 }
 
 <span class='keyword'>fn</span> <span class='function'>usage</span>(f) {
-    f.<span class='field'>writeln</span>(<span class='string'>"Usage: </span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>0</span>]<span class='escape'>)</span><span class='string'> &lt;command&gt; [args...]"</span>);
-    f.<span class='field'>writeln</span>(<span class='string'>"Commands:"</span>);
-    f.<span class='field'>writeln</span>(<span class='string'>"    add  &lt;title&gt;            Add a task"</span>);
-    f.<span class='field'>writeln</span>(<span class='string'>"    done &lt;index&gt;            Mark task as done"</span>);
-    f.<span class='field'>writeln</span>(<span class='string'>"    edit &lt;index&gt; &lt;title&gt;    Edit a task"</span>);
-    f.<span class='field'>writeln</span>(<span class='string'>"    list [query]            List tasks, with optional query"</span>);
+    f.<span class='field'>writeln</span>(<span class='string'>"Usage: </span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>0</span>]<span class='escape'>)</span><span class='string'> &lt;command&gt; [args...]"</span>)
+    f.<span class='field'>writeln</span>(<span class='string'>"Commands:"</span>)
+    f.<span class='field'>writeln</span>(<span class='string'>"    add  &lt;title&gt;            Add a task"</span>)
+    f.<span class='field'>writeln</span>(<span class='string'>"    done &lt;index&gt;            Mark task as done"</span>)
+    f.<span class='field'>writeln</span>(<span class='string'>"    edit &lt;index&gt; &lt;title&gt;    Edit a task"</span>)
+    f.<span class='field'>writeln</span>(<span class='string'>"    list [query]            List tasks, with optional query"</span>)
 }
 
 <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>2</span> {
-    io.<span class='field'>eprintln</span>(<span class='string'>"Error: command not provided"</span>);
-    usage(io.<span class='field'>stderr</span>);
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+    io.<span class='field'>eprintln</span>(<span class='string'>"Error: command not provided"</span>)
+    usage(io.<span class='field'>stderr</span>)
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
 }
 
-<span class='keyword'>var</span> command = os.<span class='field'>args</span>[<span class='constant'>1</span>];
+<span class='keyword'>var</span> command = os.<span class='field'>args</span>[<span class='constant'>1</span>]
 
 <span class='keyword'>if</span> command == <span class='string'>"add"</span> {
     <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>3</span> {
-        io.<span class='field'>eprintln</span>(<span class='string'>"Error: task title not provided"</span>);
-        usage(io.<span class='field'>stderr</span>);
-        os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        io.<span class='field'>eprintln</span>(<span class='string'>"Error: task title not provided"</span>)
+        usage(io.<span class='field'>stderr</span>)
+        os.<span class='field'>exit</span>(<span class='constant'>1</span>)
     }
 
-    <span class='keyword'>var</span> tasks = Tasks(TASKS_PATH);
-    tasks.<span class='field'>add</span>(os.<span class='field'>args</span>[<span class='constant'>2</span>]);
-    tasks.<span class='field'>save</span>();
-    <span class='keyword'>return</span>;
+    <span class='keyword'>var</span> tasks = Tasks(TASKS_PATH)
+    tasks.<span class='field'>add</span>(os.<span class='field'>args</span>[<span class='constant'>2</span>])
+    tasks.<span class='field'>save</span>()
+    <span class='keyword'>return</span>
 }
 
 <span class='keyword'>if</span> command == <span class='string'>"done"</span> {
     <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>3</span> {
-        io.<span class='field'>eprintln</span>(<span class='string'>"Error: task index not provided"</span>);
-        usage(io.<span class='field'>stderr</span>);
-        os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        io.<span class='field'>eprintln</span>(<span class='string'>"Error: task index not provided"</span>)
+        usage(io.<span class='field'>stderr</span>)
+        os.<span class='field'>exit</span>(<span class='constant'>1</span>)
     }
 
-    <span class='keyword'>var</span> index = os.<span class='field'>args</span>[<span class='constant'>2</span>].<span class='field'>tonumber</span>();
+    <span class='keyword'>var</span> index = os.<span class='field'>args</span>[<span class='constant'>2</span>].<span class='field'>tonumber</span>()
     <span class='keyword'>if</span> !index {
-        io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid index '</span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>)</span><span class='string'>'"</span>);
-        os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid index '</span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>)</span><span class='string'>'"</span>)
+        os.<span class='field'>exit</span>(<span class='constant'>1</span>)
     }
 
-    <span class='keyword'>var</span> tasks = Tasks(TASKS_PATH);
-    tasks.<span class='field'>done</span>(index);
-    tasks.<span class='field'>save</span>();
-    <span class='keyword'>return</span>;
+    <span class='keyword'>var</span> tasks = Tasks(TASKS_PATH)
+    tasks.<span class='field'>done</span>(index)
+    tasks.<span class='field'>save</span>()
+    <span class='keyword'>return</span>
 }
 
 <span class='keyword'>if</span> command == <span class='string'>"edit"</span> {
     <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>3</span> {
-        io.<span class='field'>eprintln</span>(<span class='string'>"Error: task index and title not provided"</span>);
-        usage(io.<span class='field'>stderr</span>);
-        os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        io.<span class='field'>eprintln</span>(<span class='string'>"Error: task index and title not provided"</span>)
+        usage(io.<span class='field'>stderr</span>)
+        os.<span class='field'>exit</span>(<span class='constant'>1</span>)
     }
 
-    <span class='keyword'>var</span> index = os.<span class='field'>args</span>[<span class='constant'>2</span>].<span class='field'>tonumber</span>();
+    <span class='keyword'>var</span> index = os.<span class='field'>args</span>[<span class='constant'>2</span>].<span class='field'>tonumber</span>()
     <span class='keyword'>if</span> !index {
-        io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid index '</span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>)</span><span class='string'>'"</span>);
-        os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+        io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid index '</span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>)</span><span class='string'>'"</span>)
+        os.<span class='field'>exit</span>(<span class='constant'>1</span>)
     }
 
-    <span class='keyword'>var</span> tasks = Tasks(TASKS_PATH);
-    tasks.<span class='field'>edit</span>(index, os.<span class='field'>args</span>[<span class='constant'>3</span>]);
-    tasks.<span class='field'>save</span>();
-    <span class='keyword'>return</span>;
+    <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>4</span> {
+        io.<span class='field'>eprintln</span>(<span class='string'>"Error: task title not provided"</span>)
+        usage(io.<span class='field'>stderr</span>)
+        os.<span class='field'>exit</span>(<span class='constant'>1</span>)
+    }
+
+    <span class='keyword'>var</span> tasks = Tasks(TASKS_PATH)
+    tasks.<span class='field'>edit</span>(index, os.<span class='field'>args</span>[<span class='constant'>3</span>])
+    tasks.<span class='field'>save</span>()
+    <span class='keyword'>return</span>
 }
 
 <span class='keyword'>if</span> command == <span class='string'>"list"</span> {
-    <span class='keyword'>var</span> query = <span class='constant'>nil</span>;
+    <span class='keyword'>var</span> query = <span class='constant'>nil</span>
     <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &gt; <span class='constant'>2</span> {
-        query = Regex(os.<span class='field'>args</span>[<span class='constant'>2</span>]);
+        query = Regex(os.<span class='field'>args</span>[<span class='constant'>2</span>])
         <span class='keyword'>if</span> !query {
-            io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid query '</span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>)</span><span class='string'>'"</span>);
-            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid query '</span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>)</span><span class='string'>'"</span>)
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>)
         }
     }
 
-    <span class='keyword'>var</span> tasks = Tasks(TASKS_PATH);
-    tasks.<span class='field'>list</span>(query);
-    <span class='keyword'>return</span>;
+    <span class='keyword'>var</span> tasks = Tasks(TASKS_PATH)
+    tasks.<span class='field'>list</span>(query)
+    <span class='keyword'>return</span>
 }
 
-io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid command '</span><span class='escape'>\</span><span class='escape'>(</span>command<span class='escape'>)</span><span class='string'>'"</span>);
-usage(io.<span class='field'>stderr</span>);
-os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid command '</span><span class='escape'>\</span><span class='escape'>(</span>command<span class='escape'>)</span><span class='string'>'"</span>)
+usage(io.<span class='field'>stderr</span>)
+os.<span class='field'>exit</span>(<span class='constant'>1</span>)
 </pre>
 </pre>
 </div>
@@ -1514,161 +1519,160 @@ Compile the raylib module.
 <pre class='code active'>
 <span class='comment'># flappy_bird.bs</span>
 
-<span class='keyword'>var</span> rl = <span class='keyword'>import</span>(<span class='string'>"raylib"</span>);
-<span class='keyword'>var</span> game = {};
+<span class='keyword'>var</span> rl = <span class='keyword'>import</span>(<span class='string'>"raylib"</span>)
+<span class='keyword'>var</span> game = {}
 
-<span class='keyword'>var</span> WIDTH = <span class='constant'>800</span>;
-<span class='keyword'>var</span> HEIGHT = <span class='constant'>600</span>;
+<span class='keyword'>var</span> WIDTH = <span class='constant'>800</span>
+<span class='keyword'>var</span> HEIGHT = <span class='constant'>600</span>
 
-<span class='keyword'>var</span> GRAVITY = <span class='constant'>0.5</span>;
-<span class='keyword'>var</span> IMPULSE = -<span class='constant'>7</span>;
+<span class='keyword'>var</span> GRAVITY = <span class='constant'>0.5</span>
+<span class='keyword'>var</span> IMPULSE = -<span class='constant'>7</span>
 
-<span class='keyword'>var</span> BIRD_TILT = <span class='constant'>20</span>;
-<span class='keyword'>var</span> BIRD_STARTOFF_SPEED = <span class='constant'>7</span>;
-<span class='keyword'>var</span> BIRD_ANIMATION_SPEED = <span class='constant'>0.2</span>;
+<span class='keyword'>var</span> BIRD_TILT = <span class='constant'>20</span>
+<span class='keyword'>var</span> BIRD_STARTOFF_SPEED = <span class='constant'>7</span>
+<span class='keyword'>var</span> BIRD_ANIMATION_SPEED = <span class='constant'>0.2</span>
 
-<span class='keyword'>var</span> BIRD_MIN_X = <span class='constant'>100</span>;
-<span class='keyword'>var</span> BIRD_MIN_Y = <span class='constant'>50</span>;
+<span class='keyword'>var</span> BIRD_MIN_X = <span class='constant'>100</span>
+<span class='keyword'>var</span> BIRD_MIN_Y = <span class='constant'>50</span>
 
-<span class='keyword'>var</span> PIPE_GAP = <span class='constant'>120</span>;
-<span class='keyword'>var</span> PIPE_SPEED = -<span class='constant'>4</span>;
-<span class='keyword'>var</span> PIPE_SPAWN_DELAY = <span class='constant'>1.5</span>;
-<span class='keyword'>var</span> PIPE_SPAWN_RANGE = HEIGHT / <span class='constant'>5</span>;
+<span class='keyword'>var</span> PIPE_GAP = <span class='constant'>120</span>
+<span class='keyword'>var</span> PIPE_SPEED = -<span class='constant'>4</span>
+<span class='keyword'>var</span> PIPE_SPAWN_DELAY = <span class='constant'>1.5</span>
+<span class='keyword'>var</span> PIPE_SPAWN_RANGE = HEIGHT / <span class='constant'>5</span>
 
-<span class='keyword'>var</span> BACKGROUND_SCROLL_SPEED = <span class='constant'>0.5</span>;
+<span class='keyword'>var</span> BACKGROUND_SCROLL_SPEED = <span class='constant'>0.5</span>
 
-<span class='keyword'>var</span> MESSAGE_PADDING = <span class='constant'>30</span>;
-<span class='keyword'>var</span> OVER_MESSAGE_SCALE = <span class='constant'>1.2</span>;
-<span class='keyword'>var</span> TITLE_MESSAGE_SCALE = <span class='constant'>1.2</span>;
-<span class='keyword'>var</span> CONTINUE_MESSAGE_SCALE = <span class='constant'>0.7</span>;
+<span class='keyword'>var</span> MESSAGE_PADDING = <span class='constant'>30</span>
+<span class='keyword'>var</span> OVER_MESSAGE_SCALE = <span class='constant'>1.2</span>
+<span class='keyword'>var</span> TITLE_MESSAGE_SCALE = <span class='constant'>1.2</span>
+<span class='keyword'>var</span> CONTINUE_MESSAGE_SCALE = <span class='constant'>0.7</span>
 
-<span class='keyword'>var</span> BACKGROUND_MUSIC_DELAY = <span class='constant'>1.2</span>;
+<span class='keyword'>var</span> BACKGROUND_MUSIC_DELAY = <span class='constant'>1.2</span>
 
-<span class='keyword'>var</span> DEBUG_COLOR = <span class='constant'>0xFF0000FF</span>;
-<span class='keyword'>var</span> DEBUG_HITBOX = <span class='constant'>false</span>;
+<span class='keyword'>var</span> DEBUG_COLOR = <span class='constant'>0xFF0000FF</span>
+<span class='keyword'>var</span> DEBUG_HITBOX = <span class='constant'>false</span>
 
 <span class='keyword'>class</span> <span class='class'>Assets</span> {
     init() {
-        <span class='constant'>this</span>.<span class='field'>sounds</span> = {};
-        <span class='constant'>this</span>.<span class='field'>textures</span> = {};
+        <span class='constant'>this</span>.<span class='field'>sounds</span> = {}
+        <span class='constant'>this</span>.<span class='field'>textures</span> = {}
     }
 
     sound(path, loader) {
-        path = <span class='string'>"assets/sounds/"</span> ++ path;
+        path = <span class='string'>"assets/sounds/"</span> ++ path
         <span class='keyword'>if</span> path <span class='keyword'>in</span> <span class='constant'>this</span>.<span class='field'>sounds</span> {
-            <span class='keyword'>return</span> <span class='constant'>this</span>.<span class='field'>sounds</span>[path];
+            <span class='keyword'>return</span> <span class='constant'>this</span>.<span class='field'>sounds</span>[path]
         }
 
-        <span class='keyword'>var</span> sound = loader(path);
+        <span class='keyword'>var</span> sound = loader(path)
         <span class='keyword'>if</span> !sound {
-            io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not load sound '</span><span class='escape'>\</span><span class='escape'>(</span>path<span class='escape'>)</span><span class='string'>'"</span>);
-            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not load sound '</span><span class='escape'>\</span><span class='escape'>(</span>path<span class='escape'>)</span><span class='string'>'"</span>)
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>)
         }
 
-        <span class='constant'>this</span>.<span class='field'>sounds</span>[path] = sound;
-        <span class='keyword'>return</span> sound;
+        <span class='constant'>this</span>.<span class='field'>sounds</span>[path] = sound
+        <span class='keyword'>return</span> sound
     }
 
     texture(path) {
-        path = <span class='string'>"assets/images/"</span> ++ path;
+        path = <span class='string'>"assets/images/"</span> ++ path
         <span class='keyword'>if</span> path <span class='keyword'>in</span> <span class='constant'>this</span>.<span class='field'>textures</span> {
-            <span class='keyword'>return</span> <span class='constant'>this</span>.<span class='field'>textures</span>[path];
+            <span class='keyword'>return</span> <span class='constant'>this</span>.<span class='field'>textures</span>[path]
         }
 
-        <span class='keyword'>var</span> texture = rl.<span class='field'>Texture</span>(path);
+        <span class='keyword'>var</span> texture = rl.<span class='field'>Texture</span>(path)
         <span class='keyword'>if</span> !texture {
-            io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not load image '</span><span class='escape'>\</span><span class='escape'>(</span>path<span class='escape'>)</span><span class='string'>'"</span>);
-            os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not load image '</span><span class='escape'>\</span><span class='escape'>(</span>path<span class='escape'>)</span><span class='string'>'"</span>)
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>)
         }
 
-        <span class='constant'>this</span>.<span class='field'>textures</span>[path] = texture;
-        <span class='keyword'>return</span> texture;
+        <span class='constant'>this</span>.<span class='field'>textures</span>[path] = texture
+        <span class='keyword'>return</span> texture
     }
 
     unload() {
         <span class='keyword'>for</span> _, sound <span class='keyword'>in</span> <span class='constant'>this</span>.<span class='field'>sounds</span> {
-            sound.<span class='field'>unload</span>();
+            sound.<span class='field'>unload</span>()
         }
 
         <span class='keyword'>for</span> _, texture <span class='keyword'>in</span> <span class='constant'>this</span>.<span class='field'>textures</span> {
-            texture.<span class='field'>unload</span>();
+            texture.<span class='field'>unload</span>()
         }
     }
 }
 
 <span class='keyword'>class</span> <span class='class'>Hitbox</span> {
     init(x, y, width, height) {
-        <span class='constant'>this</span>.<span class='field'>x</span> = x;
-        <span class='constant'>this</span>.<span class='field'>y</span> = y;
-        <span class='constant'>this</span>.<span class='field'>width</span> = width;
-        <span class='constant'>this</span>.<span class='field'>height</span> = height;
+        <span class='constant'>this</span>.<span class='field'>x</span> = x
+        <span class='constant'>this</span>.<span class='field'>y</span> = y
+        <span class='constant'>this</span>.<span class='field'>width</span> = width
+        <span class='constant'>this</span>.<span class='field'>height</span> = height
     }
 
     move(x, y) {
-        <span class='constant'>this</span>.<span class='field'>x</span> = x;
-        <span class='constant'>this</span>.<span class='field'>y</span> = y;
+        <span class='constant'>this</span>.<span class='field'>x</span> = x
+        <span class='constant'>this</span>.<span class='field'>y</span> = y
     }
 
     debug() {
         <span class='keyword'>if</span> DEBUG_HITBOX {
-            rl.<span class='field'>draw_rectangle</span>(<span class='constant'>this</span>.<span class='field'>x</span>, <span class='constant'>this</span>.<span class='field'>y</span>, <span class='constant'>this</span>.<span class='field'>width</span>, <span class='constant'>this</span>.<span class='field'>height</span>, DEBUG_COLOR);
+            rl.<span class='field'>draw_rectangle</span>(<span class='constant'>this</span>.<span class='field'>x</span>, <span class='constant'>this</span>.<span class='field'>y</span>, <span class='constant'>this</span>.<span class='field'>width</span>, <span class='constant'>this</span>.<span class='field'>height</span>, DEBUG_COLOR)
         }
     }
 
     collides(that) {
-        <span class='keyword'>return</span>
-            <span class='constant'>this</span>.<span class='field'>x</span> &lt; that.<span class='field'>x</span> + that.<span class='field'>width</span> &amp;&amp; <span class='constant'>this</span>.<span class='field'>x</span> + <span class='constant'>this</span>.<span class='field'>width</span> &gt; that.<span class='field'>x</span> &amp;&amp;
-            <span class='constant'>this</span>.<span class='field'>y</span> &lt; that.<span class='field'>y</span> + that.<span class='field'>height</span> &amp;&amp; <span class='constant'>this</span>.<span class='field'>y</span> + <span class='constant'>this</span>.<span class='field'>height</span> &gt; that.<span class='field'>y</span>;
+        <span class='keyword'>return</span> <span class='constant'>this</span>.<span class='field'>x</span> &lt; that.<span class='field'>x</span> + that.<span class='field'>width</span> &amp;&amp; <span class='constant'>this</span>.<span class='field'>x</span> + <span class='constant'>this</span>.<span class='field'>width</span> &gt; that.<span class='field'>x</span> &amp;&amp;
+            <span class='constant'>this</span>.<span class='field'>y</span> &lt; that.<span class='field'>y</span> + that.<span class='field'>height</span> &amp;&amp; <span class='constant'>this</span>.<span class='field'>y</span> + <span class='constant'>this</span>.<span class='field'>height</span> &gt; that.<span class='field'>y</span>
     }
 }
 
 <span class='keyword'>class</span> <span class='class'>Bird</span> {
     init() {
-        <span class='constant'>this</span>.<span class='field'>dy</span> = <span class='constant'>0</span>;
-        <span class='constant'>this</span>.<span class='field'>current</span> = <span class='constant'>0</span>;
+        <span class='constant'>this</span>.<span class='field'>dy</span> = <span class='constant'>0</span>
+        <span class='constant'>this</span>.<span class='field'>current</span> = <span class='constant'>0</span>
         <span class='constant'>this</span>.<span class='field'>textures</span> = [
             game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"bird0.png"</span>),
             game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"bird1.png"</span>),
             game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"bird2.png"</span>),
-        ];
+        ]
 
-        <span class='keyword'>var</span> w = <span class='constant'>this</span>.<span class='field'>textures</span>[<span class='constant'>0</span>].<span class='field'>width</span>() * game.<span class='field'>scale</span>;
-        <span class='keyword'>var</span> h = <span class='constant'>this</span>.<span class='field'>textures</span>[<span class='constant'>0</span>].<span class='field'>height</span>() * game.<span class='field'>scale</span>;
-        <span class='constant'>this</span>.<span class='field'>hitbox</span> = Hitbox((WIDTH - w) / <span class='constant'>2</span>, HEIGHT / <span class='constant'>3</span>, w, h);
+        <span class='keyword'>var</span> w = <span class='constant'>this</span>.<span class='field'>textures</span>[<span class='constant'>0</span>].<span class='field'>width</span>() * game.<span class='field'>scale</span>
+        <span class='keyword'>var</span> h = <span class='constant'>this</span>.<span class='field'>textures</span>[<span class='constant'>0</span>].<span class='field'>height</span>() * game.<span class='field'>scale</span>
+        <span class='constant'>this</span>.<span class='field'>hitbox</span> = Hitbox((WIDTH - w) / <span class='constant'>2</span>, HEIGHT / <span class='constant'>3</span>, w, h)
     }
 
     update() {
         <span class='keyword'>if</span> game.<span class='field'>started</span> {
             <span class='keyword'>if</span> !game.<span class='field'>over</span> &amp;&amp; <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>x</span> &gt; BIRD_MIN_X {
-                <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>x</span> -= BIRD_STARTOFF_SPEED;
-                <span class='constant'>this</span>.<span class='field'>dy</span> -= <span class='constant'>0.3</span> * GRAVITY;
+                <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>x</span> -= BIRD_STARTOFF_SPEED
+                <span class='constant'>this</span>.<span class='field'>dy</span> -= <span class='constant'>0.3</span> * GRAVITY
             }
 
-            <span class='keyword'>var</span> needs_dy = !game.<span class='field'>over</span> || <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span> + <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>height</span> * game.<span class='field'>scale</span> &lt; game.<span class='field'>base</span>.<span class='field'>y</span>;
+            <span class='keyword'>var</span> needs_dy = !game.<span class='field'>over</span> || <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span> + <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>height</span> * game.<span class='field'>scale</span> &lt; game.<span class='field'>base</span>.<span class='field'>y</span>
             <span class='keyword'>if</span> needs_dy {
-                <span class='constant'>this</span>.<span class='field'>dy</span> += GRAVITY;
+                <span class='constant'>this</span>.<span class='field'>dy</span> += GRAVITY
             }
 
             <span class='keyword'>if</span> !game.<span class='field'>over</span> &amp;&amp; rl.<span class='field'>is_key_pressed</span>(<span class='constant'>32</span>) {
-                <span class='constant'>this</span>.<span class='field'>dy</span> = IMPULSE;
+                <span class='constant'>this</span>.<span class='field'>dy</span> = IMPULSE
             }
 
             <span class='keyword'>if</span> needs_dy {
-                <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span> += <span class='constant'>this</span>.<span class='field'>dy</span>;
+                <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span> += <span class='constant'>this</span>.<span class='field'>dy</span>
                 <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span> &lt; BIRD_MIN_Y {
-                    <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span> = BIRD_MIN_Y;
+                    <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span> = BIRD_MIN_Y
                 }
             }
 
             <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span> + <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>height</span> &gt;= game.<span class='field'>base</span>.<span class='field'>y</span> {
-                game.<span class='field'>die</span>();
+                game.<span class='field'>die</span>()
             }
         }
 
         <span class='keyword'>if</span> !game.<span class='field'>over</span> {
-            <span class='constant'>this</span>.<span class='field'>current</span> += rl.<span class='field'>get_frame_time</span>();
+            <span class='constant'>this</span>.<span class='field'>current</span> += rl.<span class='field'>get_frame_time</span>()
             <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>current</span> &gt;= BIRD_ANIMATION_SPEED * <span class='keyword'>len</span>(<span class='constant'>this</span>.<span class='field'>textures</span>) {
-                <span class='constant'>this</span>.<span class='field'>current</span> %= BIRD_ANIMATION_SPEED * <span class='keyword'>len</span>(<span class='constant'>this</span>.<span class='field'>textures</span>);
+                <span class='constant'>this</span>.<span class='field'>current</span> %= BIRD_ANIMATION_SPEED * <span class='keyword'>len</span>(<span class='constant'>this</span>.<span class='field'>textures</span>)
             }
         }
 
@@ -1677,77 +1681,77 @@ Compile the raylib module.
             <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span>,
             <span class='constant'>this</span>.<span class='field'>dy</span>.<span class='field'>sign</span>() * BIRD_TILT,
             game.<span class='field'>scale</span>,
-            <span class='constant'>0xFFFFFFFF</span>);
+            <span class='constant'>0xFFFFFFFF</span>)
 
-        <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>debug</span>();
+        <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>debug</span>()
     }
 }
 
 <span class='keyword'>class</span> <span class='class'>Background</span> {
     init() {
-        <span class='constant'>this</span>.<span class='field'>x</span> = <span class='constant'>0</span>;
-        <span class='constant'>this</span>.<span class='field'>texture</span> = game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"background.png"</span>);
-        <span class='constant'>this</span>.<span class='field'>width</span> = <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>width</span>();
-        game.<span class='field'>scale</span> = HEIGHT / <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>height</span>();
+        <span class='constant'>this</span>.<span class='field'>x</span> = <span class='constant'>0</span>
+        <span class='constant'>this</span>.<span class='field'>texture</span> = game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"background.png"</span>)
+        <span class='constant'>this</span>.<span class='field'>width</span> = <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>width</span>()
+        game.<span class='field'>scale</span> = HEIGHT / <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>height</span>()
     }
 
     update() {
         <span class='keyword'>if</span> !game.<span class='field'>over</span> {
-            <span class='constant'>this</span>.<span class='field'>x</span> -= BACKGROUND_SCROLL_SPEED;
+            <span class='constant'>this</span>.<span class='field'>x</span> -= BACKGROUND_SCROLL_SPEED
             <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>x</span> &lt; -<span class='constant'>this</span>.<span class='field'>width</span> {
-                <span class='constant'>this</span>.<span class='field'>x</span> = <span class='constant'>0</span>;
+                <span class='constant'>this</span>.<span class='field'>x</span> = <span class='constant'>0</span>
             }
         }
 
-        <span class='keyword'>var</span> i = <span class='constant'>0</span>;
+        <span class='keyword'>var</span> i = <span class='constant'>0</span>
         <span class='keyword'>while</span> <span class='constant'>this</span>.<span class='field'>x</span> + <span class='constant'>this</span>.<span class='field'>width</span> * i &lt; WIDTH {
-            <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>draw</span>(<span class='constant'>this</span>.<span class='field'>x</span> + <span class='constant'>this</span>.<span class='field'>width</span> * i, <span class='constant'>0</span>, <span class='constant'>0</span>, game.<span class='field'>scale</span>, <span class='constant'>0xFFFFFFFF</span>);
-            i += <span class='constant'>1</span>;
+            <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>draw</span>(<span class='constant'>this</span>.<span class='field'>x</span> + <span class='constant'>this</span>.<span class='field'>width</span> * i, <span class='constant'>0</span>, <span class='constant'>0</span>, game.<span class='field'>scale</span>, <span class='constant'>0xFFFFFFFF</span>)
+            i += <span class='constant'>1</span>
         }
     }
 }
 
 <span class='keyword'>class</span> <span class='class'>Base</span> {
     init() {
-        <span class='constant'>this</span>.<span class='field'>x</span> = <span class='constant'>0</span>;
-        <span class='constant'>this</span>.<span class='field'>texture</span> = game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"base.png"</span>);
-        <span class='constant'>this</span>.<span class='field'>width</span> = <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>width</span>();
-        <span class='constant'>this</span>.<span class='field'>y</span> = HEIGHT - <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>height</span>() * game.<span class='field'>scale</span> * <span class='constant'>0.9</span>;
+        <span class='constant'>this</span>.<span class='field'>x</span> = <span class='constant'>0</span>
+        <span class='constant'>this</span>.<span class='field'>texture</span> = game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"base.png"</span>)
+        <span class='constant'>this</span>.<span class='field'>width</span> = <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>width</span>()
+        <span class='constant'>this</span>.<span class='field'>y</span> = HEIGHT - <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>height</span>() * game.<span class='field'>scale</span> * <span class='constant'>0.9</span>
     }
 
     update() {
         <span class='keyword'>if</span> !game.<span class='field'>over</span> {
-            <span class='constant'>this</span>.<span class='field'>x</span> += PIPE_SPEED;
+            <span class='constant'>this</span>.<span class='field'>x</span> += PIPE_SPEED
             <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>x</span> &lt; -<span class='constant'>this</span>.<span class='field'>width</span> {
-                <span class='constant'>this</span>.<span class='field'>x</span> = <span class='constant'>0</span>;
+                <span class='constant'>this</span>.<span class='field'>x</span> = <span class='constant'>0</span>
             }
         }
 
-        <span class='keyword'>var</span> i = <span class='constant'>0</span>;
+        <span class='keyword'>var</span> i = <span class='constant'>0</span>
         <span class='keyword'>while</span> <span class='constant'>this</span>.<span class='field'>x</span> + <span class='constant'>this</span>.<span class='field'>width</span> * i &lt; WIDTH {
             <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>draw</span>(
                 <span class='constant'>this</span>.<span class='field'>x</span> + <span class='constant'>this</span>.<span class='field'>width</span> * i,
                 <span class='constant'>this</span>.<span class='field'>y</span>,
                 <span class='constant'>0</span>,
                 game.<span class='field'>scale</span>,
-                <span class='constant'>0xFFFFFFFF</span>);
+                <span class='constant'>0xFFFFFFFF</span>)
 
-            i += <span class='constant'>1</span>;
+            i += <span class='constant'>1</span>
         }
     }
 }
 
 <span class='keyword'>class</span> <span class='class'>Pipe</span> {
     init(y) {
-        <span class='constant'>this</span>.<span class='field'>dx</span> = PIPE_SPEED;
-        <span class='constant'>this</span>.<span class='field'>texture</span> = game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"pipe.png"</span>);
+        <span class='constant'>this</span>.<span class='field'>dx</span> = PIPE_SPEED
+        <span class='constant'>this</span>.<span class='field'>texture</span> = game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"pipe.png"</span>)
         <span class='constant'>this</span>.<span class='field'>hitbox</span> = Hitbox(
             WIDTH,
             y,
             <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>width</span>() * game.<span class='field'>scale</span>,
-            <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>height</span>() * game.<span class='field'>scale</span>);
+            <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>height</span>() * game.<span class='field'>scale</span>)
 
-        <span class='constant'>this</span>.<span class='field'>scored</span> = <span class='constant'>false</span>;
+        <span class='constant'>this</span>.<span class='field'>scored</span> = <span class='constant'>false</span>
     }
 
     top() {
@@ -1755,7 +1759,7 @@ Compile the raylib module.
             <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>x</span>,
             <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span> - <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>height</span> / <span class='constant'>2</span>,
             <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>width</span>,
-            <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>height</span>);
+            <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>height</span>)
     }
 
     bottom() {
@@ -1763,67 +1767,67 @@ Compile the raylib module.
             <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>x</span>,
             <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span> + <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>height</span> / <span class='constant'>2</span> + PIPE_GAP,
             <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>width</span>,
-            <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>height</span>);
+            <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>height</span>)
     }
 
     update() {
         <span class='keyword'>if</span> !game.<span class='field'>over</span> {
-            <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>x</span> += <span class='constant'>this</span>.<span class='field'>dx</span>;
+            <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>x</span> += <span class='constant'>this</span>.<span class='field'>dx</span>
             <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>x</span> + <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>width</span> &lt; BIRD_MIN_X &amp;&amp; !<span class='constant'>this</span>.<span class='field'>scored</span> {
-                game.<span class='field'>point</span>();
-                <span class='constant'>this</span>.<span class='field'>scored</span> = <span class='constant'>true</span>;
+                game.<span class='field'>point</span>()
+                <span class='constant'>this</span>.<span class='field'>scored</span> = <span class='constant'>true</span>
             }
         }
 
-        <span class='keyword'>var</span> top = <span class='constant'>this</span>.<span class='field'>top</span>();
-        <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>draw</span>(top.<span class='field'>x</span>, top.<span class='field'>y</span>, <span class='constant'>180</span>, game.<span class='field'>scale</span>, <span class='constant'>0xFFFFFFFF</span>);
+        <span class='keyword'>var</span> top = <span class='constant'>this</span>.<span class='field'>top</span>()
+        <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>draw</span>(top.<span class='field'>x</span>, top.<span class='field'>y</span>, <span class='constant'>180</span>, game.<span class='field'>scale</span>, <span class='constant'>0xFFFFFFFF</span>)
 
-        <span class='keyword'>var</span> bottom = <span class='constant'>this</span>.<span class='field'>bottom</span>();
-        <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>draw</span>(bottom.<span class='field'>x</span>, bottom.<span class='field'>y</span>, <span class='constant'>0</span>, game.<span class='field'>scale</span>, <span class='constant'>0xFFFFFFFF</span>);
+        <span class='keyword'>var</span> bottom = <span class='constant'>this</span>.<span class='field'>bottom</span>()
+        <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='field'>draw</span>(bottom.<span class='field'>x</span>, bottom.<span class='field'>y</span>, <span class='constant'>0</span>, game.<span class='field'>scale</span>, <span class='constant'>0xFFFFFFFF</span>)
 
-        top.<span class='field'>debug</span>();
-        bottom.<span class='field'>debug</span>();
+        top.<span class='field'>debug</span>()
+        bottom.<span class='field'>debug</span>()
     }
 }
 
 <span class='keyword'>class</span> <span class='class'>Pipes</span> {
     init() {
-        <span class='constant'>this</span>.<span class='field'>items</span> = [];
-        <span class='constant'>this</span>.<span class='field'>clock</span> = <span class='constant'>0</span>;
+        <span class='constant'>this</span>.<span class='field'>items</span> = []
+        <span class='constant'>this</span>.<span class='field'>clock</span> = <span class='constant'>0</span>
     }
 
     update() {
         <span class='keyword'>if</span> !game.<span class='field'>started</span> {
-            <span class='keyword'>return</span> <span class='constant'>true</span>;
+            <span class='keyword'>return</span> <span class='constant'>true</span>
         }
 
         <span class='keyword'>if</span> !game.<span class='field'>over</span> {
-            <span class='constant'>this</span>.<span class='field'>clock</span> += rl.<span class='field'>get_frame_time</span>();
+            <span class='constant'>this</span>.<span class='field'>clock</span> += rl.<span class='field'>get_frame_time</span>()
             <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>clock</span> &gt;= PIPE_SPAWN_DELAY {
-                <span class='constant'>this</span>.<span class='field'>items</span>.<span class='field'>push</span>(Pipe(math.<span class='field'>random</span>(-PIPE_SPAWN_RANGE, PIPE_SPAWN_RANGE)));
-                <span class='constant'>this</span>.<span class='field'>clock</span> %= PIPE_SPAWN_DELAY;
+                <span class='constant'>this</span>.<span class='field'>items</span>.<span class='field'>push</span>(Pipe(math.<span class='field'>random</span>(-PIPE_SPAWN_RANGE, PIPE_SPAWN_RANGE)))
+                <span class='constant'>this</span>.<span class='field'>clock</span> %= PIPE_SPAWN_DELAY
             }
 
-            <span class='constant'>this</span>.<span class='field'>items</span> = <span class='constant'>this</span>.<span class='field'>items</span>.<span class='field'>filter</span>(<span class='keyword'>fn</span> (p) =&gt; p.<span class='field'>hitbox</span>.<span class='field'>x</span> &gt;= -p.<span class='field'>hitbox</span>.<span class='field'>width</span>);
+            <span class='constant'>this</span>.<span class='field'>items</span> = <span class='constant'>this</span>.<span class='field'>items</span>.<span class='field'>filter</span>(<span class='keyword'>fn</span> (p) =&gt; p.<span class='field'>hitbox</span>.<span class='field'>x</span> &gt;= -p.<span class='field'>hitbox</span>.<span class='field'>width</span>)
         }
 
         <span class='keyword'>for</span> _, pipe <span class='keyword'>in</span> <span class='constant'>this</span>.<span class='field'>items</span> {
-            pipe.<span class='field'>update</span>();
+            pipe.<span class='field'>update</span>()
             <span class='keyword'>if</span> !game.<span class='field'>over</span> &amp;&amp;
                 (pipe.<span class='field'>top</span>().<span class='field'>collides</span>(game.<span class='field'>bird</span>.<span class='field'>hitbox</span>) ||
                  pipe.<span class='field'>bottom</span>().<span class='field'>collides</span>(game.<span class='field'>bird</span>.<span class='field'>hitbox</span>)) {
-                <span class='keyword'>return</span> <span class='constant'>false</span>;
+                <span class='keyword'>return</span> <span class='constant'>false</span>
             }
         }
 
-        <span class='keyword'>return</span> <span class='constant'>true</span>;
+        <span class='keyword'>return</span> <span class='constant'>true</span>
     }
 }
 
 <span class='keyword'>class</span> <span class='class'>Score</span> {
     init() {
-        <span class='constant'>this</span>.<span class='field'>best</span> = <span class='constant'>nil</span>;
-        <span class='constant'>this</span>.<span class='field'>current</span> = <span class='constant'>0</span>;
+        <span class='constant'>this</span>.<span class='field'>best</span> = <span class='constant'>nil</span>
+        <span class='constant'>this</span>.<span class='field'>current</span> = <span class='constant'>0</span>
         <span class='constant'>this</span>.<span class='field'>textures</span> = [
             game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"0.png"</span>),
             game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"1.png"</span>),
@@ -1835,166 +1839,166 @@ Compile the raylib module.
             game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"7.png"</span>),
             game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"8.png"</span>),
             game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"9.png"</span>),
-        ];
+        ]
     }
 
     reset() {
-        <span class='constant'>this</span>.<span class='field'>current</span> = <span class='constant'>0</span>;
+        <span class='constant'>this</span>.<span class='field'>current</span> = <span class='constant'>0</span>
     }
 
     display() {
         <span class='keyword'>if</span> game.<span class='field'>started</span> {
             <span class='keyword'>fn</span> <span class='function'>show</span>(n, y, scale, tint) {
-                <span class='keyword'>var</span> digits = [];
+                <span class='keyword'>var</span> digits = []
                 <span class='keyword'>if</span> n &lt; <span class='constant'>10</span> {
-                    digits.<span class='field'>push</span>(n);
+                    digits.<span class='field'>push</span>(n)
                 } <span class='keyword'>else</span> {
                     <span class='keyword'>while</span> n != <span class='constant'>0</span> {
-                        digits.<span class='field'>push</span>(n % <span class='constant'>10</span>);
-                        n = (n / <span class='constant'>10</span>).<span class='field'>floor</span>();
+                        digits.<span class='field'>push</span>(n % <span class='constant'>10</span>)
+                        n = (n / <span class='constant'>10</span>).<span class='field'>floor</span>()
                     }
                 }
-                digits.<span class='field'>reverse</span>();
+                digits.<span class='field'>reverse</span>()
 
-                scale *= game.<span class='field'>scale</span>;
-                <span class='keyword'>var</span> width = digits.<span class='field'>reduce</span>(<span class='keyword'>fn</span> (a, b) =&gt; a + <span class='constant'>this</span>.<span class='field'>textures</span>[b].<span class='field'>width</span>() * scale, <span class='constant'>0</span>);
-                <span class='keyword'>var</span> x = (WIDTH - width) / <span class='constant'>2</span>;
+                scale *= game.<span class='field'>scale</span>
+                <span class='keyword'>var</span> width = digits.<span class='field'>reduce</span>(<span class='keyword'>fn</span> (a, b) =&gt; a + <span class='constant'>this</span>.<span class='field'>textures</span>[b].<span class='field'>width</span>() * scale, <span class='constant'>0</span>)
+                <span class='keyword'>var</span> x = (WIDTH - width) / <span class='constant'>2</span>
                 <span class='keyword'>for</span> _, n <span class='keyword'>in</span> digits {
-                    <span class='constant'>this</span>.<span class='field'>textures</span>[n].<span class='field'>draw</span>(x, y, <span class='constant'>0</span>, scale, tint);
-                    x += <span class='constant'>this</span>.<span class='field'>textures</span>[n].<span class='field'>width</span>() * scale;
+                    <span class='constant'>this</span>.<span class='field'>textures</span>[n].<span class='field'>draw</span>(x, y, <span class='constant'>0</span>, scale, tint)
+                    x += <span class='constant'>this</span>.<span class='field'>textures</span>[n].<span class='field'>width</span>() * scale
                 }
             }
 
-            show(<span class='constant'>this</span>.<span class='field'>current</span>, HEIGHT / <span class='constant'>3.6</span>, <span class='constant'>1.0</span>, <span class='constant'>0xFFFFFFFF</span>);
+            show(<span class='constant'>this</span>.<span class='field'>current</span>, HEIGHT / <span class='constant'>3.6</span>, <span class='constant'>1.0</span>, <span class='constant'>0xFFFFFFFF</span>)
             <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>best</span> {
-                show(<span class='constant'>this</span>.<span class='field'>best</span>, HEIGHT / <span class='constant'>2.8</span>, <span class='constant'>0.7</span>, <span class='constant'>0xDDDDDDFF</span>);
+                show(<span class='constant'>this</span>.<span class='field'>best</span>, HEIGHT / <span class='constant'>2.8</span>, <span class='constant'>0.7</span>, <span class='constant'>0xDDDDDDFF</span>)
             }
         }
     }
 }
 
-rl.<span class='field'>init_window</span>(WIDTH, HEIGHT, <span class='string'>"Hello from BS!"</span>);
-rl.<span class='field'>init_audio_device</span>();
-rl.<span class='field'>set_target_fps</span>(<span class='constant'>60</span>);
+rl.<span class='field'>init_window</span>(WIDTH, HEIGHT, <span class='string'>"Hello from BS!"</span>)
+rl.<span class='field'>init_audio_device</span>()
+rl.<span class='field'>set_target_fps</span>(<span class='constant'>60</span>)
 
-game.<span class='field'>assets</span> = Assets();
-game.<span class='field'>started</span> = <span class='constant'>false</span>;
-game.<span class='field'>over</span> = <span class='constant'>false</span>;
+game.<span class='field'>assets</span> = Assets()
+game.<span class='field'>started</span> = <span class='constant'>false</span>
+game.<span class='field'>over</span> = <span class='constant'>false</span>
 
 game.<span class='field'>die</span> = <span class='keyword'>fn</span> () {
     <span class='keyword'>if</span> game.<span class='field'>over</span> {
-        <span class='keyword'>return</span>;
+        <span class='keyword'>return</span>
     }
 
-    game.<span class='field'>over</span> = <span class='constant'>true</span>;
+    game.<span class='field'>over</span> = <span class='constant'>true</span>
     <span class='keyword'>if</span> !game.<span class='field'>score</span>.<span class='field'>best</span> || game.<span class='field'>score</span>.<span class='field'>current</span> &gt; game.<span class='field'>score</span>.<span class='field'>best</span> {
-        game.<span class='field'>score</span>.<span class='field'>best</span> = game.<span class='field'>score</span>.<span class='field'>current</span>;
+        game.<span class='field'>score</span>.<span class='field'>best</span> = game.<span class='field'>score</span>.<span class='field'>current</span>
     }
 
-    game.<span class='field'>die_sound</span>.<span class='field'>play</span>();
-    game.<span class='field'>background_music_delay</span> = BACKGROUND_MUSIC_DELAY;
-};
+    game.<span class='field'>die_sound</span>.<span class='field'>play</span>()
+    game.<span class='field'>background_music_delay</span> = BACKGROUND_MUSIC_DELAY
+}
 
 game.<span class='field'>point</span> = <span class='keyword'>fn</span> () {
-    game.<span class='field'>score</span>.<span class='field'>current</span> += <span class='constant'>1</span>;
-    game.<span class='field'>point_sound</span>.<span class='field'>play</span>();
-};
+    game.<span class='field'>score</span>.<span class='field'>current</span> += <span class='constant'>1</span>
+    game.<span class='field'>point_sound</span>.<span class='field'>play</span>()
+}
 
 game.<span class='field'>start</span> = <span class='keyword'>fn</span> () {
-    game.<span class='field'>start_sound</span>.<span class='field'>play</span>();
-    game.<span class='field'>background_music</span>.<span class='field'>toggle</span>();
-};
+    game.<span class='field'>start_sound</span>.<span class='field'>play</span>()
+    game.<span class='field'>background_music</span>.<span class='field'>toggle</span>()
+}
 
-game.<span class='field'>background</span> = Background();
-game.<span class='field'>base</span> = Base();
-game.<span class='field'>bird</span> = Bird();
-game.<span class='field'>pipes</span> = Pipes();
-game.<span class='field'>score</span> = Score();
+game.<span class='field'>background</span> = Background()
+game.<span class='field'>base</span> = Base()
+game.<span class='field'>bird</span> = Bird()
+game.<span class='field'>pipes</span> = Pipes()
+game.<span class='field'>score</span> = Score()
 
-game.<span class='field'>over_message</span> = game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"gameover.png"</span>);
-game.<span class='field'>title_message</span> = game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"title.png"</span>);
-game.<span class='field'>continue_message</span> = game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"continue.png"</span>);
+game.<span class='field'>over_message</span> = game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"gameover.png"</span>)
+game.<span class='field'>title_message</span> = game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"title.png"</span>)
+game.<span class='field'>continue_message</span> = game.<span class='field'>assets</span>.<span class='field'>texture</span>(<span class='string'>"continue.png"</span>)
 
-game.<span class='field'>die_sound</span> = game.<span class='field'>assets</span>.<span class='field'>sound</span>(<span class='string'>"die.wav"</span>, rl.<span class='field'>Sound</span>);
-game.<span class='field'>point_sound</span> = game.<span class='field'>assets</span>.<span class='field'>sound</span>(<span class='string'>"point.wav"</span>, rl.<span class='field'>Sound</span>);
-game.<span class='field'>start_sound</span> = game.<span class='field'>assets</span>.<span class='field'>sound</span>(<span class='string'>"start.wav"</span>, rl.<span class='field'>Sound</span>);
-game.<span class='field'>background_music</span> = game.<span class='field'>assets</span>.<span class='field'>sound</span>(<span class='string'>"background.mp3"</span>, rl.<span class='field'>Music</span>);
+game.<span class='field'>die_sound</span> = game.<span class='field'>assets</span>.<span class='field'>sound</span>(<span class='string'>"die.wav"</span>, rl.<span class='field'>Sound</span>)
+game.<span class='field'>point_sound</span> = game.<span class='field'>assets</span>.<span class='field'>sound</span>(<span class='string'>"point.wav"</span>, rl.<span class='field'>Sound</span>)
+game.<span class='field'>start_sound</span> = game.<span class='field'>assets</span>.<span class='field'>sound</span>(<span class='string'>"start.wav"</span>, rl.<span class='field'>Sound</span>)
+game.<span class='field'>background_music</span> = game.<span class='field'>assets</span>.<span class='field'>sound</span>(<span class='string'>"background.mp3"</span>, rl.<span class='field'>Music</span>)
 
-game.<span class='field'>background_music_delay</span> = <span class='constant'>0</span>;
+game.<span class='field'>background_music_delay</span> = <span class='constant'>0</span>
 
 <span class='keyword'>while</span> !rl.<span class='field'>window_should_close</span>() {
-    rl.<span class='field'>begin_drawing</span>();
-    game.<span class='field'>background</span>.<span class='field'>update</span>();
+    rl.<span class='field'>begin_drawing</span>()
+    game.<span class='field'>background</span>.<span class='field'>update</span>()
 
     <span class='keyword'>if</span> game.<span class='field'>background_music_delay</span> &gt; <span class='constant'>0</span> {
-        game.<span class='field'>background_music_delay</span> -= rl.<span class='field'>get_frame_time</span>();
+        game.<span class='field'>background_music_delay</span> -= rl.<span class='field'>get_frame_time</span>()
         <span class='keyword'>if</span> game.<span class='field'>background_music_delay</span> &lt;= <span class='constant'>0</span> {
-            game.<span class='field'>background_music</span>.<span class='field'>toggle</span>();
+            game.<span class='field'>background_music</span>.<span class='field'>toggle</span>()
         }
     }
 
-    game.<span class='field'>background_music</span>.<span class='field'>update</span>();
+    game.<span class='field'>background_music</span>.<span class='field'>update</span>()
 
     <span class='keyword'>if</span> !game.<span class='field'>pipes</span>.<span class='field'>update</span>() {
-        game.<span class='field'>die</span>();
+        game.<span class='field'>die</span>()
     }
 
-    game.<span class='field'>base</span>.<span class='field'>update</span>();
-    game.<span class='field'>bird</span>.<span class='field'>update</span>();
+    game.<span class='field'>base</span>.<span class='field'>update</span>()
+    game.<span class='field'>bird</span>.<span class='field'>update</span>()
 
     <span class='keyword'>if</span> !game.<span class='field'>started</span> {
-        <span class='keyword'>var</span> x = (WIDTH - game.<span class='field'>title_message</span>.<span class='field'>width</span>() * TITLE_MESSAGE_SCALE) / <span class='constant'>2</span>;
-        game.<span class='field'>title_message</span>.<span class='field'>draw</span>(x, HEIGHT / <span class='constant'>7</span>, <span class='constant'>0</span>, TITLE_MESSAGE_SCALE, <span class='constant'>0xFFFFFFFF</span>);
+        <span class='keyword'>var</span> x = (WIDTH - game.<span class='field'>title_message</span>.<span class='field'>width</span>() * TITLE_MESSAGE_SCALE) / <span class='constant'>2</span>
+        game.<span class='field'>title_message</span>.<span class='field'>draw</span>(x, HEIGHT / <span class='constant'>7</span>, <span class='constant'>0</span>, TITLE_MESSAGE_SCALE, <span class='constant'>0xFFFFFFFF</span>)
 
-        <span class='keyword'>var</span> x = (WIDTH - game.<span class='field'>continue_message</span>.<span class='field'>width</span>() * CONTINUE_MESSAGE_SCALE) / <span class='constant'>2</span>;
+        <span class='keyword'>var</span> x = (WIDTH - game.<span class='field'>continue_message</span>.<span class='field'>width</span>() * CONTINUE_MESSAGE_SCALE) / <span class='constant'>2</span>
         game.<span class='field'>continue_message</span>.<span class='field'>draw</span>(
             x,
             HEIGHT / <span class='constant'>3</span> + game.<span class='field'>continue_message</span>.<span class='field'>height</span>() * CONTINUE_MESSAGE_SCALE + MESSAGE_PADDING,
             <span class='constant'>0</span>,
             CONTINUE_MESSAGE_SCALE,
-            <span class='constant'>0xFFFFFFFF</span>);
+            <span class='constant'>0xFFFFFFFF</span>)
 
         <span class='keyword'>if</span> rl.<span class='field'>is_key_pressed</span>(<span class='constant'>32</span>) {
-            game.<span class='field'>started</span> = <span class='constant'>true</span>;
-            game.<span class='field'>bird</span>.<span class='field'>dy</span> = IMPULSE;
-            game.<span class='field'>start</span>();
+            game.<span class='field'>started</span> = <span class='constant'>true</span>
+            game.<span class='field'>bird</span>.<span class='field'>dy</span> = IMPULSE
+            game.<span class='field'>start</span>()
         }
     }
 
     <span class='keyword'>if</span> game.<span class='field'>over</span> {
-        <span class='keyword'>var</span> x = (WIDTH - game.<span class='field'>over_message</span>.<span class='field'>width</span>() * OVER_MESSAGE_SCALE) / <span class='constant'>2</span>;
-        game.<span class='field'>over_message</span>.<span class='field'>draw</span>(x, HEIGHT / <span class='constant'>7</span>, <span class='constant'>0</span>, OVER_MESSAGE_SCALE, <span class='constant'>0xFFFFFFFF</span>);
+        <span class='keyword'>var</span> x = (WIDTH - game.<span class='field'>over_message</span>.<span class='field'>width</span>() * OVER_MESSAGE_SCALE) / <span class='constant'>2</span>
+        game.<span class='field'>over_message</span>.<span class='field'>draw</span>(x, HEIGHT / <span class='constant'>7</span>, <span class='constant'>0</span>, OVER_MESSAGE_SCALE, <span class='constant'>0xFFFFFFFF</span>)
 
         <span class='keyword'>if</span> game.<span class='field'>background_music_delay</span> &lt;= <span class='constant'>0</span> {
-            <span class='keyword'>var</span> x = (WIDTH - game.<span class='field'>continue_message</span>.<span class='field'>width</span>() * CONTINUE_MESSAGE_SCALE) / <span class='constant'>2</span>;
+            <span class='keyword'>var</span> x = (WIDTH - game.<span class='field'>continue_message</span>.<span class='field'>width</span>() * CONTINUE_MESSAGE_SCALE) / <span class='constant'>2</span>
             game.<span class='field'>continue_message</span>.<span class='field'>draw</span>(
                 x,
                 HEIGHT / <span class='constant'>3</span> + game.<span class='field'>continue_message</span>.<span class='field'>height</span>() * CONTINUE_MESSAGE_SCALE + MESSAGE_PADDING,
                 <span class='constant'>0</span>,
                 CONTINUE_MESSAGE_SCALE,
-                <span class='constant'>0xFFFFFFFF</span>);
+                <span class='constant'>0xFFFFFFFF</span>)
 
             <span class='keyword'>if</span> rl.<span class='field'>is_key_pressed</span>(<span class='constant'>32</span>) {
-                game.<span class='field'>over</span> = <span class='constant'>false</span>;
-                game.<span class='field'>score</span>.<span class='field'>reset</span>();
+                game.<span class='field'>over</span> = <span class='constant'>false</span>
+                game.<span class='field'>score</span>.<span class='field'>reset</span>()
 
-                game.<span class='field'>bird</span> = Bird();
-                game.<span class='field'>pipes</span> = Pipes();
+                game.<span class='field'>bird</span> = Bird()
+                game.<span class='field'>pipes</span> = Pipes()
 
-                game.<span class='field'>bird</span>.<span class='field'>dy</span> = IMPULSE;
-                game.<span class='field'>start</span>();
+                game.<span class='field'>bird</span>.<span class='field'>dy</span> = IMPULSE
+                game.<span class='field'>start</span>()
             }
         }
     }
 
-    game.<span class='field'>score</span>.<span class='field'>display</span>();
-    rl.<span class='field'>end_drawing</span>();
+    game.<span class='field'>score</span>.<span class='field'>display</span>()
+    rl.<span class='field'>end_drawing</span>()
 }
 
-game.<span class='field'>assets</span>.<span class='field'>unload</span>();
+game.<span class='field'>assets</span>.<span class='field'>unload</span>()
 
-rl.<span class='field'>close_audio_device</span>();
-rl.<span class='field'>close_window</span>();
+rl.<span class='field'>close_audio_device</span>()
+rl.<span class='field'>close_window</span>()
 </pre>
 </pre>
 </div>

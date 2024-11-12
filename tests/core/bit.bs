@@ -1,7 +1,7 @@
-io.println(bit.ceil(7));
-io.println(bit.ceil(8));
-io.println(bit.ceil(9));
+io.println(bit.ceil(7))
+io.println(bit.ceil(8))
+io.println(bit.ceil(9))
 
-io.println(bit.floor(7));
-io.println(bit.floor(8));
-io.println(bit.floor(9));
+io.println(bit.floor(7))
+io.println(bit.floor(8))
+io.println(bit.floor(9))

@@ -7,13 +7,13 @@ A minimal embeddable scripting language with sane defaults and strong typing
 ```bs
 fn factorial(n) {
     if n < 2 {
-        return 1;
+        return 1
     }
 
-    return n * factorial(n - 1);
+    return n * factorial(n - 1)
 }
 
-io.println("5! = \(factorial(5))");
+io.println("5! = \(factorial(5))")
 ```
 
 ```console

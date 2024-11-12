@@ -1,18 +1,18 @@
-var i = 0;
+var i = 0
 while i < 10 {
     if i == 5 {
-        i = i + 1;
-        continue;
+        i = i + 1
+        continue
     }
 
-    io.println(i);
-    i = i + 1;
+    io.println(i)
+    i = i + 1
 }
 
 for i in 10, 0 {
     if i == 6 {
-        continue;
+        continue
     }
 
-    io.println(i);
+    io.println(i)
 }

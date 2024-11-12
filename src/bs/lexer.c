@@ -103,6 +103,7 @@ static_assert(BS_COUNT_TOKENS == 75, "Update bs_lexer_next()");
 Bs_Token bs_lexer_next(Bs_Lexer *l) {
     if (l->peeked) {
         l->peeked = false;
+        l->prev_row = l->buffer.loc.row;
         return l->buffer;
     }
 
@@ -123,6 +124,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
             if (l->comments) {
                 token.type = BS_TOKEN_COMMENT;
                 token.sv.size -= l->sv.size;
+                l->prev_row = token.loc.row;
                 return token;
             }
         } else {
@@ -133,6 +135,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
     token.sv = l->sv;
     token.loc = l->loc;
     if (l->sv.size == 0) {
+        l->prev_row = token.loc.row;
         return token;
     }
 
@@ -150,6 +153,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
         }
 
         token.sv.size -= l->sv.size;
+        l->prev_row = token.loc.row;
         return token;
     }
 
@@ -171,6 +175,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
         }
 
         token.sv.size -= l->sv.size;
+        l->prev_row = token.loc.row;
         return token;
     }
 
@@ -235,10 +240,12 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
             token.type = BS_TOKEN_IS_MAIN_MODULE;
         }
 
+        l->prev_row = token.loc.row;
         return token;
     }
 
     if (bs_lexer_match(l, '"')) {
+        l->prev_row = token.loc.row;
         return bs_lexer_str(l, token.loc);
     }
 
@@ -409,14 +416,22 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
     }
 
     token.sv.size -= l->sv.size;
+    l->prev_row = token.loc.row;
     return token;
 }
 
 Bs_Token bs_lexer_peek(Bs_Lexer *l) {
+    const size_t prev_row = l->prev_row;
     if (!l->peeked) {
         bs_lexer_buffer(l, bs_lexer_next(l));
+        l->prev_row = prev_row;
     }
     return l->buffer;
+}
+
+bool bs_lexer_peek_row(Bs_Lexer *l, Bs_Token *token) {
+    *token = bs_lexer_peek(l);
+    return token->loc.row == l->prev_row;
 }
 
 bool bs_lexer_read(Bs_Lexer *l, Bs_Token_Type type) {

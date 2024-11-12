@@ -1,10 +1,10 @@
-io.println("Deez nuts");
-io.println("Joe " ++ "Mama");
-io.println(69 ++ " Nice!");
-io.println("The truth is \(500 - (40 + 40))");
-io.println("Nested interpolation? \("Are you \("crazy")?")");
-io.println("\(34 + 35) and \(210 * 2). Hehe");
+io.println("Deez nuts")
+io.println("Joe " ++ "Mama")
+io.println(69 ++ " Nice!")
+io.println("The truth is \(500 - (40 + 40))")
+io.println("Nested interpolation? \("Are you \("crazy")?")")
+io.println("\(34 + 35) and \(210 * 2). Hehe")
 
-io.println("foo" == "foo");
-io.println("foo" == "bar");
-io.println("foo" == "foobar");
+io.println("foo" == "foo")
+io.println("foo" == "bar")
+io.println("foo" == "foobar")

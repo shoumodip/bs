@@ -1,155 +1,161 @@
-var TASKS_PATH = os.getenv("HOME") ++ "/.tasks";
+var TASKS_PATH = os.getenv("HOME") ++ "/.tasks"
 
 class Tasks {
     init(path) {
-        this.path = path;
+        this.path = path
 
-        var f = io.Reader(this.path);
+        var f = io.Reader(this.path)
         if f {
-            this.tasks = f.read().split("\n");
-            f.close();
+            this.tasks = f.read().split("\n")
+            f.close()
         } else {
-            this.tasks = [];
+            this.tasks = []
         }
     }
 
     add(title) {
-        this.tasks.push(title);
-        io.println("Added: \(title)");
+        this.tasks.push(title)
+        io.println("Added: \(title)")
     }
 
     verify(index) {
-        var total = len(this.tasks);
+        var total = len(this.tasks)
         if index >= total {
-            io.eprintln("Error: invalid index '\(index)'");
+            io.eprintln("Error: invalid index '\(index)'")
 
             if total == 1 {
-                io.eprintln("Note: there is currently 1 task");
+                io.eprintln("Note: there is currently 1 task")
             } else {
-                io.eprintln("Note: there are currently \(total) tasks");
+                io.eprintln("Note: there are currently \(total) tasks")
             }
 
-            os.exit(1);
+            os.exit(1)
         }
     }
 
     done(index) {
-        this.verify(index);
-        var title = this.tasks.remove(index);
-        io.println("Done #\(index): \(title)");
+        this.verify(index)
+        var title = this.tasks.remove(index)
+        io.println("Done #\(index): \(title)")
     }
 
     edit(index, title) {
-        this.verify(index);
-        this.tasks[index] = title;
-        io.println("Edit #\(index): \(title)");
+        this.verify(index)
+        this.tasks[index] = title
+        io.println("Edit #\(index): \(title)")
     }
 
     list(query) {
         for i, t in this.tasks {
             if query && !t.find(query) {
-                continue;
+                continue
             }
 
-            io.println("[\(i)] \(t)");
+            io.println("[\(i)] \(t)")
         }
     }
 
     save() {
-        var f = io.Writer(this.path);
+        var f = io.Writer(this.path)
         if !f {
-            io.eprintln("Error: could not save tasks to '\(this.path)'");
-            os.exit(1);
+            io.eprintln("Error: could not save tasks to '\(this.path)'")
+            os.exit(1)
         }
 
-        f.write(this.tasks.join("\n"));
-        f.close();
+        f.write(this.tasks.join("\n"))
+        f.close()
     }
 }
 
 fn usage(f) {
-    f.writeln("Usage: \(os.args[0]) <command> [args...]");
-    f.writeln("Commands:");
-    f.writeln("    add  <title>            Add a task");
-    f.writeln("    done <index>            Mark task as done");
-    f.writeln("    edit <index> <title>    Edit a task");
-    f.writeln("    list [query]            List tasks, with optional query");
+    f.writeln("Usage: \(os.args[0]) <command> [args...]")
+    f.writeln("Commands:")
+    f.writeln("    add  <title>            Add a task")
+    f.writeln("    done <index>            Mark task as done")
+    f.writeln("    edit <index> <title>    Edit a task")
+    f.writeln("    list [query]            List tasks, with optional query")
 }
 
 if len(os.args) < 2 {
-    io.eprintln("Error: command not provided");
-    usage(io.stderr);
-    os.exit(1);
+    io.eprintln("Error: command not provided")
+    usage(io.stderr)
+    os.exit(1)
 }
 
-var command = os.args[1];
+var command = os.args[1]
 
 if command == "add" {
     if len(os.args) < 3 {
-        io.eprintln("Error: task title not provided");
-        usage(io.stderr);
-        os.exit(1);
+        io.eprintln("Error: task title not provided")
+        usage(io.stderr)
+        os.exit(1)
     }
 
-    var tasks = Tasks(TASKS_PATH);
-    tasks.add(os.args[2]);
-    tasks.save();
-    return;
+    var tasks = Tasks(TASKS_PATH)
+    tasks.add(os.args[2])
+    tasks.save()
+    return
 }
 
 if command == "done" {
     if len(os.args) < 3 {
-        io.eprintln("Error: task index not provided");
-        usage(io.stderr);
-        os.exit(1);
+        io.eprintln("Error: task index not provided")
+        usage(io.stderr)
+        os.exit(1)
     }
 
-    var index = os.args[2].tonumber();
+    var index = os.args[2].tonumber()
     if !index {
-        io.eprintln("Error: invalid index '\(os.args[2])'");
-        os.exit(1);
+        io.eprintln("Error: invalid index '\(os.args[2])'")
+        os.exit(1)
     }
 
-    var tasks = Tasks(TASKS_PATH);
-    tasks.done(index);
-    tasks.save();
-    return;
+    var tasks = Tasks(TASKS_PATH)
+    tasks.done(index)
+    tasks.save()
+    return
 }
 
 if command == "edit" {
     if len(os.args) < 3 {
-        io.eprintln("Error: task index and title not provided");
-        usage(io.stderr);
-        os.exit(1);
+        io.eprintln("Error: task index and title not provided")
+        usage(io.stderr)
+        os.exit(1)
     }
 
-    var index = os.args[2].tonumber();
+    var index = os.args[2].tonumber()
     if !index {
-        io.eprintln("Error: invalid index '\(os.args[2])'");
-        os.exit(1);
+        io.eprintln("Error: invalid index '\(os.args[2])'")
+        os.exit(1)
     }
 
-    var tasks = Tasks(TASKS_PATH);
-    tasks.edit(index, os.args[3]);
-    tasks.save();
-    return;
+    if len(os.args) < 4 {
+        io.eprintln("Error: task title not provided")
+        usage(io.stderr)
+        os.exit(1)
+    }
+
+    var tasks = Tasks(TASKS_PATH)
+    tasks.edit(index, os.args[3])
+    tasks.save()
+    return
 }
 
 if command == "list" {
-    var query = nil;
+    var query = nil
     if len(os.args) > 2 {
-        query = Regex(os.args[2]);
+        query = Regex(os.args[2])
         if !query {
-            io.eprintln("Error: invalid query '\(os.args[2])'");
-            os.exit(1);
+            io.eprintln("Error: invalid query '\(os.args[2])'")
+            os.exit(1)
         }
     }
 
-    var tasks = Tasks(TASKS_PATH);
-    tasks.list(query);
-    return;
+    var tasks = Tasks(TASKS_PATH)
+    tasks.list(query)
+    return
 }
 
-io.eprintln("Error: invalid command '\(command)'");
-usage(io.stderr);
-os.exit(1);
+io.eprintln("Error: invalid command '\(command)'")
+usage(io.stderr)
+os.exit(1)

@@ -1,7 +1,7 @@
 class Foo {
     init() {
-        -nil;
+        -nil
     }
 }
 
-Foo();
+Foo()

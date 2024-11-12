@@ -1,68 +1,68 @@
 class BankAccount {
     init(holder, balance) {
-        this.holder = holder;
-        this.balance = balance;
-        io.println("[\(holder)] Created new bank account with balance \(balance)");
+        this.holder = holder
+        this.balance = balance
+        io.println("[\(holder)] Created new bank account with balance \(balance)")
     }
 
     deposit(amount) {
-        this.balance = this.balance + amount;
-        io.println("[\(this.holder)] Deposited \(amount). New balance: \(this.balance)");
+        this.balance = this.balance + amount
+        io.println("[\(this.holder)] Deposited \(amount). New balance: \(this.balance)")
     }
 
     withdraw(amount) {
         if amount > this.balance {
-            io.println("[\(this.holder)] Insufficient funds.");
-            return;
+            io.println("[\(this.holder)] Insufficient funds.")
+            return
         }
 
-        this.balance = this.balance - amount;
-        io.println("[\(this.holder)] Withdrew \(amount). New balance: \(this.balance)");
+        this.balance = this.balance - amount
+        io.println("[\(this.holder)] Withdrew \(amount). New balance: \(this.balance)")
     }
 }
 
 class SavingsAccount < BankAccount {
     init(holder, balance, interest_rate) {
-        super.init(holder, balance);
-        this.interest_rate = interest_rate;
-        io.println("[\(holder)] Switched to savings account with interest rate \(interest_rate)");
+        super.init(holder, balance)
+        this.interest_rate = interest_rate
+        io.println("[\(holder)] Switched to savings account with interest rate \(interest_rate)")
     }
 
     deposit(amount) {
-        super.deposit(amount);
-        this.balance = this.balance + this.balance * this.interest_rate;
-        io.println("[\(this.holder)] Applied \(this.interest_rate * 100)% interest. New balance: \(this.balance)");
+        super.deposit(amount)
+        this.balance = this.balance + this.balance * this.interest_rate
+        io.println("[\(this.holder)] Applied \(this.interest_rate * 100)% interest. New balance: \(this.balance)")
     }
 }
 
 class CheckingAccount < BankAccount {
     init(holder, balance, overdraft_limit) {
-        super.init(holder, balance);
-        this.overdraft_limit = overdraft_limit;
-        io.println("[\(holder)] Switched to checking account with overdraft limit \(overdraft_limit)");
+        super.init(holder, balance)
+        this.overdraft_limit = overdraft_limit
+        io.println("[\(holder)] Switched to checking account with overdraft limit \(overdraft_limit)")
     }
 
     withdraw(amount) {
         if amount > this.balance + this.overdraft_limit {
-            io.println("[\(this.holder)] Overdraft limit exceeded");
-            return;
+            io.println("[\(this.holder)] Overdraft limit exceeded")
+            return
         }
 
-        this.balance = this.balance - amount;
-        io.println("[\(this.holder)] Withdrew \(amount). New balance: \(this.balance)");
+        this.balance = this.balance - amount
+        io.println("[\(this.holder)] Withdrew \(amount). New balance: \(this.balance)")
     }
 }
 
-var general = BankAccount("Joe", 69);
-general.deposit(420);
-general.withdraw(69);
+var general = BankAccount("Joe", 69)
+general.deposit(420)
+general.withdraw(69)
 
-var savings = SavingsAccount("Bob", 420, 0.07);
-savings.deposit(69);
-savings.withdraw(420);
+var savings = SavingsAccount("Bob", 420, 0.07)
+savings.deposit(69)
+savings.withdraw(420)
 
-var checking = CheckingAccount("Alice", 420, 420);
-checking.deposit(69);
-checking.withdraw(420);
-checking.withdraw(420);
-checking.withdraw(1337);
+var checking = CheckingAccount("Alice", 420, 420)
+checking.deposit(69)
+checking.withdraw(420)
+checking.withdraw(420)
+checking.withdraw(1337)

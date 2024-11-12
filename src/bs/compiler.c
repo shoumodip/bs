@@ -239,6 +239,10 @@ static void bs_compile_error_unexpected(Bs_Compiler *c, const Bs_Token *token) {
     bs_lexer_error(&c->lexer, token->loc, "unexpected %s", bs_token_type_name(token->type));
 }
 
+static void bs_compile_consume_eol(Bs_Compiler *c) {
+    while (bs_lexer_read(&c->lexer, BS_TOKEN_EOL)) {}
+}
+
 static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Token *name);
 
 static void bs_compile_string(Bs_Compiler *c, Bs_Sv sv) {
@@ -674,9 +678,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         return;
     }
 
-    while (true) {
-        token = bs_lexer_peek(&c->lexer);
-
+    while (bs_lexer_peek_row(&c->lexer, &token)) {
         const Bs_Power lbp = bs_token_type_power(token.type);
         if (lbp <= mbp) {
             break;
@@ -1097,9 +1099,6 @@ static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Toke
     } else {
         c->lexer.peeked = false;
         bs_compile_expr(c, BS_POWER_SET);
-        if (name) {
-            bs_lexer_expect(&c->lexer, BS_TOKEN_EOL);
-        }
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_RET);
     }
 
@@ -1211,7 +1210,6 @@ static void bs_compile_variable(Bs_Compiler *c, bool public) {
     } else {
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
     }
-    bs_lexer_expect(&c->lexer, BS_TOKEN_EOL);
 
     if (public) {
         bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_GDEF, const_index);
@@ -1364,7 +1362,6 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         if (!c->jumps.depth) {
             bs_compile_error_unexpected(c, &token);
         }
-        bs_lexer_expect(&c->lexer, BS_TOKEN_EOL);
 
         bs_compile_block_drop(c, c->jumps.depth);
         bs_jumps_push(c->bs, &c->jumps, c->chunk->count);
@@ -1375,7 +1372,6 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         if (!c->jumps.depth) {
             bs_compile_error_unexpected(c, &token);
         }
-        bs_lexer_expect(&c->lexer, BS_TOKEN_EOL);
 
         bs_compile_block_drop(c, c->jumps.depth);
         bs_compile_jump_direct(c, BS_OP_JUMP, c->jumps.start);
@@ -1418,68 +1414,70 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         break;
 
     case BS_TOKEN_RETURN:
-        token = bs_lexer_peek(&c->lexer);
+        if (bs_lexer_peek_row(&c->lexer, &token) && token.type != BS_TOKEN_EOL &&
+            token.type != BS_TOKEN_EOF) {
+            if (c->lambda->type == BS_LAMBDA_INIT) {
+                const Bs_Loc loc = token.loc;
+                const bool ok = token.type == BS_TOKEN_NIL;
+                c->lexer.peeked = false;
 
-        if (token.type == BS_TOKEN_EOL) {
+                if (!ok) {
+                    bs_lexer_error_full(
+                        &c->lexer,
+                        loc,
+
+                        Bs_Sv_Static(
+                            "When an initializer method explicitly returns 'nil', it "
+                            "indicates that "
+                            "the\n"
+                            "initialization failed due to some reason, and the site of the "
+                            "instantiation\n"
+                            "gets 'nil' as the result. This is not strictly OOP, but I "
+                            "missed the part "
+                            "where\n"
+                            "that's my problem."),
+
+                        Bs_Sv_Static("var f = io.Reader(\"does_not_exist.txt\");\n"
+                                     "if !f {\n"
+                                     "    io.eprintln(\"Error: could not read file!\");\n"
+                                     "    os.exit(1);\n"
+                                     "}\n"
+                                     "\n"
+                                     "io.print(f.read()); # Or whatever you want to do"),
+
+                        "can only explicity return 'nil' from an initializer method");
+                }
+
+                if (bs_lexer_peek_row(&c->lexer, &token) && token.type != BS_TOKEN_EOL) {
+                    bs_compile_error_unexpected(c, &token);
+                }
+
+                c->class->can_fail = true;
+                bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
+            } else {
+                bs_compile_expr(c, BS_POWER_SET);
+            }
+        } else {
             if (c->lambda->type == BS_LAMBDA_INIT) {
                 bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_LRECEIVER, 0);
             } else {
                 bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
             }
-        } else if (c->lambda->type == BS_LAMBDA_INIT) {
-            const Bs_Loc loc = token.loc;
-
-            bool ok = false;
-            if (token.type == BS_TOKEN_NIL) {
-                c->lexer.peeked = false;
-                ok = bs_lexer_peek(&c->lexer).type == BS_TOKEN_EOL;
-            }
-
-            if (ok) {
-                c->class->can_fail = true;
-                bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
-            } else {
-                bs_lexer_error_full(
-                    &c->lexer,
-                    loc,
-
-                    Bs_Sv_Static("When an initializer method explicitly returns 'nil', it "
-                                 "indicates that "
-                                 "the\n"
-                                 "initialization failed due to some reason, and the site of the "
-                                 "instantiation\n"
-                                 "gets 'nil' as the result. This is not strictly OOP, but I "
-                                 "missed the part "
-                                 "where\n"
-                                 "that's my problem."),
-
-                    Bs_Sv_Static("var f = io.Reader(\"does_not_exist.txt\");\n"
-                                 "if !f {\n"
-                                 "    io.eprintln(\"Error: could not read file!\");\n"
-                                 "    os.exit(1);\n"
-                                 "}\n"
-                                 "\n"
-                                 "io.print(f.read()); # Or whatever you want to do"),
-
-                    "can only explicity return 'nil' from an initializer method");
-            }
-        } else {
-            bs_compile_expr(c, BS_POWER_SET);
         }
 
-        bs_lexer_expect(&c->lexer, BS_TOKEN_EOL);
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_RET);
         break;
 
     default:
         bs_lexer_buffer(&c->lexer, token);
         bs_compile_expr(c, BS_POWER_NIL);
-        bs_lexer_expect(&c->lexer, BS_TOKEN_EOL);
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
 
         c->last_stmt_was_expr = c->lambda->is_repl && c->lambda->depth == 1;
         break;
     }
+
+    bs_compile_consume_eol(c);
 }
 
 Bs_Fn *bs_compile_impl(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl) {
@@ -1515,7 +1513,7 @@ Bs_Fn *bs_compile_impl(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_re
     }
 
     while (!bs_lexer_read(&compiler.lexer, BS_TOKEN_EOF)) {
-        while (bs_lexer_read(&compiler.lexer, BS_TOKEN_EOL)) {}
+        bs_compile_consume_eol(&compiler);
         if (bs_lexer_read(&compiler.lexer, BS_TOKEN_EOF)) {
             break;
         }

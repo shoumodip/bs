@@ -1,1 +1,1 @@
-os.Process(["executables/echo_args", "foo", "bar", "baz"]).wait();
+os.Process(["executables/echo_args", "foo", "bar", "baz"]).wait()

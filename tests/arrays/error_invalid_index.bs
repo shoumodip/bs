@@ -1,2 +1,2 @@
-var xs = [];
-xs[false];
+var xs = []
+xs[false]

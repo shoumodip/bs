@@ -1,1 +1,1 @@
-io.println("".slice(nil, 0));
+io.println("".slice(nil, 0))

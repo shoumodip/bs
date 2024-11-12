@@ -1,21 +1,21 @@
 class Foo {
     init() {
-        this.x = 69;
-        this.y = 420;
+        this.x = 69
+        this.y = 420
     }
 }
 
-var foo = Foo();
-io.println(foo);
+var foo = Foo()
+io.println(foo)
 
-io.println(delete(foo.x));
-io.println(foo);
+io.println(delete(foo.x))
+io.println(foo)
 
-io.println(delete(foo.z));
-io.println(foo);
+io.println(delete(foo.z))
+io.println(foo)
 
-io.println(delete(foo["y"]));
-io.println(foo);
+io.println(delete(foo["y"]))
+io.println(foo)
 
-io.println(delete(foo.y));
-io.println(foo);
+io.println(delete(foo.y))
+io.println(foo)

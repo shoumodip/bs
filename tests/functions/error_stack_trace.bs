@@ -1,13 +1,13 @@
 fn baz() {
-    oops;
+    oops
 }
 
 fn bar() {
-    baz();
+    baz()
 }
 
 fn foo() {
-    bar();
+    bar()
 }
 
-foo();
+foo()

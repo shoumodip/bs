@@ -1,37 +1,37 @@
 # Invalid regex
-io.println(Regex("["));
+io.println(Regex("["))
 
 {
-    var r = Regex("");
-    io.println("foo".find(r));
-    io.println("foo".split(r));
-    io.println("foo".replace(r, "bar"));
+    var r = Regex("")
+    io.println("foo".find(r))
+    io.println("foo".split(r))
+    io.println("foo".replace(r, "bar"))
 }
 
 {
-    var r = Regex("[0-9]");
-    io.println("69a".find(r));
-    io.println("69a".find(r, 1));
-    io.println("69a".find(r, 2));
-    io.println("yolol".find(r));
+    var r = Regex("[0-9]")
+    io.println("69a".find(r))
+    io.println("69a".find(r, 1))
+    io.println("69a".find(r, 2))
+    io.println("yolol".find(r))
 }
 
 {
-    var r = Regex(" +");
-    io.println("foobar".split(r));
-    io.println("foo bar".split(r));
-    io.println("foo bar   baz".split(r));
+    var r = Regex(" +")
+    io.println("foobar".split(r))
+    io.println("foo bar".split(r))
+    io.println("foo bar   baz".split(r))
 }
 
 {
-    var r = Regex("([0-9]+) ([a-z]+)");
-    io.println("69 apples, 420 oranges".replace(r, "{type: \\2, count: \\1}"));
-    io.println("69 apples, 420  oranges".replace(r, "{type: \\2, count: \\1}"));
-    io.println("ayo noice!".replace(r, "{type: \\2, count: \\1}"));
+    var r = Regex("([0-9]+) ([a-z]+)")
+    io.println("69 apples, 420 oranges".replace(r, "{type: \\2, count: \\1}"))
+    io.println("69 apples, 420  oranges".replace(r, "{type: \\2, count: \\1}"))
+    io.println("ayo noice!".replace(r, "{type: \\2, count: \\1}"))
 }
 
 {
-    var r = Regex("^,?[0-9]+");
-    io.println("69,420".split(r));
-    io.println("69,420".replace(r, "-"));
+    var r = Regex("^,?[0-9]+")
+    io.println("69,420".split(r))
+    io.println("69,420".replace(r, "-"))
 }

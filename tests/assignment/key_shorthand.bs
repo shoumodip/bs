@@ -1,7 +1,7 @@
 var t = {
     v = 17
-};
+}
 
-t.v *= 2;
-t["v"] += 35;
-io.println(t.v);
+t.v *= 2
+t["v"] += 35
+io.println(t.v)

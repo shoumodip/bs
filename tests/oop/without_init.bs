@@ -1,6 +1,6 @@
 class Pair {}
 
-var pair = Pair();
-pair.first = 34;
-pair.second = 35;
-io.println(pair.first + pair.second);
+var pair = Pair()
+pair.first = 34
+pair.second = 35
+io.println(pair.first + pair.second)

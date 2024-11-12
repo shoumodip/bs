@@ -1,1 +1,1 @@
-Bytes().foo;
+Bytes().foo

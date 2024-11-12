@@ -1,1 +1,1 @@
-io.println(6.max(9));
+io.println(6.max(9))

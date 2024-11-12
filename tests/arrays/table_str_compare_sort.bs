@@ -7,8 +7,8 @@ var xs = [
     { name = 5, isdir = false },
     { name = 10, isdir = true },
     { name = 7, isdir = false },
-];
+]
 
-io.println(xs);
-xs.sort(fn (a, b) => a.name < b.name);
-io.println(xs);
+io.println(xs)
+xs.sort(fn (a, b) => a.name < b.name)
+io.println(xs)

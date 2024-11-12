@@ -1,1 +1,1 @@
-io.println(69 + " Nice!");
+io.println(69 + " Nice!")

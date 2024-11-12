@@ -1,2 +1,2 @@
-var x = 69;
-x.foo = 420;
+var x = 69
+x.foo = 420

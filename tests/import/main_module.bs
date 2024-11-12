@@ -1,5 +1,5 @@
 if is_main_module {
-    io.println("Directly called");
+    io.println("Directly called")
 }
 
-return 69;
+return 69

@@ -189,8 +189,6 @@ int main(int argc, char **argv) {
                         bs_free(bs);
                         return 1;
                     }
-                } else if (input.size < sizeof(line) && line[input.size - 1] != ';') {
-                    line[input.size++] = ';';
                 }
 
                 result = bs_run(bs, Bs_Sv_Static("<stdin>.bs"), input, true);

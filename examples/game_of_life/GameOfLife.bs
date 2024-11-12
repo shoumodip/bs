@@ -1,75 +1,75 @@
 class GameOfLife {
     init(width, height) {
-        this.width = width;
-        this.height = height;
+        this.width = width
+        this.height = height
 
-        this.board = [];
-        this.buffer = [];
+        this.board = []
+        this.buffer = []
 
-        this.board.resize(width * height);
-        this.buffer.resize(width * height);
+        this.board.resize(width * height)
+        this.buffer.resize(width * height)
     }
 
     get(x, y) {
-        x %= this.width;
-        y %= this.height;
-        return this.board[y * this.width + x];
+        x %= this.width
+        y %= this.height
+        return this.board[y * this.width + x]
     }
 
     set(x, y, v) {
-        x %= this.width;
-        y %= this.height;
-        this.board[y * this.width + x] = v;
+        x %= this.width
+        y %= this.height
+        this.board[y * this.width + x] = v
     }
 
     step() {
         fn set(x, y, v) {
-            x %= this.width;
-            y %= this.height;
-            this.buffer[y * this.width + x] = v;
+            x %= this.width
+            y %= this.height
+            this.buffer[y * this.width + x] = v
         }
 
         fn nbors(x, y) {
-            var count = 0;
+            var count = 0
             for dy in -1, 2 {
                 for dx in -1, 2 {
                     if dx == 0 && dy == 0 {
-                        continue;
+                        continue
                     }
 
                     if this.get(x + dx, y + dy) {
-                        count += 1;
+                        count += 1
                     }
                 }
             }
-            return count;
+            return count
         }
 
         for y in 0, this.height {
             for x in 0, this.width {
-                var n = nbors(x, y);
+                var n = nbors(x, y)
                 if n == 2 {
-                    set(x, y, this.get(x, y));
+                    set(x, y, this.get(x, y))
                 } else {
-                    set(x, y, n == 3);
+                    set(x, y, n == 3)
                 }
             }
         }
 
         # Swap buffers
-        var t = this.board;
-        this.board = this.buffer;
-        this.buffer = t;
+        var t = this.board
+        this.board = this.buffer
+        this.buffer = t
     }
 
     # (X, Y) is the center of the glider
     glider(x, y) {
-        this.set(x + 0, y - 1, true);
-        this.set(x + 1, y + 0, true);
-        this.set(x - 1, y + 1, true);
-        this.set(x + 0, y + 1, true);
-        this.set(x + 1, y + 1, true);
+        this.set(x + 0, y - 1, true)
+        this.set(x + 1, y + 0, true)
+        this.set(x - 1, y + 1, true)
+        this.set(x + 0, y + 1, true)
+        this.set(x + 1, y + 1, true)
     }
 }
 
-return GameOfLife;
+return GameOfLife

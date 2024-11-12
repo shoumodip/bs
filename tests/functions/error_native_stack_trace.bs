@@ -1,9 +1,9 @@
 fn foo(s) {
-    return os.getenv(s);
+    return os.getenv(s)
 }
 
 fn main() {
-    [1, 2].map(foo);
+    [1, 2].map(foo)
 }
 
-main();
+main()

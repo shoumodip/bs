@@ -1,5 +1,5 @@
-var xs = [];
-io.println(xs);
+var xs = []
+io.println(xs)
 
-xs[10] = 69;
-io.println(xs);
+xs[10] = 69
+io.println(xs)

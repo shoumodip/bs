@@ -1,42 +1,42 @@
-io.println(!true);
-io.println(!false);
-io.println(!nil);
-io.println(!0);
-io.println(!1);
+io.println(!true)
+io.println(!false)
+io.println(!nil)
+io.println(!0)
+io.println(!1)
 
-io.println(69 > 420);
-io.println(420 > 420);
-io.println(1337 > 420);
+io.println(69 > 420)
+io.println(420 > 420)
+io.println(1337 > 420)
 
-io.println(69 >= 420);
-io.println(420 >= 420);
-io.println(1337 >= 420);
+io.println(69 >= 420)
+io.println(420 >= 420)
+io.println(1337 >= 420)
 
-io.println(69 < 420);
-io.println(420 < 420);
-io.println(1337 < 420);
+io.println(69 < 420)
+io.println(420 < 420)
+io.println(1337 < 420)
 
-io.println(69 <= 420);
-io.println(420 <= 420);
-io.println(1337 <= 420);
+io.println(69 <= 420)
+io.println(420 <= 420)
+io.println(1337 <= 420)
 
-io.println(69 == 420);
-io.println(420 == 420);
+io.println(69 == 420)
+io.println(420 == 420)
 
-io.println(69 != 420);
-io.println(420 != 420);
+io.println(69 != 420)
+io.println(420 != 420)
 
-io.println(nil == nil);
-io.println(nil == true);
-io.println(nil == 69);
-io.println(false == 0);
+io.println(nil == nil)
+io.println(nil == true)
+io.println(nil == 69)
+io.println(false == 0)
 
-io.println(true && true);
-io.println(true && false);
-io.println(false && true);
-io.println(false && false);
+io.println(true && true)
+io.println(true && false)
+io.println(false && true)
+io.println(false && false)
 
-io.println(true || true);
-io.println(true || false);
-io.println(false || true);
-io.println(false || false);
+io.println(true || true)
+io.println(true || false)
+io.println(false || true)
+io.println(false || false)

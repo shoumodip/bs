@@ -1,43 +1,43 @@
-io.println("Foobar".slice(0, 3));
-io.println("Foobar".slice(3, 6));
-io.println("Foobar".slice(3, 3));
+io.println("Foobar".slice(0, 3))
+io.println("Foobar".slice(3, 6))
+io.println("Foobar".slice(3, 3))
 
-io.println("Foobar".toupper());
-io.println("Foobar".tolower());
+io.println("Foobar".toupper())
+io.println("Foobar".tolower())
 
-io.println("foo bar baz".find("ba"));
-io.println("foo bar baz".find("ba", 5));
-io.println("foo bar baz".find("ba", 9));
-io.println("foo bar baz".find("lmao"));
+io.println("foo bar baz".find("ba"))
+io.println("foo bar baz".find("ba", 5))
+io.println("foo bar baz".find("ba", 9))
+io.println("foo bar baz".find("lmao"))
 
-io.println("foo bar baz".split(""));
-io.println("foo bar baz".split(" "));
-io.println("foo bar baz".split("  "));
+io.println("foo bar baz".split(""))
+io.println("foo bar baz".split(" "))
+io.println("foo bar baz".split("  "))
 
-io.println("foo bar baz".replace("", "-"));
-io.println("foo bar baz".replace(" ", "---"));
-io.println("foo bar baz".replace("  ", "-"));
+io.println("foo bar baz".replace("", "-"))
+io.println("foo bar baz".replace(" ", "---"))
+io.println("foo bar baz".replace("  ", "-"))
 
-io.println("   foo bar baz  ".trim(" "));
-io.println("   foo bar baz  ".ltrim(" "));
-io.println("   foo bar baz  ".rtrim(" "));
+io.println("   foo bar baz  ".trim(" "))
+io.println("   foo bar baz  ".ltrim(" "))
+io.println("   foo bar baz  ".rtrim(" "))
 
-io.println("foo".lpad("69", 0));
-io.println("foo".lpad("69", 3));
-io.println("foo".lpad("69", 4));
-io.println("foo".lpad("69", 5));
-io.println("foo".lpad("69", 6));
+io.println("foo".lpad("69", 0))
+io.println("foo".lpad("69", 3))
+io.println("foo".lpad("69", 4))
+io.println("foo".lpad("69", 5))
+io.println("foo".lpad("69", 6))
 
-io.println("foo".rpad("69", 0));
-io.println("foo".rpad("69", 3));
-io.println("foo".rpad("69", 4));
-io.println("foo".rpad("69", 5));
-io.println("foo".rpad("69", 6));
+io.println("foo".rpad("69", 0))
+io.println("foo".rpad("69", 3))
+io.println("foo".rpad("69", 4))
+io.println("foo".rpad("69", 5))
+io.println("foo".rpad("69", 6))
 
-io.println("foobar".prefix("foo"));
-io.println("foobar".prefix("Foo"));
-io.println("foobar".prefix("deez nuts"));
+io.println("foobar".prefix("foo"))
+io.println("foobar".prefix("Foo"))
+io.println("foobar".prefix("deez nuts"))
 
-io.println("foobar".suffix("bar"));
-io.println("foobar".suffix("Bar"));
-io.println("foobar".suffix("deez nuts"));
+io.println("foobar".suffix("bar"))
+io.println("foobar".suffix("Bar"))
+io.println("foobar".suffix("deez nuts"))

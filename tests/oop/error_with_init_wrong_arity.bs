@@ -2,4 +2,4 @@ class Foo {
     init(x) {}
 }
 
-Foo();
+Foo()

@@ -1,15 +1,15 @@
-var xs = [];
+var xs = []
 
-xs[len(xs)] = 1;
-xs[len(xs)] = 4;
-xs[len(xs)] = 9;
+xs[len(xs)] = 1
+xs[len(xs)] = 4
+xs[len(xs)] = 9
 
-io.println(xs[0]);
-io.println(xs[1]);
-io.println(xs[2]);
+io.println(xs[0])
+io.println(xs[1])
+io.println(xs[2])
 
-io.println(xs);
-io.println(len(xs));
+io.println(xs)
+io.println(len(xs))
 
-io.println([69, 420]);
-io.println([69, 420, 1337][2]);
+io.println([69, 420])
+io.println([69, 420, 1337][2])

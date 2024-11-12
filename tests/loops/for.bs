@@ -1,23 +1,23 @@
 for i in 0, 5 {
-    io.println(i);
+    io.println(i)
 }
 
 for i in 5, 0 {
-    io.println(i);
+    io.println(i)
 }
 
 for i in 0, 5, 2 {
-    io.println(i);
+    io.println(i)
 }
 
 for i in 5, 0, -2 {
-    io.println(i);
+    io.println(i)
 }
 
 for i, v in [69, 420, 1337] {
-    io.println(i, v);
+    io.println(i, v)
 }
 
 for k, v in {foo = 69, bar = 420} {
-    io.println(k, v);
+    io.println(k, v)
 }

@@ -1,2 +1,2 @@
-var x = nil;
-x[420];
+var x = nil
+x[420]

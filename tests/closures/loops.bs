@@ -1,28 +1,28 @@
-var i = 0;
-var a = [];
+var i = 0
+var a = []
 
 while i < 4 {
-    var v = i;
+    var v = i
 
     a[len(a)] = fn () {
-        io.println("Captured value is \(v)");
-    };
+        io.println("Captured value is \(v)")
+    }
 
-    i = i + 1;
+    i = i + 1
 }
 
 for _, f in a {
-    f();
+    f()
 }
 
-var a = [];
+var a = []
 
 for i in 4, 0 {
     a[len(a)] = fn () {
-        io.println("Captured value is \(i)");
-    };
+        io.println("Captured value is \(i)")
+    }
 }
 
 for _, f in a {
-    f();
+    f()
 }

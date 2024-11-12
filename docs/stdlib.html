@@ -45,8 +45,8 @@ provided.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> name = io.<span class='field'>input</span>(<span class='string'>"Enter your name&gt; "</span>);
-io.<span class='field'>println</span>(<span class='string'>"Hello, </span><span class='escape'>\</span><span class='escape'>(</span>name<span class='escape'>)</span><span class='string'>!"</span>);
+<span class='keyword'>var</span> name = io.<span class='field'>input</span>(<span class='string'>"Enter your name&gt; "</span>)
+io.<span class='field'>println</span>(<span class='string'>"Hello, </span><span class='escape'>\</span><span class='escape'>(</span>name<span class='escape'>)</span><span class='string'>!"</span>)
 </pre>
 </pre>
 </div>
@@ -85,7 +85,7 @@ Print all the arguments to standard output.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>print</span>(<span class='string'>"Hello"</span>, <span class='string'>"world"</span>, <span class='constant'>69</span>);
+io.<span class='field'>print</span>(<span class='string'>"Hello"</span>, <span class='string'>"world"</span>, <span class='constant'>69</span>)
 </pre>
 </pre>
 </div>
@@ -147,10 +147,10 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> entries = <span class='keyword'>assert</span>(io.<span class='field'>readdir</span>(<span class='string'>"."</span>));
+<span class='keyword'>var</span> entries = <span class='keyword'>assert</span>(io.<span class='field'>readdir</span>(<span class='string'>"."</span>))
 
 <span class='keyword'>for</span> _, e <span class='keyword'>in</span> entries {
-    io.<span class='field'>println</span>(e.<span class='field'>name</span>(), e.<span class='field'>isdir</span>());
+    io.<span class='field'>println</span>(e.<span class='field'>name</span>(), e.<span class='field'>isdir</span>())
 }
 </pre>
 </pre>
@@ -208,14 +208,14 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='string'>"input.txt"</span>);
+<span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='string'>"input.txt"</span>)
 <span class='keyword'>if</span> !f {
-    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>);
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
 }
 
-<span class='keyword'>var</span> contents = f.<span class='field'>read</span>();
-io.<span class='field'>print</span>(contents);
+<span class='keyword'>var</span> contents = f.<span class='field'>read</span>()
+io.<span class='field'>print</span>(contents)
 </pre>
 </pre>
 </div>
@@ -274,14 +274,14 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='string'>"input.txt"</span>);
+<span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='string'>"input.txt"</span>)
 <span class='keyword'>if</span> !f {
-    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>);
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
 }
 
-io.<span class='field'>print</span>(<span class='string'>"The first 16 bytes: [</span><span class='escape'>\</span><span class='escape'>(</span>f.<span class='field'>read</span>(<span class='constant'>16</span>)<span class='escape'>)</span><span class='string'>]</span><span class='escape'>\n</span><span class='string'>"</span>);
-io.<span class='field'>print</span>(<span class='string'>"The rest:"</span>, f.<span class='field'>read</span>());
+io.<span class='field'>print</span>(<span class='string'>"The first 16 bytes: [</span><span class='escape'>\</span><span class='escape'>(</span>f.<span class='field'>read</span>(<span class='constant'>16</span>)<span class='escape'>)</span><span class='string'>]</span><span class='escape'>\n</span><span class='string'>"</span>)
+io.<span class='field'>print</span>(<span class='string'>"The rest:"</span>, f.<span class='field'>read</span>())
 </pre>
 </pre>
 </div>
@@ -325,15 +325,15 @@ Read a line.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='string'>"input.txt"</span>);
+<span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='string'>"input.txt"</span>)
 <span class='keyword'>if</span> !f {
-    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>);
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
 }
 
 <span class='keyword'>while</span> !f.<span class='field'>eof</span>() {
-    <span class='keyword'>var</span> line = f.<span class='field'>readln</span>();
-    io.<span class='field'>println</span>(<span class='string'>"Line:"</span>, line);
+    <span class='keyword'>var</span> line = f.<span class='field'>readln</span>()
+    io.<span class='field'>println</span>(<span class='string'>"Line:"</span>, line)
 }
 </pre>
 </pre>
@@ -399,18 +399,18 @@ Returns <code>true</code> if succeeded and <code>false</code> if failed
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='string'>"input.txt"</span>);
+<span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='string'>"input.txt"</span>)
 <span class='keyword'>if</span> !f {
-    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>);
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
 }
 
-io.<span class='field'>print</span>(<span class='string'>"The first 16 bytes: [</span><span class='escape'>\</span><span class='escape'>(</span>f.<span class='field'>read</span>(<span class='constant'>16</span>)<span class='escape'>)</span><span class='string'>]</span><span class='escape'>\n</span><span class='string'>"</span>);
+io.<span class='field'>print</span>(<span class='string'>"The first 16 bytes: [</span><span class='escape'>\</span><span class='escape'>(</span>f.<span class='field'>read</span>(<span class='constant'>16</span>)<span class='escape'>)</span><span class='string'>]</span><span class='escape'>\n</span><span class='string'>"</span>)
 
-f.<span class='field'>seek</span>(<span class='constant'>5</span>, io.<span class='field'>SEEK_SET</span>);
+f.<span class='field'>seek</span>(<span class='constant'>5</span>, io.<span class='field'>SEEK_SET</span>)
 
-io.<span class='field'>println</span>(<span class='string'>"The full content offset by 5:"</span>);
-io.<span class='field'>print</span>(f.<span class='field'>read</span>());
+io.<span class='field'>println</span>(<span class='string'>"The full content offset by 5:"</span>)
+io.<span class='field'>print</span>(f.<span class='field'>read</span>())
 </pre>
 </pre>
 </div>
@@ -458,19 +458,19 @@ Returns <code>nil</code> if failed
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='string'>"input.txt"</span>);
+<span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='string'>"input.txt"</span>)
 <span class='keyword'>if</span> !f {
-    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>);
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
 }
 
-io.<span class='field'>println</span>(<span class='string'>"The first 3 lines:"</span>);
+io.<span class='field'>println</span>(<span class='string'>"The first 3 lines:"</span>)
 <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>3</span> {
-    io.<span class='field'>println</span>(f.<span class='field'>readln</span>());
+    io.<span class='field'>println</span>(f.<span class='field'>readln</span>())
 }
 
-io.<span class='field'>println</span>();
-io.<span class='field'>println</span>(<span class='string'>"Read </span><span class='escape'>\</span><span class='escape'>(</span>f.<span class='field'>tell</span>()<span class='escape'>)</span><span class='string'> bytes so far."</span>);
+io.<span class='field'>println</span>()
+io.<span class='field'>println</span>(<span class='string'>"Read </span><span class='escape'>\</span><span class='escape'>(</span>f.<span class='field'>tell</span>()<span class='escape'>)</span><span class='string'> bytes so far."</span>)
 </pre>
 </pre>
 </div>
@@ -517,15 +517,15 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='field'>Writer</span>(<span class='string'>"output.txt"</span>);
+<span class='keyword'>var</span> f = io.<span class='field'>Writer</span>(<span class='string'>"output.txt"</span>)
 <span class='keyword'>if</span> !f {
-    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not create file!"</span>);
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not create file!"</span>)
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
 }
 
-f.<span class='field'>writeln</span>(<span class='string'>"Hello there!"</span>);
-f.<span class='field'>writeln</span>(<span class='string'>"General Kenobi!"</span>);
-f.<span class='field'>writeln</span>(<span class='constant'>69</span>, <span class='string'>"Nice!"</span>);
+f.<span class='field'>writeln</span>(<span class='string'>"Hello there!"</span>)
+f.<span class='field'>writeln</span>(<span class='string'>"General Kenobi!"</span>)
+f.<span class='field'>writeln</span>(<span class='constant'>69</span>, <span class='string'>"Nice!"</span>)
 </pre>
 </pre>
 </div>
@@ -605,10 +605,10 @@ Example usecase:
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> entries = <span class='keyword'>assert</span>(io.<span class='field'>readdir</span>(<span class='string'>"."</span>));
+<span class='keyword'>var</span> entries = <span class='keyword'>assert</span>(io.<span class='field'>readdir</span>(<span class='string'>"."</span>))
 
 <span class='keyword'>for</span> _, e <span class='keyword'>in</span> entries {
-    io.<span class='field'>println</span>(e.<span class='field'>name</span>(), e.<span class='field'>isdir</span>());
+    io.<span class='field'>println</span>(e.<span class='field'>name</span>(), e.<span class='field'>isdir</span>())
 }
 </pre>
 </pre>
@@ -704,7 +704,7 @@ machine can decide what to do.
 </svg>
 </button>
 <pre class='code active'>
-os.<span class='field'>exit</span>(<span class='constant'>69</span>);
+os.<span class='field'>exit</span>(<span class='constant'>69</span>)
 </pre>
 </pre>
 </div>
@@ -749,17 +749,17 @@ in the unit of seconds.
 <pre class='code active'>
 <span class='keyword'>fn</span> <span class='function'>fib</span>(n) {
     <span class='keyword'>if</span> n &lt; <span class='constant'>2</span> {
-        <span class='keyword'>return</span> n;
+        <span class='keyword'>return</span> n
     }
 
-    <span class='keyword'>return</span> fib(n - <span class='constant'>1</span>) + fib(n - <span class='constant'>2</span>);
+    <span class='keyword'>return</span> fib(n - <span class='constant'>1</span>) + fib(n - <span class='constant'>2</span>)
 }
 
-<span class='keyword'>var</span> start = os.<span class='field'>clock</span>();
-io.<span class='field'>println</span>(fib(<span class='constant'>30</span>));
+<span class='keyword'>var</span> start = os.<span class='field'>clock</span>()
+io.<span class='field'>println</span>(fib(<span class='constant'>30</span>))
 
-<span class='keyword'>var</span> elapsed = os.<span class='field'>clock</span>() - start;
-io.<span class='field'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>\</span><span class='escape'>(</span>elapsed<span class='escape'>)</span><span class='string'>"</span>);
+<span class='keyword'>var</span> elapsed = os.<span class='field'>clock</span>() - start
+io.<span class='field'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>\</span><span class='escape'>(</span>elapsed<span class='escape'>)</span><span class='string'>"</span>)
 </pre>
 </pre>
 </div>
@@ -798,11 +798,11 @@ Sleep for <code>seconds</code> interval, with nanosecond level of precision.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> start = os.<span class='field'>clock</span>();
-os.<span class='field'>sleep</span>(<span class='constant'>0.69</span>);
+<span class='keyword'>var</span> start = os.<span class='field'>clock</span>()
+os.<span class='field'>sleep</span>(<span class='constant'>0.69</span>)
 
-<span class='keyword'>var</span> elapsed = os.<span class='field'>clock</span>() - start;
-io.<span class='field'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>\</span><span class='escape'>(</span>elapsed<span class='escape'>)</span><span class='string'>"</span>);
+<span class='keyword'>var</span> elapsed = os.<span class='field'>clock</span>() - start
+io.<span class='field'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>\</span><span class='escape'>(</span>elapsed<span class='escape'>)</span><span class='string'>"</span>)
 </pre>
 </pre>
 </div>
@@ -843,8 +843,8 @@ Returns <code>nil</code> if it doesn't exist.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(os.<span class='field'>getenv</span>(<span class='string'>"FOO"</span>));
-io.<span class='field'>println</span>(os.<span class='field'>getenv</span>(<span class='string'>"BAR"</span>));
+io.<span class='field'>println</span>(os.<span class='field'>getenv</span>(<span class='string'>"FOO"</span>))
+io.<span class='field'>println</span>(os.<span class='field'>getenv</span>(<span class='string'>"BAR"</span>))
 </pre>
 </pre>
 </div>
@@ -887,8 +887,8 @@ Returns <code>true</code> if successful, else <code>false</code>.
 </svg>
 </button>
 <pre class='code active'>
-os.<span class='field'>setenv</span>(<span class='string'>"FOO"</span>, <span class='string'>"lmao"</span>);
-io.<span class='field'>println</span>(os.<span class='field'>getenv</span>(<span class='string'>"FOO"</span>));
+os.<span class='field'>setenv</span>(<span class='string'>"FOO"</span>, <span class='string'>"lmao"</span>)
+io.<span class='field'>println</span>(os.<span class='field'>getenv</span>(<span class='string'>"FOO"</span>))
 </pre>
 </pre>
 </div>
@@ -926,7 +926,7 @@ Get the current working directory.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(os.<span class='field'>getcwd</span>());
+io.<span class='field'>println</span>(os.<span class='field'>getcwd</span>())
 </pre>
 </pre>
 </div>
@@ -967,8 +967,8 @@ Returns <code>true</code> if successful, else <code>false</code>.
 </svg>
 </button>
 <pre class='code active'>
-os.<span class='field'>setcwd</span>(<span class='string'>"/usr"</span>);
-io.<span class='field'>println</span>(os.<span class='field'>getcwd</span>());
+os.<span class='field'>setcwd</span>(<span class='string'>"/usr"</span>)
+io.<span class='field'>println</span>(os.<span class='field'>getcwd</span>())
 </pre>
 </pre>
 </div>
@@ -1007,7 +1007,7 @@ name.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(os.<span class='field'>args</span>);
+io.<span class='field'>println</span>(os.<span class='field'>args</span>)
 </pre>
 </pre>
 </div>
@@ -1053,13 +1053,13 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> p = os.<span class='field'>Process</span>([<span class='string'>"ls"</span>, <span class='string'>"-l"</span>]);
+<span class='keyword'>var</span> p = os.<span class='field'>Process</span>([<span class='string'>"ls"</span>, <span class='string'>"-l"</span>])
 <span class='keyword'>if</span> !p {
-    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>);
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>)
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
 }
 
-p.<span class='field'>wait</span>();
+p.<span class='field'>wait</span>()
 </pre>
 </pre>
 </div>
@@ -1100,19 +1100,19 @@ Returns <code>nil</code> if the process was spawned without capturing stdout.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> p = os.<span class='field'>Process</span>([<span class='string'>"ls"</span>, <span class='string'>"-l"</span>], <span class='constant'>true</span>);
+<span class='keyword'>var</span> p = os.<span class='field'>Process</span>([<span class='string'>"ls"</span>, <span class='string'>"-l"</span>], <span class='constant'>true</span>)
 <span class='keyword'>if</span> !p {
-    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>);
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>)
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
 }
 
-<span class='keyword'>var</span> stdout = p.<span class='field'>stdout</span>();
+<span class='keyword'>var</span> stdout = p.<span class='field'>stdout</span>()
 <span class='keyword'>while</span> !stdout.<span class='field'>eof</span>() {
-    <span class='keyword'>var</span> line = stdout.<span class='field'>readln</span>();
-    io.<span class='field'>println</span>(<span class='string'>"Line:"</span>, line);
+    <span class='keyword'>var</span> line = stdout.<span class='field'>readln</span>()
+    io.<span class='field'>println</span>(<span class='string'>"Line:"</span>, line)
 }
 
-p.<span class='field'>wait</span>();
+p.<span class='field'>wait</span>()
 </pre>
 </pre>
 </div>
@@ -1164,18 +1164,18 @@ Returns <code>nil</code> if the process was spawned without capturing stdin.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> p = os.<span class='field'>Process</span>([<span class='string'>"grep"</span>, <span class='string'>"foobar"</span>], <span class='constant'>false</span>, <span class='constant'>false</span>, <span class='constant'>true</span>);
+<span class='keyword'>var</span> p = os.<span class='field'>Process</span>([<span class='string'>"grep"</span>, <span class='string'>"foobar"</span>], <span class='constant'>false</span>, <span class='constant'>false</span>, <span class='constant'>true</span>)
 <span class='keyword'>if</span> !p {
-    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>);
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>);
+    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>)
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
 }
 
-<span class='keyword'>var</span> stdin = p.<span class='field'>stdin</span>();
-stdin.<span class='field'>writeln</span>(<span class='string'>"First line foobar lmao"</span>);
-stdin.<span class='field'>writeln</span>(<span class='string'>"Second line lmao"</span>);
-stdin.<span class='field'>writeln</span>(<span class='string'>"Third line lets goooo foobar"</span>);
-stdin.<span class='field'>close</span>();
-p.<span class='field'>wait</span>();
+<span class='keyword'>var</span> stdin = p.<span class='field'>stdin</span>()
+stdin.<span class='field'>writeln</span>(<span class='string'>"First line foobar lmao"</span>)
+stdin.<span class='field'>writeln</span>(<span class='string'>"Second line lmao"</span>)
+stdin.<span class='field'>writeln</span>(<span class='string'>"Third line lets goooo foobar"</span>)
+stdin.<span class='field'>close</span>()
+p.<span class='field'>wait</span>()
 </pre>
 </pre>
 </div>
@@ -1246,8 +1246,8 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> r = Regex(<span class='string'>"([0-9]+) ([a-z]+)"</span>);
-io.<span class='field'>println</span>(<span class='string'>"69 apples, 420 oranges"</span>.<span class='field'>replace</span>(r, <span class='string'>"{fruit: '</span><span class='escape'>\\</span><span class='string'>2', count: </span><span class='escape'>\\</span><span class='string'>1}"</span>));
+<span class='keyword'>var</span> r = Regex(<span class='string'>"([0-9]+) ([a-z]+)"</span>)
+io.<span class='field'>println</span>(<span class='string'>"69 apples, 420 oranges"</span>.<span class='field'>replace</span>(r, <span class='string'>"{fruit: '</span><span class='escape'>\\</span><span class='string'>2', count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
 </pre>
 </pre>
 </div>
@@ -1291,9 +1291,9 @@ Slice a string from <code>start</code> (inclusive) to <code>end</code> (exclusiv
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"deez nuts"</span>.<span class='field'>slice</span>(<span class='constant'>0</span>, <span class='constant'>4</span>));
-io.<span class='field'>println</span>(<span class='string'>"deez nuts"</span>.<span class='field'>slice</span>(<span class='constant'>5</span>, <span class='constant'>9</span>));
-io.<span class='field'>println</span>(<span class='string'>"deez nuts"</span>.<span class='field'>slice</span>(<span class='constant'>5</span>)); <span class='comment'># No end defaults to string end</span>
+io.<span class='field'>println</span>(<span class='string'>"deez nuts"</span>.<span class='field'>slice</span>(<span class='constant'>0</span>, <span class='constant'>4</span>))
+io.<span class='field'>println</span>(<span class='string'>"deez nuts"</span>.<span class='field'>slice</span>(<span class='constant'>5</span>, <span class='constant'>9</span>))
+io.<span class='field'>println</span>(<span class='string'>"deez nuts"</span>.<span class='field'>slice</span>(<span class='constant'>5</span>)) <span class='comment'># No end defaults to string end</span>
 </pre>
 </pre>
 </div>
@@ -1333,7 +1333,7 @@ Reverse a string.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"sllab amgil"</span>.<span class='field'>reverse</span>());
+io.<span class='field'>println</span>(<span class='string'>"sllab amgil"</span>.<span class='field'>reverse</span>())
 </pre>
 </pre>
 </div>
@@ -1371,7 +1371,7 @@ Convert a string to uppercase.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"Urmom"</span>.<span class='field'>toupper</span>());
+io.<span class='field'>println</span>(<span class='string'>"Urmom"</span>.<span class='field'>toupper</span>())
 </pre>
 </pre>
 </div>
@@ -1409,7 +1409,7 @@ Convert a string to lowercase.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"Urmom"</span>.<span class='field'>tolower</span>());
+io.<span class='field'>println</span>(<span class='string'>"Urmom"</span>.<span class='field'>tolower</span>())
 </pre>
 </pre>
 </div>
@@ -1447,11 +1447,11 @@ Convert a string to a number.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"69"</span>.<span class='field'>tonumber</span>());
-io.<span class='field'>println</span>(<span class='string'>"420.69"</span>.<span class='field'>tonumber</span>());
-io.<span class='field'>println</span>(<span class='string'>"0xff"</span>.<span class='field'>tonumber</span>());
-io.<span class='field'>println</span>(<span class='string'>"69e3"</span>.<span class='field'>tonumber</span>());
-io.<span class='field'>println</span>(<span class='string'>"nah"</span>.<span class='field'>tonumber</span>());
+io.<span class='field'>println</span>(<span class='string'>"69"</span>.<span class='field'>tonumber</span>())
+io.<span class='field'>println</span>(<span class='string'>"420.69"</span>.<span class='field'>tonumber</span>())
+io.<span class='field'>println</span>(<span class='string'>"0xff"</span>.<span class='field'>tonumber</span>())
+io.<span class='field'>println</span>(<span class='string'>"69e3"</span>.<span class='field'>tonumber</span>())
+io.<span class='field'>println</span>(<span class='string'>"nah"</span>.<span class='field'>tonumber</span>())
 </pre>
 </pre>
 </div>
@@ -1497,16 +1497,16 @@ Returns the position if found, else <code>nil</code>.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>find</span>(<span class='string'>"ba"</span>));
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>find</span>(<span class='string'>"ba"</span>, <span class='constant'>5</span>));
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>find</span>(<span class='string'>"ba"</span>, <span class='constant'>9</span>));
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>find</span>(<span class='string'>"lmao"</span>));
+io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>find</span>(<span class='string'>"ba"</span>))
+io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>find</span>(<span class='string'>"ba"</span>, <span class='constant'>5</span>))
+io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>find</span>(<span class='string'>"ba"</span>, <span class='constant'>9</span>))
+io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>find</span>(<span class='string'>"lmao"</span>))
 
-<span class='keyword'>var</span> r = Regex(<span class='string'>"[0-9]"</span>);
-io.<span class='field'>println</span>(<span class='string'>"69a"</span>.<span class='field'>find</span>(r));
-io.<span class='field'>println</span>(<span class='string'>"69a"</span>.<span class='field'>find</span>(r, <span class='constant'>1</span>));
-io.<span class='field'>println</span>(<span class='string'>"69a"</span>.<span class='field'>find</span>(r, <span class='constant'>2</span>));
-io.<span class='field'>println</span>(<span class='string'>"yolol"</span>.<span class='field'>find</span>(r));
+<span class='keyword'>var</span> r = Regex(<span class='string'>"[0-9]"</span>)
+io.<span class='field'>println</span>(<span class='string'>"69a"</span>.<span class='field'>find</span>(r))
+io.<span class='field'>println</span>(<span class='string'>"69a"</span>.<span class='field'>find</span>(r, <span class='constant'>1</span>))
+io.<span class='field'>println</span>(<span class='string'>"69a"</span>.<span class='field'>find</span>(r, <span class='constant'>2</span>))
+io.<span class='field'>println</span>(<span class='string'>"yolol"</span>.<span class='field'>find</span>(r))
 </pre>
 </pre>
 </div>
@@ -1551,14 +1551,14 @@ Split string by <code>pattern</code>.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>split</span>(<span class='string'>""</span>));
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>split</span>(<span class='string'>" "</span>));
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>split</span>(<span class='string'>"  "</span>));
+io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>split</span>(<span class='string'>""</span>))
+io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>split</span>(<span class='string'>" "</span>))
+io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>split</span>(<span class='string'>"  "</span>))
 
-<span class='keyword'>var</span> r = Regex(<span class='string'>" +"</span>);
-io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>split</span>(r));
-io.<span class='field'>println</span>(<span class='string'>"foo bar"</span>.<span class='field'>split</span>(r));
-io.<span class='field'>println</span>(<span class='string'>"foo bar   baz"</span>.<span class='field'>split</span>(r));
+<span class='keyword'>var</span> r = Regex(<span class='string'>" +"</span>)
+io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>split</span>(r))
+io.<span class='field'>println</span>(<span class='string'>"foo bar"</span>.<span class='field'>split</span>(r))
+io.<span class='field'>println</span>(<span class='string'>"foo bar   baz"</span>.<span class='field'>split</span>(r))
 </pre>
 </pre>
 </div>
@@ -1601,14 +1601,14 @@ Replace <code>pattern</code> with <code>replacement</code>.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>replace</span>(<span class='string'>""</span>, <span class='string'>"-"</span>));
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>replace</span>(<span class='string'>" "</span>, <span class='string'>"---"</span>));
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>replace</span>(<span class='string'>"  "</span>, <span class='string'>"-"</span>));
+io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>replace</span>(<span class='string'>""</span>, <span class='string'>"-"</span>))
+io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>replace</span>(<span class='string'>" "</span>, <span class='string'>"---"</span>))
+io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>replace</span>(<span class='string'>"  "</span>, <span class='string'>"-"</span>))
 
-<span class='keyword'>var</span> r = Regex(<span class='string'>"([0-9]+) ([a-z]+)"</span>);
-io.<span class='field'>println</span>(<span class='string'>"69 apples, 420 oranges"</span>.<span class='field'>replace</span>(r, <span class='string'>"{type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>));
-io.<span class='field'>println</span>(<span class='string'>"69 apples, 420  oranges"</span>.<span class='field'>replace</span>(r, <span class='string'>"{type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>));
-io.<span class='field'>println</span>(<span class='string'>"ayo noice!"</span>.<span class='field'>replace</span>(r, <span class='string'>"{type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>));
+<span class='keyword'>var</span> r = Regex(<span class='string'>"([0-9]+) ([a-z]+)"</span>)
+io.<span class='field'>println</span>(<span class='string'>"69 apples, 420 oranges"</span>.<span class='field'>replace</span>(r, <span class='string'>"{type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
+io.<span class='field'>println</span>(<span class='string'>"69 apples, 420  oranges"</span>.<span class='field'>replace</span>(r, <span class='string'>"{type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
+io.<span class='field'>println</span>(<span class='string'>"ayo noice!"</span>.<span class='field'>replace</span>(r, <span class='string'>"{type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
 </pre>
 </pre>
 </div>
@@ -1656,11 +1656,11 @@ Compare two strings together.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>compare</span>(<span class='string'>"bar"</span>));
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>compare</span>(<span class='string'>"lol"</span>));
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>compare</span>(<span class='string'>"foo"</span>));
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>compare</span>(<span class='string'>"food"</span>));
-io.<span class='field'>println</span>(<span class='string'>"food"</span>.<span class='field'>compare</span>(<span class='string'>"foo"</span>));
+io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>compare</span>(<span class='string'>"bar"</span>))
+io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>compare</span>(<span class='string'>"lol"</span>))
+io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>compare</span>(<span class='string'>"foo"</span>))
+io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>compare</span>(<span class='string'>"food"</span>))
+io.<span class='field'>println</span>(<span class='string'>"food"</span>.<span class='field'>compare</span>(<span class='string'>"foo"</span>))
 </pre>
 </pre>
 </div>
@@ -1702,7 +1702,7 @@ Trim <code>pattern</code> from the left of a string.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"["</span> ++ <span class='string'>"   foo bar baz  "</span>.<span class='field'>ltrim</span>(<span class='string'>" "</span>) ++ <span class='string'>"]"</span>);
+io.<span class='field'>println</span>(<span class='string'>"["</span> ++ <span class='string'>"   foo bar baz  "</span>.<span class='field'>ltrim</span>(<span class='string'>" "</span>) ++ <span class='string'>"]"</span>)
 </pre>
 </pre>
 </div>
@@ -1740,7 +1740,7 @@ Trim <code>pattern</code> from the right of a string.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"["</span> ++ <span class='string'>"   foo bar baz  "</span>.<span class='field'>rtrim</span>(<span class='string'>" "</span>) ++ <span class='string'>"]"</span>);
+io.<span class='field'>println</span>(<span class='string'>"["</span> ++ <span class='string'>"   foo bar baz  "</span>.<span class='field'>rtrim</span>(<span class='string'>" "</span>) ++ <span class='string'>"]"</span>)
 </pre>
 </pre>
 </div>
@@ -1778,7 +1778,7 @@ Trim <code>pattern</code> from both sides of a string.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"["</span> ++ <span class='string'>"   foo bar baz  "</span>.<span class='field'>trim</span>(<span class='string'>" "</span>) ++ <span class='string'>"]"</span>);
+io.<span class='field'>println</span>(<span class='string'>"["</span> ++ <span class='string'>"   foo bar baz  "</span>.<span class='field'>trim</span>(<span class='string'>" "</span>) ++ <span class='string'>"]"</span>)
 </pre>
 </pre>
 </div>
@@ -1817,11 +1817,11 @@ Pad string with <code>pattern</code> on the left side, till the total length rea
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>0</span>));
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>3</span>));
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>4</span>));
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>5</span>));
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>6</span>));
+io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>0</span>))
+io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>3</span>))
+io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>4</span>))
+io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>5</span>))
+io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>6</span>))
 </pre>
 </pre>
 </div>
@@ -1864,11 +1864,11 @@ Pad string with <code>pattern</code> on the right side, till the total length re
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>0</span>));
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>3</span>));
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>4</span>));
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>5</span>));
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>6</span>));
+io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>0</span>))
+io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>3</span>))
+io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>4</span>))
+io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>5</span>))
+io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>6</span>))
 </pre>
 </pre>
 </div>
@@ -1910,9 +1910,9 @@ Check whether string starts with <code>pattern</code>.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>prefix</span>(<span class='string'>"foo"</span>));
-io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>prefix</span>(<span class='string'>"Foo"</span>));
-io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>prefix</span>(<span class='string'>"deez nuts"</span>));
+io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>prefix</span>(<span class='string'>"foo"</span>))
+io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>prefix</span>(<span class='string'>"Foo"</span>))
+io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>prefix</span>(<span class='string'>"deez nuts"</span>))
 </pre>
 </pre>
 </div>
@@ -1952,9 +1952,9 @@ Check whether string ends with <code>pattern</code>.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>suffix</span>(<span class='string'>"bar"</span>));
-io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>suffix</span>(<span class='string'>"Bar"</span>));
-io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>suffix</span>(<span class='string'>"deez nuts"</span>));
+io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>suffix</span>(<span class='string'>"bar"</span>))
+io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>suffix</span>(<span class='string'>"Bar"</span>))
+io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>suffix</span>(<span class='string'>"deez nuts"</span>))
 </pre>
 </pre>
 </div>
@@ -2001,9 +2001,9 @@ Return the bitwise ceiling of a number.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(bit.<span class='field'>ceil</span>(<span class='constant'>7</span>));
-io.<span class='field'>println</span>(bit.<span class='field'>ceil</span>(<span class='constant'>8</span>));
-io.<span class='field'>println</span>(bit.<span class='field'>ceil</span>(<span class='constant'>9</span>));
+io.<span class='field'>println</span>(bit.<span class='field'>ceil</span>(<span class='constant'>7</span>))
+io.<span class='field'>println</span>(bit.<span class='field'>ceil</span>(<span class='constant'>8</span>))
+io.<span class='field'>println</span>(bit.<span class='field'>ceil</span>(<span class='constant'>9</span>))
 </pre>
 </pre>
 </div>
@@ -2043,9 +2043,9 @@ Return the bitwise floor of a number.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(bit.<span class='field'>floor</span>(<span class='constant'>7</span>));
-io.<span class='field'>println</span>(bit.<span class='field'>floor</span>(<span class='constant'>8</span>));
-io.<span class='field'>println</span>(bit.<span class='field'>floor</span>(<span class='constant'>9</span>));
+io.<span class='field'>println</span>(bit.<span class='field'>floor</span>(<span class='constant'>7</span>))
+io.<span class='field'>println</span>(bit.<span class='field'>floor</span>(<span class='constant'>8</span>))
+io.<span class='field'>println</span>(bit.<span class='field'>floor</span>(<span class='constant'>9</span>))
 </pre>
 </pre>
 </div>
@@ -2203,10 +2203,10 @@ Create a string builder.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> b = Bytes();
-b.<span class='field'>write</span>(<span class='string'>"Hello, "</span>);
-b.<span class='field'>write</span>(<span class='string'>"world!"</span>);
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>());
+<span class='keyword'>var</span> b = Bytes()
+b.<span class='field'>write</span>(<span class='string'>"Hello, "</span>)
+b.<span class='field'>write</span>(<span class='string'>"world!"</span>)
+io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
 </pre>
 </pre>
 </div>
@@ -2244,13 +2244,13 @@ Return the current number of bytes written.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> b = Bytes();
-b.<span class='field'>write</span>(<span class='string'>"Hello"</span>);
-b.<span class='field'>write</span>(<span class='string'>" world!"</span>);
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>());
+<span class='keyword'>var</span> b = Bytes()
+b.<span class='field'>write</span>(<span class='string'>"Hello"</span>)
+b.<span class='field'>write</span>(<span class='string'>" world!"</span>)
+io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
 
-<span class='keyword'>var</span> n = b.<span class='field'>count</span>();
-io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span>n<span class='escape'>)</span><span class='string'> bytes written."</span>);
+<span class='keyword'>var</span> n = b.<span class='field'>count</span>()
+io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span>n<span class='escape'>)</span><span class='string'> bytes written."</span>)
 </pre>
 </pre>
 </div>
@@ -2289,15 +2289,15 @@ Move back the writer head to <code>position</code>.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> b = Bytes();
-b.<span class='field'>write</span>(<span class='string'>"Hello"</span>);
+<span class='keyword'>var</span> b = Bytes()
+b.<span class='field'>write</span>(<span class='string'>"Hello"</span>)
 
-<span class='keyword'>var</span> p = b.<span class='field'>count</span>();
-b.<span class='field'>write</span>(<span class='string'>" world!"</span>);
+<span class='keyword'>var</span> p = b.<span class='field'>count</span>()
+b.<span class='field'>write</span>(<span class='string'>" world!"</span>)
 
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>());
-b.<span class='field'>reset</span>(p);
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>());
+io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
+b.<span class='field'>reset</span>(p)
+io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
 </pre>
 </pre>
 </div>
@@ -2340,12 +2340,12 @@ a string.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> b = Bytes();
-b.<span class='field'>write</span>(<span class='string'>"Hello world!"</span>);
+<span class='keyword'>var</span> b = Bytes()
+b.<span class='field'>write</span>(<span class='string'>"Hello world!"</span>)
 
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>());
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>(<span class='constant'>0</span>, <span class='constant'>5</span>));
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>(<span class='constant'>6</span>, <span class='constant'>12</span>));
+io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
+io.<span class='field'>println</span>(b.<span class='field'>slice</span>(<span class='constant'>0</span>, <span class='constant'>5</span>))
+io.<span class='field'>println</span>(b.<span class='field'>slice</span>(<span class='constant'>6</span>, <span class='constant'>12</span>))
 </pre>
 </pre>
 </div>
@@ -2385,10 +2385,10 @@ Write <code>str</code> to the end.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> b = Bytes();
-b.<span class='field'>write</span>(<span class='string'>"Nice! "</span>);
-b.<span class='field'>write</span>(<span class='string'>""</span> ++ <span class='constant'>69</span>); <span class='comment'># Only strings can be written to a Bytes object</span>
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>());
+<span class='keyword'>var</span> b = Bytes()
+b.<span class='field'>write</span>(<span class='string'>"Nice! "</span>)
+b.<span class='field'>write</span>(<span class='string'>""</span> ++ <span class='constant'>69</span>) <span class='comment'># Only strings can be written to a Bytes object</span>
+io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
 </pre>
 </pre>
 </div>
@@ -2426,10 +2426,10 @@ Write <code>value</code> at <code>position</code>.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> b = Bytes();
-b.<span class='field'>write</span>(<span class='string'>"Helloworld!"</span>);
-b.<span class='field'>insert</span>(<span class='constant'>5</span>, <span class='string'>", "</span>);
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>());
+<span class='keyword'>var</span> b = Bytes()
+b.<span class='field'>write</span>(<span class='string'>"Helloworld!"</span>)
+b.<span class='field'>insert</span>(<span class='constant'>5</span>, <span class='string'>", "</span>)
+io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
 </pre>
 </pre>
 </div>
@@ -2476,10 +2476,10 @@ The provided function <code>f</code> must take a single argument.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
-<span class='keyword'>var</span> ys = xs.<span class='field'>map</span>(<span class='keyword'>fn</span> (x) =&gt; x * <span class='constant'>2</span>);
-io.<span class='field'>println</span>(xs);
-io.<span class='field'>println</span>(ys);
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
+<span class='keyword'>var</span> ys = xs.<span class='field'>map</span>(<span class='keyword'>fn</span> (x) =&gt; x * <span class='constant'>2</span>)
+io.<span class='field'>println</span>(xs)
+io.<span class='field'>println</span>(ys)
 </pre>
 </pre>
 </div>
@@ -2521,10 +2521,10 @@ The provided function <code>f</code> must take a single argument.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
-<span class='keyword'>var</span> ys = xs.<span class='field'>filter</span>(<span class='keyword'>fn</span> (x) =&gt; x % <span class='constant'>2</span> == <span class='constant'>0</span>);
-io.<span class='field'>println</span>(xs);
-io.<span class='field'>println</span>(ys);
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
+<span class='keyword'>var</span> ys = xs.<span class='field'>filter</span>(<span class='keyword'>fn</span> (x) =&gt; x % <span class='constant'>2</span> == <span class='constant'>0</span>)
+io.<span class='field'>println</span>(xs)
+io.<span class='field'>println</span>(ys)
 </pre>
 </pre>
 </div>
@@ -2568,13 +2568,13 @@ current value.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
 
-<span class='keyword'>var</span> a = xs.<span class='field'>reduce</span>(<span class='keyword'>fn</span> (x, y) =&gt; x + y);
-io.<span class='field'>println</span>(a);
+<span class='keyword'>var</span> a = xs.<span class='field'>reduce</span>(<span class='keyword'>fn</span> (x, y) =&gt; x + y)
+io.<span class='field'>println</span>(a)
 
-<span class='keyword'>var</span> b = xs.<span class='field'>reduce</span>(<span class='keyword'>fn</span> (x, y) =&gt; x + y, <span class='constant'>10</span>);
-io.<span class='field'>println</span>(b);
+<span class='keyword'>var</span> b = xs.<span class='field'>reduce</span>(<span class='keyword'>fn</span> (x, y) =&gt; x + y, <span class='constant'>10</span>)
+io.<span class='field'>println</span>(b)
 </pre>
 </pre>
 </div>
@@ -2613,15 +2613,15 @@ Copy an array.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
-<span class='keyword'>var</span> ys = xs;
-<span class='keyword'>var</span> zs = xs.<span class='field'>copy</span>();
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
+<span class='keyword'>var</span> ys = xs
+<span class='keyword'>var</span> zs = xs.<span class='field'>copy</span>()
 
-xs[<span class='constant'>0</span>] = <span class='constant'>69</span>;
+xs[<span class='constant'>0</span>] = <span class='constant'>69</span>
 
-io.<span class='field'>println</span>(xs);
-io.<span class='field'>println</span>(ys);
-io.<span class='field'>println</span>(zs);
+io.<span class='field'>println</span>(xs)
+io.<span class='field'>println</span>(ys)
+io.<span class='field'>println</span>(zs)
 </pre>
 </pre>
 </div>
@@ -2661,7 +2661,7 @@ Join the elements of an array, separated by <code>separator</code> into a single
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>([<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>].<span class='field'>join</span>(<span class='string'>" -&gt; "</span>));
+io.<span class='field'>println</span>([<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>].<span class='field'>join</span>(<span class='string'>" -&gt; "</span>))
 </pre>
 </pre>
 </div>
@@ -2703,11 +2703,11 @@ Returns the position if found, else <code>nil</code>.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>, <span class='constant'>3</span>];
-io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>3</span>));
-io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>3</span>, <span class='constant'>3</span>));
-io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>3</span>, <span class='constant'>6</span>));
-io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>true</span>, <span class='constant'>6</span>));
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>, <span class='constant'>3</span>]
+io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>3</span>))
+io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>3</span>, <span class='constant'>3</span>))
+io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>3</span>, <span class='constant'>6</span>))
+io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>true</span>, <span class='constant'>6</span>))
 </pre>
 </pre>
 </div>
@@ -2748,11 +2748,11 @@ Compare the elements of two arrays.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
-<span class='keyword'>var</span> ys = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
+<span class='keyword'>var</span> ys = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
 
-io.<span class='field'>println</span>(xs == ys);
-io.<span class='field'>println</span>(xs.<span class='field'>equal</span>(ys));
+io.<span class='field'>println</span>(xs == ys)
+io.<span class='field'>println</span>(xs.<span class='field'>equal</span>(ys))
 </pre>
 </pre>
 </div>
@@ -2798,13 +2798,13 @@ This modifies the array.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> xs = [];
+<span class='keyword'>var</span> xs = []
 
 <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>5</span> {
-    xs.<span class='field'>push</span>(i * <span class='constant'>2</span>);
+    xs.<span class='field'>push</span>(i * <span class='constant'>2</span>)
 }
 
-io.<span class='field'>println</span>(xs);
+io.<span class='field'>println</span>(xs)
 </pre>
 </pre>
 </div>
@@ -2845,19 +2845,19 @@ This modifies the array.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> xs = [];
+<span class='keyword'>var</span> xs = []
 
 <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>5</span> {
     <span class='keyword'>if</span> i == <span class='constant'>2</span> {
-        <span class='keyword'>continue</span>;
+        <span class='keyword'>continue</span>
     }
 
-    xs.<span class='field'>push</span>(i * <span class='constant'>2</span>);
+    xs.<span class='field'>push</span>(i * <span class='constant'>2</span>)
 }
-io.<span class='field'>println</span>(xs);
+io.<span class='field'>println</span>(xs)
 
-xs.<span class='field'>insert</span>(<span class='constant'>2</span>, <span class='constant'>4</span>);
-io.<span class='field'>println</span>(xs);
+xs.<span class='field'>insert</span>(<span class='constant'>2</span>, <span class='constant'>4</span>)
+io.<span class='field'>println</span>(xs)
 </pre>
 </pre>
 </div>
@@ -2896,10 +2896,10 @@ Sort an array inplace with <code>compare</code>, and return itself.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> xs = [<span class='constant'>4</span>, <span class='constant'>2</span>, <span class='constant'>5</span>, <span class='constant'>1</span>, <span class='constant'>3</span>];
-xs.<span class='field'>sort</span>(<span class='keyword'>fn</span> (x, y) =&gt; x &lt; y); <span class='comment'># This also returns the array so you can chain operations</span>
+<span class='keyword'>var</span> xs = [<span class='constant'>4</span>, <span class='constant'>2</span>, <span class='constant'>5</span>, <span class='constant'>1</span>, <span class='constant'>3</span>]
+xs.<span class='field'>sort</span>(<span class='keyword'>fn</span> (x, y) =&gt; x &lt; y) <span class='comment'># This also returns the array so you can chain operations</span>
 
-io.<span class='field'>println</span>(xs);
+io.<span class='field'>println</span>(xs)
 </pre>
 </pre>
 </div>
@@ -2948,11 +2948,11 @@ This modifies the array.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
-io.<span class='field'>println</span>(xs);
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
+io.<span class='field'>println</span>(xs)
 
-xs.<span class='field'>resize</span>(<span class='constant'>3</span>);
-io.<span class='field'>println</span>(xs);
+xs.<span class='field'>resize</span>(<span class='constant'>3</span>)
+io.<span class='field'>println</span>(xs)
 </pre>
 </pre>
 </div>
@@ -2994,11 +2994,11 @@ This modifies the array.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
-io.<span class='field'>println</span>(xs);
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
+io.<span class='field'>println</span>(xs)
 
-io.<span class='field'>println</span>(xs.<span class='field'>remove</span>(<span class='constant'>2</span>));
-io.<span class='field'>println</span>(xs);
+io.<span class='field'>println</span>(xs.<span class='field'>remove</span>(<span class='constant'>2</span>))
+io.<span class='field'>println</span>(xs)
 </pre>
 </pre>
 </div>
@@ -3041,11 +3041,11 @@ This modifies the array.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
-io.<span class='field'>println</span>(xs);
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
+io.<span class='field'>println</span>(xs)
 
-xs.<span class='field'>reverse</span>(); <span class='comment'># This also returns the array so you can chain operations</span>
-io.<span class='field'>println</span>(xs);
+xs.<span class='field'>reverse</span>() <span class='comment'># This also returns the array so you can chain operations</span>
+io.<span class='field'>println</span>(xs)
 </pre>
 </pre>
 </div>
@@ -3087,11 +3087,11 @@ This modifies the array.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
-io.<span class='field'>println</span>(xs);
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
+io.<span class='field'>println</span>(xs)
 
-xs.<span class='field'>fill</span>(<span class='constant'>69</span>); <span class='comment'># This also returns the array so you can chain operations</span>
-io.<span class='field'>println</span>(xs);
+xs.<span class='field'>fill</span>(<span class='constant'>69</span>) <span class='comment'># This also returns the array so you can chain operations</span>
+io.<span class='field'>println</span>(xs)
 </pre>
 </pre>
 </div>
@@ -3128,8 +3128,8 @@ with a preset size and value.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> xs = [].<span class='field'>resize</span>(<span class='constant'>5</span>).<span class='field'>fill</span>(<span class='string'>"foo"</span>);
-io.<span class='field'>println</span>(xs);
+<span class='keyword'>var</span> xs = [].<span class='field'>resize</span>(<span class='constant'>5</span>).<span class='field'>fill</span>(<span class='string'>"foo"</span>)
+io.<span class='field'>println</span>(xs)
 </pre>
 </pre>
 </div>
@@ -3167,10 +3167,10 @@ Slice an array from <code>start</code> (inclusive) to <code>end</code> (exclusiv
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
-io.<span class='field'>println</span>(xs);
-io.<span class='field'>println</span>(xs.<span class='field'>slice</span>(<span class='constant'>2</span>));
-io.<span class='field'>println</span>(xs.<span class='field'>slice</span>(<span class='constant'>1</span>, <span class='constant'>3</span>));
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
+io.<span class='field'>println</span>(xs)
+io.<span class='field'>println</span>(xs.<span class='field'>slice</span>(<span class='constant'>2</span>))
+io.<span class='field'>println</span>(xs.<span class='field'>slice</span>(<span class='constant'>1</span>, <span class='constant'>3</span>))
 </pre>
 </pre>
 </div>
@@ -3213,10 +3213,10 @@ This modifies the array.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>];
-<span class='keyword'>var</span> ys = [<span class='constant'>6</span>, <span class='constant'>7</span>, <span class='constant'>8</span>, <span class='constant'>9</span>, <span class='constant'>10</span>];
-io.<span class='field'>println</span>(xs);
-io.<span class='field'>println</span>(xs.<span class='field'>append</span>(ys));
+<span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
+<span class='keyword'>var</span> ys = [<span class='constant'>6</span>, <span class='constant'>7</span>, <span class='constant'>8</span>, <span class='constant'>9</span>, <span class='constant'>10</span>]
+io.<span class='field'>println</span>(xs)
+io.<span class='field'>println</span>(xs.<span class='field'>append</span>(ys))
 </pre>
 </pre>
 </div>
@@ -3275,16 +3275,16 @@ Copy a table.
 <span class='keyword'>var</span> xs = {
     foo = <span class='constant'>69</span>,
     bar = <span class='constant'>420</span>
-};
+}
 
-<span class='keyword'>var</span> ys = xs;
-<span class='keyword'>var</span> zs = xs.<span class='field'>copy</span>();
+<span class='keyword'>var</span> ys = xs
+<span class='keyword'>var</span> zs = xs.<span class='field'>copy</span>()
 
-xs.<span class='field'>bar</span> = <span class='constant'>1337</span>;
+xs.<span class='field'>bar</span> = <span class='constant'>1337</span>
 
-io.<span class='field'>println</span>(xs);
-io.<span class='field'>println</span>(ys);
-io.<span class='field'>println</span>(zs);
+io.<span class='field'>println</span>(xs)
+io.<span class='field'>println</span>(ys)
+io.<span class='field'>println</span>(zs)
 </pre>
 </pre>
 </div>
@@ -3333,11 +3333,11 @@ Compare the elements of two tables.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> xs = { foo = <span class='constant'>69</span>, bar = <span class='constant'>420</span> };
-<span class='keyword'>var</span> ys = { foo = <span class='constant'>69</span>, bar = <span class='constant'>420</span> };
+<span class='keyword'>var</span> xs = { foo = <span class='constant'>69</span>, bar = <span class='constant'>420</span> }
+<span class='keyword'>var</span> ys = { foo = <span class='constant'>69</span>, bar = <span class='constant'>420</span> }
 
-io.<span class='field'>println</span>(xs == ys);
-io.<span class='field'>println</span>(xs.<span class='field'>equal</span>(ys));
+io.<span class='field'>println</span>(xs == ys)
+io.<span class='field'>println</span>(xs.<span class='field'>equal</span>(ys))
 </pre>
 </pre>
 </div>
@@ -3385,8 +3385,8 @@ Sine in radians.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> theta = <span class='constant'>0.5</span>;
-io.<span class='field'>println</span>(theta.<span class='field'>sin</span>());
+<span class='keyword'>var</span> theta = <span class='constant'>0.5</span>
+io.<span class='field'>println</span>(theta.<span class='field'>sin</span>())
 </pre>
 </pre>
 </div>
@@ -3458,7 +3458,7 @@ Return the exponential function of the number.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='constant'>2</span>.<span class='field'>exp</span>()); <span class='comment'># Basically e^2</span>
+io.<span class='field'>println</span>(<span class='constant'>2</span>.<span class='field'>exp</span>()) <span class='comment'># Basically e^2</span>
 </pre>
 </pre>
 </div>
@@ -3538,9 +3538,9 @@ Return the sign of the number.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>((<span class='constant'>0</span>).<span class='field'>sign</span>());
-io.<span class='field'>println</span>((<span class='constant'>69</span>).<span class='field'>sign</span>());
-io.<span class='field'>println</span>((-<span class='constant'>420</span>).<span class='field'>sign</span>());
+io.<span class='field'>println</span>((<span class='constant'>0</span>).<span class='field'>sign</span>())
+io.<span class='field'>println</span>((<span class='constant'>69</span>).<span class='field'>sign</span>())
+io.<span class='field'>println</span>((-<span class='constant'>420</span>).<span class='field'>sign</span>())
 </pre>
 </pre>
 </div>
@@ -3580,8 +3580,8 @@ Return the maximum between the method receiver and the provided arguments.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='constant'>1</span>.<span class='field'>max</span>(<span class='constant'>2</span>, <span class='constant'>3</span>));
-io.<span class='field'>println</span>(<span class='constant'>3</span>.<span class='field'>max</span>(<span class='constant'>0</span>, <span class='constant'>1</span>, <span class='constant'>2</span>));
+io.<span class='field'>println</span>(<span class='constant'>1</span>.<span class='field'>max</span>(<span class='constant'>2</span>, <span class='constant'>3</span>))
+io.<span class='field'>println</span>(<span class='constant'>3</span>.<span class='field'>max</span>(<span class='constant'>0</span>, <span class='constant'>1</span>, <span class='constant'>2</span>))
 </pre>
 </pre>
 </div>
@@ -3620,8 +3620,8 @@ Return the minimum between the method receiver and the provided arguments.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='constant'>1</span>.<span class='field'>min</span>(<span class='constant'>2</span>, <span class='constant'>3</span>));
-io.<span class='field'>println</span>(<span class='constant'>3</span>.<span class='field'>min</span>(<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>));
+io.<span class='field'>println</span>(<span class='constant'>1</span>.<span class='field'>min</span>(<span class='constant'>2</span>, <span class='constant'>3</span>))
+io.<span class='field'>println</span>(<span class='constant'>3</span>.<span class='field'>min</span>(<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>))
 </pre>
 </pre>
 </div>
@@ -3687,10 +3687,10 @@ If no arguments are provided, a number between <code>0</code> and <code>1</code>
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(math.<span class='field'>random</span>());
-io.<span class='field'>println</span>(math.<span class='field'>random</span>());
-io.<span class='field'>println</span>(math.<span class='field'>random</span>(<span class='constant'>69</span>, <span class='constant'>420</span>));
-io.<span class='field'>println</span>(math.<span class='field'>random</span>(<span class='constant'>69</span>, <span class='constant'>420</span>));
+io.<span class='field'>println</span>(math.<span class='field'>random</span>())
+io.<span class='field'>println</span>(math.<span class='field'>random</span>())
+io.<span class='field'>println</span>(math.<span class='field'>random</span>(<span class='constant'>69</span>, <span class='constant'>420</span>))
+io.<span class='field'>println</span>(math.<span class='field'>random</span>(<span class='constant'>69</span>, <span class='constant'>420</span>))
 </pre>
 </pre>
 </div>

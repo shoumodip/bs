@@ -1,2 +1,2 @@
-pub var foo = 69;
-pub var bar = 420;
+pub var foo = 69
+pub var bar = 420

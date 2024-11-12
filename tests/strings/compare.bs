@@ -1,5 +1,5 @@
-io.println("foo".compare("bar"));
-io.println("foo".compare("lol"));
-io.println("foo".compare("foo"));
-io.println("foo".compare("food"));
-io.println("food".compare("foo"));
+io.println("foo".compare("bar"))
+io.println("foo".compare("lol"))
+io.println("foo".compare("foo"))
+io.println("foo".compare("food"))
+io.println("food".compare("foo"))
