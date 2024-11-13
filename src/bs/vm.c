@@ -729,27 +729,29 @@ Bs_Sv bs_buffer_relative_path(Bs_Buffer *b, Bs_Sv path) {
     const size_t max = bs_min(path.size, cwd->size);
 
     size_t i = 0;
-    while (i < max) {
-        if (path.data[i] != cwd->data[i]) {
-            break;
-        }
-
-        i++;
-    }
-
-    if (i != cwd->size || !bs_issep(path.data[i])) {
-        bs_da_push_many(b->bs, b, "../", 3);
-        for (size_t j = i; j < cwd->size; j++) {
-            if (bs_issep(cwd->data[j])) {
-                bs_da_push_many(b->bs, b, "../", 3);
+    if (!bs_sv_eq(Bs_Sv(cwd->data, cwd->size), Bs_Sv_Static("/"))) {
+        while (i < max) {
+            if (path.data[i] != cwd->data[i]) {
+                break;
             }
+
+            i++;
         }
 
-        while (i && !bs_issep(path.data[i - 1])) {
-            i--;
+        if (i != cwd->size || !bs_issep(path.data[i])) {
+            bs_da_push_many(b->bs, b, "../", 3);
+            for (size_t j = i; j < cwd->size; j++) {
+                if (bs_issep(cwd->data[j])) {
+                    bs_da_push_many(b->bs, b, "../", 3);
+                }
+            }
+
+            while (i && !bs_issep(path.data[i - 1])) {
+                i--;
+            }
+        } else {
+            i++;
         }
-    } else {
-        i++;
     }
 
     bs_da_push_many(b->bs, b, path.data + i, path.size - i);
