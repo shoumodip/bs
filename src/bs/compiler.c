@@ -81,6 +81,40 @@ static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     }
 }
 
+static_assert(BS_COUNT_TOKENS == 75, "Update bs_token_type_can_start()");
+static bool bs_token_type_can_start(Bs_Token_Type type) {
+    switch (type) {
+    case BS_TOKEN_NIL:
+    case BS_TOKEN_STR:
+    case BS_TOKEN_ISTR:
+    case BS_TOKEN_NUM:
+    case BS_TOKEN_TRUE:
+    case BS_TOKEN_FALSE:
+    case BS_TOKEN_IDENT:
+    case BS_TOKEN_LPAREN:
+    case BS_TOKEN_LBRACE:
+    case BS_TOKEN_LBRACKET:
+    case BS_TOKEN_SUB:
+    case BS_TOKEN_BNOT:
+    case BS_TOKEN_LNOT:
+    case BS_TOKEN_LEN:
+    case BS_TOKEN_PANIC:
+    case BS_TOKEN_ASSERT:
+    case BS_TOKEN_DELETE:
+    case BS_TOKEN_IMPORT:
+    case BS_TOKEN_TYPEOF:
+    case BS_TOKEN_IF:
+    case BS_TOKEN_FN:
+    case BS_TOKEN_THIS:
+    case BS_TOKEN_SUPER:
+    case BS_TOKEN_IS_MAIN_MODULE:
+        return true;
+
+    default:
+        return false;
+    }
+}
+
 typedef struct {
     size_t *data;
     size_t count;
@@ -153,8 +187,8 @@ static void bs_lambda_free(Bs *bs, Bs_Lambda *l) {
     }
 }
 
-// The lambdas need to stored on the heap since the error handling mechanism
-// uses longjumps which changes the stack pointer
+// The lambdas need to stored on the heap since the error handling mechanism uses longjumps which
+// changes the stack pointer
 static Bs_Lambda *bs_lambda_new(Bs_Lambda_Type type, bool is_repl) {
     Bs_Lambda *p = malloc(sizeof(Bs_Lambda));
     assert(p);
@@ -1414,8 +1448,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         break;
 
     case BS_TOKEN_RETURN:
-        if (bs_lexer_peek_row(&c->lexer, &token) && token.type != BS_TOKEN_EOL &&
-            token.type != BS_TOKEN_EOF) {
+        if (bs_lexer_peek_row(&c->lexer, &token) && bs_token_type_can_start(token.type)) {
             if (c->lambda->type == BS_LAMBDA_INIT) {
                 const Bs_Loc loc = token.loc;
                 const bool ok = token.type == BS_TOKEN_NIL;
@@ -1426,29 +1459,37 @@ static void bs_compile_stmt(Bs_Compiler *c) {
                         &c->lexer,
                         loc,
 
-                        Bs_Sv_Static(
-                            "When an initializer method explicitly returns 'nil', it "
-                            "indicates that "
-                            "the\n"
-                            "initialization failed due to some reason, and the site of the "
-                            "instantiation\n"
-                            "gets 'nil' as the result. This is not strictly OOP, but I "
-                            "missed the part "
-                            "where\n"
-                            "that's my problem."),
+                        Bs_Sv_Static("When an initializer method explicitly returns 'nil', it "
+                                     "indicates that the\n"
+                                     "initialization failed due to some reason, and the site of "
+                                     "the instantiation\n"
+                                     "gets 'nil' as the result. This is not strictly OOP, but I "
+                                     "missed the part where\n"
+                                     "that's my problem."),
 
-                        Bs_Sv_Static("var f = io.Reader(\"does_not_exist.txt\");\n"
-                                     "if !f {\n"
-                                     "    io.eprintln(\"Error: could not read file!\");\n"
-                                     "    os.exit(1);\n"
+                        Bs_Sv_Static("class Log {\n"
+                                     "    init(path) {\n"
+                                     "        this.file = io.Writer(path)\n"
+                                     "        if !this.file {\n"
+                                     "            return nil # Failed to open log file\n"
+                                     "        }\n"
+                                     "    }\n"
+                                     "\n"
+                                     "    write(s) => this.file.writeln(s)\n"
                                      "}\n"
                                      "\n"
-                                     "io.print(f.read()); # Or whatever you want to do"),
+                                     "var log = Log(\"log.txt\")\n"
+                                     "if !log {\n"
+                                     "    panic() # Handle error\n"
+                                     "}\n"
+                                     "\n"
+                                     "log.write(\"Hello, world!\") # Or whatever you want to do"),
 
                         "can only explicity return 'nil' from an initializer method");
                 }
 
-                if (bs_lexer_peek_row(&c->lexer, &token) && token.type != BS_TOKEN_EOL) {
+                if (bs_lexer_peek_row(&c->lexer, &token) &&
+                    bs_token_type_power(token.type) != BS_POWER_NIL) {
                     bs_compile_error_unexpected(c, &token);
                 }
 

@@ -2002,9 +2002,9 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                         Bs_Sv_Static("Use (++) for string concatenation, or use string "
                                      "interpolation instead"),
 
-                        Bs_Sv_Static("\"Hello, \" ++ \"world!\";\n"
-                                     "\"Hello, \" ++ 69;\n"
-                                     "\"Hello, \\(34 + 35) nice!\";"),
+                        Bs_Sv_Static("\"Hello, \" ++ \"world!\"\n"
+                                     "\"Hello, \" ++ 69\n"
+                                     "\"Hello, \\(34 + 35) nice!\""),
 
                         "invalid operands to binary (+): " Bs_Sv_Fmt ", " Bs_Sv_Fmt,
                         Bs_Sv_Arg(sa),

@@ -163,15 +163,15 @@ false
 :i returncode 1
 :b stdout 0
 
-:b stderr 242
+:b stderr 239
 strings/error_invalid_addition.bs:1:15: error: invalid operands to binary (+): number, string
 
 Use (++) for string concatenation, or use string interpolation instead
 
 ```
-"Hello, " ++ "world!";
-"Hello, " ++ 69;
-"Hello, \(34 + 35) nice!";
+"Hello, " ++ "world!"
+"Hello, " ++ 69
+"Hello, \(34 + 35) nice!"
 ```
 
 :b shell 28
@@ -811,7 +811,7 @@ ligma
 :i returncode 1
 :b stdout 0
 
-:b stderr 534
+:b stderr 685
 oop/error_cannot_return_from_init.bs:3:16: error: can only explicity return 'nil' from an initializer method
 
 When an initializer method explicitly returns 'nil', it indicates that the
@@ -820,13 +820,23 @@ gets 'nil' as the result. This is not strictly OOP, but I missed the part where
 that's my problem.
 
 ```
-var f = io.Reader("does_not_exist.txt");
-if !f {
-    io.eprintln("Error: could not read file!");
-    os.exit(1);
+class Log {
+    init(path) {
+        this.file = io.Writer(path)
+        if !this.file {
+            return nil # Failed to open log file
+        }
+    }
+
+    write(s) => this.file.writeln(s)
 }
 
-io.print(f.read()); # Or whatever you want to do
+var log = Log("log.txt")
+if !log {
+    panic() # Handle error
+}
+
+log.write("Hello, world!") # Or whatever you want to do
 ```
 
 :b shell 41
