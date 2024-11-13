@@ -1608,6 +1608,40 @@ Euler's constant.
 ### PI @constant
 PI.
 
+### range(begin, end, step?) @function
+Return an array containing a range.
+
+If `step` is not provided, it is automatically selected.
+
+```bs
+io.println(math.range(1, 6))
+io.println(math.range(6, 1))
+
+io.println(math.range(1, 6, 2))
+io.println(math.range(6, 1, -2))
+```
+
+```console
+$ bs demo.bs
+[1, 2, 3, 4, 5]
+[6, 5, 4, 3, 2]
+[1, 3, 5]
+[6, 4, 2]
+```
+
+If `step` is provided such that it would run indefinitely, an error will be
+raised.
+
+```bs
+io.println(math.range(1, 6, -1))
+```
+
+```console
+$ bs demo.bs
+[C]: error: a step of -1 in an ascending range would run indefinitely
+demo.bs:1:29: in range()
+```
+
 ### random(low?, high?) @function
 Return a pseudorandom number between `low` and `high`.
 

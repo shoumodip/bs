@@ -1,4 +1,4 @@
-:i count 123
+:i count 125
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -1397,7 +1397,7 @@ false
 :b shell 22
 ../bin/bs core/math.bs
 :i returncode 0
-:b stdout 243
+:b stdout 425
 2.71828182845905
 3.14159265358979
 0
@@ -1439,6 +1439,32 @@ false
 0
 1
 -1
+[
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+]
+[1, 3, 5, 7, 9]
+[
+    11,
+    10,
+    9,
+    8,
+    7,
+    6,
+    5,
+    4,
+    3,
+    2
+]
+[11, 9, 7, 5, 3]
 
 :b stderr 0
 
@@ -1722,4 +1748,22 @@ true
 5 r
 
 :b stderr 0
+
+:b shell 55
+../bin/bs core/math_range_indefinite_ascending_guard.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 133
+[C]: error: a step of -1 in an ascending range would run indefinitely
+core/math_range_indefinite_ascending_guard.bs:1:19: in range()
+
+:b shell 56
+../bin/bs core/math_range_indefinite_descending_guard.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 133
+[C]: error: a step of 1 in a descending range would run indefinitely
+core/math_range_indefinite_descending_guard.bs:1:19: in range()
 

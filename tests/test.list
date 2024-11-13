@@ -121,3 +121,5 @@
 ../bin/bs core/readdir.bs
 ../bin/bs not_is_in_binary_op/main.bs
 ../bin/bs strings/index.bs
+../bin/bs core/math_range_indefinite_ascending_guard.bs
+../bin/bs core/math_range_indefinite_descending_guard.bs

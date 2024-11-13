@@ -54,3 +54,8 @@ io.println(4.lerp(8, 0.5))
 io.println((0).sign())
 io.println((69).sign())
 io.println((-420).sign())
+
+io.println(math.range(1, 11))
+io.println(math.range(1, 11, 2))
+io.println(math.range(11, 1))
+io.println(math.range(11, 1, -2))

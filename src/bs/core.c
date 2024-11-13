@@ -2143,6 +2143,39 @@ Bs_Value bs_math_sign(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_num((x > 0) - (x < 0));
 }
 
+Bs_Value bs_math_range(Bs *bs, Bs_Value *args, size_t arity) {
+    if (arity != 2 && arity != 3) {
+        bs_error(bs, "expected 2 or 3 arguments, got %zu", arity);
+    }
+
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
+    bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
+
+    const double begin = args[0].as.number;
+    const double end = args[1].as.number;
+
+    const bool ascending = end > begin;
+    double step = ascending ? 1 : -1;
+    if (arity == 3) {
+        bs_arg_check_value_type(bs, args, 2, BS_VALUE_NUM);
+        step = args[2].as.number;
+        if (step == 0 || ascending != step > 0) {
+            bs_error_at(
+                bs,
+                3,
+                "a step of %.15g in %s range would run indefinitely",
+                step,
+                ascending ? "an ascending" : "a descending");
+        }
+    }
+
+    Bs_Array *a = bs_array_new(bs);
+    for (double i = begin; ascending ? (i < end) : (i > end); i += step) {
+        bs_array_set(bs, a, a->count, bs_value_num(i));
+    }
+    return bs_value_object(a);
+}
+
 Bs_Value bs_math_random(Bs *bs, Bs_Value *args, size_t arity) {
     if (arity != 0 && arity != 2) {
         bs_error(bs, "expected 0 or 2 arguments, got %zu", arity);
@@ -2481,6 +2514,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         Bs_Table *math = bs_table_new(bs);
         bs_add(bs, math, "E", bs_value_num(2.7182818284590452354));
         bs_add(bs, math, "PI", bs_value_num(3.14159265358979323846));
+        bs_add_fn(bs, math, "range", bs_math_range);
         bs_add_fn(bs, math, "random", bs_math_random);
         bs_global_set(bs, Bs_Sv_Static("math"), bs_value_object(math));
     }
