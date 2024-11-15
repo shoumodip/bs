@@ -1,4 +1,4 @@
-:i count 125
+:i count 126
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -1766,4 +1766,14 @@ core/math_range_indefinite_ascending_guard.bs:1:19: in range()
 :b stderr 133
 [C]: error: a step of 1 in a descending range would run indefinitely
 core/math_range_indefinite_descending_guard.bs:1:19: in range()
+
+:b shell 33
+../bin/bs strings/single_quote.bs
+:i returncode 0
+:b stdout 35
+Hello, world!
+Nice, 69!
+Here: '"'!
+
+:b stderr 0
 

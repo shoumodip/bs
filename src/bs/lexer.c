@@ -49,10 +49,10 @@ void bs_lexer_buffer(Bs_Lexer *l, Bs_Token token) {
     l->buffer = token;
 }
 
-Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc) {
+Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc, char end) {
     Bs_Token token = {.sv = l->sv, .loc = loc};
 
-    while (l->sv.size > 0 && *l->sv.data != '"') {
+    while (l->sv.size > 0 && *l->sv.data != end) {
         char ch = *l->sv.data;
         if (ch == '\\') {
             if (l->sv.size <= 2) {
@@ -67,6 +67,7 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc) {
             case 'r':
             case 't':
             case '0':
+            case '\'':
             case '"':
             case '\\':
                 break;
@@ -246,7 +247,12 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
 
     if (bs_lexer_match(l, '"')) {
         l->prev_row = token.loc.row;
-        return bs_lexer_str(l, token.loc);
+        return bs_lexer_str(l, token.loc, '"');
+    }
+
+    if (bs_lexer_match(l, '\'')) {
+        l->prev_row = token.loc.row;
+        return bs_lexer_str(l, token.loc, '\'');
     }
 
     switch (bs_lexer_consume(l)) {

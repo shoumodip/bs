@@ -48,7 +48,7 @@ Bs_Lexer bs_lexer_new(Bs_Sv path, Bs_Sv input, Bs_Error_Writer *error);
 void bs_lexer_advance(Bs_Lexer *l);
 void bs_lexer_buffer(Bs_Lexer *lexer, Bs_Token token);
 
-Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc);
+Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc, char end);
 Bs_Token bs_lexer_next(Bs_Lexer *lexer);
 Bs_Token bs_lexer_peek(Bs_Lexer *lexer);
 

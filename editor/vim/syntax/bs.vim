@@ -30,9 +30,10 @@ syntax match Type "\<\a\w*\>\(\s*<\s*\a\w*\>\)\?" contained contains=Inheritance
 syntax keyword Keyword class skipwhite skipempty nextgroup=Type
 
 syntax match Error '\\.' contained
-syntax match SpecialChar '\\e\|\\n\|\\r\|\\t\|\\0\|\\"\|\\\\' contained
+syntax match SpecialChar /\\e\|\\n\|\\r\|\\t\|\\0\|\\"\|\\'\|\\\\/ contained
 syntax region Parenthesis contains=TOP matchgroup=NONE start='(' end=')'
 syntax region String contains=Error,SpecialChar,Interpolation start='"' skip='\\\\\|\\"' end='"'
+syntax region String contains=Error,SpecialChar,Interpolation start="'" skip="\\\\\|\\'" end="'"
 syntax region Interpolation contained contains=TOP matchgroup=Special start='\\(' end=')'
 
 let b:current_syntax = "bs"

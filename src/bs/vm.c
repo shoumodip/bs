@@ -1204,6 +1204,10 @@ static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
     }
 
     switch (value.as.object->type) {
+    case BS_OBJECT_FN:
+        bs_error_at(bs, offset, "cannot call raw function directly, wrap it in a closure first");
+        break;
+
     case BS_OBJECT_CLOSURE:
         bs_call_closure(bs, offset, (Bs_Closure *)value.as.object, arity);
         break;

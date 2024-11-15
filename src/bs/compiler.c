@@ -311,6 +311,10 @@ static void bs_compile_string(Bs_Compiler *c, Bs_Sv sv) {
                 ch = '\"';
                 break;
 
+            case '\'':
+                ch = '\'';
+                break;
+
             case '\\':
                 ch = '\\';
                 break;
@@ -438,9 +442,10 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         bs_compile_string(c, token.sv);
         break;
 
-    case BS_TOKEN_ISTR:
+    case BS_TOKEN_ISTR: {
         bs_compile_string(c, token.sv);
 
+        const char end = token.sv.data[-1];
         while (token.type == BS_TOKEN_ISTR) {
             bs_lexer_expect(&c->lexer, BS_TOKEN_LPAREN);
             bs_compile_expr(c, BS_POWER_SET);
@@ -448,14 +453,14 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_JOIN);
 
-            token = bs_lexer_str(&c->lexer, c->lexer.loc);
+            token = bs_lexer_str(&c->lexer, c->lexer.loc, end);
 
             if (token.sv.size) {
                 bs_compile_string(c, token.sv);
                 bs_chunk_push_op(c->bs, c->chunk, BS_OP_JOIN);
             }
         }
-        break;
+    } break;
 
     case BS_TOKEN_NUM:
         bs_chunk_push_op_value(
