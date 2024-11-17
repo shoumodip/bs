@@ -123,12 +123,12 @@ static void bsdoc_print_token(FILE *f, Bs_Token token, Bsdoc_Style style, const 
     const bool string = token.type == BS_TOKEN_STR || token.type == BS_TOKEN_ISTR;
     bool interpolation = false;
     if (string) {
-        if (token.sv.data[-1] == '"') {
+        if (token.sv.data[-1] == '"' || token.sv.data[-1] == '\'') {
             token.sv.data--;
             token.sv.size++;
         }
 
-        if (token.sv.data[token.sv.size] == '"') {
+        if (token.sv.data[token.sv.size] == '"' || token.sv.data[token.sv.size] == '\'') {
             token.sv.size++;
         } else if (token.sv.data[token.sv.size] == '\\') {
             interpolation = true;
@@ -159,11 +159,11 @@ static void bsdoc_print_token(FILE *f, Bs_Token token, Bsdoc_Style style, const 
 }
 
 typedef struct {
-    bool data[256];
+    char data[256];
     size_t count;
 } Bsdoc_Parens;
 
-static void bsdoc_parens_push(Bsdoc_Parens *f, bool start) {
+static void bsdoc_parens_push(Bsdoc_Parens *f, char start) {
     assert(f->count < bs_c_array_size(f->data));
     f->data[f->count++] = start;
 }
@@ -298,35 +298,36 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
         switch (token.type) {
         case BS_TOKEN_ISTR:
             bsdoc_print_token(f, token, style, &last);
+            bsdoc_parens_push(&parens, token.sv.data[-1]);
 
             token = bs_lexer_expect(&lexer, BS_TOKEN_LPAREN);
             bsdoc_print_token(f, token, BSDOC_STYLE_ESCAPE, &last);
-
-            bsdoc_parens_push(&parens, true);
             break;
 
         case BS_TOKEN_LPAREN:
             bsdoc_print_token(f, token, style, &last);
-            bsdoc_parens_push(&parens, false);
+            bsdoc_parens_push(&parens, '\0');
             break;
 
-        case BS_TOKEN_RPAREN:
+        case BS_TOKEN_RPAREN: {
             assert(parens.count);
-            if (parens.data[--parens.count]) {
+            const char ch = parens.data[--parens.count];
+            assert(ch == '"' || ch == '\'' || ch == '\0');
+            if (ch) {
                 bsdoc_print_token(f, token, BSDOC_STYLE_ESCAPE, &last);
 
-                token = bs_lexer_str(&lexer, lexer.loc);
+                token = bs_lexer_str(&lexer, lexer.loc, ch);
                 bsdoc_print_token(f, token, bsdoc_token_type_style(token.type), &last);
 
                 if (token.type == BS_TOKEN_ISTR) {
                     token = bs_lexer_expect(&lexer, BS_TOKEN_LPAREN);
                     bsdoc_print_token(f, token, BSDOC_STYLE_ESCAPE, &last);
-                    bsdoc_parens_push(&parens, true);
+                    bsdoc_parens_push(&parens, ch);
                 }
             } else {
                 bsdoc_print_token(f, token, style, &last);
             }
-            break;
+        } break;
 
         case BS_TOKEN_FN:
             bsdoc_print_token(f, token, style, &last);

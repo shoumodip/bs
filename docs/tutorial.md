@@ -119,6 +119,9 @@ io.println(len("Hello!"))
 
 # Output: b
 io.println("foobar"[3])
+
+# Output: Let's go!
+io.println('Let\'s go!') # Single quotes can also be used
 ```
 
 ### Arrays
