@@ -1,0 +1,4 @@
+io.println(
+    "foobar"
+        .lpad("Xx", 8)
+        .rpad("Xx", 10))

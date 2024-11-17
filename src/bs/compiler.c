@@ -717,7 +717,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         return;
     }
 
-    while (bs_lexer_peek_row(&c->lexer, &token)) {
+    while (bs_lexer_peek_row(&c->lexer, &token) || token.type == BS_TOKEN_DOT) {
         const Bs_Power lbp = bs_token_type_power(token.type);
         if (lbp <= mbp) {
             break;

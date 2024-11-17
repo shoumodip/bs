@@ -1,4 +1,4 @@
-:i count 126
+:i count 127
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -1774,6 +1774,14 @@ core/math_range_indefinite_descending_guard.bs:1:19: in range()
 Hello, world!
 Nice, 69!
 Here: '"'!
+
+:b stderr 0
+
+:b shell 41
+../bin/bs invokation/asi_esception_dot.bs
+:i returncode 0
+:b stdout 11
+XxfoobarXx
 
 :b stderr 0
 

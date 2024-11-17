@@ -124,3 +124,4 @@
 ../bin/bs core/math_range_indefinite_ascending_guard.bs
 ../bin/bs core/math_range_indefinite_descending_guard.bs
 ../bin/bs strings/single_quote.bs
+../bin/bs invokation/asi_esception_dot.bs
