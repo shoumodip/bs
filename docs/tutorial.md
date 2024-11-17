@@ -255,6 +255,52 @@ io.println(420 is "nil")           # Output: false
 io.println(420 !is "nil")          # Output: true
 ```
 
+## Semicolons
+Semicolons can be used to mark the end of an expression optionally. This is not
+necessary though, since BS performs automatic semicolon insertion based on
+newlines similarly to Go.
+
+
+```bs
+# Output:
+# 69
+# 420
+io.println(69); io.println(420)
+```
+
+This does mean, however, that placement of binary operators matter.
+
+```bs
+# => 100 - 31;
+100 - 31
+
+# => 100 - 31;
+100 -
+31
+
+# => 100; -31;
+100
+- 31
+```
+
+Basically binary operators cannot start on a newline. If you wish to split an
+expression across multiple lines, the operators have to kept on the same line
+if you wish the next line to be part of that expression.
+
+The field access operator (`.`) is the only exception to this rule.
+
+```bs
+# Considered part of the same expression, even though the binary operator (.)
+# starts on a new line.
+something
+    .foo
+    .bar(deez, nuts)
+    .baz
+
+# The above expression is equivalent to this.
+something.foo.bar(deez, nuts).baz
+```
+
 ## Conditions
 ### If Statement
 ```bs
