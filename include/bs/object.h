@@ -98,13 +98,13 @@ bool bs_table_set(Bs *bs, Bs_Table *table, Bs_Value key, Bs_Value value);
 
 struct Bs_Closure {
     Bs_Object meta;
-    const Bs_Fn *fn;
+    Bs_Fn *fn;
 
     size_t upvalues;
     Bs_Upvalue *data[];
 };
 
-Bs_Closure *bs_closure_new(Bs *bs, const Bs_Fn *fn);
+Bs_Closure *bs_closure_new(Bs *bs, Bs_Fn *fn);
 
 struct Bs_Upvalue {
     Bs_Object meta;

@@ -104,7 +104,7 @@ bool bs_table_set(Bs *bs, Bs_Table *t, Bs_Value key, Bs_Value value) {
     return bs_map_set(bs, &t->map, key, value);
 }
 
-Bs_Closure *bs_closure_new(Bs *bs, const Bs_Fn *fn) {
+Bs_Closure *bs_closure_new(Bs *bs, Bs_Fn *fn) {
     const size_t upvalues = sizeof(Bs_Upvalue *) * fn->upvalues;
     Bs_Closure *closure =
         (Bs_Closure *)bs_object_new(bs, BS_OBJECT_CLOSURE, sizeof(Bs_Closure) + upvalues);

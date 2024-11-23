@@ -1526,7 +1526,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
     bs_compile_consume_eol(c);
 }
 
-Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl) {
+Bs_Closure *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl) {
     Bs_Compiler compiler = {
         .bs = bs,
         .is_main = is_main,
@@ -1576,5 +1576,5 @@ Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl) {
     bs_lambda_free(compiler.bs, lambda);
     bs_jumps_free(compiler.bs, &compiler.jumps);
     bs_op_locs_free(compiler.bs, &compiler.locations);
-    return fn;
+    return bs_closure_new(bs, fn);
 }

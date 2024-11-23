@@ -1310,7 +1310,7 @@ static void bs_close_upvalues(Bs *bs, Bs_Value *last) {
     }
 }
 
-const Bs_Fn *bs_compile_module(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl) {
+const Bs_Closure *bs_compile_module(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl) {
     Bs_Module module = {
         .name = bs_str_new(bs, path),
         .length = path.size,
@@ -1324,8 +1324,8 @@ const Bs_Fn *bs_compile_module(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bo
     const Bs_Sv relative =
         bs_buffer_relative_path(&bs->paths, Bs_Sv(module.name->data, module.name->size));
 
-    Bs_Fn *fn = bs_compile(bs, relative, input, is_main, is_repl);
-    if (!fn) {
+    Bs_Closure *closure = bs_compile(bs, relative, input, is_main, is_repl);
+    if (!closure) {
         return NULL;
     }
 
@@ -1337,12 +1337,12 @@ const Bs_Fn *bs_compile_module(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bo
             bs_modules_push(bs, &bs->modules, module);
             repl_module_index = bs->modules.count;
         }
-        fn->module = repl_module_index;
+        closure->fn->module = repl_module_index;
     } else {
         bs_modules_push(bs, &bs->modules, module);
-        fn->module = bs->modules.count;
+        closure->fn->module = bs->modules.count;
     }
-    return fn;
+    return closure;
 }
 
 static bool bs_import_language(Bs *bs, Bs_Sv path) {
@@ -1353,7 +1353,7 @@ static bool bs_import_language(Bs *bs, Bs_Sv path) {
     }
 
     path.size--;
-    const Bs_Fn *fn = bs_compile_module(bs, path, Bs_Sv(contents, size), false, false);
+    const Bs_Closure *fn = bs_compile_module(bs, path, Bs_Sv(contents, size), false, false);
     free(contents);
 
     if (!fn) {
@@ -1361,10 +1361,10 @@ static bool bs_import_language(Bs *bs, Bs_Sv path) {
     }
 
 #ifdef BS_STEP_DEBUG
-    bs_debug_chunk(bs_pretty_printer(bs, &bs->config.log), &fn->chunk);
+    bs_debug_chunk(bs_pretty_printer(bs, &bs->config.log), &fn->fn->chunk);
 #endif // BS_STEP_DEBUG
 
-    bs_stack_push(bs, bs_value_object(bs_closure_new(bs, fn)));
+    bs_stack_push(bs, bs_value_object(fn));
     bs_call_stack_top(bs, 0);
     return true;
 }
@@ -1768,8 +1768,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             break;
 
         case BS_OP_CLOSURE: {
-            const Bs_Fn *fn = (const Bs_Fn *)bs_chunk_read_const(bs).as.object;
-            Bs_Closure *closure = bs_closure_new(bs, fn);
+            Bs_Closure *closure = bs_closure_new(bs, (Bs_Fn *)bs_chunk_read_const(bs).as.object);
             bs_stack_push(bs, bs_value_object(closure));
 
             for (size_t i = 0; i < closure->upvalues; i++) {
@@ -2615,16 +2614,16 @@ Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_repl) {
     const size_t start = b->count;
 
     bs_buffer_absolute_path(b, path);
-    const Bs_Fn *fn = bs_compile_module(bs, bs_buffer_reset(b, start), input, true, is_repl);
+    const Bs_Closure *fn = bs_compile_module(bs, bs_buffer_reset(b, start), input, true, is_repl);
     if (!fn) {
         return (Bs_Result){.exit = 1};
     }
 
 #ifdef BS_STEP_DEBUG
-    bs_debug_chunk(bs_pretty_printer(bs, &bs->config.log), &fn->chunk);
+    bs_debug_chunk(bs_pretty_printer(bs, &bs->config.log), &fn->fn->chunk);
 #endif // BS_STEP_DEBUG
 
-    result.value = bs_call(bs, bs_value_object(bs_closure_new(bs, fn)), NULL, 0);
+    result.value = bs_call(bs, bs_value_object(fn), NULL, 0);
 
 end:
     bs->stack.count = 0;

@@ -3,6 +3,6 @@
 
 #include "object.h"
 
-Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl);
+Bs_Closure *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl);
 
 #endif // BS_COMPILER_H
