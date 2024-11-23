@@ -191,7 +191,7 @@ int main(int argc, char **argv) {
                     }
                 }
 
-                result = bs_run(bs, Bs_Sv_Static("<stdin>.bs"), input, true);
+                result = bs_run(bs, Bs_Sv_Static("<stdin>"), input, true);
                 if (result.ok) {
                     if (result.exit != -1) {
                         break;
@@ -211,7 +211,7 @@ int main(int argc, char **argv) {
                 buffer.count += fread(head, 1, buffer.capacity - buffer.count, stdin);
             }
 
-            result = bs_run(bs, Bs_Sv_Static("<stdin>.bs"), bs_buffer_reset(&buffer, 0), false);
+            result = bs_run(bs, Bs_Sv_Static("<stdin>"), bs_buffer_reset(&buffer, 0), false);
             bs_da_free(bs, &buffer);
         }
 
