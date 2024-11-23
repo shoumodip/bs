@@ -1526,7 +1526,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
     bs_compile_consume_eol(c);
 }
 
-Bs_Fn *bs_compile_impl(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl) {
+Bs_Fn *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl) {
     Bs_Compiler compiler = {
         .bs = bs,
         .is_main = is_main,
