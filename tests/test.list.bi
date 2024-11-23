@@ -1,4 +1,4 @@
-:i count 127
+:i count 128
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -1784,4 +1784,29 @@ Here: '"'!
 XxfoobarXx
 
 :b stderr 0
+
+:b shell 22
+../bin/bs core/meta.bs
+:i returncode 0
+:b stdout 84
+<fn>
+69
+nil
+420
+Nice!
+Nice!
+Nice!
+Nice!
+Nice!
+Nice!
+Nice!
+Nice!
+Nice!
+Nice!
+nil
+nil
+
+:b stderr 92
+<meta>:1:5: error: invalid character '$' (36)
+<meta>:1:5: error: invalid character '$' (36)
 

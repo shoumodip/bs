@@ -175,6 +175,7 @@ struct Bs_Lambda {
     Bs_Uplocals uplocals;
 
     bool is_repl;
+    bool is_meta;
 };
 
 #define bs_lambda_push bs_da_push
@@ -187,12 +188,12 @@ static void bs_lambda_free(Bs *bs, Bs_Lambda *l) {
     }
 }
 
-// The lambdas need to stored on the heap since the error handling mechanism uses longjumps which
-// changes the stack pointer
-static Bs_Lambda *bs_lambda_new(Bs_Lambda_Type type, bool is_repl) {
+static Bs_Lambda *bs_lambda_new(Bs_Lambda_Type type, bool is_repl, bool is_meta) {
+    // The lambdas need to stored on the heap since the error handling mechanism uses longjumps
+    // which changes the stack pointer
     Bs_Lambda *p = malloc(sizeof(Bs_Lambda));
     assert(p);
-    *p = (Bs_Lambda){.type = type, .is_repl = is_repl};
+    *p = (Bs_Lambda){.type = type, .is_repl = is_repl, .is_meta = is_meta};
     return p;
 }
 
@@ -1111,7 +1112,7 @@ static size_t bs_compile_definition(Bs_Compiler *c, Bs_Token *name, bool public)
 static void bs_compile_stmt(Bs_Compiler *c);
 
 static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Token *name) {
-    Bs_Lambda *lambda = bs_lambda_new(type, false);
+    Bs_Lambda *lambda = bs_lambda_new(type, false, false);
     bs_compile_lambda_init(c, lambda, name ? name->sv : (Bs_Sv){0});
     bs_compile_block_init(c);
 
@@ -1519,20 +1520,20 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         bs_compile_expr(c, BS_POWER_NIL);
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
 
-        c->last_stmt_was_expr = c->lambda->is_repl && c->lambda->depth == 1;
+        c->last_stmt_was_expr = (c->lambda->is_repl || c->lambda->is_meta) && c->lambda->depth == 1;
         break;
     }
 
     bs_compile_consume_eol(c);
 }
 
-Bs_Closure *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl) {
+Bs_Closure *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl, bool is_meta) {
     Bs_Compiler compiler = {
         .bs = bs,
         .is_main = is_main,
     };
 
-    Bs_Lambda *lambda = bs_lambda_new(BS_LAMBDA_FN, is_repl);
+    Bs_Lambda *lambda = bs_lambda_new(BS_LAMBDA_FN, is_repl, is_meta);
     bs_compile_lambda_init(&compiler, lambda, path);
     bs_compile_block_init(&compiler);
 
@@ -1568,7 +1569,7 @@ Bs_Closure *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_re
         bs_compile_stmt(&compiler);
     }
 
-    if (is_repl && compiler.last_stmt_was_expr) {
+    if ((is_repl || is_meta) && compiler.last_stmt_was_expr) {
         compiler.chunk->data[compiler.chunk->last] = BS_OP_RET;
     }
 

@@ -1,4 +1,3 @@
-#include "bs/vm.h"
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -23,8 +22,8 @@
 #    define FD_OPEN fdopen
 #endif // _WIN32
 
+#include "bs/compiler.h"
 #include "bs/core.h"
-#include "bs/object.h"
 #include "regex/regex.h"
 
 // IO
@@ -2243,6 +2242,32 @@ Bs_Value bs_math_lerp(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_num(a + (b - a) * t);
 }
 
+// Metaprogramming
+Bs_Value bs_meta_compile(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    const Bs_Sv input = Bs_Sv(str->data, str->size);
+
+    const Bs_Closure *closure = bs_compile(bs, Bs_Sv_Static("<meta>"), input, false, false, true);
+    return closure ? bs_value_object(closure) : bs_value_nil;
+}
+
+Bs_Value bs_meta_eval(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    const Bs_Sv input = Bs_Sv(str->data, str->size);
+
+    const Bs_Closure *closure = bs_compile(bs, Bs_Sv_Static("<meta>"), input, false, false, true);
+    if (!closure) {
+        return bs_value_nil;
+    }
+    return bs_call(bs, bs_value_object(closure), NULL, 0);
+}
+
 // Main
 static void bs_add(Bs *bs, Bs_Table *table, const char *key, Bs_Value value) {
     bs_table_set(bs, table, bs_value_object(bs_str_new(bs, bs_sv_from_cstr(key))), value);
@@ -2517,5 +2542,12 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_add_fn(bs, math, "range", bs_math_range);
         bs_add_fn(bs, math, "random", bs_math_random);
         bs_global_set(bs, Bs_Sv_Static("math"), bs_value_object(math));
+    }
+
+    {
+        Bs_Table *meta = bs_table_new(bs);
+        bs_add_fn(bs, meta, "compile", bs_meta_compile);
+        bs_add_fn(bs, meta, "eval", bs_meta_eval);
+        bs_global_set(bs, Bs_Sv_Static("meta"), bs_value_object(meta));
     }
 }

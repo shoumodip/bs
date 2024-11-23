@@ -1324,7 +1324,7 @@ const Bs_Closure *bs_compile_module(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_mai
     const Bs_Sv relative =
         bs_buffer_relative_path(&bs->paths, Bs_Sv(module.name->data, module.name->size));
 
-    Bs_Closure *closure = bs_compile(bs, relative, input, is_main, is_repl);
+    Bs_Closure *closure = bs_compile(bs, relative, input, is_main, is_repl, false);
     if (!closure) {
         return NULL;
     }

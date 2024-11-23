@@ -1661,3 +1661,55 @@ $ bs demo.bs
 94.8939746794728
 193.56447644558
 ```
+
+## Metaprogramming
+Contains simple metaprogramming primitives.
+
+### compile(str) @function
+Compile a string into a function.
+
+```bs
+var f = meta.compile("34 + 35")
+io.println(f())
+```
+
+```console
+$ bs demo.bs
+69
+```
+
+If any errors were encountered while compiling the string, `nil` is returned.
+
+```bs
+var f = meta.compile("Oops$")
+io.println(f)
+```
+
+```console
+$ bs demo.bs
+<meta>:1:5: error: invalid character '$' (36)
+nil
+```
+
+### eval(str) @function
+Evaluate a string.
+
+```bs
+io.println(meta.eval("34 + 35"))
+io.println(meta.eval("
+    for i in 0, 5 {
+        io.println('Nice!')
+    }
+"))
+```
+
+```console
+$ bs demo.bs
+69
+Nice!
+Nice!
+Nice!
+Nice!
+Nice!
+nil
+```

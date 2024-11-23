@@ -1,0 +1,20 @@
+{
+    var f = meta.compile("34 + 35")
+    io.println(f)
+    io.println(f())
+}
+
+{
+    var f = meta.compile("Oops$")
+    io.println(f)
+}
+
+io.println(meta.eval("500 - 80"))
+
+io.println(meta.eval("
+    for i in 0, 10 {
+        io.println('Nice!')
+    }
+"))
+
+io.println(meta.eval("Hehe$"))
