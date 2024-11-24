@@ -1,0 +1,16 @@
+fn compare(a, b) {
+    if a.suffix("/") && !b.suffix("/") {
+        return true
+    }
+
+    if !a.suffix("/") && b.suffix("/") {
+        return false
+    }
+
+    return a.compare(b) < 0
+}
+
+io.readdir(if len(os.args) >= 2 then os.args[1] else ".")
+    .map(fn (e) => e.name() ++ if e.isdir() then "/" else "")
+    .sort(compare)
+    .map(io.println)

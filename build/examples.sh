@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DIRS="cat grep shell rule110 game_of_life tasks flappy_bird"
+DIRS="cat ls grep shell rule110 game_of_life tasks flappy_bird"
 
 process() {
     awk '

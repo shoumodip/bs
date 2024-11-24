@@ -46,6 +46,36 @@ for i in 1, len(os.args) {
 os.exit(code)
 ```
 
+## `ls`
+The UNIX `ls` coreutil.
+
+```bs
+# ls.bs
+
+fn compare(a, b) {
+    if a.suffix("/") && !b.suffix("/") {
+        return true
+    }
+
+    if !a.suffix("/") && b.suffix("/") {
+        return false
+    }
+
+    return a.compare(b) < 0
+}
+
+io.readdir(if len(os.args) >= 2 then os.args[1] else ".")
+    .map(fn (e) => e.name() ++ if e.isdir() then "/" else "")
+    .sort(compare)
+    .map(io.println)
+```
+
+```console
+$ bs ls.bs
+README.md
+ls.bs
+```
+
 ## `grep`
 The UNIX `grep` coreutil.
 
