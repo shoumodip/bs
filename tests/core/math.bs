@@ -59,3 +59,5 @@ io.println(math.range(1, 11))
 io.println(math.range(1, 11, 2))
 io.println(math.range(11, 1))
 io.println(math.range(11, 1, -2))
+
+io.println(math.PI.precise(5))

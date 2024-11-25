@@ -2242,6 +2242,14 @@ static Bs_Value bs_math_lerp(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_num(a + (b - a) * t);
 }
 
+static Bs_Value bs_math_precise(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
+    const double n = args[-1].as.number;
+    const double l = pow(10, args[0].as.number);
+    return bs_value_num(round(n * l) / l);
+}
+
 // Metaprogramming
 static Bs_Value bs_meta_compile(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
@@ -2535,6 +2543,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("min"), bs_math_min);
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("clamp"), bs_math_clamp);
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("lerp"), bs_math_lerp);
+        bs_builtin_number_methods_add(bs, Bs_Sv_Static("precise"), bs_math_precise);
 
         Bs_Table *math = bs_table_new(bs);
         bs_add(bs, math, "E", bs_value_num(2.7182818284590452354));

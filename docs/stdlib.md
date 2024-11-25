@@ -1602,6 +1602,23 @@ Clamp the number between `low` and `high`.
 ### number.lerp(a, b, t) @method
 Linear interpolation.
 
+### number.precise(level) @method
+Set the precision (number of decimal digits).
+
+```bs
+var n = 69.1337
+io.println(n)
+io.println(n.precise(0))
+io.println(n.precise(3))
+```
+
+```console
+$ bs demo.bs
+69.1337
+69
+69.134
+```
+
 ### E @constant
 Euler's constant.
 
