@@ -202,6 +202,7 @@ int main(int argc, char **argv) {
                     crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
                     bs_fmt(w, "\n");
                 }
+                result = (Bs_Result){0};
             }
         } else {
             Bs_Buffer buffer = {0};
