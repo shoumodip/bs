@@ -984,8 +984,8 @@ Create a string builder.
 
 ```bs
 var b = Bytes()
-b.write("Hello, ")
-b.write("world!")
+b.push("Hello, ")
+b.push("world!")
 io.println(b.slice())
 ```
 
@@ -999,8 +999,8 @@ Return the current number of bytes written.
 
 ```bs
 var b = Bytes()
-b.write("Hello")
-b.write(" world!")
+b.push("Hello")
+b.push(" world!")
 io.println(b.slice())
 
 var n = b.count()
@@ -1018,10 +1018,10 @@ Move back the writer head to `position`.
 
 ```bs
 var b = Bytes()
-b.write("Hello")
+b.push("Hello")
 
 var p = b.count()
-b.write(" world!")
+b.push(" world!")
 
 io.println(b.slice())
 b.reset(p)
@@ -1042,7 +1042,7 @@ a string.
 
 ```bs
 var b = Bytes()
-b.write("Hello world!")
+b.push("Hello world!")
 
 io.println(b.slice())
 io.println(b.slice(0, 5))
@@ -1056,13 +1056,13 @@ Hello
 world!
 ```
 
-### Bytes.write(str) @method
-Write `str` to the end.
+### Bytes.push(str) @method
+Push `str` to the end.
 
 ```bs
 var b = Bytes()
-b.write("Nice! ")
-b.write("" ++ 69) # Only strings can be written to a Bytes object
+b.push("Nice! ")
+b.push("" ++ 69) # Only strings can be pushed into a Bytes object
 io.println(b.slice())
 ```
 
@@ -1072,11 +1072,11 @@ Nice! 69
 ```
 
 ### Bytes.insert(position, value) @method
-Write `value` at `position`.
+Insert `value` at `position`.
 
 ```bs
 var b = Bytes()
-b.write("Helloworld!")
+b.push("Helloworld!")
 b.insert(5, ", ")
 io.println(b.slice())
 ```
@@ -1084,6 +1084,49 @@ io.println(b.slice())
 ```console
 $ bs demo.bs
 Hello, world!
+```
+
+### Bytes.get(position) @method
+Get the byte at `position` as a number.
+
+```bs
+var b = Bytes()
+b.push("Hello")
+
+for i in 0, b.count() {
+    var c = b.get(i)
+    io.println(ascii.char(c), c)
+}
+```
+
+```console
+$ bs demo.bs
+H 72
+e 101
+l 108
+l 108
+o 111
+```
+
+### Bytes.set(position, value) @method
+Set the byte at `position` to `value`.
+
+The argument `value` has to be a number.
+
+```bs
+var b = Bytes()
+
+b.push("Cello")
+io.println(b.slice())
+
+b.set(0, ascii.code("H"))
+io.println(b.slice())
+```
+
+```console
+$ bs demo.bs
+Cello
+Hello
 ```
 
 ## Array

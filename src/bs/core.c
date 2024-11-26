@@ -818,7 +818,6 @@ static Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
 
         cargv[array->count] = NULL;
 
-        // TODO: error handling
         if (capture_stdout) {
             close(stdout_pipe[0]);
             dup2(stdout_pipe[1], STDOUT_FILENO);
@@ -953,76 +952,6 @@ static Bs_Value bs_process_stdin(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
     return p->stdin_write ? bs_value_object(p->stdin_write) : bs_value_nil;
-}
-
-// Random
-typedef struct {
-    uint64_t state[2];
-} Bs_Random;
-
-static uint64_t bs_random_u64(Bs_Random *r) {
-    uint64_t s0 = r->state[0];
-    uint64_t s1 = r->state[1];
-    const uint64_t result = s0 + s1;
-
-    s1 ^= s0;
-    r->state[0] = ((s0 << 55) | (s0 >> 9)) ^ s1 ^ (s1 << 14);
-    r->state[1] = (s1 << 36) | (s1 >> 28);
-    return result;
-}
-
-static Bs_Value bs_random_init(Bs *bs, Bs_Value *args, size_t arity) {
-    if (arity > 1) {
-        bs_error(bs, "expected 0 or 1 arguments, got %zu", arity);
-    }
-
-    uint64_t seed;
-    if (arity) {
-        bs_arg_check_whole_number(bs, args, 0);
-        seed = (uint64_t)args[0].as.number;
-    } else {
-        seed = time(NULL);
-
-#ifdef _WIN32
-        LARGE_INTEGER counter;
-        QueryPerformanceCounter(&counter);
-        seed ^= (uint64_t)(counter.QuadPart);
-        seed ^= (uint64_t)_getpid();
-#else
-        struct timespec ts;
-        clock_gettime(CLOCK_MONOTONIC, &ts);
-        seed ^= (uint64_t)(ts.tv_sec ^ ts.tv_nsec);
-        seed ^= (uint64_t)getpid();
-#endif
-    }
-
-    Bs_Random r;
-    r.state[0] = seed;
-    r.state[0] = (r.state[0] ^ (r.state[0] >> 30)) * 0xBF58476D1CE4E5B9ULL;
-    r.state[1] = (r.state[0] ^ (r.state[0] >> 27)) * 0x94D049BB133111EBULL;
-
-    bs_this_as(args, Bs_Random) = r;
-    return bs_value_nil;
-}
-
-static Bs_Value bs_random_number(Bs *bs, Bs_Value *args, size_t arity) {
-    if (arity != 0 && arity != 2) {
-        bs_error(bs, "expected 0 or 2 arguments, got %zu", arity);
-    }
-
-    if (arity) {
-        bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
-        bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
-    }
-
-    const double result = (double)bs_random_u64(&bs_this_as(args, Bs_Random)) / UINT64_MAX;
-    if (!arity) {
-        return bs_value_num(result);
-    }
-
-    const double min = bs_min(args[0].as.number, args[1].as.number);
-    const double max = bs_max(args[0].as.number, args[1].as.number);
-    return bs_value_num(min + result * (max - min));
 }
 
 // Regex
@@ -1549,7 +1478,7 @@ static Bs_Value bs_ascii_char(Bs *bs, Bs_Value *args, size_t arity) {
     bs_arg_check_whole_number(bs, args, 0);
 
     const size_t code = args[0].as.number;
-    if (code > 0xff) {
+    if (code > 0xFF) {
         bs_error_at(bs, 1, "invalid ascii code '%zu'", code);
     }
 
@@ -1716,7 +1645,7 @@ static Bs_Value bs_bytes_reset(Bs *bs, Bs_Value *args, size_t arity) {
     const size_t reset = args[0].as.number;
 
     if (reset > b->count) {
-        bs_error(bs, "cannot reset bytes of length %zu to %zu", b->count, reset);
+        bs_error(bs, "cannot reset Bytes of length %zu to %zu", b->count, reset);
     }
 
     b->count = reset;
@@ -1742,13 +1671,13 @@ static Bs_Value bs_bytes_slice(Bs *bs, Bs_Value *args, size_t arity) {
     }
 
     if (begin >= b->count || end > b->count) {
-        bs_error(bs, "cannot slice bytes of length %zu from %zu to %zu", b->count, begin, end);
+        bs_error(bs, "cannot slice Bytes of length %zu from %zu to %zu", b->count, begin, end);
     }
 
     return bs_value_object(bs_str_new(bs, Bs_Sv(b->data + begin, end - begin)));
 }
 
-static Bs_Value bs_bytes_write(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value bs_bytes_push(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
@@ -1769,7 +1698,7 @@ static Bs_Value bs_bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
     const Bs_Str *src = (const Bs_Str *)args[1].as.object;
 
     if (index > b->count) {
-        bs_error(bs, "cannot insert at %zu into bytes of length %zu", index, b->count);
+        bs_error(bs, "cannot insert at %zu into Bytes of length %zu", index, b->count);
     }
 
     bs_da_push_many(bs, b, NULL, src->size);
@@ -1777,6 +1706,41 @@ static Bs_Value bs_bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
     memcpy(b->data + index, src->data, src->size);
     b->count += src->size;
 
+    return bs_value_nil;
+}
+
+static Bs_Value bs_bytes_get(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_whole_number(bs, args, 0);
+
+    const Bs_Buffer *b = &bs_this_as(args, Bs_Buffer);
+    const size_t index = args[0].as.number;
+
+    if (index >= b->count) {
+        bs_error(bs, "cannot get byte at index %zu in Bytes of length %zu", index, b->count);
+    }
+
+    return bs_value_num(b->data[index]);
+}
+
+static Bs_Value bs_bytes_set(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 2);
+    bs_arg_check_whole_number(bs, args, 0);
+    bs_arg_check_whole_number(bs, args, 1);
+
+    Bs_Buffer *b = &bs_this_as(args, Bs_Buffer);
+    const size_t index = args[0].as.number;
+    const size_t code = args[1].as.number;
+
+    if (index >= b->count) {
+        bs_error(bs, "cannot set byte at index %zu in Bytes of length %zu", index, b->count);
+    }
+
+    if (code > 0xFF) {
+        bs_error_at(bs, 1, "invalid ascii code '%zu'", code);
+    }
+
+    b->data[index] = (char)code;
     return bs_value_nil;
 }
 
@@ -2300,6 +2264,75 @@ static Bs_Value bs_math_precise(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_num(round(n * l) / l);
 }
 
+typedef struct {
+    uint64_t state[2];
+} Bs_Random;
+
+static uint64_t bs_random_u64(Bs_Random *r) {
+    uint64_t s0 = r->state[0];
+    uint64_t s1 = r->state[1];
+    const uint64_t result = s0 + s1;
+
+    s1 ^= s0;
+    r->state[0] = ((s0 << 55) | (s0 >> 9)) ^ s1 ^ (s1 << 14);
+    r->state[1] = (s1 << 36) | (s1 >> 28);
+    return result;
+}
+
+static Bs_Value bs_random_init(Bs *bs, Bs_Value *args, size_t arity) {
+    if (arity > 1) {
+        bs_error(bs, "expected 0 or 1 arguments, got %zu", arity);
+    }
+
+    uint64_t seed;
+    if (arity) {
+        bs_arg_check_whole_number(bs, args, 0);
+        seed = (uint64_t)args[0].as.number;
+    } else {
+        seed = time(NULL);
+
+#ifdef _WIN32
+        LARGE_INTEGER counter;
+        QueryPerformanceCounter(&counter);
+        seed ^= (uint64_t)(counter.QuadPart);
+        seed ^= (uint64_t)_getpid();
+#else
+        struct timespec ts;
+        clock_gettime(CLOCK_MONOTONIC, &ts);
+        seed ^= (uint64_t)(ts.tv_sec ^ ts.tv_nsec);
+        seed ^= (uint64_t)getpid();
+#endif
+    }
+
+    Bs_Random r;
+    r.state[0] = seed;
+    r.state[0] = (r.state[0] ^ (r.state[0] >> 30)) * 0xBF58476D1CE4E5B9ULL;
+    r.state[1] = (r.state[0] ^ (r.state[0] >> 27)) * 0x94D049BB133111EBULL;
+
+    bs_this_as(args, Bs_Random) = r;
+    return bs_value_nil;
+}
+
+static Bs_Value bs_random_number(Bs *bs, Bs_Value *args, size_t arity) {
+    if (arity != 0 && arity != 2) {
+        bs_error(bs, "expected 0 or 2 arguments, got %zu", arity);
+    }
+
+    if (arity) {
+        bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
+        bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
+    }
+
+    const double result = (double)bs_random_u64(&bs_this_as(args, Bs_Random)) / UINT64_MAX;
+    if (!arity) {
+        return bs_value_num(result);
+    }
+
+    const double min = bs_min(args[0].as.number, args[1].as.number);
+    const double max = bs_max(args[0].as.number, args[1].as.number);
+    return bs_value_num(min + result * (max - min));
+}
+
 // Metaprogramming
 static Bs_Value bs_meta_compile(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
@@ -2517,8 +2550,11 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_c_class_add(bs, bytes_class, Bs_Sv_Static("reset"), bs_bytes_reset);
 
         bs_c_class_add(bs, bytes_class, Bs_Sv_Static("slice"), bs_bytes_slice);
-        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("write"), bs_bytes_write);
+        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("push"), bs_bytes_push);
         bs_c_class_add(bs, bytes_class, Bs_Sv_Static("insert"), bs_bytes_insert);
+
+        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("get"), bs_bytes_get);
+        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("set"), bs_bytes_set);
 
         bs_global_set(bs, Bs_Sv_Static("Bytes"), bs_value_object(bytes_class));
     }

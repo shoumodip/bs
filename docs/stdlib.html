@@ -2204,8 +2204,8 @@ Create a string builder.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> b = Bytes()
-b.<span class='field'>write</span>(<span class='string'>"Hello, "</span>)
-b.<span class='field'>write</span>(<span class='string'>"world!"</span>)
+b.<span class='field'>push</span>(<span class='string'>"Hello, "</span>)
+b.<span class='field'>push</span>(<span class='string'>"world!"</span>)
 io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
 </pre>
 </pre>
@@ -2245,8 +2245,8 @@ Return the current number of bytes written.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> b = Bytes()
-b.<span class='field'>write</span>(<span class='string'>"Hello"</span>)
-b.<span class='field'>write</span>(<span class='string'>" world!"</span>)
+b.<span class='field'>push</span>(<span class='string'>"Hello"</span>)
+b.<span class='field'>push</span>(<span class='string'>" world!"</span>)
 io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
 
 <span class='keyword'>var</span> n = b.<span class='field'>count</span>()
@@ -2290,10 +2290,10 @@ Move back the writer head to <code>position</code>.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> b = Bytes()
-b.<span class='field'>write</span>(<span class='string'>"Hello"</span>)
+b.<span class='field'>push</span>(<span class='string'>"Hello"</span>)
 
 <span class='keyword'>var</span> p = b.<span class='field'>count</span>()
-b.<span class='field'>write</span>(<span class='string'>" world!"</span>)
+b.<span class='field'>push</span>(<span class='string'>" world!"</span>)
 
 io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
 b.<span class='field'>reset</span>(p)
@@ -2341,7 +2341,7 @@ a string.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> b = Bytes()
-b.<span class='field'>write</span>(<span class='string'>"Hello world!"</span>)
+b.<span class='field'>push</span>(<span class='string'>"Hello world!"</span>)
 
 io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
 io.<span class='field'>println</span>(b.<span class='field'>slice</span>(<span class='constant'>0</span>, <span class='constant'>5</span>))
@@ -2369,9 +2369,9 @@ world!
 </div>
 </section>
 <section id='s80'>
-<h3><code><span class='class'>Bytes</span>.<span class='field'>write</span>(str)</code></h3>
+<h3><code><span class='class'>Bytes</span>.<span class='field'>push</span>(str)</code></h3>
 <p>
-Write <code>str</code> to the end.
+Push <code>str</code> to the end.
 </p>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2386,8 +2386,8 @@ Write <code>str</code> to the end.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> b = Bytes()
-b.<span class='field'>write</span>(<span class='string'>"Nice! "</span>)
-b.<span class='field'>write</span>(<span class='string'>""</span> ++ <span class='constant'>69</span>) <span class='comment'># Only strings can be written to a Bytes object</span>
+b.<span class='field'>push</span>(<span class='string'>"Nice! "</span>)
+b.<span class='field'>push</span>(<span class='string'>""</span> ++ <span class='constant'>69</span>) <span class='comment'># Only strings can be pushed into a Bytes object</span>
 io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
 </pre>
 </pre>
@@ -2412,7 +2412,7 @@ Nice! 69
 <section id='s81'>
 <h3><code><span class='class'>Bytes</span>.<span class='field'>insert</span>(position, value)</code></h3>
 <p>
-Write <code>value</code> at <code>position</code>.
+Insert <code>value</code> at <code>position</code>.
 </p>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2427,7 +2427,7 @@ Write <code>value</code> at <code>position</code>.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> b = Bytes()
-b.<span class='field'>write</span>(<span class='string'>"Helloworld!"</span>)
+b.<span class='field'>push</span>(<span class='string'>"Helloworld!"</span>)
 b.<span class='field'>insert</span>(<span class='constant'>5</span>, <span class='string'>", "</span>)
 io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
 </pre>
@@ -2450,13 +2450,109 @@ Hello, world!
 </pre>
 </div>
 </section>
-</section>
 <section id='s82'>
+<h3><code><span class='class'>Bytes</span>.<span class='field'>get</span>(position)</code></h3>
+<p>
+Get the byte at <code>position</code> as a number.
+</p>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> b = Bytes()
+b.<span class='field'>push</span>(<span class='string'>"Hello"</span>)
+
+<span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, b.<span class='field'>count</span>() {
+    <span class='keyword'>var</span> c = b.<span class='field'>get</span>(i)
+    io.<span class='field'>println</span>(ascii.<span class='field'>char</span>(c), c)
+}
+</pre>
+</pre>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='constant'>$ </span>bs demo.bs
+H 72
+e 101
+l 108
+l 108
+o 111
+</pre>
+</div>
+</section>
+<section id='s83'>
+<h3><code><span class='class'>Bytes</span>.<span class='field'>set</span>(position, value)</code></h3>
+<p>
+Set the byte at <code>position</code> to <code>value</code>.
+</p>
+<p>
+The argument <code>value</code> has to be a number.
+</p>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> b = Bytes()
+
+b.<span class='field'>push</span>(<span class='string'>"Cello"</span>)
+io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
+
+b.<span class='field'>set</span>(<span class='constant'>0</span>, ascii.<span class='field'>code</span>(<span class='string'>"H"</span>))
+io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
+</pre>
+</pre>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='constant'>$ </span>bs demo.bs
+Cello
+Hello
+</pre>
+</div>
+</section>
+</section>
+<section id='s84'>
 <h2> Array</h2>
 <p>
 Methods for the builtin array value.
 </p>
-<section id='s83'>
+<section id='s85'>
 <h3><code><span class='class'>array</span>.<span class='field'>map</span>(f)</code></h3>
 <p>
 Functional map.
@@ -2501,7 +2597,7 @@ io.<span class='field'>println</span>(ys)
 </pre>
 </div>
 </section>
-<section id='s84'>
+<section id='s86'>
 <h3><code><span class='class'>array</span>.<span class='field'>filter</span>(f)</code></h3>
 <p>
 Functional filter.
@@ -2546,7 +2642,7 @@ io.<span class='field'>println</span>(ys)
 </pre>
 </div>
 </section>
-<section id='s85'>
+<section id='s87'>
 <h3><code><span class='class'>array</span>.<span class='field'>reduce</span>(f, accumulator?)</code></h3>
 <p>
 Functional reduce.
@@ -2596,7 +2692,7 @@ io.<span class='field'>println</span>(b)
 </pre>
 </div>
 </section>
-<section id='s86'>
+<section id='s88'>
 <h3><code><span class='class'>array</span>.<span class='field'>copy</span>()</code></h3>
 <p>
 Copy an array.
@@ -2644,7 +2740,7 @@ io.<span class='field'>println</span>(zs)
 </pre>
 </div>
 </section>
-<section id='s87'>
+<section id='s89'>
 <h3><code><span class='class'>array</span>.<span class='field'>join</span>(separator)</code></h3>
 <p>
 Join the elements of an array, separated by <code>separator</code> into a single string.
@@ -2682,7 +2778,7 @@ io.<span class='field'>println</span>([<span class='constant'>1</span>, <span cl
 </pre>
 </div>
 </section>
-<section id='s88'>
+<section id='s90'>
 <h3><code><span class='class'>array</span>.<span class='field'>find</span>(value, start?)</code></h3>
 <p>
 Find <code>value</code> within an array starting from position <code>start</code> (which defaults to
@@ -2731,7 +2827,7 @@ nil
 </pre>
 </div>
 </section>
-<section id='s89'>
+<section id='s91'>
 <h3><code><span class='class'>array</span>.<span class='field'>equal</span>(that)</code></h3>
 <p>
 Compare the elements of two arrays.
@@ -2778,7 +2874,7 @@ The first expression returns <code>false</code> because the <code>==</code> oper
 reference.
 </p>
 </section>
-<section id='s90'>
+<section id='s92'>
 <h3><code><span class='class'>array</span>.<span class='field'>push</span>(value)</code></h3>
 <p>
 Push <code>value</code> into an array.
@@ -2825,7 +2921,7 @@ io.<span class='field'>println</span>(xs)
 </pre>
 </div>
 </section>
-<section id='s91'>
+<section id='s93'>
 <h3><code><span class='class'>array</span>.<span class='field'>insert</span>(position, value)</code></h3>
 <p>
 Insert <code>value</code> into an array at <code>position</code>.
@@ -2879,7 +2975,7 @@ io.<span class='field'>println</span>(xs)
 </pre>
 </div>
 </section>
-<section id='s92'>
+<section id='s94'>
 <h3><code><span class='class'>array</span>.<span class='field'>sort</span>(compare)</code></h3>
 <p>
 Sort an array inplace with <code>compare</code>, and return itself.
@@ -2924,7 +3020,7 @@ The compare function must take two arguments. If it returns <code>true</code>, t
 left argument shall be considered "less than", and vice versa for <code>false</code>.
 </p>
 </section>
-<section id='s93'>
+<section id='s95'>
 <h3><code><span class='class'>array</span>.<span class='field'>resize</span>(size)</code></h3>
 <p>
 Resize an array to one having <code>size</code> elements.
@@ -2974,7 +3070,7 @@ io.<span class='field'>println</span>(xs)
 </pre>
 </div>
 </section>
-<section id='s94'>
+<section id='s96'>
 <h3><code><span class='class'>array</span>.<span class='field'>remove</span>(index)</code></h3>
 <p>
 Removes the item at <code>index</code> and returns it.
@@ -3021,7 +3117,7 @@ io.<span class='field'>println</span>(xs)
 </pre>
 </div>
 </section>
-<section id='s95'>
+<section id='s97'>
 <h3><code><span class='class'>array</span>.<span class='field'>reverse</span>()</code></h3>
 <p>
 Reverse an array.
@@ -3067,7 +3163,7 @@ io.<span class='field'>println</span>(xs)
 </pre>
 </div>
 </section>
-<section id='s96'>
+<section id='s98'>
 <h3><code><span class='class'>array</span>.<span class='field'>fill</span>(value)</code></h3>
 <p>
 Fill an array with <code>value</code>.
@@ -3150,7 +3246,7 @@ io.<span class='field'>println</span>(xs)
 </pre>
 </div>
 </section>
-<section id='s97'>
+<section id='s99'>
 <h3><code><span class='class'>array</span>.<span class='field'>slice</span>(start, end?)</code></h3>
 <p>
 Slice an array from <code>start</code> (inclusive) to <code>end</code> (exclusive).
@@ -3193,7 +3289,7 @@ io.<span class='field'>println</span>(xs.<span class='field'>slice</span>(<span 
 </pre>
 </div>
 </section>
-<section id='s98'>
+<section id='s100'>
 <h3><code><span class='class'>array</span>.<span class='field'>append</span>(other)</code></h3>
 <p>
 Append an array.
@@ -3250,12 +3346,12 @@ io.<span class='field'>println</span>(xs.<span class='field'>append</span>(ys))
 </div>
 </section>
 </section>
-<section id='s99'>
+<section id='s101'>
 <h2> Table</h2>
 <p>
 Methods for the builtin table value.
 </p>
-<section id='s100'>
+<section id='s102'>
 <h3><code><span class='class'>table</span>.<span class='field'>copy</span>()</code></h3>
 <p>
 Copy a table.
@@ -3316,7 +3412,7 @@ io.<span class='field'>println</span>(zs)
 </pre>
 </div>
 </section>
-<section id='s101'>
+<section id='s103'>
 <h3><code><span class='class'>table</span>.<span class='field'>equal</span>(that)</code></h3>
 <p>
 Compare the elements of two tables.
@@ -3363,12 +3459,12 @@ Just like arrays, tables are compared by reference with the <code>==</code> oper
 </p>
 </section>
 </section>
-<section id='s102'>
+<section id='s104'>
 <h2> Math</h2>
 <p>
 Contains simple mathematical primitives.
 </p>
-<section id='s103'>
+<section id='s105'>
 <h3><code><span class='class'>number</span>.<span class='field'>sin</span>()</code></h3>
 <p>
 Sine in radians.
@@ -3411,37 +3507,37 @@ Note that the precision of the mathematical functions may vary depending on the
 compiler and the platform. This is inherent to computing in general.
 </p>
 </section>
-<section id='s104'>
+<section id='s106'>
 <h3><code><span class='class'>number</span>.<span class='field'>cos</span>()</code></h3>
 <p>
 Cosine in radians.
 </p>
 </section>
-<section id='s105'>
+<section id='s107'>
 <h3><code><span class='class'>number</span>.<span class='field'>tan</span>()</code></h3>
 <p>
 Tangent in radians.
 </p>
 </section>
-<section id='s106'>
+<section id='s108'>
 <h3><code><span class='class'>number</span>.<span class='field'>asin</span>()</code></h3>
 <p>
 Inverse sine in radians.
 </p>
 </section>
-<section id='s107'>
+<section id='s109'>
 <h3><code><span class='class'>number</span>.<span class='field'>acos</span>()</code></h3>
 <p>
 Inverse cosine in radians.
 </p>
 </section>
-<section id='s108'>
+<section id='s110'>
 <h3><code><span class='class'>number</span>.<span class='field'>atan</span>()</code></h3>
 <p>
 Inverse tangent in radians.
 </p>
 </section>
-<section id='s109'>
+<section id='s111'>
 <h3><code><span class='class'>number</span>.<span class='field'>exp</span>()</code></h3>
 <p>
 Return the exponential function of the number.
@@ -3479,49 +3575,49 @@ io.<span class='field'>println</span>(<span class='constant'>2</span>.<span clas
 </pre>
 </div>
 </section>
-<section id='s110'>
+<section id='s112'>
 <h3><code><span class='class'>number</span>.<span class='field'>log</span>()</code></h3>
 <p>
 Return the natural logarithm (base <code>e</code>) of the number.
 </p>
 </section>
-<section id='s111'>
+<section id='s113'>
 <h3><code><span class='class'>number</span>.<span class='field'>log10</span>()</code></h3>
 <p>
 Return the common logarithm (base <code>10</code>) of the number.
 </p>
 </section>
-<section id='s112'>
+<section id='s114'>
 <h3><code><span class='class'>number</span>.<span class='field'>pow</span>(exponent)</code></h3>
 <p>
 Raise the number to <code>exponent</code>.
 </p>
 </section>
-<section id='s113'>
+<section id='s115'>
 <h3><code><span class='class'>number</span>.<span class='field'>sqrt</span>()</code></h3>
 <p>
 Square root.
 </p>
 </section>
-<section id='s114'>
+<section id='s116'>
 <h3><code><span class='class'>number</span>.<span class='field'>ceil</span>()</code></h3>
 <p>
 Ceiling.
 </p>
 </section>
-<section id='s115'>
+<section id='s117'>
 <h3><code><span class='class'>number</span>.<span class='field'>floor</span>()</code></h3>
 <p>
 Floor.
 </p>
 </section>
-<section id='s116'>
+<section id='s118'>
 <h3><code><span class='class'>number</span>.<span class='field'>round</span>()</code></h3>
 <p>
 Return the nearest integer.
 </p>
 </section>
-<section id='s117'>
+<section id='s119'>
 <h3><code><span class='class'>number</span>.<span class='field'>sign</span>()</code></h3>
 <p>
 Return the sign of the number.
@@ -3563,7 +3659,7 @@ io.<span class='field'>println</span>((-<span class='constant'>420</span>).<span
 </pre>
 </div>
 </section>
-<section id='s118'>
+<section id='s120'>
 <h3><code><span class='class'>number</span>.<span class='field'>max</span>(...)</code></h3>
 <p>
 Return the maximum between the method receiver and the provided arguments.
@@ -3603,7 +3699,7 @@ io.<span class='field'>println</span>(<span class='constant'>3</span>.<span clas
 </pre>
 </div>
 </section>
-<section id='s119'>
+<section id='s121'>
 <h3><code><span class='class'>number</span>.<span class='field'>min</span>(...)</code></h3>
 <p>
 Return the minimum between the method receiver and the provided arguments.
@@ -3643,19 +3739,19 @@ io.<span class='field'>println</span>(<span class='constant'>3</span>.<span clas
 </pre>
 </div>
 </section>
-<section id='s120'>
+<section id='s122'>
 <h3><code><span class='class'>number</span>.<span class='field'>clamp</span>(low, high)</code></h3>
 <p>
 Clamp the number between <code>low</code> and <code>high</code>.
 </p>
 </section>
-<section id='s121'>
+<section id='s123'>
 <h3><code><span class='class'>number</span>.<span class='field'>lerp</span>(a, b, t)</code></h3>
 <p>
 Linear interpolation.
 </p>
 </section>
-<section id='s122'>
+<section id='s124'>
 <h3><code><span class='class'>number</span>.<span class='field'>precise</span>(level)</code></h3>
 <p>
 Set the precision (number of decimal digits).
@@ -3698,7 +3794,7 @@ io.<span class='field'>println</span>(n.<span class='field'>precise</span>(<span
 </pre>
 </div>
 </section>
-<section id='s123'>
+<section id='s125'>
 <h3><code><span class='class'>Random</span>(seed?)</code></h3>
 <p>
 Random number generator using the <code>xoroshiro128+</code> algorithm.
@@ -3764,7 +3860,7 @@ io.<span class='field'>println</span>(b.<span class='field'>number</span>(<span 
 182.365867621578
 </pre>
 </div>
-<section id='s124'>
+<section id='s126'>
 <h4><code><span class='class'>Random</span>.<span class='field'>number</span>(min?, max?)</code></h4>
 <p>
 Return a random number between <code>low</code> and <code>high</code>.
@@ -3813,7 +3909,7 @@ io.<span class='field'>println</span>(r.<span class='field'>number</span>(<span 
 </div>
 </section>
 </section>
-<section id='s125'>
+<section id='s127'>
 <h3><code><span class='function'>range</span>(begin, end, step?)</code></h3>
 <p>
 Return an array containing a range.
@@ -3898,25 +3994,25 @@ demo.bs:1:29: in range()
 </pre>
 </div>
 </section>
-<section id='s126'>
+<section id='s128'>
 <h3><code><span class='constant'>E</span></code></h3>
 <p>
 Euler's constant.
 </p>
 </section>
-<section id='s127'>
+<section id='s129'>
 <h3><code><span class='constant'>PI</span></code></h3>
 <p>
 PI.
 </p>
 </section>
 </section>
-<section id='s128'>
+<section id='s130'>
 <h2> Meta</h2>
 <p>
 Contains simple metaprogramming primitives.
 </p>
-<section id='s129'>
+<section id='s131'>
 <h3><code><span class='function'>compile</span>(str)</code></h3>
 <p>
 Compile a string into a function.
@@ -3992,7 +4088,7 @@ nil
 </pre>
 </div>
 </section>
-<section id='s130'>
+<section id='s132'>
 <h3><code><span class='function'>eval</span>(str)</code></h3>
 <p>
 Evaluate a string.
@@ -4306,167 +4402,173 @@ nil
 <a href='#s79'>slice</a>
 </li>
 <li>
-<a href='#s80'>write</a>
+<a href='#s80'>push</a>
 </li>
 <li>
 <a href='#s81'>insert</a>
 </li>
-</ul>
+<li>
+<a href='#s82'>get</a>
 </li>
 <li>
-<a href='#s82'> Array</a>
-<ul>
-<li>
-<a href='#s83'>map</a>
-</li>
-<li>
-<a href='#s84'>filter</a>
-</li>
-<li>
-<a href='#s85'>reduce</a>
-</li>
-<li>
-<a href='#s86'>copy</a>
-</li>
-<li>
-<a href='#s87'>join</a>
-</li>
-<li>
-<a href='#s88'>find</a>
-</li>
-<li>
-<a href='#s89'>equal</a>
-</li>
-<li>
-<a href='#s90'>push</a>
-</li>
-<li>
-<a href='#s91'>insert</a>
-</li>
-<li>
-<a href='#s92'>sort</a>
-</li>
-<li>
-<a href='#s93'>resize</a>
-</li>
-<li>
-<a href='#s94'>remove</a>
-</li>
-<li>
-<a href='#s95'>reverse</a>
-</li>
-<li>
-<a href='#s96'>fill</a>
-</li>
-<li>
-<a href='#s97'>slice</a>
-</li>
-<li>
-<a href='#s98'>append</a>
+<a href='#s83'>set</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s99'> Table</a>
+<a href='#s84'> Array</a>
 <ul>
 <li>
-<a href='#s100'>copy</a>
+<a href='#s85'>map</a>
 </li>
 <li>
-<a href='#s101'>equal</a>
+<a href='#s86'>filter</a>
+</li>
+<li>
+<a href='#s87'>reduce</a>
+</li>
+<li>
+<a href='#s88'>copy</a>
+</li>
+<li>
+<a href='#s89'>join</a>
+</li>
+<li>
+<a href='#s90'>find</a>
+</li>
+<li>
+<a href='#s91'>equal</a>
+</li>
+<li>
+<a href='#s92'>push</a>
+</li>
+<li>
+<a href='#s93'>insert</a>
+</li>
+<li>
+<a href='#s94'>sort</a>
+</li>
+<li>
+<a href='#s95'>resize</a>
+</li>
+<li>
+<a href='#s96'>remove</a>
+</li>
+<li>
+<a href='#s97'>reverse</a>
+</li>
+<li>
+<a href='#s98'>fill</a>
+</li>
+<li>
+<a href='#s99'>slice</a>
+</li>
+<li>
+<a href='#s100'>append</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s102'> Math</a>
+<a href='#s101'> Table</a>
 <ul>
 <li>
-<a href='#s103'>sin</a>
+<a href='#s102'>copy</a>
 </li>
 <li>
-<a href='#s104'>cos</a>
-</li>
-<li>
-<a href='#s105'>tan</a>
-</li>
-<li>
-<a href='#s106'>asin</a>
-</li>
-<li>
-<a href='#s107'>acos</a>
-</li>
-<li>
-<a href='#s108'>atan</a>
-</li>
-<li>
-<a href='#s109'>exp</a>
-</li>
-<li>
-<a href='#s110'>log</a>
-</li>
-<li>
-<a href='#s111'>log10</a>
-</li>
-<li>
-<a href='#s112'>pow</a>
-</li>
-<li>
-<a href='#s113'>sqrt</a>
-</li>
-<li>
-<a href='#s114'>ceil</a>
-</li>
-<li>
-<a href='#s115'>floor</a>
-</li>
-<li>
-<a href='#s116'>round</a>
-</li>
-<li>
-<a href='#s117'>sign</a>
-</li>
-<li>
-<a href='#s118'>max</a>
-</li>
-<li>
-<a href='#s119'>min</a>
-</li>
-<li>
-<a href='#s120'>clamp</a>
-</li>
-<li>
-<a href='#s121'>lerp</a>
-</li>
-<li>
-<a href='#s122'>precise</a>
-</li>
-<li>
-<a href='#s123'>Random</a>
-<ul>
-<li>
-<a href='#s124'>number</a>
+<a href='#s103'>equal</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s125'>range</a>
+<a href='#s104'> Math</a>
+<ul>
+<li>
+<a href='#s105'>sin</a>
 </li>
 <li>
-<a href='#s126'> E </a>
+<a href='#s106'>cos</a>
 </li>
 <li>
-<a href='#s127'> PI </a>
+<a href='#s107'>tan</a>
+</li>
+<li>
+<a href='#s108'>asin</a>
+</li>
+<li>
+<a href='#s109'>acos</a>
+</li>
+<li>
+<a href='#s110'>atan</a>
+</li>
+<li>
+<a href='#s111'>exp</a>
+</li>
+<li>
+<a href='#s112'>log</a>
+</li>
+<li>
+<a href='#s113'>log10</a>
+</li>
+<li>
+<a href='#s114'>pow</a>
+</li>
+<li>
+<a href='#s115'>sqrt</a>
+</li>
+<li>
+<a href='#s116'>ceil</a>
+</li>
+<li>
+<a href='#s117'>floor</a>
+</li>
+<li>
+<a href='#s118'>round</a>
+</li>
+<li>
+<a href='#s119'>sign</a>
+</li>
+<li>
+<a href='#s120'>max</a>
+</li>
+<li>
+<a href='#s121'>min</a>
+</li>
+<li>
+<a href='#s122'>clamp</a>
+</li>
+<li>
+<a href='#s123'>lerp</a>
+</li>
+<li>
+<a href='#s124'>precise</a>
+</li>
+<li>
+<a href='#s125'>Random</a>
+<ul>
+<li>
+<a href='#s126'>number</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s128'> Meta</a>
-<ul>
-<li>
-<a href='#s129'>compile</a>
+<a href='#s127'>range</a>
 </li>
 <li>
-<a href='#s130'>eval</a>
+<a href='#s128'> E </a>
+</li>
+<li>
+<a href='#s129'> PI </a>
+</li>
+</ul>
+</li>
+<li>
+<a href='#s130'> Meta</a>
+<ul>
+<li>
+<a href='#s131'>compile</a>
+</li>
+<li>
+<a href='#s132'>eval</a>
 </li>
 </ul>
 </li>
