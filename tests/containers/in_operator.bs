@@ -28,6 +28,6 @@
 }
 
 {
-    io.println("write" in Bytes)
+    io.println("push" in Bytes)
     io.println("lmao" in Bytes)
 }
