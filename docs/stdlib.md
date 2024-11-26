@@ -1071,6 +1071,20 @@ $ bs demo.bs
 Nice! 69
 ```
 
+An ASCII code can also be provided instead of a string.
+
+```bs
+var b = Bytes()
+b.push("Hello")
+b.push(33) # ASCII code of '!'
+io.println(b.slice())
+```
+
+```console
+$ bs demo.bs
+Hello!
+```
+
 ### Bytes.insert(position, value) @method
 Insert `value` at `position`.
 

@@ -86,6 +86,7 @@ typedef enum {
     BS_CHECK_FN,
     BS_CHECK_INT,
     BS_CHECK_WHOLE,
+    BS_CHECK_ASCII,
 } Bs_Check_Type;
 
 typedef struct {
@@ -103,6 +104,7 @@ typedef struct {
 #define bs_check_fn ((Bs_Check){.type = BS_CHECK_FN})
 #define bs_check_int ((Bs_Check){.type = BS_CHECK_INT})
 #define bs_check_whole ((Bs_Check){.type = BS_CHECK_WHOLE})
+#define bs_check_ascii ((Bs_Check){.type = BS_CHECK_ASCII})
 
 void bs_check_multi_at(
     Bs *bs,
@@ -121,6 +123,7 @@ void bs_check_object_type_at(
 
 void bs_check_integer_at(Bs *bs, size_t location, Bs_Value value, const char *label);
 void bs_check_whole_number_at(Bs *bs, size_t location, Bs_Value value, const char *label);
+void bs_check_ascii_code_at(Bs *bs, size_t location, Bs_Value value, const char *label);
 
 #define bs_check_multi(bs, value, checks, count, label)                                            \
     bs_check_multi_at(bs, 0, value, checks, count, label)
@@ -136,6 +139,7 @@ void bs_check_whole_number_at(Bs *bs, size_t location, Bs_Value value, const cha
 
 #define bs_check_integer(bs, value, label) bs_check_integer_at(bs, 0, value, label)
 #define bs_check_whole_number(bs, value, lable) bs_check_whole_number_at(bs, 0, value, label)
+#define bs_check_ascii_code(bs, value, lable) bs_check_ascii_code_at(bs, 0, value, label)
 
 #define bs_arg_check_multi(bs, args, index, checks, count)                                         \
     bs_check_multi_at(bs, (index) + 1, (args)[index], checks, count, NULL)
@@ -157,6 +161,8 @@ void bs_check_whole_number_at(Bs *bs, size_t location, Bs_Value value, const cha
 
 #define bs_arg_check_whole_number(bs, args, index)                                                 \
     bs_check_whole_number_at(bs, (index) + 1, (args)[index], NULL)
+#define bs_arg_check_ascii_code(bs, args, index)                                                   \
+    bs_check_ascii_code_at(bs, (index) + 1, (args)[index], NULL)
 
 #define bs_this_as(args, T) (*(T *)((Bs_C_Instance *)(args)[-1].as.object)->data)
 

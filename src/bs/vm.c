@@ -1017,6 +1017,13 @@ void bs_check_multi_at(
             }
             break;
 
+        case BS_CHECK_ASCII:
+            if (value.type == BS_VALUE_NUM && value.as.number == (long)value.as.number &&
+                value.as.number >= 0 && value.as.number <= 127) {
+                return;
+            }
+            break;
+
         default:
             assert(false && "unreachable");
         }
@@ -1066,6 +1073,10 @@ void bs_check_multi_at(
             bs_fmt(&w, "positive integer");
             break;
 
+        case BS_CHECK_ASCII:
+            bs_fmt(&w, "ASCII code (0 to 127)");
+            break;
+
         default:
             assert(false && "unreachable");
         }
@@ -1105,6 +1116,11 @@ void bs_check_integer_at(Bs *bs, size_t location, Bs_Value value, const char *la
 
 void bs_check_whole_number_at(Bs *bs, size_t location, Bs_Value value, const char *label) {
     const Bs_Check check = bs_check_whole;
+    bs_check_multi_at(bs, location, value, &check, 1, label);
+}
+
+void bs_check_ascii_code_at(Bs *bs, size_t location, Bs_Value value, const char *label) {
+    const Bs_Check check = bs_check_ascii;
     bs_check_multi_at(bs, location, value, &check, 1, label);
 }
 

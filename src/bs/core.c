@@ -1475,14 +1475,9 @@ static Bs_Value bs_bit_floor(Bs *bs, Bs_Value *args, size_t arity) {
 // Ascii
 static Bs_Value bs_ascii_char(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_arg_check_whole_number(bs, args, 0);
+    bs_arg_check_ascii_code(bs, args, 0);
 
-    const size_t code = args[0].as.number;
-    if (code > 0xFF) {
-        bs_error_at(bs, 1, "invalid ascii code '%zu'", code);
-    }
-
-    const char ch = code;
+    const char ch = args[0].as.number;
     return bs_value_object(bs_str_new(bs, Bs_Sv(&ch, 1)));
 }
 
@@ -1679,11 +1674,20 @@ static Bs_Value bs_bytes_slice(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_bytes_push(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
-    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
-    Bs_Buffer *b = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
-    const Bs_Str *src = (const Bs_Str *)args[0].as.object;
-    bs_da_push_many(bs, b, src->data, src->size);
+    const Bs_Check checks[] = {
+        bs_check_object(BS_OBJECT_STR),
+        bs_check_ascii,
+    };
+    bs_arg_check_multi(bs, args, 0, checks, bs_c_array_size(checks));
+
+    Bs_Buffer *b = &bs_this_as(args, Bs_Buffer);
+    if (args[0].type == BS_VALUE_NUM) {
+        bs_da_push(bs, b, (char)args[0].as.number);
+    } else {
+        const Bs_Str *src = (const Bs_Str *)args[0].as.object;
+        bs_da_push_many(bs, b, src->data, src->size);
+    }
 
     return bs_value_nil;
 }
@@ -1726,18 +1730,14 @@ static Bs_Value bs_bytes_get(Bs *bs, Bs_Value *args, size_t arity) {
 static Bs_Value bs_bytes_set(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_whole_number(bs, args, 0);
-    bs_arg_check_whole_number(bs, args, 1);
+    bs_arg_check_ascii_code(bs, args, 1);
 
     Bs_Buffer *b = &bs_this_as(args, Bs_Buffer);
     const size_t index = args[0].as.number;
-    const size_t code = args[1].as.number;
+    const char code = args[1].as.number;
 
     if (index >= b->count) {
         bs_error(bs, "cannot set byte at index %zu in Bytes of length %zu", index, b->count);
-    }
-
-    if (code > 0xFF) {
-        bs_error_at(bs, 1, "invalid ascii code '%zu'", code);
     }
 
     b->data[index] = (char)code;
