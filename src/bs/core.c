@@ -960,8 +960,27 @@ typedef struct {
     uint64_t state[2];
 } Bs_Random;
 
-static Bs_Random bs_random_new(uint64_t seed, bool use_random_seed) {
-    if (use_random_seed) {
+static uint64_t bs_random_u64(Bs_Random *r) {
+    uint64_t s0 = r->state[0];
+    uint64_t s1 = r->state[1];
+    const uint64_t result = s0 + s1;
+
+    s1 ^= s0;
+    r->state[0] = ((s0 << 55) | (s0 >> 9)) ^ s1 ^ (s1 << 14);
+    r->state[1] = (s1 << 36) | (s1 >> 28);
+    return result;
+}
+
+static Bs_Value bs_random_init(Bs *bs, Bs_Value *args, size_t arity) {
+    if (arity > 1) {
+        bs_error(bs, "expected 0 or 1 arguments, got %zu", arity);
+    }
+
+    uint64_t seed;
+    if (arity) {
+        bs_arg_check_whole_number(bs, args, 0);
+        seed = (uint64_t)args[0].as.number;
+    } else {
         seed = time(NULL);
 
 #ifdef _WIN32
@@ -981,31 +1000,8 @@ static Bs_Random bs_random_new(uint64_t seed, bool use_random_seed) {
     r.state[0] = seed;
     r.state[0] = (r.state[0] ^ (r.state[0] >> 30)) * 0xBF58476D1CE4E5B9ULL;
     r.state[1] = (r.state[0] ^ (r.state[0] >> 27)) * 0x94D049BB133111EBULL;
-    return r;
-}
 
-static uint64_t bs_random_get(Bs_Random *r) {
-    uint64_t s0 = r->state[0];
-    uint64_t s1 = r->state[1];
-    const uint64_t result = s0 + s1;
-
-    s1 ^= s0;
-    r->state[0] = ((s0 << 55) | (s0 >> 9)) ^ s1 ^ (s1 << 14);
-    r->state[1] = (s1 << 36) | (s1 >> 28);
-    return result;
-}
-
-static Bs_Value bs_random_init(Bs *bs, Bs_Value *args, size_t arity) {
-    if (arity > 1) {
-        bs_error(bs, "expected 0 or 1 arguments, got %zu", arity);
-    }
-
-    if (arity) {
-        bs_arg_check_whole_number(bs, args, 0);
-        bs_this_as(args, Bs_Random) = bs_random_new((uint64_t)args[0].as.number, false);
-    } else {
-        bs_this_as(args, Bs_Random) = bs_random_new(0, true);
-    }
+    bs_this_as(args, Bs_Random) = r;
     return bs_value_nil;
 }
 
@@ -1019,7 +1015,7 @@ static Bs_Value bs_random_number(Bs *bs, Bs_Value *args, size_t arity) {
         bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
     }
 
-    const double result = (double)bs_random_get(&bs_this_as(args, Bs_Random)) / UINT64_MAX;
+    const double result = (double)bs_random_u64(&bs_this_as(args, Bs_Random)) / UINT64_MAX;
     if (!arity) {
         return bs_value_num(result);
     }
@@ -2249,28 +2245,6 @@ static Bs_Value bs_math_range(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(a);
 }
 
-static Bs_Random bs_global_rng;
-
-static Bs_Value bs_math_random(Bs *bs, Bs_Value *args, size_t arity) {
-    if (arity != 0 && arity != 2) {
-        bs_error(bs, "expected 0 or 2 arguments, got %zu", arity);
-    }
-
-    if (arity) {
-        bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
-        bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
-    }
-
-    const double result = (double)bs_random_get(&bs_global_rng) / UINT64_MAX;
-    if (!arity) {
-        return bs_value_num(result);
-    }
-
-    const double min = bs_min(args[0].as.number, args[1].as.number);
-    const double max = bs_max(args[0].as.number, args[1].as.number);
-    return bs_value_num(min + result * (max - min));
-}
-
 static Bs_Value bs_math_max(Bs *bs, Bs_Value *args, size_t arity) {
     if (!arity) {
         bs_error(bs, "expected at least 1 argument, got 0");
@@ -2366,8 +2340,6 @@ static void bs_add_fn(Bs *bs, Bs_Table *table, const char *key, Bs_C_Fn_Ptr fn) 
 }
 
 void bs_core_init(Bs *bs, int argc, char **argv) {
-    bs_global_rng = bs_random_new(0, true);
-
     {
         bs_io_reader_class =
             bs_c_class_new(bs, Bs_Sv_Static("Reader"), sizeof(Bs_File), bs_io_reader_init);
@@ -2485,14 +2457,6 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_regex_class->free = bs_regex_free;
 
         bs_global_set(bs, Bs_Sv_Static("Regex"), bs_value_object(bs_regex_class));
-    }
-
-    {
-        Bs_C_Class *random_class =
-            bs_c_class_new(bs, Bs_Sv_Static("Random"), sizeof(Bs_Random), bs_random_init);
-
-        bs_c_class_add(bs, random_class, Bs_Sv_Static("number"), bs_random_number);
-        bs_global_set(bs, Bs_Sv_Static("Random"), bs_value_object(random_class));
     }
 
     {
@@ -2614,10 +2578,18 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("precise"), bs_math_precise);
 
         Bs_Table *math = bs_table_new(bs);
+
+        {
+            Bs_C_Class *random_class =
+                bs_c_class_new(bs, Bs_Sv_Static("Random"), sizeof(Bs_Random), bs_random_init);
+
+            bs_c_class_add(bs, random_class, Bs_Sv_Static("number"), bs_random_number);
+            bs_add(bs, math, "Random", bs_value_object(random_class));
+        }
+
+        bs_add_fn(bs, math, "range", bs_math_range);
         bs_add(bs, math, "E", bs_value_num(2.7182818284590452354));
         bs_add(bs, math, "PI", bs_value_num(3.14159265358979323846));
-        bs_add_fn(bs, math, "range", bs_math_range);
-        bs_add_fn(bs, math, "random", bs_math_random);
         bs_global_set(bs, Bs_Sv_Static("math"), bs_value_object(math));
     }
 

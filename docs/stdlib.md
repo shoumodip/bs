@@ -1619,11 +1619,66 @@ $ bs demo.bs
 69.134
 ```
 
-### E @constant
-Euler's constant.
+### Random(seed?) @class
+Random number generator using the `xoroshiro128+` algorithm.
 
-### PI @constant
-PI.
+If the `seed` argument is not provided, then a random seed is chosen at
+runtime.
+
+```bs
+var a = math.Random()
+var b = math.Random(1337)
+
+io.println(a.number())
+io.println(a.number())
+io.println(a.number(69, 420))
+io.println(a.number(69, 420))
+
+io.println()
+io.println("==== Constant ====")
+io.println()
+
+io.println(b.number())
+io.println(b.number())
+io.println(b.number(69, 420))
+io.println(b.number(69, 420))
+```
+
+```console
+$ bs demo.bs
+0.279107155961776
+0.73815524476827
+225.323320231653
+148.438554063034
+
+==== Constant ====
+
+0.0725452046400308
+0.811773795162954
+416.950161924657
+182.365867621578
+```
+
+#### Random.number(min?, max?) @method
+Return a random number between `low` and `high`.
+
+If no arguments are provided, a number between `0` and `1` is returned.
+
+```bs
+var r = math.Random()
+io.println(r.number())
+io.println(r.number())
+io.println(r.number(69, 420))
+io.println(r.number(69, 420))
+```
+
+```console
+$ bs demo.bs
+0.279107155961776
+0.73815524476827
+225.323320231653
+148.438554063034
+```
 
 ### range(begin, end, step?) @function
 Return an array containing a range.
@@ -1659,27 +1714,13 @@ $ bs demo.bs
 demo.bs:1:29: in range()
 ```
 
-### random(low?, high?) @function
-Return a pseudorandom number between `low` and `high`.
+### E @constant
+Euler's constant.
 
-If no arguments are provided, a number between `0` and `1` is returned.
+### PI @constant
+PI.
 
-```bs
-io.println(math.random())
-io.println(math.random())
-io.println(math.random(69, 420))
-io.println(math.random(69, 420))
-```
-
-```console
-$ bs demo.bs
-0.0547563294203749
-0.833639462400991
-94.8939746794728
-193.56447644558
-```
-
-## Metaprogramming
+## Meta
 Contains simple metaprogramming primitives.
 
 ### compile(str) @function
