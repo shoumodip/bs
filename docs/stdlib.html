@@ -2187,7 +2187,7 @@ Strings are immutable in BS. The native class <code>Bytes</code> provides a muta
 builder for optimized string modification operations.
 </p>
 <section id='s76'>
-<h3><code><span class='class'>Bytes</span>()</code></h3>
+<h3><code><span class='class'>Bytes</span>(str?)</code></h3>
 <p>
 Create a string builder.
 </p>
@@ -2207,6 +2207,9 @@ Create a string builder.
 b.<span class='field'>push</span>(<span class='string'>"Hello, "</span>)
 b.<span class='field'>push</span>(<span class='string'>"world!"</span>)
 io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
+
+<span class='keyword'>var</span> nice = Bytes(<span class='string'>"69 Hehe"</span>)
+io.<span class='field'>println</span>(nice.<span class='field'>slice</span>())
 </pre>
 </pre>
 </div>
@@ -2224,6 +2227,7 @@ io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
 <pre class='code active'>
 <span class='constant'>$ </span>bs demo.bs
 Hello, world!
+69 Hehe
 </pre>
 </div>
 </section>
@@ -2369,9 +2373,9 @@ world!
 </div>
 </section>
 <section id='s80'>
-<h3><code><span class='class'>Bytes</span>.<span class='field'>push</span>(str)</code></h3>
+<h3><code><span class='class'>Bytes</span>.<span class='field'>push</span>(value)</code></h3>
 <p>
-Push <code>str</code> to the end.
+Push <code>value</code> to the end.
 </p>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2387,7 +2391,7 @@ Push <code>str</code> to the end.
 <pre class='code active'>
 <span class='keyword'>var</span> b = Bytes()
 b.<span class='field'>push</span>(<span class='string'>"Nice! "</span>)
-b.<span class='field'>push</span>(<span class='string'>""</span> ++ <span class='constant'>69</span>) <span class='comment'># Only strings can be pushed into a Bytes object</span>
+b.<span class='field'>push</span>(<span class='string'>""</span> ++ <span class='constant'>69</span>) <span class='comment'># To push the string representation, a string must be provided</span>
 io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
 </pre>
 </pre>
@@ -2446,6 +2450,50 @@ io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
 Hello!
 </pre>
 </div>
+<p>
+Another <code>Bytes</code> instance can also be provided.
+</p>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> a = Bytes()
+a.<span class='field'>push</span>(<span class='string'>"Hello "</span>)
+
+<span class='keyword'>var</span> b = Bytes()
+b.<span class='field'>push</span>(<span class='string'>"world!"</span>)
+
+io.<span class='field'>println</span>(a.<span class='field'>slice</span>())
+a.<span class='field'>push</span>(b)
+io.<span class='field'>println</span>(a.<span class='field'>slice</span>())
+</pre>
+</pre>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='constant'>$ </span>bs demo.bs
+Hello
+Hello world!
+</pre>
+</div>
 </section>
 <section id='s81'>
 <h3><code><span class='class'>Bytes</span>.<span class='field'>insert</span>(position, value)</code></h3>
@@ -2464,9 +2512,12 @@ Insert <code>value</code> at <code>position</code>.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> b = Bytes()
-b.<span class='field'>push</span>(<span class='string'>"Helloworld!"</span>)
-b.<span class='field'>insert</span>(<span class='constant'>5</span>, <span class='string'>", "</span>)
+<span class='keyword'>var</span> a = Bytes(<span class='string'>"Hell"</span>)
+<span class='keyword'>var</span> b = Bytes(<span class='string'>"world!"</span>)
+
+b.<span class='field'>insert</span>(<span class='constant'>0</span>, a)
+b.<span class='field'>insert</span>(<span class='constant'>4</span>, <span class='string'>", "</span>)
+b.<span class='field'>insert</span>(<span class='constant'>4</span>, <span class='constant'>111</span>) <span class='comment'># ASCII code of 'o'</span>
 io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
 </pre>
 </pre>

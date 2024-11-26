@@ -979,7 +979,7 @@ Expects `char` to be a string of length `1`.
 Strings are immutable in BS. The native class `Bytes` provides a mutable string
 builder for optimized string modification operations.
 
-### Bytes() @class
+### Bytes(str?) @class
 Create a string builder.
 
 ```bs
@@ -987,11 +987,15 @@ var b = Bytes()
 b.push("Hello, ")
 b.push("world!")
 io.println(b.slice())
+
+var nice = Bytes("69 Hehe")
+io.println(nice.slice())
 ```
 
 ```console
 $ bs demo.bs
 Hello, world!
+69 Hehe
 ```
 
 ### Bytes.count() @method
@@ -1056,13 +1060,13 @@ Hello
 world!
 ```
 
-### Bytes.push(str) @method
-Push `str` to the end.
+### Bytes.push(value) @method
+Push `value` to the end.
 
 ```bs
 var b = Bytes()
 b.push("Nice! ")
-b.push("" ++ 69) # Only strings can be pushed into a Bytes object
+b.push("" ++ 69) # To push the string representation, a string must be provided
 io.println(b.slice())
 ```
 
@@ -1085,13 +1089,36 @@ $ bs demo.bs
 Hello!
 ```
 
+Another `Bytes` instance can also be provided.
+
+```bs
+var a = Bytes()
+a.push("Hello ")
+
+var b = Bytes()
+b.push("world!")
+
+io.println(a.slice())
+a.push(b)
+io.println(a.slice())
+```
+
+```console
+$ bs demo.bs
+Hello
+Hello world!
+```
+
 ### Bytes.insert(position, value) @method
 Insert `value` at `position`.
 
 ```bs
-var b = Bytes()
-b.push("Helloworld!")
-b.insert(5, ", ")
+var a = Bytes("Hell")
+var b = Bytes("world!")
+
+b.insert(0, a)
+b.insert(4, ", ")
+b.insert(4, 111) # ASCII code of 'o'
 io.println(b.slice())
 ```
 

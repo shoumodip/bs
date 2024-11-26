@@ -1618,12 +1618,23 @@ static Bs_C_Class *bs_bytes_class;
 
 static void bs_bytes_free(void *userdata, void *instance_data) {
     Bs_Buffer *b = &bs_static_cast(instance_data, Bs_Buffer);
-    bs_da_free(b->bs, b);
+    if (b->bs) {
+        bs_da_free(b->bs, b);
+    }
 }
 
 static Bs_Value bs_bytes_init(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 0);
+    if (arity > 1) {
+        bs_error(bs, "expected 0 or 1 arguments, got %zu", arity);
+    }
     Bs_Buffer *b = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
+
+    if (arity) {
+        bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+        const Bs_Str *src = (const Bs_Str *)args[0].as.object;
+        bs_da_push_many(bs, b, src->data, src->size);
+    }
+
     b->bs = bs;
     return bs_value_nil;
 }
@@ -1679,6 +1690,7 @@ static Bs_Value bs_bytes_push(Bs *bs, Bs_Value *args, size_t arity) {
 
     const Bs_Check checks[] = {
         bs_check_object(BS_OBJECT_STR),
+        bs_check_c_instance(bs_bytes_class),
         bs_check_ascii,
     };
     bs_arg_check_multi(bs, args, 0, checks, bs_c_array_size(checks));
@@ -1686,9 +1698,12 @@ static Bs_Value bs_bytes_push(Bs *bs, Bs_Value *args, size_t arity) {
     Bs_Buffer *b = &bs_this_as(args, Bs_Buffer);
     if (args[0].type == BS_VALUE_NUM) {
         bs_da_push(bs, b, (char)args[0].as.number);
-    } else {
+    } else if (args[0].as.object->type == BS_OBJECT_STR) {
         const Bs_Str *src = (const Bs_Str *)args[0].as.object;
         bs_da_push_many(bs, b, src->data, src->size);
+    } else if (args[0].as.object->type == BS_OBJECT_C_INSTANCE) {
+        const Bs_Buffer *s = &bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, Bs_Buffer);
+        bs_da_push_many(bs, b, s->data, s->count);
     }
 
     return bs_value_nil;
@@ -1697,20 +1712,40 @@ static Bs_Value bs_bytes_push(Bs *bs, Bs_Value *args, size_t arity) {
 static Bs_Value bs_bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_whole_number(bs, args, 0);
-    bs_arg_check_object_type(bs, args, 1, BS_OBJECT_STR);
+
+    const Bs_Check checks[] = {
+        bs_check_object(BS_OBJECT_STR),
+        bs_check_c_instance(bs_bytes_class),
+        bs_check_ascii,
+    };
+    bs_arg_check_multi(bs, args, 1, checks, bs_c_array_size(checks));
 
     Bs_Buffer *b = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
     const size_t index = args[0].as.number;
-    const Bs_Str *src = (const Bs_Str *)args[1].as.object;
 
     if (index > b->count) {
         bs_error(bs, "cannot insert at %zu into Bytes of length %zu", index, b->count);
     }
 
-    bs_da_push_many(bs, b, NULL, src->size);
-    memmove(b->data + index + src->size, b->data + index, b->count - index);
-    memcpy(b->data + index, src->data, src->size);
-    b->count += src->size;
+    char temp = 0;
+    size_t size = sizeof(temp);
+    const char *data = &temp;
+    if (args[1].type == BS_VALUE_NUM) {
+        temp = args[1].as.number;
+    } else if (args[1].as.object->type == BS_OBJECT_STR) {
+        const Bs_Str *src = (const Bs_Str *)args[1].as.object;
+        data = src->data;
+        size = src->size;
+    } else if (args[1].as.object->type == BS_OBJECT_C_INSTANCE) {
+        const Bs_Buffer *s = &bs_static_cast(((Bs_C_Instance *)args[1].as.object)->data, Bs_Buffer);
+        data = s->data;
+        size = s->count;
+    }
+
+    bs_da_push_many(bs, b, NULL, size);
+    memmove(b->data + index + size, b->data + index, b->count - index);
+    memcpy(b->data + index, data, size);
+    b->count += size;
 
     return bs_value_nil;
 }
