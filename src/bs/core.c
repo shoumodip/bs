@@ -1614,6 +1614,8 @@ static Bs_Value bs_ascii_isupper(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Bytes
+static Bs_C_Class *bs_bytes_class;
+
 static void bs_bytes_free(void *userdata, void *instance_data) {
     Bs_Buffer *b = &bs_static_cast(instance_data, Bs_Buffer);
     bs_da_free(b->bs, b);
@@ -2333,6 +2335,30 @@ static Bs_Value bs_random_number(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_num(min + result * (max - min));
 }
 
+static Bs_Value bs_random_bytes(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_whole_number(bs, args, 0);
+
+    Bs_Random *r = &bs_this_as(args, Bs_Random);
+    size_t count = args[0].as.number;
+
+    Bs_Value instance = bs_call(bs, bs_value_object(bs_bytes_class), NULL, 0);
+    Bs_Buffer *b = &bs_static_cast(((Bs_C_Instance *)instance.as.object)->data, Bs_Buffer);
+
+    while (count) {
+        const uint64_t n = bs_random_u64(r);
+        const size_t size = bs_min(sizeof(n), count);
+
+        const char *bytes = (const char *)&n;
+        for (size_t i = 0; i < size; i++) {
+            bs_da_push(bs, b, (bytes[i] % 128 + 128) % 128);
+        }
+        count -= size;
+    }
+
+    return instance;
+}
+
 // Metaprogramming
 static Bs_Value bs_meta_compile(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
@@ -2541,22 +2567,22 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     }
 
     {
-        Bs_C_Class *bytes_class =
+        bs_bytes_class =
             bs_c_class_new(bs, Bs_Sv_Static("Bytes"), sizeof(Bs_Buffer), bs_bytes_init);
 
-        bytes_class->free = bs_bytes_free;
+        bs_bytes_class->free = bs_bytes_free;
 
-        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("count"), bs_bytes_count);
-        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("reset"), bs_bytes_reset);
+        bs_c_class_add(bs, bs_bytes_class, Bs_Sv_Static("count"), bs_bytes_count);
+        bs_c_class_add(bs, bs_bytes_class, Bs_Sv_Static("reset"), bs_bytes_reset);
 
-        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("slice"), bs_bytes_slice);
-        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("push"), bs_bytes_push);
-        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("insert"), bs_bytes_insert);
+        bs_c_class_add(bs, bs_bytes_class, Bs_Sv_Static("slice"), bs_bytes_slice);
+        bs_c_class_add(bs, bs_bytes_class, Bs_Sv_Static("push"), bs_bytes_push);
+        bs_c_class_add(bs, bs_bytes_class, Bs_Sv_Static("insert"), bs_bytes_insert);
 
-        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("get"), bs_bytes_get);
-        bs_c_class_add(bs, bytes_class, Bs_Sv_Static("set"), bs_bytes_set);
+        bs_c_class_add(bs, bs_bytes_class, Bs_Sv_Static("get"), bs_bytes_get);
+        bs_c_class_add(bs, bs_bytes_class, Bs_Sv_Static("set"), bs_bytes_set);
 
-        bs_global_set(bs, Bs_Sv_Static("Bytes"), bs_value_object(bytes_class));
+        bs_global_set(bs, Bs_Sv_Static("Bytes"), bs_value_object(bs_bytes_class));
     }
 
     {
@@ -2620,6 +2646,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
                 bs_c_class_new(bs, Bs_Sv_Static("Random"), sizeof(Bs_Random), bs_random_init);
 
             bs_c_class_add(bs, random_class, Bs_Sv_Static("number"), bs_random_number);
+            bs_c_class_add(bs, random_class, Bs_Sv_Static("bytes"), bs_random_bytes);
             bs_add(bs, math, "Random", bs_value_object(random_class));
         }
 

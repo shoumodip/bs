@@ -1737,6 +1737,20 @@ $ bs demo.bs
 148.438554063034
 ```
 
+#### Random.bytes(count) @method
+Return a random sequence of bytes.
+
+```bs
+var seq = math.Random().bytes(9)
+io.println(seq.slice())
+```
+
+```console
+$ bs demo.bs
+{03ah
+"7f
+```
+
 ### range(begin, end, step?) @function
 Return an array containing a range.
 
