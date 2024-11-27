@@ -986,10 +986,10 @@ Create a string builder.
 var b = Bytes()
 b.push("Hello, ")
 b.push("world!")
-io.println(b.slice())
+io.println(b)
 
 var nice = Bytes("69 Hehe")
-io.println(nice.slice())
+io.println(nice)
 ```
 
 ```console
@@ -1005,7 +1005,7 @@ Return the current number of bytes written.
 var b = Bytes()
 b.push("Hello")
 b.push(" world!")
-io.println(b.slice())
+io.println(b)
 
 var n = b.count()
 io.println("\(n) bytes written.")
@@ -1027,9 +1027,9 @@ b.push("Hello")
 var p = b.count()
 b.push(" world!")
 
-io.println(b.slice())
+io.println(b)
 b.reset(p)
-io.println(b.slice())
+io.println(b)
 ```
 
 ```console
@@ -1067,7 +1067,7 @@ Push `value` to the end.
 var b = Bytes()
 b.push("Nice! ")
 b.push("" ++ 69) # To push the string representation, a string must be provided
-io.println(b.slice())
+io.println(b)
 ```
 
 ```console
@@ -1081,7 +1081,7 @@ An ASCII code can also be provided instead of a string.
 var b = Bytes()
 b.push("Hello")
 b.push(33) # ASCII code of '!'
-io.println(b.slice())
+io.println(b)
 ```
 
 ```console
@@ -1098,9 +1098,9 @@ a.push("Hello ")
 var b = Bytes()
 b.push("world!")
 
-io.println(a.slice())
+io.println(a)
 a.push(b)
-io.println(a.slice())
+io.println(a)
 ```
 
 ```console
@@ -1119,7 +1119,7 @@ var b = Bytes("world!")
 b.insert(0, a)
 b.insert(4, ", ")
 b.insert(4, 111) # ASCII code of 'o'
-io.println(b.slice())
+io.println(b)
 ```
 
 ```console
@@ -1158,10 +1158,10 @@ The argument `value` has to be a number.
 var b = Bytes()
 
 b.push("Cello")
-io.println(b.slice())
+io.println(b)
 
 b.set(0, ascii.code("H"))
-io.println(b.slice())
+io.println(b)
 ```
 
 ```console

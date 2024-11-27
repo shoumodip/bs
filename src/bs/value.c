@@ -305,7 +305,11 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
 
     case BS_OBJECT_C_INSTANCE: {
         const Bs_C_Instance *instance = (const Bs_C_Instance *)object;
-        bs_fmt(p->writer, "<" Bs_Sv_Fmt ">", Bs_Sv_Arg(instance->class->name));
+        if (instance->class->show) {
+            instance->class->show(p, instance->data);
+        } else {
+            bs_fmt(p->writer, "<" Bs_Sv_Fmt ">", Bs_Sv_Arg(instance->class->name));
+        }
     } break;
 
     case BS_OBJECT_C_LIB:

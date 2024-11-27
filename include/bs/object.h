@@ -136,6 +136,7 @@ Bs_Instance *bs_instance_new(Bs *bs, Bs_Class *class);
 
 typedef void (*Bs_C_Class_Free)(void *userdata, void *instance_data);
 typedef void (*Bs_C_Class_Mark)(Bs *bs, void *instance_data);
+typedef void (*Bs_C_Class_Show)(Bs_Pretty_Printer *printer, const void *instance_data);
 
 struct Bs_C_Class {
     Bs_Object meta;
@@ -146,6 +147,7 @@ struct Bs_C_Class {
     Bs_C_Fn *init;
     Bs_C_Class_Free free;
     Bs_C_Class_Mark mark;
+    Bs_C_Class_Show show;
 
     bool can_fail;
 };

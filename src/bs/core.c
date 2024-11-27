@@ -1623,6 +1623,11 @@ static void bs_bytes_free(void *userdata, void *instance_data) {
     }
 }
 
+static void bs_bytes_show(Bs_Pretty_Printer *p, const void *instance_data) {
+    const Bs_Buffer *b = &bs_static_cast(instance_data, Bs_Buffer);
+    p->writer->write(p->writer, Bs_Sv(b->data, b->count));
+}
+
 static Bs_Value bs_bytes_init(Bs *bs, Bs_Value *args, size_t arity) {
     if (arity > 1) {
         bs_error(bs, "expected 0 or 1 arguments, got %zu", arity);
@@ -2606,6 +2611,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
             bs_c_class_new(bs, Bs_Sv_Static("Bytes"), sizeof(Bs_Buffer), bs_bytes_init);
 
         bs_bytes_class->free = bs_bytes_free;
+        bs_bytes_class->show = bs_bytes_show;
 
         bs_c_class_add(bs, bs_bytes_class, Bs_Sv_Static("count"), bs_bytes_count);
         bs_c_class_add(bs, bs_bytes_class, Bs_Sv_Static("reset"), bs_bytes_reset);

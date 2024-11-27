@@ -2206,10 +2206,10 @@ Create a string builder.
 <span class='keyword'>var</span> b = Bytes()
 b.<span class='field'>push</span>(<span class='string'>"Hello, "</span>)
 b.<span class='field'>push</span>(<span class='string'>"world!"</span>)
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
+io.<span class='field'>println</span>(b)
 
 <span class='keyword'>var</span> nice = Bytes(<span class='string'>"69 Hehe"</span>)
-io.<span class='field'>println</span>(nice.<span class='field'>slice</span>())
+io.<span class='field'>println</span>(nice)
 </pre>
 </pre>
 </div>
@@ -2251,7 +2251,7 @@ Return the current number of bytes written.
 <span class='keyword'>var</span> b = Bytes()
 b.<span class='field'>push</span>(<span class='string'>"Hello"</span>)
 b.<span class='field'>push</span>(<span class='string'>" world!"</span>)
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
+io.<span class='field'>println</span>(b)
 
 <span class='keyword'>var</span> n = b.<span class='field'>count</span>()
 io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span>n<span class='escape'>)</span><span class='string'> bytes written."</span>)
@@ -2299,9 +2299,9 @@ b.<span class='field'>push</span>(<span class='string'>"Hello"</span>)
 <span class='keyword'>var</span> p = b.<span class='field'>count</span>()
 b.<span class='field'>push</span>(<span class='string'>" world!"</span>)
 
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
+io.<span class='field'>println</span>(b)
 b.<span class='field'>reset</span>(p)
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
+io.<span class='field'>println</span>(b)
 </pre>
 </pre>
 </div>
@@ -2392,7 +2392,7 @@ Push <code>value</code> to the end.
 <span class='keyword'>var</span> b = Bytes()
 b.<span class='field'>push</span>(<span class='string'>"Nice! "</span>)
 b.<span class='field'>push</span>(<span class='string'>""</span> ++ <span class='constant'>69</span>) <span class='comment'># To push the string representation, a string must be provided</span>
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
+io.<span class='field'>println</span>(b)
 </pre>
 </pre>
 </div>
@@ -2430,7 +2430,7 @@ An ASCII code can also be provided instead of a string.
 <span class='keyword'>var</span> b = Bytes()
 b.<span class='field'>push</span>(<span class='string'>"Hello"</span>)
 b.<span class='field'>push</span>(<span class='constant'>33</span>) <span class='comment'># ASCII code of '!'</span>
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
+io.<span class='field'>println</span>(b)
 </pre>
 </pre>
 </div>
@@ -2471,9 +2471,9 @@ a.<span class='field'>push</span>(<span class='string'>"Hello "</span>)
 <span class='keyword'>var</span> b = Bytes()
 b.<span class='field'>push</span>(<span class='string'>"world!"</span>)
 
-io.<span class='field'>println</span>(a.<span class='field'>slice</span>())
+io.<span class='field'>println</span>(a)
 a.<span class='field'>push</span>(b)
-io.<span class='field'>println</span>(a.<span class='field'>slice</span>())
+io.<span class='field'>println</span>(a)
 </pre>
 </pre>
 </div>
@@ -2518,7 +2518,7 @@ Insert <code>value</code> at <code>position</code>.
 b.<span class='field'>insert</span>(<span class='constant'>0</span>, a)
 b.<span class='field'>insert</span>(<span class='constant'>4</span>, <span class='string'>", "</span>)
 b.<span class='field'>insert</span>(<span class='constant'>4</span>, <span class='constant'>111</span>) <span class='comment'># ASCII code of 'o'</span>
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
+io.<span class='field'>println</span>(b)
 </pre>
 </pre>
 </div>
@@ -2610,10 +2610,10 @@ The argument <code>value</code> has to be a number.
 <span class='keyword'>var</span> b = Bytes()
 
 b.<span class='field'>push</span>(<span class='string'>"Cello"</span>)
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
+io.<span class='field'>println</span>(b)
 
 b.<span class='field'>set</span>(<span class='constant'>0</span>, ascii.<span class='field'>code</span>(<span class='string'>"H"</span>))
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
+io.<span class='field'>println</span>(b)
 </pre>
 </pre>
 </div>
