@@ -1711,7 +1711,7 @@ static Bs_Value bs_bytes_push(Bs *bs, Bs_Value *args, size_t arity) {
         bs_da_push_many(bs, b, s->data, s->count);
     }
 
-    return bs_value_nil;
+    return args[-1];
 }
 
 static Bs_Value bs_bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
@@ -1752,7 +1752,7 @@ static Bs_Value bs_bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
     memcpy(b->data + index, data, size);
     b->count += size;
 
-    return bs_value_nil;
+    return args[-1];
 }
 
 static Bs_Value bs_bytes_get(Bs *bs, Bs_Value *args, size_t arity) {
@@ -1956,7 +1956,7 @@ static Bs_Value bs_array_insert(Bs *bs, Bs_Value *args, size_t arity) {
     } else {
         bs_array_set(bs, a, index, value);
     }
-    return bs_value_nil;
+    return args[-1];
 }
 
 typedef struct {
@@ -2040,7 +2040,7 @@ static Bs_Value bs_array_reverse(Bs *bs, Bs_Value *args, size_t arity) {
         src->data[i] = src->data[src->count - i - 1];
         src->data[src->count - i - 1] = t;
     }
-    return bs_value_object(src);
+    return args[-1];
 }
 
 static Bs_Value bs_array_fill(Bs *bs, Bs_Value *args, size_t arity) {
@@ -2050,7 +2050,7 @@ static Bs_Value bs_array_fill(Bs *bs, Bs_Value *args, size_t arity) {
     for (size_t i = 0; i < src->count; i++) {
         src->data[i] = args[0];
     }
-    return bs_value_object(src);
+    return args[-1];
 }
 
 static Bs_Value bs_array_slice(Bs *bs, Bs_Value *args, size_t arity) {
@@ -2092,7 +2092,7 @@ static Bs_Value bs_array_append(Bs *bs, Bs_Value *args, size_t arity) {
     for (size_t i = 0; i < src->count; i++) {
         bs_array_set(bs, dst, dst->count, src->data[i]);
     }
-    return bs_value_object(dst);
+    return args[-1];
 }
 
 // Table

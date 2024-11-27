@@ -1064,62 +1064,36 @@ world!
 Push `value` to the end.
 
 ```bs
-var b = Bytes()
-b.push("Nice! ")
-b.push("" ++ 69) # To push the string representation, a string must be provided
-io.println(b)
+var buffer = Bytes()
+
+# Operations can be chained
+buffer
+    .push("Hello")           # A String
+    .push(Bytes(", world!")) # Another Bytes instance
+    .push(32)                # An ASCII code, in this case ' '
+    .push("" ++ 69)          # To push the string representation, a string must be provided
+
+io.println(buffer)
 ```
 
 ```console
 $ bs demo.bs
-Nice! 69
-```
-
-An ASCII code can also be provided instead of a string.
-
-```bs
-var b = Bytes()
-b.push("Hello")
-b.push(33) # ASCII code of '!'
-io.println(b)
-```
-
-```console
-$ bs demo.bs
-Hello!
-```
-
-Another `Bytes` instance can also be provided.
-
-```bs
-var a = Bytes()
-a.push("Hello ")
-
-var b = Bytes()
-b.push("world!")
-
-io.println(a)
-a.push(b)
-io.println(a)
-```
-
-```console
-$ bs demo.bs
-Hello
-Hello world!
+Hello, world! 69
 ```
 
 ### Bytes.insert(position, value) @method
 Insert `value` at `position`.
 
 ```bs
-var a = Bytes("Hell")
-var b = Bytes("world!")
+var buffer = Bytes("world!")
 
-b.insert(0, a)
-b.insert(4, ", ")
-b.insert(4, 111) # ASCII code of 'o'
-io.println(b)
+# Operations can be chained, just like Bytes.push()
+buffer
+    .insert(0, "Hell")      # A String
+    .insert(4, Bytes(", ")) # Another Bytes instance
+    .insert(4, 111)         # An ASCII code, in this case 'o'
+
+io.println(buffer)
 ```
 
 ```console
@@ -1328,6 +1302,20 @@ $ bs demo.bs
 [0, 2, 4, 6, 8]
 ```
 
+Operations can be chained.
+
+```bs
+io.println(
+    ["Nice!"]
+        .push(69)
+        .push(420))
+```
+
+```console
+$ bs demo.bs
+["Nice!", 69, 420]
+```
+
 ### array.insert(position, value) @method
 Insert `value` into an array at `position`.
 
@@ -1355,6 +1343,20 @@ $ bs demo.bs
 [0, 2, 4, 6, 6]
 ```
 
+Operations can be chained, like `array.push()`
+
+```bs
+io.println(
+    ["Nice!"]
+        .insert(0, 69)
+        .insert(1, 420))
+```
+
+```console
+$ bs demo.bs
+[69, 420, "Nice!"]
+```
+
 ### array.sort(compare) @method
 Sort an array inplace with `compare`, and return itself.
 
@@ -1374,7 +1376,7 @@ The compare function must take two arguments. If it returns `true`, then the
 left argument shall be considered "less than", and vice versa for `false`.
 
 ### array.resize(size) @method
-Resize an array to one having `size` elements.
+Resize an array to one having `size` elements, and return itself.
 
 If `size` is larger than the original size, the extra elements shall default to
 `nil`.
@@ -1385,13 +1387,14 @@ This modifies the array.
 var xs = [1, 2, 3, 4, 5]
 io.println(xs)
 
-xs.resize(3)
+io.println(xs.resize(3))
 io.println(xs)
 ```
 
 ```console
 $ bs demo.bs
 [1, 2, 3, 4, 5]
+[1, 2, 3]
 [1, 2, 3]
 ```
 
@@ -1453,8 +1456,7 @@ $ bs demo.bs
 [69, 69, 69, 69, 69]
 ```
 
-This can also be used along with `array.resize()` to quickly create new arrays
-with a preset size and value.
+Use this with `array.resize()` to create an array with a preset size and value.
 
 ```bs
 var xs = [].resize(5).fill("foo")
@@ -1464,6 +1466,33 @@ io.println(xs)
 ```console
 $ bs demo.bs
 ["foo", "foo", "foo", "foo", "foo"]
+```
+
+Here's a 2D version.
+
+```bs
+var width = 5
+var height = 6
+
+var board = []
+    .resize(height)
+    .map(fn (x) => [].resize(width).fill(0))
+
+board[2][2] = 1
+
+io.println(board)
+```
+
+```console
+$ bs demo.bs
+[
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0],
+    [0, 0, 1, 0, 0],
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0]
+]
 ```
 
 ### array.slice(start, end?) @method

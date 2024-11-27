@@ -2389,91 +2389,16 @@ Push <code>value</code> to the end.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> b = Bytes()
-b.<span class='field'>push</span>(<span class='string'>"Nice! "</span>)
-b.<span class='field'>push</span>(<span class='string'>""</span> ++ <span class='constant'>69</span>) <span class='comment'># To push the string representation, a string must be provided</span>
-io.<span class='field'>println</span>(b)
-</pre>
-</pre>
-</div>
-<div class='codes'>
-<button class='copy' onclick='copyClick(this)'>
-<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
-    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
-</svg>
-</button>
-<button class='copied hidden'>
-<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
-    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
-</svg>
-</button>
-<pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
-Nice! 69
-</pre>
-</div>
-<p>
-An ASCII code can also be provided instead of a string.
-</p>
-<div class='codes'>
-<button class='copy' onclick='copyClick(this)'>
-<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
-    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
-</svg>
-</button>
-<button class='copied hidden'>
-<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
-    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
-</svg>
-</button>
-<pre class='code active'>
-<span class='keyword'>var</span> b = Bytes()
-b.<span class='field'>push</span>(<span class='string'>"Hello"</span>)
-b.<span class='field'>push</span>(<span class='constant'>33</span>) <span class='comment'># ASCII code of '!'</span>
-io.<span class='field'>println</span>(b)
-</pre>
-</pre>
-</div>
-<div class='codes'>
-<button class='copy' onclick='copyClick(this)'>
-<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
-    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
-</svg>
-</button>
-<button class='copied hidden'>
-<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
-    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
-</svg>
-</button>
-<pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
-Hello!
-</pre>
-</div>
-<p>
-Another <code>Bytes</code> instance can also be provided.
-</p>
-<div class='codes'>
-<button class='copy' onclick='copyClick(this)'>
-<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
-    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
-</svg>
-</button>
-<button class='copied hidden'>
-<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
-    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
-</svg>
-</button>
-<pre class='code active'>
-<span class='keyword'>var</span> a = Bytes()
-a.<span class='field'>push</span>(<span class='string'>"Hello "</span>)
+<span class='keyword'>var</span> buffer = Bytes()
 
-<span class='keyword'>var</span> b = Bytes()
-b.<span class='field'>push</span>(<span class='string'>"world!"</span>)
+<span class='comment'># Operations can be chained</span>
+buffer
+    .<span class='field'>push</span>(<span class='string'>"Hello"</span>)           <span class='comment'># A String</span>
+    .<span class='field'>push</span>(Bytes(<span class='string'>", world!"</span>)) <span class='comment'># Another Bytes instance</span>
+    .<span class='field'>push</span>(<span class='constant'>32</span>)                <span class='comment'># An ASCII code, in this case ' '</span>
+    .<span class='field'>push</span>(<span class='string'>""</span> ++ <span class='constant'>69</span>)          <span class='comment'># To push the string representation, a string must be provided</span>
 
-io.<span class='field'>println</span>(a)
-a.<span class='field'>push</span>(b)
-io.<span class='field'>println</span>(a)
+io.<span class='field'>println</span>(buffer)
 </pre>
 </pre>
 </div>
@@ -2490,8 +2415,7 @@ io.<span class='field'>println</span>(a)
 </button>
 <pre class='code active'>
 <span class='constant'>$ </span>bs demo.bs
-Hello
-Hello world!
+Hello, world! 69
 </pre>
 </div>
 </section>
@@ -2512,13 +2436,15 @@ Insert <code>value</code> at <code>position</code>.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> a = Bytes(<span class='string'>"Hell"</span>)
-<span class='keyword'>var</span> b = Bytes(<span class='string'>"world!"</span>)
+<span class='keyword'>var</span> buffer = Bytes(<span class='string'>"world!"</span>)
 
-b.<span class='field'>insert</span>(<span class='constant'>0</span>, a)
-b.<span class='field'>insert</span>(<span class='constant'>4</span>, <span class='string'>", "</span>)
-b.<span class='field'>insert</span>(<span class='constant'>4</span>, <span class='constant'>111</span>) <span class='comment'># ASCII code of 'o'</span>
-io.<span class='field'>println</span>(b)
+<span class='comment'># Operations can be chained, just like Bytes.push()</span>
+buffer
+    .<span class='field'>insert</span>(<span class='constant'>0</span>, <span class='string'>"Hell"</span>)      <span class='comment'># A String</span>
+    .<span class='field'>insert</span>(<span class='constant'>4</span>, Bytes(<span class='string'>", "</span>)) <span class='comment'># Another Bytes instance</span>
+    .<span class='field'>insert</span>(<span class='constant'>4</span>, <span class='constant'>111</span>)         <span class='comment'># An ASCII code, in this case 'o'</span>
+
+io.<span class='field'>println</span>(buffer)
 </pre>
 </pre>
 </div>
@@ -3009,6 +2935,44 @@ io.<span class='field'>println</span>(xs)
 [0, 2, 4, 6, 8]
 </pre>
 </div>
+<p>
+Operations can be chained.
+</p>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+io.<span class='field'>println</span>(
+    [<span class='string'>"Nice!"</span>]
+        .<span class='field'>push</span>(<span class='constant'>69</span>)
+        .<span class='field'>push</span>(<span class='constant'>420</span>))
+</pre>
+</pre>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='constant'>$ </span>bs demo.bs
+["Nice!", 69, 420]
+</pre>
+</div>
 </section>
 <section id='s93'>
 <h3><code><span class='class'>array</span>.<span class='field'>insert</span>(position, value)</code></h3>
@@ -3063,6 +3027,44 @@ io.<span class='field'>println</span>(xs)
 [0, 2, 4, 6, 6]
 </pre>
 </div>
+<p>
+Operations can be chained, like <code>array.push()</code>
+</p>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+io.<span class='field'>println</span>(
+    [<span class='string'>"Nice!"</span>]
+        .<span class='field'>insert</span>(<span class='constant'>0</span>, <span class='constant'>69</span>)
+        .<span class='field'>insert</span>(<span class='constant'>1</span>, <span class='constant'>420</span>))
+</pre>
+</pre>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='constant'>$ </span>bs demo.bs
+[69, 420, "Nice!"]
+</pre>
+</div>
 </section>
 <section id='s94'>
 <h3><code><span class='class'>array</span>.<span class='field'>sort</span>(compare)</code></h3>
@@ -3112,7 +3114,7 @@ left argument shall be considered "less than", and vice versa for <code>false</c
 <section id='s95'>
 <h3><code><span class='class'>array</span>.<span class='field'>resize</span>(size)</code></h3>
 <p>
-Resize an array to one having <code>size</code> elements.
+Resize an array to one having <code>size</code> elements, and return itself.
 </p>
 <p>
 If <code>size</code> is larger than the original size, the extra elements shall default to
@@ -3136,7 +3138,7 @@ This modifies the array.
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
 io.<span class='field'>println</span>(xs)
 
-xs.<span class='field'>resize</span>(<span class='constant'>3</span>)
+io.<span class='field'>println</span>(xs.<span class='field'>resize</span>(<span class='constant'>3</span>))
 io.<span class='field'>println</span>(xs)
 </pre>
 </pre>
@@ -3155,6 +3157,7 @@ io.<span class='field'>println</span>(xs)
 <pre class='code active'>
 <span class='constant'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
+[1, 2, 3]
 [1, 2, 3]
 </pre>
 </div>
@@ -3298,8 +3301,7 @@ io.<span class='field'>println</span>(xs)
 </pre>
 </div>
 <p>
-This can also be used along with <code>array.resize()</code> to quickly create new arrays
-with a preset size and value.
+Use this with <code>array.resize()</code> to create an array with a preset size and value.
 </p>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -3332,6 +3334,57 @@ io.<span class='field'>println</span>(xs)
 <pre class='code active'>
 <span class='constant'>$ </span>bs demo.bs
 ["foo", "foo", "foo", "foo", "foo"]
+</pre>
+</div>
+<p>
+Here's a 2D version.
+</p>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> width = <span class='constant'>5</span>
+<span class='keyword'>var</span> height = <span class='constant'>6</span>
+
+<span class='keyword'>var</span> board = []
+    .<span class='field'>resize</span>(height)
+    .<span class='field'>map</span>(<span class='keyword'>fn</span> (x) =&gt; [].<span class='field'>resize</span>(width).<span class='field'>fill</span>(<span class='constant'>0</span>))
+
+board[<span class='constant'>2</span>][<span class='constant'>2</span>] = <span class='constant'>1</span>
+
+io.<span class='field'>println</span>(board)
+</pre>
+</pre>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='constant'>$ </span>bs demo.bs
+[
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0],
+    [0, 0, 1, 0, 0],
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0]
+]
 </pre>
 </div>
 </section>
