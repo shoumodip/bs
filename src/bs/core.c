@@ -1625,7 +1625,14 @@ static void bs_bytes_free(void *userdata, void *instance_data) {
 
 static void bs_bytes_show(Bs_Pretty_Printer *p, const void *instance_data) {
     const Bs_Buffer *b = &bs_static_cast(instance_data, Bs_Buffer);
-    p->writer->write(p->writer, Bs_Sv(b->data, b->count));
+    const Bs_Sv sv = Bs_Sv(b->data, b->count);
+    if (p->depth) {
+        p->writer->write(p->writer, Bs_Sv_Static("Bytes("));
+        bs_pretty_printer_quote(p, sv);
+        p->writer->write(p->writer, Bs_Sv_Static(")"));
+    } else {
+        p->writer->write(p->writer, sv);
+    }
 }
 
 static Bs_Value bs_bytes_init(Bs *bs, Bs_Value *args, size_t arity) {
