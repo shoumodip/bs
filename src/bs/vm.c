@@ -15,6 +15,7 @@
 #endif // _WIN32
 
 #include "bs/compiler.h"
+#include "bs/core.h"
 
 // #define BS_GC_DEBUG_LOG
 // #define BS_GC_DEBUG_STRESS
@@ -433,7 +434,7 @@ void bs_buffer_write(Bs_Writer *w, Bs_Sv sv) {
     bs_da_push_many(b->bs, b, sv.data, sv.size);
 }
 
-Bs *bs_new(Bs_Error_Writer error) {
+Bs *bs_new(int argc, char **argv) {
     Bs *bs = calloc(1, sizeof(Bs));
     assert(bs);
 
@@ -449,9 +450,10 @@ Bs *bs_new(Bs_Error_Writer error) {
     bs->config.buffer.bs = bs;
 
     bs->config.log = bs_file_writer(stdout);
-    bs->config.error = error;
+    bs->config.error.write = bs_error_write_default;
 
     bs_update_cwd(bs);
+    bs_core_init(bs, argc, argv);
     return bs;
 }
 

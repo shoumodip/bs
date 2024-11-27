@@ -16,7 +16,7 @@
 typedef struct Bs Bs;
 typedef Bs_Value (*Bs_C_Fn_Ptr)(Bs *bs, Bs_Value *args, size_t arity);
 
-Bs *bs_new(Bs_Error_Writer error);
+Bs *bs_new(int argc, char **argv);
 void bs_free(Bs *bs);
 void bs_mark(Bs *bs, Bs_Object *object);
 void *bs_realloc(Bs *bs, void *ptr, size_t old_size, size_t new_size);

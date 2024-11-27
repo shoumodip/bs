@@ -3,6 +3,34 @@
 
 #include "bs/lexer.h"
 
+void bs_error_write_default(Bs_Error_Writer *w, Bs_Error error) {
+    if (error.native) {
+        fprintf(stderr, "[C]: ");
+    } else if (error.type != BS_ERROR_STANDALONE) {
+        fprintf(stderr, Bs_Loc_Fmt, Bs_Loc_Arg(error.loc));
+    }
+
+    if (error.type == BS_ERROR_TRACE) {
+        fprintf(stderr, "in ");
+    } else if (error.type != BS_ERROR_PANIC) {
+        fprintf(stderr, "error: ");
+    }
+
+    fprintf(stderr, Bs_Sv_Fmt "\n", Bs_Sv_Arg(error.message));
+
+    if (error.explanation.size) {
+        fprintf(stderr, "\n" Bs_Sv_Fmt "\n", Bs_Sv_Arg(error.explanation));
+    }
+
+    if (error.example.size) {
+        fprintf(stderr, "\n```\n" Bs_Sv_Fmt "\n```\n", Bs_Sv_Arg(error.example));
+    }
+
+    if (error.continued) {
+        fprintf(stderr, "\n");
+    }
+}
+
 static bool ishex(char c) {
     return isdigit(c) || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f');
 }

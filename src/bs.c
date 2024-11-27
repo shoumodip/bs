@@ -1,6 +1,4 @@
-#include <stdio.h>
-
-#include "bs/core.h"
+#include "bs/vm.h"
 
 #define CROSSLINE_IMPLEMENTATION
 #include "crossline/crossline.h"
@@ -15,7 +13,7 @@
 #    define PATH_SEPARATOR '/'
 #endif
 
-static void bs_error_write(Bs_Error_Writer *w, Bs_Error error) {
+static void bs_error_write_pretty(Bs_Error_Writer *w, Bs_Error error) {
     if (error.native) {
         fprintf(stderr, "[C]: ");
     } else if (error.type != BS_ERROR_STANDALONE) {
@@ -130,8 +128,8 @@ static void bs_history_path(char *buffer, size_t size) {
 int main(int argc, char **argv) {
     crossline_prompt_color_set(CROSSLINE_FGCOLOR_BLUE);
 
-    Bs *bs = bs_new((Bs_Error_Writer){.write = bs_error_write});
-    bs_core_init(bs, argc - 1, argv + 1);
+    Bs *bs = bs_new(argc - 1, argv + 1);
+    bs_config(bs)->error.write = bs_error_write_pretty;
 
     if (argc < 2 || !strcmp(argv[1], "-")) {
         Bs_Result result = {0};

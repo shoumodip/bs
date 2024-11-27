@@ -30,6 +30,8 @@ struct Bs_Error_Writer {
     void (*write)(Bs_Error_Writer *writer, Bs_Error error);
 };
 
+void bs_error_write_default(Bs_Error_Writer *w, Bs_Error error);
+
 typedef struct {
     Bs_Sv sv;
     Bs_Loc loc;
