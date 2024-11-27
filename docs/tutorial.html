@@ -1861,6 +1861,9 @@ more applicable, albeit involved, example.
 <span class='keyword'>var</span> hero = Hero(io.<span class='field'>input</span>(<span class='string'>"Enter hero's name&gt; "</span>), <span class='constant'>30</span>, <span class='constant'>10</span>)
 <span class='keyword'>var</span> enemy = Enemy(io.<span class='field'>input</span>(<span class='string'>"Enter enemy's name&gt; "</span>), <span class='constant'>25</span>, <span class='constant'>8</span>)
 
+<span class='comment'># Create a random number generator</span>
+<span class='keyword'>var</span> rng = math.<span class='field'>Random</span>()
+
 <span class='keyword'>while</span> hero.<span class='field'>is_alive</span>() &amp;&amp; enemy.<span class='field'>is_alive</span>() {
     io.<span class='field'>println</span>()
 
@@ -1886,7 +1889,7 @@ more applicable, albeit involved, example.
         }
 
         <span class='comment'># Enemy will either attack or poison the hero based on a 50-50 chance</span>
-        <span class='keyword'>if</span> math.<span class='field'>random</span>() &gt;= <span class='constant'>0.5</span> {
+        <span class='keyword'>if</span> rng.<span class='field'>number</span>() &gt;= <span class='constant'>0.5</span> {
             enemy.<span class='field'>poison</span>(hero)
         } <span class='keyword'>else</span> {
             enemy.<span class='field'>attack</span>(hero)

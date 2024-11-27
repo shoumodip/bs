@@ -1557,7 +1557,7 @@ class Pipes {
         if !game.over {
             this.clock += rl.get_frame_time()
             if this.clock >= PIPE_SPAWN_DELAY {
-                this.items.push(Pipe(math.random(-PIPE_SPAWN_RANGE, PIPE_SPAWN_RANGE)))
+                this.items.push(Pipe(game.rng.number(-PIPE_SPAWN_RANGE, PIPE_SPAWN_RANGE)))
                 this.clock %= PIPE_SPAWN_DELAY
             }
 
@@ -1637,6 +1637,7 @@ rl.set_target_fps(60)
 game.assets = Assets()
 game.started = false
 game.over = false
+game.rng = math.Random()
 
 game.die = fn () {
     if game.over {

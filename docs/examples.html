@@ -1860,7 +1860,7 @@ Compile the raylib module.
         <span class='keyword'>if</span> !game.<span class='field'>over</span> {
             <span class='constant'>this</span>.<span class='field'>clock</span> += rl.<span class='field'>get_frame_time</span>()
             <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>clock</span> &gt;= PIPE_SPAWN_DELAY {
-                <span class='constant'>this</span>.<span class='field'>items</span>.<span class='field'>push</span>(Pipe(math.<span class='field'>random</span>(-PIPE_SPAWN_RANGE, PIPE_SPAWN_RANGE)))
+                <span class='constant'>this</span>.<span class='field'>items</span>.<span class='field'>push</span>(Pipe(game.<span class='field'>rng</span>.<span class='field'>number</span>(-PIPE_SPAWN_RANGE, PIPE_SPAWN_RANGE)))
                 <span class='constant'>this</span>.<span class='field'>clock</span> %= PIPE_SPAWN_DELAY
             }
 
@@ -1940,6 +1940,7 @@ rl.<span class='field'>set_target_fps</span>(<span class='constant'>60</span>)
 game.<span class='field'>assets</span> = Assets()
 game.<span class='field'>started</span> = <span class='constant'>false</span>
 game.<span class='field'>over</span> = <span class='constant'>false</span>
+game.<span class='field'>rng</span> = math.<span class='field'>Random</span>()
 
 game.<span class='field'>die</span> = <span class='keyword'>fn</span> () {
     <span class='keyword'>if</span> game.<span class='field'>over</span> {

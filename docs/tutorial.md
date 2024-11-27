@@ -924,6 +924,9 @@ class Enemy < Sprite {
 var hero = Hero(io.input("Enter hero's name> "), 30, 10)
 var enemy = Enemy(io.input("Enter enemy's name> "), 25, 8)
 
+# Create a random number generator
+var rng = math.Random()
+
 while hero.is_alive() && enemy.is_alive() {
     io.println()
 
@@ -949,7 +952,7 @@ while hero.is_alive() && enemy.is_alive() {
         }
 
         # Enemy will either attack or poison the hero based on a 50-50 chance
-        if math.random() >= 0.5 {
+        if rng.number() >= 0.5 {
             enemy.poison(hero)
         } else {
             enemy.attack(hero)
