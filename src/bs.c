@@ -9,8 +9,10 @@
 #    include <io.h>
 #    define isatty _isatty
 #    define fileno _fileno
+#    define PATH_SEPARATOR '\\'
 #else
 #    include <unistd.h>
+#    define PATH_SEPARATOR '/'
 #endif
 
 static void bs_error_write(Bs_Error_Writer *w, Bs_Error error) {
@@ -49,7 +51,7 @@ static void bs_error_write(Bs_Error_Writer *w, Bs_Error error) {
     }
 }
 
-bool bs_repl_block(char *line, size_t size, Bs_Sv *input, Bs_Sv ending, bool do_indent) {
+static bool bs_repl_block(char *line, size_t size, Bs_Sv *input, Bs_Sv ending, bool do_indent) {
     size_t indent = 0;
     while (true) {
         const size_t available = size - input->size;
@@ -99,6 +101,32 @@ bool bs_repl_block(char *line, size_t size, Bs_Sv *input, Bs_Sv ending, bool do_
     return true;
 }
 
+static void bs_history_path(char *buffer, size_t size) {
+    const char *base;
+
+#ifdef _WIN32
+    base = getenv("APPDATA");
+    if (base) {
+        snprintf(buffer, size, "%s%cbs_history", base, PATH_SEPARATOR);
+        return;
+    }
+#else
+    base = getenv("XDG_CACHE_HOME");
+    if (base) {
+        snprintf(buffer, size, "%s%cbs_history", base, PATH_SEPARATOR);
+        return;
+    }
+
+    base = getenv("HOME");
+    if (base) {
+        snprintf(buffer, size, "%s%c.cache%cbs_history", base, PATH_SEPARATOR, PATH_SEPARATOR);
+        return;
+    }
+#endif
+
+    snprintf(buffer, size, ".bs_history");
+}
+
 int main(int argc, char **argv) {
     crossline_prompt_color_set(CROSSLINE_FGCOLOR_BLUE);
 
@@ -113,6 +141,10 @@ int main(int argc, char **argv) {
             crossline_color_set(CROSSLINE_FGCOLOR_YELLOW);
             bs_fmt(w, "Welcome to the BS Repl! Use :h to get help.\n");
             crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
+
+            static char history_path[1024];
+            bs_history_path(history_path, sizeof(history_path));
+            crossline_history_load(history_path);
 
             static char line[8 * 1024]; // 8KB is enough for all repl related tasks
             while (true) {
@@ -181,12 +213,14 @@ int main(int argc, char **argv) {
                     if (!bs_repl_block(line, sizeof(line), &input, Bs_Sv_Static(":}"), true)) {
                         bs_error_standalone(bs, "could not read from standard input");
                         bs_free(bs);
+                        crossline_history_save(history_path);
                         return 1;
                     }
                 } else if (bs_sv_eq(input, Bs_Sv_Static(":["))) {
                     if (!bs_repl_block(line, sizeof(line), &input, Bs_Sv_Static(":]"), false)) {
                         bs_error_standalone(bs, "could not read from standard input");
                         bs_free(bs);
+                        crossline_history_save(history_path);
                         return 1;
                     }
                 }
@@ -204,6 +238,8 @@ int main(int argc, char **argv) {
                 }
                 result = (Bs_Result){0};
             }
+
+            crossline_history_save(history_path);
         } else {
             Bs_Buffer buffer = {0};
             while (!feof(stdin)) {
