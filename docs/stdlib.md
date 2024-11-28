@@ -572,11 +572,8 @@ Wait for the process to exit, and return its exit code.
 
 Returns `nil` if failed.
 
-## Regular Expressions
+## Regex(pattern) @class
 POSIX compatible regular expressions.
-
-### Regex(pattern) @class
-Native C class that compiles a regular expression.
 
 Returns `nil` if failed.
 
@@ -975,12 +972,9 @@ Return whether a character is whitespace.
 
 Expects `char` to be a string of length `1`.
 
-## Bytes
+## Bytes(str?) @class
 Strings are immutable in BS. The native class `Bytes` provides a mutable string
 builder for optimized string modification operations.
-
-### Bytes(str?) @class
-Create a string builder.
 
 ```bs
 var b = Bytes()
@@ -1863,7 +1857,8 @@ $ bs demo.bs
 69
 ```
 
-If any errors were encountered while compiling the string, `nil` is returned.
+If any errors were encountered while compiling the string, a table is returned
+instead of a function.
 
 ```bs
 var f = meta.compile("Oops@")
@@ -1872,11 +1867,26 @@ io.println(f)
 
 ```console
 $ bs demo.bs
-<meta>:1:5: error: invalid character '@' (64)
+{
+    explanation = nil,
+    example = nil,
+    line = "Oops@",
+    message = "invalid character '@' (64)",
+    col = 5,
+    row = 1
+}
+```
 
-    1 | Oops@
-      |     ^
-nil
+So the usage becomes as straight forward as:
+
+```bs
+var f = meta.compile(...)
+if f is "table" {
+    io.eprintln("Error")
+    # Error handling...
+}
+
+f() # Or whatever you want to do
 ```
 
 ### eval(str) @function

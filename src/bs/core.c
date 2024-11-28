@@ -2397,6 +2397,57 @@ static Bs_Value bs_random_bytes(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Metaprogramming
+typedef struct {
+    Bs *bs;
+    Bs_Table *error;
+} Bs_Meta_Compile_Context;
+
+static void bs_meta_compile_error_write(Bs_Error_Writer *w, Bs_Error error) {
+    // Only compilation errors are possible here
+    assert(error.type == BS_ERROR_MAIN);
+    assert(!error.native);
+
+    Bs_Meta_Compile_Context *c = w->data;
+    c->error = bs_table_new(c->bs);
+
+    bs_table_set(
+        c->bs,
+        c->error,
+        bs_value_object(bs_str_new(c->bs, Bs_Sv_Static("row"))),
+        bs_value_num(error.loc.row));
+
+    bs_table_set(
+        c->bs,
+        c->error,
+        bs_value_object(bs_str_new(c->bs, Bs_Sv_Static("col"))),
+        bs_value_num(error.loc.col));
+
+    bs_table_set(
+        c->bs,
+        c->error,
+        bs_value_object(bs_str_new(c->bs, Bs_Sv_Static("message"))),
+        bs_value_object(bs_str_new(c->bs, error.message)));
+
+    bs_table_set(
+        c->bs,
+        c->error,
+        bs_value_object(bs_str_new(c->bs, Bs_Sv_Static("line"))),
+        bs_value_object(bs_str_new(c->bs, error.loc.line)));
+
+    bs_table_set(
+        c->bs,
+        c->error,
+        bs_value_object(bs_str_new(c->bs, Bs_Sv_Static("explanation"))),
+        error.explanation.size ? bs_value_object(bs_str_new(c->bs, error.explanation))
+                               : bs_value_nil);
+
+    bs_table_set(
+        c->bs,
+        c->error,
+        bs_value_object(bs_str_new(c->bs, Bs_Sv_Static("example"))),
+        error.example.size ? bs_value_object(bs_str_new(c->bs, error.example)) : bs_value_nil);
+}
+
 static Bs_Value bs_meta_compile(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
@@ -2404,9 +2455,21 @@ static Bs_Value bs_meta_compile(Bs *bs, Bs_Value *args, size_t arity) {
     Bs_Str *str = (Bs_Str *)args[0].as.object;
     const Bs_Sv input = Bs_Sv(str->data, str->size);
 
+    Bs_Meta_Compile_Context context = {.bs = bs};
+
+    Bs_Config *config = bs_config(bs);
+    const Bs_Error_Writer save = config->error;
+
+    config->error = (Bs_Error_Writer){
+        .data = &context,
+        .write = bs_meta_compile_error_write,
+    };
+
     const Bs_Closure *closure = bs_compile(bs, Bs_Sv_Static("<meta>"), input, false, false, true);
+    config->error = save;
+
     if (!closure) {
-        return bs_value_nil;
+        return bs_value_object(context.error);
     }
 
     closure->fn->source = str;

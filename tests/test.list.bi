@@ -2028,10 +2028,17 @@ XxfoobarXx
 :b shell 22
 ../bin/bs core/meta.bs
 :i returncode 1
-:b stdout 80
+:b stdout 211
 <fn>
 69
-nil
+{
+    explanation = nil,
+    example = nil,
+    line = "Oops@",
+    message = "invalid character '@' (64)",
+    col = 5,
+    row = 1
+}
 420
 Nice!
 Nice!
@@ -2045,12 +2052,7 @@ Nice!
 Nice!
 nil
 
-:b stderr 272
-<meta>:1:5: error: invalid character '@' (64)
-
-    1 | Oops@
-      |     ^
-
+:b stderr 196
 <meta>:1:5: error: invalid character '@' (64)
 
     1 | Hehe@
