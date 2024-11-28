@@ -97,6 +97,7 @@ static bool bs_token_type_can_start(Bs_Token_Type type) {
     case BS_TOKEN_SUB:
     case BS_TOKEN_BNOT:
     case BS_TOKEN_LNOT:
+    case BS_TOKEN_JOIN:
     case BS_TOKEN_LEN:
     case BS_TOKEN_PANIC:
     case BS_TOKEN_ASSERT:
@@ -547,6 +548,11 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     case BS_TOKEN_LNOT:
         bs_compile_expr(c, BS_POWER_PRE);
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_LNOT);
+        break;
+
+    case BS_TOKEN_JOIN:
+        bs_compile_expr(c, BS_POWER_PRE);
+        bs_chunk_push_op(c->bs, c->chunk, BS_OP_TOSTR);
         break;
 
     case BS_TOKEN_LEN:

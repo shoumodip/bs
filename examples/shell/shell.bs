@@ -4,7 +4,7 @@ var home = os.getenv("HOME")
 fn pwd() {
     var cwd = os.getcwd()
     if cwd.prefix(home) {
-        return "~" ++ cwd.slice(len(home))
+        return "~" $ cwd.slice(len(home))
     }
 
     return cwd
@@ -65,7 +65,7 @@ while !io.stdin.eof() {
         }
 
         if path.prefix("~") {
-            path = home ++ path.slice(1)
+            path = home $ path.slice(1)
         }
 
         var current = os.getcwd()

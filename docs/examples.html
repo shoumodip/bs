@@ -120,7 +120,7 @@ The UNIX <code>ls</code> coreutil.
 }
 
 io.<span class='field'>readdir</span>(<span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &gt;= <span class='constant'>2</span> <span class='keyword'>then</span> os.<span class='field'>args</span>[<span class='constant'>1</span>] <span class='keyword'>else</span> <span class='string'>"."</span>)
-    .<span class='field'>map</span>(<span class='keyword'>fn</span> (e) =&gt; e.<span class='field'>name</span>() ++ <span class='keyword'>if</span> e.<span class='field'>isdir</span>() <span class='keyword'>then</span> <span class='string'>"/"</span> <span class='keyword'>else</span> <span class='string'>""</span>)
+    .<span class='field'>map</span>(<span class='keyword'>fn</span> (e) =&gt; e.<span class='field'>name</span>() $ <span class='keyword'>if</span> e.<span class='field'>isdir</span>() <span class='keyword'>then</span> <span class='string'>"/"</span> <span class='keyword'>else</span> <span class='string'>""</span>)
     .<span class='field'>sort</span>(compare)
     .<span class='field'>map</span>(io.<span class='field'>println</span>)
 </pre>
@@ -282,7 +282,7 @@ A simple UNIX shell.
 <span class='keyword'>fn</span> <span class='function'>pwd</span>() {
     <span class='keyword'>var</span> cwd = os.<span class='field'>getcwd</span>()
     <span class='keyword'>if</span> cwd.<span class='field'>prefix</span>(home) {
-        <span class='keyword'>return</span> <span class='string'>"~"</span> ++ cwd.<span class='field'>slice</span>(<span class='keyword'>len</span>(home))
+        <span class='keyword'>return</span> <span class='string'>"~"</span> $ cwd.<span class='field'>slice</span>(<span class='keyword'>len</span>(home))
     }
 
     <span class='keyword'>return</span> cwd
@@ -343,7 +343,7 @@ A simple UNIX shell.
         }
 
         <span class='keyword'>if</span> path.<span class='field'>prefix</span>(<span class='string'>"~"</span>) {
-            path = home ++ path.<span class='field'>slice</span>(<span class='constant'>1</span>)
+            path = home $ path.<span class='field'>slice</span>(<span class='constant'>1</span>)
         }
 
         <span class='keyword'>var</span> current = os.<span class='field'>getcwd</span>()
@@ -1051,7 +1051,7 @@ Run the program.
 <pre class='code active'>
 <span class='comment'># tasks.bs</span>
 
-<span class='keyword'>var</span> TASKS_PATH = os.<span class='field'>getenv</span>(<span class='string'>"HOME"</span>) ++ <span class='string'>"/.tasks"</span>
+<span class='keyword'>var</span> TASKS_PATH = os.<span class='field'>getenv</span>(<span class='string'>"HOME"</span>) $ <span class='string'>"/.tasks"</span>
 
 <span class='keyword'>class</span> <span class='class'>Tasks</span> {
     init(path) {
@@ -1615,7 +1615,7 @@ Compile the raylib module.
     }
 
     sound(path, loader) {
-        path = <span class='string'>"assets/sounds/"</span> ++ path
+        path = <span class='string'>"assets/sounds/"</span> $ path
         <span class='keyword'>if</span> path <span class='keyword'>in</span> <span class='constant'>this</span>.<span class='field'>sounds</span> {
             <span class='keyword'>return</span> <span class='constant'>this</span>.<span class='field'>sounds</span>[path]
         }
@@ -1631,7 +1631,7 @@ Compile the raylib module.
     }
 
     texture(path) {
-        path = <span class='string'>"assets/images/"</span> ++ path
+        path = <span class='string'>"assets/images/"</span> $ path
         <span class='keyword'>if</span> path <span class='keyword'>in</span> <span class='constant'>this</span>.<span class='field'>textures</span> {
             <span class='keyword'>return</span> <span class='constant'>this</span>.<span class='field'>textures</span>[path]
         }

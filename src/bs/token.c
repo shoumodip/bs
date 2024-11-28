@@ -121,7 +121,7 @@ const char *bs_token_type_name(Bs_Token_Type type) {
         return "'len'";
 
     case BS_TOKEN_JOIN:
-        return "'++'";
+        return "'$'";
 
     case BS_TOKEN_PANIC:
         return "'panic'";
@@ -172,7 +172,7 @@ const char *bs_token_type_name(Bs_Token_Type type) {
         return "'>>='";
 
     case BS_TOKEN_JOIN_SET:
-        return "'++='";
+        return "'$='";
 
     case BS_TOKEN_IF:
         return "'if'";

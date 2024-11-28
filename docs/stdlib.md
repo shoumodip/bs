@@ -32,7 +32,7 @@ io.print("Hello", "world", 69)
 
 ```console
 $ bs demo.bs
-Hello, world 69⏎
+Hello world 69⏎
 ```
 
 The arguments are separated with spaces.
@@ -772,7 +772,7 @@ $ bs demo.bs
 Trim `pattern` from the left of a string.
 
 ```bs
-io.println("[" ++ "   foo bar baz  ".ltrim(" ") ++ "]")
+io.println("[" $ "   foo bar baz  ".ltrim(" ") $ "]")
 ```
 
 ```console
@@ -784,7 +784,7 @@ $ bs demo.bs
 Trim `pattern` from the right of a string.
 
 ```bs
-io.println("[" ++ "   foo bar baz  ".rtrim(" ") ++ "]")
+io.println("[" $ "   foo bar baz  ".rtrim(" ") $ "]")
 ```
 
 ```console
@@ -796,7 +796,7 @@ $ bs demo.bs
 Trim `pattern` from both sides of a string.
 
 ```bs
-io.println("[" ++ "   foo bar baz  ".trim(" ") ++ "]")
+io.println("[" $ "   foo bar baz  ".trim(" ") $ "]")
 ```
 
 ```console
@@ -1071,7 +1071,7 @@ buffer
     .push("Hello")           # A String
     .push(Bytes(", world!")) # Another Bytes instance
     .push(32)                # An ASCII code, in this case ' '
-    .push("" ++ 69)          # To push the string representation, a string must be provided
+    .push($69)               # To push the string representation, a string must be provided
 
 io.println(buffer)
 ```

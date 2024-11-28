@@ -1715,7 +1715,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 67, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 68, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const bool handles_on_save = bs->handles_on;
@@ -2022,11 +2022,11 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                     bs_error_full(
                         bs,
 
-                        Bs_Sv_Static("Use (++) for string concatenation, or use string "
+                        Bs_Sv_Static("Use ($) for string concatenation, or use string "
                                      "interpolation instead"),
 
-                        Bs_Sv_Static("\"Hello, \" ++ \"world!\"\n"
-                                     "\"Hello, \" ++ 69\n"
+                        Bs_Sv_Static("\"Hello, \" $ \"world!\"\n"
+                                     "\"Hello, \" $ 69\n"
                                      "\"Hello, \\(34 + 35) nice!\""),
 
                         "invalid operands to binary (+): " Bs_Sv_Fmt ", " Bs_Sv_Fmt,
@@ -2297,6 +2297,17 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Sv sv = bs_buffer_reset(buffer, start);
             bs_stack_set(bs, 1, bs_value_object(bs_str_new(bs, sv)));
             bs->stack.count--;
+        } break;
+
+        case BS_OP_TOSTR: {
+            Bs_Buffer *buffer = &bs->config.buffer;
+            const size_t start = buffer->count;
+
+            Bs_Writer w = bs_buffer_writer(buffer);
+            bs_value_write(bs, &w, bs_stack_peek(bs, 0));
+
+            const Bs_Sv sv = bs_buffer_reset(buffer, start);
+            bs_stack_set(bs, 0, bs_value_object(bs_str_new(bs, sv)));
         } break;
 
         case BS_OP_PANIC: {

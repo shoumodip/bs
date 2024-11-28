@@ -54,7 +54,7 @@ io.println([1, 2, 3, 4, 2].find(2, 2))
 
     io.println(xs)
     for i in 0, 5 {
-        xs[len(xs)] = "Temp #" ++ i
+        xs[len(xs)] = "Temp #" $ i
     }
 
     io.println(xs)

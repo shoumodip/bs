@@ -9,6 +9,7 @@
 }
 
 :root {
+    --quote: #666666;
     --border: #444444;
     --border-size: 0.15rem;
     --border-radius: 0.3rem;
@@ -93,6 +94,20 @@ a, button {
     -moz-user-select: none;
     -ms-user-select: none;
     -webkit-tap-highlight-color: transparent;
+}
+
+blockquote {
+    margin-left: 0px;
+    padding-left: calc(var(--padding) * 2);
+    border-left: calc(var(--border-size) * 2) solid var(--quote);
+    color: var(--quote);
+    font-style: italic;
+}
+
+blockquote br {
+    display: block;
+    content: "";
+    margin-top: var(--padding);
 }
 
 .copy, .copied {

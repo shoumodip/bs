@@ -1,5 +1,5 @@
 var s = "Hello"
 io.println(s)
 
-s ++= ", world!"
+s $= ", world!"
 io.println(s)

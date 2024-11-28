@@ -111,9 +111,6 @@ io.println("Interpolation! \(34 + 35)")
 # Output: Nested interpolation! 420
 io.println("Nested \("interpolation! \(420)")")
 
-# Output: Hello, world! 69
-io.println("Hello, " ++ "world! " ++ 69)
-
 # Output: 6
 io.println(len("Hello!"))
 
@@ -124,41 +121,73 @@ io.println("foobar"[3])
 io.println('Let\'s go!') # Single quotes can also be used
 ```
 
+#### (`$`)
+```bs
+# Unary ($) converts any value to a string
+io.println(len($(21 * 20)))            # Output: 3
+
+# Binary ($) performs string concatenation
+io.println("Hello, " $ "world! " $ 69) # Output: Hello, world! 69
+```
+
+<blockquote>
+<b>Q.</b> Why (<code>$</code>) of all things? Couldn't you have chosen a more sensible operator?
+<br>
+<b>A.</b> In my defense, I am just a silly goose.
+</blockquote>
+
 ### Arrays
 ```bs
 # Variables will be introduced later
 var array = [69, 420]
 
 # Pretty printing by default!
-io.println(array)      # Output: [69, 420]
+io.println(array)        # Output: [69, 420]
 
 # Array access
-io.println(array[0])   # Output: 69
+io.println(array[0])     # Output: 69
 
 # Array access out of bounds is an error
-io.println(array[2])   # Error!
+io.println(array[2])     # Error!
 
 # Array assignment
 array[1] = "nice!"
-io.println(array)      # Output: [69, "nice!"]
+io.println(array)        # Output: [69, "nice!"]
 
 # Array assignment out of bounds is NOT an error
 array[3] = "Are you serious?"
-io.println(array)      # Output: [69, "nice!", nil, "Are you serious?"]
+io.println(array)        # Output: [69, "nice!", nil, "Are you serious?"]
 
 # Array length
-io.println(len(array)) # Output: 4
+io.println(len(array))   # Output: 4
 
 # Due to the assignment semantics, appending to arrays is quite easy
 array[len(array)] = 420
-io.println(array)      # Output: [69, "nice!", nil, "Are you serious?", 420]
+io.println(array)        # Output: [69, "nice!", nil, "Are you serious?", 420]
+
+# Of course, you can also use the push() method of arrays
+array.push(1337)
+
+# Output:
+# [
+#     69,
+#     "nice!",
+#     nil,
+#     "Are you serious?",
+#     420,
+#     1337
+# ]
+io.println(array)
 
 # Arrays are compared by reference, not value
 var xs = [1, 2, 3]
 var ys = [1, 2, 3]
 var zs = xs
-io.println(xs == ys)   # Output: false
-io.println(xs == zs)   # Output: true
+io.println(xs == ys)     # Output: false
+io.println(xs == zs)     # Output: true
+
+# To compare by value, use the equal() method of arrays
+io.println(xs.equal(ys)) # Output: true
 ```
 
 ### Tables
@@ -181,7 +210,7 @@ io.println(table[69])             # Output: 420
 
 # Key assignment
 table.key = "value"
-table["bar" ++ 69] = "eh"
+table["bar" $ 69] = "eh"
 
 # Output:
 # {
@@ -226,6 +255,9 @@ var ys = {a = 1, b = 2}
 var zs = xs
 io.println(xs == ys)              # Output: false
 io.println(xs == zs)              # Output: true
+
+# To compare by value, use the equal() method of tables
+io.println(xs.equal(ys))          # Output: true
 ```
 
 ### Typeof
@@ -664,7 +696,7 @@ a += 35
 var b = "Nice! "
 
 # String concatenation is also supported
-b ++= a
+b $= a
 
 io.println(b) # Output: Nice! 69
 ```

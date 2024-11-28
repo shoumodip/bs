@@ -65,7 +65,7 @@ fn compare(a, b) {
 }
 
 io.readdir(if len(os.args) >= 2 then os.args[1] else ".")
-    .map(fn (e) => e.name() ++ if e.isdir() then "/" else "")
+    .map(fn (e) => e.name() $ if e.isdir() then "/" else "")
     .sort(compare)
     .map(io.println)
 ```
@@ -175,7 +175,7 @@ var home = os.getenv("HOME")
 fn pwd() {
     var cwd = os.getcwd()
     if cwd.prefix(home) {
-        return "~" ++ cwd.slice(len(home))
+        return "~" $ cwd.slice(len(home))
     }
 
     return cwd
@@ -236,7 +236,7 @@ while !io.stdin.eof() {
         }
 
         if path.prefix("~") {
-            path = home ++ path.slice(1)
+            path = home $ path.slice(1)
         }
 
         var current = os.getcwd()
@@ -796,7 +796,7 @@ $ bs game_of_life_raylib.bs
 ```bs
 # tasks.bs
 
-var TASKS_PATH = os.getenv("HOME") ++ "/.tasks"
+var TASKS_PATH = os.getenv("HOME") $ "/.tasks"
 
 class Tasks {
     init(path) {
@@ -1312,7 +1312,7 @@ class Assets {
     }
 
     sound(path, loader) {
-        path = "assets/sounds/" ++ path
+        path = "assets/sounds/" $ path
         if path in this.sounds {
             return this.sounds[path]
         }
@@ -1328,7 +1328,7 @@ class Assets {
     }
 
     texture(path) {
-        path = "assets/images/" ++ path
+        path = "assets/images/" $ path
         if path in this.textures {
             return this.textures[path]
         }

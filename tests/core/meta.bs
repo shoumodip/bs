@@ -5,7 +5,7 @@
 }
 
 {
-    var f = meta.compile("Oops$")
+    var f = meta.compile("Oops@")
     io.println(f)
 }
 
@@ -17,4 +17,4 @@ io.println(meta.eval("
     }
 "))
 
-io.println(meta.eval("Hehe$"))
+io.println(meta.eval("Hehe@"))

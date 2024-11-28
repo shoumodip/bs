@@ -38,7 +38,7 @@ class Assets {
     }
 
     sound(path, loader) {
-        path = "assets/sounds/" ++ path
+        path = "assets/sounds/" $ path
         if path in this.sounds {
             return this.sounds[path]
         }
@@ -54,7 +54,7 @@ class Assets {
     }
 
     texture(path) {
-        path = "assets/images/" ++ path
+        path = "assets/images/" $ path
         if path in this.textures {
             return this.textures[path]
         }

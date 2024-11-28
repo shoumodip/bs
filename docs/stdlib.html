@@ -102,7 +102,7 @@ io.<span class='field'>print</span>(<span class='string'>"Hello"</span>, <span c
 </button>
 <pre class='code active'>
 <span class='constant'>$ </span>bs demo.bs
-Hello, world 69⏎
+Hello world 69⏎
 </pre>
 </div>
 <p>
@@ -1702,7 +1702,7 @@ Trim <code>pattern</code> from the left of a string.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"["</span> ++ <span class='string'>"   foo bar baz  "</span>.<span class='field'>ltrim</span>(<span class='string'>" "</span>) ++ <span class='string'>"]"</span>)
+io.<span class='field'>println</span>(<span class='string'>"["</span> $ <span class='string'>"   foo bar baz  "</span>.<span class='field'>ltrim</span>(<span class='string'>" "</span>) $ <span class='string'>"]"</span>)
 </pre>
 </pre>
 </div>
@@ -1740,7 +1740,7 @@ Trim <code>pattern</code> from the right of a string.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"["</span> ++ <span class='string'>"   foo bar baz  "</span>.<span class='field'>rtrim</span>(<span class='string'>" "</span>) ++ <span class='string'>"]"</span>)
+io.<span class='field'>println</span>(<span class='string'>"["</span> $ <span class='string'>"   foo bar baz  "</span>.<span class='field'>rtrim</span>(<span class='string'>" "</span>) $ <span class='string'>"]"</span>)
 </pre>
 </pre>
 </div>
@@ -1778,7 +1778,7 @@ Trim <code>pattern</code> from both sides of a string.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"["</span> ++ <span class='string'>"   foo bar baz  "</span>.<span class='field'>trim</span>(<span class='string'>" "</span>) ++ <span class='string'>"]"</span>)
+io.<span class='field'>println</span>(<span class='string'>"["</span> $ <span class='string'>"   foo bar baz  "</span>.<span class='field'>trim</span>(<span class='string'>" "</span>) $ <span class='string'>"]"</span>)
 </pre>
 </pre>
 </div>
@@ -2396,7 +2396,7 @@ buffer
     .<span class='field'>push</span>(<span class='string'>"Hello"</span>)           <span class='comment'># A String</span>
     .<span class='field'>push</span>(Bytes(<span class='string'>", world!"</span>)) <span class='comment'># Another Bytes instance</span>
     .<span class='field'>push</span>(<span class='constant'>32</span>)                <span class='comment'># An ASCII code, in this case ' '</span>
-    .<span class='field'>push</span>(<span class='string'>""</span> ++ <span class='constant'>69</span>)          <span class='comment'># To push the string representation, a string must be provided</span>
+    .<span class='field'>push</span>($<span class='constant'>69</span>)               <span class='comment'># To push the string representation, a string must be provided</span>
 
 io.<span class='field'>println</span>(buffer)
 </pre>

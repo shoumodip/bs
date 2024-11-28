@@ -320,14 +320,16 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
         token.type = BS_TOKEN_RBRACKET;
         break;
 
+    case '$':
+        if (bs_lexer_match(l, '=')) {
+            token.type = BS_TOKEN_JOIN_SET;
+        } else {
+            token.type = BS_TOKEN_JOIN;
+        }
+        break;
+
     case '+':
-        if (bs_lexer_match(l, '+')) {
-            if (bs_lexer_match(l, '=')) {
-                token.type = BS_TOKEN_JOIN_SET;
-            } else {
-                token.type = BS_TOKEN_JOIN;
-            }
-        } else if (bs_lexer_match(l, '=')) {
+        if (bs_lexer_match(l, '=')) {
             token.type = BS_TOKEN_ADD_SET;
         } else {
             token.type = BS_TOKEN_ADD;

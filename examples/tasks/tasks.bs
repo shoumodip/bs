@@ -1,4 +1,4 @@
-var TASKS_PATH = os.getenv("HOME") ++ "/.tasks"
+var TASKS_PATH = os.getenv("HOME") $ "/.tasks"
 
 class Tasks {
     init(path) {

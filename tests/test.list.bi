@@ -145,7 +145,7 @@ false
 :b shell 25
 ../bin/bs strings/main.bs
 :i returncode 0
-:b stdout 116
+:b stdout 121
 Deez nuts
 Joe Mama
 69 Nice!
@@ -155,6 +155,7 @@ Nested interpolation? Are you crazy?
 true
 false
 false
+  69
 
 :b stderr 0
 
@@ -163,14 +164,14 @@ false
 :i returncode 1
 :b stdout 0
 
-:b stderr 239
+:b stderr 236
 strings/error_invalid_addition.bs:1:15: error: invalid operands to binary (+): number, string
 
-Use (++) for string concatenation, or use string interpolation instead
+Use ($) for string concatenation, or use string interpolation instead
 
 ```
-"Hello, " ++ "world!"
-"Hello, " ++ 69
+"Hello, " $ "world!"
+"Hello, " $ 69
 "Hello, \(34 + 35) nice!"
 ```
 
@@ -1808,6 +1809,6 @@ nil
 nil
 
 :b stderr 92
-<meta>:1:5: error: invalid character '$' (36)
-<meta>:1:5: error: invalid character '$' (36)
+<meta>:1:5: error: invalid character '@' (64)
+<meta>:1:5: error: invalid character '@' (64)
 
