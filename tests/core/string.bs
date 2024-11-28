@@ -41,3 +41,5 @@ io.println("foobar".prefix("deez nuts"))
 io.println("foobar".suffix("bar"))
 io.println("foobar".suffix("Bar"))
 io.println("foobar".suffix("deez nuts"))
+
+io.println("foo".repeat(6))

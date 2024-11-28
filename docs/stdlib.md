@@ -618,6 +618,18 @@ $ bs demo.bs
 ligma balls
 ```
 
+### string.repeat(count) @method
+Repeat a string `count` times.
+
+```bs
+io.println("foo".repeat(6))
+```
+
+```console
+$ bs demo.bs
+foofoofoofoofoofoo
+```
+
 ### string.toupper() @method
 Convert a string to uppercase.
 

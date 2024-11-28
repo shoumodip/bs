@@ -1021,6 +1021,23 @@ static Bs_Value bs_str_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
 }
 
+static Bs_Value bs_str_repeat(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_whole_number(bs, args, 0);
+
+    const Bs_Str *src = (const Bs_Str *)args[-1].as.object;
+    const size_t count = args[0].as.number;
+
+    Bs_Buffer *b = &bs_config(bs)->buffer;
+    const size_t start = b->count;
+
+    for (size_t i = 0; i < count; i++) {
+        bs_da_push_many(bs, b, src->data, src->size);
+    }
+
+    return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
+}
+
 static Bs_Value bs_str_tolower(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
@@ -2634,6 +2651,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     {
         bs_builtin_object_methods_add(bs, BS_OBJECT_STR, Bs_Sv_Static("slice"), bs_str_slice);
         bs_builtin_object_methods_add(bs, BS_OBJECT_STR, Bs_Sv_Static("reverse"), bs_str_reverse);
+        bs_builtin_object_methods_add(bs, BS_OBJECT_STR, Bs_Sv_Static("repeat"), bs_str_repeat);
 
         bs_builtin_object_methods_add(bs, BS_OBJECT_STR, Bs_Sv_Static("toupper"), bs_str_toupper);
         bs_builtin_object_methods_add(bs, BS_OBJECT_STR, Bs_Sv_Static("tolower"), bs_str_tolower);

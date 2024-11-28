@@ -1460,7 +1460,7 @@ builtin_methods/error_undefined_str.bs:1:4: error: undefined method: foo
 :b shell 24
 ../bin/bs core/string.bs
 :i returncode 0
-:b stdout 255
+:b stdout 274
 Foo
 bar
 
@@ -1495,6 +1495,7 @@ false
 true
 false
 false
+foofoofoofoofoofoo
 
 :b stderr 0
 
