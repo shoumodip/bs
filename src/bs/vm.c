@@ -919,7 +919,7 @@ void bs_error_full_at(
     error.message = bs_buffer_reset(&bs->config.buffer, start);
     error.explanation = explanation;
     error.example = example;
-    error.continued = (explanation.size || example.size) && bs->frames.count > 1;
+    error.continued = bs->frames.count > 1;
 
     bs->config.error.write(&bs->config.error, error);
     bs_error_end(bs, location, error.native);

@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <ctype.h>
+#include <string.h>
 
 #include "bs/lexer.h"
 
@@ -18,6 +19,26 @@ void bs_error_write_default(Bs_Error_Writer *w, Bs_Error error) {
 
     fprintf(stderr, Bs_Sv_Fmt "\n", Bs_Sv_Arg(error.message));
 
+    if (!error.native && error.type != BS_ERROR_STANDALONE) {
+        fprintf(stderr, "\n    %zu | " Bs_Sv_Fmt "\n", error.loc.row, Bs_Sv_Arg(error.loc.line));
+
+        const int count = snprintf(NULL, 0, "    %zu", error.loc.row);
+        assert(count >= 0);
+        for (size_t i = 0; i < count; i++) {
+            fputc(' ', stderr);
+        }
+        fputs(" | ", stderr);
+
+        for (size_t i = 0; i + 1 < error.loc.col; i++) {
+            fputc(error.loc.line.data[i] == '\t' ? '\t' : ' ', stderr);
+        }
+        fputs("^\n", stderr);
+
+        if (!error.explanation.size && !error.example.size && error.continued) {
+            fputc('\n', stderr);
+        }
+    }
+
     if (error.explanation.size) {
         fprintf(stderr, "\n" Bs_Sv_Fmt "\n", Bs_Sv_Arg(error.explanation));
     }
@@ -26,7 +47,7 @@ void bs_error_write_default(Bs_Error_Writer *w, Bs_Error error) {
         fprintf(stderr, "\n```\n" Bs_Sv_Fmt "\n```\n", Bs_Sv_Arg(error.example));
     }
 
-    if (error.continued) {
+    if ((error.explanation.size || error.example.size) && error.continued) {
         fprintf(stderr, "\n");
     }
 }
@@ -35,11 +56,23 @@ static bool ishex(char c) {
     return isdigit(c) || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f');
 }
 
+static Bs_Sv line_from_sv(Bs_Sv sv) {
+    const char *p = memchr(sv.data, '\n', sv.size);
+    sv.size = p ? p - sv.data : sv.size;
+    return sv;
+}
+
 void bs_lexer_advance(Bs_Lexer *l) {
     if (*l->sv.data == '\n') {
         if (l->sv.size > 1) {
             l->loc.row += 1;
             l->loc.col = 1;
+
+            l->sv.data += 1;
+            l->sv.size -= 1;
+
+            l->loc.line = line_from_sv(l->sv);
+            return;
         }
     } else {
         l->loc.col += 1;
@@ -68,6 +101,7 @@ Bs_Lexer bs_lexer_new(Bs_Sv path, Bs_Sv input, Bs_Error_Writer *error) {
         .loc.path = path,
         .loc.row = 1,
         .loc.col = 1,
+        .loc.line = line_from_sv(input),
         .error = error,
     };
 }

@@ -1866,13 +1866,16 @@ $ bs demo.bs
 If any errors were encountered while compiling the string, `nil` is returned.
 
 ```bs
-var f = meta.compile("Oops$")
+var f = meta.compile("Oops@")
 io.println(f)
 ```
 
 ```console
 $ bs demo.bs
-<meta>:1:5: error: invalid character '$' (36)
+<meta>:1:5: error: invalid character '@' (64)
+
+    1 | Oops@
+      |     ^
 nil
 ```
 

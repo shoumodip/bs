@@ -4247,7 +4247,7 @@ If any errors were encountered while compiling the string, <code>nil</code> is r
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = meta.<span class='field'>compile</span>(<span class='string'>"Oops$"</span>)
+<span class='keyword'>var</span> f = meta.<span class='field'>compile</span>(<span class='string'>"Oops@"</span>)
 io.<span class='field'>println</span>(f)
 </pre>
 </pre>
@@ -4265,7 +4265,10 @@ io.<span class='field'>println</span>(f)
 </button>
 <pre class='code active'>
 <span class='constant'>$ </span>bs demo.bs
-&lt;meta&gt;:1:5: error: invalid character '$' (36)
+&lt;meta&gt;:1:5: error: invalid character '@' (64)
+
+    1 | Oops@
+      |     ^
 nil
 </pre>
 </div>

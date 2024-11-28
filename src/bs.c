@@ -13,7 +13,7 @@
 #    define PATH_SEPARATOR '/'
 #endif
 
-static void bs_error_write_pretty(Bs_Error_Writer *w, Bs_Error error) {
+static void bs_error_write_colors(Bs_Error_Writer *w, Bs_Error error) {
     if (error.native) {
         fprintf(stderr, "[C]: ");
     } else if (error.type != BS_ERROR_STANDALONE) {
@@ -32,6 +32,38 @@ static void bs_error_write_pretty(Bs_Error_Writer *w, Bs_Error error) {
 
     fprintf(stderr, Bs_Sv_Fmt "\n", Bs_Sv_Arg(error.message));
 
+    if (!error.native && error.type != BS_ERROR_STANDALONE) {
+        fprintf(stderr, "\n    ");
+
+        crossline_color_set_on(0, CROSSLINE_FGCOLOR_BLUE);
+        fprintf(stderr, "%zu | ", error.loc.row);
+        crossline_color_set_on(0, CROSSLINE_FGCOLOR_DEFAULT);
+
+        fprintf(stderr, Bs_Sv_Fmt "\n", Bs_Sv_Arg(error.loc.line));
+
+        const int count = snprintf(NULL, 0, "    %zu", error.loc.row);
+        assert(count >= 0);
+        for (size_t i = 0; i < count; i++) {
+            fputc(' ', stderr);
+        }
+
+        crossline_color_set_on(0, CROSSLINE_FGCOLOR_BLUE);
+        fputs(" | ", stderr);
+        crossline_color_set_on(0, CROSSLINE_FGCOLOR_DEFAULT);
+
+        for (size_t i = 0; i + 1 < error.loc.col; i++) {
+            fputc(error.loc.line.data[i] == '\t' ? '\t' : ' ', stderr);
+        }
+
+        crossline_color_set_on(0, CROSSLINE_FGCOLOR_MAGENTA);
+        fputs("^\n", stderr);
+        crossline_color_set_on(0, CROSSLINE_FGCOLOR_DEFAULT);
+
+        if (!error.explanation.size && !error.example.size && error.continued) {
+            fputc('\n', stderr);
+        }
+    }
+
     if (error.explanation.size) {
         crossline_color_set_on(0, CROSSLINE_FGCOLOR_YELLOW);
         fprintf(stderr, "\n" Bs_Sv_Fmt "\n", Bs_Sv_Arg(error.explanation));
@@ -44,7 +76,7 @@ static void bs_error_write_pretty(Bs_Error_Writer *w, Bs_Error error) {
         crossline_color_set_on(0, CROSSLINE_FGCOLOR_DEFAULT);
     }
 
-    if (error.continued) {
+    if ((error.explanation.size || error.example.size) && error.continued) {
         fprintf(stderr, "\n");
     }
 }
@@ -129,7 +161,7 @@ int main(int argc, char **argv) {
     crossline_prompt_color_set(CROSSLINE_FGCOLOR_BLUE);
 
     Bs *bs = bs_new(argc - 1, argv + 1);
-    bs_config(bs)->error.write = bs_error_write_pretty;
+    bs_config(bs)->error.write = bs_error_write_colors;
 
     if (argc < 2 || !strcmp(argv[1], "-")) {
         Bs_Result result = {0};

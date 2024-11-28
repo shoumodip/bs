@@ -758,7 +758,14 @@ f()               # "Should" print 69
 ```console
 $ bs variables.bs
 variables.bs:2:16: error: undefined identifier 'x'
+
+    2 |     io.println(x) # Refers to the variable 'x'
+      |                ^
+
 variables.bs:7:2: in f()
+
+    7 | f()               # "Should" print 69
+      |  ^
 ```
 
 What is going on?

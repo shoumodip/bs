@@ -38,16 +38,22 @@ Hex
 :i returncode 1
 :b stdout 0
 
-:b stderr 75
+:b stderr 100
 arithmetics/error_invalid_digit.bs:1:3: error: invalid digit 'x' in number
+
+    1 | 69x
+      |   ^
 
 :b shell 48
 ../bin/bs arithmetics/error_invalid_hex_digit.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 79
+:b stderr 108
 arithmetics/error_invalid_hex_digit.bs:1:5: error: invalid digit 'g' in number
+
+    1 | 0x69g
+      |     ^
 
 :b shell 28
 ../bin/bs assignment/main.bs
@@ -164,8 +170,11 @@ false
 :i returncode 1
 :b stdout 0
 
-:b stderr 236
+:b stderr 295
 strings/error_invalid_addition.bs:1:15: error: invalid operands to binary (+): number, string
+
+    1 | io.println(69 + " Nice!")
+      |               ^
 
 Use ($) for string concatenation, or use string interpolation instead
 
@@ -212,8 +221,11 @@ Use ($) for string concatenation, or use string interpolation instead
 :i returncode 1
 :b stdout 0
 
-:b stderr 68
+:b stderr 91
 variables/error_undefined.bs:1:1: error: undefined identifier 'foo'
+
+    1 | foo
+      | ^
 
 :b shell 24
 ../bin/bs arrays/main.bs
@@ -255,32 +267,44 @@ variables/error_undefined.bs:1:1: error: undefined identifier 'foo'
 :i returncode 1
 :b stdout 0
 
-:b stderr 98
+:b stderr 148
 arrays/error_index_out_of_bounds.bs:3:14: error: cannot get value at index 0 in array of length 0
+
+    3 | io.println(xs[0])
+      |              ^
 
 :b shell 39
 ../bin/bs arrays/error_invalid_index.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 124
+:b stderr 156
 arrays/error_invalid_index.bs:2:4: error: expected array index or method name to be positive integer or string, got boolean
+
+    2 | xs[false]
+      |    ^
 
 :b shell 46
 ../bin/bs arrays/error_invalid_index_assign.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 105
+:b stderr 145
 arrays/error_invalid_index_assign.bs:2:4: error: expected array index to be positive integer, got string
+
+    2 | xs["string"] = 69
+      |    ^
 
 :b shell 52
 ../bin/bs arrays/error_invalid_index_const_assign.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 111
+:b stderr 145
 arrays/error_invalid_index_const_assign.bs:2:4: error: expected array index to be positive integer, got string
+
+    2 | xs.foo = 69
+      |    ^
 
 :b shell 32
 ../bin/bs arrays/compare_sort.bs
@@ -371,9 +395,12 @@ arrays/error_invalid_index_const_assign.bs:2:4: error: expected array index to b
 :i returncode 1
 :b stdout 0
 
-:b stderr 126
+:b stderr 167
 [C]: error: cannot remove item at index 0 from array of length 0
 arrays/error_remove_out_of_bounds.bs:2:10: in array.remove()
+
+    2 | xs.remove(0)
+      |          ^
 
 :b shell 24
 ../bin/bs tables/main.bs
@@ -393,48 +420,66 @@ foo
 :i returncode 1
 :b stdout 0
 
-:b stderr 70
+:b stderr 100
 tables/error_invalid_key.bs:2:4: error: cannot use 'nil' as table key
+
+    2 | xs[nil]
+      |    ^
 
 :b shell 44
 ../bin/bs tables/error_invalid_key_assign.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 77
+:b stderr 112
 tables/error_invalid_key_assign.bs:2:4: error: cannot use 'nil' as table key
+
+    2 | xs[nil] = 69
+      |    ^
 
 :b shell 47
 ../bin/bs containers/error_invalid_container.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 82
+:b stderr 109
 containers/error_invalid_container.bs:2:2: error: cannot invoke or index into nil
+
+    2 | x[420]
+      |  ^
 
 :b shell 53
 ../bin/bs containers/error_invalid_container_const.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 88
+:b stderr 114
 containers/error_invalid_container_const.bs:2:2: error: cannot invoke or index into nil
+
+    2 | x.foo
+      |  ^
 
 :b shell 54
 ../bin/bs containers/error_invalid_container_assign.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 95
+:b stderr 129
 containers/error_invalid_container_assign.bs:2:2: error: cannot take mutable index into number
+
+    2 | x[420] = 1337
+      |  ^
 
 :b shell 60
 ../bin/bs containers/error_invalid_container_const_assign.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 101
+:b stderr 133
 containers/error_invalid_container_const_assign.bs:2:2: error: cannot take mutable index into number
+
+    2 | x.foo = 420
+      |  ^
 
 :b shell 35
 ../bin/bs containers/in_operator.bs
@@ -458,40 +503,55 @@ false
 :i returncode 1
 :b stdout 0
 
-:b stderr 87
+:b stderr 119
 containers/error_in_operator_invalid_container.bs:1:4: error: cannot index into number
+
+    1 | 69 in 420
+      |    ^
 
 :b shell 55
 ../bin/bs containers/error_in_operator_invalid_index.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 88
+:b stderr 121
 containers/error_in_operator_invalid_index.bs:1:5: error: cannot use 'nil' as table key
+
+    1 | nil in {}
+      |     ^
 
 :b shell 59
 ../bin/bs containers/error_undefined_c_instance_property.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 105
+:b stderr 144
 containers/error_undefined_c_instance_property.bs:1:9: error: undefined instance property or method: foo
+
+    1 | Bytes().foo
+      |         ^
 
 :b shell 57
 ../bin/bs containers/error_undefined_instance_property.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 103
+:b stderr 138
 containers/error_undefined_instance_property.bs:2:7: error: undefined instance property or method: foo
+
+    2 | Foo().foo
+      |       ^
 
 :b shell 49
 ../bin/bs containers/error_undefined_table_key.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 77
+:b stderr 106
 containers/error_undefined_table_key.bs:5:4: error: undefined table key: bar
+
+    5 | xs.bar
+      |    ^
 
 :b shell 24
 ../bin/bs import/main.bs
@@ -516,16 +576,22 @@ In common.bs!
 :i returncode 1
 :b stdout 0
 
-:b stderr 84
+:b stderr 135
 import/error_could_not_open.bs:1:8: error: could not import module 'does_not_exist'
+
+    1 | import("does_not_exist")
+      |        ^
 
 :b shell 41
 ../bin/bs import/error_expected_string.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 90
+:b stderr 127
 import/error_expected_string.bs:1:8: error: expected module name to be string, got number
+
+    1 | import(69)
+      |        ^
 
 :b shell 31
 ../bin/bs import/main_module.bs
@@ -635,32 +701,44 @@ foo 69
 :i returncode 1
 :b stdout 0
 
-:b stderr 72
+:b stderr 121
 loops/error_invalid_iterator.bs:1:13: error: cannot iterate over number
+
+    1 | for i, v in 69 {}
+      |             ^
 
 :b shell 44
 ../bin/bs loops/error_invalid_range_start.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 91
+:b stderr 140
 loops/error_invalid_range_start.bs:1:10: error: expected range start to be number, got nil
+
+    1 | for i in nil, nil {}
+      |          ^
 
 :b shell 42
 ../bin/bs loops/error_invalid_range_end.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 87
+:b stderr 137
 loops/error_invalid_range_end.bs:1:13: error: expected range end to be number, got nil
+
+    1 | for i in 0, nil {}
+      |             ^
 
 :b shell 43
 ../bin/bs loops/error_invalid_range_step.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 93
+:b stderr 152
 loops/error_invalid_range_step.bs:1:17: error: expected range step to be number, got boolean
+
+    1 | for i in 0, 10, true {}
+      |                 ^
 
 :b shell 27
 ../bin/bs functions/main.bs
@@ -684,31 +762,56 @@ Value of x is 69
 :i returncode 1
 :b stdout 0
 
-:b stderr 72
+:b stderr 96
 functions/error_invalid_arity.bs:3:2: error: expected 1 argument, got 0
+
+    3 | f()
+      |  ^
 
 :b shell 40
 ../bin/bs functions/error_stack_trace.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 208
+:b stderr 345
 functions/error_stack_trace.bs:2:5: error: undefined identifier 'oops'
+
+    2 |     oops
+      |     ^
+
 functions/error_stack_trace.bs:6:8: in baz()
+
+    6 |     baz()
+      |        ^
 functions/error_stack_trace.bs:10:8: in bar()
+
+    10 |     bar()
+       |        ^
 functions/error_stack_trace.bs:13:4: in foo()
+
+    13 | foo()
+       |    ^
 
 :b shell 47
 ../bin/bs functions/error_native_stack_trace.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 240
+:b stderr 387
 [C]: error: expected argument #1 to be string, got number
 functions/error_native_stack_trace.bs:2:22: in getenv()
+
+    2 |     return os.getenv(s)
+      |                      ^
 [C]: in foo()
 functions/error_native_stack_trace.bs:6:15: in array.map()
+
+    6 |     [1, 2].map(foo)
+      |               ^
 functions/error_native_stack_trace.bs:9:5: in main()
+
+    9 | main()
+      |     ^
 
 :b shell 26
 ../bin/bs closures/main.bs
@@ -812,8 +915,11 @@ ligma
 :i returncode 1
 :b stdout 0
 
-:b stderr 685
+:b stderr 737
 oop/error_cannot_return_from_init.bs:3:16: error: can only explicity return 'nil' from an initializer method
+
+    3 |         return 69
+      |                ^
 
 When an initializer method explicitly returns 'nil', it indicates that the
 initialization failed due to some reason, and the site of the instantiation
@@ -845,42 +951,65 @@ log.write("Hello, world!") # Or whatever you want to do
 :i returncode 1
 :b stdout 0
 
-:b stderr 81
+:b stderr 105
 oop/error_this_outside_class.bs:1:1: error: cannot use 'this' outside of 'class'
+
+    1 | this
+      | ^
 
 :b shell 44
 ../bin/bs oop/error_with_init_wrong_arity.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 74
+:b stderr 102
 oop/error_with_init_wrong_arity.bs:5:4: error: expected 1 argument, got 0
+
+    5 | Foo()
+      |    ^
 
 :b shell 47
 ../bin/bs oop/error_without_init_wrong_arity.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 78
+:b stderr 108
 oop/error_without_init_wrong_arity.bs:3:4: error: expected 0 arguments, got 1
+
+    3 | Foo(69)
+      |    ^
 
 :b shell 34
 ../bin/bs oop/error_inside_init.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 110
+:b stderr 179
 oop/error_inside_init.bs:3:9: error: invalid operand to unary (-): nil
+
+    3 |         -nil
+      |         ^
+
 oop/error_inside_init.bs:7:4: in Foo()
+
+    7 | Foo()
+      |    ^
 
 :b shell 41
 ../bin/bs oop/error_inside_method_call.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 129
+:b stderr 210
 oop/error_inside_method_call.bs:3:9: error: invalid operand to unary (-): nil
+
+    3 |         -nil
+      |         ^
+
 oop/error_inside_method_call.bs:7:10: in Foo.foo()
+
+    7 | Foo().foo()
+      |          ^
 
 :b shell 41
 ../bin/bs oop/return_without_expr_init.bs
@@ -934,9 +1063,16 @@ Hello, John Doe!
 :i returncode 1
 :b stdout 0
 
-:b stderr 125
+:b stderr 203
 oop/error_undefined_super_method.bs:4:15: error: undefined super method: foo
+
+    4 |         super.foo()
+      |               ^
+
 oop/error_undefined_super_method.bs:8:2: in A()
+
+    8 | A()
+      |  ^
 
 :b shell 29
 ../bin/bs invokation/chain.bs
@@ -954,101 +1090,141 @@ oop/error_undefined_super_method.bs:8:2: in A()
 :i returncode 1
 :b stdout 0
 
-:b stderr 87
+:b stderr 113
 invokation/error_call_invalid_container.bs:2:2: error: cannot invoke or index into nil
+
+    2 | t.f()
+      |  ^
 
 :b shell 46
 ../bin/bs invokation/error_call_invalid_key.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 127
+:b stderr 157
 invokation/error_call_invalid_key.bs:2:4: error: expected array index or method name to be positive integer or string, got nil
+
+    2 | xs[nil]
+      |    ^
 
 :b shell 42
 ../bin/bs invokation/error_invoked_body.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 145
+:b stderr 222
 invokation/error_invoked_body.bs:3:13: error: invalid operands to binary (+): nil, number
+
+    3 |         nil + 69
+      |             ^
+
 invokation/error_invoked_body.bs:7:4: in <anonymous>()
+
+    7 | t.f()
+      |    ^
 
 :b shell 56
 ../bin/bs invokation/error_key_call_argument_location.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 135
+:b stderr 170
 [C]: error: expected argument #1 to be positive integer, got nil
 invokation/error_key_call_argument_location.bs:5:5: in string.slice()
+
+    5 | t.f(nil, 0)
+      |     ^
 
 :b shell 55
 ../bin/bs invokation/error_key_call_invalid_function.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 77
+:b stderr 105
 invokation/error_key_call_invalid_function.bs:5:4: error: cannot call number
+
+    5 | t.f()
+      |    ^
 
 :b shell 50
 ../bin/bs invokation/error_key_call_wrong_arity.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 81
+:b stderr 111
 invokation/error_key_call_wrong_arity.bs:7:4: error: expected 0 arguments, got 1
+
+    7 | t.f(69)
+      |    ^
 
 :b shell 53
 ../bin/bs invokation/error_method_call_wrong_arity.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 84
+:b stderr 118
 invokation/error_method_call_wrong_arity.bs:8:6: error: expected 0 arguments, got 1
+
+    8 | foo.f(69)
+      |      ^
 
 :b shell 59
 ../bin/bs invokation/error_native_call_argument_location.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 139
+:b stderr 207
 [C]: error: expected argument #1 to be positive integer, got nil
 invokation/error_native_call_argument_location.bs:1:21: in string.slice()
+
+    1 | io.println("".slice(nil, 0))
+      |                     ^
 
 :b shell 53
 ../bin/bs invokation/error_native_call_wrong_arity.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 110
+:b stderr 189
 [C]: error: expected 0 arguments, got 1
 invokation/error_native_call_wrong_arity.bs:1:28: in string.reverse()
+
+    1 | io.println("Hello!".reverse(69))
+      |                            ^
 
 :b shell 61
 ../bin/bs invokation/error_property_call_argument_location.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 140
+:b stderr 179
 [C]: error: expected argument #1 to be positive integer, got nil
 invokation/error_property_call_argument_location.bs:5:7: in string.slice()
+
+    5 | foo.f(nil, 0)
+      |       ^
 
 :b shell 60
 ../bin/bs invokation/error_property_call_invalid_function.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 82
+:b stderr 114
 invokation/error_property_call_invalid_function.bs:5:6: error: cannot call number
+
+    5 | foo.f()
+      |      ^
 
 :b shell 55
 ../bin/bs invokation/error_property_call_wrong_arity.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 86
+:b stderr 120
 invokation/error_property_call_wrong_arity.bs:8:6: error: expected 0 arguments, got 1
+
+    8 | foo.f(69)
+      |      ^
 
 :b shell 32
 ../bin/bs invokation/key_call.bs
@@ -1087,16 +1263,22 @@ Hello, world!
 :i returncode 1
 :b stdout 0
 
-:b stderr 78
+:b stderr 138
 delete/error_cannot_delete_super.bs:4:16: error: cannot use 'delete' on super
+
+    4 |         delete(super.foo)
+      |                ^
 
 :b shell 51
 ../bin/bs delete/error_expected_index_expression.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 200
+:b stderr 237
 delete/error_expected_index_expression.bs:2:8: error: expected index expression
+
+    2 | delete(xs)
+      |        ^
 
 Index expression can be any of the following:
 
@@ -1110,24 +1292,33 @@ xs["bar"]; # Expression based index
 :i returncode 1
 :b stdout 0
 
-:b stderr 72
+:b stderr 113
 delete/error_invalid_container.bs:2:9: error: cannot delete from number
+
+    2 | delete(x.foo)
+      |         ^
 
 :b shell 51
 ../bin/bs delete/error_invalid_instance_property.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 93
+:b stderr 143
 delete/error_invalid_instance_property.bs:2:13: error: cannot use 'nil' as instance property
+
+    2 | delete(Foo()[nil])
+      |             ^
 
 :b shell 43
 ../bin/bs delete/error_invalid_table_key.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 77
+:b stderr 121
 delete/error_invalid_table_key.bs:2:10: error: cannot use 'nil' as table key
+
+    2 | delete(xs[nil])
+      |          ^
 
 :b shell 37
 ../bin/bs delete/instance_property.bs
@@ -1227,24 +1418,33 @@ ys = {
 :i returncode 1
 :b stdout 0
 
-:b stderr 75
+:b stderr 106
 builtin_methods/error_undefined_array.bs:1:4: error: undefined method: foo
+
+    1 | [].foo()
+      |    ^
 
 :b shell 51
 ../bin/bs builtin_methods/error_undefined_number.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 76
+:b stderr 107
 builtin_methods/error_undefined_number.bs:1:4: error: undefined method: foo
+
+    1 | 69.foo()
+      |    ^
 
 :b shell 48
 ../bin/bs builtin_methods/error_undefined_str.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 73
+:b stderr 104
 builtin_methods/error_undefined_str.bs:1:4: error: undefined method: foo
+
+    1 | "".foo()
+      |    ^
 
 :b shell 24
 ../bin/bs core/string.bs
@@ -1547,9 +1747,12 @@ false
 :i returncode 1
 :b stdout 0
 
-:b stderr 109
+:b stderr 147
 [C]: error: expected argument #1 to be function, got nil
 core/error_expected_function.bs:1:8: in array.map()
+
+    1 | [].map(nil)
+      |        ^
 
 :b shell 23
 ../bin/bs core/regex.bs
@@ -1588,8 +1791,11 @@ ayo noice!
 :i returncode 1
 :b stdout 0
 
-:b stderr 671
+:b stderr 727
 ffi/error_invalid_library.bs:1:8: error: invalid native library 'executables/invalid'
+
+    1 | import("executables/invalid")
+      |        ^
 
 A BS native library must define 'bs_library_init'
 
@@ -1659,32 +1865,44 @@ Done!
 :i returncode 1
 :b stdout 0
 
-:b stderr 26
+:b stderr 53
 panic/panic.bs:1:1: panic
+
+    1 | panic()
+      | ^
 
 :b shell 31
 ../bin/bs panic/with_message.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 32
+:b stderr 65
 panic/with_message.bs:1:1: Here
+
+    1 | panic("Here")
+      | ^
 
 :b shell 26
 ../bin/bs assert/assert.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 39
+:b stderr 72
 assert/assert.bs:2:1: assertion failed
+
+    2 | assert(false)
+      | ^
 
 :b shell 32
 ../bin/bs assert/with_message.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 34
+:b stderr 76
 assert/with_message.bs:2:1: Ligma
+
+    2 | assert(false, "Ligma")
+      | ^
 
 :b shell 25
 ../bin/bs core/readdir.bs
@@ -1756,18 +1974,24 @@ true
 :i returncode 1
 :b stdout 0
 
-:b stderr 133
+:b stderr 192
 [C]: error: a step of -1 in an ascending range would run indefinitely
 core/math_range_indefinite_ascending_guard.bs:1:19: in range()
+
+    1 | math.range(0, 10, -1)
+      |                   ^
 
 :b shell 56
 ../bin/bs core/math_range_indefinite_descending_guard.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 133
+:b stderr 191
 [C]: error: a step of 1 in a descending range would run indefinitely
 core/math_range_indefinite_descending_guard.bs:1:19: in range()
+
+    1 | math.range(10, 0, 1)
+      |                   ^
 
 :b shell 33
 ../bin/bs strings/single_quote.bs
@@ -1808,7 +2032,13 @@ Nice!
 nil
 nil
 
-:b stderr 92
+:b stderr 150
 <meta>:1:5: error: invalid character '@' (64)
+
+    1 | Oops@
+      |     ^
 <meta>:1:5: error: invalid character '@' (64)
+
+    1 | Hehe@
+      |     ^
 

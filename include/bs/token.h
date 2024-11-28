@@ -5,6 +5,7 @@
 
 typedef struct {
     Bs_Sv path;
+    Bs_Sv line;
     size_t row;
     size_t col;
 } Bs_Loc;
