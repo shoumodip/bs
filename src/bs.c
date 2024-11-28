@@ -39,7 +39,8 @@ static void bs_error_write_colors(Bs_Error_Writer *w, Bs_Error error) {
         fprintf(stderr, "%zu | ", error.loc.row);
         crossline_color_set_on(0, CROSSLINE_FGCOLOR_DEFAULT);
 
-        fprintf(stderr, Bs_Sv_Fmt "\n", Bs_Sv_Arg(error.loc.line));
+        const Bs_Sv line = bs_sv_trim(error.loc.line, '\r'); // Video Game OS fix
+        fprintf(stderr, Bs_Sv_Fmt "\n", Bs_Sv_Arg(line));
 
         const int count = snprintf(NULL, 0, "    %zu", error.loc.row);
         assert(count >= 0);
@@ -52,7 +53,7 @@ static void bs_error_write_colors(Bs_Error_Writer *w, Bs_Error error) {
         crossline_color_set_on(0, CROSSLINE_FGCOLOR_DEFAULT);
 
         for (size_t i = 0; i + 1 < error.loc.col; i++) {
-            fputc(error.loc.line.data[i] == '\t' ? '\t' : ' ', stderr);
+            fputc(line.data[i] == '\t' ? '\t' : ' ', stderr);
         }
 
         crossline_color_set_on(0, CROSSLINE_FGCOLOR_MAGENTA);
