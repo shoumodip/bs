@@ -35,7 +35,7 @@ static void bs_error_write_colors(Bs_Error_Writer *w, Bs_Error error) {
     if (!error.native && error.type != BS_ERROR_STANDALONE) {
         fprintf(stderr, "\n    ");
 
-        crossline_color_set_on(0, CROSSLINE_FGCOLOR_BLUE);
+        crossline_color_set_on(0, CROSSLINE_FGCOLOR_CYAN);
         fprintf(stderr, "%zu | ", error.loc.row);
         crossline_color_set_on(0, CROSSLINE_FGCOLOR_DEFAULT);
 
@@ -48,7 +48,7 @@ static void bs_error_write_colors(Bs_Error_Writer *w, Bs_Error error) {
             fputc(' ', stderr);
         }
 
-        crossline_color_set_on(0, CROSSLINE_FGCOLOR_BLUE);
+        crossline_color_set_on(0, CROSSLINE_FGCOLOR_CYAN);
         fputs(" | ", stderr);
         crossline_color_set_on(0, CROSSLINE_FGCOLOR_DEFAULT);
 
