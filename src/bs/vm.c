@@ -255,6 +255,7 @@ static void bs_blacken_object(Bs *bs, Bs_Object *object) {
     case BS_OBJECT_FN: {
         Bs_Fn *fn = (Bs_Fn *)object;
         bs_mark(bs, (Bs_Object *)fn->name);
+        bs_mark(bs, (Bs_Object *)fn->source);
 
         for (size_t i = 0; i < fn->chunk.constants.count; i++) {
             bs_mark_value(bs, fn->chunk.constants.data[i]);

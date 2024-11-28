@@ -2411,24 +2411,31 @@ static Bs_Value bs_meta_compile(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
-    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
-    const Bs_Sv input = Bs_Sv(str->data, str->size);
-
-    const Bs_Closure *closure = bs_compile(bs, Bs_Sv_Static("<meta>"), input, false, false, true);
-    return closure ? bs_value_object(closure) : bs_value_nil;
-}
-
-static Bs_Value bs_meta_eval(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 1);
-    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
-
-    const Bs_Str *str = (const Bs_Str *)args[0].as.object;
+    Bs_Str *str = (Bs_Str *)args[0].as.object;
     const Bs_Sv input = Bs_Sv(str->data, str->size);
 
     const Bs_Closure *closure = bs_compile(bs, Bs_Sv_Static("<meta>"), input, false, false, true);
     if (!closure) {
         return bs_value_nil;
     }
+
+    closure->fn->source = str;
+    return bs_value_object(closure);
+}
+
+static Bs_Value bs_meta_eval(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    Bs_Str *str = (Bs_Str *)args[0].as.object;
+    const Bs_Sv input = Bs_Sv(str->data, str->size);
+
+    const Bs_Closure *closure = bs_compile(bs, Bs_Sv_Static("<meta>"), input, false, false, true);
+    if (!closure) {
+        return bs_value_nil;
+    }
+
+    closure->fn->source = str;
     return bs_call(bs, bs_value_object(closure), NULL, 0);
 }
 
