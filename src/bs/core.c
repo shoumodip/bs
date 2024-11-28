@@ -2432,7 +2432,13 @@ static Bs_Value bs_meta_eval(Bs *bs, Bs_Value *args, size_t arity) {
 
     const Bs_Closure *closure = bs_compile(bs, Bs_Sv_Static("<meta>"), input, false, false, true);
     if (!closure) {
-        return bs_value_nil;
+        Bs_Error error = bs_error_begin(bs);
+        error.type = BS_ERROR_TRACE;
+        error.message = Bs_Sv_Static("<meta>()");
+
+        Bs_Config *config = bs_config(bs);
+        config->error.write(&config->error, error);
+        bs_error_end(bs, error.native);
     }
 
     closure->fn->source = str;

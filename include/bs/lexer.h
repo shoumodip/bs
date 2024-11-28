@@ -40,6 +40,7 @@ typedef struct {
     Bs_Token buffer;
     size_t prev_row;
 
+    bool is_meta;
     bool comments;
     jmp_buf unwind;
 

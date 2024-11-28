@@ -49,6 +49,8 @@ typedef struct {
 
     Bs_Str *name;
     size_t length;
+
+    const char *source;
 } Bs_Module;
 
 typedef struct {
@@ -57,7 +59,14 @@ typedef struct {
     size_t capacity;
 } Bs_Modules;
 
-#define bs_modules_free bs_da_free
+static void bs_modules_free(Bs *bs, Bs_Modules *m) {
+    for (size_t i = 0; i < m->count; i++) {
+        // The const correctness is *not* a bug. See: https://yarchive.net/comp/const.html
+        free((char *)m->data[i].source);
+    }
+    bs_da_free(bs, m);
+}
+
 #define bs_modules_push bs_da_push
 
 static bool bs_modules_find(Bs_Modules *modules, Bs_Sv name, size_t *index) {
@@ -804,11 +813,15 @@ static bool bs_value_has_builtin_methods(Bs_Value value) {
     }
 }
 
-static Bs_Error bs_error_begin(Bs *bs, size_t location) {
+Bs_Error bs_error_begin_at(Bs *bs, size_t location) {
     fflush(stdout); // Flush stdout beforehand *just in case*
     bs->gc_on = false;
 
-    Bs_Error error = {.type = BS_ERROR_MAIN};
+    Bs_Error error = {
+        .type = BS_ERROR_MAIN,
+        .continued = bs->frames.count > 1,
+    };
+
     if (bs->frame->ip) {
         const Bs_Op_Loc *oploc = bs_chunk_get_op_loc(
             &bs->frame->closure->fn->chunk, bs->frame->ip - bs->frame->closure->fn->chunk.data);
@@ -816,12 +829,15 @@ static Bs_Error bs_error_begin(Bs *bs, size_t location) {
         error.loc = oploc[location].loc;
     } else {
         error.native = true;
+        if (error.continued && !bs->frames.data[bs->frames.count - 2].ip) {
+            error.continued = false;
+        }
     }
 
     return error;
 }
 
-static void bs_error_end(Bs *bs, size_t location, bool native) {
+void bs_error_end_at(Bs *bs, size_t location, bool native) {
     const size_t start = bs->config.buffer.count;
     Bs_Writer w = bs_buffer_writer(&bs->config.buffer);
 
@@ -899,6 +915,11 @@ static void bs_error_end(Bs *bs, size_t location, bool native) {
         }
 
         error.message = bs_buffer_reset(&bs->config.buffer, start);
+        error.continued = i > 2;
+        if (error.continued && error.native && !caller->ip) {
+            error.continued = true;
+        }
+
         bs->config.error.write(&bs->config.error, error);
     }
 
@@ -916,14 +937,13 @@ void bs_error_full_at(
     bs_vfmt(&w, fmt, args);
     va_end(args);
 
-    Bs_Error error = bs_error_begin(bs, location);
+    Bs_Error error = bs_error_begin_at(bs, location);
     error.message = bs_buffer_reset(&bs->config.buffer, start);
     error.explanation = explanation;
     error.example = example;
-    error.continued = bs->frames.count > 1;
 
     bs->config.error.write(&bs->config.error, error);
-    bs_error_end(bs, location, error.native);
+    bs_error_end_at(bs, location, error.native);
 }
 
 void bs_error_standalone(Bs *bs, const char *fmt, ...) {
@@ -1088,11 +1108,11 @@ void bs_check_multi_at(
     const Bs_Sv sv = bs_value_type_name_full(value);
     bs_fmt(&w, ", got " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
 
-    Bs_Error error = bs_error_begin(bs, location);
+    Bs_Error error = bs_error_begin_at(bs, location);
     error.message = bs_buffer_reset(&bs->config.buffer, start);
 
     bs->config.error.write(&bs->config.error, error);
-    bs_error_end(bs, location, error.native);
+    bs_error_end_at(bs, location, error.native);
 }
 
 void bs_check_callable_at(Bs *bs, size_t location, Bs_Value value, const char *label) {
@@ -1335,6 +1355,11 @@ const Bs_Closure *bs_compile_module(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_mai
         .length = path.size,
     };
 
+    // The main and repl contents are owned outside of BS. Don't take ownership over those
+    if (!is_main && !is_repl) {
+        module.source = input.data;
+    }
+
     if (bs_sv_suffix(path, Bs_Sv_Static(".bs"))) {
         module.length -= 3;
     }
@@ -1373,7 +1398,6 @@ static bool bs_import_language(Bs *bs, Bs_Sv path) {
 
     path.size--;
     const Bs_Closure *fn = bs_compile_module(bs, path, Bs_Sv(contents, size), false, false);
-    free(contents);
 
     if (!fn) {
         bs_unwind(bs, 1);
@@ -2319,12 +2343,12 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             bs_value_write(bs, &w, value);
             bs->stack.count--;
 
-            Bs_Error error = bs_error_begin(bs, 0);
+            Bs_Error error = bs_error_begin_at(bs, 0);
             error.type = BS_ERROR_PANIC;
             error.message = bs_buffer_reset(&bs->config.buffer, start);
 
             bs->config.error.write(&bs->config.error, error);
-            bs_error_end(bs, 0, error.native);
+            bs_error_end_at(bs, 0, error.native);
         } break;
 
         case BS_OP_ASSERT: {
@@ -2336,12 +2360,12 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 bs_value_write(bs, &w, message);
                 bs->stack.count -= 2;
 
-                Bs_Error error = bs_error_begin(bs, 0);
+                Bs_Error error = bs_error_begin_at(bs, 0);
                 error.type = BS_ERROR_PANIC;
                 error.message = bs_buffer_reset(&bs->config.buffer, start);
 
                 bs->config.error.write(&bs->config.error, error);
-                bs_error_end(bs, 0, error.native);
+                bs_error_end_at(bs, 0, error.native);
             } else {
                 bs->stack.count--;
             }

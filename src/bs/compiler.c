@@ -1547,6 +1547,7 @@ Bs_Closure *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_re
         // Own the path
         const Bs_Sv path = Bs_Sv(lambda->fn->name->data, lambda->fn->name->size);
         compiler.lexer = bs_lexer_new(path, input, &bs_config(bs)->error);
+        compiler.lexer.is_meta = is_meta;
     }
 
     if (setjmp(compiler.lexer.unwind)) {

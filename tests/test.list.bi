@@ -395,8 +395,9 @@ arrays/error_invalid_index_const_assign.bs:2:4: error: expected array index to b
 :i returncode 1
 :b stdout 0
 
-:b stderr 167
+:b stderr 168
 [C]: error: cannot remove item at index 0 from array of length 0
+
 arrays/error_remove_out_of_bounds.bs:2:10: in array.remove()
 
     2 | xs.remove(0)
@@ -773,7 +774,7 @@ functions/error_invalid_arity.bs:3:2: error: expected 1 argument, got 0
 :i returncode 1
 :b stdout 0
 
-:b stderr 345
+:b stderr 347
 functions/error_stack_trace.bs:2:5: error: undefined identifier 'oops'
 
     2 |     oops
@@ -783,10 +784,12 @@ functions/error_stack_trace.bs:6:8: in baz()
 
     6 |     baz()
       |        ^
+
 functions/error_stack_trace.bs:10:8: in bar()
 
     10 |     bar()
        |        ^
+
 functions/error_stack_trace.bs:13:4: in foo()
 
     13 | foo()
@@ -797,17 +800,21 @@ functions/error_stack_trace.bs:13:4: in foo()
 :i returncode 1
 :b stdout 0
 
-:b stderr 387
+:b stderr 391
 [C]: error: expected argument #1 to be string, got number
+
 functions/error_native_stack_trace.bs:2:22: in getenv()
 
     2 |     return os.getenv(s)
       |                      ^
+
 [C]: in foo()
+
 functions/error_native_stack_trace.bs:6:15: in array.map()
 
     6 |     [1, 2].map(foo)
       |               ^
+
 functions/error_native_stack_trace.bs:9:5: in main()
 
     9 | main()
@@ -1128,8 +1135,9 @@ invokation/error_invoked_body.bs:7:4: in <anonymous>()
 :i returncode 1
 :b stdout 0
 
-:b stderr 170
+:b stderr 171
 [C]: error: expected argument #1 to be positive integer, got nil
+
 invokation/error_key_call_argument_location.bs:5:5: in string.slice()
 
     5 | t.f(nil, 0)
@@ -1173,8 +1181,9 @@ invokation/error_method_call_wrong_arity.bs:8:6: error: expected 0 arguments, go
 :i returncode 1
 :b stdout 0
 
-:b stderr 207
+:b stderr 208
 [C]: error: expected argument #1 to be positive integer, got nil
+
 invokation/error_native_call_argument_location.bs:1:21: in string.slice()
 
     1 | io.println("".slice(nil, 0))
@@ -1185,8 +1194,9 @@ invokation/error_native_call_argument_location.bs:1:21: in string.slice()
 :i returncode 1
 :b stdout 0
 
-:b stderr 189
+:b stderr 190
 [C]: error: expected 0 arguments, got 1
+
 invokation/error_native_call_wrong_arity.bs:1:28: in string.reverse()
 
     1 | io.println("Hello!".reverse(69))
@@ -1197,8 +1207,9 @@ invokation/error_native_call_wrong_arity.bs:1:28: in string.reverse()
 :i returncode 1
 :b stdout 0
 
-:b stderr 179
+:b stderr 180
 [C]: error: expected argument #1 to be positive integer, got nil
+
 invokation/error_property_call_argument_location.bs:5:7: in string.slice()
 
     5 | foo.f(nil, 0)
@@ -1747,8 +1758,9 @@ false
 :i returncode 1
 :b stdout 0
 
-:b stderr 147
+:b stderr 148
 [C]: error: expected argument #1 to be function, got nil
+
 core/error_expected_function.bs:1:8: in array.map()
 
     1 | [].map(nil)
@@ -1974,8 +1986,9 @@ true
 :i returncode 1
 :b stdout 0
 
-:b stderr 192
+:b stderr 193
 [C]: error: a step of -1 in an ascending range would run indefinitely
+
 core/math_range_indefinite_ascending_guard.bs:1:19: in range()
 
     1 | math.range(0, 10, -1)
@@ -1986,8 +1999,9 @@ core/math_range_indefinite_ascending_guard.bs:1:19: in range()
 :i returncode 1
 :b stdout 0
 
-:b stderr 191
+:b stderr 192
 [C]: error: a step of 1 in a descending range would run indefinitely
+
 core/math_range_indefinite_descending_guard.bs:1:19: in range()
 
     1 | math.range(10, 0, 1)
@@ -2013,8 +2027,8 @@ XxfoobarXx
 
 :b shell 22
 ../bin/bs core/meta.bs
-:i returncode 0
-:b stdout 84
+:i returncode 1
+:b stdout 80
 <fn>
 69
 nil
@@ -2030,15 +2044,22 @@ Nice!
 Nice!
 Nice!
 nil
-nil
 
-:b stderr 150
+:b stderr 272
 <meta>:1:5: error: invalid character '@' (64)
 
     1 | Oops@
       |     ^
+
 <meta>:1:5: error: invalid character '@' (64)
 
     1 | Hehe@
       |     ^
+
+[C]: in <meta>()
+
+core/meta.bs:20:21: in eval()
+
+    20 | io.println(meta.eval("Hehe@"))
+       |                     ^
 

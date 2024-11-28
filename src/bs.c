@@ -59,10 +59,10 @@ static void bs_error_write_colors(Bs_Error_Writer *w, Bs_Error error) {
         crossline_color_set_on(0, CROSSLINE_FGCOLOR_MAGENTA);
         fputs("^\n", stderr);
         crossline_color_set_on(0, CROSSLINE_FGCOLOR_DEFAULT);
+    }
 
-        if (!error.explanation.size && !error.example.size && error.continued) {
-            fputc('\n', stderr);
-        }
+    if (!error.explanation.size && !error.example.size && error.continued) {
+        fputc('\n', stderr);
     }
 
     if (error.explanation.size) {
@@ -265,8 +265,8 @@ int main(int argc, char **argv) {
                     crossline_color_set(CROSSLINE_FGCOLOR_MAGENTA);
                     bs_value_write(bs, w, result.value);
                     crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
-                    bs_fmt(w, "\n");
                 }
+                bs_fmt(w, "\n");
                 result = (Bs_Result){0};
             }
 

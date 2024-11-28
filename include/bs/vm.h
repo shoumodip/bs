@@ -62,6 +62,12 @@ Bs_Config *bs_config(Bs *bs);
 // Errors
 void bs_unwind(Bs *bs, unsigned char exit);
 
+Bs_Error bs_error_begin_at(Bs *bs, size_t location);
+void bs_error_end_at(Bs *bs, size_t location, bool native);
+
+#define bs_error_begin(bs) bs_error_begin_at(bs, 0)
+#define bs_error_end(bs, native) bs_error_end_at(bs, 0, native)
+
 void bs_error_full_at(
     Bs *bs, size_t location, Bs_Sv explanation, Bs_Sv example, const char *fmt, ...)
     __attribute__((__format__(__printf__, 5, 6)));

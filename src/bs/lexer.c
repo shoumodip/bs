@@ -553,6 +553,7 @@ void bs_lexer_error_full(
     error.message = Bs_Sv(buffer, count);
     error.explanation = explanation;
     error.example = example;
+    error.continued = l->is_meta;
 
     l->error->write(l->error, error);
     longjmp(l->unwind, 1);
