@@ -1971,19 +1971,15 @@ typedef struct {
     Bs_Value fn;
 } Bs_Array_Sort_Context;
 
-static int bs_array_sort_compare(const void *a, const void *b) {
-    static Bs_Array_Sort_Context context;
-    if (!a) {
-        context = *(const Bs_Array_Sort_Context *)b;
-        return 0;
-    }
+static Bs_Array_Sort_Context sort_context;
 
+static int bs_array_sort_compare(const void *a, const void *b) {
     const Bs_Value args[] = {
         *(const Bs_Value *)a,
         *(const Bs_Value *)b,
     };
 
-    const Bs_Value output = bs_call(context.bs, context.fn, args, bs_c_array_size(args));
+    const Bs_Value output = bs_call(sort_context.bs, sort_context.fn, args, bs_c_array_size(args));
     return bs_value_is_falsey(output) ? 1 : -1;
 }
 
@@ -1991,18 +1987,12 @@ static Bs_Value bs_array_sort(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_callable(bs, args, 0);
 
+    sort_context.bs = bs;
+    sort_context.fn = args[0];
+
     Bs_Array *src = (Bs_Array *)args[-1].as.object;
-    const Bs_Value fn = args[0];
-
-    // Prepare the context
-    const Bs_Array_Sort_Context context = {
-        .bs = bs,
-        .fn = fn,
-    };
-    bs_array_sort_compare(NULL, &context);
-
     qsort(src->data, src->count, sizeof(*src->data), bs_array_sort_compare);
-    return bs_value_object(src);
+    return args[-1];
 }
 
 static Bs_Value bs_array_resize(Bs *bs, Bs_Value *args, size_t arity) {
@@ -2016,7 +2006,7 @@ static Bs_Value bs_array_resize(Bs *bs, Bs_Value *args, size_t arity) {
     } else {
         src->count = size;
     }
-    return bs_value_object(src);
+    return args[-1];
 }
 
 static Bs_Value bs_array_remove(Bs *bs, Bs_Value *args, size_t arity) {
