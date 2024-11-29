@@ -734,7 +734,8 @@ Bs_Sv bs_buffer_absolute_path(Bs_Buffer *b, Bs_Sv path) {
         }
 
         if (bs_issep(*p)) {
-            *r++ = *p++;
+            *r++ = '/'; // Assert dominance
+            p++;
         }
     }
 
