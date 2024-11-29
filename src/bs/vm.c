@@ -753,7 +753,10 @@ Bs_Sv bs_buffer_relative_path(Bs_Buffer *b, Bs_Sv path) {
     if (!bs_sv_eq(Bs_Sv(cwd->data, cwd->size), Bs_Sv_Static("/"))) {
         while (i < max) {
             if (path.data[i] != cwd->data[i]) {
-                break;
+                // More video game OS shenanigans
+                if (!bs_issep(path.data[i]) || !bs_issep(cwd->data[i])) {
+                    break;
+                }
             }
 
             i++;
