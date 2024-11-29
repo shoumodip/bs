@@ -59,6 +59,11 @@ typedef struct {
 
 Bs_Config *bs_config(Bs *bs);
 
+// Modules
+size_t bs_modules_count(Bs *bs);
+Bs_Sv bs_modules_get_name(Bs *bs, size_t index);
+void bs_modules_unload(Bs *bs, size_t index);
+
 // Errors
 void bs_unwind(Bs *bs, unsigned char exit);
 

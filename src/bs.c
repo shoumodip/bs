@@ -1,4 +1,4 @@
-#include "bs/vm.h"
+#include <limits.h>
 
 #define CROSSLINE_IMPLEMENTATION
 #include "crossline/crossline.h"
@@ -12,6 +12,8 @@
 #    include <unistd.h>
 #    define PATH_SEPARATOR '/'
 #endif
+
+#include "bs/vm.h"
 
 static void bs_error_write_colors(Bs_Error_Writer *w, Bs_Error error) {
     if (error.native) {
@@ -230,6 +232,20 @@ int main(int argc, char **argv) {
                     crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
 
                     crossline_color_set(CROSSLINE_FGCOLOR_YELLOW);
+                    bs_fmt(w, "Use :u to list and unload modules:\n");
+                    crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
+
+                    crossline_color_set(CROSSLINE_FGCOLOR_GREEN);
+                    bs_fmt(w, ":u      ");
+                    crossline_color_set(CROSSLINE_FGCOLOR_MAGENTA);
+                    bs_fmt(w, "# List all loaded modules\n");
+                    crossline_color_set(CROSSLINE_FGCOLOR_GREEN);
+                    bs_fmt(w, ":u 0    ");
+                    crossline_color_set(CROSSLINE_FGCOLOR_MAGENTA);
+                    bs_fmt(w, "# Unload the module at index 0\n\n");
+                    crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
+
+                    crossline_color_set(CROSSLINE_FGCOLOR_YELLOW);
                     bs_fmt(w, "Website: https://shoumodip.github.io/bs\n");
                     crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
                     continue;
@@ -238,6 +254,53 @@ int main(int argc, char **argv) {
                 if (bs_sv_prefix(input, Bs_Sv_Static(":!"))) {
                     system(line + 2);
                     continue;
+                }
+
+                {
+                    Bs_Sv command = bs_sv_trim(input, ' ');
+                    if (bs_sv_eq(command, Bs_Sv_Static(":u"))) {
+                        const size_t count = bs_modules_count(bs);
+
+                        const int length = snprintf(NULL, 0, "%zu", count);
+                        assert(length >= 0);
+
+                        for (size_t i = 0; i < count; i++) {
+                            const Bs_Sv name = bs_modules_get_name(bs, i);
+                            if (name.size) {
+                                printf("%*zu: " Bs_Sv_Fmt "\n", length, i, Bs_Sv_Arg(name));
+                            }
+                        }
+                        continue;
+                    }
+
+                    if (bs_sv_prefix(command, Bs_Sv_Static(":u "))) {
+                        bs_sv_drop(&command, 3);
+
+                        char *end = NULL;
+                        const size_t index = strtoul(command.data, &end, 10);
+
+                        if (end == command.data || index == ULONG_MAX ||
+                            end - command.data != command.size) {
+                            bs_error_standalone(
+                                bs, "invalid index '" Bs_Sv_Fmt "'", Bs_Sv_Arg(command));
+                            continue;
+                        }
+
+                        const size_t count = bs_modules_count(bs);
+                        if (index >= count) {
+                            bs_error_standalone(
+                                bs, "index %zu out of range, total is %zu", index, count);
+                            continue;
+                        }
+
+                        const Bs_Sv name = bs_modules_get_name(bs, index);
+                        crossline_color_set(CROSSLINE_FGCOLOR_GREEN);
+                        printf("Unloaded: " Bs_Sv_Fmt "\n", Bs_Sv_Arg(name));
+                        crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
+
+                        bs_modules_unload(bs, index);
+                        continue;
+                    }
                 }
 
                 if (bs_sv_eq(input, Bs_Sv_Static(":{"))) {

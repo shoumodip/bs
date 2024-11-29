@@ -53,6 +53,11 @@ typedef struct {
     const char *source;
 } Bs_Module;
 
+static void bs_module_free(Bs_Module *m) {
+    // The const correctness is *not* a bug. See: https://yarchive.net/comp/const.html
+    free((char *)m->source);
+}
+
 typedef struct {
     Bs_Module *data;
     size_t count;
@@ -61,8 +66,7 @@ typedef struct {
 
 static void bs_modules_free(Bs *bs, Bs_Modules *m) {
     for (size_t i = 0; i < m->count; i++) {
-        // The const correctness is *not* a bug. See: https://yarchive.net/comp/const.html
-        free((char *)m->data[i].source);
+        bs_module_free(&m->data[i]);
     }
     bs_da_free(bs, m);
 }
@@ -70,7 +74,8 @@ static void bs_modules_free(Bs *bs, Bs_Modules *m) {
 #define bs_modules_push bs_da_push
 
 static bool bs_modules_find(Bs_Modules *modules, Bs_Sv name, size_t *index) {
-    for (size_t i = 0; i < modules->count; i++) {
+    // Start at 1 to skip the Repl module
+    for (size_t i = 1; i < modules->count; i++) {
         const Bs_Module *m = &modules->data[i];
         if (bs_sv_eq(Bs_Sv(m->name->data, m->length), name)) {
             *index = i;
@@ -464,6 +469,9 @@ Bs *bs_new(int argc, char **argv) {
 
     bs_update_cwd(bs);
     bs_core_init(bs, argc, argv);
+
+    // The Repl module
+    bs_modules_push(bs, &bs->modules, (Bs_Module){0});
     return bs;
 }
 
@@ -770,9 +778,35 @@ Bs_Sv bs_buffer_relative_path(Bs_Buffer *b, Bs_Sv path) {
     return Bs_Sv(b->data + start, b->count - start);
 }
 
-// Context
+// Config
 Bs_Config *bs_config(Bs *bs) {
     return &bs->config;
+}
+
+// Modules
+size_t bs_modules_count(Bs *bs) {
+    assert(bs->modules.count);
+    return bs->modules.count - 1;
+}
+
+Bs_Sv bs_modules_get_name(Bs *bs, size_t index) {
+    index++; // Skip the repl
+
+    assert(index < bs->modules.count);
+    const Bs_Module *m = &bs->modules.data[index];
+    return Bs_Sv(m->name->data, m->length);
+}
+
+void bs_modules_unload(Bs *bs, size_t index) {
+    index++; // Skip the repl
+
+    assert(index < bs->modules.count);
+    bs_module_free(&bs->modules.data[index]);
+
+    for (size_t i = index; i + 1 < bs->modules.count; i++) {
+        bs->modules.data[i] = bs->modules.data[i + 1];
+    }
+    bs->modules.count--;
 }
 
 // Errors
@@ -1373,15 +1407,9 @@ const Bs_Closure *bs_compile_module(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_mai
         return NULL;
     }
 
-    static size_t repl_module_index;
     if (is_repl) {
-        if (repl_module_index) {
-            bs->modules.data[repl_module_index - 1] = module;
-        } else {
-            bs_modules_push(bs, &bs->modules, module);
-            repl_module_index = bs->modules.count;
-        }
-        closure->fn->module = repl_module_index;
+        bs->modules.data[0] = module;
+        closure->fn->module = 1;
     } else {
         bs_modules_push(bs, &bs->modules, module);
         closure->fn->module = bs->modules.count;
