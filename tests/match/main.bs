@@ -1,0 +1,49 @@
+var x = 69
+
+match x {}
+
+match x {
+    69 => {
+        io.println("A")
+    }
+
+    420 => io.println("B")
+}
+
+match x {
+    420 => io.println("A")
+    1337 => io.println("B")
+}
+
+match x {
+    420, 1337 => io.println("A")
+}
+
+match x {
+    69, 420, 1337 => io.println("A")
+}
+
+match x {
+    0, 1 => io.println("A")
+    69, 420, 1337 => io.println("B")
+}
+
+match x {
+    69, 420, 1337 => io.println("A")
+    0, 1 => io.println("B")
+}
+
+for _, x in [0, 1, 69, 420, 1337, 42, 5] {
+    io.println("x = \(x)")
+    match x {
+        0, 1 => io.println("A")
+        69, 420, 1337 => io.println("B")
+        42 => io.println("C")
+    } else {
+        io.println("D")
+    }
+}
+
+match x {} else {
+    io.println("HERE!")
+}

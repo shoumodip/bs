@@ -29,7 +29,7 @@ bs_debug_op_invoke(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset, cons
     bs_fmt(p->writer, "'\n");
 }
 
-static_assert(BS_COUNT_OPS == 68, "Update bs_debug_op()");
+static_assert(BS_COUNT_OPS == 69, "Update bs_debug_op()");
 void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
     bs_fmt(p->writer, "%04zu ", *offset);
 
@@ -317,6 +317,10 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
 
     case BS_OP_THEN:
         bs_debug_op_int(p, c, offset, "OP_THEN");
+        break;
+
+    case BS_OP_MATCH:
+        bs_debug_op_int(p, c, offset, "OP_MATCH");
         break;
 
     case BS_OP_ITER:

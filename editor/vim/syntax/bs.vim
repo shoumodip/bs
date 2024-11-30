@@ -18,7 +18,7 @@ syntax match Comment "#.*" contains=Todo
 syntax match Identifier "\.\s*\a\w*\>"hs=s+1
 
 syntax keyword Todo TODO XXX FIXME NOTE
-syntax keyword Keyword len panic assert import typeof delete if then else in is for while break continue pub var return
+syntax keyword Keyword len panic assert import typeof delete if then else match in is for while break continue pub var return
 syntax keyword Boolean true false
 syntax keyword Constant nil this super is_main_module
 

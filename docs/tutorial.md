@@ -370,6 +370,91 @@ $ bs conditions.bs
 Minor
 ```
 
+### Match Statement
+```bs
+# Output: A
+match 69 {
+    69 => io.println("A")
+    420 => {
+        io.println("B")
+    }
+}
+
+# Output: B
+match 420 {
+    69 => io.println("A")
+    420 => {
+        io.println("B")
+    }
+}
+
+match 1337 {
+    69 => io.println("A")
+    420 => {
+        io.println("B")
+    }
+
+    # No output in this case, since none of the cases match
+}
+
+# Output: C
+match 1337 {
+    69 => io.println("A")
+    420 => {
+        io.println("B")
+    }
+} else {
+    # Executed when none of the cases match
+    io.println("C")
+}
+
+# Output: C
+match 42 {
+    # Multiple cases for the same branch
+    0, 1 => io.println("A")
+    69, 420, 1337 => {
+        io.println("B")
+    }
+    42 => io.println("C")
+} else {
+    io.println("D")
+}
+
+# Output: A
+match 0 {} else {
+    # Why would you do this though? :/
+    io.println("A")
+}
+
+var x = "foo"
+var y = "bar"
+
+# Output:
+# Side effect!
+# x
+match "foobar".slice(0, 3) { # All values can be matched
+    y => io.println("y")
+
+    # Expressions are allowed
+    22 + 10 => io.println("Deez")
+
+    # Arbritary runtime code in general is allowed
+    os.clock() => panic("What?")
+
+    # And you thought JS was bad
+    (fn () {
+        # 1. Functions will be described later
+        # 2. The order of operations matter. If a matching case was encountered
+        #    before this, then this side effect would not have occured
+        io.println("Side effect!")
+    })() => {
+        io.println("Why?")
+    }
+
+    x => io.println("x")
+}
+```
+
 ## Loops
 ### While Loop
 ```bs

@@ -16,7 +16,7 @@ typedef enum {
     BS_POWER_DOT,
 } Bs_Power;
 
-static_assert(BS_COUNT_TOKENS == 75, "Update bs_token_type_power()");
+static_assert(BS_COUNT_TOKENS == 76, "Update bs_token_type_power()");
 static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_DOT:
@@ -81,7 +81,7 @@ static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     }
 }
 
-static_assert(BS_COUNT_TOKENS == 75, "Update bs_token_type_can_start()");
+static_assert(BS_COUNT_TOKENS == 76, "Update bs_token_type_can_start()");
 static bool bs_token_type_can_start(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_NIL:
@@ -252,6 +252,7 @@ typedef struct {
     Bs_Chunk *chunk;
 
     Bs_Jumps jumps;
+    Bs_Jumps matches;
     Bs_Op_Locs locations;
 
     bool is_main;
@@ -435,7 +436,7 @@ static void bs_compile_assignment(Bs_Compiler *c, const Bs_Token *token, Bs_Op a
     }
 }
 
-static_assert(BS_COUNT_TOKENS == 75, "Update bs_compile_expr()");
+static_assert(BS_COUNT_TOKENS == 76, "Update bs_compile_expr()");
 static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
     Bs_Loc loc = token.loc;
@@ -1296,7 +1297,7 @@ static void bs_compile_jumps_reset(Bs_Compiler *c, Bs_Jumps save) {
     c->jumps.start = save.start;
 }
 
-static_assert(BS_COUNT_TOKENS == 75, "Update bs_compile_stmt()");
+static_assert(BS_COUNT_TOKENS == 76, "Update bs_compile_stmt()");
 static void bs_compile_stmt(Bs_Compiler *c) {
     Bs_Token token = bs_lexer_next(&c->lexer);
 
@@ -1327,6 +1328,52 @@ static void bs_compile_stmt(Bs_Compiler *c) {
             bs_compile_stmt(c);
         }
         bs_compile_jump_patch(c, else_addr);
+    } break;
+
+    case BS_TOKEN_MATCH: {
+        bs_compile_expr(c, BS_POWER_SET);
+        bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE);
+
+        const size_t matches_count_save = c->matches.count;
+
+        while (!bs_lexer_read(&c->lexer, BS_TOKEN_RBRACE)) {
+            const size_t cases_count_save = c->matches.count;
+
+            do {
+                bs_compile_expr(c, BS_POWER_SET);
+
+                bs_jumps_push(c->bs, &c->matches, c->chunk->count);
+                bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_MATCH, 0);
+
+                token = bs_lexer_either(&c->lexer, BS_TOKEN_COMMA, BS_TOKEN_ARROW);
+            } while (token.type == BS_TOKEN_COMMA);
+
+            const size_t skip_addr = bs_compile_jump_start(c, BS_OP_JUMP);
+
+            for (size_t i = cases_count_save; i < c->matches.count; i++) {
+                bs_compile_jump_patch(c, c->matches.data[i]);
+            }
+            c->matches.count = cases_count_save;
+
+            bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
+            bs_compile_stmt(c);
+
+            bs_jumps_push(c->bs, &c->matches, c->chunk->count);
+            bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_JUMP, 0);
+
+            bs_compile_jump_patch(c, skip_addr);
+        }
+        bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
+
+        if (bs_lexer_read(&c->lexer, BS_TOKEN_ELSE)) {
+            bs_lexer_buffer(&c->lexer, bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE));
+            bs_compile_stmt(c);
+        }
+
+        for (size_t i = matches_count_save; i < c->matches.count; i++) {
+            bs_compile_jump_patch(c, c->matches.data[i]);
+        }
+        c->matches.count = matches_count_save;
     } break;
 
     case BS_TOKEN_FOR: {
@@ -1576,6 +1623,7 @@ Bs_Closure *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_re
         compiler.chunk = NULL;
 
         bs_jumps_free(compiler.bs, &compiler.jumps);
+        bs_jumps_free(compiler.bs, &compiler.matches);
         bs_op_locs_free(compiler.bs, &compiler.locations);
         return NULL;
     }
@@ -1597,6 +1645,7 @@ Bs_Closure *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_re
     Bs_Fn *fn = bs_compile_lambda_end(&compiler);
     bs_lambda_free(compiler.bs, lambda);
     bs_jumps_free(compiler.bs, &compiler.jumps);
+    bs_jumps_free(compiler.bs, &compiler.matches);
     bs_op_locs_free(compiler.bs, &compiler.locations);
     return bs_closure_new(bs, fn);
 }

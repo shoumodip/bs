@@ -1772,7 +1772,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 68, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 69, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const bool handles_on_save = bs->handles_on;
@@ -2587,6 +2587,14 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         case BS_OP_THEN: {
             const size_t offset = bs_chunk_read_int(bs);
             if (!bs_value_is_falsey(bs_stack_peek(bs, 0))) {
+                bs->frame->ip += offset;
+            }
+        } break;
+
+        case BS_OP_MATCH: {
+            const size_t offset = bs_chunk_read_int(bs);
+            const Bs_Value pred = bs_stack_pop(bs);
+            if (bs_value_equal(bs_stack_peek(bs, 0), pred)) {
                 bs->frame->ip += offset;
             }
         } break;
