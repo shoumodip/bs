@@ -256,6 +256,11 @@ typedef struct {
 
     bool is_main;
     bool last_stmt_was_expr;
+
+    // Fixes this bug:
+    //
+    // (if x then a.y else a.z)(...) => (if x then a.y else a.z(...))
+    bool last_expr_was_if;
 } Bs_Compiler;
 
 static size_t bs_compile_jump_start(Bs_Compiler *c, Bs_Op op) {
@@ -435,6 +440,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
     Bs_Loc loc = token.loc;
 
+    c->last_expr_was_if = false;
     switch (token.type) {
     case BS_TOKEN_NIL:
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
@@ -663,6 +669,8 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         bs_lexer_expect(&c->lexer, BS_TOKEN_ELSE);
         bs_compile_expr(c, BS_POWER_SET);
         bs_compile_jump_patch(c, else_addr);
+
+        c->last_expr_was_if = true;
     } break;
 
     case BS_TOKEN_FN:
@@ -873,22 +881,26 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             Bs_Loc locs[2];
             size_t call_const_index = 0;
             size_t super_const_index = 0;
-            if (op_get == BS_OP_IGET_CONST) {
-                call_const_index = *(size_t *)&c->chunk->data[c->chunk->last + 1];
-                c->chunk->count = c->chunk->last;
 
-                locs[1] = c->chunk->locations.data[--c->chunk->locations.count].loc;
-                locs[0] = c->chunk->locations.data[--c->chunk->locations.count].loc;
-            } else if (op_get == BS_OP_SUPER_GET) {
-                call_const_index = *(size_t *)&c->chunk->data[c->chunk->last + 1];
+            const bool was_if = c->last_expr_was_if;
+            if (!was_if) {
+                if (op_get == BS_OP_IGET_CONST) {
+                    call_const_index = *(size_t *)&c->chunk->data[c->chunk->last + 1];
+                    c->chunk->count = c->chunk->last;
 
-                assert(c->chunk->last > 1 + sizeof(size_t));
-                c->chunk->count = c->chunk->last - 1 - sizeof(size_t);
+                    locs[1] = c->chunk->locations.data[--c->chunk->locations.count].loc;
+                    locs[0] = c->chunk->locations.data[--c->chunk->locations.count].loc;
+                } else if (op_get == BS_OP_SUPER_GET) {
+                    call_const_index = *(size_t *)&c->chunk->data[c->chunk->last + 1];
 
-                assert(c->chunk->data[c->chunk->count] == BS_OP_URECEIVER);
-                super_const_index = *(size_t *)&c->chunk->data[c->chunk->count + 1];
+                    assert(c->chunk->last > 1 + sizeof(size_t));
+                    c->chunk->count = c->chunk->last - 1 - sizeof(size_t);
 
-                locs[0] = c->chunk->locations.data[--c->chunk->locations.count].loc;
+                    assert(c->chunk->data[c->chunk->count] == BS_OP_URECEIVER);
+                    super_const_index = *(size_t *)&c->chunk->data[c->chunk->count + 1];
+
+                    locs[0] = c->chunk->locations.data[--c->chunk->locations.count].loc;
+                }
             }
 
             const size_t locations_save = c->locations.count;
@@ -914,13 +926,13 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
                 }
             }
 
-            if (op_get == BS_OP_IGET_CONST) {
+            if (!was_if && op_get == BS_OP_IGET_CONST) {
                 bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_INVOKE, call_const_index);
                 bs_da_push(c->bs, c->chunk, arity);
 
                 bs_chunk_push_op_loc(c->bs, c->chunk, locs[0]);
                 bs_chunk_push_op_loc(c->bs, c->chunk, locs[1]);
-            } else if (op_get == BS_OP_SUPER_GET) {
+            } else if (!was_if && op_get == BS_OP_SUPER_GET) {
                 bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_URECEIVER, super_const_index);
                 bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_SUPER_INVOKE, call_const_index);
                 bs_da_push(c->bs, c->chunk, arity);
@@ -1038,6 +1050,8 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         default:
             assert(false && "unreachable");
         }
+
+        c->last_expr_was_if = false;
     }
 }
 

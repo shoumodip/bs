@@ -1,0 +1,2 @@
+(if true then io.println else io.eprintln)("First")
+(if false then io.println else io.eprintln)("Second")

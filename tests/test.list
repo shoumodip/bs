@@ -126,3 +126,4 @@
 ../bin/bs strings/single_quote.bs
 ../bin/bs invokation/asi_esception_dot.bs
 ../bin/bs core/meta.bs
+../bin/bs conditions/invocation_optimization_guard.bs

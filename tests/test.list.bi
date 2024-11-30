@@ -1,4 +1,4 @@
-:i count 128
+:i count 129
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -2065,4 +2065,13 @@ core/meta.bs:20:21: in eval()
 
     20 | io.println(meta.eval("Hehe@"))
        |                     ^
+
+:b shell 53
+../bin/bs conditions/invocation_optimization_guard.bs
+:i returncode 0
+:b stdout 6
+First
+
+:b stderr 7
+Second
 
