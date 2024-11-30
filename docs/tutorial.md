@@ -646,11 +646,24 @@ fn factorial(n) {
 }
 
 io.println(factorial(6))
+
+fn f() {}
+fn g() {
+    return
+
+    io.println("HERE!")
+}
+
+# Functions implicitly return 'nil'
+io.println(f())
+io.println(g())
 ```
 
 ```console
 $ bs functions.bs
 720
+nil
+nil
 ```
 
 ### First Class Functions

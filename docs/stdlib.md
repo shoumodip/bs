@@ -1901,6 +1901,64 @@ if f is "table" {
 f() # Or whatever you want to do
 ```
 
+The function is compiled such that the last expression in the body is returned,
+otherwise defaulting to `nil`.
+
+```bs
+var f = meta.compile("
+    for i in 0, 5 {
+        io.println('Nice!')
+    }
+")
+
+assert(f is "function")
+io.println(f())
+
+var g = meta.compile("
+    for i in 0, 5 {
+        io.println('Hehe!')
+    }
+
+    69
+")
+
+assert(g is "function")
+io.println(g())
+
+var h = meta.compile("
+    for i in 0, 5 {
+        io.println('Bruh!')
+    }
+
+    return 420
+")
+
+assert(h is "function")
+io.println(h())
+```
+
+```console
+$ bs demo.bs
+Nice!
+Nice!
+Nice!
+Nice!
+Nice!
+nil
+Hehe!
+Hehe!
+Hehe!
+Hehe!
+Hehe!
+69
+Bruh!
+Bruh!
+Bruh!
+Bruh!
+Bruh!
+420
+```
+
 ### eval(str) @function
 Evaluate a string.
 

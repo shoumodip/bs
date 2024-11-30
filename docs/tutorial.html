@@ -1183,6 +1183,17 @@ Hello, world!
 }
 
 io.<span class='field'>println</span>(factorial(<span class='constant'>6</span>))
+
+<span class='keyword'>fn</span> <span class='function'>f</span>() {}
+<span class='keyword'>fn</span> <span class='function'>g</span>() {
+    <span class='keyword'>return</span>
+
+    io.<span class='field'>println</span>(<span class='string'>"HERE!"</span>)
+}
+
+<span class='comment'># Functions implicitly return 'nil'</span>
+io.<span class='field'>println</span>(f())
+io.<span class='field'>println</span>(g())
 </pre>
 </pre>
 </div>
@@ -1200,6 +1211,8 @@ io.<span class='field'>println</span>(factorial(<span class='constant'>6</span>)
 <pre class='code active'>
 <span class='constant'>$ </span>bs functions.bs
 720
+nil
+nil
 </pre>
 </div>
 </section>

@@ -4327,6 +4327,88 @@ f() <span class='comment'># Or whatever you want to do</span>
 </pre>
 </pre>
 </div>
+<p>
+The function is compiled such that the last expression in the body is returned,
+otherwise defaulting to <code>nil</code>.
+</p>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> f = meta.<span class='field'>compile</span>(<span class='string'>"
+    for i in 0, 5 {
+        io.println('Nice!')
+    }
+"</span>)
+
+<span class='keyword'>assert</span>(f <span class='keyword'>is</span> <span class='string'>"function"</span>)
+io.<span class='field'>println</span>(f())
+
+<span class='keyword'>var</span> g = meta.<span class='field'>compile</span>(<span class='string'>"
+    for i in 0, 5 {
+        io.println('Hehe!')
+    }
+
+    69
+"</span>)
+
+<span class='keyword'>assert</span>(g <span class='keyword'>is</span> <span class='string'>"function"</span>)
+io.<span class='field'>println</span>(g())
+
+<span class='keyword'>var</span> h = meta.<span class='field'>compile</span>(<span class='string'>"
+    for i in 0, 5 {
+        io.println('Bruh!')
+    }
+
+    return 420
+"</span>)
+
+<span class='keyword'>assert</span>(h <span class='keyword'>is</span> <span class='string'>"function"</span>)
+io.<span class='field'>println</span>(h())
+</pre>
+</pre>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='constant'>$ </span>bs demo.bs
+Nice!
+Nice!
+Nice!
+Nice!
+Nice!
+nil
+Hehe!
+Hehe!
+Hehe!
+Hehe!
+Hehe!
+69
+Bruh!
+Bruh!
+Bruh!
+Bruh!
+Bruh!
+420
+</pre>
+</div>
 </section>
 <section id='s132'>
 <h3><code><span class='function'>eval</span>(str)</code></h3>
