@@ -1,0 +1,35 @@
+# io.println("0")
+
+/#
+    io.println("1")
+    io.println("2")
+#/
+
+/#
+    io.println("3")
+    /#
+        io.println("4")
+        io.println("5")
+    #/
+    io.println("6")
+#/
+
+# /#
+    io.println("7")
+    /#
+        io.println("8")
+        io.println("9")
+    #/
+    io.println("10")
+#/
+
+/#
+    io.println("11")
+    #/
+        io.println("12")
+        io.println("13")
+    /#
+    io.println("14")
+#/
+
+io.println(34 + /# Multiline comments in a single line #/ 35)

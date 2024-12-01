@@ -1,4 +1,4 @@
-:i count 133
+:i count 134
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -1920,7 +1920,7 @@ assert/with_message.bs:2:1: Ligma
 :b shell 25
 ../bin/bs core/readdir.bs
 :i returncode 0
-:b stdout 392
+:b stdout 402
 arithmetics DIR
 arrays DIR
 assert DIR
@@ -1937,6 +1937,7 @@ ffi DIR
 functions DIR
 import DIR
 invokation DIR
+lexer DIR
 loops DIR
 match DIR
 not_is_in_binary_op DIR
@@ -2134,4 +2135,16 @@ match/error_cannot_use_var.bs:2:11: error: cannot use 'var' here without wrappin
 
     2 |     69 => var
       |           ^
+
+:b shell 27
+../bin/bs lexer/comments.bs
+:i returncode 0
+:b stdout 14
+7
+10
+12
+13
+69
+
+:b stderr 0
 

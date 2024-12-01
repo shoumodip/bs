@@ -17,6 +17,9 @@ syntax match Number "\<[0-9]\+\(\.[0-9]\+\)\?\>"
 syntax match Comment "#.*" contains=Todo
 syntax match Identifier "\.\s*\a\w*\>"hs=s+1
 
+syntax region NestedComment contains=Todo,NestedComment start="/#" end="#/" fold
+highlight! link NestedComment Comment
+
 syntax keyword Todo TODO XXX FIXME NOTE
 syntax keyword Keyword len panic assert import typeof delete if then else match in is for while break continue pub var return
 syntax keyword Boolean true false

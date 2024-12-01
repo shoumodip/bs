@@ -16,6 +16,28 @@ $ bs hello.bs
 Hello, world!
 ```
 
+## Comments
+```bs
+# Single Line Comment
+
+/#
+    Multi
+    Line
+    Comments
+#/
+
+/#
+    Nested
+
+    /#
+        Multi
+        Line
+    #/
+
+    Comments
+#/
+```
+
 ## Basic Types
 ### Nil
 ```bs

@@ -191,6 +191,40 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
                 l->prev_row = token.loc.row;
                 return token;
             }
+        } else if (l->sv.data[0] == '/' && l->sv.size > 1 && l->sv.data[1] == '#') {
+            if (l->comments) {
+                token.sv = l->sv;
+                token.loc = l->loc;
+            }
+
+            size_t depth = 0;
+            while (l->sv.size >= 2) {
+                if (l->sv.data[0] == '/' && l->sv.data[1] == '#') {
+                    depth++;
+                } else if (l->sv.data[0] == '#' && l->sv.data[1] == '/') {
+                    depth--;
+                    if (!depth) {
+                        break;
+                    }
+                }
+
+                bs_lexer_advance(l);
+            }
+
+            if (depth) {
+                bs_lexer_error(l, l->loc, "unterminated comment");
+            }
+
+            // Skip the '#}'
+            bs_lexer_advance(l);
+            bs_lexer_advance(l);
+
+            if (l->comments) {
+                token.type = BS_TOKEN_COMMENT;
+                token.sv.size -= l->sv.size;
+                l->prev_row = token.loc.row;
+                return token;
+            }
         } else {
             break;
         }
