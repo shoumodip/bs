@@ -1,4 +1,4 @@
-:i count 130
+:i count 133
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -2101,4 +2101,37 @@ D
 HERE!
 
 :b stderr 0
+
+:b shell 41
+../bin/bs match/error_cannot_use_class.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 137
+match/error_cannot_use_class.bs:2:11: error: cannot use 'class' here without wrapping in {}
+
+    2 |     69 => class
+      |           ^
+
+:b shell 38
+../bin/bs match/error_cannot_use_fn.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 128
+match/error_cannot_use_fn.bs:2:11: error: cannot use 'fn' here without wrapping in {}
+
+    2 |     69 => fn
+      |           ^
+
+:b shell 39
+../bin/bs match/error_cannot_use_var.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 131
+match/error_cannot_use_var.bs:2:11: error: cannot use 'var' here without wrapping in {}
+
+    2 |     69 => var
+      |           ^
 

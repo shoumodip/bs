@@ -1356,6 +1356,16 @@ static void bs_compile_stmt(Bs_Compiler *c) {
             c->matches.count = cases_count_save;
 
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
+
+            token = bs_lexer_peek(&c->lexer);
+            if (token.type == BS_TOKEN_VAR || token.type == BS_TOKEN_FN ||
+                token.type == BS_TOKEN_CLASS) {
+                bs_lexer_error(
+                    &c->lexer,
+                    token.loc,
+                    "cannot use %s here without wrapping in {}",
+                    bs_token_type_name(token.type));
+            }
             bs_compile_stmt(c);
 
             bs_jumps_push(c->bs, &c->matches, c->chunk->count);
