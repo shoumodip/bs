@@ -2226,6 +2226,11 @@ static Bs_Value bs_math_round(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_num(round(args[-1].as.number));
 }
 
+static Bs_Value bs_math_abs(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    return bs_value_num(fabs(args[-1].as.number));
+}
+
 static Bs_Value bs_math_sign(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     const double x = args[-1].as.number;
@@ -2763,6 +2768,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("ceil"), bs_math_ceil);
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("floor"), bs_math_floor);
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("round"), bs_math_round);
+        bs_builtin_number_methods_add(bs, Bs_Sv_Static("abs"), bs_math_abs);
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("sign"), bs_math_sign);
 
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("max"), bs_math_max);

@@ -3786,6 +3786,12 @@ Return the nearest integer.
 </p>
 </section>
 <section id='s118'>
+<h3><code><span class='class'>number</span>.<span class='field'>abs</span>()</code></h3>
+<p>
+Return the absolute value (Basically make a number positive).
+</p>
+</section>
+<section id='s119'>
 <h3><code><span class='class'>number</span>.<span class='field'>sign</span>()</code></h3>
 <p>
 Return the sign of the number.
@@ -3827,7 +3833,7 @@ io.<span class='field'>println</span>((-<span class='constant'>420</span>).<span
 </pre>
 </div>
 </section>
-<section id='s119'>
+<section id='s120'>
 <h3><code><span class='class'>number</span>.<span class='field'>max</span>(...)</code></h3>
 <p>
 Return the maximum between the method receiver and the provided arguments.
@@ -3867,7 +3873,7 @@ io.<span class='field'>println</span>(<span class='constant'>3</span>.<span clas
 </pre>
 </div>
 </section>
-<section id='s120'>
+<section id='s121'>
 <h3><code><span class='class'>number</span>.<span class='field'>min</span>(...)</code></h3>
 <p>
 Return the minimum between the method receiver and the provided arguments.
@@ -3907,19 +3913,19 @@ io.<span class='field'>println</span>(<span class='constant'>3</span>.<span clas
 </pre>
 </div>
 </section>
-<section id='s121'>
+<section id='s122'>
 <h3><code><span class='class'>number</span>.<span class='field'>clamp</span>(low, high)</code></h3>
 <p>
 Clamp the number between <code>low</code> and <code>high</code>.
 </p>
 </section>
-<section id='s122'>
+<section id='s123'>
 <h3><code><span class='class'>number</span>.<span class='field'>lerp</span>(a, b, t)</code></h3>
 <p>
 Linear interpolation.
 </p>
 </section>
-<section id='s123'>
+<section id='s124'>
 <h3><code><span class='class'>number</span>.<span class='field'>precise</span>(level)</code></h3>
 <p>
 Set the precision (number of decimal digits).
@@ -3962,7 +3968,7 @@ io.<span class='field'>println</span>(n.<span class='field'>precise</span>(<span
 </pre>
 </div>
 </section>
-<section id='s124'>
+<section id='s125'>
 <h3><code><span class='class'>Random</span>(seed?)</code></h3>
 <p>
 Random number generator using the <code>xoroshiro128+</code> algorithm.
@@ -4028,7 +4034,7 @@ io.<span class='field'>println</span>(b.<span class='field'>number</span>(<span 
 182.365867621578
 </pre>
 </div>
-<section id='s125'>
+<section id='s126'>
 <h4><code><span class='class'>Random</span>.<span class='field'>number</span>(min?, max?)</code></h4>
 <p>
 Return a random number between <code>low</code> and <code>high</code>.
@@ -4076,7 +4082,7 @@ io.<span class='field'>println</span>(r.<span class='field'>number</span>(<span 
 </pre>
 </div>
 </section>
-<section id='s126'>
+<section id='s127'>
 <h4><code><span class='class'>Random</span>.<span class='field'>bytes</span>(count)</code></h4>
 <p>
 Return a random sequence of bytes.
@@ -4117,7 +4123,7 @@ io.<span class='field'>println</span>(seq.<span class='field'>slice</span>())
 </div>
 </section>
 </section>
-<section id='s127'>
+<section id='s128'>
 <h3><code><span class='function'>range</span>(begin, end, step?)</code></h3>
 <p>
 Return an array containing a range.
@@ -4202,25 +4208,25 @@ demo.bs:1:29: in range()
 </pre>
 </div>
 </section>
-<section id='s128'>
+<section id='s129'>
 <h3><code><span class='constant'>E</span></code></h3>
 <p>
 Euler's constant.
 </p>
 </section>
-<section id='s129'>
+<section id='s130'>
 <h3><code><span class='constant'>PI</span></code></h3>
 <p>
 PI.
 </p>
 </section>
 </section>
-<section id='s130'>
+<section id='s131'>
 <h2> Meta</h2>
 <p>
 Contains simple metaprogramming primitives.
 </p>
-<section id='s131'>
+<section id='s132'>
 <h3><code><span class='function'>compile</span>(str)</code></h3>
 <p>
 Compile a string into a function.
@@ -4410,7 +4416,7 @@ Bruh!
 </pre>
 </div>
 </section>
-<section id='s132'>
+<section id='s133'>
 <h3><code><span class='function'>eval</span>(str)</code></h3>
 <p>
 Evaluate a string.
@@ -4842,53 +4848,56 @@ nil
 <a href='#s117'>round</a>
 </li>
 <li>
-<a href='#s118'>sign</a>
+<a href='#s118'>abs</a>
 </li>
 <li>
-<a href='#s119'>max</a>
+<a href='#s119'>sign</a>
 </li>
 <li>
-<a href='#s120'>min</a>
+<a href='#s120'>max</a>
 </li>
 <li>
-<a href='#s121'>clamp</a>
+<a href='#s121'>min</a>
 </li>
 <li>
-<a href='#s122'>lerp</a>
+<a href='#s122'>clamp</a>
 </li>
 <li>
-<a href='#s123'>precise</a>
+<a href='#s123'>lerp</a>
 </li>
 <li>
-<a href='#s124'>Random</a>
+<a href='#s124'>precise</a>
+</li>
+<li>
+<a href='#s125'>Random</a>
 <ul>
 <li>
-<a href='#s125'>number</a>
+<a href='#s126'>number</a>
 </li>
 <li>
-<a href='#s126'>bytes</a>
+<a href='#s127'>bytes</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s127'>range</a>
+<a href='#s128'>range</a>
 </li>
 <li>
-<a href='#s128'> E </a>
+<a href='#s129'> E </a>
 </li>
 <li>
-<a href='#s129'> PI </a>
+<a href='#s130'> PI </a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s130'> Meta</a>
+<a href='#s131'> Meta</a>
 <ul>
 <li>
-<a href='#s131'>compile</a>
+<a href='#s132'>compile</a>
 </li>
 <li>
-<a href='#s132'>eval</a>
+<a href='#s133'>eval</a>
 </li>
 </ul>
 </li>

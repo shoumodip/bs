@@ -1671,6 +1671,9 @@ Floor.
 ### number.round() @method
 Return the nearest integer.
 
+### number.abs() @method
+Return the absolute value (Basically make a number positive).
+
 ### number.sign() @method
 Return the sign of the number.
 
