@@ -733,12 +733,22 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         return;
     }
 
-    while (bs_lexer_peek_row(&c->lexer, &token) || token.type == BS_TOKEN_DOT) {
+    while (true) {
+        if (mbp == BS_POWER_NIL) {
+            // Top level expression, perform ASI
+            if (!bs_lexer_peek_row(&c->lexer, &token) && token.type != BS_TOKEN_DOT) {
+                break;
+            }
+        } else {
+            // No ASI
+            token = bs_lexer_peek(&c->lexer);
+        }
+
         const Bs_Power lbp = bs_token_type_power(token.type);
         if (lbp <= mbp) {
             break;
         }
-        c->lexer.peeked = false;
+        bs_lexer_unbuffer(&c->lexer);
 
         loc = token.loc;
         switch (token.type) {
@@ -1158,7 +1168,7 @@ static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Toke
     if (c->lexer.buffer.type == BS_TOKEN_LBRACE) {
         bs_compile_stmt(c);
     } else {
-        c->lexer.peeked = false;
+        bs_lexer_unbuffer(&c->lexer);
         bs_compile_expr(c, BS_POWER_SET);
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_RET);
     }
@@ -1535,7 +1545,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
             if (c->lambda->type == BS_LAMBDA_INIT) {
                 const Bs_Loc loc = token.loc;
                 const bool ok = token.type == BS_TOKEN_NIL;
-                c->lexer.peeked = false;
+                bs_lexer_unbuffer(&c->lexer);
 
                 if (!ok) {
                     bs_lexer_error_full(

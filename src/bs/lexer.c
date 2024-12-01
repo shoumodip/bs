@@ -112,6 +112,16 @@ void bs_lexer_buffer(Bs_Lexer *l, Bs_Token token) {
     l->buffer = token;
 }
 
+void bs_lexer_unbuffer(Bs_Lexer *l) {
+    l->peeked = false;
+    l->prev_row = l->buffer.loc.row;
+    if (l->buffer.type == BS_TOKEN_STR) {
+        // Strings can span across multiple lines
+        // Since, this is a lexer with a lookahead of 1, this is fine
+        l->prev_row = l->loc.row;
+    }
+}
+
 Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc, char end) {
     Bs_Token token = {.sv = l->sv, .loc = loc};
 
@@ -159,6 +169,10 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc, char end) {
     token.type = BS_TOKEN_STR;
     token.sv.size -= l->sv.size;
 
+    // Strings can span across multiple lines
+    // Since, this is a lexer with a lookahead of 1, this is fine
+    l->prev_row = l->loc.row;
+
     bs_lexer_advance(l);
     return token;
 }
@@ -166,8 +180,7 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc, char end) {
 static_assert(BS_COUNT_TOKENS == 76, "Update bs_lexer_next()");
 Bs_Token bs_lexer_next(Bs_Lexer *l) {
     if (l->peeked) {
-        l->peeked = false;
-        l->prev_row = l->buffer.loc.row;
+        bs_lexer_unbuffer(l);
         return l->buffer;
     }
 
@@ -215,14 +228,13 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
                 bs_lexer_error(l, l->loc, "unterminated comment");
             }
 
-            // Skip the '#}'
+            // Skip the '#/'
             bs_lexer_advance(l);
             bs_lexer_advance(l);
 
             if (l->comments) {
                 token.type = BS_TOKEN_COMMENT;
                 token.sv.size -= l->sv.size;
-                l->prev_row = token.loc.row;
                 return token;
             }
         } else {
@@ -345,12 +357,10 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
     }
 
     if (bs_lexer_match(l, '"')) {
-        l->prev_row = token.loc.row;
         return bs_lexer_str(l, token.loc, '"');
     }
 
     if (bs_lexer_match(l, '\'')) {
-        l->prev_row = token.loc.row;
         return bs_lexer_str(l, token.loc, '\'');
     }
 
@@ -543,8 +553,11 @@ bool bs_lexer_peek_row(Bs_Lexer *l, Bs_Token *token) {
 
 bool bs_lexer_read(Bs_Lexer *l, Bs_Token_Type type) {
     bs_lexer_peek(l);
-    l->peeked = l->buffer.type != type;
-    return !l->peeked;
+    if (l->buffer.type == type) {
+        bs_lexer_unbuffer(l);
+        return true;
+    }
+    return false;
 }
 
 Bs_Token bs_lexer_expect(Bs_Lexer *l, Bs_Token_Type type) {

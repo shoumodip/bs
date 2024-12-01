@@ -1,0 +1,18 @@
+# No ASI in nested expressions
+io.println(69 $ "Nice!
+Lol "
+           $ 420)
+
+"Foo Bar"
+- 1
+
+"Foo
+Bar"
+- 1
+
+69 $ "Nice!
+Lol "
+-420
+
+"Foo
+Bar" - 1

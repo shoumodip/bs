@@ -132,3 +132,4 @@
 ../bin/bs match/error_cannot_use_fn.bs
 ../bin/bs match/error_cannot_use_var.bs
 ../bin/bs lexer/comments.bs
+../bin/bs lexer/multiline_string_binary_continuation.bs

@@ -1,4 +1,4 @@
-:i count 134
+:i count 135
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -2150,4 +2150,17 @@ match/error_cannot_use_var.bs:2:11: error: cannot use 'var' here without wrappin
 69
 
 :b stderr 0
+
+:b shell 55
+../bin/bs lexer/multiline_string_binary_continuation.bs
+:i returncode 1
+:b stdout 16
+69Nice!
+Lol 420
+
+:b stderr 141
+lexer/multiline_string_binary_continuation.bs:18:6: error: invalid operands to binary (-): string, number
+
+    18 | Bar" - 1
+       |      ^
 
