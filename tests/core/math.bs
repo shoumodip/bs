@@ -61,3 +61,7 @@ io.println(math.range(11, 1))
 io.println(math.range(11, 1, -2))
 
 io.println(math.PI.precise(5))
+
+io.println(0.abs())
+io.println(420.69.abs())
+io.println((-420.69).abs())
