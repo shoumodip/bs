@@ -555,6 +555,11 @@ static Bs_C_Instance *bs_pipe_new(Bs *bs, int fd, bool write) {
 
     Bs_File *f = &bs_flex_member_as(instance->data, Bs_File);
     f->file = FD_OPEN(fd, write ? "w" : "r");
+
+#ifdef _WIN32
+    setmode(fd, _O_TEXT);
+#endif // _WIN32
+
     f->pipe = true;
     return instance;
 }

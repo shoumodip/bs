@@ -2,7 +2,7 @@
 
 set -xe
 
-CFLAGS="-I./include -I./thirdparty -O3"
+CFLAGS="-I./include -I./thirdparty"
 LIBS="-lm"
 
 CC=x86_64-w64-mingw32-gcc
