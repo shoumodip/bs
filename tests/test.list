@@ -134,3 +134,4 @@
 ../bin/bs lexer/comments.bs
 ../bin/bs lexer/multiline_string_binary_continuation.bs
 ../bin/bs core/meta_eval_runtime_error.bs
+../bin/bs core/meta_call_error.bs

@@ -542,7 +542,7 @@ newlines similarly to Go.
 <span class='comment'># Output:</span>
 <span class='comment'># 69</span>
 <span class='comment'># 420</span>
-io.<span class='field'>println</span>(<span class='constant'>69</span>); io.<span class='field'>println</span>(<span class='constant'>420</span>)
+io.<span class='field'>println</span>(<span class='constant'>69</span>)<span class='comment'>;</span> io.<span class='field'>println</span>(<span class='constant'>420</span>)
 </pre>
 </pre>
 </div>
@@ -2506,17 +2506,17 @@ Create a file <code>arithmetic.c</code> with the following content
 <span class='field'>#include</span> <span class='string'>&lt;bs/object.h&gt;</span>
 
 <span class='class'>Bs_Value</span> arithmetic_add(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
-    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>2</span>);
-    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_VALUE_NUM</span>);
-    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>1</span>, <span class='constant'>BS_VALUE_NUM</span>);
-    <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(args[<span class='constant'>0</span>].as.number + args[<span class='constant'>1</span>].as.number);
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>2</span>)<span class='comment'>;</span>
+    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_VALUE_NUM</span>)<span class='comment'>;</span>
+    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>1</span>, <span class='constant'>BS_VALUE_NUM</span>)<span class='comment'>;</span>
+    <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(args[<span class='constant'>0</span>].as.number + args[<span class='constant'>1</span>].as.number)<span class='comment'>;</span>
 }
 
 <span class='class'>Bs_Value</span> arithmetic_sub(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
-    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>2</span>);
-    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_VALUE_NUM</span>);
-    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>1</span>, <span class='constant'>BS_VALUE_NUM</span>);
-    <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(args[<span class='constant'>0</span>].as.number - args[<span class='constant'>1</span>].as.number);
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>2</span>)<span class='comment'>;</span>
+    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_VALUE_NUM</span>)<span class='comment'>;</span>
+    <span class='function'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>1</span>, <span class='constant'>BS_VALUE_NUM</span>)<span class='comment'>;</span>
+    <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(args[<span class='constant'>0</span>].as.number - args[<span class='constant'>1</span>].as.number)<span class='comment'>;</span>
 }
 
 <span class='comment'>// This is the "entry point" of the library. This function will be called when
@@ -2525,8 +2525,8 @@ Create a file <code>arithmetic.c</code> with the following content
     <span class='keyword'>static</span> <span class='keyword'>const</span> <span class='class'>Bs_FFI</span> ffi[] = {
         {<span class='string'>"add"</span>, arithmetic_add},
         {<span class='string'>"sub"</span>, arithmetic_sub},
-    };
-    <span class='function'>bs_c_lib_ffi</span>(bs, library, ffi, <span class='constant'>bs_c_array_size</span>(ffi));
+    }<span class='comment'>;</span>
+    <span class='function'>bs_c_lib_ffi</span>(bs, library, ffi, <span class='constant'>bs_c_array_size</span>(ffi))<span class='comment'>;</span>
 }
 </pre>
 </div>
@@ -2616,66 +2616,66 @@ library.
 <span class='field'>#include</span> <span class='string'>"bs/object.h"</span>
 
 <span class='class'>Bs_Value</span> rl_init_window(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
-    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>3</span>);
-    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
-    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>1</span>);
-    <span class='function'>bs_arg_check_object_type</span>(bs, args, <span class='constant'>2</span>, <span class='constant'>BS_OBJECT_STR</span>);
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>3</span>)<span class='comment'>;</span>
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>)<span class='comment'>;</span>
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>1</span>)<span class='comment'>;</span>
+    <span class='function'>bs_arg_check_object_type</span>(bs, args, <span class='constant'>2</span>, <span class='constant'>BS_OBJECT_STR</span>)<span class='comment'>;</span>
 
-    <span class='keyword'>const</span> <span class='class'>int</span> width = args[<span class='constant'>0</span>].as.number;
-    <span class='keyword'>const</span> <span class='class'>int</span> height = args[<span class='constant'>1</span>].as.number;
-    <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *title = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>2</span>].as.object;
+    <span class='keyword'>const</span> <span class='class'>int</span> width = args[<span class='constant'>0</span>].as.number<span class='comment'>;</span>
+    <span class='keyword'>const</span> <span class='class'>int</span> height = args[<span class='constant'>1</span>].as.number<span class='comment'>;</span>
+    <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *title = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>2</span>].as.object<span class='comment'>;</span>
 
     <span class='comment'>// BS strings are null terminated by default for FFI convenience
-</span>    InitWindow(width, height, title-&gt;data);
-    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+</span>    InitWindow(width, height, title-&gt;data)<span class='comment'>;</span>
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span><span class='comment'>;</span>
 }
 
 <span class='class'>Bs_Value</span> rl_close_window(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
-    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    CloseWindow();
-    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>)<span class='comment'>;</span>
+    CloseWindow()<span class='comment'>;</span>
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span><span class='comment'>;</span>
 }
 
 <span class='class'>Bs_Value</span> rl_window_should_close(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
-    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    <span class='keyword'>return</span> <span class='constant'>bs_value_bool</span>(WindowShouldClose());
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>)<span class='comment'>;</span>
+    <span class='keyword'>return</span> <span class='constant'>bs_value_bool</span>(WindowShouldClose())<span class='comment'>;</span>
 }
 
 <span class='class'>Bs_Value</span> rl_begin_drawing(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
-    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    BeginDrawing();
-    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>)<span class='comment'>;</span>
+    BeginDrawing()<span class='comment'>;</span>
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span><span class='comment'>;</span>
 }
 
 <span class='class'>Bs_Value</span> rl_end_drawing(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
-    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
-    EndDrawing();
-    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>)<span class='comment'>;</span>
+    EndDrawing()<span class='comment'>;</span>
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span><span class='comment'>;</span>
 }
 
 <span class='class'>Bs_Value</span> rl_clear_background(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
-    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
-    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
-    ClearBackground(GetColor(args[<span class='constant'>0</span>].as.number));
-    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>)<span class='comment'>;</span>
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>)<span class='comment'>;</span>
+    ClearBackground(GetColor(args[<span class='constant'>0</span>].as.number))<span class='comment'>;</span>
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span><span class='comment'>;</span>
 }
 
 <span class='class'>Bs_Value</span> rl_draw_text(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
-    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>5</span>);
-    <span class='function'>bs_arg_check_object_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_OBJECT_STR</span>);
-    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>1</span>);
-    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>2</span>);
-    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>3</span>);
-    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>4</span>);
+    <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>5</span>)<span class='comment'>;</span>
+    <span class='function'>bs_arg_check_object_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_OBJECT_STR</span>)<span class='comment'>;</span>
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>1</span>)<span class='comment'>;</span>
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>2</span>)<span class='comment'>;</span>
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>3</span>)<span class='comment'>;</span>
+    <span class='function'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>4</span>)<span class='comment'>;</span>
 
-    <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *text = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>0</span>].as.object;
-    <span class='keyword'>const</span> <span class='class'>int</span> x = args[<span class='constant'>1</span>].as.number;
-    <span class='keyword'>const</span> <span class='class'>int</span> y = args[<span class='constant'>2</span>].as.number;
-    <span class='keyword'>const</span> <span class='class'>int</span> size = args[<span class='constant'>3</span>].as.number;
-    <span class='keyword'>const</span> <span class='class'>Color</span> color = GetColor(args[<span class='constant'>4</span>].as.number);
+    <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *text = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>0</span>].as.object<span class='comment'>;</span>
+    <span class='keyword'>const</span> <span class='class'>int</span> x = args[<span class='constant'>1</span>].as.number<span class='comment'>;</span>
+    <span class='keyword'>const</span> <span class='class'>int</span> y = args[<span class='constant'>2</span>].as.number<span class='comment'>;</span>
+    <span class='keyword'>const</span> <span class='class'>int</span> size = args[<span class='constant'>3</span>].as.number<span class='comment'>;</span>
+    <span class='keyword'>const</span> <span class='class'>Color</span> color = GetColor(args[<span class='constant'>4</span>].as.number)<span class='comment'>;</span>
 
-    DrawText(text-&gt;data, x, y, size, color);
-    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
+    DrawText(text-&gt;data, x, y, size, color)<span class='comment'>;</span>
+    <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span><span class='comment'>;</span>
 }
 
 <span class='constant'>BS_LIBRARY_INIT</span> <span class='class'>void</span> bs_library_init(<span class='class'>Bs</span> *bs, <span class='class'>Bs_C_Lib</span> *library) {
@@ -2687,8 +2687,8 @@ library.
         {<span class='string'>"end_drawing"</span>, rl_end_drawing},
         {<span class='string'>"clear_background"</span>, rl_clear_background},
         {<span class='string'>"draw_text"</span>, rl_draw_text},
-    };
-    <span class='function'>bs_c_lib_ffi</span>(bs, library, ffi, <span class='constant'>bs_c_array_size</span>(ffi));
+    }<span class='comment'>;</span>
+    <span class='function'>bs_c_lib_ffi</span>(bs, library, ffi, <span class='constant'>bs_c_array_size</span>(ffi))<span class='comment'>;</span>
 }
 </pre>
 </div>

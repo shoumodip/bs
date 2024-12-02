@@ -33,7 +33,7 @@ typedef struct {
 } Bs_File;
 
 static void bs_io_file_free(void *userdata, void *instance_data) {
-    Bs_File *f = &bs_static_cast(instance_data, Bs_File);
+    Bs_File *f = &bs_flex_member_as(instance_data, Bs_File);
     if (f->file && fileno(f->file) > 2) {
         fclose(f->file);
         memset(f, 0, sizeof(*f));
@@ -44,7 +44,7 @@ static Bs_Value bs_io_file_close(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
     Bs_C_Instance *this = (Bs_C_Instance *)args[-1].as.object;
-    if (!bs_static_cast(this->data, Bs_File).file) {
+    if (!bs_flex_member_as(this->data, Bs_File).file) {
         bs_error(bs, "cannot close already closed file");
     }
 
@@ -66,7 +66,7 @@ static Bs_Value bs_io_reader_init(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_nil;
     }
 
-    Bs_File *f = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
     f->file = file;
     f->pipe = false;
     return args[-1];
@@ -81,7 +81,7 @@ static Bs_Value bs_io_reader_read(Bs *bs, Bs_Value *args, size_t arity) {
         bs_arg_check_whole_number(bs, args, 0);
     }
 
-    Bs_File *f = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
     if (!f->file) {
         bs_error(bs, "cannot read from closed file");
     }
@@ -126,7 +126,7 @@ static Bs_Value bs_io_reader_read(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_io_reader_readln(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    Bs_File *f = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
     if (!f->file) {
         bs_error(bs, "cannot read from closed file");
     }
@@ -147,7 +147,7 @@ static Bs_Value bs_io_reader_readln(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_io_reader_eof(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    Bs_File *f = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
     return bs_value_bool(f->file ? feof(f->file) : true);
 }
 
@@ -156,7 +156,7 @@ static Bs_Value bs_io_reader_seek(Bs *bs, Bs_Value *args, size_t arity) {
     bs_arg_check_whole_number(bs, args, 0);
     bs_arg_check_whole_number(bs, args, 1);
 
-    Bs_File *f = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
     if (!f->file) {
         bs_error(bs, "cannot seek in closed file");
     }
@@ -176,7 +176,7 @@ static Bs_Value bs_io_reader_seek(Bs *bs, Bs_Value *args, size_t arity) {
 static Bs_Value bs_io_reader_tell(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
-    Bs_File *f = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
     if (!f->file) {
         bs_error(bs, "cannot get position of closed file");
     }
@@ -203,7 +203,7 @@ static Bs_Value bs_io_writer_init(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_nil;
     }
 
-    Bs_File *f = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
     f->file = file;
     f->pipe = false;
     return args[-1];
@@ -212,7 +212,7 @@ static Bs_Value bs_io_writer_init(Bs *bs, Bs_Value *args, size_t arity) {
 static Bs_Value bs_io_writer_flush(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
-    Bs_File *f = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
     if (!f->file) {
         bs_error(bs, "cannot flush closed file");
     }
@@ -222,7 +222,7 @@ static Bs_Value bs_io_writer_flush(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_io_writer_write(Bs *bs, Bs_Value *args, size_t arity) {
-    Bs_File *f = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
     if (!f->file) {
         bs_error(bs, "cannot write into closed file");
     }
@@ -239,7 +239,7 @@ static Bs_Value bs_io_writer_write(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_io_writer_writeln(Bs *bs, Bs_Value *args, size_t arity) {
-    Bs_File *f = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
     if (!f->file) {
         bs_error(bs, "cannot write into closed file");
     }
@@ -265,32 +265,26 @@ typedef struct {
 static Bs_C_Class *bs_io_direntry_class;
 
 static void bs_io_direntry_mark(Bs *bs, void *instance_data) {
-    Bs_Dir_Entry *e = &bs_static_cast(instance_data, Bs_Dir_Entry);
+    Bs_Dir_Entry *e = &bs_flex_member_as(instance_data, Bs_Dir_Entry);
     bs_mark(bs, (Bs_Object *)e->name);
 }
 
 static Bs_Value bs_io_direntry_init(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 2);
-    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
-    bs_arg_check_value_type(bs, args, 1, BS_VALUE_BOOL);
-
-    Bs_Dir_Entry *e = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Dir_Entry);
-    e->name = (Bs_Str *)args[0].as.object;
-    e->isdir = args[1].as.boolean;
+    bs_error(bs, "not supposed to be used directly");
     return bs_value_nil;
 }
 
 static Bs_Value bs_io_direntry_name(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
-    Bs_Dir_Entry *e = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Dir_Entry);
+    Bs_Dir_Entry *e = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Dir_Entry);
     return bs_value_object(e->name);
 }
 
 static Bs_Value bs_io_direntry_isdir(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
-    Bs_Dir_Entry *e = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Dir_Entry);
+    Bs_Dir_Entry *e = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Dir_Entry);
     return bs_value_bool(e->isdir);
 }
 
@@ -390,7 +384,7 @@ static Bs_Value bs_io_readdir(Bs *bs, Bs_Value *args, size_t arity) {
 
         Bs_C_Instance *instance = bs_c_instance_new(bs, bs_io_direntry_class);
 
-        Bs_Dir_Entry *e = &bs_static_cast(instance->data, Bs_Dir_Entry);
+        Bs_Dir_Entry *e = &bs_flex_member_as(instance->data, Bs_Dir_Entry);
         e->name = bs_str_new(bs, bs_sv_from_cstr(findFileData.cFileName));
         e->isdir = (findFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
         bs_array_set(bs, a, a->count, bs_value_object(instance));
@@ -412,7 +406,7 @@ static Bs_Value bs_io_readdir(Bs *bs, Bs_Value *args, size_t arity) {
 
         Bs_C_Instance *instance = bs_c_instance_new(bs, bs_io_direntry_class);
 
-        Bs_Dir_Entry *e = &bs_static_cast(instance->data, Bs_Dir_Entry);
+        Bs_Dir_Entry *e = &bs_flex_member_as(instance->data, Bs_Dir_Entry);
         e->name = bs_str_new(bs, bs_sv_from_cstr(entry->d_name));
         e->isdir = entry->d_type == DT_DIR;
         bs_array_set(bs, a, a->count, bs_value_object(instance));
@@ -587,7 +581,7 @@ typedef struct {
 } Bs_Process;
 
 static void bs_process_mark(Bs *bs, void *instance_data) {
-    Bs_Process *p = &bs_static_cast(instance_data, Bs_Process);
+    Bs_Process *p = &bs_flex_member_as(instance_data, Bs_Process);
     bs_mark(bs, (Bs_Object *)p->stdout_read);
     bs_mark(bs, (Bs_Object *)p->stderr_read);
     bs_mark(bs, (Bs_Object *)p->stdin_write);
@@ -597,7 +591,7 @@ static Bs_C_Instance *bs_pipe_new(Bs *bs, int fd, bool write) {
     Bs_C_Instance *instance =
         bs_c_instance_new(bs, write ? bs_io_writer_class : bs_io_reader_class);
 
-    Bs_File *f = &bs_static_cast(instance->data, Bs_File);
+    Bs_File *f = &bs_flex_member_as(instance->data, Bs_File);
     f->file = FD_OPEN(fd, write ? "wb" : "rb");
     f->pipe = true;
     return instance;
@@ -640,7 +634,7 @@ static Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
         bs_check_object_type_at(bs, 1, array->data[i], BS_OBJECT_STR, buffer);
     }
 
-    Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+    Bs_Process *p = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
 
 #ifdef _WIN32
     STARTUPINFOA siStartInfo;
@@ -878,7 +872,7 @@ static Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
 
-    Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+    Bs_Process *p = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
 #ifdef _WIN32
     if (!TerminateProcess(p->piProcInfo.hProcess, 1)) {
         return bs_value_bool(false);
@@ -900,7 +894,7 @@ static Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
 static Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
-    Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+    Bs_Process *p = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
 
 #ifdef _WIN32
     if (WaitForSingleObject(p->piProcInfo.hProcess, INFINITE) == WAIT_FAILED) {
@@ -938,19 +932,19 @@ static Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_process_stdout(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+    Bs_Process *p = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
     return p->stdout_read ? bs_value_object(p->stdout_read) : bs_value_nil;
 }
 
 static Bs_Value bs_process_stderr(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+    Bs_Process *p = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
     return p->stderr_read ? bs_value_object(p->stderr_read) : bs_value_nil;
 }
 
 static Bs_Value bs_process_stdin(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    Bs_Process *p = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+    Bs_Process *p = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
     return p->stdin_write ? bs_value_object(p->stdin_write) : bs_value_nil;
 }
 
@@ -962,7 +956,7 @@ typedef struct {
 static Bs_C_Class *bs_regex_class;
 
 static void bs_regex_free(void *userdata, void *instance_data) {
-    regfree(&bs_static_cast(instance_data, regex_t));
+    regfree(&bs_flex_member_as(instance_data, regex_t));
 }
 
 static Bs_Value bs_regex_init(Bs *bs, Bs_Value *args, size_t arity) {
@@ -976,7 +970,7 @@ static Bs_Value bs_regex_init(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_nil;
     }
 
-    bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, regex_t) = regex;
+    bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, regex_t) = regex;
     return args[-1];
 }
 
@@ -1120,7 +1114,8 @@ static Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
             }
         }
     } else {
-        const regex_t regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, regex_t);
+        const regex_t regex =
+            bs_flex_member_as(((Bs_C_Instance *)args[0].as.object)->data, regex_t);
 
         regmatch_t match;
         if (!regexec(&regex, str->data + offset, 1, &match, 0)) {
@@ -1166,7 +1161,8 @@ static Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
             }
         }
     } else {
-        const regex_t regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, regex_t);
+        const regex_t regex =
+            bs_flex_member_as(((Bs_C_Instance *)args[0].as.object)->data, regex_t);
 
         int eflags = 0;
         regmatch_t match;
@@ -1235,7 +1231,8 @@ static Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
         const size_t start = b->count;
 
         const char *cursor = str->data;
-        const regex_t regex = bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, regex_t);
+        const regex_t regex =
+            bs_flex_member_as(((Bs_C_Instance *)args[0].as.object)->data, regex_t);
 
         int eflags = 0;
         regmatch_t matches[10];
@@ -1634,14 +1631,14 @@ static Bs_Value bs_ascii_isupper(Bs *bs, Bs_Value *args, size_t arity) {
 static Bs_C_Class *bs_bytes_class;
 
 static void bs_bytes_free(void *userdata, void *instance_data) {
-    Bs_Buffer *b = &bs_static_cast(instance_data, Bs_Buffer);
+    Bs_Buffer *b = &bs_flex_member_as(instance_data, Bs_Buffer);
     if (b->bs) {
         bs_da_free(b->bs, b);
     }
 }
 
 static void bs_bytes_show(Bs_Pretty_Printer *p, const void *instance_data) {
-    const Bs_Buffer *b = &bs_static_cast(instance_data, Bs_Buffer);
+    const Bs_Buffer *b = &bs_flex_member_as(instance_data, Bs_Buffer);
     const Bs_Sv sv = Bs_Sv(b->data, b->count);
     if (p->depth) {
         p->writer->write(p->writer, Bs_Sv_Static("Bytes("));
@@ -1656,7 +1653,7 @@ static Bs_Value bs_bytes_init(Bs *bs, Bs_Value *args, size_t arity) {
     if (arity > 1) {
         bs_error(bs, "expected 0 or 1 arguments, got %zu", arity);
     }
-    Bs_Buffer *b = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
+    Bs_Buffer *b = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
 
     if (arity) {
         bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
@@ -1670,7 +1667,7 @@ static Bs_Value bs_bytes_init(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_bytes_count(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    const Bs_Buffer *b = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
+    const Bs_Buffer *b = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
     return bs_value_num(b->count);
 }
 
@@ -1678,7 +1675,7 @@ static Bs_Value bs_bytes_reset(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
 
-    Bs_Buffer *b = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
+    Bs_Buffer *b = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
     const size_t reset = args[0].as.number;
 
     if (reset > b->count) {
@@ -1699,7 +1696,7 @@ static Bs_Value bs_bytes_slice(Bs *bs, Bs_Value *args, size_t arity) {
         bs_arg_check_whole_number(bs, args, 1);
     }
 
-    const Bs_Buffer *b = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
+    const Bs_Buffer *b = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
     const size_t begin = arity ? bs_min(args[0].as.number, args[1].as.number) : 0;
     const size_t end = arity ? bs_max(args[0].as.number, args[1].as.number) : b->count;
 
@@ -1724,14 +1721,15 @@ static Bs_Value bs_bytes_push(Bs *bs, Bs_Value *args, size_t arity) {
     };
     bs_arg_check_multi(bs, args, 0, checks, bs_c_array_size(checks));
 
-    Bs_Buffer *b = &bs_this_as(args, Bs_Buffer);
+    Bs_Buffer *b = &bs_this_c_instance_data_as(args, Bs_Buffer);
     if (args[0].type == BS_VALUE_NUM) {
         bs_da_push(bs, b, (char)args[0].as.number);
     } else if (args[0].as.object->type == BS_OBJECT_STR) {
         const Bs_Str *src = (const Bs_Str *)args[0].as.object;
         bs_da_push_many(bs, b, src->data, src->size);
     } else if (args[0].as.object->type == BS_OBJECT_C_INSTANCE) {
-        const Bs_Buffer *s = &bs_static_cast(((Bs_C_Instance *)args[0].as.object)->data, Bs_Buffer);
+        const Bs_Buffer *s =
+            &bs_flex_member_as(((Bs_C_Instance *)args[0].as.object)->data, Bs_Buffer);
         bs_da_push_many(bs, b, s->data, s->count);
     }
 
@@ -1749,7 +1747,7 @@ static Bs_Value bs_bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
     };
     bs_arg_check_multi(bs, args, 1, checks, bs_c_array_size(checks));
 
-    Bs_Buffer *b = &bs_static_cast(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
+    Bs_Buffer *b = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
     const size_t index = args[0].as.number;
 
     if (index > b->count) {
@@ -1766,7 +1764,8 @@ static Bs_Value bs_bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
         data = src->data;
         size = src->size;
     } else if (args[1].as.object->type == BS_OBJECT_C_INSTANCE) {
-        const Bs_Buffer *s = &bs_static_cast(((Bs_C_Instance *)args[1].as.object)->data, Bs_Buffer);
+        const Bs_Buffer *s =
+            &bs_flex_member_as(((Bs_C_Instance *)args[1].as.object)->data, Bs_Buffer);
         data = s->data;
         size = s->count;
     }
@@ -1783,7 +1782,7 @@ static Bs_Value bs_bytes_get(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
 
-    const Bs_Buffer *b = &bs_this_as(args, Bs_Buffer);
+    const Bs_Buffer *b = &bs_this_c_instance_data_as(args, Bs_Buffer);
     const size_t index = args[0].as.number;
 
     if (index >= b->count) {
@@ -1798,7 +1797,7 @@ static Bs_Value bs_bytes_set(Bs *bs, Bs_Value *args, size_t arity) {
     bs_arg_check_whole_number(bs, args, 0);
     bs_arg_check_ascii_code(bs, args, 1);
 
-    Bs_Buffer *b = &bs_this_as(args, Bs_Buffer);
+    Bs_Buffer *b = &bs_this_c_instance_data_as(args, Bs_Buffer);
     const size_t index = args[0].as.number;
     const char code = args[1].as.number;
 
@@ -2370,7 +2369,7 @@ static Bs_Value bs_random_init(Bs *bs, Bs_Value *args, size_t arity) {
     r.state[0] = (r.state[0] ^ (r.state[0] >> 30)) * 0xBF58476D1CE4E5B9ULL;
     r.state[1] = (r.state[0] ^ (r.state[0] >> 27)) * 0x94D049BB133111EBULL;
 
-    bs_this_as(args, Bs_Random) = r;
+    bs_this_c_instance_data_as(args, Bs_Random) = r;
     return bs_value_nil;
 }
 
@@ -2384,7 +2383,8 @@ static Bs_Value bs_random_number(Bs *bs, Bs_Value *args, size_t arity) {
         bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
     }
 
-    const double result = (double)bs_random_u64(&bs_this_as(args, Bs_Random)) / UINT64_MAX;
+    const double result =
+        (double)bs_random_u64(&bs_this_c_instance_data_as(args, Bs_Random)) / UINT64_MAX;
     if (!arity) {
         return bs_value_num(result);
     }
@@ -2398,11 +2398,11 @@ static Bs_Value bs_random_bytes(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
 
-    Bs_Random *r = &bs_this_as(args, Bs_Random);
+    Bs_Random *r = &bs_this_c_instance_data_as(args, Bs_Random);
     size_t count = args[0].as.number;
 
     Bs_Value instance = bs_call(bs, bs_value_object(bs_bytes_class), NULL, 0);
-    Bs_Buffer *b = &bs_static_cast(((Bs_C_Instance *)instance.as.object)->data, Bs_Buffer);
+    Bs_Buffer *b = &bs_flex_member_as(((Bs_C_Instance *)instance.as.object)->data, Bs_Buffer);
 
     while (count) {
         const uint64_t n = bs_random_u64(r);
@@ -2419,55 +2419,97 @@ static Bs_Value bs_random_bytes(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Metaprogramming
+static Bs_C_Class *bs_meta_error_class;
+
+typedef struct {
+    size_t row;
+    size_t col;
+    Bs_Str *line;
+
+    Bs_Str *message;
+    Bs_Str *explanation;
+    Bs_Str *example;
+} Bs_Meta_Error;
+
+static void bs_meta_error_mark(Bs *bs, void *instance_data) {
+    Bs_Meta_Error *e = &bs_flex_member_as(instance_data, Bs_Meta_Error);
+    bs_mark(bs, (Bs_Object *)e->line);
+    bs_mark(bs, (Bs_Object *)e->message);
+    bs_mark(bs, (Bs_Object *)e->explanation);
+    bs_mark(bs, (Bs_Object *)e->example);
+}
+
+static Bs_Value bs_meta_error_init(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_error(bs, "not supposed to be used directly");
+    return bs_value_nil;
+}
+
+static Bs_Value bs_meta_error_row(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    const size_t row = bs_this_c_instance_data_as(args, Bs_Meta_Error).row;
+    return row ? bs_value_num(row) : bs_value_nil;
+}
+
+static Bs_Value bs_meta_error_col(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    const size_t col = bs_this_c_instance_data_as(args, Bs_Meta_Error).col;
+    return col ? bs_value_num(col) : bs_value_nil;
+}
+
+static Bs_Value bs_meta_error_line(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    Bs_Str *line = bs_this_c_instance_data_as(args, Bs_Meta_Error).line;
+    return line ? bs_value_object(line) : bs_value_nil;
+}
+
+static Bs_Value bs_meta_error_message(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    // Message is guaranted
+    return bs_value_object(bs_this_c_instance_data_as(args, Bs_Meta_Error).message);
+}
+
+static Bs_Value bs_meta_error_explanation(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    Bs_Str *explanation = bs_this_c_instance_data_as(args, Bs_Meta_Error).explanation;
+    return explanation ? bs_value_object(explanation) : bs_value_nil;
+}
+
+static Bs_Value bs_meta_error_example(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    Bs_Str *example = bs_this_c_instance_data_as(args, Bs_Meta_Error).example;
+    return example ? bs_value_object(example) : bs_value_nil;
+}
+
 typedef struct {
     Bs *bs;
-    Bs_Table *error;
-} Bs_Meta_Compile_Context;
+    Bs_C_Instance *error;
+} Bs_Meta_Error_Context;
 
-static void bs_meta_compile_error_write(Bs_Error_Writer *w, Bs_Error error) {
-    // Only compilation errors are possible here
-    assert(error.type == BS_ERROR_MAIN);
-    assert(!error.native);
+static void bs_meta_error_write(Bs_Error_Writer *w, Bs_Error error) {
+    Bs_Meta_Error_Context *c = w->data;
+    if (c->error) {
+        return; // Skip stack trace
+    }
+    assert(error.type == BS_ERROR_MAIN); // Only compilation errors are possible here
 
-    Bs_Meta_Compile_Context *c = w->data;
-    c->error = bs_table_new(c->bs);
+    c->error = bs_c_instance_new(c->bs, bs_meta_error_class);
+    Bs_Meta_Error *e = &bs_flex_member_as(c->error->data, Bs_Meta_Error);
 
-    bs_table_set(
-        c->bs,
-        c->error,
-        bs_value_object(bs_str_new(c->bs, Bs_Sv_Static("row"))),
-        bs_value_num(error.loc.row));
+    if (!error.native) {
+        e->row = error.loc.row;
+        e->col = error.loc.col;
+        e->line = bs_str_new(c->bs, error.loc.line);
+    }
 
-    bs_table_set(
-        c->bs,
-        c->error,
-        bs_value_object(bs_str_new(c->bs, Bs_Sv_Static("col"))),
-        bs_value_num(error.loc.col));
+    e->message = bs_str_new(c->bs, error.message);
 
-    bs_table_set(
-        c->bs,
-        c->error,
-        bs_value_object(bs_str_new(c->bs, Bs_Sv_Static("message"))),
-        bs_value_object(bs_str_new(c->bs, error.message)));
+    if (error.explanation.size) {
+        e->explanation = bs_str_new(c->bs, error.explanation);
+    }
 
-    bs_table_set(
-        c->bs,
-        c->error,
-        bs_value_object(bs_str_new(c->bs, Bs_Sv_Static("line"))),
-        bs_value_object(bs_str_new(c->bs, error.loc.line)));
-
-    bs_table_set(
-        c->bs,
-        c->error,
-        bs_value_object(bs_str_new(c->bs, Bs_Sv_Static("explanation"))),
-        error.explanation.size ? bs_value_object(bs_str_new(c->bs, error.explanation))
-                               : bs_value_nil);
-
-    bs_table_set(
-        c->bs,
-        c->error,
-        bs_value_object(bs_str_new(c->bs, Bs_Sv_Static("example"))),
-        error.example.size ? bs_value_object(bs_str_new(c->bs, error.example)) : bs_value_nil);
+    if (error.example.size) {
+        e->example = bs_str_new(c->bs, error.example);
+    }
 }
 
 static Bs_Value bs_meta_compile(Bs *bs, Bs_Value *args, size_t arity) {
@@ -2477,14 +2519,14 @@ static Bs_Value bs_meta_compile(Bs *bs, Bs_Value *args, size_t arity) {
     Bs_Str *str = (Bs_Str *)args[0].as.object;
     const Bs_Sv input = Bs_Sv(str->data, str->size);
 
-    Bs_Meta_Compile_Context context = {.bs = bs};
+    Bs_Meta_Error_Context context = {.bs = bs};
 
     Bs_Config *config = bs_config(bs);
     const Bs_Error_Writer save = config->error;
 
     config->error = (Bs_Error_Writer){
         .data = &context,
-        .write = bs_meta_compile_error_write,
+        .write = bs_meta_error_write,
     };
 
     const Bs_Closure *closure = bs_compile(bs, Bs_Sv_Static("<meta>"), input, false, false, true);
@@ -2496,6 +2538,38 @@ static Bs_Value bs_meta_compile(Bs *bs, Bs_Value *args, size_t arity) {
 
     closure->fn->source = str;
     return bs_value_object(closure);
+}
+
+static Bs_Value bs_meta_call(Bs *bs, Bs_Value *args, size_t arity) {
+    if (!arity) {
+        bs_error(bs, "expected at least 1 argument, got 0");
+    }
+    bs_arg_check_callable(bs, args, 0);
+
+    Bs_Meta_Error_Context context = {.bs = bs};
+
+    Bs_Config *config = bs_config(bs);
+    const Bs_Error_Writer error_save = config->error;
+
+    config->error = (Bs_Error_Writer){
+        .data = &context,
+        .write = bs_meta_error_write,
+    };
+
+    Bs_Value result = bs_value_nil;
+
+    const Bs_Unwind unwind_save = bs_unwind_save(bs);
+    if (setjmp(config->unwind.point)) {
+        result = bs_value_object(context.error);
+        goto end;
+    }
+
+    result = bs_call(bs, args[0], args + 1, arity - 1);
+
+end:
+    config->error = error_save;
+    bs_unwind_restore(bs, &unwind_save);
+    return result;
 }
 
 static Bs_Value bs_meta_eval(Bs *bs, Bs_Value *args, size_t arity) {
@@ -2585,19 +2659,19 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
 
         {
             Bs_C_Instance *io_stdin = bs_c_instance_new(bs, bs_io_reader_class);
-            bs_static_cast(io_stdin->data, Bs_File).file = stdin;
+            bs_flex_member_as(io_stdin->data, Bs_File).file = stdin;
             bs_add(bs, io, "stdin", bs_value_object(io_stdin));
         }
 
         {
             Bs_C_Instance *io_stdout = bs_c_instance_new(bs, bs_io_writer_class);
-            bs_static_cast(io_stdout->data, Bs_File).file = stdout;
+            bs_flex_member_as(io_stdout->data, Bs_File).file = stdout;
             bs_add(bs, io, "stdout", bs_value_object(io_stdout));
         }
 
         {
             Bs_C_Instance *io_stderr = bs_c_instance_new(bs, bs_io_writer_class);
-            bs_static_cast(io_stderr->data, Bs_File).file = stderr;
+            bs_flex_member_as(io_stderr->data, Bs_File).file = stderr;
             bs_add(bs, io, "stderr", bs_value_object(io_stderr));
         }
 
@@ -2796,7 +2870,26 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
 
     {
         Bs_Table *meta = bs_table_new(bs);
+
+        {
+            bs_meta_error_class = bs_c_class_new(
+                bs, Bs_Sv_Static("Error"), sizeof(Bs_Meta_Error), bs_meta_error_init);
+
+            bs_meta_error_class->mark = bs_meta_error_mark;
+
+            bs_c_class_add(bs, bs_meta_error_class, Bs_Sv_Static("row"), bs_meta_error_row);
+            bs_c_class_add(bs, bs_meta_error_class, Bs_Sv_Static("col"), bs_meta_error_col);
+            bs_c_class_add(bs, bs_meta_error_class, Bs_Sv_Static("line"), bs_meta_error_line);
+            bs_c_class_add(bs, bs_meta_error_class, Bs_Sv_Static("message"), bs_meta_error_message);
+            bs_c_class_add(bs, bs_meta_error_class, Bs_Sv_Static("example"), bs_meta_error_example);
+            bs_c_class_add(
+                bs, bs_meta_error_class, Bs_Sv_Static("explanation"), bs_meta_error_explanation);
+
+            bs_add(bs, meta, "Error", bs_value_object(bs_meta_error_class));
+        }
+
         bs_add_fn(bs, meta, "compile", bs_meta_compile);
+        bs_add_fn(bs, meta, "call", bs_meta_call);
         bs_add_fn(bs, meta, "eval", bs_meta_eval);
         bs_global_set(bs, Bs_Sv_Static("meta"), bs_value_object(meta));
     }

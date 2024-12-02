@@ -104,7 +104,7 @@ Bs_Value rl_texture_init(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_nil;
     }
 
-    bs_this_as(args, Texture) = texture;
+    bs_this_c_instance_data_as(args, Texture) = texture;
     return args[-1];
 }
 
@@ -118,7 +118,7 @@ Bs_Value rl_texture_draw(Bs *bs, Bs_Value *args, size_t arity) {
 
     const float scale = args[3].as.number;
 
-    const Texture texture = bs_this_as(args, Texture);
+    const Texture texture = bs_this_c_instance_data_as(args, Texture);
     const Rectangle src = {0, 0, texture.width, texture.height};
     const Rectangle dst = {
         args[0].as.number + (texture.width * scale) / 2.0,
@@ -137,17 +137,17 @@ Bs_Value rl_texture_draw(Bs *bs, Bs_Value *args, size_t arity) {
 
 Bs_Value rl_texture_width(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    return bs_value_num(bs_this_as(args, Texture).width);
+    return bs_value_num(bs_this_c_instance_data_as(args, Texture).width);
 }
 
 Bs_Value rl_texture_height(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    return bs_value_num(bs_this_as(args, Texture).height);
+    return bs_value_num(bs_this_c_instance_data_as(args, Texture).height);
 }
 
 Bs_Value rl_texture_unload(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    UnloadTexture(bs_this_as(args, Texture));
+    UnloadTexture(bs_this_c_instance_data_as(args, Texture));
     return bs_value_nil;
 }
 
@@ -162,19 +162,19 @@ Bs_Value rl_sound_init(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_nil;
     }
 
-    bs_this_as(args, Sound) = sound;
+    bs_this_c_instance_data_as(args, Sound) = sound;
     return args[-1];
 }
 
 Bs_Value rl_sound_play(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    PlaySound(bs_this_as(args, Sound));
+    PlaySound(bs_this_c_instance_data_as(args, Sound));
     return bs_value_nil;
 }
 
 Bs_Value rl_sound_unload(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    UnloadSound(bs_this_as(args, Sound));
+    UnloadSound(bs_this_c_instance_data_as(args, Sound));
     return bs_value_nil;
 }
 
@@ -194,13 +194,13 @@ Bs_Value rl_music_init(Bs *bs, Bs_Value *args, size_t arity) {
     PlayMusicStream(music);
     SetMusicVolume(music, 0.2);
 
-    bs_this_as(args, Music) = music;
+    bs_this_c_instance_data_as(args, Music) = music;
     return args[-1];
 }
 
 Bs_Value rl_music_toggle(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    Music music = bs_this_as(args, Music);
+    Music music = bs_this_c_instance_data_as(args, Music);
     if (IsMusicStreamPlaying(music)) {
         StopMusicStream(music);
     } else {
@@ -211,13 +211,13 @@ Bs_Value rl_music_toggle(Bs *bs, Bs_Value *args, size_t arity) {
 
 Bs_Value rl_music_update(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    UpdateMusicStream(bs_this_as(args, Music));
+    UpdateMusicStream(bs_this_c_instance_data_as(args, Music));
     return bs_value_nil;
 }
 
 Bs_Value rl_music_unload(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    UnloadMusicStream(bs_this_as(args, Music));
+    UnloadMusicStream(bs_this_c_instance_data_as(args, Music));
     return bs_value_nil;
 }
 

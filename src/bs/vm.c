@@ -146,10 +146,7 @@ struct Bs {
     Bs_Pretty_Printer printer;
 
     // Exit
-    int exit;
-    bool ok;
     bool running;
-    jmp_buf unwind;
 };
 
 // Garbage collector
@@ -783,6 +780,20 @@ Bs_Sv bs_buffer_relative_path(Bs_Buffer *b, Bs_Sv path) {
 }
 
 // Config
+Bs_Unwind bs_unwind_save(Bs *bs) {
+    Bs_Unwind u = bs->config.unwind;
+    u.stack_count = bs->stack.count;
+    u.frames_count = bs->frames.count;
+    return u;
+}
+
+void bs_unwind_restore(Bs *bs, const Bs_Unwind *u) {
+    bs->config.unwind = *u;
+    bs->stack.count = u->stack_count;
+    bs->frames.count = u->frames_count;
+    bs->frame = bs->frames.count ? &bs->frames.data[bs->frames.count - 1] : NULL;
+}
+
 Bs_Config *bs_config(Bs *bs) {
     return &bs->config;
 }
@@ -825,8 +836,8 @@ static Bs_Op_Loc *bs_chunk_get_op_loc(const Bs_Chunk *c, size_t op_index) {
 }
 
 void bs_unwind(Bs *bs, unsigned char exit) {
-    bs->exit = exit;
-    longjmp(bs->unwind, 1);
+    bs->config.unwind.exit = exit;
+    longjmp(bs->config.unwind.point, 1);
 }
 
 static bool bs_value_has_builtin_methods(Bs_Value value) {
@@ -977,7 +988,7 @@ void bs_error_end_at(Bs *bs, size_t location, bool native) {
         bs->config.error.write(&bs->config.error, error);
     }
 
-    bs->ok = false;
+    bs->config.unwind.ok = false;
     bs_unwind(bs, 1);
 }
 
@@ -2710,11 +2721,11 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 }
 
 Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_repl) {
-    bs->ok = true;
+    bs->config.unwind.ok = true;
     bs->running = true;
-    bs->exit = -1;
+    bs->config.unwind.exit = -1;
 
-    if (setjmp(bs->unwind)) {
+    if (setjmp(bs->config.unwind.point)) {
         goto end;
     }
 
@@ -2748,11 +2759,14 @@ end:
     bs->running = false;
 
 #ifdef BS_STEP_DEBUG
-    bs_fmt(&bs->config.log, "Stopping BS with exit code %d\n", (bs->exit == -1) ? 0 : bs->exit);
+    bs_fmt(
+        &bs->config.log,
+        "Stopping BS with exit code %d\n",
+        (bs->config.unwind.exit == -1) ? 0 : bs->config.unwind.exit);
 #endif // BS_STEP_DEBUG
 
-    result.ok = bs->ok;
-    result.exit = bs->exit;
+    result.ok = bs->config.unwind.ok;
+    result.exit = bs->config.unwind.exit;
     return result;
 }
 

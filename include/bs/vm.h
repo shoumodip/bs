@@ -48,6 +48,19 @@ Bs_Sv bs_buffer_relative_path(Bs_Buffer *buffer, Bs_Sv path);
 
 // Config
 typedef struct {
+    int exit;
+    bool ok;
+
+    size_t stack_count;
+    size_t frames_count;
+
+    jmp_buf point;
+} Bs_Unwind;
+
+Bs_Unwind bs_unwind_save(Bs *bs);
+void bs_unwind_restore(Bs *bs, const Bs_Unwind *unwind);
+
+typedef struct {
     void *userdata;
 
     Bs_Writer log;
@@ -55,6 +68,8 @@ typedef struct {
     Bs_Error_Writer error;
 
     Bs_Str *cwd;
+
+    Bs_Unwind unwind;
 } Bs_Config;
 
 Bs_Config *bs_config(Bs *bs);
@@ -175,7 +190,7 @@ void bs_check_ascii_code_at(Bs *bs, size_t location, Bs_Value value, const char 
 #define bs_arg_check_ascii_code(bs, args, index)                                                   \
     bs_check_ascii_code_at(bs, (index) + 1, (args)[index], NULL)
 
-#define bs_this_as(args, T) (*(T *)((Bs_C_Instance *)(args)[-1].as.object)->data)
+#define bs_this_c_instance_data_as(args, T) (*(T *)((Bs_C_Instance *)(args)[-1].as.object)->data)
 
 // Interpreter
 typedef struct {

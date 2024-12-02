@@ -289,9 +289,10 @@ Write all the arguments into the file, with a following newline.
 
 Returns `false` if any errors were encountered, else `true`.
 
-### DirEntry(name, isdir) @class
+### DirEntry() @class
 Native C class that wraps over a directory entry. This doesn't really do
-anything, and only serves as an implementation detail for `readdir()`.
+anything, and only serves as an implementation detail for `readdir()`. Attempt
+to call this constructor directly will throw a runtime error.
 
 Example usecase:
 
@@ -1861,6 +1862,63 @@ PI.
 ## Meta
 Contains simple metaprogramming primitives.
 
+### Error() @class
+Native C class that wraps over a metaprogram error. This doesn't really do
+anything, and only serves as an implementation detail for the `meta` functions.
+Attempt to call this constructor directly will throw a runtime error.
+
+Example usecase:
+
+```bs
+var f = meta.compile("Oops")
+if f is "Error" {
+    io.println("Row:", f.row())
+    io.println("Col:", f.col())
+    io.println("Line:", f.line())
+    io.println("Message:", f.message())
+    io.println("Explanation:", f.explanation())
+    io.println("Example:", f.example())
+}
+```
+
+```console
+$ bs demo.bs
+Row: 1
+Col: 5
+Line: Oops@
+Message: invalid character '@' (64)
+Explanation: nil
+Example: nil
+```
+
+#### Error.row() @method
+Return the row in which the error occured.
+
+Returns `nil` if the error occured in native code.
+
+#### Error.col() @method
+Return the col in which the error occured.
+
+Returns `nil` if the error occured in native code.
+
+#### Error.line() @method
+Return the line of meta source code in which the error occured as a string.
+
+Returns `nil` if the error occured in native code.
+
+#### Error.message() @method
+Return the error message.
+
+#### Error.explanation() @method
+Return the explanation associated with the error.
+
+Returns `nil` if there is no explanation associated with the error.
+
+#### Error.example() @method
+Return the example associated with the error.
+
+Returns `nil` if there is no example associated with the error.
+
 ### compile(str) @function
 Compile a string into a function.
 
@@ -1874,33 +1932,36 @@ $ bs demo.bs
 69
 ```
 
-If any errors were encountered while compiling the string, a table is returned
-instead of a function.
+If any errors were encountered while compiling the string, an `Error` instance
+is returned instead of a function.
 
 ```bs
-var f = meta.compile("Oops@")
-io.println(f)
+var f = meta.compile("Oops@"); assert(f is "Error")
+
+io.println("Row:", f.row())
+io.println("Col:", f.col())
+io.println("Line:", f.line())
+io.println("Message:", f.message())
+io.println("Explanation:", f.explanation())
+io.println("Example:", f.example())
 ```
 
 ```console
 $ bs demo.bs
-{
-    explanation = nil,
-    example = nil,
-    line = "Oops@",
-    message = "invalid character '@' (64)",
-    col = 5,
-    row = 1
-}
+Row: 1
+Col: 5
+Line: Oops@
+Message: invalid character '@' (64)
+Explanation: nil
+Example: nil
 ```
 
 So the usage becomes as straight forward as:
 
 ```bs
 var f = meta.compile(...)
-if f is "table" {
-    io.eprintln("Error")
-    # Error handling...
+if f is "Error" {
+    panic(f.message()) # Error handling...
 }
 
 f() # Or whatever you want to do
@@ -1962,6 +2023,47 @@ Bruh!
 Bruh!
 Bruh!
 420
+```
+
+### call(fn, ...args) @function
+Basically a protected call.
+
+```bs
+fn handle(result) {
+    if result is "Error" {
+        io.println("ERROR!")
+        io.println("Row:", result.row())
+        io.println("Col:", result.col())
+        io.println("Line: ", result.line())
+        io.println("Message:", result.message())
+        io.println("Explanation:", result.explanation())
+        io.println("Example:", result.example())
+    } else {
+        io.println("OK!")
+        io.println(result)
+    }
+}
+
+# Ok
+handle(meta.call(fn (a, b) => a + b, 34, 35))
+io.println()
+
+# Error
+handle(meta.call(fn () => -nil))
+```
+
+```console
+$ bs demo.bs
+OK!
+69
+
+ERROR!
+Row: 19
+Col: 27
+Line: handle(meta.call(fn () => -nil))              # Bs Fail
+Message: invalid operand to unary (-): nil
+Explanation: nil
+Example: nil
 ```
 
 ### eval(str) @function

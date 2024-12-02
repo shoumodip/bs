@@ -1,4 +1,4 @@
-:i count 136
+:i count 137
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -2016,17 +2016,15 @@ XxfoobarXx
 :b shell 22
 ../bin/bs core/meta.bs
 :i returncode 1
-:b stdout 211
+:b stdout 168
 <fn>
 69
-{
-    explanation = nil,
-    example = nil,
-    line = "Oops@",
-    message = "invalid character '@' (64)",
-    col = 5,
-    row = 1
-}
+Row: 1
+Col: 5
+Line: Oops@
+Message: invalid character '@' (64)
+Explanation: nil
+Example: nil
 420
 Nice!
 Nice!
@@ -2046,9 +2044,9 @@ nil
     1 | Hehe@
       |     ^
 
-core/meta.bs:20:21: in eval()
+core/meta.bs:25:21: in eval()
 
-    20 | io.println(meta.eval("Hehe@"))
+    25 | io.println(meta.eval("Hehe@"))
        |                     ^
 
 :b shell 53
@@ -2159,4 +2157,37 @@ core/meta_eval_runtime_error.bs:1:10: in eval()
 
     1 | meta.eval("nil + 69")
       |          ^
+
+:b shell 33
+../bin/bs core/meta_call_error.bs
+:i returncode 0
+:b stdout 384
+OK!
+69
+
+ERROR!
+Row: 19
+Col: 27
+Line: handle(meta.call(fn () => -nil))              # Bs Fail
+Message: invalid operand to unary (-): nil
+Explanation: nil
+Example: nil
+
+ERROR!
+Row: nil
+Col: nil
+Line: nil
+Message: expected 1 argument, got 0
+Explanation: nil
+Example: nil
+
+ERROR!
+Row: 26
+Col: 15
+Line:     fn h() => lmao
+Message: undefined identifier 'lmao'
+Explanation: nil
+Example: nil
+
+:b stderr 0
 

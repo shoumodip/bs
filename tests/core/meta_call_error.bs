@@ -1,0 +1,30 @@
+fn handle(result) {
+    if result is "Error" {
+        io.println("ERROR!")
+        io.println("Row:", result.row())
+        io.println("Col:", result.col())
+        io.println(("Line: " $ result.line()).rtrim("\r")) # Not a problem in practice, but need to satisfy the tests...
+        io.println("Message:", result.message())
+        io.println("Explanation:", result.explanation())
+        io.println("Example:", result.example())
+    } else {
+        io.println("OK!")
+        io.println(result)
+    }
+}
+
+handle(meta.call(fn (a, b) => a + b, 34, 35)) # Ok
+io.println()
+
+handle(meta.call(fn () => -nil))              # Bs Fail
+io.println()
+
+handle(meta.call(io.Reader))                  # Native Fail
+io.println()
+
+{
+    fn h() => lmao
+    fn g() => h()
+    fn f() => g()
+    handle(meta.call(f))                      # No stack trace!
+}

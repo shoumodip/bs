@@ -585,10 +585,11 @@ Returns <code>false</code> if any errors were encountered, else <code>true</code
 </section>
 </section>
 <section id='s19'>
-<h3><code><span class='class'>DirEntry</span>(name, isdir)</code></h3>
+<h3><code><span class='class'>DirEntry</span>()</code></h3>
 <p>
 Native C class that wraps over a directory entry. This doesn't really do
-anything, and only serves as an implementation detail for <code>readdir()</code>.
+anything, and only serves as an implementation detail for <code>readdir()</code>. Attempt
+to call this constructor directly will throw a runtime error.
 </p>
 <p>
 Example usecase:
@@ -4229,6 +4230,113 @@ PI.
 Contains simple metaprogramming primitives.
 </p>
 <section id='s132'>
+<h3><code><span class='class'>Error</span>()</code></h3>
+<p>
+Native C class that wraps over a metaprogram error. This doesn't really do
+anything, and only serves as an implementation detail for the <code>meta</code> functions.
+Attempt to call this constructor directly will throw a runtime error.
+</p>
+<p>
+Example usecase:
+</p>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>var</span> f = meta.<span class='field'>compile</span>(<span class='string'>"Oops"</span>)
+<span class='keyword'>if</span> f <span class='keyword'>is</span> <span class='string'>"Error"</span> {
+    io.<span class='field'>println</span>(<span class='string'>"Row:"</span>, f.<span class='field'>row</span>())
+    io.<span class='field'>println</span>(<span class='string'>"Col:"</span>, f.<span class='field'>col</span>())
+    io.<span class='field'>println</span>(<span class='string'>"Line:"</span>, f.<span class='field'>line</span>())
+    io.<span class='field'>println</span>(<span class='string'>"Message:"</span>, f.<span class='field'>message</span>())
+    io.<span class='field'>println</span>(<span class='string'>"Explanation:"</span>, f.<span class='field'>explanation</span>())
+    io.<span class='field'>println</span>(<span class='string'>"Example:"</span>, f.<span class='field'>example</span>())
+}
+</pre>
+</pre>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='constant'>$ </span>bs demo.bs
+Row: 1
+Col: 5
+Line: Oops@
+Message: invalid character '@' (64)
+Explanation: nil
+Example: nil
+</pre>
+</div>
+<section id='s133'>
+<h4><code><span class='class'>Error</span>.<span class='field'>row</span>()</code></h4>
+<p>
+Return the row in which the error occured.
+</p>
+<p>
+Returns <code>nil</code> if the error occured in native code.
+</p>
+</section>
+<section id='s134'>
+<h4><code><span class='class'>Error</span>.<span class='field'>col</span>()</code></h4>
+<p>
+Return the col in which the error occured.
+</p>
+<p>
+Returns <code>nil</code> if the error occured in native code.
+</p>
+</section>
+<section id='s135'>
+<h4><code><span class='class'>Error</span>.<span class='field'>line</span>()</code></h4>
+<p>
+Return the line of meta source code in which the error occured as a string.
+</p>
+<p>
+Returns <code>nil</code> if the error occured in native code.
+</p>
+</section>
+<section id='s136'>
+<h4><code><span class='class'>Error</span>.<span class='field'>message</span>()</code></h4>
+<p>
+Return the error message.
+</p>
+</section>
+<section id='s137'>
+<h4><code><span class='class'>Error</span>.<span class='field'>explanation</span>()</code></h4>
+<p>
+Return the explanation associated with the error.
+</p>
+<p>
+Returns <code>nil</code> if there is no explanation associated with the error.
+</p>
+</section>
+<section id='s138'>
+<h4><code><span class='class'>Error</span>.<span class='field'>example</span>()</code></h4>
+<p>
+Return the example associated with the error.
+</p>
+<p>
+Returns <code>nil</code> if there is no example associated with the error.
+</p>
+</section>
+</section>
+<section id='s139'>
 <h3><code><span class='function'>compile</span>(str)</code></h3>
 <p>
 Compile a string into a function.
@@ -4267,8 +4375,8 @@ io.<span class='field'>println</span>(f())
 </pre>
 </div>
 <p>
-If any errors were encountered while compiling the string, a table is returned
-instead of a function.
+If any errors were encountered while compiling the string, an <code>Error</code> instance
+is returned instead of a function.
 </p>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -4282,8 +4390,14 @@ instead of a function.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = meta.<span class='field'>compile</span>(<span class='string'>"Oops@"</span>)
-io.<span class='field'>println</span>(f)
+<span class='keyword'>var</span> f = meta.<span class='field'>compile</span>(<span class='string'>"Oops@"</span>)<span class='comment'>;</span> <span class='keyword'>assert</span>(f <span class='keyword'>is</span> <span class='string'>"Error"</span>)
+
+io.<span class='field'>println</span>(<span class='string'>"Row:"</span>, f.<span class='field'>row</span>())
+io.<span class='field'>println</span>(<span class='string'>"Col:"</span>, f.<span class='field'>col</span>())
+io.<span class='field'>println</span>(<span class='string'>"Line:"</span>, f.<span class='field'>line</span>())
+io.<span class='field'>println</span>(<span class='string'>"Message:"</span>, f.<span class='field'>message</span>())
+io.<span class='field'>println</span>(<span class='string'>"Explanation:"</span>, f.<span class='field'>explanation</span>())
+io.<span class='field'>println</span>(<span class='string'>"Example:"</span>, f.<span class='field'>example</span>())
 </pre>
 </pre>
 </div>
@@ -4300,14 +4414,12 @@ io.<span class='field'>println</span>(f)
 </button>
 <pre class='code active'>
 <span class='constant'>$ </span>bs demo.bs
-{
-    explanation = nil,
-    example = nil,
-    line = "Oops@",
-    message = "invalid character '@' (64)",
-    col = 5,
-    row = 1
-}
+Row: 1
+Col: 5
+Line: Oops@
+Message: invalid character '@' (64)
+Explanation: nil
+Example: nil
 </pre>
 </div>
 <p>
@@ -4326,9 +4438,8 @@ So the usage becomes as straight forward as:
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> f = meta.<span class='field'>compile</span>(...)
-<span class='keyword'>if</span> f <span class='keyword'>is</span> <span class='string'>"table"</span> {
-    io.<span class='field'>eprintln</span>(<span class='string'>"Error"</span>)
-    <span class='comment'># Error handling...</span>
+<span class='keyword'>if</span> f <span class='keyword'>is</span> <span class='string'>"Error"</span> {
+    <span class='keyword'>panic</span>(f.<span class='field'>message</span>()) <span class='comment'># Error handling...</span>
 }
 
 f() <span class='comment'># Or whatever you want to do</span>
@@ -4418,7 +4529,74 @@ Bruh!
 </pre>
 </div>
 </section>
-<section id='s133'>
+<section id='s140'>
+<h3><code><span class='function'>call</span>(fn, ...args)</code></h3>
+<p>
+Basically a protected call.
+</p>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>fn</span> <span class='function'>handle</span>(result) {
+    <span class='keyword'>if</span> result <span class='keyword'>is</span> <span class='string'>"Error"</span> {
+        io.<span class='field'>println</span>(<span class='string'>"ERROR!"</span>)
+        io.<span class='field'>println</span>(<span class='string'>"Row:"</span>, result.<span class='field'>row</span>())
+        io.<span class='field'>println</span>(<span class='string'>"Col:"</span>, result.<span class='field'>col</span>())
+        io.<span class='field'>println</span>(<span class='string'>"Line: "</span>, result.<span class='field'>line</span>())
+        io.<span class='field'>println</span>(<span class='string'>"Message:"</span>, result.<span class='field'>message</span>())
+        io.<span class='field'>println</span>(<span class='string'>"Explanation:"</span>, result.<span class='field'>explanation</span>())
+        io.<span class='field'>println</span>(<span class='string'>"Example:"</span>, result.<span class='field'>example</span>())
+    } <span class='keyword'>else</span> {
+        io.<span class='field'>println</span>(<span class='string'>"OK!"</span>)
+        io.<span class='field'>println</span>(result)
+    }
+}
+
+<span class='comment'># Ok</span>
+handle(meta.<span class='field'>call</span>(<span class='keyword'>fn</span> (a, b) =&gt; a + b, <span class='constant'>34</span>, <span class='constant'>35</span>))
+io.<span class='field'>println</span>()
+
+<span class='comment'># Error</span>
+handle(meta.<span class='field'>call</span>(<span class='keyword'>fn</span> () =&gt; -<span class='constant'>nil</span>))
+</pre>
+</pre>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='constant'>$ </span>bs demo.bs
+OK!
+69
+
+ERROR!
+Row: 19
+Col: 27
+Line: handle(meta.call(fn () =&gt; -nil))              # Bs Fail
+Message: invalid operand to unary (-): nil
+Explanation: nil
+Example: nil
+</pre>
+</div>
+</section>
+<section id='s141'>
 <h3><code><span class='function'>eval</span>(str)</code></h3>
 <p>
 Evaluate a string.
@@ -4939,10 +5117,36 @@ demo.bs:1:10: in eval()
 <a href='#s131'> Meta</a>
 <ul>
 <li>
-<a href='#s132'>compile</a>
+<a href='#s132'>Error</a>
+<ul>
+<li>
+<a href='#s133'>row</a>
 </li>
 <li>
-<a href='#s133'>eval</a>
+<a href='#s134'>col</a>
+</li>
+<li>
+<a href='#s135'>line</a>
+</li>
+<li>
+<a href='#s136'>message</a>
+</li>
+<li>
+<a href='#s137'>explanation</a>
+</li>
+<li>
+<a href='#s138'>example</a>
+</li>
+</ul>
+</li>
+<li>
+<a href='#s139'>compile</a>
+</li>
+<li>
+<a href='#s140'>call</a>
+</li>
+<li>
+<a href='#s141'>eval</a>
 </li>
 </ul>
 </li>

@@ -24,6 +24,7 @@ static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type) {
     case BS_TOKEN_ISTR:
         return BSDOC_STYLE_STRING;
 
+    case BS_TOKEN_EOL:
     case BS_TOKEN_COMMENT:
         return BSDOC_STYLE_COMMENT;
 
@@ -211,7 +212,7 @@ static const Bsdoc_Style_Pair style_pairs[] = {
     p(BSDOC_STYLE_CONSTANT, "bs_value_bool"),
     p(BSDOC_STYLE_CONSTANT, "bs_value_object"),
     p(BSDOC_STYLE_CONSTANT, "bs_c_array_size"),
-    p(BSDOC_STYLE_CONSTANT, "bs_this_as"),
+    p(BSDOC_STYLE_CONSTANT, "bs_this_c_instance_data_as"),
     p(BSDOC_STYLE_CONSTANT, "Bs_Sv_Static"),
 };
 #undef p

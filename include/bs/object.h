@@ -164,7 +164,7 @@ struct Bs_C_Instance {
     char data[];
 };
 
-#define bs_static_cast(data, T) (*(T *)(data))
+#define bs_flex_member_as(data, T) (*(T *)(data))
 
 Bs_C_Instance *bs_c_instance_new(Bs *bs, Bs_C_Class *class);
 

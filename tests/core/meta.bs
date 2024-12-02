@@ -6,7 +6,12 @@
 
 {
     var f = meta.compile("Oops@")
-    io.println(f)
+    io.println("Row:", f.row())
+    io.println("Col:", f.col())
+    io.println("Line:", f.line())
+    io.println("Message:", f.message())
+    io.println("Explanation:", f.explanation())
+    io.println("Example:", f.example())
 }
 
 io.println(meta.eval("500 - 80"))
