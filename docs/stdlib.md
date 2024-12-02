@@ -77,6 +77,31 @@ LICENSE false
 .github true
 ```
 
+### readfile(path) @function
+Read a file into a string.
+
+Returns `nil` if failed.
+
+```bs
+var contents = io.readfile("input.txt")
+if !contents {
+    io.eprintln("Error: could not read file 'input.txt'")
+    os.exit(1)
+}
+
+io.print(contents)
+```
+
+```console
+$ bs demo.bs
+Just a test file
+Nothing to see here
+Foo
+Bar
+Baz
+People's dreams have no end! ~ Blackbeard
+```
+
 ### Reader(path) @class
 Native C class that opens `path` in readable mode.
 

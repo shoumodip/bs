@@ -41,15 +41,14 @@ The UNIX <code>cat</code> coreutil.
 
 <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>1</span>, <span class='keyword'>len</span>(os.<span class='field'>args</span>) {
     <span class='keyword'>var</span> path = os.<span class='field'>args</span>[i]
-    <span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(path)
-    <span class='keyword'>if</span> !f {
+    <span class='keyword'>var</span> contents = io.<span class='field'>readfile</span>(path)
+    <span class='keyword'>if</span> !contents {
         io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file '</span><span class='escape'>\</span><span class='escape'>(</span>path<span class='escape'>)</span><span class='string'>'"</span>)
         code = <span class='constant'>1</span>
         <span class='keyword'>continue</span>
     }
 
-    io.<span class='field'>print</span>(f.<span class='field'>read</span>())
-    f.<span class='field'>close</span>()
+    io.<span class='field'>print</span>(contents)
 }
 
 os.<span class='field'>exit</span>(code)
@@ -73,15 +72,14 @@ var code = 0
 
 for i in 1, len(os.args) {
     var path = os.args[i]
-    var f = io.Reader(path)
-    if !f {
+    var contents = io.readfile(path)
+    if !contents {
         io.eprintln("Error: could not read file '\(path)'")
         code = 1
         continue
     }
 
-    io.print(f.read())
-    f.close()
+    io.print(contents)
 }
 
 os.exit(code)
@@ -1056,14 +1054,7 @@ Run the program.
 <span class='keyword'>class</span> <span class='class'>Tasks</span> {
     init(path) {
         <span class='constant'>this</span>.<span class='field'>path</span> = path
-
-        <span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='constant'>this</span>.<span class='field'>path</span>)
-        <span class='keyword'>if</span> f {
-            <span class='constant'>this</span>.<span class='field'>tasks</span> = f.<span class='field'>read</span>().<span class='field'>split</span>(<span class='string'>"</span><span class='escape'>\n</span><span class='string'>"</span>)
-            f.<span class='field'>close</span>()
-        } <span class='keyword'>else</span> {
-            <span class='constant'>this</span>.<span class='field'>tasks</span> = []
-        }
+        <span class='constant'>this</span>.<span class='field'>tasks</span> = (io.<span class='field'>readfile</span>(<span class='constant'>this</span>.<span class='field'>path</span>) || <span class='string'>""</span>).<span class='field'>split</span>(<span class='string'>"</span><span class='escape'>\n</span><span class='string'>"</span>)
     }
 
     add(title) {

@@ -385,6 +385,24 @@ static Bs_Value bs_io_readdir(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(a);
 }
 
+static Bs_Value bs_io_readfile(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 1);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+
+    const Bs_Str *path = (const Bs_Str *)args[0].as.object;
+
+    size_t size;
+    char *contents = bs_read_file(path->data, &size);
+    if (!contents) {
+        return bs_value_nil;
+    }
+
+    Bs_Str *str = bs_str_new(bs, Bs_Sv(contents, size));
+
+    free(contents);
+    return bs_value_object(str);
+}
+
 // OS
 static Bs_Value bs_os_exit(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
@@ -2620,6 +2638,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_add_fn(bs, io, "eprintln", bs_io_eprintln);
 
         bs_add_fn(bs, io, "readdir", bs_io_readdir);
+        bs_add_fn(bs, io, "readfile", bs_io_readfile);
 
         {
             Bs_C_Instance *io_stdin = bs_c_instance_new(bs, bs_io_reader_class);

@@ -9,15 +9,14 @@ var code = 0
 
 for i in 1, len(os.args) {
     var path = os.args[i]
-    var f = io.Reader(path)
-    if !f {
+    var contents = io.readfile(path)
+    if !contents {
         io.eprintln("Error: could not read file '\(path)'")
         code = 1
         continue
     }
 
-    io.print(f.read())
-    f.close()
+    io.print(contents)
 }
 
 os.exit(code)

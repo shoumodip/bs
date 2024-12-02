@@ -3,14 +3,7 @@ var TASKS_PATH = os.getenv("HOME") $ "/.tasks"
 class Tasks {
     init(path) {
         this.path = path
-
-        var f = io.Reader(this.path)
-        if f {
-            this.tasks = f.read().split("\n")
-            f.close()
-        } else {
-            this.tasks = []
-        }
+        this.tasks = (io.readfile(this.path) || "").split("\n")
     }
 
     add(title) {
