@@ -60,6 +60,15 @@ static bool ishex(char c) {
 static Bs_Sv line_from_sv(Bs_Sv sv) {
     const char *p = memchr(sv.data, '\n', sv.size);
     sv.size = p ? p - sv.data : sv.size;
+
+    // I should probably switch to Text IO instead of Binary IO,
+    // but that would break `io.Reader.tell()` and `io.Reader.seek()`
+    //
+    // TODO: consider removing the `tell()` and `seek()` methods from `io.Reader()`
+    //       and just switch to Text IO already.
+    if (sv.size && sv.data[sv.size - 1] == '\r') {
+        sv.size--;
+    }
     return sv;
 }
 
