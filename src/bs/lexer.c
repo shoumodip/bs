@@ -20,7 +20,7 @@ void bs_error_write_default(Bs_Error_Writer *w, Bs_Error error) {
     fprintf(stderr, Bs_Sv_Fmt "\n", Bs_Sv_Arg(error.message));
 
     if (!error.native && error.type != BS_ERROR_STANDALONE) {
-        const Bs_Sv line = bs_sv_trim(error.loc.line, '\r'); // Video Game OS fix
+        const Bs_Sv line = error.loc.line;
         fprintf(stderr, "\n    %zu | " Bs_Sv_Fmt "\n", error.loc.row, Bs_Sv_Arg(line));
 
         const int count = snprintf(NULL, 0, "    %zu", error.loc.row);
@@ -60,15 +60,6 @@ static bool ishex(char c) {
 static Bs_Sv line_from_sv(Bs_Sv sv) {
     const char *p = memchr(sv.data, '\n', sv.size);
     sv.size = p ? p - sv.data : sv.size;
-
-    // I should probably switch to Text IO instead of Binary IO,
-    // but that would break `io.Reader.tell()` and `io.Reader.seek()`
-    //
-    // TODO: consider removing the `tell()` and `seek()` methods from `io.Reader()`
-    //       and just switch to Text IO already.
-    if (sv.size && sv.data[sv.size - 1] == '\r') {
-        sv.size--;
-    }
     return sv;
 }
 

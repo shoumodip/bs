@@ -41,7 +41,7 @@ static void bs_error_write_colors(Bs_Error_Writer *w, Bs_Error error) {
         fprintf(stderr, "%zu | ", error.loc.row);
         crossline_color_set_on(0, CROSSLINE_FGCOLOR_DEFAULT);
 
-        const Bs_Sv line = bs_sv_trim(error.loc.line, '\r'); // Video Game OS fix
+        const Bs_Sv line = error.loc.line;
         fprintf(stderr, Bs_Sv_Fmt "\n", Bs_Sv_Arg(line));
 
         const int count = snprintf(NULL, 0, "    %zu", error.loc.row);

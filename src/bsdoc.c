@@ -490,7 +490,7 @@ int bsdoc_run_file(const char *input) {
         memcpy(output + length, "html", 5);
     }
 
-    FILE *f = fopen(output, "wb");
+    FILE *f = fopen(output, "w");
     if (!f) {
         bs_fmt(&error, "error: could not write file '%s'\n", output);
         exit(1);

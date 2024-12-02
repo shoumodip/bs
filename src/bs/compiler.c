@@ -293,10 +293,6 @@ static void bs_compile_string(Bs_Compiler *c, Bs_Sv sv) {
 
     for (size_t i = 0; i < sv.size; i++) {
         char ch = sv.data[i];
-        if (ch == '\r') {
-            continue; // Make the multiline string ASI test case pass on windows bruh
-        }
-
         if (ch == '\\') {
             switch (sv.data[++i]) {
             case 'e':

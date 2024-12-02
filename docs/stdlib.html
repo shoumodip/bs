@@ -23,10 +23,6 @@
 <p>
 Contains simple I/O primitives.
 </p>
-<p>
-Note that I/O is binary in BS. On *nix systems it doesn't matter, but on the
-video game OS it should be kept in mind.
-</p>
 <section id='s1'>
 <h3><code><span class='function'>input</span>(prompt?)</code></h3>
 <p>
@@ -360,10 +356,6 @@ Line: People's dreams have no end! ~ Blackbeard
 Line:
 </pre>
 </div>
-<p>
-Note that on windows, the line will have a trailing <code>\r</code>, since I/O is binary
-in BS. It is up to the user to decide whether to strip it or not.
-</p>
 </section>
 <section id='s11'>
 <h4><code><span class='class'>Reader</span>.<span class='field'>eof</span>()</code></h4>
@@ -371,133 +363,8 @@ in BS. It is up to the user to decide whether to strip it or not.
 Return whether the end of file has been reached.
 </p>
 </section>
+</section>
 <section id='s12'>
-<h4><code><span class='class'>Reader</span>.<span class='field'>seek</span>(offset, whence)</code></h4>
-<p>
-Change the read position of the file.
-</p>
-<p>
-Any of the following values can be used for <code>whence</code>.
-</p>
-<ul>
-<li><code>SEEK_SET</code> - Seek from beginning of file</li>
-<li><code>SEEK_CUR</code> - Seek from current position</li>
-<li><code>SEEK_END</code> - Seek from end of file</li>
-</ul>
-<p>
-Returns <code>true</code> if succeeded and <code>false</code> if failed
-</p>
-<div class='codes'>
-<button class='copy' onclick='copyClick(this)'>
-<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
-    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
-</svg>
-</button>
-<button class='copied hidden'>
-<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
-    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
-</svg>
-</button>
-<pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='string'>"input.txt"</span>)
-<span class='keyword'>if</span> !f {
-    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
-}
-
-io.<span class='field'>print</span>(<span class='string'>"The first 16 bytes: [</span><span class='escape'>\</span><span class='escape'>(</span>f.<span class='field'>read</span>(<span class='constant'>16</span>)<span class='escape'>)</span><span class='string'>]</span><span class='escape'>\n</span><span class='string'>"</span>)
-
-f.<span class='field'>seek</span>(<span class='constant'>5</span>, io.<span class='field'>SEEK_SET</span>)
-
-io.<span class='field'>println</span>(<span class='string'>"The full content offset by 5:"</span>)
-io.<span class='field'>print</span>(f.<span class='field'>read</span>())
-</pre>
-</pre>
-</div>
-<div class='codes'>
-<button class='copy' onclick='copyClick(this)'>
-<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
-    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
-</svg>
-</button>
-<button class='copied hidden'>
-<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
-    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
-</svg>
-</button>
-<pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
-The first 16 bytes: [Just a test file]
-The full content offset by 5:
-a test file
-Nothing to see here
-Foo
-Bar
-Baz
-People's dreams have no end! ~ Blackbeard
-</pre>
-</div>
-</section>
-<section id='s13'>
-<h4><code><span class='class'>Reader</span>.<span class='field'>tell</span>()</code></h4>
-<p>
-Get the current position of the file.
-</p>
-<p>
-Returns <code>nil</code> if failed
-</p>
-<div class='codes'>
-<button class='copy' onclick='copyClick(this)'>
-<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
-    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
-</svg>
-</button>
-<button class='copied hidden'>
-<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
-    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
-</svg>
-</button>
-<pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='string'>"input.txt"</span>)
-<span class='keyword'>if</span> !f {
-    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
-}
-
-io.<span class='field'>println</span>(<span class='string'>"The first 3 lines:"</span>)
-<span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>3</span> {
-    io.<span class='field'>println</span>(f.<span class='field'>readln</span>())
-}
-
-io.<span class='field'>println</span>()
-io.<span class='field'>println</span>(<span class='string'>"Read </span><span class='escape'>\</span><span class='escape'>(</span>f.<span class='field'>tell</span>()<span class='escape'>)</span><span class='string'> bytes so far."</span>)
-</pre>
-</pre>
-</div>
-<div class='codes'>
-<button class='copy' onclick='copyClick(this)'>
-<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
-    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
-</svg>
-</button>
-<button class='copied hidden'>
-<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
-    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
-</svg>
-</button>
-<pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
-The first 3 lines:
-Just a test file
-Nothing to see here
-Foo
-
-Read 41 bytes so far.
-</pre>
-</div>
-</section>
-</section>
-<section id='s14'>
 <h3><code><span class='class'>Writer</span>(path)</code></h3>
 <p>
 Native C class that opens <code>path</code> in writeable mode.
@@ -548,7 +415,7 @@ General Kenobi!
 69 Nice!
 </pre>
 </div>
-<section id='s15'>
+<section id='s13'>
 <h4><code><span class='class'>Writer</span>.<span class='field'>close</span>()</code></h4>
 <p>
 Close the file.
@@ -558,14 +425,14 @@ This is done automatically by the garbage collector, so can be omitted for
 short programs.
 </p>
 </section>
-<section id='s16'>
+<section id='s14'>
 <h4><code><span class='class'>Writer</span>.<span class='field'>flush</span>()</code></h4>
 <p>
 Flush the contents of the file, since I/O is buffered in C, which is the
 language BS is written in.
 </p>
 </section>
-<section id='s17'>
+<section id='s15'>
 <h4><code><span class='class'>Writer</span>.<span class='field'>write</span>(...)</code></h4>
 <p>
 Write all the arguments into the file.
@@ -574,7 +441,7 @@ Write all the arguments into the file.
 Returns <code>false</code> if any errors were encountered, else <code>true</code>.
 </p>
 </section>
-<section id='s18'>
+<section id='s16'>
 <h4><code><span class='class'>Writer</span>.<span class='field'>writeln</span>(...)</code></h4>
 <p>
 Write all the arguments into the file, with a following newline.
@@ -584,7 +451,7 @@ Returns <code>false</code> if any errors were encountered, else <code>true</code
 </p>
 </section>
 </section>
-<section id='s19'>
+<section id='s17'>
 <h3><code><span class='class'>DirEntry</span>()</code></h3>
 <p>
 Native C class that wraps over a directory entry. This doesn't really do
@@ -646,44 +513,44 @@ LICENSE false
 .github true
 </pre>
 </div>
-<section id='s20'>
+<section id='s18'>
 <h4><code><span class='class'>DirEntry</span>.<span class='field'>name</span>()</code></h4>
 <p>
 Get the name of the entry.
 </p>
 </section>
-<section id='s21'>
+<section id='s19'>
 <h4><code><span class='class'>DirEntry</span>.<span class='field'>isdir</span>()</code></h4>
 <p>
 Get whether the entry is a directory.
 </p>
 </section>
 </section>
-<section id='s22'>
+<section id='s20'>
 <h3><code><span class='constant'>stdin</span></code></h3>
 <p>
 <code>Reader</code> for standard input.
 </p>
 </section>
-<section id='s23'>
+<section id='s21'>
 <h3><code><span class='constant'>stdout</span></code></h3>
 <p>
 <code>Writer</code> for standard output.
 </p>
 </section>
-<section id='s24'>
+<section id='s22'>
 <h3><code><span class='constant'>stderr</span></code></h3>
 <p>
 <code>Writer</code> for standard error.
 </p>
 </section>
 </section>
-<section id='s25'>
+<section id='s23'>
 <h2> OS</h2>
 <p>
 Contains simple primitives for OS functions.
 </p>
-<section id='s26'>
+<section id='s24'>
 <h3><code><span class='function'>exit</span>(code)</code></h3>
 <p>
 Halt the BS runtime with exit code <code>code</code>.
@@ -727,7 +594,7 @@ os.<span class='field'>exit</span>(<span class='constant'>69</span>)
 </pre>
 </div>
 </section>
-<section id='s27'>
+<section id='s25'>
 <h3><code><span class='function'>clock</span>()</code></h3>
 <p>
 Get the monotonic time passed since boot.
@@ -782,7 +649,7 @@ Elapsed: 0.137143968999226
 </pre>
 </div>
 </section>
-<section id='s28'>
+<section id='s26'>
 <h3><code><span class='function'>sleep</span>(seconds)</code></h3>
 <p>
 Sleep for <code>seconds</code> interval, with nanosecond level of precision.
@@ -824,7 +691,7 @@ Elapsed: 0.690292477000185
 </pre>
 </div>
 </section>
-<section id='s29'>
+<section id='s27'>
 <h3><code><span class='function'>getenv</span>(name)</code></h3>
 <p>
 Get the environment variable <code>name</code>.
@@ -868,7 +735,7 @@ nil
 </pre>
 </div>
 </section>
-<section id='s30'>
+<section id='s28'>
 <h3><code><span class='function'>setenv</span>(name, value)</code></h3>
 <p>
 Set the environment variable <code>name</code> to <code>value</code>.
@@ -910,7 +777,7 @@ lmao
 </pre>
 </div>
 </section>
-<section id='s31'>
+<section id='s29'>
 <h3><code><span class='function'>getcwd</span>()</code></h3>
 <p>
 Get the current working directory.
@@ -948,7 +815,7 @@ io.<span class='field'>println</span>(os.<span class='field'>getcwd</span>())
 </pre>
 </div>
 </section>
-<section id='s32'>
+<section id='s30'>
 <h3><code><span class='function'>setcwd</span>(dir)</code></h3>
 <p>
 Set the current working directory to <code>dir</code>.
@@ -990,7 +857,7 @@ io.<span class='field'>println</span>(os.<span class='field'>getcwd</span>())
 </pre>
 </div>
 </section>
-<section id='s33'>
+<section id='s31'>
 <h3><code><span class='constant'>args</span></code></h3>
 <p>
 Array of command line arguments. First element is the program
@@ -1029,7 +896,7 @@ io.<span class='field'>println</span>(os.<span class='field'>args</span>)
 </pre>
 </div>
 </section>
-<section id='s34'>
+<section id='s32'>
 <h3><code><span class='class'>Process</span>(args, capture_stdout?, capture_stderr?, capture_stdin?)</code></h3>
 <p>
 Native C class that spawns a process. Expects <code>args</code> to be an
@@ -1081,7 +948,7 @@ total 4
 -rw-r--r-- 1 shoumodip shoumodip 122 Oct  6 15:11 demo.bs
 </pre>
 </div>
-<section id='s35'>
+<section id='s33'>
 <h4><code><span class='class'>Process</span>.<span class='field'>stdout</span>()</code></h4>
 <p>
 Get the standard output of the process as an <code>io.Reader</code> instance.
@@ -1136,7 +1003,7 @@ Line:
 </pre>
 </div>
 </section>
-<section id='s36'>
+<section id='s34'>
 <h4><code><span class='class'>Process</span>.<span class='field'>stderr</span>()</code></h4>
 <p>
 Get the standard error of the process as an <code>io.Reader</code> instance.
@@ -1145,7 +1012,7 @@ Get the standard error of the process as an <code>io.Reader</code> instance.
 Returns <code>nil</code> if the process was spawned without capturing stderr.
 </p>
 </section>
-<section id='s37'>
+<section id='s35'>
 <h4><code><span class='class'>Process</span>.<span class='field'>stdin</span>()</code></h4>
 <p>
 Get the standard input of the process as an <code>io.Writer</code> instance.
@@ -1198,7 +1065,7 @@ Third line lets goooo foobar
 </pre>
 </div>
 </section>
-<section id='s38'>
+<section id='s36'>
 <h4><code><span class='class'>Process</span>.<span class='field'>kill</span>(signal)</code></h4>
 <p>
 Kill the process with <code>signal</code>.
@@ -1211,7 +1078,7 @@ signals there.
 Returns <code>false</code> if any errors were encountered, else <code>true</code>.
 </p>
 </section>
-<section id='s39'>
+<section id='s37'>
 <h4><code><span class='class'>Process</span>.<span class='field'>wait</span>()</code></h4>
 <p>
 Wait for the process to exit, and return its exit code.
@@ -1222,7 +1089,7 @@ Returns <code>nil</code> if failed.
 </section>
 </section>
 </section>
-<section id='s40'>
+<section id='s38'>
 <h2><code><span class='class'>Regex</span>(pattern)</code></h2>
 <p>
 POSIX compatible regular expressions.
@@ -1264,12 +1131,12 @@ io.<span class='field'>println</span>(<span class='string'>"69 apples, 420 orang
 </pre>
 </div>
 </section>
-<section id='s41'>
+<section id='s39'>
 <h2> String</h2>
 <p>
 Methods for the builtin string value.
 </p>
-<section id='s42'>
+<section id='s40'>
 <h3><code><span class='class'>string</span>.<span class='field'>slice</span>(start, end?)</code></h3>
 <p>
 Slice a string from <code>start</code> (inclusive) to <code>end</code> (exclusive).
@@ -1311,7 +1178,7 @@ nuts
 </pre>
 </div>
 </section>
-<section id='s43'>
+<section id='s41'>
 <h3><code><span class='class'>string</span>.<span class='field'>reverse</span>()</code></h3>
 <p>
 Reverse a string.
@@ -1349,7 +1216,7 @@ ligma balls
 </pre>
 </div>
 </section>
-<section id='s44'>
+<section id='s42'>
 <h3><code><span class='class'>string</span>.<span class='field'>repeat</span>(count)</code></h3>
 <p>
 Repeat a string <code>count</code> times.
@@ -1387,7 +1254,7 @@ foofoofoofoofoofoo
 </pre>
 </div>
 </section>
-<section id='s45'>
+<section id='s43'>
 <h3><code><span class='class'>string</span>.<span class='field'>toupper</span>()</code></h3>
 <p>
 Convert a string to uppercase.
@@ -1425,7 +1292,7 @@ URMOM
 </pre>
 </div>
 </section>
-<section id='s46'>
+<section id='s44'>
 <h3><code><span class='class'>string</span>.<span class='field'>tolower</span>()</code></h3>
 <p>
 Convert a string to lowercase.
@@ -1463,7 +1330,7 @@ urmom
 </pre>
 </div>
 </section>
-<section id='s47'>
+<section id='s45'>
 <h3><code><span class='class'>string</span>.<span class='field'>tonumber</span>()</code></h3>
 <p>
 Convert a string to a number.
@@ -1509,7 +1376,7 @@ nil
 </pre>
 </div>
 </section>
-<section id='s48'>
+<section id='s46'>
 <h3><code><span class='class'>string</span>.<span class='field'>find</span>(pattern, start?)</code></h3>
 <p>
 Find <code>pattern</code> within a string starting from position <code>start</code> (which defaults
@@ -1567,7 +1434,7 @@ nil
 </pre>
 </div>
 </section>
-<section id='s49'>
+<section id='s47'>
 <h3><code><span class='class'>string</span>.<span class='field'>split</span>(pattern)</code></h3>
 <p>
 Split string by <code>pattern</code>.
@@ -1617,7 +1484,7 @@ io.<span class='field'>println</span>(<span class='string'>"foo bar   baz"</span
 </pre>
 </div>
 </section>
-<section id='s50'>
+<section id='s48'>
 <h3><code><span class='class'>string</span>.<span class='field'>replace</span>(pattern, replacement)</code></h3>
 <p>
 Replace <code>pattern</code> with <code>replacement</code>.
@@ -1667,7 +1534,7 @@ ayo noice!
 </pre>
 </div>
 </section>
-<section id='s51'>
+<section id='s49'>
 <h3><code><span class='class'>string</span>.<span class='field'>compare</span>(other)</code></h3>
 <p>
 Compare two strings together.
@@ -1718,7 +1585,7 @@ io.<span class='field'>println</span>(<span class='string'>"food"</span>.<span c
 </pre>
 </div>
 </section>
-<section id='s52'>
+<section id='s50'>
 <h3><code><span class='class'>string</span>.<span class='field'>ltrim</span>(pattern)</code></h3>
 <p>
 Trim <code>pattern</code> from the left of a string.
@@ -1756,7 +1623,7 @@ io.<span class='field'>println</span>(<span class='string'>"["</span> $ <span cl
 </pre>
 </div>
 </section>
-<section id='s53'>
+<section id='s51'>
 <h3><code><span class='class'>string</span>.<span class='field'>rtrim</span>(pattern)</code></h3>
 <p>
 Trim <code>pattern</code> from the right of a string.
@@ -1794,7 +1661,7 @@ io.<span class='field'>println</span>(<span class='string'>"["</span> $ <span cl
 </pre>
 </div>
 </section>
-<section id='s54'>
+<section id='s52'>
 <h3><code><span class='class'>string</span>.<span class='field'>trim</span>(pattern)</code></h3>
 <p>
 Trim <code>pattern</code> from both sides of a string.
@@ -1832,7 +1699,7 @@ io.<span class='field'>println</span>(<span class='string'>"["</span> $ <span cl
 </pre>
 </div>
 </section>
-<section id='s55'>
+<section id='s53'>
 <h3><code><span class='class'>string</span>.<span class='field'>lpad</span>(pattern, count)</code></h3>
 <p>
 Pad string with <code>pattern</code> on the left side, till the total length reaches
@@ -1879,7 +1746,7 @@ foo
 </pre>
 </div>
 </section>
-<section id='s56'>
+<section id='s54'>
 <h3><code><span class='class'>string</span>.<span class='field'>rpad</span>(pattern, count)</code></h3>
 <p>
 Pad string with <code>pattern</code> on the right side, till the total length reaches
@@ -1926,7 +1793,7 @@ foo696
 </pre>
 </div>
 </section>
-<section id='s57'>
+<section id='s55'>
 <h3><code><span class='class'>string</span>.<span class='field'>prefix</span>(pattern)</code></h3>
 <p>
 Check whether string starts with <code>pattern</code>.
@@ -1968,7 +1835,7 @@ false
 </pre>
 </div>
 </section>
-<section id='s58'>
+<section id='s56'>
 <h3><code><span class='class'>string</span>.<span class='field'>suffix</span>(pattern)</code></h3>
 <p>
 Check whether string ends with <code>pattern</code>.
@@ -2011,13 +1878,13 @@ false
 </div>
 </section>
 </section>
-<section id='s59'>
+<section id='s57'>
 <h2> Bit</h2>
 <p>
 Contains bitwise operations which are not frequent enough to warrant a
 dedicated operator, but which still finds occasional uses.
 </p>
-<section id='s60'>
+<section id='s58'>
 <h3><code><span class='function'>ceil</span>(n)</code></h3>
 <p>
 Return the bitwise ceiling of a number.
@@ -2059,7 +1926,7 @@ io.<span class='field'>println</span>(bit.<span class='field'>ceil</span>(<span 
 </pre>
 </div>
 </section>
-<section id='s61'>
+<section id='s59'>
 <h3><code><span class='function'>floor</span>(n)</code></h3>
 <p>
 Return the bitwise floor of a number.
@@ -2102,18 +1969,18 @@ io.<span class='field'>println</span>(bit.<span class='field'>floor</span>(<span
 </div>
 </section>
 </section>
-<section id='s62'>
+<section id='s60'>
 <h2> ASCII</h2>
 <p>
 Contains functions for dealing with ASCII codes and characters.
 </p>
-<section id='s63'>
+<section id='s61'>
 <h3><code><span class='function'>char</span>(code)</code></h3>
 <p>
 Return the character associated with an ASCII code.
 </p>
 </section>
-<section id='s64'>
+<section id='s62'>
 <h3><code><span class='function'>code</span>(char)</code></h3>
 <p>
 Return the ASCII code associated with a character.
@@ -2122,7 +1989,7 @@ Return the ASCII code associated with a character.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s65'>
+<section id='s63'>
 <h3><code><span class='function'>isalnum</span>(char)</code></h3>
 <p>
 Return whether a character is an alphabet or a digit.
@@ -2131,7 +1998,7 @@ Return whether a character is an alphabet or a digit.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s66'>
+<section id='s64'>
 <h3><code><span class='function'>isalpha</span>(char)</code></h3>
 <p>
 Return whether a character is an alphabet.
@@ -2140,7 +2007,7 @@ Return whether a character is an alphabet.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s67'>
+<section id='s65'>
 <h3><code><span class='function'>iscntrl</span>(char)</code></h3>
 <p>
 Return whether a character is a control character.
@@ -2149,7 +2016,7 @@ Return whether a character is a control character.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s68'>
+<section id='s66'>
 <h3><code><span class='function'>isdigit</span>(char)</code></h3>
 <p>
 Return whether a character is a digit.
@@ -2158,7 +2025,7 @@ Return whether a character is a digit.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s69'>
+<section id='s67'>
 <h3><code><span class='function'>islower</span>(char)</code></h3>
 <p>
 Return whether a character is lowercase.
@@ -2167,7 +2034,7 @@ Return whether a character is lowercase.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s70'>
+<section id='s68'>
 <h3><code><span class='function'>isupper</span>(char)</code></h3>
 <p>
 Return whether a character is uppercase.
@@ -2176,7 +2043,7 @@ Return whether a character is uppercase.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s71'>
+<section id='s69'>
 <h3><code><span class='function'>isgraph</span>(char)</code></h3>
 <p>
 Return whether a character is graphable.
@@ -2185,7 +2052,7 @@ Return whether a character is graphable.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s72'>
+<section id='s70'>
 <h3><code><span class='function'>isprint</span>(char)</code></h3>
 <p>
 Return whether a character is printable.
@@ -2194,7 +2061,7 @@ Return whether a character is printable.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s73'>
+<section id='s71'>
 <h3><code><span class='function'>ispunct</span>(char)</code></h3>
 <p>
 Return whether a character is a punctuation.
@@ -2203,7 +2070,7 @@ Return whether a character is a punctuation.
 Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
-<section id='s74'>
+<section id='s72'>
 <h3><code><span class='function'>isspace</span>(char)</code></h3>
 <p>
 Return whether a character is whitespace.
@@ -2213,7 +2080,7 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 </section>
-<section id='s75'>
+<section id='s73'>
 <h2><code><span class='class'>Bytes</span>(str?)</code></h2>
 <p>
 Strings are immutable in BS. The native class <code>Bytes</code> provides a mutable string
@@ -2258,7 +2125,7 @@ Hello, world!
 69 Hehe
 </pre>
 </div>
-<section id='s76'>
+<section id='s74'>
 <h3><code><span class='class'>Bytes</span>.<span class='field'>count</span>()</code></h3>
 <p>
 Return the current number of bytes written.
@@ -2303,7 +2170,7 @@ Hello world!
 </pre>
 </div>
 </section>
-<section id='s77'>
+<section id='s75'>
 <h3><code><span class='class'>Bytes</span>.<span class='field'>reset</span>(position)</code></h3>
 <p>
 Move back the writer head to <code>position</code>.
@@ -2350,7 +2217,7 @@ Hello
 </pre>
 </div>
 </section>
-<section id='s78'>
+<section id='s76'>
 <h3><code><span class='class'>Bytes</span>.<span class='field'>slice</span>(start?, end?)</code></h3>
 <p>
 Return a slice from <code>start</code> (inclusive) to <code>end</code> (exclusive).
@@ -2399,7 +2266,7 @@ world!
 </pre>
 </div>
 </section>
-<section id='s79'>
+<section id='s77'>
 <h3><code><span class='class'>Bytes</span>.<span class='field'>push</span>(value)</code></h3>
 <p>
 Push <code>value</code> to the end.
@@ -2446,7 +2313,7 @@ Hello, world! 69
 </pre>
 </div>
 </section>
-<section id='s80'>
+<section id='s78'>
 <h3><code><span class='class'>Bytes</span>.<span class='field'>insert</span>(position, value)</code></h3>
 <p>
 Insert <code>value</code> at <code>position</code>.
@@ -2492,7 +2359,7 @@ Hello, world!
 </pre>
 </div>
 </section>
-<section id='s81'>
+<section id='s79'>
 <h3><code><span class='class'>Bytes</span>.<span class='field'>get</span>(position)</code></h3>
 <p>
 Get the byte at <code>position</code> as a number.
@@ -2540,7 +2407,7 @@ o 111
 </pre>
 </div>
 </section>
-<section id='s82'>
+<section id='s80'>
 <h3><code><span class='class'>Bytes</span>.<span class='field'>set</span>(position, value)</code></h3>
 <p>
 Set the byte at <code>position</code> to <code>value</code>.
@@ -2589,12 +2456,12 @@ Hello
 </div>
 </section>
 </section>
-<section id='s83'>
+<section id='s81'>
 <h2> Array</h2>
 <p>
 Methods for the builtin array value.
 </p>
-<section id='s84'>
+<section id='s82'>
 <h3><code><span class='class'>array</span>.<span class='field'>map</span>(f)</code></h3>
 <p>
 Functional map.
@@ -2639,7 +2506,7 @@ io.<span class='field'>println</span>(ys)
 </pre>
 </div>
 </section>
-<section id='s85'>
+<section id='s83'>
 <h3><code><span class='class'>array</span>.<span class='field'>filter</span>(f)</code></h3>
 <p>
 Functional filter.
@@ -2684,7 +2551,7 @@ io.<span class='field'>println</span>(ys)
 </pre>
 </div>
 </section>
-<section id='s86'>
+<section id='s84'>
 <h3><code><span class='class'>array</span>.<span class='field'>reduce</span>(f, accumulator?)</code></h3>
 <p>
 Functional reduce.
@@ -2734,7 +2601,7 @@ io.<span class='field'>println</span>(b)
 </pre>
 </div>
 </section>
-<section id='s87'>
+<section id='s85'>
 <h3><code><span class='class'>array</span>.<span class='field'>copy</span>()</code></h3>
 <p>
 Copy an array.
@@ -2782,7 +2649,7 @@ io.<span class='field'>println</span>(zs)
 </pre>
 </div>
 </section>
-<section id='s88'>
+<section id='s86'>
 <h3><code><span class='class'>array</span>.<span class='field'>join</span>(separator)</code></h3>
 <p>
 Join the elements of an array, separated by <code>separator</code> into a single string.
@@ -2820,7 +2687,7 @@ io.<span class='field'>println</span>([<span class='constant'>1</span>, <span cl
 </pre>
 </div>
 </section>
-<section id='s89'>
+<section id='s87'>
 <h3><code><span class='class'>array</span>.<span class='field'>find</span>(value, start?)</code></h3>
 <p>
 Find <code>value</code> within an array starting from position <code>start</code> (which defaults to
@@ -2869,7 +2736,7 @@ nil
 </pre>
 </div>
 </section>
-<section id='s90'>
+<section id='s88'>
 <h3><code><span class='class'>array</span>.<span class='field'>equal</span>(that)</code></h3>
 <p>
 Compare the elements of two arrays.
@@ -2916,7 +2783,7 @@ The first expression returns <code>false</code> because the <code>==</code> oper
 reference.
 </p>
 </section>
-<section id='s91'>
+<section id='s89'>
 <h3><code><span class='class'>array</span>.<span class='field'>push</span>(value)</code></h3>
 <p>
 Push <code>value</code> into an array.
@@ -3001,7 +2868,7 @@ io.<span class='field'>println</span>(
 </pre>
 </div>
 </section>
-<section id='s92'>
+<section id='s90'>
 <h3><code><span class='class'>array</span>.<span class='field'>insert</span>(position, value)</code></h3>
 <p>
 Insert <code>value</code> into an array at <code>position</code>.
@@ -3093,7 +2960,7 @@ io.<span class='field'>println</span>(
 </pre>
 </div>
 </section>
-<section id='s93'>
+<section id='s91'>
 <h3><code><span class='class'>array</span>.<span class='field'>sort</span>(compare)</code></h3>
 <p>
 Sort an array inplace with <code>compare</code>, and return itself.
@@ -3138,7 +3005,7 @@ The compare function must take two arguments. If it returns <code>true</code>, t
 left argument shall be considered "less than", and vice versa for <code>false</code>.
 </p>
 </section>
-<section id='s94'>
+<section id='s92'>
 <h3><code><span class='class'>array</span>.<span class='field'>resize</span>(size)</code></h3>
 <p>
 Resize an array to one having <code>size</code> elements, and return itself.
@@ -3189,7 +3056,7 @@ io.<span class='field'>println</span>(xs)
 </pre>
 </div>
 </section>
-<section id='s95'>
+<section id='s93'>
 <h3><code><span class='class'>array</span>.<span class='field'>remove</span>(index)</code></h3>
 <p>
 Removes the item at <code>index</code> and returns it.
@@ -3236,7 +3103,7 @@ io.<span class='field'>println</span>(xs)
 </pre>
 </div>
 </section>
-<section id='s96'>
+<section id='s94'>
 <h3><code><span class='class'>array</span>.<span class='field'>reverse</span>()</code></h3>
 <p>
 Reverse an array.
@@ -3282,7 +3149,7 @@ io.<span class='field'>println</span>(xs)
 </pre>
 </div>
 </section>
-<section id='s97'>
+<section id='s95'>
 <h3><code><span class='class'>array</span>.<span class='field'>fill</span>(value)</code></h3>
 <p>
 Fill an array with <code>value</code>.
@@ -3415,7 +3282,7 @@ io.<span class='field'>println</span>(board)
 </pre>
 </div>
 </section>
-<section id='s98'>
+<section id='s96'>
 <h3><code><span class='class'>array</span>.<span class='field'>slice</span>(start, end?)</code></h3>
 <p>
 Slice an array from <code>start</code> (inclusive) to <code>end</code> (exclusive).
@@ -3458,7 +3325,7 @@ io.<span class='field'>println</span>(xs.<span class='field'>slice</span>(<span 
 </pre>
 </div>
 </section>
-<section id='s99'>
+<section id='s97'>
 <h3><code><span class='class'>array</span>.<span class='field'>append</span>(other)</code></h3>
 <p>
 Append an array.
@@ -3515,12 +3382,12 @@ io.<span class='field'>println</span>(xs.<span class='field'>append</span>(ys))
 </div>
 </section>
 </section>
-<section id='s100'>
+<section id='s98'>
 <h2> Table</h2>
 <p>
 Methods for the builtin table value.
 </p>
-<section id='s101'>
+<section id='s99'>
 <h3><code><span class='class'>table</span>.<span class='field'>copy</span>()</code></h3>
 <p>
 Copy a table.
@@ -3581,7 +3448,7 @@ io.<span class='field'>println</span>(zs)
 </pre>
 </div>
 </section>
-<section id='s102'>
+<section id='s100'>
 <h3><code><span class='class'>table</span>.<span class='field'>equal</span>(that)</code></h3>
 <p>
 Compare the elements of two tables.
@@ -3628,12 +3495,12 @@ Just like arrays, tables are compared by reference with the <code>==</code> oper
 </p>
 </section>
 </section>
-<section id='s103'>
+<section id='s101'>
 <h2> Math</h2>
 <p>
 Contains simple mathematical primitives.
 </p>
-<section id='s104'>
+<section id='s102'>
 <h3><code><span class='class'>number</span>.<span class='field'>sin</span>()</code></h3>
 <p>
 Sine in radians.
@@ -3676,37 +3543,37 @@ Note that the precision of the mathematical functions may vary depending on the
 compiler and the platform. This is inherent to computing in general.
 </p>
 </section>
-<section id='s105'>
+<section id='s103'>
 <h3><code><span class='class'>number</span>.<span class='field'>cos</span>()</code></h3>
 <p>
 Cosine in radians.
 </p>
 </section>
-<section id='s106'>
+<section id='s104'>
 <h3><code><span class='class'>number</span>.<span class='field'>tan</span>()</code></h3>
 <p>
 Tangent in radians.
 </p>
 </section>
-<section id='s107'>
+<section id='s105'>
 <h3><code><span class='class'>number</span>.<span class='field'>asin</span>()</code></h3>
 <p>
 Inverse sine in radians.
 </p>
 </section>
-<section id='s108'>
+<section id='s106'>
 <h3><code><span class='class'>number</span>.<span class='field'>acos</span>()</code></h3>
 <p>
 Inverse cosine in radians.
 </p>
 </section>
-<section id='s109'>
+<section id='s107'>
 <h3><code><span class='class'>number</span>.<span class='field'>atan</span>()</code></h3>
 <p>
 Inverse tangent in radians.
 </p>
 </section>
-<section id='s110'>
+<section id='s108'>
 <h3><code><span class='class'>number</span>.<span class='field'>exp</span>()</code></h3>
 <p>
 Return the exponential function of the number.
@@ -3744,55 +3611,55 @@ io.<span class='field'>println</span>(<span class='constant'>2</span>.<span clas
 </pre>
 </div>
 </section>
-<section id='s111'>
+<section id='s109'>
 <h3><code><span class='class'>number</span>.<span class='field'>log</span>()</code></h3>
 <p>
 Return the natural logarithm (base <code>e</code>) of the number.
 </p>
 </section>
-<section id='s112'>
+<section id='s110'>
 <h3><code><span class='class'>number</span>.<span class='field'>log10</span>()</code></h3>
 <p>
 Return the common logarithm (base <code>10</code>) of the number.
 </p>
 </section>
-<section id='s113'>
+<section id='s111'>
 <h3><code><span class='class'>number</span>.<span class='field'>pow</span>(exponent)</code></h3>
 <p>
 Raise the number to <code>exponent</code>.
 </p>
 </section>
-<section id='s114'>
+<section id='s112'>
 <h3><code><span class='class'>number</span>.<span class='field'>sqrt</span>()</code></h3>
 <p>
 Square root.
 </p>
 </section>
-<section id='s115'>
+<section id='s113'>
 <h3><code><span class='class'>number</span>.<span class='field'>ceil</span>()</code></h3>
 <p>
 Ceiling.
 </p>
 </section>
-<section id='s116'>
+<section id='s114'>
 <h3><code><span class='class'>number</span>.<span class='field'>floor</span>()</code></h3>
 <p>
 Floor.
 </p>
 </section>
-<section id='s117'>
+<section id='s115'>
 <h3><code><span class='class'>number</span>.<span class='field'>round</span>()</code></h3>
 <p>
 Return the nearest integer.
 </p>
 </section>
-<section id='s118'>
+<section id='s116'>
 <h3><code><span class='class'>number</span>.<span class='field'>abs</span>()</code></h3>
 <p>
 Return the absolute value (Basically make a number positive).
 </p>
 </section>
-<section id='s119'>
+<section id='s117'>
 <h3><code><span class='class'>number</span>.<span class='field'>sign</span>()</code></h3>
 <p>
 Return the sign of the number.
@@ -3834,7 +3701,7 @@ io.<span class='field'>println</span>((-<span class='constant'>420</span>).<span
 </pre>
 </div>
 </section>
-<section id='s120'>
+<section id='s118'>
 <h3><code><span class='class'>number</span>.<span class='field'>max</span>(...)</code></h3>
 <p>
 Return the maximum between the method receiver and the provided arguments.
@@ -3874,7 +3741,7 @@ io.<span class='field'>println</span>(<span class='constant'>3</span>.<span clas
 </pre>
 </div>
 </section>
-<section id='s121'>
+<section id='s119'>
 <h3><code><span class='class'>number</span>.<span class='field'>min</span>(...)</code></h3>
 <p>
 Return the minimum between the method receiver and the provided arguments.
@@ -3914,19 +3781,19 @@ io.<span class='field'>println</span>(<span class='constant'>3</span>.<span clas
 </pre>
 </div>
 </section>
-<section id='s122'>
+<section id='s120'>
 <h3><code><span class='class'>number</span>.<span class='field'>clamp</span>(low, high)</code></h3>
 <p>
 Clamp the number between <code>low</code> and <code>high</code>.
 </p>
 </section>
-<section id='s123'>
+<section id='s121'>
 <h3><code><span class='class'>number</span>.<span class='field'>lerp</span>(a, b, t)</code></h3>
 <p>
 Linear interpolation.
 </p>
 </section>
-<section id='s124'>
+<section id='s122'>
 <h3><code><span class='class'>number</span>.<span class='field'>precise</span>(level)</code></h3>
 <p>
 Set the precision (number of decimal digits).
@@ -3969,7 +3836,7 @@ io.<span class='field'>println</span>(n.<span class='field'>precise</span>(<span
 </pre>
 </div>
 </section>
-<section id='s125'>
+<section id='s123'>
 <h3><code><span class='class'>Random</span>(seed?)</code></h3>
 <p>
 Random number generator using the <code>xoroshiro128+</code> algorithm.
@@ -4035,7 +3902,7 @@ io.<span class='field'>println</span>(b.<span class='field'>number</span>(<span 
 182.365867621578
 </pre>
 </div>
-<section id='s126'>
+<section id='s124'>
 <h4><code><span class='class'>Random</span>.<span class='field'>number</span>(min?, max?)</code></h4>
 <p>
 Return a random number between <code>low</code> and <code>high</code>.
@@ -4083,7 +3950,7 @@ io.<span class='field'>println</span>(r.<span class='field'>number</span>(<span 
 </pre>
 </div>
 </section>
-<section id='s127'>
+<section id='s125'>
 <h4><code><span class='class'>Random</span>.<span class='field'>bytes</span>(count)</code></h4>
 <p>
 Return a random sequence of bytes.
@@ -4124,7 +3991,7 @@ io.<span class='field'>println</span>(seq.<span class='field'>slice</span>())
 </div>
 </section>
 </section>
-<section id='s128'>
+<section id='s126'>
 <h3><code><span class='function'>range</span>(begin, end, step?)</code></h3>
 <p>
 Return an array containing a range.
@@ -4211,25 +4078,25 @@ demo.bs:1:29: error: a step of -1 in an ascending range would run indefinitely
 </pre>
 </div>
 </section>
-<section id='s129'>
+<section id='s127'>
 <h3><code><span class='constant'>E</span></code></h3>
 <p>
 Euler's constant.
 </p>
 </section>
-<section id='s130'>
+<section id='s128'>
 <h3><code><span class='constant'>PI</span></code></h3>
 <p>
 PI.
 </p>
 </section>
 </section>
-<section id='s131'>
+<section id='s129'>
 <h2> Meta</h2>
 <p>
 Contains simple metaprogramming primitives.
 </p>
-<section id='s132'>
+<section id='s130'>
 <h3><code><span class='class'>Error</span>()</code></h3>
 <p>
 Native C class that wraps over a metaprogram error. This doesn't really do
@@ -4284,7 +4151,7 @@ Explanation: nil
 Example: nil
 </pre>
 </div>
-<section id='s133'>
+<section id='s131'>
 <h4><code><span class='class'>Error</span>.<span class='field'>row</span>()</code></h4>
 <p>
 Return the row in which the error occured.
@@ -4293,7 +4160,7 @@ Return the row in which the error occured.
 Returns <code>nil</code> if the error occured in native code.
 </p>
 </section>
-<section id='s134'>
+<section id='s132'>
 <h4><code><span class='class'>Error</span>.<span class='field'>col</span>()</code></h4>
 <p>
 Return the col in which the error occured.
@@ -4302,7 +4169,7 @@ Return the col in which the error occured.
 Returns <code>nil</code> if the error occured in native code.
 </p>
 </section>
-<section id='s135'>
+<section id='s133'>
 <h4><code><span class='class'>Error</span>.<span class='field'>line</span>()</code></h4>
 <p>
 Return the line of meta source code in which the error occured as a string.
@@ -4311,13 +4178,13 @@ Return the line of meta source code in which the error occured as a string.
 Returns <code>nil</code> if the error occured in native code.
 </p>
 </section>
-<section id='s136'>
+<section id='s134'>
 <h4><code><span class='class'>Error</span>.<span class='field'>message</span>()</code></h4>
 <p>
 Return the error message.
 </p>
 </section>
-<section id='s137'>
+<section id='s135'>
 <h4><code><span class='class'>Error</span>.<span class='field'>explanation</span>()</code></h4>
 <p>
 Return the explanation associated with the error.
@@ -4326,7 +4193,7 @@ Return the explanation associated with the error.
 Returns <code>nil</code> if there is no explanation associated with the error.
 </p>
 </section>
-<section id='s138'>
+<section id='s136'>
 <h4><code><span class='class'>Error</span>.<span class='field'>example</span>()</code></h4>
 <p>
 Return the example associated with the error.
@@ -4336,7 +4203,7 @@ Returns <code>nil</code> if there is no example associated with the error.
 </p>
 </section>
 </section>
-<section id='s139'>
+<section id='s137'>
 <h3><code><span class='function'>compile</span>(str)</code></h3>
 <p>
 Compile a string into a function.
@@ -4529,7 +4396,7 @@ Bruh!
 </pre>
 </div>
 </section>
-<section id='s140'>
+<section id='s138'>
 <h3><code><span class='function'>call</span>(fn, ...args)</code></h3>
 <p>
 Basically a protected call.
@@ -4596,7 +4463,7 @@ Example: nil
 </pre>
 </div>
 </section>
-<section id='s141'>
+<section id='s139'>
 <h3><code><span class='function'>eval</span>(str)</code></h3>
 <p>
 Evaluate a string.
@@ -4728,425 +4595,419 @@ demo.bs:1:10: in eval()
 <li>
 <a href='#s11'>eof</a>
 </li>
-<li>
-<a href='#s12'>seek</a>
-</li>
-<li>
-<a href='#s13'>tell</a>
-</li>
 </ul>
 </li>
 <li>
-<a href='#s14'>Writer</a>
+<a href='#s12'>Writer</a>
 <ul>
 <li>
-<a href='#s15'>close</a>
+<a href='#s13'>close</a>
 </li>
 <li>
-<a href='#s16'>flush</a>
+<a href='#s14'>flush</a>
 </li>
 <li>
-<a href='#s17'>write</a>
+<a href='#s15'>write</a>
 </li>
 <li>
-<a href='#s18'>writeln</a>
+<a href='#s16'>writeln</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s19'>DirEntry</a>
+<a href='#s17'>DirEntry</a>
 <ul>
 <li>
-<a href='#s20'>name</a>
+<a href='#s18'>name</a>
 </li>
 <li>
-<a href='#s21'>isdir</a>
+<a href='#s19'>isdir</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s22'> stdin </a>
+<a href='#s20'> stdin </a>
 </li>
 <li>
-<a href='#s23'> stdout </a>
+<a href='#s21'> stdout </a>
 </li>
 <li>
-<a href='#s24'> stderr </a>
+<a href='#s22'> stderr </a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s25'> OS</a>
+<a href='#s23'> OS</a>
 <ul>
 <li>
-<a href='#s26'>exit</a>
+<a href='#s24'>exit</a>
 </li>
 <li>
-<a href='#s27'>clock</a>
+<a href='#s25'>clock</a>
 </li>
 <li>
-<a href='#s28'>sleep</a>
+<a href='#s26'>sleep</a>
 </li>
 <li>
-<a href='#s29'>getenv</a>
+<a href='#s27'>getenv</a>
 </li>
 <li>
-<a href='#s30'>setenv</a>
+<a href='#s28'>setenv</a>
 </li>
 <li>
-<a href='#s31'>getcwd</a>
+<a href='#s29'>getcwd</a>
 </li>
 <li>
-<a href='#s32'>setcwd</a>
+<a href='#s30'>setcwd</a>
 </li>
 <li>
-<a href='#s33'> args </a>
+<a href='#s31'> args </a>
 </li>
 <li>
-<a href='#s34'>Process</a>
+<a href='#s32'>Process</a>
 <ul>
 <li>
-<a href='#s35'>stdout</a>
+<a href='#s33'>stdout</a>
 </li>
 <li>
-<a href='#s36'>stderr</a>
+<a href='#s34'>stderr</a>
 </li>
 <li>
-<a href='#s37'>stdin</a>
+<a href='#s35'>stdin</a>
 </li>
 <li>
-<a href='#s38'>kill</a>
+<a href='#s36'>kill</a>
 </li>
 <li>
-<a href='#s39'>wait</a>
+<a href='#s37'>wait</a>
 </li>
 </ul>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s40'>Regex</a>
+<a href='#s38'>Regex</a>
 </li>
 <li>
-<a href='#s41'> String</a>
+<a href='#s39'> String</a>
 <ul>
 <li>
-<a href='#s42'>slice</a>
+<a href='#s40'>slice</a>
 </li>
 <li>
-<a href='#s43'>reverse</a>
+<a href='#s41'>reverse</a>
 </li>
 <li>
-<a href='#s44'>repeat</a>
+<a href='#s42'>repeat</a>
 </li>
 <li>
-<a href='#s45'>toupper</a>
+<a href='#s43'>toupper</a>
 </li>
 <li>
-<a href='#s46'>tolower</a>
+<a href='#s44'>tolower</a>
 </li>
 <li>
-<a href='#s47'>tonumber</a>
+<a href='#s45'>tonumber</a>
 </li>
 <li>
-<a href='#s48'>find</a>
+<a href='#s46'>find</a>
 </li>
 <li>
-<a href='#s49'>split</a>
+<a href='#s47'>split</a>
 </li>
 <li>
-<a href='#s50'>replace</a>
+<a href='#s48'>replace</a>
 </li>
 <li>
-<a href='#s51'>compare</a>
+<a href='#s49'>compare</a>
 </li>
 <li>
-<a href='#s52'>ltrim</a>
+<a href='#s50'>ltrim</a>
 </li>
 <li>
-<a href='#s53'>rtrim</a>
+<a href='#s51'>rtrim</a>
 </li>
 <li>
-<a href='#s54'>trim</a>
+<a href='#s52'>trim</a>
 </li>
 <li>
-<a href='#s55'>lpad</a>
+<a href='#s53'>lpad</a>
 </li>
 <li>
-<a href='#s56'>rpad</a>
+<a href='#s54'>rpad</a>
 </li>
 <li>
-<a href='#s57'>prefix</a>
+<a href='#s55'>prefix</a>
 </li>
 <li>
-<a href='#s58'>suffix</a>
+<a href='#s56'>suffix</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s59'> Bit</a>
+<a href='#s57'> Bit</a>
 <ul>
 <li>
-<a href='#s60'>ceil</a>
+<a href='#s58'>ceil</a>
 </li>
 <li>
-<a href='#s61'>floor</a>
+<a href='#s59'>floor</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s62'> ASCII</a>
+<a href='#s60'> ASCII</a>
 <ul>
 <li>
-<a href='#s63'>char</a>
+<a href='#s61'>char</a>
 </li>
 <li>
-<a href='#s64'>code</a>
+<a href='#s62'>code</a>
 </li>
 <li>
-<a href='#s65'>isalnum</a>
+<a href='#s63'>isalnum</a>
 </li>
 <li>
-<a href='#s66'>isalpha</a>
+<a href='#s64'>isalpha</a>
 </li>
 <li>
-<a href='#s67'>iscntrl</a>
+<a href='#s65'>iscntrl</a>
 </li>
 <li>
-<a href='#s68'>isdigit</a>
+<a href='#s66'>isdigit</a>
 </li>
 <li>
-<a href='#s69'>islower</a>
+<a href='#s67'>islower</a>
 </li>
 <li>
-<a href='#s70'>isupper</a>
+<a href='#s68'>isupper</a>
 </li>
 <li>
-<a href='#s71'>isgraph</a>
+<a href='#s69'>isgraph</a>
 </li>
 <li>
-<a href='#s72'>isprint</a>
+<a href='#s70'>isprint</a>
 </li>
 <li>
-<a href='#s73'>ispunct</a>
+<a href='#s71'>ispunct</a>
 </li>
 <li>
-<a href='#s74'>isspace</a>
+<a href='#s72'>isspace</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s75'>Bytes</a>
+<a href='#s73'>Bytes</a>
 <ul>
 <li>
-<a href='#s76'>count</a>
+<a href='#s74'>count</a>
 </li>
 <li>
-<a href='#s77'>reset</a>
+<a href='#s75'>reset</a>
 </li>
 <li>
-<a href='#s78'>slice</a>
+<a href='#s76'>slice</a>
 </li>
 <li>
-<a href='#s79'>push</a>
+<a href='#s77'>push</a>
 </li>
 <li>
-<a href='#s80'>insert</a>
+<a href='#s78'>insert</a>
 </li>
 <li>
-<a href='#s81'>get</a>
+<a href='#s79'>get</a>
 </li>
 <li>
-<a href='#s82'>set</a>
+<a href='#s80'>set</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s83'> Array</a>
+<a href='#s81'> Array</a>
 <ul>
 <li>
-<a href='#s84'>map</a>
+<a href='#s82'>map</a>
 </li>
 <li>
-<a href='#s85'>filter</a>
+<a href='#s83'>filter</a>
 </li>
 <li>
-<a href='#s86'>reduce</a>
+<a href='#s84'>reduce</a>
 </li>
 <li>
-<a href='#s87'>copy</a>
+<a href='#s85'>copy</a>
 </li>
 <li>
-<a href='#s88'>join</a>
+<a href='#s86'>join</a>
 </li>
 <li>
-<a href='#s89'>find</a>
+<a href='#s87'>find</a>
 </li>
 <li>
-<a href='#s90'>equal</a>
+<a href='#s88'>equal</a>
 </li>
 <li>
-<a href='#s91'>push</a>
+<a href='#s89'>push</a>
 </li>
 <li>
-<a href='#s92'>insert</a>
+<a href='#s90'>insert</a>
 </li>
 <li>
-<a href='#s93'>sort</a>
+<a href='#s91'>sort</a>
 </li>
 <li>
-<a href='#s94'>resize</a>
+<a href='#s92'>resize</a>
 </li>
 <li>
-<a href='#s95'>remove</a>
+<a href='#s93'>remove</a>
 </li>
 <li>
-<a href='#s96'>reverse</a>
+<a href='#s94'>reverse</a>
 </li>
 <li>
-<a href='#s97'>fill</a>
+<a href='#s95'>fill</a>
 </li>
 <li>
-<a href='#s98'>slice</a>
+<a href='#s96'>slice</a>
 </li>
 <li>
-<a href='#s99'>append</a>
+<a href='#s97'>append</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s100'> Table</a>
+<a href='#s98'> Table</a>
 <ul>
 <li>
-<a href='#s101'>copy</a>
+<a href='#s99'>copy</a>
 </li>
 <li>
-<a href='#s102'>equal</a>
+<a href='#s100'>equal</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s103'> Math</a>
+<a href='#s101'> Math</a>
 <ul>
 <li>
-<a href='#s104'>sin</a>
+<a href='#s102'>sin</a>
 </li>
 <li>
-<a href='#s105'>cos</a>
+<a href='#s103'>cos</a>
 </li>
 <li>
-<a href='#s106'>tan</a>
+<a href='#s104'>tan</a>
 </li>
 <li>
-<a href='#s107'>asin</a>
+<a href='#s105'>asin</a>
 </li>
 <li>
-<a href='#s108'>acos</a>
+<a href='#s106'>acos</a>
 </li>
 <li>
-<a href='#s109'>atan</a>
+<a href='#s107'>atan</a>
 </li>
 <li>
-<a href='#s110'>exp</a>
+<a href='#s108'>exp</a>
 </li>
 <li>
-<a href='#s111'>log</a>
+<a href='#s109'>log</a>
 </li>
 <li>
-<a href='#s112'>log10</a>
+<a href='#s110'>log10</a>
 </li>
 <li>
-<a href='#s113'>pow</a>
+<a href='#s111'>pow</a>
 </li>
 <li>
-<a href='#s114'>sqrt</a>
+<a href='#s112'>sqrt</a>
 </li>
 <li>
-<a href='#s115'>ceil</a>
+<a href='#s113'>ceil</a>
 </li>
 <li>
-<a href='#s116'>floor</a>
+<a href='#s114'>floor</a>
 </li>
 <li>
-<a href='#s117'>round</a>
+<a href='#s115'>round</a>
 </li>
 <li>
-<a href='#s118'>abs</a>
+<a href='#s116'>abs</a>
 </li>
 <li>
-<a href='#s119'>sign</a>
+<a href='#s117'>sign</a>
 </li>
 <li>
-<a href='#s120'>max</a>
+<a href='#s118'>max</a>
 </li>
 <li>
-<a href='#s121'>min</a>
+<a href='#s119'>min</a>
 </li>
 <li>
-<a href='#s122'>clamp</a>
+<a href='#s120'>clamp</a>
 </li>
 <li>
-<a href='#s123'>lerp</a>
+<a href='#s121'>lerp</a>
 </li>
 <li>
-<a href='#s124'>precise</a>
+<a href='#s122'>precise</a>
 </li>
 <li>
-<a href='#s125'>Random</a>
+<a href='#s123'>Random</a>
 <ul>
 <li>
-<a href='#s126'>number</a>
+<a href='#s124'>number</a>
 </li>
 <li>
-<a href='#s127'>bytes</a>
+<a href='#s125'>bytes</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s128'>range</a>
+<a href='#s126'>range</a>
 </li>
 <li>
-<a href='#s129'> E </a>
+<a href='#s127'> E </a>
 </li>
 <li>
-<a href='#s130'> PI </a>
-</li>
-</ul>
-</li>
-<li>
-<a href='#s131'> Meta</a>
-<ul>
-<li>
-<a href='#s132'>Error</a>
-<ul>
-<li>
-<a href='#s133'>row</a>
-</li>
-<li>
-<a href='#s134'>col</a>
-</li>
-<li>
-<a href='#s135'>line</a>
-</li>
-<li>
-<a href='#s136'>message</a>
-</li>
-<li>
-<a href='#s137'>explanation</a>
-</li>
-<li>
-<a href='#s138'>example</a>
+<a href='#s128'> PI </a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s139'>compile</a>
+<a href='#s129'> Meta</a>
+<ul>
+<li>
+<a href='#s130'>Error</a>
+<ul>
+<li>
+<a href='#s131'>row</a>
 </li>
 <li>
-<a href='#s140'>call</a>
+<a href='#s132'>col</a>
 </li>
 <li>
-<a href='#s141'>eval</a>
+<a href='#s133'>line</a>
+</li>
+<li>
+<a href='#s134'>message</a>
+</li>
+<li>
+<a href='#s135'>explanation</a>
+</li>
+<li>
+<a href='#s136'>example</a>
+</li>
+</ul>
+</li>
+<li>
+<a href='#s137'>compile</a>
+</li>
+<li>
+<a href='#s138'>call</a>
+</li>
+<li>
+<a href='#s139'>eval</a>
 </li>
 </ul>
 </li>
