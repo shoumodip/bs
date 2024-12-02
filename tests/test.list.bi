@@ -1,4 +1,4 @@
-:i count 135
+:i count 136
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -395,10 +395,8 @@ arrays/error_invalid_index_const_assign.bs:2:4: error: expected array index to b
 :i returncode 1
 :b stdout 0
 
-:b stderr 168
-[C]: error: cannot remove item at index 0 from array of length 0
-
-arrays/error_remove_out_of_bounds.bs:2:10: in array.remove()
+:b stderr 144
+arrays/error_remove_out_of_bounds.bs:2:10: error: cannot remove item at index 0 from array of length 0
 
     2 | xs.remove(0)
       |          ^
@@ -800,10 +798,8 @@ functions/error_stack_trace.bs:13:4: in foo()
 :i returncode 1
 :b stdout 0
 
-:b stderr 391
-[C]: error: expected argument #1 to be string, got number
-
-functions/error_native_stack_trace.bs:2:22: in getenv()
+:b stderr 373
+functions/error_native_stack_trace.bs:2:22: error: expected argument #1 to be string, got number
 
     2 |     return os.getenv(s)
       |                      ^
@@ -1135,10 +1131,8 @@ invokation/error_invoked_body.bs:7:4: in <anonymous>()
 :i returncode 1
 :b stdout 0
 
-:b stderr 171
-[C]: error: expected argument #1 to be positive integer, got nil
-
-invokation/error_key_call_argument_location.bs:5:5: in string.slice()
+:b stderr 147
+invokation/error_key_call_argument_location.bs:5:5: error: expected argument #1 to be positive integer, got nil
 
     5 | t.f(nil, 0)
       |     ^
@@ -1181,10 +1175,8 @@ invokation/error_method_call_wrong_arity.bs:8:6: error: expected 0 arguments, go
 :i returncode 1
 :b stdout 0
 
-:b stderr 208
-[C]: error: expected argument #1 to be positive integer, got nil
-
-invokation/error_native_call_argument_location.bs:1:21: in string.slice()
+:b stderr 184
+invokation/error_native_call_argument_location.bs:1:21: error: expected argument #1 to be positive integer, got nil
 
     1 | io.println("".slice(nil, 0))
       |                     ^
@@ -1194,10 +1186,8 @@ invokation/error_native_call_argument_location.bs:1:21: in string.slice()
 :i returncode 1
 :b stdout 0
 
-:b stderr 190
-[C]: error: expected 0 arguments, got 1
-
-invokation/error_native_call_wrong_arity.bs:1:28: in string.reverse()
+:b stderr 164
+invokation/error_native_call_wrong_arity.bs:1:28: error: expected 0 arguments, got 1
 
     1 | io.println("Hello!".reverse(69))
       |                            ^
@@ -1207,10 +1197,8 @@ invokation/error_native_call_wrong_arity.bs:1:28: in string.reverse()
 :i returncode 1
 :b stdout 0
 
-:b stderr 180
-[C]: error: expected argument #1 to be positive integer, got nil
-
-invokation/error_property_call_argument_location.bs:5:7: in string.slice()
+:b stderr 156
+invokation/error_property_call_argument_location.bs:5:7: error: expected argument #1 to be positive integer, got nil
 
     5 | foo.f(nil, 0)
       |       ^
@@ -1762,10 +1750,8 @@ false
 :i returncode 1
 :b stdout 0
 
-:b stderr 148
-[C]: error: expected argument #1 to be function, got nil
-
-core/error_expected_function.bs:1:8: in array.map()
+:b stderr 127
+core/error_expected_function.bs:1:8: error: expected argument #1 to be function, got nil
 
     1 | [].map(nil)
       |        ^
@@ -1992,10 +1978,8 @@ true
 :i returncode 1
 :b stdout 0
 
-:b stderr 193
-[C]: error: a step of -1 in an ascending range would run indefinitely
-
-core/math_range_indefinite_ascending_guard.bs:1:19: in range()
+:b stderr 176
+core/math_range_indefinite_ascending_guard.bs:1:19: error: a step of -1 in an ascending range would run indefinitely
 
     1 | math.range(0, 10, -1)
       |                   ^
@@ -2005,10 +1989,8 @@ core/math_range_indefinite_ascending_guard.bs:1:19: in range()
 :i returncode 1
 :b stdout 0
 
-:b stderr 192
-[C]: error: a step of 1 in a descending range would run indefinitely
-
-core/math_range_indefinite_descending_guard.bs:1:19: in range()
+:b stderr 175
+core/math_range_indefinite_descending_guard.bs:1:19: error: a step of 1 in a descending range would run indefinitely
 
     1 | math.range(10, 0, 1)
       |                   ^
@@ -2058,13 +2040,11 @@ Nice!
 Nice!
 nil
 
-:b stderr 196
+:b stderr 178
 <meta>:1:5: error: invalid character '@' (64)
 
     1 | Hehe@
       |     ^
-
-[C]: in <meta>()
 
 core/meta.bs:20:21: in eval()
 
@@ -2163,4 +2143,20 @@ lexer/multiline_string_binary_continuation.bs:18:6: error: invalid operands to b
 
     18 | Bar" - 1
        |      ^
+
+:b shell 41
+../bin/bs core/meta_eval_runtime_error.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 194
+<meta>:1:5: error: invalid operands to binary (+): nil, number
+
+    1 | nil + 69
+      |     ^
+
+core/meta_eval_runtime_error.bs:1:10: in eval()
+
+    1 | meta.eval("nil + 69")
+      |          ^
 

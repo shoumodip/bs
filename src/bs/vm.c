@@ -867,7 +867,16 @@ Bs_Error bs_error_begin_at(Bs *bs, size_t location) {
         error.loc = oploc[location].loc;
     } else {
         error.native = true;
-        if (error.continued && !bs->frames.data[bs->frames.count - 2].ip) {
+        if (bs->frames.data[bs->frames.count - 2].ip) {
+            const Bs_Frame *prev = &bs->frames.data[bs->frames.count - 2];
+            const Bs_Op_Loc *oploc = bs_chunk_get_op_loc(
+                &prev->closure->fn->chunk, prev->ip - prev->closure->fn->chunk.data);
+
+            error.native = false;
+            error.loc = oploc[location + bs->frame->locations_offset].loc;
+
+            error.continued = bs->frames.count > 2;
+        } else if (error.continued) {
             error.continued = false;
         }
     }
@@ -882,6 +891,13 @@ void bs_error_end_at(Bs *bs, size_t location, bool native) {
     for (size_t i = bs->frames.count; i > 1; i--) {
         const Bs_Frame *callee = &bs->frames.data[i - 1];
         const Bs_Frame *caller = &bs->frames.data[i - 2];
+        if (!callee->ip && caller->ip && i == bs->frames.count) {
+            continue;
+        }
+
+        if (!caller->ip && callee->ip && callee->closure->fn->source) {
+            continue;
+        }
 
         Bs_Error error = {.type = BS_ERROR_TRACE};
 

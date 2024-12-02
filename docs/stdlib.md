@@ -1846,8 +1846,10 @@ io.println(math.range(1, 6, -1))
 
 ```console
 $ bs demo.bs
-[C]: error: a step of -1 in an ascending range would run indefinitely
-demo.bs:1:29: in range()
+demo.bs:1:29: error: a step of -1 in an ascending range would run indefinitely
+
+    1 | io.println(math.range(1, 6, -1))
+      |                             ^
 ```
 
 ### E @constant
@@ -1983,4 +1985,23 @@ Nice!
 Nice!
 Nice!
 nil
+```
+
+Errors are thrown as it is.
+
+```bs
+meta.eval("-nil")
+```
+
+```console
+$ bs demo.bs
+<meta>:1:1: error: invalid operand to unary (-): nil
+
+    1 | -nil
+      | ^
+
+demo.bs:1:10: in eval()
+
+    1 | meta.eval("-nil")
+      |          ^
 ```

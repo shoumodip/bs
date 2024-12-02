@@ -2509,7 +2509,7 @@ static Bs_Value bs_meta_eval(Bs *bs, Bs_Value *args, size_t arity) {
     if (!closure) {
         Bs_Error error = bs_error_begin(bs);
         error.type = BS_ERROR_TRACE;
-        error.message = Bs_Sv_Static("<meta>()");
+        error.message = Bs_Sv_Static("eval()");
 
         Bs_Config *config = bs_config(bs);
         config->error.write(&config->error, error);
