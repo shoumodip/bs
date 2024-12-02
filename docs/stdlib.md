@@ -388,19 +388,6 @@ $ bs demo.bs
 /usr
 ```
 
-### args @constant
-Array of command line arguments. First element is the program
-name.
-
-```bs
-io.println(os.args)
-```
-
-```console
-$ bs demo.bs foo bar baz
-["demo.bs", "foo", "bar", "baz"]
-```
-
 ### Process(args, capture_stdout?, capture_stderr?, capture_stdin?) @class
 Native C class that spawns a process. Expects `args` to be an
 array of strings that represent the command line arguments.
@@ -497,6 +484,56 @@ Returns `false` if any errors were encountered, else `true`.
 Wait for the process to exit, and return its exit code.
 
 Returns `nil` if failed.
+
+### args @constant
+Array of command line arguments. First element is the program
+name.
+
+```bs
+io.println(os.args)
+```
+
+```console
+$ bs demo.bs foo bar baz
+["demo.bs", "foo", "bar", "baz"]
+```
+
+### name @constant
+The name of the OS.
+
+```bs
+io.println(os.name)
+```
+
+```console
+$ bs demo.bs
+Linux      # On linux
+macOS      # On macOS
+Windows    # On windows
+Unknown    # On unknown
+```
+
+<blockquote>
+The output depends on the OS.
+</blockquote>
+
+### arch @constant
+The CPU architecture.
+
+```bs
+io.println(os.arch)
+```
+
+```console
+$ bs demo.bs
+x86_64     # On x86_64
+ARM64      # On arm64
+Unknown    # On unknown
+```
+
+<blockquote>
+The output depends on the architecture.
+</blockquote>
 
 ## Regex(pattern) @class
 POSIX compatible regular expressions.

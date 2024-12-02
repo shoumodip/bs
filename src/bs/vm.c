@@ -2,7 +2,7 @@
 #include <math.h>
 #include <setjmp.h>
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
 #    define WIN32_LEAN_AND_MEAN
 #    include <windows.h>
 
@@ -227,7 +227,7 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
         Bs_C_Lib *library = (Bs_C_Lib *)object;
         bs_map_free(bs, &library->map);
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
         FreeLibrary(library->handle);
 #else
         dlclose(library->handle);
@@ -598,7 +598,7 @@ bool bs_update_cwd(Bs *bs) {
     Bs_Buffer *b = &bs->paths;
     const size_t start = b->count;
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
     const DWORD size = GetCurrentDirectory(0, NULL);
     if (!size) {
         bs_return_defer(false);
@@ -1513,14 +1513,14 @@ static void bs_import(Bs *bs) {
 
     // Native
     {
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
         bs_da_push_many(bs, b, ".dll", 5);
 
         Bs_C_Lib_Handle handle = LoadLibrary(b->data + start);
         if (!handle) {
             bs_error(bs, "could not import module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*path));
         }
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__MACH__)
         bs_da_push_many(bs, b, ".dylib", 7);
 
         Bs_C_Lib_Handle handle = dlopen(b->data + start, RTLD_LAZY);
@@ -1538,7 +1538,7 @@ static void bs_import(Bs *bs) {
 
         Bs_C_Lib *library = bs_c_lib_new(bs, handle);
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
         void (*init)(Bs *, Bs_C_Lib *) = (void *)GetProcAddress(handle, "bs_library_init");
 #else
         void (*init)(Bs *, Bs_C_Lib *) = dlsym(handle, "bs_library_init");

@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
 #    define WIN32_LEAN_AND_MEAN
 #    include <io.h>
 #    include <process.h>
@@ -329,7 +329,7 @@ static Bs_Value bs_io_readdir(Bs *bs, Bs_Value *args, size_t arity) {
     const Bs_Str *path = (const Bs_Str *)args[0].as.object;
     Bs_Array *a = bs_array_new(bs);
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
     char searchPath[MAX_PATH];
     snprintf(searchPath, sizeof(searchPath), "%s\\*", path->data);
 
@@ -397,7 +397,7 @@ static Bs_Value bs_os_exit(Bs *bs, Bs_Value *args, size_t arity) {
 static Bs_Value bs_os_clock(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
     LARGE_INTEGER frequency, counter;
     if (!QueryPerformanceFrequency(&frequency)) {
         bs_error(bs, "could not get clock");
@@ -424,7 +424,7 @@ static Bs_Value bs_os_sleep(Bs *bs, Bs_Value *args, size_t arity) {
 
     const double seconds = args[0].as.number;
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
     DWORD milliseconds = (DWORD)(seconds * 1000);
     DWORD remaining_microseconds = (DWORD)((seconds - (milliseconds / 1000.0)) * 1000000);
 
@@ -471,7 +471,7 @@ static Bs_Value bs_os_getenv(Bs *bs, Bs_Value *args, size_t arity) {
 
     const Bs_Str *name = (const Bs_Str *)args[0].as.object;
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
     Bs_Buffer *b = &bs_config(bs)->buffer;
     const DWORD size = GetEnvironmentVariableA(name->data, NULL, 0);
     if (size) {
@@ -498,7 +498,7 @@ static Bs_Value bs_os_setenv(Bs *bs, Bs_Value *args, size_t arity) {
     const Bs_Str *key = (const Bs_Str *)args[0].as.object;
     const Bs_Str *value = (const Bs_Str *)args[1].as.object;
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
     return bs_value_bool(SetEnvironmentVariable(key->data, value->data) != 0);
 #else
     return bs_value_bool(setenv(key->data, value->data, true) == 0);
@@ -516,7 +516,7 @@ static Bs_Value bs_os_setcwd(Bs *bs, Bs_Value *args, size_t arity) {
 
     const Bs_Str *path = (const Bs_Str *)args[0].as.object;
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
     const bool ok = SetCurrentDirectory(path->data);
 #else
     const bool ok = chdir(path->data) >= 0;
@@ -531,7 +531,7 @@ static Bs_Value bs_os_setcwd(Bs *bs, Bs_Value *args, size_t arity) {
 
 // Process
 typedef struct {
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
     PROCESS_INFORMATION piProcInfo;
 #else
     pid_t pid;
@@ -556,7 +556,7 @@ static Bs_C_Instance *bs_pipe_new(Bs *bs, int fd, bool write) {
     Bs_File *f = &bs_flex_member_as(instance->data, Bs_File);
     f->file = FD_OPEN(fd, write ? "w" : "r");
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
     setmode(fd, _O_TEXT);
 #endif // _WIN32
 
@@ -603,7 +603,7 @@ static Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
 
     Bs_Process *p = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
     STARTUPINFOA siStartInfo;
     ZeroMemory(&siStartInfo, sizeof(siStartInfo));
     siStartInfo.cb = sizeof(STARTUPINFO);
@@ -840,7 +840,7 @@ static Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
     bs_arg_check_whole_number(bs, args, 0);
 
     Bs_Process *p = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
     if (!TerminateProcess(p->piProcInfo.hProcess, 1)) {
         return bs_value_bool(false);
     }
@@ -863,7 +863,7 @@ static Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
 
     Bs_Process *p = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
     if (WaitForSingleObject(p->piProcInfo.hProcess, INFINITE) == WAIT_FAILED) {
         return bs_value_nil;
     }
@@ -2318,7 +2318,7 @@ static Bs_Value bs_random_init(Bs *bs, Bs_Value *args, size_t arity) {
     } else {
         seed = time(NULL);
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
         LARGE_INTEGER counter;
         QueryPerformanceCounter(&counter);
         seed ^= (uint64_t)(counter.QuadPart);
@@ -2673,6 +2673,24 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_c_class_add(bs, process_class, Bs_Sv_Static("stdin"), bs_process_stdin);
 
         bs_add(bs, os, "Process", bs_value_object(process_class));
+
+#if defined(_WIN32) || defined(_WIN64)
+        bs_add(bs, os, "name", bs_value_object(bs_str_new(bs, Bs_Sv_Static("Windows"))));
+#elif defined(__APPLE__) || defined(__MACH__)
+        bs_add(bs, os, "name", bs_value_object(bs_str_new(bs, Bs_Sv_Static("macOS"))));
+#elif defined(__linux__)
+        bs_add(bs, os, "name", bs_value_object(bs_str_new(bs, Bs_Sv_Static("Linux"))));
+#else
+        bs_add(bs, os, "name", bs_value_object(bs_str_new(bs, Bs_Sv_Static("Unknown"))));
+#endif
+
+#if defined(__x86_64__) || defined(_M_X64)
+        bs_add(bs, os, "arch", bs_value_object(bs_str_new(bs, Bs_Sv_Static("x86_64"))));
+#elif defined(__aarch64__) || defined(_M_ARM64)
+        bs_add(bs, os, "arch", bs_value_object(bs_str_new(bs, Bs_Sv_Static("ARM64"))));
+#else
+        bs_add(bs, os, "arch", bs_value_object(bs_str_new(bs, Bs_Sv_Static("Unknown"))));
+#endif
 
         bs_global_set(bs, Bs_Sv_Static("os"), bs_value_object(os));
     }

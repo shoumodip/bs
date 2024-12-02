@@ -184,7 +184,7 @@ struct Bs_C_Fn {
 
 Bs_C_Fn *bs_c_fn_new(Bs *bs, Bs_Sv name, Bs_C_Fn_Ptr ptr);
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
 #    define WIN32_LEAN_AND_MEAN
 #    include <windows.h>
 

@@ -3,7 +3,7 @@
 #define CROSSLINE_IMPLEMENTATION
 #include "crossline/crossline.h"
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
 #    include <io.h>
 #    define isatty _isatty
 #    define fileno _fileno
@@ -137,7 +137,7 @@ static bool bs_repl_block(char *line, size_t size, Bs_Sv *input, Bs_Sv ending, b
 static void bs_history_path(char *buffer, size_t size) {
     const char *base;
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
     base = getenv("APPDATA");
     if (base) {
         snprintf(buffer, size, "%s%cbs_history", base, PATH_SEPARATOR);
