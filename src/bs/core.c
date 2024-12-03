@@ -29,7 +29,6 @@
 // IO
 typedef struct {
     FILE *file;
-    bool pipe;
 } Bs_File;
 
 static void bs_io_file_free(void *userdata, void *instance_data) {
@@ -68,7 +67,6 @@ static Bs_Value bs_io_reader_init(Bs *bs, Bs_Value *args, size_t arity) {
 
     Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
     f->file = file;
-    f->pipe = false;
     return args[-1];
 }
 
@@ -167,7 +165,6 @@ static Bs_Value bs_io_writer_init(Bs *bs, Bs_Value *args, size_t arity) {
 
     Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
     f->file = file;
-    f->pipe = false;
     return args[-1];
 }
 
@@ -578,7 +575,6 @@ static Bs_C_Instance *bs_pipe_new(Bs *bs, int fd, bool write) {
     setmode(fd, _O_TEXT);
 #endif // _WIN32
 
-    f->pipe = true;
     return instance;
 }
 
