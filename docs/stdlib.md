@@ -200,6 +200,79 @@ Line:
 #### Reader.eof() @method
 Return whether the end of file has been reached.
 
+#### Reader.seek(offset, whence) @method
+Change the read position of the file.
+
+Any of the following values can be used for `whence`.
+
+- `SEEK_SET` - Seek from beginning of file
+- `SEEK_CUR` - Seek from current position
+- `SEEK_END` - Seek from end of file
+
+This function only works if the file was opened in binary mode.
+
+Returns `true` if succeeded and `false` if failed.
+
+```bs
+var f = io.Reader("input.txt", true)
+if !f {
+    io.eprintln("Error: could not read file!")
+    os.exit(1)
+}
+
+io.print("The first 16 bytes: [\(f.read(16))]\n")
+
+f.seek(5, io.SEEK_SET)
+
+io.println("The full content offset by 5:")
+io.print(f.read())
+```
+
+```console
+$ bs demo.bs
+The first 16 bytes: [Just a test file]
+The full content offset by 5:
+a test file
+Nothing to see here
+Foo
+Bar
+Baz
+People's dreams have no end! ~ Blackbeard
+```
+
+#### Reader.tell() @method
+Get the current position of the file.
+
+This function only works if the file was opened in binary mode.
+
+Returns `nil` if failed.
+
+```bs
+var f = io.Reader("input.txt", true)
+if !f {
+    io.eprintln("Error: could not read file!")
+    os.exit(1)
+}
+
+io.println("The first 3 lines:")
+for i in 0, 3 {
+    io.println(f.readln())
+}
+
+io.println()
+io.println("Read \(f.tell()) bytes so far.")
+```
+
+```console
+$ bs demo.bs
+The first 3 lines:
+Just a test file
+Nothing to see here
+Foo
+
+Read 41 bytes so far.
+```
+
 ### Writer(path, binary?) @class
 Native C class that opens `path` in writeable mode.
 

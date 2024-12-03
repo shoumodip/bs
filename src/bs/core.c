@@ -29,6 +29,7 @@
 // IO
 typedef struct {
     FILE *file;
+    bool seekable;
 } Bs_File;
 
 static void bs_io_file_free(void *userdata, void *instance_data) {
@@ -75,6 +76,7 @@ static Bs_Value bs_io_reader_init(Bs *bs, Bs_Value *args, size_t arity) {
 
     Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
     f->file = file;
+    f->seekable = binary;
     return args[-1];
 }
 
@@ -155,6 +157,44 @@ static Bs_Value bs_io_reader_eof(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
     return bs_value_bool(f->file ? feof(f->file) : true);
+}
+
+static Bs_Value bs_io_reader_seek(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 2);
+    bs_arg_check_whole_number(bs, args, 0);
+    bs_arg_check_whole_number(bs, args, 1);
+
+    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    if (!f->file) {
+        bs_error(bs, "cannot seek in closed file");
+    }
+
+    if (!f->seekable) {
+        bs_error(bs, "cannot seek in pipe or non binary file");
+    }
+
+    const int whence = args[1].as.number;
+    if (whence > 2) {
+        bs_error_at(bs, 2, "invalid whence '%d'", whence);
+    }
+
+    return bs_value_bool(fseek(f->file, args[0].as.number, whence) != -1);
+}
+
+static Bs_Value bs_io_reader_tell(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+
+    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    if (!f->file) {
+        bs_error(bs, "cannot get position of closed file");
+    }
+
+    if (!f->seekable) {
+        bs_error(bs, "cannot get position of pipe or non binary file");
+    }
+
+    const long position = ftell(f->file);
+    return position == -1 ? bs_value_nil : bs_value_num(position);
 }
 
 // Writer
@@ -2626,10 +2666,13 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_io_reader_class->can_fail = true;
         bs_io_reader_class->free = bs_io_file_free;
 
-        bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("eof"), bs_io_reader_eof);
         bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("close"), bs_io_file_close);
         bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("read"), bs_io_reader_read);
         bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("readln"), bs_io_reader_readln);
+
+        bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("eof"), bs_io_reader_eof);
+        bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("seek"), bs_io_reader_seek);
+        bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("tell"), bs_io_reader_tell);
 
         bs_io_writer_class =
             bs_c_class_new(bs, Bs_Sv_Static("Writer"), sizeof(Bs_File), bs_io_writer_init);
@@ -2682,6 +2725,12 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
             Bs_C_Instance *io_stderr = bs_c_instance_new(bs, bs_io_writer_class);
             bs_flex_member_as(io_stderr->data, Bs_File).file = stderr;
             bs_add(bs, io, "stderr", bs_value_object(io_stderr));
+        }
+
+        {
+            bs_add(bs, io, "SEEK_SET", bs_value_num(SEEK_SET));
+            bs_add(bs, io, "SEEK_CUR", bs_value_num(SEEK_CUR));
+            bs_add(bs, io, "SEEK_END", bs_value_num(SEEK_END));
         }
 
         bs_global_set(bs, Bs_Sv_Static("io"), bs_value_object(io));
