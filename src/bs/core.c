@@ -74,7 +74,7 @@ static Bs_Value bs_io_reader_init(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_nil;
     }
 
-    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_this_c_instance_data_as(args, Bs_File);
     f->file = file;
     f->seekable = binary;
     return args[-1];
@@ -89,7 +89,7 @@ static Bs_Value bs_io_reader_read(Bs *bs, Bs_Value *args, size_t arity) {
         bs_arg_check_whole_number(bs, args, 0);
     }
 
-    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_this_c_instance_data_as(args, Bs_File);
     if (!f->file) {
         bs_error(bs, "cannot read from closed file");
     }
@@ -134,7 +134,7 @@ static Bs_Value bs_io_reader_read(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_io_reader_readln(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_this_c_instance_data_as(args, Bs_File);
     if (!f->file) {
         bs_error(bs, "cannot read from closed file");
     }
@@ -155,7 +155,7 @@ static Bs_Value bs_io_reader_readln(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_io_reader_eof(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_this_c_instance_data_as(args, Bs_File);
     return bs_value_bool(f->file ? feof(f->file) : true);
 }
 
@@ -164,7 +164,7 @@ static Bs_Value bs_io_reader_seek(Bs *bs, Bs_Value *args, size_t arity) {
     bs_arg_check_whole_number(bs, args, 0);
     bs_arg_check_whole_number(bs, args, 1);
 
-    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_this_c_instance_data_as(args, Bs_File);
     if (!f->file) {
         bs_error(bs, "cannot seek in closed file");
     }
@@ -184,7 +184,7 @@ static Bs_Value bs_io_reader_seek(Bs *bs, Bs_Value *args, size_t arity) {
 static Bs_Value bs_io_reader_tell(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
-    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_this_c_instance_data_as(args, Bs_File);
     if (!f->file) {
         bs_error(bs, "cannot get position of closed file");
     }
@@ -219,7 +219,7 @@ static Bs_Value bs_io_writer_init(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_nil;
     }
 
-    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_this_c_instance_data_as(args, Bs_File);
     f->file = file;
     return args[-1];
 }
@@ -227,7 +227,7 @@ static Bs_Value bs_io_writer_init(Bs *bs, Bs_Value *args, size_t arity) {
 static Bs_Value bs_io_writer_flush(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
-    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_this_c_instance_data_as(args, Bs_File);
     if (!f->file) {
         bs_error(bs, "cannot flush closed file");
     }
@@ -237,7 +237,7 @@ static Bs_Value bs_io_writer_flush(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_io_writer_write(Bs *bs, Bs_Value *args, size_t arity) {
-    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_this_c_instance_data_as(args, Bs_File);
     if (!f->file) {
         bs_error(bs, "cannot write into closed file");
     }
@@ -254,7 +254,7 @@ static Bs_Value bs_io_writer_write(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_io_writer_writeln(Bs *bs, Bs_Value *args, size_t arity) {
-    Bs_File *f = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_File);
+    Bs_File *f = &bs_this_c_instance_data_as(args, Bs_File);
     if (!f->file) {
         bs_error(bs, "cannot write into closed file");
     }
@@ -291,15 +291,13 @@ static Bs_Value bs_io_direntry_init(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_io_direntry_name(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-
-    Bs_Dir_Entry *e = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Dir_Entry);
+    Bs_Dir_Entry *e = &bs_this_c_instance_data_as(args, Bs_Dir_Entry);
     return bs_value_object(e->name);
 }
 
 static Bs_Value bs_io_direntry_isdir(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-
-    Bs_Dir_Entry *e = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Dir_Entry);
+    Bs_Dir_Entry *e = &bs_this_c_instance_data_as(args, Bs_Dir_Entry);
     return bs_value_bool(e->isdir);
 }
 
@@ -685,7 +683,7 @@ static Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
         bs_check_object_type_at(bs, 1, array->data[i], BS_OBJECT_STR, buffer);
     }
 
-    Bs_Process *p = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+    Bs_Process *p = &bs_this_c_instance_data_as(args, Bs_Process);
 
 #if defined(_WIN32) || defined(_WIN64)
     STARTUPINFOA siStartInfo;
@@ -923,7 +921,8 @@ static Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
 
-    Bs_Process *p = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+    Bs_Process *p = &bs_this_c_instance_data_as(args, Bs_Process);
+
 #if defined(_WIN32) || defined(_WIN64)
     if (!TerminateProcess(p->piProcInfo.hProcess, 1)) {
         return bs_value_bool(false);
@@ -945,7 +944,7 @@ static Bs_Value bs_process_kill(Bs *bs, Bs_Value *args, size_t arity) {
 static Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
-    Bs_Process *p = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+    Bs_Process *p = &bs_this_c_instance_data_as(args, Bs_Process);
 
 #if defined(_WIN32) || defined(_WIN64)
     if (WaitForSingleObject(p->piProcInfo.hProcess, INFINITE) == WAIT_FAILED) {
@@ -983,19 +982,19 @@ static Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_process_stdout(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    Bs_Process *p = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+    Bs_Process *p = &bs_this_c_instance_data_as(args, Bs_Process);
     return p->stdout_read ? bs_value_object(p->stdout_read) : bs_value_nil;
 }
 
 static Bs_Value bs_process_stderr(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    Bs_Process *p = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+    Bs_Process *p = &bs_this_c_instance_data_as(args, Bs_Process);
     return p->stderr_read ? bs_value_object(p->stderr_read) : bs_value_nil;
 }
 
 static Bs_Value bs_process_stdin(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    Bs_Process *p = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Process);
+    Bs_Process *p = &bs_this_c_instance_data_as(args, Bs_Process);
     return p->stdin_write ? bs_value_object(p->stdin_write) : bs_value_nil;
 }
 
@@ -1021,7 +1020,7 @@ static Bs_Value bs_regex_init(Bs *bs, Bs_Value *args, size_t arity) {
         return bs_value_nil;
     }
 
-    bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, regex_t) = regex;
+    bs_this_c_instance_data_as(args, regex_t) = regex;
     return args[-1];
 }
 
@@ -1704,7 +1703,7 @@ static Bs_Value bs_bytes_init(Bs *bs, Bs_Value *args, size_t arity) {
     if (arity > 1) {
         bs_error(bs, "expected 0 or 1 arguments, got %zu", arity);
     }
-    Bs_Buffer *b = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
+    Bs_Buffer *b = &bs_this_c_instance_data_as(args, Bs_Buffer);
 
     if (arity) {
         bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
@@ -1718,7 +1717,7 @@ static Bs_Value bs_bytes_init(Bs *bs, Bs_Value *args, size_t arity) {
 
 static Bs_Value bs_bytes_count(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
-    const Bs_Buffer *b = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
+    const Bs_Buffer *b = &bs_this_c_instance_data_as(args, Bs_Buffer);
     return bs_value_num(b->count);
 }
 
@@ -1726,7 +1725,7 @@ static Bs_Value bs_bytes_reset(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
 
-    Bs_Buffer *b = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
+    Bs_Buffer *b = &bs_this_c_instance_data_as(args, Bs_Buffer);
     const size_t reset = args[0].as.number;
 
     if (reset > b->count) {
@@ -1747,7 +1746,7 @@ static Bs_Value bs_bytes_slice(Bs *bs, Bs_Value *args, size_t arity) {
         bs_arg_check_whole_number(bs, args, 1);
     }
 
-    const Bs_Buffer *b = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
+    const Bs_Buffer *b = &bs_this_c_instance_data_as(args, Bs_Buffer);
     const size_t begin = arity ? bs_min(args[0].as.number, args[1].as.number) : 0;
     const size_t end = arity ? bs_max(args[0].as.number, args[1].as.number) : b->count;
 
@@ -1798,7 +1797,7 @@ static Bs_Value bs_bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
     };
     bs_arg_check_multi(bs, args, 1, checks, bs_c_array_size(checks));
 
-    Bs_Buffer *b = &bs_flex_member_as(((Bs_C_Instance *)args[-1].as.object)->data, Bs_Buffer);
+    Bs_Buffer *b = &bs_this_c_instance_data_as(args, Bs_Buffer);
     const size_t index = args[0].as.number;
 
     if (index > b->count) {
