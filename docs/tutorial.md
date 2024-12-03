@@ -1343,6 +1343,10 @@ $ cc -o arithmetic.dylib -fPIC -shared arithmetic.c -lbs # On macOS
 $ cl /LD /Fe:arithmetic.dll arithmetic.c bs.lib # On Windows
 ```
 
+<blockquote>
+Make sure to provide the compiler and linker flags as required.
+</blockquote>
+
 Finally, load it from BS.
 
 ```bs
@@ -1454,6 +1458,10 @@ $ cc -o raylib.so -fPIC -shared raylib.c -lbs -lraylib    # On Linux
 $ cc -o raylib.dylib -fPIC -shared raylib.c -lbs -lraylib # On macOS
 $ cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib        # On Windows
 ```
+
+<blockquote>
+Make sure to provide the compiler and linker flags as required.
+</blockquote>
 
 Finally, load it from BS.
 

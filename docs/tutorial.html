@@ -12,12 +12,7 @@
 </header>
 <main id='main'>
 <a href='index.html' class='navigation-icon'>
-<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='40px' height='40px' viewBox='0 0 40 40' version='1.1'>
-<g id='surface1'>
-<path fill='#EEEEEE' d='M 540.751058 254.813963 L 294.493283 38.235463 C 283.049382 28.128467 264.439674 28.128467 253.102725 38.235463 L 6.951902 254.813963 C -4.545475 264.867483 -1.497333 273.049338 13.850329 273.049338 L 89.786494 273.049338 L 89.786494 494.868502 C 89.786494 506.954117 99.733062 516.954161 111.925629 516.954161 L 204.867218 516.954161 L 204.867218 371.071162 C 204.867218 358.985547 214.813786 348.985503 226.952877 348.985503 L 320.80356 348.985503 C 333.049603 348.985503 342.942695 358.771643 342.942695 371.071162 L 342.942695 516.954161 L 435.884284 516.954161 C 448.130327 516.954161 457.969943 507.007593 457.969943 494.868502 L 457.969943 272.995862 L 533.959584 272.995862 C 549.039865 272.995862 552.088007 264.867483 540.751058 254.813963 Z M 540.751058 254.813963 ' transform='matrix(0.0730466,0,0,0.0730466,0,0)'/>
-</g>
-</svg>
-</a>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='30px' height='30px' viewBox='0 0 30 30' version='1.1'><g id='surface1'><path fill='#D4BE98' d='M 29.625 13.960938 L 16.132812 2.09375 C 15.507812 1.542969 14.488281 1.542969 13.867188 2.09375 L 0.382812 13.960938 C -0.25 14.511719 -0.0820312 14.960938 0.757812 14.960938 L 4.917969 14.960938 L 4.917969 27.113281 C 4.917969 27.773438 5.464844 28.320312 6.132812 28.320312 L 11.222656 28.320312 L 11.222656 20.328125 C 11.222656 19.667969 11.769531 19.121094 12.433594 19.121094 L 17.574219 19.121094 C 18.246094 19.121094 18.789062 19.65625 18.789062 20.328125 L 18.789062 28.320312 L 23.878906 28.320312 C 24.550781 28.320312 25.089844 27.777344 25.089844 27.113281 L 25.089844 14.957031 L 29.253906 14.957031 C 30.078125 14.957031 30.246094 14.511719 29.625 13.960938 Z M 29.625 13.960938 '/></g></a>
 <section id='s0'>
 <h2> Introduction</h2>
 <p>
@@ -2503,7 +2498,7 @@ Create a file <code>arithmetic.c</code> with the following content
 <pre class='code active'>
 <span class='comment'>// arithmetic.c
 </span>
-<span class='field'>#include</span> <span class='string'>&lt;bs/object.h&gt;</span>
+<span class='keyword'>#include</span> <span class='string'>&lt;bs/object.h&gt;</span>
 
 <span class='class'>Bs_Value</span> arithmetic_add(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>2</span>)<span class='comment'>;</span>
@@ -2550,6 +2545,11 @@ Compile it into a dynamic library, linking against <code>bs</code>
 <span class='constant'>$ </span>cl /LD /Fe:arithmetic.dll arithmetic.c bs.lib <span class='comment'># On Windows</span>
 </pre>
 </div>
+<blockquote>
+<p>
+Make sure to provide the compiler and linker flags as required.
+</blockquote>
+</p>
 <p>
 Finally, load it from BS.
 </p>
@@ -2612,8 +2612,8 @@ library.
 <pre class='code active'>
 <span class='comment'>// raylib.c
 </span>
-<span class='field'>#include</span> <span class='string'>"raylib.h"</span>
-<span class='field'>#include</span> <span class='string'>"bs/object.h"</span>
+<span class='keyword'>#include</span> <span class='string'>"raylib.h"</span>
+<span class='keyword'>#include</span> <span class='string'>"bs/object.h"</span>
 
 <span class='class'>Bs_Value</span> rl_init_window(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='function'>bs_check_arity</span>(bs, arity, <span class='constant'>3</span>)<span class='comment'>;</span>
@@ -2712,6 +2712,11 @@ Compile it into a dynamic library, linking against <code>bs</code> and <code>ray
 <span class='constant'>$ </span>cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib        <span class='comment'># On Windows</span>
 </pre>
 </div>
+<blockquote>
+<p>
+Make sure to provide the compiler and linker flags as required.
+</blockquote>
+</p>
 <p>
 Finally, load it from BS.
 </p>

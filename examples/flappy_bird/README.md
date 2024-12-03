@@ -12,6 +12,10 @@ $ cc -o raylib.dylib -fPIC -shared raylib.c -lbs -lraylib # On macOS
 $ cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib        # On Windows
 ```
 
+<blockquote>
+Make sure to provide the compiler and linker flags as required.
+</blockquote>
+
 <!-- embed: examples/flappy_bird/flappy_bird.bs -->
 
 Download and extract the

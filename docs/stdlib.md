@@ -1857,7 +1857,7 @@ Attempt to call this constructor directly will throw a runtime error.
 Example usecase:
 
 ```bs
-var f = meta.compile("Oops")
+var f = meta.compile("Oops@")
 if f is "Error" {
     io.println("Row:", f.row())
     io.println("Col:", f.col())
@@ -1884,7 +1884,7 @@ Return the row in which the error occured.
 Returns `nil` if the error occured in native code.
 
 #### Error.col() @method
-Return the col in which the error occured.
+Return the column in which the error occured.
 
 Returns `nil` if the error occured in native code.
 

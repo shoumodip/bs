@@ -666,6 +666,10 @@ $ cc -o raylib.dylib -fPIC -shared raylib.c -lbs -lraylib # On macOS
 $ cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib        # On Windows
 ```
 
+<blockquote>
+Make sure to provide the compiler and linker flags as required.
+</blockquote>
+
 ```bs
 # game_of_life_raylib.bs
 
@@ -1259,6 +1263,10 @@ $ cc -o raylib.so -fPIC -shared raylib.c -lbs -lraylib    # On Linux
 $ cc -o raylib.dylib -fPIC -shared raylib.c -lbs -lraylib # On macOS
 $ cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib        # On Windows
 ```
+
+<blockquote>
+Make sure to provide the compiler and linker flags as required.
+</blockquote>
 
 ```bs
 # flappy_bird.bs

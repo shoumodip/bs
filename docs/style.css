@@ -9,26 +9,31 @@
 }
 
 :root {
-    --quote: #666666;
-    --border: #444444;
-    --border-size: 0.15rem;
-    --border-radius: 0.3rem;
+    --h2: #EA6962;
+    --h3: #E78A4E;
+    --h4: #D8A657;
+    --h5: #A9B665;
+
+    --link: #89B482;
+    --quote: #5A524C;
+    --border: #45403D;
+    --border-size: 0.1rem;
 
     --pagebg: #202020;
-    --pagefg: #EEEEEE;
-    --codebg: #1C1C1C;
-    --copyfg: #888888;
-    --sidebarbg: #282828;
+    --pagefg: #D4BE98;
+    --codebg: #282828;
+    --copyfg: #928374;
+    --sidebarbg: #242424;
 
-    --field: #F78C6C;
-    --class: #E6B800;
-    --escape: #E78A4E;
-    --string: #D19A66;
-    --comment: #888888;
-    --keyword: #C678DD;
-    --success: #3FB950;
-    --constant: #56B6C2;
-    --function: #5FAFD7;
+    --field: #7DAEA3;
+    --class: #D8A657;
+    --escape: #A9B665;
+    --string: #98B482;
+    --comment: #928374;
+    --keyword: #EA6962;
+    --success: #A9B665;
+    --constant: #D3869B;
+    --function: #A9B665;
 
     --padding: 0.4rem;
     --font-size: 1.1rem;
@@ -42,16 +47,19 @@
 }
 
 a {
-    color: var(--constant);
+    color: var(--link);
+    text-underline-offset: calc(var(--padding) / 2);
 }
 
 li {
     line-height: calc(1.5 * var(--font-size));
 }
 
-h1 {
-    margin: var(--padding);
-}
+h1 { margin: var(--padding); }
+h2:not(.hl-header) { color: var(--h2); }
+h3:not(.hl-header) { color: var(--h3); }
+h4:not(.hl-header) { color: var(--h4); }
+h5:not(.hl-header) { color: var(--h5); }
 
 body {
     margin: 0;
@@ -66,7 +74,6 @@ code {
     font-size: 90%;
     whitespace: pre;
     font-family: "JetBrains Mono";
-    border-radius: var(--border-radius);
 }
 
 pre {
@@ -101,7 +108,6 @@ blockquote {
     padding-left: calc(var(--padding) * 2);
     border-left: calc(var(--border-size) * 2) solid var(--quote);
     color: var(--quote);
-    font-style: italic;
 }
 
 blockquote br {
@@ -118,7 +124,6 @@ blockquote br {
     padding: calc(1.1 * var(--padding)) calc(0.5 * var(--padding));
     position: absolute;
     font-size: calc(0.7 * var(--font-size));
-    border-radius: var(--border-radius);
 
     fill: var(--copyfg);
     background: transparent;
@@ -135,12 +140,8 @@ blockquote br {
 .code {
     display: none;
     margin-top: calc(-1 * var(--border-size));
-}
-
-.code.active {
-    padding: var(--padding) calc(2.8 * var(--padding));
+    padding: var(--padding) calc(1.5 * var(--padding));
     display: block;
-    border-radius: var(--border-radius);
     margin-bottom: calc(4 * var(--padding));
     background-color: var(--codebg);
 }
@@ -203,7 +204,7 @@ header {
     display: none;
     position: absolute;
     transform: translateY(-50%);
-    font-size: calc(2 * var(--font-size));
+    font-size: calc(1.5 * var(--font-size));
     background: none;
     margin-right: auto;
 }
@@ -212,10 +213,10 @@ nav {
     top: var(--header);
     left: 0;
     width: var(--sidebar);
-    height: calc(100vh - var(--header));
+    height: calc(100% - var(--header));
     z-index: 999;
     position: fixed;
-    background: var(--codebg);
+    background: var(--sidebarbg);
     transform: translateX(0);
     overflow-y: auto;
     transition: transform 0.3s ease;
@@ -251,7 +252,7 @@ nav ul li a {
 }
 
 nav ul li a:hover {
-    color: var(--constant);
+    color: var(--link);
 }
 
 main {
@@ -283,7 +284,6 @@ main {
 
 .link {
     border: var(--border-size) solid var(--border);
-    border-radius: var(--border-radius);
     position: relative;
     overflow: hidden;
     cursor: pointer;
@@ -323,12 +323,12 @@ main {
 
 /* Chromium */
 ::-webkit-scrollbar {
-    width: calc(1.2 * var(--padding));
+    width: calc(0.8 * var(--padding));
+    height: calc(0.8 * var(--padding));
 }
 
 ::-webkit-scrollbar-thumb {
     background: var(--border);
-    border-radius: var(--border-radius);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -346,8 +346,8 @@ html {
 }
 
 .navigation-icon {
-    top: calc((var(--header) - 40px) / 2);
-    right: calc((var(--header) - 40px) / 2);
+    top: calc((var(--header) - 30px) / 2);
+    right: calc((var(--header) - 30px) / 2);
     z-index: 9000;
     position: fixed;
 }
