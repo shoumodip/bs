@@ -1727,10 +1727,14 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
         label = "instance property or method";
     } break;
 
-    case BS_OBJECT_C_INSTANCE:
-        map = &((Bs_C_Instance *)container.as.object)->class->methods;
-        label = "instance property or method";
-        break;
+    case BS_OBJECT_C_INSTANCE: {
+        Bs_C_Instance *instance = (Bs_C_Instance *)container.as.object;
+        return bs_value_object(bs_bound_method_new(
+            bs,
+            container,
+            bs_check_map_get_at(
+                bs, 1, &instance->class->methods, index, "instance property or method")));
+    } break;
 
     case BS_OBJECT_C_LIB:
         map = &((Bs_C_Lib *)container.as.object)->map;

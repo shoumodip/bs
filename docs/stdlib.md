@@ -2106,7 +2106,7 @@ fn handle(result) {
         io.println("ERROR!")
         io.println("Row:", result.row())
         io.println("Col:", result.col())
-        io.println("Line: ", result.line())
+        io.println("Line:", result.line())
         io.println("Message:", result.message())
         io.println("Explanation:", result.explanation())
         io.println("Example:", result.example())
@@ -2130,9 +2130,9 @@ OK!
 69
 
 ERROR!
-Row: 19
+Row: 21
 Col: 27
-Line: handle(meta.call(fn () => -nil))              # Bs Fail
+Line: handle(meta.call(fn () => -nil))
 Message: invalid operand to unary (-): nil
 Explanation: nil
 Example: nil
