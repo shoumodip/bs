@@ -1127,82 +1127,79 @@ Run the program.
 }
 
 <span class='keyword'>var</span> command = os.<span class='field'>args</span>[<span class='constant'>1</span>]
-
-<span class='keyword'>if</span> command == <span class='string'>"add"</span> {
-    <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>3</span> {
-        io.<span class='field'>eprintln</span>(<span class='string'>"Error: task title not provided"</span>)
-        usage(io.<span class='field'>stderr</span>)
-        os.<span class='field'>exit</span>(<span class='constant'>1</span>)
-    }
-
-    <span class='keyword'>var</span> tasks = Tasks(TASKS_PATH)
-    tasks.<span class='field'>add</span>(os.<span class='field'>args</span>[<span class='constant'>2</span>])
-    tasks.<span class='field'>save</span>()
-    <span class='keyword'>return</span>
-}
-
-<span class='keyword'>if</span> command == <span class='string'>"done"</span> {
-    <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>3</span> {
-        io.<span class='field'>eprintln</span>(<span class='string'>"Error: task index not provided"</span>)
-        usage(io.<span class='field'>stderr</span>)
-        os.<span class='field'>exit</span>(<span class='constant'>1</span>)
-    }
-
-    <span class='keyword'>var</span> index = os.<span class='field'>args</span>[<span class='constant'>2</span>].<span class='field'>tonumber</span>()
-    <span class='keyword'>if</span> !index {
-        io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid index '</span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>)</span><span class='string'>'"</span>)
-        os.<span class='field'>exit</span>(<span class='constant'>1</span>)
-    }
-
-    <span class='keyword'>var</span> tasks = Tasks(TASKS_PATH)
-    tasks.<span class='field'>done</span>(index)
-    tasks.<span class='field'>save</span>()
-    <span class='keyword'>return</span>
-}
-
-<span class='keyword'>if</span> command == <span class='string'>"edit"</span> {
-    <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>3</span> {
-        io.<span class='field'>eprintln</span>(<span class='string'>"Error: task index and title not provided"</span>)
-        usage(io.<span class='field'>stderr</span>)
-        os.<span class='field'>exit</span>(<span class='constant'>1</span>)
-    }
-
-    <span class='keyword'>var</span> index = os.<span class='field'>args</span>[<span class='constant'>2</span>].<span class='field'>tonumber</span>()
-    <span class='keyword'>if</span> !index {
-        io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid index '</span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>)</span><span class='string'>'"</span>)
-        os.<span class='field'>exit</span>(<span class='constant'>1</span>)
-    }
-
-    <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>4</span> {
-        io.<span class='field'>eprintln</span>(<span class='string'>"Error: task title not provided"</span>)
-        usage(io.<span class='field'>stderr</span>)
-        os.<span class='field'>exit</span>(<span class='constant'>1</span>)
-    }
-
-    <span class='keyword'>var</span> tasks = Tasks(TASKS_PATH)
-    tasks.<span class='field'>edit</span>(index, os.<span class='field'>args</span>[<span class='constant'>3</span>])
-    tasks.<span class='field'>save</span>()
-    <span class='keyword'>return</span>
-}
-
-<span class='keyword'>if</span> command == <span class='string'>"list"</span> {
-    <span class='keyword'>var</span> query = <span class='constant'>nil</span>
-    <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &gt; <span class='constant'>2</span> {
-        query = Regex(os.<span class='field'>args</span>[<span class='constant'>2</span>])
-        <span class='keyword'>if</span> !query {
-            io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid query '</span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>)</span><span class='string'>'"</span>)
+<span class='keyword'>match</span> command {
+    <span class='string'>"add"</span> =&gt; {
+        <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>3</span> {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: task title not provided"</span>)
+            usage(io.<span class='field'>stderr</span>)
             os.<span class='field'>exit</span>(<span class='constant'>1</span>)
         }
+
+        <span class='keyword'>var</span> tasks = Tasks(TASKS_PATH)
+        tasks.<span class='field'>add</span>(os.<span class='field'>args</span>[<span class='constant'>2</span>])
+        tasks.<span class='field'>save</span>()
     }
 
-    <span class='keyword'>var</span> tasks = Tasks(TASKS_PATH)
-    tasks.<span class='field'>list</span>(query)
-    <span class='keyword'>return</span>
-}
+    <span class='string'>"done"</span> =&gt; {
+        <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>3</span> {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: task index not provided"</span>)
+            usage(io.<span class='field'>stderr</span>)
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>)
+        }
 
-io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid command '</span><span class='escape'>\</span><span class='escape'>(</span>command<span class='escape'>)</span><span class='string'>'"</span>)
-usage(io.<span class='field'>stderr</span>)
-os.<span class='field'>exit</span>(<span class='constant'>1</span>)
+        <span class='keyword'>var</span> index = os.<span class='field'>args</span>[<span class='constant'>2</span>].<span class='field'>tonumber</span>()
+        <span class='keyword'>if</span> !index {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid index '</span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>)</span><span class='string'>'"</span>)
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>)
+        }
+
+        <span class='keyword'>var</span> tasks = Tasks(TASKS_PATH)
+        tasks.<span class='field'>done</span>(index)
+        tasks.<span class='field'>save</span>()
+    }
+
+    <span class='string'>"edit"</span> =&gt; {
+        <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>3</span> {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: task index and title not provided"</span>)
+            usage(io.<span class='field'>stderr</span>)
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>)
+        }
+
+        <span class='keyword'>var</span> index = os.<span class='field'>args</span>[<span class='constant'>2</span>].<span class='field'>tonumber</span>()
+        <span class='keyword'>if</span> !index {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid index '</span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>)</span><span class='string'>'"</span>)
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>)
+        }
+
+        <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>4</span> {
+            io.<span class='field'>eprintln</span>(<span class='string'>"Error: task title not provided"</span>)
+            usage(io.<span class='field'>stderr</span>)
+            os.<span class='field'>exit</span>(<span class='constant'>1</span>)
+        }
+
+        <span class='keyword'>var</span> tasks = Tasks(TASKS_PATH)
+        tasks.<span class='field'>edit</span>(index, os.<span class='field'>args</span>[<span class='constant'>3</span>])
+        tasks.<span class='field'>save</span>()
+    }
+
+    <span class='string'>"list"</span> =&gt; {
+        <span class='keyword'>var</span> query = <span class='constant'>nil</span>
+        <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &gt; <span class='constant'>2</span> {
+            query = Regex(os.<span class='field'>args</span>[<span class='constant'>2</span>])
+            <span class='keyword'>if</span> !query {
+                io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid query '</span><span class='escape'>\</span><span class='escape'>(</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>)</span><span class='string'>'"</span>)
+                os.<span class='field'>exit</span>(<span class='constant'>1</span>)
+            }
+        }
+
+        <span class='keyword'>var</span> tasks = Tasks(TASKS_PATH)
+        tasks.<span class='field'>list</span>(query)
+    }
+} <span class='keyword'>else</span> {
+    io.<span class='field'>eprintln</span>(<span class='string'>"Error: invalid command '</span><span class='escape'>\</span><span class='escape'>(</span>command<span class='escape'>)</span><span class='string'>'"</span>)
+    usage(io.<span class='field'>stderr</span>)
+    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
+}
 </pre>
 </pre>
 </div>

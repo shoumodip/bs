@@ -876,82 +876,79 @@ if len(os.args) < 2 {
 }
 
 var command = os.args[1]
-
-if command == "add" {
-    if len(os.args) < 3 {
-        io.eprintln("Error: task title not provided")
-        usage(io.stderr)
-        os.exit(1)
-    }
-
-    var tasks = Tasks(TASKS_PATH)
-    tasks.add(os.args[2])
-    tasks.save()
-    return
-}
-
-if command == "done" {
-    if len(os.args) < 3 {
-        io.eprintln("Error: task index not provided")
-        usage(io.stderr)
-        os.exit(1)
-    }
-
-    var index = os.args[2].tonumber()
-    if !index {
-        io.eprintln("Error: invalid index '\(os.args[2])'")
-        os.exit(1)
-    }
-
-    var tasks = Tasks(TASKS_PATH)
-    tasks.done(index)
-    tasks.save()
-    return
-}
-
-if command == "edit" {
-    if len(os.args) < 3 {
-        io.eprintln("Error: task index and title not provided")
-        usage(io.stderr)
-        os.exit(1)
-    }
-
-    var index = os.args[2].tonumber()
-    if !index {
-        io.eprintln("Error: invalid index '\(os.args[2])'")
-        os.exit(1)
-    }
-
-    if len(os.args) < 4 {
-        io.eprintln("Error: task title not provided")
-        usage(io.stderr)
-        os.exit(1)
-    }
-
-    var tasks = Tasks(TASKS_PATH)
-    tasks.edit(index, os.args[3])
-    tasks.save()
-    return
-}
-
-if command == "list" {
-    var query = nil
-    if len(os.args) > 2 {
-        query = Regex(os.args[2])
-        if !query {
-            io.eprintln("Error: invalid query '\(os.args[2])'")
+match command {
+    "add" => {
+        if len(os.args) < 3 {
+            io.eprintln("Error: task title not provided")
+            usage(io.stderr)
             os.exit(1)
         }
+
+        var tasks = Tasks(TASKS_PATH)
+        tasks.add(os.args[2])
+        tasks.save()
     }
 
-    var tasks = Tasks(TASKS_PATH)
-    tasks.list(query)
-    return
-}
+    "done" => {
+        if len(os.args) < 3 {
+            io.eprintln("Error: task index not provided")
+            usage(io.stderr)
+            os.exit(1)
+        }
 
-io.eprintln("Error: invalid command '\(command)'")
-usage(io.stderr)
-os.exit(1)
+        var index = os.args[2].tonumber()
+        if !index {
+            io.eprintln("Error: invalid index '\(os.args[2])'")
+            os.exit(1)
+        }
+
+        var tasks = Tasks(TASKS_PATH)
+        tasks.done(index)
+        tasks.save()
+    }
+
+    "edit" => {
+        if len(os.args) < 3 {
+            io.eprintln("Error: task index and title not provided")
+            usage(io.stderr)
+            os.exit(1)
+        }
+
+        var index = os.args[2].tonumber()
+        if !index {
+            io.eprintln("Error: invalid index '\(os.args[2])'")
+            os.exit(1)
+        }
+
+        if len(os.args) < 4 {
+            io.eprintln("Error: task title not provided")
+            usage(io.stderr)
+            os.exit(1)
+        }
+
+        var tasks = Tasks(TASKS_PATH)
+        tasks.edit(index, os.args[3])
+        tasks.save()
+    }
+
+    "list" => {
+        var query = nil
+        if len(os.args) > 2 {
+            query = Regex(os.args[2])
+            if !query {
+                io.eprintln("Error: invalid query '\(os.args[2])'")
+                os.exit(1)
+            }
+        }
+
+        var tasks = Tasks(TASKS_PATH)
+        tasks.list(query)
+    }
+} else {
+    io.eprintln("Error: invalid command '\(command)'")
+    usage(io.stderr)
+    os.exit(1)
+}
 ```
 
 ```console
