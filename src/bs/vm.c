@@ -2735,7 +2735,19 @@ Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_repl) {
     const size_t start = b->count;
 
     bs_buffer_absolute_path(b, path);
-    const Bs_Closure *fn = bs_compile_module(bs, bs_buffer_reset(b, start), input, true, is_repl);
+
+    const Bs_Closure *fn;
+    if (is_repl) {
+        Bs_Str *source = bs_str_new(bs, input);
+
+        fn = bs_compile_module(
+            bs, bs_buffer_reset(b, start), Bs_Sv(source->data, source->size), true, is_repl);
+
+        fn->fn->source = source;
+    } else {
+        fn = bs_compile_module(bs, bs_buffer_reset(b, start), input, true, is_repl);
+    }
+
     if (!fn) {
         return (Bs_Result){.exit = 1};
     }
