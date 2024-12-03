@@ -77,8 +77,11 @@ LICENSE false
 .github true
 ```
 
-### readfile(path) @function
+### readfile(path, binary?) @function
 Read a file into a string.
+
+If the argument `binary` is provided to be `true`, then the file is opened in
+binary mode.
 
 Returns `nil` if failed.
 
@@ -102,8 +105,11 @@ Baz
 People's dreams have no end! ~ Blackbeard
 ```
 
-### Reader(path) @class
+### Reader(path, binary?) @class
 Native C class that opens `path` in readable mode.
+
+If the argument `binary` is provided to be `true`, then the file is opened in
+binary mode.
 
 Returns `nil` if failed.
 
@@ -194,8 +200,11 @@ Line:
 #### Reader.eof() @method
 Return whether the end of file has been reached.
 
-### Writer(path) @class
+### Writer(path, binary?) @class
 Native C class that opens `path` in writeable mode.
+
+If the argument `binary` is provided to be `true`, then the file is opened in
+binary mode.
 
 Returns `nil` if failed.
 
@@ -413,12 +422,15 @@ $ bs demo.bs
 /usr
 ```
 
-### Process(args, capture_stdout?, capture_stderr?, capture_stdin?) @class
+### Process(args, capture_stdout?, capture_stderr?, capture_stdin?, binary?) @class
 Native C class that spawns a process. Expects `args` to be an
 array of strings that represent the command line arguments.
 
-If any of the optional capture arguments are provided to be true, then that
+If any of the optional capture arguments are provided to be `true`, then that
 corresponding file of the created process will be captured.
+
+If the argument `binary` is provided to be `true`, then the captured files are
+opened in binary mode.
 
 Returns `nil` if failed.
 

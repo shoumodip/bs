@@ -55,12 +55,20 @@ static Bs_Value bs_io_file_close(Bs *bs, Bs_Value *args, size_t arity) {
 static Bs_C_Class *bs_io_reader_class;
 
 static Bs_Value bs_io_reader_init(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 1);
-    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    if (arity != 1 && arity != 2) {
+        bs_error(bs, "expected 1 or 2 arguments, got %zu", arity);
+    }
 
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     const Bs_Str *path = (const Bs_Str *)args[0].as.object;
 
-    FILE *file = fopen(path->data, "r");
+    bool binary = false;
+    if (arity == 2) {
+        bs_arg_check_value_type(bs, args, 1, BS_VALUE_BOOL);
+        binary = args[1].as.boolean;
+    }
+
+    FILE *file = fopen(path->data, binary ? "rb" : "r");
     if (!file) {
         return bs_value_nil;
     }
@@ -153,12 +161,20 @@ static Bs_Value bs_io_reader_eof(Bs *bs, Bs_Value *args, size_t arity) {
 static Bs_C_Class *bs_io_writer_class;
 
 static Bs_Value bs_io_writer_init(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 1);
-    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    if (arity != 1 && arity != 2) {
+        bs_error(bs, "expected 1 or 2 arguments, got %zu", arity);
+    }
 
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     const Bs_Str *path = (const Bs_Str *)args[0].as.object;
 
-    FILE *file = fopen(path->data, "w");
+    bool binary = false;
+    if (arity == 2) {
+        bs_arg_check_value_type(bs, args, 1, BS_VALUE_BOOL);
+        binary = args[1].as.boolean;
+    }
+
+    FILE *file = fopen(path->data, binary ? "wb" : "w");
     if (!file) {
         return bs_value_nil;
     }
@@ -383,13 +399,21 @@ static Bs_Value bs_io_readdir(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 static Bs_Value bs_io_readfile(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 1);
-    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
+    if (arity != 1 && arity != 2) {
+        bs_error(bs, "expected 1 or 2 arguments, got %zu", arity);
+    }
 
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     const Bs_Str *path = (const Bs_Str *)args[0].as.object;
 
+    bool binary = false;
+    if (arity == 2) {
+        bs_arg_check_value_type(bs, args, 1, BS_VALUE_BOOL);
+        binary = args[1].as.boolean;
+    }
+
     size_t size;
-    char *contents = bs_read_file(path->data, &size);
+    char *contents = bs_read_file(path->data, &size, binary);
     if (!contents) {
         return bs_value_nil;
     }
@@ -564,7 +588,7 @@ static void bs_process_mark(Bs *bs, void *instance_data) {
     bs_mark(bs, (Bs_Object *)p->stdin_write);
 }
 
-static Bs_C_Instance *bs_pipe_new(Bs *bs, int fd, bool write) {
+static Bs_C_Instance *bs_pipe_new(Bs *bs, int fd, bool write, bool binary) {
     Bs_C_Instance *instance =
         bs_c_instance_new(bs, write ? bs_io_writer_class : bs_io_reader_class);
 
@@ -572,21 +596,22 @@ static Bs_C_Instance *bs_pipe_new(Bs *bs, int fd, bool write) {
     f->file = FD_OPEN(fd, write ? "w" : "r");
 
 #if defined(_WIN32) || defined(_WIN64)
-    setmode(fd, _O_TEXT);
+    setmode(fd, binary ? _O_BINARY : _O_TEXT);
 #endif // _WIN32
 
     return instance;
 }
 
 static Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
-    if (arity < 1 || arity > 4) {
-        bs_error(bs, "expected 1 to 4 arguments, got %zu", arity);
+    if (arity < 1 || arity > 5) {
+        bs_error(bs, "expected 1 to 5 arguments, got %zu", arity);
     }
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
 
     bool capture_stdout = false;
     bool capture_stderr = false;
     bool capture_stdin = false;
+    bool capture_binary = false;
 
     if (arity >= 2) {
         bs_arg_check_value_type(bs, args, 1, BS_VALUE_BOOL);
@@ -601,6 +626,11 @@ static Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
     if (arity == 4) {
         bs_arg_check_value_type(bs, args, 3, BS_VALUE_BOOL);
         capture_stdin = args[3].as.boolean;
+    }
+
+    if (arity == 5) {
+        bs_arg_check_value_type(bs, args, 4, BS_VALUE_BOOL);
+        capture_binary = args[4].as.boolean;
     }
 
     const Bs_Array *array = (const Bs_Array *)args[0].as.object;
@@ -722,20 +752,20 @@ static Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
     CloseHandle(p->piProcInfo.hThread);
 
     if (capture_stdout) {
-        p->stdout_read =
-            bs_pipe_new(bs, _open_osfhandle((intptr_t)stdout_pipe_read, _O_RDONLY), false);
+        p->stdout_read = bs_pipe_new(
+            bs, _open_osfhandle((intptr_t)stdout_pipe_read, _O_RDONLY), false, capture_binary);
         CloseHandle(stdout_pipe_write);
     }
 
     if (capture_stderr) {
-        p->stderr_read =
-            bs_pipe_new(bs, _open_osfhandle((intptr_t)stderr_pipe_read, _O_RDONLY), false);
+        p->stderr_read = bs_pipe_new(
+            bs, _open_osfhandle((intptr_t)stderr_pipe_read, _O_RDONLY), false, capture_binary);
         CloseHandle(stderr_pipe_write);
     }
 
     if (capture_stdin) {
-        p->stdin_write =
-            bs_pipe_new(bs, _open_osfhandle((intptr_t)stdin_pipe_write, _O_WRONLY), true);
+        p->stdin_write = bs_pipe_new(
+            bs, _open_osfhandle((intptr_t)stdin_pipe_write, _O_WRONLY), true, capture_binary);
         CloseHandle(stdin_pipe_read);
     }
 #else
@@ -832,17 +862,17 @@ static Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
 
     if (capture_stdout) {
         close(stdout_pipe[1]);
-        p->stdout_read = bs_pipe_new(bs, stdout_pipe[0], false);
+        p->stdout_read = bs_pipe_new(bs, stdout_pipe[0], false, capture_binary);
     }
 
     if (capture_stderr) {
         close(stderr_pipe[1]);
-        p->stderr_read = bs_pipe_new(bs, stderr_pipe[0], false);
+        p->stderr_read = bs_pipe_new(bs, stderr_pipe[0], false, capture_binary);
     }
 
     if (capture_stdin) {
         close(stdin_pipe[0]);
-        p->stdin_write = bs_pipe_new(bs, stdin_pipe[1], true);
+        p->stdin_write = bs_pipe_new(bs, stdin_pipe[1], true, capture_binary);
     }
 #endif // _WIN32
 

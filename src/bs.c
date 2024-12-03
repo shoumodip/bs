@@ -353,7 +353,7 @@ int main(int argc, char **argv) {
     const char *path = argv[1];
 
     size_t size = 0;
-    char *contents = bs_read_file(path, &size);
+    char *contents = bs_read_file(path, &size, false);
     if (!contents) {
         bs_error_standalone(bs, "could not read file '%s'", path);
         bs_free(bs);

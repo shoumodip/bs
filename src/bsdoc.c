@@ -473,7 +473,7 @@ int bsdoc_run_file(const char *input) {
     Bs_Writer error = bs_file_writer(stderr);
 
     size_t size;
-    char *contents = bs_read_file(input, &size);
+    char *contents = bs_read_file(input, &size, false);
     if (!contents) {
         bs_fmt(&error, "error: could not read file '%s'\n", input);
         exit(1);
@@ -688,7 +688,7 @@ int bsdoc_run_file(const char *input) {
                 const Bs_Sv shell = Bs_Sv_Static("$ ");
                 if (bs_sv_prefix(line, shell)) {
                     bs_sv_drop(&line, shell.size);
-                    bsdoc_print_styled_sv(f, BSDOC_STYLE_CONSTANT, shell);
+                    bsdoc_print_styled_sv(f, BSDOC_STYLE_STRING, shell);
 
                     Bs_Sv comment = line;
                     line = bs_sv_split(&comment, '#');

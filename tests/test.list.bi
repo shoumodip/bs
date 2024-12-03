@@ -2161,7 +2161,7 @@ core/meta_eval_runtime_error.bs:1:10: in eval()
 :b shell 33
 ../bin/bs core/meta_call_error.bs
 :i returncode 0
-:b stdout 384
+:b stdout 390
 OK!
 69
 
@@ -2177,7 +2177,7 @@ ERROR!
 Row: nil
 Col: nil
 Line: nil
-Message: expected 1 argument, got 0
+Message: expected 1 or 2 arguments, got 0
 Explanation: nil
 Example: nil
 

@@ -1450,7 +1450,7 @@ const Bs_Closure *bs_compile_module(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_mai
 
 static bool bs_import_language(Bs *bs, Bs_Sv path) {
     size_t size = 0;
-    char *contents = bs_read_file(path.data, &size);
+    char *contents = bs_read_file(path.data, &size, false);
     if (!contents) {
         return false;
     }

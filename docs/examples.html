@@ -62,7 +62,7 @@ os.<span class='field'>exit</span>(code)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs cat.bs cat.bs <span class='comment'># Poor man's quine</span>
+<span class='string'>$ </span>bs cat.bs cat.bs <span class='comment'># Poor man's quine</span>
 var code = 0
 
 for i in 1, len(os.args) {
@@ -131,7 +131,7 @@ io.<span class='field'>readdir</span>(<span class='keyword'>if</span> <span clas
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs ls.bs
+<span class='string'>$ </span>bs ls.bs
 README.md
 ls.bs
 </pre>
@@ -218,7 +218,7 @@ os.<span class='field'>exit</span>(code)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs grep.bs '\.[A-z]+\(' grep.bs
+<span class='string'>$ </span>bs grep.bs '\.[A-z]+\(' grep.bs
 grep.bs:3:13:     while !f.eof() {
 grep.bs:4:21:         var line = f.readln()
 grep.bs:6:23:         var col = line.find(pattern)
@@ -233,7 +233,7 @@ grep.bs:38:15:     var f = io.Reader(path)
 grep.bs:40:11:         io.println("Error: could not open file '\(path)'")
 grep.bs:48:3: os.exit(code)
 
-<span class='constant'>$ </span>cat grep.bs | bs grep.bs '\.[A-z]+\(' <span class='comment'># DON'T CAT INTO GREP!!!</span>
+<span class='string'>$ </span>cat grep.bs | bs grep.bs '\.[A-z]+\(' <span class='comment'># DON'T CAT INTO GREP!!!</span>
 &lt;stdin&gt;:3:13:     while !f.eof() {
 &lt;stdin&gt;:4:21:         var line = f.readln()
 &lt;stdin&gt;:6:23:         var col = line.find(pattern)
@@ -373,7 +373,7 @@ io.<span class='field'>println</span>()
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs shell.bs
+<span class='string'>$ </span>bs shell.bs
 ~/Git/bs/examples/shell $ ls -a
 .  ..  README.md  shell.bs
 </pre>
@@ -395,7 +395,7 @@ in order to get readline bindings and filename autocompletion.
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>rlwrap -c bs shell.bs <span class='comment'># Like so</span>
+<span class='string'>$ </span>rlwrap -c bs shell.bs <span class='comment'># Like so</span>
 </pre>
 </div>
 </section>
@@ -450,7 +450,7 @@ board[<span class='keyword'>len</span>(board) - <span class='constant'>2</span>]
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs rule110.bs
+<span class='string'>$ </span>bs rule110.bs
                             *
                            **
                           ***
@@ -642,7 +642,7 @@ Run the program.
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs game_of_life_tui.bs
+<span class='string'>$ </span>bs game_of_life_tui.bs
 </pre>
 </div>
 </section>
@@ -874,9 +874,9 @@ Compile the raylib module.
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>cc -o raylib.so -fPIC -shared raylib.c -lbs -lraylib    <span class='comment'># On Linux</span>
-<span class='constant'>$ </span>cc -o raylib.dylib -fPIC -shared raylib.c -lbs -lraylib <span class='comment'># On macOS</span>
-<span class='constant'>$ </span>cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib        <span class='comment'># On Windows</span>
+<span class='string'>$ </span>cc -o raylib.so -fPIC -shared raylib.c -lbs -lraylib    <span class='comment'># On Linux</span>
+<span class='string'>$ </span>cc -o raylib.dylib -fPIC -shared raylib.c -lbs -lraylib <span class='comment'># On macOS</span>
+<span class='string'>$ </span>cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib        <span class='comment'># On Windows</span>
 </pre>
 </div>
 <blockquote>
@@ -1028,7 +1028,7 @@ Run the program.
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs game_of_life_raylib.bs
+<span class='string'>$ </span>bs game_of_life_raylib.bs
 </pre>
 </div>
 </section>
@@ -1218,27 +1218,27 @@ os.<span class='field'>exit</span>(<span class='constant'>1</span>)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs tasks.bs add "Finish reading book"
+<span class='string'>$ </span>bs tasks.bs add "Finish reading book"
 Added: Finish reading book
 
-<span class='constant'>$ </span>bs tasks.bs add "Submit project report"
+<span class='string'>$ </span>bs tasks.bs add "Submit project report"
 Added: Submit project report
 
-<span class='constant'>$ </span>bs tasks.bs add "Submit homework"
+<span class='string'>$ </span>bs tasks.bs add "Submit homework"
 Added: Submit homework
 
-<span class='constant'>$ </span>bs tasks.bs list
+<span class='string'>$ </span>bs tasks.bs list
 [0] Finish reading book
 [1] Submit project report
 [2] Submit homework
 
-<span class='constant'>$ </span>bs tasks.bs list 'Submit.*report'
+<span class='string'>$ </span>bs tasks.bs list 'Submit.*report'
 [1] Submit project report
 
-<span class='constant'>$ </span>bs tasks.bs done 0
+<span class='string'>$ </span>bs tasks.bs done 0
 Done: Finish reading book
 
-<span class='constant'>$ </span>bs tasks.bs list
+<span class='string'>$ </span>bs tasks.bs list
 [0] Submit project report
 [1] Submit homework
 </pre>
@@ -1547,9 +1547,9 @@ Compile the raylib module.
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>cc -o raylib.so -fPIC -shared raylib.c -lbs -lraylib    <span class='comment'># On Linux</span>
-<span class='constant'>$ </span>cc -o raylib.dylib -fPIC -shared raylib.c -lbs -lraylib <span class='comment'># On macOS</span>
-<span class='constant'>$ </span>cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib        <span class='comment'># On Windows</span>
+<span class='string'>$ </span>cc -o raylib.so -fPIC -shared raylib.c -lbs -lraylib    <span class='comment'># On Linux</span>
+<span class='string'>$ </span>cc -o raylib.dylib -fPIC -shared raylib.c -lbs -lraylib <span class='comment'># On macOS</span>
+<span class='string'>$ </span>cl /LD /Fe:raylib.dll raylib.c bs.lib raylib.lib        <span class='comment'># On Windows</span>
 </pre>
 </div>
 <blockquote>
@@ -2074,7 +2074,7 @@ Run the program.
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs flappy_bird.bs
+<span class='string'>$ </span>bs flappy_bird.bs
 </pre>
 </div>
 <section id='s10'>

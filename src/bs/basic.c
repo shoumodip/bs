@@ -90,10 +90,10 @@ void bs_fmt(Bs_Writer *w, const char *fmt, ...) {
     va_end(args);
 }
 
-char *bs_read_file(const char *path, size_t *size) {
+char *bs_read_file(const char *path, size_t *size, bool binary) {
     char *result = NULL;
 
-    FILE *f = fopen(path, "r");
+    FILE *f = fopen(path, binary ? "rb" : "r");
     if (!f) {
         return NULL;
     }

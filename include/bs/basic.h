@@ -52,7 +52,7 @@ void bs_fmt(Bs_Writer *writer, const char *fmt, ...) __attribute__((__format__(_
     } while (0)
 
 // File IO
-char *bs_read_file(const char *path, size_t *size);
+char *bs_read_file(const char *path, size_t *size, bool binary);
 
 // Arithmetic
 #define bs_min(a, b) ((a) < (b) ? (a) : (b))

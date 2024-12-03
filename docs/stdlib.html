@@ -53,7 +53,7 @@ io.<span class='field'>println</span>(<span class='string'>"Hello, </span><span 
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Enter your name&gt; Batman
 Hello, Batman!
 </pre>
@@ -92,7 +92,7 @@ io.<span class='field'>print</span>(<span class='string'>"Hello"</span>, <span c
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Hello world 69⏎
 </pre>
 </div>
@@ -158,7 +158,7 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 .git true
 include true
 demo.bs false
@@ -180,9 +180,13 @@ LICENSE false
 </div>
 </section>
 <section id='s7'>
-<h3 class='hl-header'><code><span class='function'>readfile</span>(path)</code></h3>
+<h3 class='hl-header'><code><span class='function'>readfile</span>(path, binary?)</code></h3>
 <p>
 Read a file into a string.
+</p>
+<p>
+If the argument <code>binary</code> is provided to be <code>true</code>, then the file is opened in
+binary mode.
 </p>
 <p>
 Returns <code>nil</code> if failed.
@@ -221,7 +225,7 @@ io.<span class='field'>print</span>(contents)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Just a test file
 Nothing to see here
 Foo
@@ -232,9 +236,13 @@ People's dreams have no end! ~ Blackbeard
 </div>
 </section>
 <section id='s8'>
-<h3 class='hl-header'><code><span class='class'>Reader</span>(path)</code></h3>
+<h3 class='hl-header'><code><span class='class'>Reader</span>(path, binary?)</code></h3>
 <p>
 Native C class that opens <code>path</code> in readable mode.
+</p>
+<p>
+If the argument <code>binary</code> is provided to be <code>true</code>, then the file is opened in
+binary mode.
 </p>
 <p>
 Returns <code>nil</code> if failed.
@@ -277,7 +285,7 @@ Create a file <code>input.txt</code> with some sample text and run it.
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Just a test file
 Nothing to see here
 Foo
@@ -340,7 +348,7 @@ io.<span class='field'>print</span>(<span class='string'>"The rest:"</span>, f.<
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 The first 16 bytes: [Just a test file]
 The rest:
 Nothing to see here
@@ -393,7 +401,7 @@ Read a line.
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Line: Just a test file
 Line: Nothing to see here
 Line: Foo
@@ -412,9 +420,13 @@ Return whether the end of file has been reached.
 </section>
 </section>
 <section id='s13'>
-<h3 class='hl-header'><code><span class='class'>Writer</span>(path)</code></h3>
+<h3 class='hl-header'><code><span class='class'>Writer</span>(path, binary?)</code></h3>
 <p>
 Native C class that opens <code>path</code> in writeable mode.
+</p>
+<p>
+If the argument <code>binary</code> is provided to be <code>true</code>, then the file is opened in
+binary mode.
 </p>
 <p>
 Returns <code>nil</code> if failed.
@@ -455,8 +467,8 @@ f.<span class='field'>writeln</span>(<span class='constant'>69</span>, <span cla
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
-<span class='constant'>$ </span>cat output.txt <span class='comment'># `type output.txt` on windows</span>
+<span class='string'>$ </span>bs demo.bs
+<span class='string'>$ </span>cat output.txt <span class='comment'># `type output.txt` on windows</span>
 Hello there!
 General Kenobi!
 69 Nice!
@@ -540,7 +552,7 @@ Example usecase:
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 .git true
 include true
 demo.bs false
@@ -635,8 +647,8 @@ os.<span class='field'>exit</span>(<span class='constant'>69</span>)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
-<span class='constant'>$ </span>echo $? <span class='comment'># `echo %errorlevel%` on windows</span>
+<span class='string'>$ </span>bs demo.bs
+<span class='string'>$ </span>echo $? <span class='comment'># `echo %errorlevel%` on windows</span>
 69
 </pre>
 </div>
@@ -690,7 +702,7 @@ io.<span class='field'>println</span>(<span class='string'>"Elapsed: </span><spa
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 832040
 Elapsed: 0.137143968999226
 </pre>
@@ -733,7 +745,7 @@ io.<span class='field'>println</span>(<span class='string'>"Elapsed: </span><spa
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Elapsed: 0.690292477000185
 </pre>
 </div>
@@ -775,8 +787,8 @@ io.<span class='field'>println</span>(os.<span class='field'>getenv</span>(<span
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>export FOO=lmao <span class='comment'># `set FOO=lmao` on windows</span>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>export FOO=lmao <span class='comment'># `set FOO=lmao` on windows</span>
+<span class='string'>$ </span>bs demo.bs
 lmao
 nil
 </pre>
@@ -819,7 +831,7 @@ io.<span class='field'>println</span>(os.<span class='field'>getenv</span>(<span
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 lmao
 </pre>
 </div>
@@ -857,7 +869,7 @@ io.<span class='field'>println</span>(os.<span class='field'>getcwd</span>())
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 /home/sk/Git/bs
 </pre>
 </div>
@@ -899,20 +911,24 @@ io.<span class='field'>println</span>(os.<span class='field'>getcwd</span>())
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 /usr
 </pre>
 </div>
 </section>
 <section id='s32'>
-<h3 class='hl-header'><code><span class='class'>Process</span>(args, capture_stdout?, capture_stderr?, capture_stdin?)</code></h3>
+<h3 class='hl-header'><code><span class='class'>Process</span>(args, capture_stdout?, capture_stderr?, capture_stdin?, binary?)</code></h3>
 <p>
 Native C class that spawns a process. Expects <code>args</code> to be an
 array of strings that represent the command line arguments.
 </p>
 <p>
-If any of the optional capture arguments are provided to be true, then that
+If any of the optional capture arguments are provided to be <code>true</code>, then that
 corresponding file of the created process will be captured.
+</p>
+<p>
+If the argument <code>binary</code> is provided to be <code>true</code>, then the captured files are
+opened in binary mode.
 </p>
 <p>
 Returns <code>nil</code> if failed.
@@ -951,7 +967,7 @@ p.<span class='field'>wait</span>()
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 total 4
 -rw-r--r-- 1 shoumodip shoumodip 122 Oct  6 15:11 demo.bs
 </pre>
@@ -1004,7 +1020,7 @@ p.<span class='field'>wait</span>()
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Line: total 4
 Line: -rw-r--r-- 1 shoumodip shoumodip 241 Oct  6 15:44 demo.bs
 Line:
@@ -1067,7 +1083,7 @@ p.<span class='field'>wait</span>()
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 First line foobar lmao
 Third line lets goooo foobar
 </pre>
@@ -1130,7 +1146,7 @@ io.<span class='field'>println</span>(os.<span class='field'>args</span>)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs foo bar baz
+<span class='string'>$ </span>bs demo.bs foo bar baz
 ["demo.bs", "foo", "bar", "baz"]
 </pre>
 </div>
@@ -1168,7 +1184,7 @@ io.<span class='field'>println</span>(os.<span class='field'>name</span>)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Linux      # On linux
 macOS      # On macOS
 Windows    # On windows
@@ -1214,7 +1230,7 @@ io.<span class='field'>println</span>(os.<span class='field'>arch</span>)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 x86_64     # On x86_64
 ARM64      # On arm64
 Unknown    # On unknown
@@ -1264,7 +1280,7 @@ io.<span class='field'>println</span>(<span class='string'>"69 apples, 420 orang
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 {fruit: 'apples', count: 69}, {fruit: 'oranges', count: 420}
 </pre>
 </div>
@@ -1309,7 +1325,7 @@ io.<span class='field'>println</span>(<span class='string'>"deez nuts"</span>.<s
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 deez
 nuts
 nuts
@@ -1349,7 +1365,7 @@ io.<span class='field'>println</span>(<span class='string'>"sllab amgil"</span>.
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 ligma balls
 </pre>
 </div>
@@ -1387,7 +1403,7 @@ io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span cl
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 foofoofoofoofoofoo
 </pre>
 </div>
@@ -1425,7 +1441,7 @@ io.<span class='field'>println</span>(<span class='string'>"Urmom"</span>.<span 
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 URMOM
 </pre>
 </div>
@@ -1463,7 +1479,7 @@ io.<span class='field'>println</span>(<span class='string'>"Urmom"</span>.<span 
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 urmom
 </pre>
 </div>
@@ -1505,7 +1521,7 @@ io.<span class='field'>println</span>(<span class='string'>"nah"</span>.<span cl
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 69
 420.69
 255
@@ -1560,7 +1576,7 @@ io.<span class='field'>println</span>(<span class='string'>"yolol"</span>.<span 
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 4
 8
 nil
@@ -1612,7 +1628,7 @@ io.<span class='field'>println</span>(<span class='string'>"foo bar   baz"</span
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 ["foo bar baz"]
 ["foo", "bar", "baz"]
 ["foo bar baz"]
@@ -1662,7 +1678,7 @@ io.<span class='field'>println</span>(<span class='string'>"ayo noice!"</span>.<
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 foo bar baz
 foo---bar---baz
 foo bar ba
@@ -1714,7 +1730,7 @@ io.<span class='field'>println</span>(<span class='string'>"food"</span>.<span c
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 1
 -1
 0
@@ -1756,7 +1772,7 @@ io.<span class='field'>println</span>(<span class='string'>"["</span> $ <span cl
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [foo bar baz  ]
 </pre>
 </div>
@@ -1794,7 +1810,7 @@ io.<span class='field'>println</span>(<span class='string'>"["</span> $ <span cl
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [   foo bar baz]
 </pre>
 </div>
@@ -1832,7 +1848,7 @@ io.<span class='field'>println</span>(<span class='string'>"["</span> $ <span cl
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [foo bar baz]
 </pre>
 </div>
@@ -1875,7 +1891,7 @@ io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span cl
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 foo
 foo
 6foo
@@ -1922,7 +1938,7 @@ io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span cl
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 foo
 foo
 foo6
@@ -1966,7 +1982,7 @@ io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 true
 false
 false
@@ -2008,7 +2024,7 @@ io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 true
 false
 false
@@ -2057,7 +2073,7 @@ io.<span class='field'>println</span>(bit.<span class='field'>ceil</span>(<span 
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 8
 8
 16
@@ -2099,7 +2115,7 @@ io.<span class='field'>println</span>(bit.<span class='field'>floor</span>(<span
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 4
 8
 8
@@ -2258,7 +2274,7 @@ io.<span class='field'>println</span>(nice)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Hello, world!
 69 Hehe
 </pre>
@@ -2302,7 +2318,7 @@ io.<span class='field'>println</span>(<span class='string'>"</span><span class='
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Hello world!
 12 bytes written.
 </pre>
@@ -2349,7 +2365,7 @@ io.<span class='field'>println</span>(b)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Hello world!
 Hello
 </pre>
@@ -2397,7 +2413,7 @@ io.<span class='field'>println</span>(b.<span class='field'>slice</span>(<span c
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Hello world!
 Hello
 world!
@@ -2446,7 +2462,7 @@ io.<span class='field'>println</span>(buffer)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Hello, world! 69
 </pre>
 </div>
@@ -2492,7 +2508,7 @@ io.<span class='field'>println</span>(buffer)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Hello, world!
 </pre>
 </div>
@@ -2536,7 +2552,7 @@ b.<span class='field'>push</span>(<span class='string'>"Hello"</span>)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 H 72
 e 101
 l 108
@@ -2587,7 +2603,7 @@ io.<span class='field'>println</span>(b)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Cello
 Hello
 </pre>
@@ -2638,7 +2654,7 @@ io.<span class='field'>println</span>(ys)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 [2, 4, 6, 8, 10]
 </pre>
@@ -2683,7 +2699,7 @@ io.<span class='field'>println</span>(ys)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 [2, 4]
 </pre>
@@ -2733,7 +2749,7 @@ io.<span class='field'>println</span>(b)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 15
 25
 </pre>
@@ -2780,7 +2796,7 @@ io.<span class='field'>println</span>(zs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [69, 2, 3, 4, 5]
 [69, 2, 3, 4, 5]
 [1, 2, 3, 4, 5]
@@ -2820,7 +2836,7 @@ io.<span class='field'>println</span>([<span class='constant'>1</span>, <span cl
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 1 -&gt; 2 -&gt; 3 -&gt; 4 -&gt; 5
 </pre>
 </div>
@@ -2866,7 +2882,7 @@ io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span c
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 2
 5
 nil
@@ -2911,7 +2927,7 @@ io.<span class='field'>println</span>(xs.<span class='field'>equal</span>(ys))
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 false
 true
 </pre>
@@ -2963,7 +2979,7 @@ io.<span class='field'>println</span>(xs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [0, 2, 4, 6, 8]
 </pre>
 </div>
@@ -3001,7 +3017,7 @@ io.<span class='field'>println</span>(
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 ["Nice!", 69, 420]
 </pre>
 </div>
@@ -3054,7 +3070,7 @@ io.<span class='field'>println</span>(xs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [0, 2, 6, 8]
 [0, 2, 4, 6, 6]
 </pre>
@@ -3093,7 +3109,7 @@ io.<span class='field'>println</span>(
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [69, 420, "Nice!"]
 </pre>
 </div>
@@ -3134,7 +3150,7 @@ io.<span class='field'>println</span>(xs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 </pre>
 </div>
@@ -3187,7 +3203,7 @@ io.<span class='field'>println</span>(xs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 [1, 2, 3]
 [1, 2, 3]
@@ -3234,7 +3250,7 @@ io.<span class='field'>println</span>(xs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 3
 [1, 2, 4, 5]
@@ -3281,7 +3297,7 @@ io.<span class='field'>println</span>(xs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 [5, 4, 3, 2, 1]
 </pre>
@@ -3327,7 +3343,7 @@ io.<span class='field'>println</span>(xs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 [69, 69, 69, 69, 69]
 </pre>
@@ -3364,7 +3380,7 @@ io.<span class='field'>println</span>(xs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 ["foo", "foo", "foo", "foo", "foo"]
 </pre>
 </div>
@@ -3408,7 +3424,7 @@ io.<span class='field'>println</span>(board)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [
     [0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0],
@@ -3456,7 +3472,7 @@ io.<span class='field'>println</span>(xs.<span class='field'>slice</span>(<span 
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 [3, 4, 5]
 [2, 3]
@@ -3502,7 +3518,7 @@ io.<span class='field'>println</span>(xs.<span class='field'>append</span>(ys))
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 [
     1,
@@ -3570,7 +3586,7 @@ io.<span class='field'>println</span>(zs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 {
     bar = 1337,
     foo = 69
@@ -3623,7 +3639,7 @@ io.<span class='field'>println</span>(xs.<span class='field'>equal</span>(ys))
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 false
 true
 </pre>
@@ -3672,7 +3688,7 @@ io.<span class='field'>println</span>(theta.<span class='field'>sin</span>())
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 0.479425538604203
 </pre>
 </div>
@@ -3744,7 +3760,7 @@ io.<span class='field'>println</span>(<span class='constant'>2</span>.<span clas
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 7.38905609893065
 </pre>
 </div>
@@ -3832,7 +3848,7 @@ io.<span class='field'>println</span>((-<span class='constant'>420</span>).<span
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 0
 1
 -1
@@ -3873,7 +3889,7 @@ io.<span class='field'>println</span>(<span class='constant'>3</span>.<span clas
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 3
 3
 </pre>
@@ -3913,7 +3929,7 @@ io.<span class='field'>println</span>(<span class='constant'>3</span>.<span clas
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 1
 1
 </pre>
@@ -3967,7 +3983,7 @@ io.<span class='field'>println</span>(n.<span class='field'>precise</span>(<span
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 69.1337
 69
 69.134
@@ -4026,7 +4042,7 @@ io.<span class='field'>println</span>(b.<span class='field'>number</span>(<span 
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 0.279107155961776
 0.73815524476827
 225.323320231653
@@ -4080,7 +4096,7 @@ io.<span class='field'>println</span>(r.<span class='field'>number</span>(<span 
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 0.279107155961776
 0.73815524476827
 225.323320231653
@@ -4122,7 +4138,7 @@ io.<span class='field'>println</span>(seq.<span class='field'>slice</span>())
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 {03ah
 "7f
 </pre>
@@ -4169,7 +4185,7 @@ io.<span class='field'>println</span>(math.<span class='field'>range</span>(<spa
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 [6, 5, 4, 3, 2]
 [1, 3, 5]
@@ -4208,7 +4224,7 @@ io.<span class='field'>println</span>(math.<span class='field'>range</span>(<spa
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 demo.bs:1:29: error: a step of -1 in an ascending range would run indefinitely
 
     1 | io.println(math.range(1, 6, -1))
@@ -4280,7 +4296,7 @@ Example usecase:
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Row: 1
 Col: 5
 Line: Oops@
@@ -4375,7 +4391,7 @@ io.<span class='field'>println</span>(f())
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 69
 </pre>
 </div>
@@ -4418,7 +4434,7 @@ io.<span class='field'>println</span>(<span class='string'>"Example:"</span>, f.
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Row: 1
 Col: 5
 Line: Oops@
@@ -4512,7 +4528,7 @@ io.<span class='field'>println</span>(h())
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Nice!
 Nice!
 Nice!
@@ -4587,7 +4603,7 @@ handle(meta.<span class='field'>call</span>(<span class='keyword'>fn</span> () =
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 OK!
 69
 
@@ -4639,7 +4655,7 @@ io.<span class='field'>println</span>(meta.<span class='field'>eval</span>(<span
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 69
 Nice!
 Nice!
@@ -4680,7 +4696,7 @@ meta.<span class='field'>eval</span>(<span class='string'>"-nil"</span>)
 </svg>
 </button>
 <pre class='code active'>
-<span class='constant'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 &lt;meta&gt;:1:1: error: invalid operand to unary (-): nil
 
     1 | -nil
