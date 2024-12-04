@@ -1,6 +1,6 @@
 @font-face {
-  font-family: "DM Sans";
-  src: url(fonts/DMSans/DMSans-Regular.ttf);
+  font-family: "Roboto";
+  src: url(fonts/Roboto/Roboto-Regular.ttf);
 }
 
 @font-face {
@@ -44,7 +44,7 @@
 }
 
 * {
-    font-family: "DM Sans";
+    font-family: "Roboto";
 }
 
 a {
