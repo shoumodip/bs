@@ -2747,7 +2747,9 @@ Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_repl) {
         fn = bs_compile_module(
             bs, bs_buffer_reset(b, start), Bs_Sv(source->data, source->size), true, is_repl);
 
-        fn->fn->source = source;
+        if (fn) {
+            fn->fn->source = source;
+        }
     } else {
         fn = bs_compile_module(bs, bs_buffer_reset(b, start), input, true, is_repl);
     }

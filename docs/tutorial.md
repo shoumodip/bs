@@ -1250,7 +1250,7 @@ panic()
 
 ```console
 $ bs panic.bs
-panic/panic.bs:1:1: panic
+panic.bs:1:1: panic
 ```
 
 An optional message can also be provided.
@@ -1261,7 +1261,7 @@ panic("TODO")
 
 ```console
 $ bs panic.bs
-panic/panic.bs:1:1: TODO
+panic.bs:1:1: TODO
 ```
 
 ## Assert

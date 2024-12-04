@@ -23,6 +23,7 @@ static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_THIS:
     case BS_TOKEN_SUPER:
+    case BS_TOKEN_IS_MAIN_MODULE:
         return BSDOC_STYLE_THIS;
 
     case BS_TOKEN_STR:
@@ -60,7 +61,6 @@ static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type) {
     case BS_TOKEN_NUM:
     case BS_TOKEN_TRUE:
     case BS_TOKEN_FALSE:
-    case BS_TOKEN_IS_MAIN_MODULE:
         return BSDOC_STYLE_CONSTANT;
 
     default:
