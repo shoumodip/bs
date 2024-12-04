@@ -8,6 +8,7 @@
 
 typedef enum {
     BSDOC_STYLE_NONE,
+    BSDOC_STYLE_THIS,
     BSDOC_STYLE_CLASS,
     BSDOC_STYLE_FIELD,
     BSDOC_STYLE_ESCAPE,
@@ -20,6 +21,10 @@ typedef enum {
 
 static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type) {
     switch (type) {
+    case BS_TOKEN_THIS:
+    case BS_TOKEN_SUPER:
+        return BSDOC_STYLE_THIS;
+
     case BS_TOKEN_STR:
     case BS_TOKEN_ISTR:
         return BSDOC_STYLE_STRING;
@@ -55,8 +60,6 @@ static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type) {
     case BS_TOKEN_NUM:
     case BS_TOKEN_TRUE:
     case BS_TOKEN_FALSE:
-    case BS_TOKEN_THIS:
-    case BS_TOKEN_SUPER:
     case BS_TOKEN_IS_MAIN_MODULE:
         return BSDOC_STYLE_CONSTANT;
 
@@ -68,6 +71,10 @@ static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type) {
 static void bsdoc_print_styled_sv(FILE *f, Bsdoc_Style style, Bs_Sv sv) {
     switch (style) {
     case BSDOC_STYLE_NONE:
+        break;
+
+    case BSDOC_STYLE_THIS:
+        fprintf(f, "<span class='this'>");
         break;
 
     case BSDOC_STYLE_CLASS:
@@ -199,10 +206,10 @@ static const Bsdoc_Style_Pair style_pairs[] = {
     p(BSDOC_STYLE_CONSTANT, "BS_VALUE_NUM"),
     p(BSDOC_STYLE_CONSTANT, "BS_OBJECT_STR"),
     p(BSDOC_STYLE_CONSTANT, "BS_LIBRARY_INIT"),
-    p(BSDOC_STYLE_FUNCTION, "bs_check_arity"),
-    p(BSDOC_STYLE_FUNCTION, "bs_arg_check_value_type"),
-    p(BSDOC_STYLE_FUNCTION, "bs_arg_check_object_type"),
-    p(BSDOC_STYLE_FUNCTION, "bs_arg_check_whole_number"),
+    p(BSDOC_STYLE_CONSTANT, "bs_check_arity"),
+    p(BSDOC_STYLE_CONSTANT, "bs_arg_check_value_type"),
+    p(BSDOC_STYLE_CONSTANT, "bs_arg_check_object_type"),
+    p(BSDOC_STYLE_CONSTANT, "bs_arg_check_whole_number"),
     p(BSDOC_STYLE_FUNCTION, "bs_c_lib_ffi"),
     p(BSDOC_STYLE_FUNCTION, "bs_c_lib_set"),
     p(BSDOC_STYLE_FUNCTION, "bs_c_class_new"),
@@ -688,7 +695,7 @@ int bsdoc_run_file(const char *input) {
                 const Bs_Sv shell = Bs_Sv_Static("$ ");
                 if (bs_sv_prefix(line, shell)) {
                     bs_sv_drop(&line, shell.size);
-                    bsdoc_print_styled_sv(f, BSDOC_STYLE_STRING, shell);
+                    bsdoc_print_styled_sv(f, BSDOC_STYLE_THIS, shell);
 
                     Bs_Sv comment = line;
                     line = bs_sv_split(&comment, '#');

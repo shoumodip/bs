@@ -1371,8 +1371,8 @@ library.
 ```c
 // raylib.c
 
-#include "raylib.h"
-#include "bs/object.h"
+#include <raylib.h>
+#include <bs/object.h>
 
 Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);

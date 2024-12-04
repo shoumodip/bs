@@ -25,10 +25,11 @@
     --copyfg: #928374;
     --sidebarbg: #242424;
 
+    --this: #89B482;
     --field: #7DAEA3;
     --class: #D8A657;
-    --escape: #A9B665;
-    --string: #98B482;
+    --escape: #D8A657;
+    --string: #A9B665;
     --comment: #928374;
     --keyword: #EA6962;
     --success: #A9B665;
@@ -149,6 +150,10 @@ blockquote br {
 .codes {
     position: relative;
     padding-top: var(--padding);
+}
+
+.this {
+    color: var(--this);
 }
 
 .field {

@@ -463,8 +463,8 @@ $ bs game_of_life_tui.bs
 
 #include <math.h>
 
-#include "bs/object.h"
-#include "raylib.h"
+#include <bs/object.h>
+#include <raylib.h>
 
 Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
@@ -984,8 +984,8 @@ Flappy Bird using Raylib.
 ```c
 // raylib.c
 
-#include "raylib.h"
-#include "bs/object.h"
+#include <bs/object.h>
+#include <raylib.h>
 
 Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
