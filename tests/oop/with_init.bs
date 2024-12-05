@@ -4,7 +4,7 @@ class Person {
     }
 
     greet() {
-        io.println("Hello, \(this.name)!")
+        io.println("Hello, \{this.name}!")
     }
 }
 

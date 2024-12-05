@@ -8,7 +8,6 @@
 
 typedef enum {
     BSDOC_STYLE_NONE,
-    BSDOC_STYLE_THIS,
     BSDOC_STYLE_CLASS,
     BSDOC_STYLE_FIELD,
     BSDOC_STYLE_ESCAPE,
@@ -21,11 +20,6 @@ typedef enum {
 
 static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type) {
     switch (type) {
-    case BS_TOKEN_THIS:
-    case BS_TOKEN_SUPER:
-    case BS_TOKEN_IS_MAIN_MODULE:
-        return BSDOC_STYLE_THIS;
-
     case BS_TOKEN_STR:
     case BS_TOKEN_ISTR:
         return BSDOC_STYLE_STRING;
@@ -61,6 +55,9 @@ static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type) {
     case BS_TOKEN_NUM:
     case BS_TOKEN_TRUE:
     case BS_TOKEN_FALSE:
+    case BS_TOKEN_THIS:
+    case BS_TOKEN_SUPER:
+    case BS_TOKEN_IS_MAIN_MODULE:
         return BSDOC_STYLE_CONSTANT;
 
     default:
@@ -71,10 +68,6 @@ static Bsdoc_Style bsdoc_token_type_style(Bs_Token_Type type) {
 static void bsdoc_print_styled_sv(FILE *f, Bsdoc_Style style, Bs_Sv sv) {
     switch (style) {
     case BSDOC_STYLE_NONE:
-        break;
-
-    case BSDOC_STYLE_THIS:
-        fprintf(f, "<span class='this'>");
         break;
 
     case BSDOC_STYLE_CLASS:
@@ -210,10 +203,6 @@ static const Bsdoc_Style_Pair style_pairs[] = {
     p(BSDOC_STYLE_CONSTANT, "bs_arg_check_value_type"),
     p(BSDOC_STYLE_CONSTANT, "bs_arg_check_object_type"),
     p(BSDOC_STYLE_CONSTANT, "bs_arg_check_whole_number"),
-    p(BSDOC_STYLE_FUNCTION, "bs_c_lib_ffi"),
-    p(BSDOC_STYLE_FUNCTION, "bs_c_lib_set"),
-    p(BSDOC_STYLE_FUNCTION, "bs_c_class_new"),
-    p(BSDOC_STYLE_FUNCTION, "bs_c_class_add"),
     p(BSDOC_STYLE_CONSTANT, "bs_value_nil"),
     p(BSDOC_STYLE_CONSTANT, "bs_value_num"),
     p(BSDOC_STYLE_CONSTANT, "bs_value_bool"),
@@ -246,6 +235,11 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
 
     Bsdoc_Style next = BSDOC_STYLE_NONE;
     const char *last = input.data;
+
+    // 0 - Normal
+    // 1 - (.) or (->)
+    // 2 - (-)
+    int c_mode_prev;
     while (lexer.sv.size) {
         Bs_Token token = bs_lexer_next(&lexer);
         if (!c) {
@@ -259,6 +253,20 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
 
         Bsdoc_Style style;
         if (c) {
+            if (token.type == BS_TOKEN_DOT) {
+                c_mode_prev = 1;
+            } else if (token.type == BS_TOKEN_SUB) {
+                c_mode_prev = 2;
+            } else if (c_mode_prev == 2 && token.type == BS_TOKEN_GT) {
+                c_mode_prev = 1;
+            } else if (c_mode_prev == 1 && token.type == BS_TOKEN_IDENT) {
+                bsdoc_print_token(f, token, BSDOC_STYLE_FIELD, &last);
+                c_mode_prev = 0;
+                continue;
+            } else {
+                c_mode_prev = 0;
+            }
+
             style = bsdoc_token_type_style(token.type);
             if (token.type == BS_TOKEN_IDENT) {
                 for (size_t i = 0; i < bs_c_array_size(style_pairs); i++) {
@@ -267,6 +275,10 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
                         style = pair->style;
                         break;
                     }
+                }
+
+                if (style == BSDOC_STYLE_NONE && bs_lexer_peek(&lexer).type == BS_TOKEN_LPAREN) {
+                    style = BSDOC_STYLE_FUNCTION;
                 }
             }
 
@@ -295,10 +307,16 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
             continue;
         }
 
-        if (token.type == BS_TOKEN_IDENT && next != BSDOC_STYLE_NONE) {
-            style = next;
-            if (next != BSDOC_STYLE_CLASS) {
-                next = BSDOC_STYLE_NONE;
+        if (token.type == BS_TOKEN_IDENT) {
+            if (bs_lexer_peek(&lexer).type == BS_TOKEN_LPAREN) {
+                style = BSDOC_STYLE_FUNCTION;
+            } else if (next != BSDOC_STYLE_NONE) {
+                style = next;
+                if (next != BSDOC_STYLE_CLASS) {
+                    next = BSDOC_STYLE_NONE;
+                }
+            } else {
+                style = bsdoc_token_type_style(token.type);
             }
         } else {
             style = bsdoc_token_type_style(token.type);
@@ -309,16 +327,16 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
             bsdoc_print_token(f, token, style, &last);
             bsdoc_parens_push(&parens, token.sv.data[-1]);
 
-            token = bs_lexer_expect(&lexer, BS_TOKEN_LPAREN);
+            token = bs_lexer_expect(&lexer, BS_TOKEN_LBRACE);
             bsdoc_print_token(f, token, BSDOC_STYLE_ESCAPE, &last);
             break;
 
-        case BS_TOKEN_LPAREN:
+        case BS_TOKEN_LBRACE:
             bsdoc_print_token(f, token, style, &last);
             bsdoc_parens_push(&parens, '\0');
             break;
 
-        case BS_TOKEN_RPAREN: {
+        case BS_TOKEN_RBRACE: {
             assert(parens.count);
             const char ch = parens.data[--parens.count];
             assert(ch == '"' || ch == '\'' || ch == '\0');
@@ -329,7 +347,7 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
                 bsdoc_print_token(f, token, bsdoc_token_type_style(token.type), &last);
 
                 if (token.type == BS_TOKEN_ISTR) {
-                    token = bs_lexer_expect(&lexer, BS_TOKEN_LPAREN);
+                    token = bs_lexer_expect(&lexer, BS_TOKEN_LBRACE);
                     bsdoc_print_token(f, token, BSDOC_STYLE_ESCAPE, &last);
                     bsdoc_parens_push(&parens, ch);
                 }
@@ -340,7 +358,6 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
 
         case BS_TOKEN_FN:
             bsdoc_print_token(f, token, style, &last);
-            next = BSDOC_STYLE_FUNCTION;
             break;
 
         case BS_TOKEN_CLASS:
@@ -695,7 +712,7 @@ int bsdoc_run_file(const char *input) {
                 const Bs_Sv shell = Bs_Sv_Static("$ ");
                 if (bs_sv_prefix(line, shell)) {
                     bs_sv_drop(&line, shell.size);
-                    bsdoc_print_styled_sv(f, BSDOC_STYLE_THIS, shell);
+                    bsdoc_print_styled_sv(f, BSDOC_STYLE_STRING, shell);
 
                     Bs_Sv comment = line;
                     line = bs_sv_split(&comment, '#');

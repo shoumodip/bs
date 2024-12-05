@@ -5,7 +5,7 @@ while i < 4 {
     var v = i
 
     a[len(a)] = fn () {
-        io.println("Captured value is \(v)")
+        io.println("Captured value is \{v}")
     }
 
     i = i + 1
@@ -19,7 +19,7 @@ var a = []
 
 for i in 4, 0 {
     a[len(a)] = fn () {
-        io.println("Captured value is \(i)")
+        io.println("Captured value is \{i}")
     }
 }
 

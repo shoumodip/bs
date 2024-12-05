@@ -11,7 +11,7 @@ for i in 1, len(os.args) {
     var path = os.args[i]
     var contents = io.readfile(path)
     if !contents {
-        io.eprintln("Error: could not read file '\(path)'")
+        io.eprintln("Error: could not read file '\{path}'")
         code = 1
         continue
     }

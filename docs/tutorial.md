@@ -128,10 +128,10 @@ io.println("Hello!")
 io.println("Say \"Hello\"!\nHere, a\t tab!")
 
 # Output: Interpolation! 69
-io.println("Interpolation! \(34 + 35)")
+io.println("Interpolation! \{34 + 35}")
 
 # Output: Nested interpolation! 420
-io.println("Nested \("interpolation! \(420)")")
+io.println("Nested \{"interpolation! \{420}"}")
 
 # Output: 6
 io.println(len("Hello!"))
@@ -552,7 +552,7 @@ Iterate over a string.
 var str = "foobar"
 
 for i, c in str {
-    io.println("Index: \(i) Char: \(c)")
+    io.println("Index: \{i} Char: \{c}")
 }
 ```
 
@@ -572,7 +572,7 @@ Iterate over an array.
 var xs = [2, 4, 6, 8, 10]
 
 for i, v in xs {
-    io.println("Index: \(i) Value: \(v)")
+    io.println("Index: \{i} Value: \{v}")
 }
 ```
 
@@ -595,7 +595,7 @@ var xs = {
 }
 
 for k, v in xs {
-    io.println("Key: \(k) Value: \(v)")
+    io.println("Key: \{k} Value: \{v}")
 }
 ```
 
@@ -646,7 +646,7 @@ $ bs loops.bs
 ## Functions
 ```bs
 fn greet(name) {
-    io.println("Hello, \(name)!")
+    io.println("Hello, \{name}!")
 }
 
 greet("world")
@@ -839,7 +839,7 @@ io.println(x)     # Output: 69
 var x = 69
 io.println(x) # Output: 69
 
-var x = "x used to be \(x)"
+var x = "x used to be \{x}"
 io.println(x) # Output: x used to be 69
 ```
 
@@ -1016,16 +1016,16 @@ class Sprite {
     }
 
     attack(target) {
-        io.println("\(this.name) attacks \(target.name) for \(this.attack_power) damage!")
+        io.println("\{this.name} attacks \{target.name} for \{this.attack_power} damage!")
         target.take_damage(this.attack_power)
     }
 
     take_damage(amount) {
         this.health -= amount
         if this.is_alive() {
-            io.println("\(this.name) has \(this.health) health remaining.")
+            io.println("\{this.name} has \{this.health} health remaining.")
         } else {
-            io.println("\(this.name) has been defeated!")
+            io.println("\{this.name} has been defeated!")
         }
     }
 
@@ -1044,7 +1044,7 @@ class Hero < Sprite {
 
     # Special ability of hero: defending
     defend() {
-        io.println("\(this.name) is defending!")
+        io.println("\{this.name} is defending!")
         this.defending = true
     }
 
@@ -1072,7 +1072,7 @@ class Enemy < Sprite {
 
     # Special ability of enemy: poisoning
     poison(target) {
-        io.println("\(this.name) poisons \(target.name)!")
+        io.println("\{this.name} poisons \{target.name}!")
         target.poisoned = true
         target.take_damage(this.attack_power)
     }
@@ -1091,13 +1091,13 @@ while hero.is_alive() && enemy.is_alive() {
 
     # Hero cannot choose while poisoned
     if hero.poisoned {
-        io.println("\(hero.name) has been poisoned! skipping turn.")
+        io.println("\{hero.name} has been poisoned! skipping turn.")
 
         # Prevent consecutive poisoning
         hero.poisoned = false
         enemy.attack(hero)
     } else {
-        var choice = io.input("Enter \(hero.name)'s choice (A: attack, D: defend)> ").toupper()
+        var choice = io.input("Enter \{hero.name}'s choice (A: attack, D: defend)> ").toupper()
 
         if choice == "A" {
             hero.attack(enemy)
@@ -1107,7 +1107,7 @@ while hero.is_alive() && enemy.is_alive() {
         } else if choice == "D" {
             hero.defend()
         } else {
-            io.println("ERROR: invalid choice! skipping \(hero.name)'s turn.")
+            io.println("ERROR: invalid choice! skipping \{hero.name}'s turn.")
         }
 
         # Enemy will either attack or poison the hero based on a 50-50 chance
@@ -1120,9 +1120,9 @@ while hero.is_alive() && enemy.is_alive() {
 }
 
 if hero.is_alive() {
-    io.println("\(hero.name) won!")
+    io.println("\{hero.name} won!")
 } else {
-    io.println("\(hero.name) lost :(")
+    io.println("\{hero.name} lost :(")
 }
 ```
 
@@ -1173,7 +1173,7 @@ class Logger {
     write(s) {
         # os.clock() returns the current monotonic time in seconds as a
         # floating point number
-        this.file.writeln("\(os.clock()): \(s)")
+        this.file.writeln("\{os.clock()}: \{s}")
     }
 }
 

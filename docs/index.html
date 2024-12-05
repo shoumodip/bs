@@ -33,10 +33,10 @@ A minimal embeddable scripting language with sane defaults and strong typing
         <span class='keyword'>return</span> <span class='constant'>1</span>
     }
 
-    <span class='keyword'>return</span> n * factorial(n - <span class='constant'>1</span>)
+    <span class='keyword'>return</span> n * <span class='function'>factorial</span>(n - <span class='constant'>1</span>)
 }
 
-io.<span class='field'>println</span>(<span class='string'>"5! = </span><span class='escape'>\</span><span class='escape'>(</span>factorial(<span class='constant'>5</span>)<span class='escape'>)</span><span class='string'>"</span>)
+io.<span class='function'>println</span>(<span class='string'>"5! = </span><span class='escape'>\</span><span class='escape'>{</span><span class='function'>factorial</span>(<span class='constant'>5</span>)<span class='escape'>}</span><span class='string'>"</span>)
 </pre>
 </pre>
 </div>
@@ -52,7 +52,7 @@ io.<span class='field'>println</span>(<span class='string'>"5! = </span><span cl
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs factorial.bs
+<span class='string'>$ </span>bs factorial.bs
 5! = 120
 </pre>
 </div>

@@ -36,8 +36,8 @@ provided.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> name = io.<span class='field'>input</span>(<span class='string'>"Enter your name&gt; "</span>)
-io.<span class='field'>println</span>(<span class='string'>"Hello, </span><span class='escape'>\</span><span class='escape'>(</span>name<span class='escape'>)</span><span class='string'>!"</span>)
+<span class='keyword'>var</span> name = io.<span class='function'>input</span>(<span class='string'>"Enter your name&gt; "</span>)
+io.<span class='function'>println</span>(<span class='string'>"Hello, </span><span class='escape'>\</span><span class='escape'>{</span>name<span class='escape'>}</span><span class='string'>!"</span>)
 </pre>
 </pre>
 </div>
@@ -53,7 +53,7 @@ io.<span class='field'>println</span>(<span class='string'>"Hello, </span><span 
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Enter your name&gt; Batman
 Hello, Batman!
 </pre>
@@ -76,7 +76,7 @@ Print all the arguments to standard output.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>print</span>(<span class='string'>"Hello"</span>, <span class='string'>"world"</span>, <span class='constant'>69</span>)
+io.<span class='function'>print</span>(<span class='string'>"Hello"</span>, <span class='string'>"world"</span>, <span class='constant'>69</span>)
 </pre>
 </pre>
 </div>
@@ -92,7 +92,7 @@ io.<span class='field'>print</span>(<span class='string'>"Hello"</span>, <span c
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Hello world 69⏎
 </pre>
 </div>
@@ -138,10 +138,10 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> entries = <span class='keyword'>assert</span>(io.<span class='field'>readdir</span>(<span class='string'>"."</span>))
+<span class='keyword'>var</span> entries = <span class='keyword'>assert</span>(io.<span class='function'>readdir</span>(<span class='string'>"."</span>))
 
 <span class='keyword'>for</span> _, e <span class='keyword'>in</span> entries {
-    io.<span class='field'>println</span>(e.<span class='field'>name</span>(), e.<span class='field'>isdir</span>())
+    io.<span class='function'>println</span>(e.<span class='function'>name</span>(), e.<span class='function'>isdir</span>())
 }
 </pre>
 </pre>
@@ -158,7 +158,7 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 .git true
 include true
 demo.bs false
@@ -203,13 +203,13 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> contents = io.<span class='field'>readfile</span>(<span class='string'>"input.txt"</span>)
+<span class='keyword'>var</span> contents = io.<span class='function'>readfile</span>(<span class='string'>"input.txt"</span>)
 <span class='keyword'>if</span> !contents {
-    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file 'input.txt'"</span>)
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not read file 'input.txt'"</span>)
+    os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
-io.<span class='field'>print</span>(contents)
+io.<span class='function'>print</span>(contents)
 </pre>
 </pre>
 </div>
@@ -225,7 +225,7 @@ io.<span class='field'>print</span>(contents)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Just a test file
 Nothing to see here
 Foo
@@ -259,14 +259,14 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='string'>"input.txt"</span>)
+<span class='keyword'>var</span> f = io.<span class='function'>Reader</span>(<span class='string'>"input.txt"</span>)
 <span class='keyword'>if</span> !f {
-    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
+    os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
-<span class='keyword'>var</span> contents = f.<span class='field'>read</span>()
-io.<span class='field'>print</span>(contents)
+<span class='keyword'>var</span> contents = f.<span class='function'>read</span>()
+io.<span class='function'>print</span>(contents)
 </pre>
 </pre>
 </div>
@@ -285,7 +285,7 @@ Create a file <code>input.txt</code> with some sample text and run it.
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Just a test file
 Nothing to see here
 Foo
@@ -325,14 +325,14 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='string'>"input.txt"</span>)
+<span class='keyword'>var</span> f = io.<span class='function'>Reader</span>(<span class='string'>"input.txt"</span>)
 <span class='keyword'>if</span> !f {
-    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
+    os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
-io.<span class='field'>print</span>(<span class='string'>"The first 16 bytes: [</span><span class='escape'>\</span><span class='escape'>(</span>f.<span class='field'>read</span>(<span class='constant'>16</span>)<span class='escape'>)</span><span class='string'>]</span><span class='escape'>\n</span><span class='string'>"</span>)
-io.<span class='field'>print</span>(<span class='string'>"The rest:"</span>, f.<span class='field'>read</span>())
+io.<span class='function'>print</span>(<span class='string'>"The first 16 bytes: [</span><span class='escape'>\</span><span class='escape'>{</span>f.<span class='function'>read</span>(<span class='constant'>16</span>)<span class='escape'>}</span><span class='string'>]</span><span class='escape'>\n</span><span class='string'>"</span>)
+io.<span class='function'>print</span>(<span class='string'>"The rest:"</span>, f.<span class='function'>read</span>())
 </pre>
 </pre>
 </div>
@@ -348,7 +348,7 @@ io.<span class='field'>print</span>(<span class='string'>"The rest:"</span>, f.<
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 The first 16 bytes: [Just a test file]
 The rest:
 Nothing to see here
@@ -376,15 +376,15 @@ Read a line.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='string'>"input.txt"</span>)
+<span class='keyword'>var</span> f = io.<span class='function'>Reader</span>(<span class='string'>"input.txt"</span>)
 <span class='keyword'>if</span> !f {
-    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
+    os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
-<span class='keyword'>while</span> !f.<span class='field'>eof</span>() {
-    <span class='keyword'>var</span> line = f.<span class='field'>readln</span>()
-    io.<span class='field'>println</span>(<span class='string'>"Line:"</span>, line)
+<span class='keyword'>while</span> !f.<span class='function'>eof</span>() {
+    <span class='keyword'>var</span> line = f.<span class='function'>readln</span>()
+    io.<span class='function'>println</span>(<span class='string'>"Line:"</span>, line)
 }
 </pre>
 </pre>
@@ -401,7 +401,7 @@ Read a line.
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Line: Just a test file
 Line: Nothing to see here
 Line: Foo
@@ -449,18 +449,18 @@ Returns <code>true</code> if succeeded and <code>false</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='string'>"input.txt"</span>, <span class='constant'>true</span>)
+<span class='keyword'>var</span> f = io.<span class='function'>Reader</span>(<span class='string'>"input.txt"</span>, <span class='constant'>true</span>)
 <span class='keyword'>if</span> !f {
-    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
+    os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
-io.<span class='field'>print</span>(<span class='string'>"The first 16 bytes: [</span><span class='escape'>\</span><span class='escape'>(</span>f.<span class='field'>read</span>(<span class='constant'>16</span>)<span class='escape'>)</span><span class='string'>]</span><span class='escape'>\n</span><span class='string'>"</span>)
+io.<span class='function'>print</span>(<span class='string'>"The first 16 bytes: [</span><span class='escape'>\</span><span class='escape'>{</span>f.<span class='function'>read</span>(<span class='constant'>16</span>)<span class='escape'>}</span><span class='string'>]</span><span class='escape'>\n</span><span class='string'>"</span>)
 
-f.<span class='field'>seek</span>(<span class='constant'>5</span>, io.<span class='field'>SEEK_SET</span>)
+f.<span class='function'>seek</span>(<span class='constant'>5</span>, io.<span class='field'>SEEK_SET</span>)
 
-io.<span class='field'>println</span>(<span class='string'>"The full content offset by 5:"</span>)
-io.<span class='field'>print</span>(f.<span class='field'>read</span>())
+io.<span class='function'>println</span>(<span class='string'>"The full content offset by 5:"</span>)
+io.<span class='function'>print</span>(f.<span class='function'>read</span>())
 </pre>
 </pre>
 </div>
@@ -476,7 +476,7 @@ io.<span class='field'>print</span>(f.<span class='field'>read</span>())
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 The first 16 bytes: [Just a test file]
 The full content offset by 5:
 a test file
@@ -511,19 +511,19 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='field'>Reader</span>(<span class='string'>"input.txt"</span>, <span class='constant'>true</span>)
+<span class='keyword'>var</span> f = io.<span class='function'>Reader</span>(<span class='string'>"input.txt"</span>, <span class='constant'>true</span>)
 <span class='keyword'>if</span> !f {
-    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
+    os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
-io.<span class='field'>println</span>(<span class='string'>"The first 3 lines:"</span>)
+io.<span class='function'>println</span>(<span class='string'>"The first 3 lines:"</span>)
 <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>3</span> {
-    io.<span class='field'>println</span>(f.<span class='field'>readln</span>())
+    io.<span class='function'>println</span>(f.<span class='function'>readln</span>())
 }
 
-io.<span class='field'>println</span>()
-io.<span class='field'>println</span>(<span class='string'>"Read </span><span class='escape'>\</span><span class='escape'>(</span>f.<span class='field'>tell</span>()<span class='escape'>)</span><span class='string'> bytes so far."</span>)
+io.<span class='function'>println</span>()
+io.<span class='function'>println</span>(<span class='string'>"Read </span><span class='escape'>\</span><span class='escape'>{</span>f.<span class='function'>tell</span>()<span class='escape'>}</span><span class='string'> bytes so far."</span>)
 </pre>
 </pre>
 </div>
@@ -539,7 +539,7 @@ io.<span class='field'>println</span>(<span class='string'>"Read </span><span cl
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 The first 3 lines:
 Just a test file
 Nothing to see here
@@ -574,15 +574,15 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='field'>Writer</span>(<span class='string'>"output.txt"</span>)
+<span class='keyword'>var</span> f = io.<span class='function'>Writer</span>(<span class='string'>"output.txt"</span>)
 <span class='keyword'>if</span> !f {
-    io.<span class='field'>eprintln</span>(<span class='string'>"Error: could not create file!"</span>)
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not create file!"</span>)
+    os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
-f.<span class='field'>writeln</span>(<span class='string'>"Hello there!"</span>)
-f.<span class='field'>writeln</span>(<span class='string'>"General Kenobi!"</span>)
-f.<span class='field'>writeln</span>(<span class='constant'>69</span>, <span class='string'>"Nice!"</span>)
+f.<span class='function'>writeln</span>(<span class='string'>"Hello there!"</span>)
+f.<span class='function'>writeln</span>(<span class='string'>"General Kenobi!"</span>)
+f.<span class='function'>writeln</span>(<span class='constant'>69</span>, <span class='string'>"Nice!"</span>)
 </pre>
 </pre>
 </div>
@@ -598,8 +598,8 @@ f.<span class='field'>writeln</span>(<span class='constant'>69</span>, <span cla
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
-<span class='this'>$ </span>cat output.txt <span class='comment'># `type output.txt` on windows</span>
+<span class='string'>$ </span>bs demo.bs
+<span class='string'>$ </span>cat output.txt <span class='comment'># `type output.txt` on windows</span>
 Hello there!
 General Kenobi!
 69 Nice!
@@ -663,10 +663,10 @@ Example usecase:
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> entries = <span class='keyword'>assert</span>(io.<span class='field'>readdir</span>(<span class='string'>"."</span>))
+<span class='keyword'>var</span> entries = <span class='keyword'>assert</span>(io.<span class='function'>readdir</span>(<span class='string'>"."</span>))
 
 <span class='keyword'>for</span> _, e <span class='keyword'>in</span> entries {
-    io.<span class='field'>println</span>(e.<span class='field'>name</span>(), e.<span class='field'>isdir</span>())
+    io.<span class='function'>println</span>(e.<span class='function'>name</span>(), e.<span class='function'>isdir</span>())
 }
 </pre>
 </pre>
@@ -683,7 +683,7 @@ Example usecase:
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 .git true
 include true
 demo.bs false
@@ -762,7 +762,7 @@ machine can decide what to do.
 </svg>
 </button>
 <pre class='code active'>
-os.<span class='field'>exit</span>(<span class='constant'>69</span>)
+os.<span class='function'>exit</span>(<span class='constant'>69</span>)
 </pre>
 </pre>
 </div>
@@ -778,8 +778,8 @@ os.<span class='field'>exit</span>(<span class='constant'>69</span>)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
-<span class='this'>$ </span>echo $? <span class='comment'># `echo %errorlevel%` on windows</span>
+<span class='string'>$ </span>bs demo.bs
+<span class='string'>$ </span>echo $? <span class='comment'># `echo %errorlevel%` on windows</span>
 69
 </pre>
 </div>
@@ -810,14 +810,14 @@ in the unit of seconds.
         <span class='keyword'>return</span> n
     }
 
-    <span class='keyword'>return</span> fib(n - <span class='constant'>1</span>) + fib(n - <span class='constant'>2</span>)
+    <span class='keyword'>return</span> <span class='function'>fib</span>(n - <span class='constant'>1</span>) + <span class='function'>fib</span>(n - <span class='constant'>2</span>)
 }
 
-<span class='keyword'>var</span> start = os.<span class='field'>clock</span>()
-io.<span class='field'>println</span>(fib(<span class='constant'>30</span>))
+<span class='keyword'>var</span> start = os.<span class='function'>clock</span>()
+io.<span class='function'>println</span>(<span class='function'>fib</span>(<span class='constant'>30</span>))
 
-<span class='keyword'>var</span> elapsed = os.<span class='field'>clock</span>() - start
-io.<span class='field'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>\</span><span class='escape'>(</span>elapsed<span class='escape'>)</span><span class='string'>"</span>)
+<span class='keyword'>var</span> elapsed = os.<span class='function'>clock</span>() - start
+io.<span class='function'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>\</span><span class='escape'>{</span>elapsed<span class='escape'>}</span><span class='string'>"</span>)
 </pre>
 </pre>
 </div>
@@ -833,7 +833,7 @@ io.<span class='field'>println</span>(<span class='string'>"Elapsed: </span><spa
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 832040
 Elapsed: 0.137143968999226
 </pre>
@@ -856,11 +856,11 @@ Sleep for <code>seconds</code> interval, with nanosecond level of precision.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> start = os.<span class='field'>clock</span>()
-os.<span class='field'>sleep</span>(<span class='constant'>0.69</span>)
+<span class='keyword'>var</span> start = os.<span class='function'>clock</span>()
+os.<span class='function'>sleep</span>(<span class='constant'>0.69</span>)
 
-<span class='keyword'>var</span> elapsed = os.<span class='field'>clock</span>() - start
-io.<span class='field'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>\</span><span class='escape'>(</span>elapsed<span class='escape'>)</span><span class='string'>"</span>)
+<span class='keyword'>var</span> elapsed = os.<span class='function'>clock</span>() - start
+io.<span class='function'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>\</span><span class='escape'>{</span>elapsed<span class='escape'>}</span><span class='string'>"</span>)
 </pre>
 </pre>
 </div>
@@ -876,7 +876,7 @@ io.<span class='field'>println</span>(<span class='string'>"Elapsed: </span><spa
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Elapsed: 0.690292477000185
 </pre>
 </div>
@@ -901,8 +901,8 @@ Returns <code>nil</code> if it doesn't exist.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(os.<span class='field'>getenv</span>(<span class='string'>"FOO"</span>))
-io.<span class='field'>println</span>(os.<span class='field'>getenv</span>(<span class='string'>"BAR"</span>))
+io.<span class='function'>println</span>(os.<span class='function'>getenv</span>(<span class='string'>"FOO"</span>))
+io.<span class='function'>println</span>(os.<span class='function'>getenv</span>(<span class='string'>"BAR"</span>))
 </pre>
 </pre>
 </div>
@@ -918,8 +918,8 @@ io.<span class='field'>println</span>(os.<span class='field'>getenv</span>(<span
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>export FOO=lmao <span class='comment'># `set FOO=lmao` on windows</span>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>export FOO=lmao <span class='comment'># `set FOO=lmao` on windows</span>
+<span class='string'>$ </span>bs demo.bs
 lmao
 nil
 </pre>
@@ -945,8 +945,8 @@ Returns <code>true</code> if successful, else <code>false</code>.
 </svg>
 </button>
 <pre class='code active'>
-os.<span class='field'>setenv</span>(<span class='string'>"FOO"</span>, <span class='string'>"lmao"</span>)
-io.<span class='field'>println</span>(os.<span class='field'>getenv</span>(<span class='string'>"FOO"</span>))
+os.<span class='function'>setenv</span>(<span class='string'>"FOO"</span>, <span class='string'>"lmao"</span>)
+io.<span class='function'>println</span>(os.<span class='function'>getenv</span>(<span class='string'>"FOO"</span>))
 </pre>
 </pre>
 </div>
@@ -962,7 +962,7 @@ io.<span class='field'>println</span>(os.<span class='field'>getenv</span>(<span
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 lmao
 </pre>
 </div>
@@ -984,7 +984,7 @@ Get the current working directory.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(os.<span class='field'>getcwd</span>())
+io.<span class='function'>println</span>(os.<span class='function'>getcwd</span>())
 </pre>
 </pre>
 </div>
@@ -1000,7 +1000,7 @@ io.<span class='field'>println</span>(os.<span class='field'>getcwd</span>())
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 /home/sk/Git/bs
 </pre>
 </div>
@@ -1025,8 +1025,8 @@ Returns <code>true</code> if successful, else <code>false</code>.
 </svg>
 </button>
 <pre class='code active'>
-os.<span class='field'>setcwd</span>(<span class='string'>"/usr"</span>)
-io.<span class='field'>println</span>(os.<span class='field'>getcwd</span>())
+os.<span class='function'>setcwd</span>(<span class='string'>"/usr"</span>)
+io.<span class='function'>println</span>(os.<span class='function'>getcwd</span>())
 </pre>
 </pre>
 </div>
@@ -1042,7 +1042,7 @@ io.<span class='field'>println</span>(os.<span class='field'>getcwd</span>())
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 /usr
 </pre>
 </div>
@@ -1076,13 +1076,13 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> p = os.<span class='field'>Process</span>([<span class='string'>"ls"</span>, <span class='string'>"-l"</span>])
+<span class='keyword'>var</span> p = os.<span class='function'>Process</span>([<span class='string'>"ls"</span>, <span class='string'>"-l"</span>])
 <span class='keyword'>if</span> !p {
-    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>)
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>)
+    os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
-p.<span class='field'>wait</span>()
+p.<span class='function'>wait</span>()
 </pre>
 </pre>
 </div>
@@ -1098,7 +1098,7 @@ p.<span class='field'>wait</span>()
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 total 4
 -rw-r--r-- 1 shoumodip shoumodip 122 Oct  6 15:11 demo.bs
 </pre>
@@ -1123,19 +1123,19 @@ Returns <code>nil</code> if the process was spawned without capturing stdout.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> p = os.<span class='field'>Process</span>([<span class='string'>"ls"</span>, <span class='string'>"-l"</span>], <span class='constant'>true</span>)
+<span class='keyword'>var</span> p = os.<span class='function'>Process</span>([<span class='string'>"ls"</span>, <span class='string'>"-l"</span>], <span class='constant'>true</span>)
 <span class='keyword'>if</span> !p {
-    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>)
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>)
+    os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
-<span class='keyword'>var</span> stdout = p.<span class='field'>stdout</span>()
-<span class='keyword'>while</span> !stdout.<span class='field'>eof</span>() {
-    <span class='keyword'>var</span> line = stdout.<span class='field'>readln</span>()
-    io.<span class='field'>println</span>(<span class='string'>"Line:"</span>, line)
+<span class='keyword'>var</span> stdout = p.<span class='function'>stdout</span>()
+<span class='keyword'>while</span> !stdout.<span class='function'>eof</span>() {
+    <span class='keyword'>var</span> line = stdout.<span class='function'>readln</span>()
+    io.<span class='function'>println</span>(<span class='string'>"Line:"</span>, line)
 }
 
-p.<span class='field'>wait</span>()
+p.<span class='function'>wait</span>()
 </pre>
 </pre>
 </div>
@@ -1151,7 +1151,7 @@ p.<span class='field'>wait</span>()
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Line: total 4
 Line: -rw-r--r-- 1 shoumodip shoumodip 241 Oct  6 15:44 demo.bs
 Line:
@@ -1187,18 +1187,18 @@ Returns <code>nil</code> if the process was spawned without capturing stdin.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> p = os.<span class='field'>Process</span>([<span class='string'>"grep"</span>, <span class='string'>"foobar"</span>], <span class='constant'>false</span>, <span class='constant'>false</span>, <span class='constant'>true</span>)
+<span class='keyword'>var</span> p = os.<span class='function'>Process</span>([<span class='string'>"grep"</span>, <span class='string'>"foobar"</span>], <span class='constant'>false</span>, <span class='constant'>false</span>, <span class='constant'>true</span>)
 <span class='keyword'>if</span> !p {
-    io.<span class='field'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>)
-    os.<span class='field'>exit</span>(<span class='constant'>1</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>)
+    os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
-<span class='keyword'>var</span> stdin = p.<span class='field'>stdin</span>()
-stdin.<span class='field'>writeln</span>(<span class='string'>"First line foobar lmao"</span>)
-stdin.<span class='field'>writeln</span>(<span class='string'>"Second line lmao"</span>)
-stdin.<span class='field'>writeln</span>(<span class='string'>"Third line lets goooo foobar"</span>)
-stdin.<span class='field'>close</span>()
-p.<span class='field'>wait</span>()
+<span class='keyword'>var</span> stdin = p.<span class='function'>stdin</span>()
+stdin.<span class='function'>writeln</span>(<span class='string'>"First line foobar lmao"</span>)
+stdin.<span class='function'>writeln</span>(<span class='string'>"Second line lmao"</span>)
+stdin.<span class='function'>writeln</span>(<span class='string'>"Third line lets goooo foobar"</span>)
+stdin.<span class='function'>close</span>()
+p.<span class='function'>wait</span>()
 </pre>
 </pre>
 </div>
@@ -1214,7 +1214,7 @@ p.<span class='field'>wait</span>()
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 First line foobar lmao
 Third line lets goooo foobar
 </pre>
@@ -1261,7 +1261,7 @@ name.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(os.<span class='field'>args</span>)
+io.<span class='function'>println</span>(os.<span class='field'>args</span>)
 </pre>
 </pre>
 </div>
@@ -1277,7 +1277,7 @@ io.<span class='field'>println</span>(os.<span class='field'>args</span>)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs foo bar baz
+<span class='string'>$ </span>bs demo.bs foo bar baz
 ["demo.bs", "foo", "bar", "baz"]
 </pre>
 </div>
@@ -1299,7 +1299,7 @@ The name of the OS.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(os.<span class='field'>name</span>)
+io.<span class='function'>println</span>(os.<span class='field'>name</span>)
 </pre>
 </pre>
 </div>
@@ -1315,7 +1315,7 @@ io.<span class='field'>println</span>(os.<span class='field'>name</span>)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Linux      # On linux
 macOS      # On macOS
 Windows    # On windows
@@ -1345,7 +1345,7 @@ The CPU architecture.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(os.<span class='field'>arch</span>)
+io.<span class='function'>println</span>(os.<span class='field'>arch</span>)
 </pre>
 </pre>
 </div>
@@ -1361,7 +1361,7 @@ io.<span class='field'>println</span>(os.<span class='field'>arch</span>)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 x86_64     # On x86_64
 ARM64      # On arm64
 Unknown    # On unknown
@@ -1394,8 +1394,8 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> r = Regex(<span class='string'>"([0-9]+) ([a-z]+)"</span>)
-io.<span class='field'>println</span>(<span class='string'>"69 apples, 420 oranges"</span>.<span class='field'>replace</span>(r, <span class='string'>"{fruit: '</span><span class='escape'>\\</span><span class='string'>2', count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
+<span class='keyword'>var</span> r = <span class='function'>Regex</span>(<span class='string'>"([0-9]+) ([a-z]+)"</span>)
+io.<span class='function'>println</span>(<span class='string'>"69 apples, 420 oranges"</span>.<span class='function'>replace</span>(r, <span class='string'>"{fruit: '</span><span class='escape'>\\</span><span class='string'>2', count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
 </pre>
 </pre>
 </div>
@@ -1411,7 +1411,7 @@ io.<span class='field'>println</span>(<span class='string'>"69 apples, 420 orang
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 {fruit: 'apples', count: 69}, {fruit: 'oranges', count: 420}
 </pre>
 </div>
@@ -1438,9 +1438,9 @@ Slice a string from <code>start</code> (inclusive) to <code>end</code> (exclusiv
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"deez nuts"</span>.<span class='field'>slice</span>(<span class='constant'>0</span>, <span class='constant'>4</span>))
-io.<span class='field'>println</span>(<span class='string'>"deez nuts"</span>.<span class='field'>slice</span>(<span class='constant'>5</span>, <span class='constant'>9</span>))
-io.<span class='field'>println</span>(<span class='string'>"deez nuts"</span>.<span class='field'>slice</span>(<span class='constant'>5</span>)) <span class='comment'># No end defaults to string end</span>
+io.<span class='function'>println</span>(<span class='string'>"deez nuts"</span>.<span class='function'>slice</span>(<span class='constant'>0</span>, <span class='constant'>4</span>))
+io.<span class='function'>println</span>(<span class='string'>"deez nuts"</span>.<span class='function'>slice</span>(<span class='constant'>5</span>, <span class='constant'>9</span>))
+io.<span class='function'>println</span>(<span class='string'>"deez nuts"</span>.<span class='function'>slice</span>(<span class='constant'>5</span>)) <span class='comment'># No end defaults to string end</span>
 </pre>
 </pre>
 </div>
@@ -1456,7 +1456,7 @@ io.<span class='field'>println</span>(<span class='string'>"deez nuts"</span>.<s
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 deez
 nuts
 nuts
@@ -1480,7 +1480,7 @@ Reverse a string.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"sllab amgil"</span>.<span class='field'>reverse</span>())
+io.<span class='function'>println</span>(<span class='string'>"sllab amgil"</span>.<span class='function'>reverse</span>())
 </pre>
 </pre>
 </div>
@@ -1496,7 +1496,7 @@ io.<span class='field'>println</span>(<span class='string'>"sllab amgil"</span>.
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 ligma balls
 </pre>
 </div>
@@ -1518,7 +1518,7 @@ Repeat a string <code>count</code> times.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>repeat</span>(<span class='constant'>6</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>repeat</span>(<span class='constant'>6</span>))
 </pre>
 </pre>
 </div>
@@ -1534,7 +1534,7 @@ io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span cl
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 foofoofoofoofoofoo
 </pre>
 </div>
@@ -1556,7 +1556,7 @@ Convert a string to uppercase.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"Urmom"</span>.<span class='field'>toupper</span>())
+io.<span class='function'>println</span>(<span class='string'>"Urmom"</span>.<span class='function'>toupper</span>())
 </pre>
 </pre>
 </div>
@@ -1572,7 +1572,7 @@ io.<span class='field'>println</span>(<span class='string'>"Urmom"</span>.<span 
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 URMOM
 </pre>
 </div>
@@ -1594,7 +1594,7 @@ Convert a string to lowercase.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"Urmom"</span>.<span class='field'>tolower</span>())
+io.<span class='function'>println</span>(<span class='string'>"Urmom"</span>.<span class='function'>tolower</span>())
 </pre>
 </pre>
 </div>
@@ -1610,7 +1610,7 @@ io.<span class='field'>println</span>(<span class='string'>"Urmom"</span>.<span 
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 urmom
 </pre>
 </div>
@@ -1632,11 +1632,11 @@ Convert a string to a number.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"69"</span>.<span class='field'>tonumber</span>())
-io.<span class='field'>println</span>(<span class='string'>"420.69"</span>.<span class='field'>tonumber</span>())
-io.<span class='field'>println</span>(<span class='string'>"0xff"</span>.<span class='field'>tonumber</span>())
-io.<span class='field'>println</span>(<span class='string'>"69e3"</span>.<span class='field'>tonumber</span>())
-io.<span class='field'>println</span>(<span class='string'>"nah"</span>.<span class='field'>tonumber</span>())
+io.<span class='function'>println</span>(<span class='string'>"69"</span>.<span class='function'>tonumber</span>())
+io.<span class='function'>println</span>(<span class='string'>"420.69"</span>.<span class='function'>tonumber</span>())
+io.<span class='function'>println</span>(<span class='string'>"0xff"</span>.<span class='function'>tonumber</span>())
+io.<span class='function'>println</span>(<span class='string'>"69e3"</span>.<span class='function'>tonumber</span>())
+io.<span class='function'>println</span>(<span class='string'>"nah"</span>.<span class='function'>tonumber</span>())
 </pre>
 </pre>
 </div>
@@ -1652,7 +1652,7 @@ io.<span class='field'>println</span>(<span class='string'>"nah"</span>.<span cl
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 69
 420.69
 255
@@ -1682,16 +1682,16 @@ Returns the position if found, else <code>nil</code>.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>find</span>(<span class='string'>"ba"</span>))
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>find</span>(<span class='string'>"ba"</span>, <span class='constant'>5</span>))
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>find</span>(<span class='string'>"ba"</span>, <span class='constant'>9</span>))
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>find</span>(<span class='string'>"lmao"</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>find</span>(<span class='string'>"ba"</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>find</span>(<span class='string'>"ba"</span>, <span class='constant'>5</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>find</span>(<span class='string'>"ba"</span>, <span class='constant'>9</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>find</span>(<span class='string'>"lmao"</span>))
 
-<span class='keyword'>var</span> r = Regex(<span class='string'>"[0-9]"</span>)
-io.<span class='field'>println</span>(<span class='string'>"69a"</span>.<span class='field'>find</span>(r))
-io.<span class='field'>println</span>(<span class='string'>"69a"</span>.<span class='field'>find</span>(r, <span class='constant'>1</span>))
-io.<span class='field'>println</span>(<span class='string'>"69a"</span>.<span class='field'>find</span>(r, <span class='constant'>2</span>))
-io.<span class='field'>println</span>(<span class='string'>"yolol"</span>.<span class='field'>find</span>(r))
+<span class='keyword'>var</span> r = <span class='function'>Regex</span>(<span class='string'>"[0-9]"</span>)
+io.<span class='function'>println</span>(<span class='string'>"69a"</span>.<span class='function'>find</span>(r))
+io.<span class='function'>println</span>(<span class='string'>"69a"</span>.<span class='function'>find</span>(r, <span class='constant'>1</span>))
+io.<span class='function'>println</span>(<span class='string'>"69a"</span>.<span class='function'>find</span>(r, <span class='constant'>2</span>))
+io.<span class='function'>println</span>(<span class='string'>"yolol"</span>.<span class='function'>find</span>(r))
 </pre>
 </pre>
 </div>
@@ -1707,7 +1707,7 @@ io.<span class='field'>println</span>(<span class='string'>"yolol"</span>.<span 
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 4
 8
 nil
@@ -1736,14 +1736,14 @@ Split string by <code>pattern</code>.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>split</span>(<span class='string'>""</span>))
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>split</span>(<span class='string'>" "</span>))
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>split</span>(<span class='string'>"  "</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>split</span>(<span class='string'>""</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>split</span>(<span class='string'>" "</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>split</span>(<span class='string'>"  "</span>))
 
-<span class='keyword'>var</span> r = Regex(<span class='string'>" +"</span>)
-io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>split</span>(r))
-io.<span class='field'>println</span>(<span class='string'>"foo bar"</span>.<span class='field'>split</span>(r))
-io.<span class='field'>println</span>(<span class='string'>"foo bar   baz"</span>.<span class='field'>split</span>(r))
+<span class='keyword'>var</span> r = <span class='function'>Regex</span>(<span class='string'>" +"</span>)
+io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<span class='function'>split</span>(r))
+io.<span class='function'>println</span>(<span class='string'>"foo bar"</span>.<span class='function'>split</span>(r))
+io.<span class='function'>println</span>(<span class='string'>"foo bar   baz"</span>.<span class='function'>split</span>(r))
 </pre>
 </pre>
 </div>
@@ -1759,7 +1759,7 @@ io.<span class='field'>println</span>(<span class='string'>"foo bar   baz"</span
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 ["foo bar baz"]
 ["foo", "bar", "baz"]
 ["foo bar baz"]
@@ -1786,14 +1786,14 @@ Replace <code>pattern</code> with <code>replacement</code>.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>replace</span>(<span class='string'>""</span>, <span class='string'>"-"</span>))
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>replace</span>(<span class='string'>" "</span>, <span class='string'>"---"</span>))
-io.<span class='field'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='field'>replace</span>(<span class='string'>"  "</span>, <span class='string'>"-"</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>replace</span>(<span class='string'>""</span>, <span class='string'>"-"</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>replace</span>(<span class='string'>" "</span>, <span class='string'>"---"</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>replace</span>(<span class='string'>"  "</span>, <span class='string'>"-"</span>))
 
-<span class='keyword'>var</span> r = Regex(<span class='string'>"([0-9]+) ([a-z]+)"</span>)
-io.<span class='field'>println</span>(<span class='string'>"69 apples, 420 oranges"</span>.<span class='field'>replace</span>(r, <span class='string'>"{type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
-io.<span class='field'>println</span>(<span class='string'>"69 apples, 420  oranges"</span>.<span class='field'>replace</span>(r, <span class='string'>"{type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
-io.<span class='field'>println</span>(<span class='string'>"ayo noice!"</span>.<span class='field'>replace</span>(r, <span class='string'>"{type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
+<span class='keyword'>var</span> r = <span class='function'>Regex</span>(<span class='string'>"([0-9]+) ([a-z]+)"</span>)
+io.<span class='function'>println</span>(<span class='string'>"69 apples, 420 oranges"</span>.<span class='function'>replace</span>(r, <span class='string'>"{type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
+io.<span class='function'>println</span>(<span class='string'>"69 apples, 420  oranges"</span>.<span class='function'>replace</span>(r, <span class='string'>"{type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
+io.<span class='function'>println</span>(<span class='string'>"ayo noice!"</span>.<span class='function'>replace</span>(r, <span class='string'>"{type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
 </pre>
 </pre>
 </div>
@@ -1809,7 +1809,7 @@ io.<span class='field'>println</span>(<span class='string'>"ayo noice!"</span>.<
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 foo bar baz
 foo---bar---baz
 foo bar ba
@@ -1841,11 +1841,11 @@ Compare two strings together.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>compare</span>(<span class='string'>"bar"</span>))
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>compare</span>(<span class='string'>"lol"</span>))
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>compare</span>(<span class='string'>"foo"</span>))
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>compare</span>(<span class='string'>"food"</span>))
-io.<span class='field'>println</span>(<span class='string'>"food"</span>.<span class='field'>compare</span>(<span class='string'>"foo"</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>compare</span>(<span class='string'>"bar"</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>compare</span>(<span class='string'>"lol"</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>compare</span>(<span class='string'>"foo"</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>compare</span>(<span class='string'>"food"</span>))
+io.<span class='function'>println</span>(<span class='string'>"food"</span>.<span class='function'>compare</span>(<span class='string'>"foo"</span>))
 </pre>
 </pre>
 </div>
@@ -1861,7 +1861,7 @@ io.<span class='field'>println</span>(<span class='string'>"food"</span>.<span c
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 1
 -1
 0
@@ -1887,7 +1887,7 @@ Trim <code>pattern</code> from the left of a string.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"["</span> $ <span class='string'>"   foo bar baz  "</span>.<span class='field'>ltrim</span>(<span class='string'>" "</span>) $ <span class='string'>"]"</span>)
+io.<span class='function'>println</span>(<span class='string'>"["</span> $ <span class='string'>"   foo bar baz  "</span>.<span class='function'>ltrim</span>(<span class='string'>" "</span>) $ <span class='string'>"]"</span>)
 </pre>
 </pre>
 </div>
@@ -1903,7 +1903,7 @@ io.<span class='field'>println</span>(<span class='string'>"["</span> $ <span cl
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [foo bar baz  ]
 </pre>
 </div>
@@ -1925,7 +1925,7 @@ Trim <code>pattern</code> from the right of a string.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"["</span> $ <span class='string'>"   foo bar baz  "</span>.<span class='field'>rtrim</span>(<span class='string'>" "</span>) $ <span class='string'>"]"</span>)
+io.<span class='function'>println</span>(<span class='string'>"["</span> $ <span class='string'>"   foo bar baz  "</span>.<span class='function'>rtrim</span>(<span class='string'>" "</span>) $ <span class='string'>"]"</span>)
 </pre>
 </pre>
 </div>
@@ -1941,7 +1941,7 @@ io.<span class='field'>println</span>(<span class='string'>"["</span> $ <span cl
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [   foo bar baz]
 </pre>
 </div>
@@ -1963,7 +1963,7 @@ Trim <code>pattern</code> from both sides of a string.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"["</span> $ <span class='string'>"   foo bar baz  "</span>.<span class='field'>trim</span>(<span class='string'>" "</span>) $ <span class='string'>"]"</span>)
+io.<span class='function'>println</span>(<span class='string'>"["</span> $ <span class='string'>"   foo bar baz  "</span>.<span class='function'>trim</span>(<span class='string'>" "</span>) $ <span class='string'>"]"</span>)
 </pre>
 </pre>
 </div>
@@ -1979,7 +1979,7 @@ io.<span class='field'>println</span>(<span class='string'>"["</span> $ <span cl
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [foo bar baz]
 </pre>
 </div>
@@ -2002,11 +2002,11 @@ Pad string with <code>pattern</code> on the left side, till the total length rea
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>0</span>))
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>3</span>))
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>4</span>))
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>5</span>))
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>6</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>0</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>3</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>4</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>5</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>6</span>))
 </pre>
 </pre>
 </div>
@@ -2022,7 +2022,7 @@ io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span cl
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 foo
 foo
 6foo
@@ -2049,11 +2049,11 @@ Pad string with <code>pattern</code> on the right side, till the total length re
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>0</span>))
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>3</span>))
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>4</span>))
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>5</span>))
-io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span class='field'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>6</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>0</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>3</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>4</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>5</span>))
+io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>6</span>))
 </pre>
 </pre>
 </div>
@@ -2069,7 +2069,7 @@ io.<span class='field'>println</span>(<span class='string'>"foo"</span>.<span cl
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 foo
 foo
 foo6
@@ -2095,9 +2095,9 @@ Check whether string starts with <code>pattern</code>.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>prefix</span>(<span class='string'>"foo"</span>))
-io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>prefix</span>(<span class='string'>"Foo"</span>))
-io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>prefix</span>(<span class='string'>"deez nuts"</span>))
+io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<span class='function'>prefix</span>(<span class='string'>"foo"</span>))
+io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<span class='function'>prefix</span>(<span class='string'>"Foo"</span>))
+io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<span class='function'>prefix</span>(<span class='string'>"deez nuts"</span>))
 </pre>
 </pre>
 </div>
@@ -2113,7 +2113,7 @@ io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 true
 false
 false
@@ -2137,9 +2137,9 @@ Check whether string ends with <code>pattern</code>.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>suffix</span>(<span class='string'>"bar"</span>))
-io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>suffix</span>(<span class='string'>"Bar"</span>))
-io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span class='field'>suffix</span>(<span class='string'>"deez nuts"</span>))
+io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<span class='function'>suffix</span>(<span class='string'>"bar"</span>))
+io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<span class='function'>suffix</span>(<span class='string'>"Bar"</span>))
+io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<span class='function'>suffix</span>(<span class='string'>"deez nuts"</span>))
 </pre>
 </pre>
 </div>
@@ -2155,7 +2155,7 @@ io.<span class='field'>println</span>(<span class='string'>"foobar"</span>.<span
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 true
 false
 false
@@ -2186,9 +2186,9 @@ Return the bitwise ceiling of a number.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(bit.<span class='field'>ceil</span>(<span class='constant'>7</span>))
-io.<span class='field'>println</span>(bit.<span class='field'>ceil</span>(<span class='constant'>8</span>))
-io.<span class='field'>println</span>(bit.<span class='field'>ceil</span>(<span class='constant'>9</span>))
+io.<span class='function'>println</span>(bit.<span class='function'>ceil</span>(<span class='constant'>7</span>))
+io.<span class='function'>println</span>(bit.<span class='function'>ceil</span>(<span class='constant'>8</span>))
+io.<span class='function'>println</span>(bit.<span class='function'>ceil</span>(<span class='constant'>9</span>))
 </pre>
 </pre>
 </div>
@@ -2204,7 +2204,7 @@ io.<span class='field'>println</span>(bit.<span class='field'>ceil</span>(<span 
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 8
 8
 16
@@ -2228,9 +2228,9 @@ Return the bitwise floor of a number.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(bit.<span class='field'>floor</span>(<span class='constant'>7</span>))
-io.<span class='field'>println</span>(bit.<span class='field'>floor</span>(<span class='constant'>8</span>))
-io.<span class='field'>println</span>(bit.<span class='field'>floor</span>(<span class='constant'>9</span>))
+io.<span class='function'>println</span>(bit.<span class='function'>floor</span>(<span class='constant'>7</span>))
+io.<span class='function'>println</span>(bit.<span class='function'>floor</span>(<span class='constant'>8</span>))
+io.<span class='function'>println</span>(bit.<span class='function'>floor</span>(<span class='constant'>9</span>))
 </pre>
 </pre>
 </div>
@@ -2246,7 +2246,7 @@ io.<span class='field'>println</span>(bit.<span class='field'>floor</span>(<span
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 4
 8
 8
@@ -2383,13 +2383,13 @@ builder for optimized string modification operations.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> b = Bytes()
-b.<span class='field'>push</span>(<span class='string'>"Hello, "</span>)
-b.<span class='field'>push</span>(<span class='string'>"world!"</span>)
-io.<span class='field'>println</span>(b)
+<span class='keyword'>var</span> b = <span class='function'>Bytes</span>()
+b.<span class='function'>push</span>(<span class='string'>"Hello, "</span>)
+b.<span class='function'>push</span>(<span class='string'>"world!"</span>)
+io.<span class='function'>println</span>(b)
 
-<span class='keyword'>var</span> nice = Bytes(<span class='string'>"69 Hehe"</span>)
-io.<span class='field'>println</span>(nice)
+<span class='keyword'>var</span> nice = <span class='function'>Bytes</span>(<span class='string'>"69 Hehe"</span>)
+io.<span class='function'>println</span>(nice)
 </pre>
 </pre>
 </div>
@@ -2405,7 +2405,7 @@ io.<span class='field'>println</span>(nice)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Hello, world!
 69 Hehe
 </pre>
@@ -2427,13 +2427,13 @@ Return the current number of bytes written.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> b = Bytes()
-b.<span class='field'>push</span>(<span class='string'>"Hello"</span>)
-b.<span class='field'>push</span>(<span class='string'>" world!"</span>)
-io.<span class='field'>println</span>(b)
+<span class='keyword'>var</span> b = <span class='function'>Bytes</span>()
+b.<span class='function'>push</span>(<span class='string'>"Hello"</span>)
+b.<span class='function'>push</span>(<span class='string'>" world!"</span>)
+io.<span class='function'>println</span>(b)
 
-<span class='keyword'>var</span> n = b.<span class='field'>count</span>()
-io.<span class='field'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>(</span>n<span class='escape'>)</span><span class='string'> bytes written."</span>)
+<span class='keyword'>var</span> n = b.<span class='function'>count</span>()
+io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>{</span>n<span class='escape'>}</span><span class='string'> bytes written."</span>)
 </pre>
 </pre>
 </div>
@@ -2449,7 +2449,7 @@ io.<span class='field'>println</span>(<span class='string'>"</span><span class='
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Hello world!
 12 bytes written.
 </pre>
@@ -2472,15 +2472,15 @@ Move back the writer head to <code>position</code>.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> b = Bytes()
-b.<span class='field'>push</span>(<span class='string'>"Hello"</span>)
+<span class='keyword'>var</span> b = <span class='function'>Bytes</span>()
+b.<span class='function'>push</span>(<span class='string'>"Hello"</span>)
 
-<span class='keyword'>var</span> p = b.<span class='field'>count</span>()
-b.<span class='field'>push</span>(<span class='string'>" world!"</span>)
+<span class='keyword'>var</span> p = b.<span class='function'>count</span>()
+b.<span class='function'>push</span>(<span class='string'>" world!"</span>)
 
-io.<span class='field'>println</span>(b)
-b.<span class='field'>reset</span>(p)
-io.<span class='field'>println</span>(b)
+io.<span class='function'>println</span>(b)
+b.<span class='function'>reset</span>(p)
+io.<span class='function'>println</span>(b)
 </pre>
 </pre>
 </div>
@@ -2496,7 +2496,7 @@ io.<span class='field'>println</span>(b)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Hello world!
 Hello
 </pre>
@@ -2523,12 +2523,12 @@ a string.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> b = Bytes()
-b.<span class='field'>push</span>(<span class='string'>"Hello world!"</span>)
+<span class='keyword'>var</span> b = <span class='function'>Bytes</span>()
+b.<span class='function'>push</span>(<span class='string'>"Hello world!"</span>)
 
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>())
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>(<span class='constant'>0</span>, <span class='constant'>5</span>))
-io.<span class='field'>println</span>(b.<span class='field'>slice</span>(<span class='constant'>6</span>, <span class='constant'>12</span>))
+io.<span class='function'>println</span>(b.<span class='function'>slice</span>())
+io.<span class='function'>println</span>(b.<span class='function'>slice</span>(<span class='constant'>0</span>, <span class='constant'>5</span>))
+io.<span class='function'>println</span>(b.<span class='function'>slice</span>(<span class='constant'>6</span>, <span class='constant'>12</span>))
 </pre>
 </pre>
 </div>
@@ -2544,7 +2544,7 @@ io.<span class='field'>println</span>(b.<span class='field'>slice</span>(<span c
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Hello world!
 Hello
 world!
@@ -2568,16 +2568,16 @@ Push <code>value</code> to the end.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> buffer = Bytes()
+<span class='keyword'>var</span> buffer = <span class='function'>Bytes</span>()
 
 <span class='comment'># Operations can be chained</span>
 buffer
-    .<span class='field'>push</span>(<span class='string'>"Hello"</span>)           <span class='comment'># A String</span>
-    .<span class='field'>push</span>(Bytes(<span class='string'>", world!"</span>)) <span class='comment'># Another Bytes instance</span>
-    .<span class='field'>push</span>(<span class='constant'>32</span>)                <span class='comment'># An ASCII code, in this case ' '</span>
-    .<span class='field'>push</span>($<span class='constant'>69</span>)               <span class='comment'># To push the string representation, a string must be provided</span>
+    .<span class='function'>push</span>(<span class='string'>"Hello"</span>)           <span class='comment'># A String</span>
+    .<span class='function'>push</span>(<span class='function'>Bytes</span>(<span class='string'>", world!"</span>)) <span class='comment'># Another Bytes instance</span>
+    .<span class='function'>push</span>(<span class='constant'>32</span>)                <span class='comment'># An ASCII code, in this case ' '</span>
+    .<span class='function'>push</span>($<span class='constant'>69</span>)               <span class='comment'># To push the string representation, a string must be provided</span>
 
-io.<span class='field'>println</span>(buffer)
+io.<span class='function'>println</span>(buffer)
 </pre>
 </pre>
 </div>
@@ -2593,7 +2593,7 @@ io.<span class='field'>println</span>(buffer)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Hello, world! 69
 </pre>
 </div>
@@ -2615,15 +2615,15 @@ Insert <code>value</code> at <code>position</code>.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> buffer = Bytes(<span class='string'>"world!"</span>)
+<span class='keyword'>var</span> buffer = <span class='function'>Bytes</span>(<span class='string'>"world!"</span>)
 
 <span class='comment'># Operations can be chained, just like Bytes.push()</span>
 buffer
-    .<span class='field'>insert</span>(<span class='constant'>0</span>, <span class='string'>"Hell"</span>)      <span class='comment'># A String</span>
-    .<span class='field'>insert</span>(<span class='constant'>4</span>, Bytes(<span class='string'>", "</span>)) <span class='comment'># Another Bytes instance</span>
-    .<span class='field'>insert</span>(<span class='constant'>4</span>, <span class='constant'>111</span>)         <span class='comment'># An ASCII code, in this case 'o'</span>
+    .<span class='function'>insert</span>(<span class='constant'>0</span>, <span class='string'>"Hell"</span>)      <span class='comment'># A String</span>
+    .<span class='function'>insert</span>(<span class='constant'>4</span>, <span class='function'>Bytes</span>(<span class='string'>", "</span>)) <span class='comment'># Another Bytes instance</span>
+    .<span class='function'>insert</span>(<span class='constant'>4</span>, <span class='constant'>111</span>)         <span class='comment'># An ASCII code, in this case 'o'</span>
 
-io.<span class='field'>println</span>(buffer)
+io.<span class='function'>println</span>(buffer)
 </pre>
 </pre>
 </div>
@@ -2639,7 +2639,7 @@ io.<span class='field'>println</span>(buffer)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Hello, world!
 </pre>
 </div>
@@ -2661,12 +2661,12 @@ Get the byte at <code>position</code> as a number.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> b = Bytes()
-b.<span class='field'>push</span>(<span class='string'>"Hello"</span>)
+<span class='keyword'>var</span> b = <span class='function'>Bytes</span>()
+b.<span class='function'>push</span>(<span class='string'>"Hello"</span>)
 
-<span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, b.<span class='field'>count</span>() {
-    <span class='keyword'>var</span> c = b.<span class='field'>get</span>(i)
-    io.<span class='field'>println</span>(ascii.<span class='field'>char</span>(c), c)
+<span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, b.<span class='function'>count</span>() {
+    <span class='keyword'>var</span> c = b.<span class='function'>get</span>(i)
+    io.<span class='function'>println</span>(ascii.<span class='function'>char</span>(c), c)
 }
 </pre>
 </pre>
@@ -2683,7 +2683,7 @@ b.<span class='field'>push</span>(<span class='string'>"Hello"</span>)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 H 72
 e 101
 l 108
@@ -2712,13 +2712,13 @@ The argument <code>value</code> has to be a number.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> b = Bytes()
+<span class='keyword'>var</span> b = <span class='function'>Bytes</span>()
 
-b.<span class='field'>push</span>(<span class='string'>"Cello"</span>)
-io.<span class='field'>println</span>(b)
+b.<span class='function'>push</span>(<span class='string'>"Cello"</span>)
+io.<span class='function'>println</span>(b)
 
-b.<span class='field'>set</span>(<span class='constant'>0</span>, ascii.<span class='field'>code</span>(<span class='string'>"H"</span>))
-io.<span class='field'>println</span>(b)
+b.<span class='function'>set</span>(<span class='constant'>0</span>, ascii.<span class='function'>code</span>(<span class='string'>"H"</span>))
+io.<span class='function'>println</span>(b)
 </pre>
 </pre>
 </div>
@@ -2734,7 +2734,7 @@ io.<span class='field'>println</span>(b)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Cello
 Hello
 </pre>
@@ -2767,9 +2767,9 @@ The provided function <code>f</code> must take a single argument.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
-<span class='keyword'>var</span> ys = xs.<span class='field'>map</span>(<span class='keyword'>fn</span> (x) =&gt; x * <span class='constant'>2</span>)
-io.<span class='field'>println</span>(xs)
-io.<span class='field'>println</span>(ys)
+<span class='keyword'>var</span> ys = xs.<span class='function'>map</span>(<span class='keyword'>fn</span> (x) =&gt; x * <span class='constant'>2</span>)
+io.<span class='function'>println</span>(xs)
+io.<span class='function'>println</span>(ys)
 </pre>
 </pre>
 </div>
@@ -2785,7 +2785,7 @@ io.<span class='field'>println</span>(ys)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 [2, 4, 6, 8, 10]
 </pre>
@@ -2812,9 +2812,9 @@ The provided function <code>f</code> must take a single argument.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
-<span class='keyword'>var</span> ys = xs.<span class='field'>filter</span>(<span class='keyword'>fn</span> (x) =&gt; x % <span class='constant'>2</span> == <span class='constant'>0</span>)
-io.<span class='field'>println</span>(xs)
-io.<span class='field'>println</span>(ys)
+<span class='keyword'>var</span> ys = xs.<span class='function'>filter</span>(<span class='keyword'>fn</span> (x) =&gt; x % <span class='constant'>2</span> == <span class='constant'>0</span>)
+io.<span class='function'>println</span>(xs)
+io.<span class='function'>println</span>(ys)
 </pre>
 </pre>
 </div>
@@ -2830,7 +2830,7 @@ io.<span class='field'>println</span>(ys)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 [2, 4]
 </pre>
@@ -2860,11 +2860,11 @@ current value.
 <pre class='code active'>
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
 
-<span class='keyword'>var</span> a = xs.<span class='field'>reduce</span>(<span class='keyword'>fn</span> (x, y) =&gt; x + y)
-io.<span class='field'>println</span>(a)
+<span class='keyword'>var</span> a = xs.<span class='function'>reduce</span>(<span class='keyword'>fn</span> (x, y) =&gt; x + y)
+io.<span class='function'>println</span>(a)
 
-<span class='keyword'>var</span> b = xs.<span class='field'>reduce</span>(<span class='keyword'>fn</span> (x, y) =&gt; x + y, <span class='constant'>10</span>)
-io.<span class='field'>println</span>(b)
+<span class='keyword'>var</span> b = xs.<span class='function'>reduce</span>(<span class='keyword'>fn</span> (x, y) =&gt; x + y, <span class='constant'>10</span>)
+io.<span class='function'>println</span>(b)
 </pre>
 </pre>
 </div>
@@ -2880,7 +2880,7 @@ io.<span class='field'>println</span>(b)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 15
 25
 </pre>
@@ -2905,13 +2905,13 @@ Copy an array.
 <pre class='code active'>
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
 <span class='keyword'>var</span> ys = xs
-<span class='keyword'>var</span> zs = xs.<span class='field'>copy</span>()
+<span class='keyword'>var</span> zs = xs.<span class='function'>copy</span>()
 
 xs[<span class='constant'>0</span>] = <span class='constant'>69</span>
 
-io.<span class='field'>println</span>(xs)
-io.<span class='field'>println</span>(ys)
-io.<span class='field'>println</span>(zs)
+io.<span class='function'>println</span>(xs)
+io.<span class='function'>println</span>(ys)
+io.<span class='function'>println</span>(zs)
 </pre>
 </pre>
 </div>
@@ -2927,7 +2927,7 @@ io.<span class='field'>println</span>(zs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [69, 2, 3, 4, 5]
 [69, 2, 3, 4, 5]
 [1, 2, 3, 4, 5]
@@ -2951,7 +2951,7 @@ Join the elements of an array, separated by <code>separator</code> into a single
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>([<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>].<span class='field'>join</span>(<span class='string'>" -&gt; "</span>))
+io.<span class='function'>println</span>([<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>].<span class='function'>join</span>(<span class='string'>" -&gt; "</span>))
 </pre>
 </pre>
 </div>
@@ -2967,7 +2967,7 @@ io.<span class='field'>println</span>([<span class='constant'>1</span>, <span cl
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 1 -&gt; 2 -&gt; 3 -&gt; 4 -&gt; 5
 </pre>
 </div>
@@ -2994,10 +2994,10 @@ Returns the position if found, else <code>nil</code>.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>, <span class='constant'>3</span>]
-io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>3</span>))
-io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>3</span>, <span class='constant'>3</span>))
-io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>3</span>, <span class='constant'>6</span>))
-io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span class='constant'>true</span>, <span class='constant'>6</span>))
+io.<span class='function'>println</span>(xs.<span class='function'>find</span>(<span class='constant'>3</span>))
+io.<span class='function'>println</span>(xs.<span class='function'>find</span>(<span class='constant'>3</span>, <span class='constant'>3</span>))
+io.<span class='function'>println</span>(xs.<span class='function'>find</span>(<span class='constant'>3</span>, <span class='constant'>6</span>))
+io.<span class='function'>println</span>(xs.<span class='function'>find</span>(<span class='constant'>true</span>, <span class='constant'>6</span>))
 </pre>
 </pre>
 </div>
@@ -3013,7 +3013,7 @@ io.<span class='field'>println</span>(xs.<span class='field'>find</span>(<span c
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 2
 5
 nil
@@ -3041,8 +3041,8 @@ Compare the elements of two arrays.
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
 <span class='keyword'>var</span> ys = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
 
-io.<span class='field'>println</span>(xs == ys)
-io.<span class='field'>println</span>(xs.<span class='field'>equal</span>(ys))
+io.<span class='function'>println</span>(xs == ys)
+io.<span class='function'>println</span>(xs.<span class='function'>equal</span>(ys))
 </pre>
 </pre>
 </div>
@@ -3058,7 +3058,7 @@ io.<span class='field'>println</span>(xs.<span class='field'>equal</span>(ys))
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 false
 true
 </pre>
@@ -3091,10 +3091,10 @@ This modifies the array.
 <span class='keyword'>var</span> xs = []
 
 <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>5</span> {
-    xs.<span class='field'>push</span>(i * <span class='constant'>2</span>)
+    xs.<span class='function'>push</span>(i * <span class='constant'>2</span>)
 }
 
-io.<span class='field'>println</span>(xs)
+io.<span class='function'>println</span>(xs)
 </pre>
 </pre>
 </div>
@@ -3110,7 +3110,7 @@ io.<span class='field'>println</span>(xs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [0, 2, 4, 6, 8]
 </pre>
 </div>
@@ -3129,10 +3129,10 @@ Operations can be chained.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(
+io.<span class='function'>println</span>(
     [<span class='string'>"Nice!"</span>]
-        .<span class='field'>push</span>(<span class='constant'>69</span>)
-        .<span class='field'>push</span>(<span class='constant'>420</span>))
+        .<span class='function'>push</span>(<span class='constant'>69</span>)
+        .<span class='function'>push</span>(<span class='constant'>420</span>))
 </pre>
 </pre>
 </div>
@@ -3148,7 +3148,7 @@ io.<span class='field'>println</span>(
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 ["Nice!", 69, 420]
 </pre>
 </div>
@@ -3180,12 +3180,12 @@ This modifies the array.
         <span class='keyword'>continue</span>
     }
 
-    xs.<span class='field'>push</span>(i * <span class='constant'>2</span>)
+    xs.<span class='function'>push</span>(i * <span class='constant'>2</span>)
 }
-io.<span class='field'>println</span>(xs)
+io.<span class='function'>println</span>(xs)
 
-xs.<span class='field'>insert</span>(<span class='constant'>2</span>, <span class='constant'>4</span>)
-io.<span class='field'>println</span>(xs)
+xs.<span class='function'>insert</span>(<span class='constant'>2</span>, <span class='constant'>4</span>)
+io.<span class='function'>println</span>(xs)
 </pre>
 </pre>
 </div>
@@ -3201,7 +3201,7 @@ io.<span class='field'>println</span>(xs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [0, 2, 6, 8]
 [0, 2, 4, 6, 6]
 </pre>
@@ -3221,10 +3221,10 @@ Operations can be chained, like <code>array.push()</code>
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(
+io.<span class='function'>println</span>(
     [<span class='string'>"Nice!"</span>]
-        .<span class='field'>insert</span>(<span class='constant'>0</span>, <span class='constant'>69</span>)
-        .<span class='field'>insert</span>(<span class='constant'>1</span>, <span class='constant'>420</span>))
+        .<span class='function'>insert</span>(<span class='constant'>0</span>, <span class='constant'>69</span>)
+        .<span class='function'>insert</span>(<span class='constant'>1</span>, <span class='constant'>420</span>))
 </pre>
 </pre>
 </div>
@@ -3240,7 +3240,7 @@ io.<span class='field'>println</span>(
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [69, 420, "Nice!"]
 </pre>
 </div>
@@ -3263,9 +3263,9 @@ Sort an array inplace with <code>compare</code>, and return itself.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> xs = [<span class='constant'>4</span>, <span class='constant'>2</span>, <span class='constant'>5</span>, <span class='constant'>1</span>, <span class='constant'>3</span>]
-xs.<span class='field'>sort</span>(<span class='keyword'>fn</span> (x, y) =&gt; x &lt; y) <span class='comment'># This also returns the array so you can chain operations</span>
+xs.<span class='function'>sort</span>(<span class='keyword'>fn</span> (x, y) =&gt; x &lt; y) <span class='comment'># This also returns the array so you can chain operations</span>
 
-io.<span class='field'>println</span>(xs)
+io.<span class='function'>println</span>(xs)
 </pre>
 </pre>
 </div>
@@ -3281,7 +3281,7 @@ io.<span class='field'>println</span>(xs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 </pre>
 </div>
@@ -3315,10 +3315,10 @@ This modifies the array.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
-io.<span class='field'>println</span>(xs)
+io.<span class='function'>println</span>(xs)
 
-io.<span class='field'>println</span>(xs.<span class='field'>resize</span>(<span class='constant'>3</span>))
-io.<span class='field'>println</span>(xs)
+io.<span class='function'>println</span>(xs.<span class='function'>resize</span>(<span class='constant'>3</span>))
+io.<span class='function'>println</span>(xs)
 </pre>
 </pre>
 </div>
@@ -3334,7 +3334,7 @@ io.<span class='field'>println</span>(xs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 [1, 2, 3]
 [1, 2, 3]
@@ -3362,10 +3362,10 @@ This modifies the array.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
-io.<span class='field'>println</span>(xs)
+io.<span class='function'>println</span>(xs)
 
-io.<span class='field'>println</span>(xs.<span class='field'>remove</span>(<span class='constant'>2</span>))
-io.<span class='field'>println</span>(xs)
+io.<span class='function'>println</span>(xs.<span class='function'>remove</span>(<span class='constant'>2</span>))
+io.<span class='function'>println</span>(xs)
 </pre>
 </pre>
 </div>
@@ -3381,7 +3381,7 @@ io.<span class='field'>println</span>(xs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 3
 [1, 2, 4, 5]
@@ -3409,10 +3409,10 @@ This modifies the array.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
-io.<span class='field'>println</span>(xs)
+io.<span class='function'>println</span>(xs)
 
-xs.<span class='field'>reverse</span>() <span class='comment'># This also returns the array so you can chain operations</span>
-io.<span class='field'>println</span>(xs)
+xs.<span class='function'>reverse</span>() <span class='comment'># This also returns the array so you can chain operations</span>
+io.<span class='function'>println</span>(xs)
 </pre>
 </pre>
 </div>
@@ -3428,7 +3428,7 @@ io.<span class='field'>println</span>(xs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 [5, 4, 3, 2, 1]
 </pre>
@@ -3455,10 +3455,10 @@ This modifies the array.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
-io.<span class='field'>println</span>(xs)
+io.<span class='function'>println</span>(xs)
 
-xs.<span class='field'>fill</span>(<span class='constant'>69</span>) <span class='comment'># This also returns the array so you can chain operations</span>
-io.<span class='field'>println</span>(xs)
+xs.<span class='function'>fill</span>(<span class='constant'>69</span>) <span class='comment'># This also returns the array so you can chain operations</span>
+io.<span class='function'>println</span>(xs)
 </pre>
 </pre>
 </div>
@@ -3474,7 +3474,7 @@ io.<span class='field'>println</span>(xs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 [69, 69, 69, 69, 69]
 </pre>
@@ -3494,8 +3494,8 @@ Use this with <code>array.resize()</code> to create an array with a preset size 
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> xs = [].<span class='field'>resize</span>(<span class='constant'>5</span>).<span class='field'>fill</span>(<span class='string'>"foo"</span>)
-io.<span class='field'>println</span>(xs)
+<span class='keyword'>var</span> xs = [].<span class='function'>resize</span>(<span class='constant'>5</span>).<span class='function'>fill</span>(<span class='string'>"foo"</span>)
+io.<span class='function'>println</span>(xs)
 </pre>
 </pre>
 </div>
@@ -3511,7 +3511,7 @@ io.<span class='field'>println</span>(xs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 ["foo", "foo", "foo", "foo", "foo"]
 </pre>
 </div>
@@ -3534,12 +3534,12 @@ Here's a 2D version.
 <span class='keyword'>var</span> height = <span class='constant'>6</span>
 
 <span class='keyword'>var</span> board = []
-    .<span class='field'>resize</span>(height)
-    .<span class='field'>map</span>(<span class='keyword'>fn</span> (x) =&gt; [].<span class='field'>resize</span>(width).<span class='field'>fill</span>(<span class='constant'>0</span>))
+    .<span class='function'>resize</span>(height)
+    .<span class='function'>map</span>(<span class='keyword'>fn</span> (x) =&gt; [].<span class='function'>resize</span>(width).<span class='function'>fill</span>(<span class='constant'>0</span>))
 
 board[<span class='constant'>2</span>][<span class='constant'>2</span>] = <span class='constant'>1</span>
 
-io.<span class='field'>println</span>(board)
+io.<span class='function'>println</span>(board)
 </pre>
 </pre>
 </div>
@@ -3555,7 +3555,7 @@ io.<span class='field'>println</span>(board)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [
     [0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0],
@@ -3585,9 +3585,9 @@ Slice an array from <code>start</code> (inclusive) to <code>end</code> (exclusiv
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
-io.<span class='field'>println</span>(xs)
-io.<span class='field'>println</span>(xs.<span class='field'>slice</span>(<span class='constant'>2</span>))
-io.<span class='field'>println</span>(xs.<span class='field'>slice</span>(<span class='constant'>1</span>, <span class='constant'>3</span>))
+io.<span class='function'>println</span>(xs)
+io.<span class='function'>println</span>(xs.<span class='function'>slice</span>(<span class='constant'>2</span>))
+io.<span class='function'>println</span>(xs.<span class='function'>slice</span>(<span class='constant'>1</span>, <span class='constant'>3</span>))
 </pre>
 </pre>
 </div>
@@ -3603,7 +3603,7 @@ io.<span class='field'>println</span>(xs.<span class='field'>slice</span>(<span 
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 [3, 4, 5]
 [2, 3]
@@ -3632,8 +3632,8 @@ This modifies the array.
 <pre class='code active'>
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
 <span class='keyword'>var</span> ys = [<span class='constant'>6</span>, <span class='constant'>7</span>, <span class='constant'>8</span>, <span class='constant'>9</span>, <span class='constant'>10</span>]
-io.<span class='field'>println</span>(xs)
-io.<span class='field'>println</span>(xs.<span class='field'>append</span>(ys))
+io.<span class='function'>println</span>(xs)
+io.<span class='function'>println</span>(xs.<span class='function'>append</span>(ys))
 </pre>
 </pre>
 </div>
@@ -3649,7 +3649,7 @@ io.<span class='field'>println</span>(xs.<span class='field'>append</span>(ys))
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 [
     1,
@@ -3695,13 +3695,13 @@ Copy a table.
 }
 
 <span class='keyword'>var</span> ys = xs
-<span class='keyword'>var</span> zs = xs.<span class='field'>copy</span>()
+<span class='keyword'>var</span> zs = xs.<span class='function'>copy</span>()
 
 xs.<span class='field'>bar</span> = <span class='constant'>1337</span>
 
-io.<span class='field'>println</span>(xs)
-io.<span class='field'>println</span>(ys)
-io.<span class='field'>println</span>(zs)
+io.<span class='function'>println</span>(xs)
+io.<span class='function'>println</span>(ys)
+io.<span class='function'>println</span>(zs)
 </pre>
 </pre>
 </div>
@@ -3717,7 +3717,7 @@ io.<span class='field'>println</span>(zs)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 {
     bar = 1337,
     foo = 69
@@ -3753,8 +3753,8 @@ Compare the elements of two tables.
 <span class='keyword'>var</span> xs = { foo = <span class='constant'>69</span>, bar = <span class='constant'>420</span> }
 <span class='keyword'>var</span> ys = { foo = <span class='constant'>69</span>, bar = <span class='constant'>420</span> }
 
-io.<span class='field'>println</span>(xs == ys)
-io.<span class='field'>println</span>(xs.<span class='field'>equal</span>(ys))
+io.<span class='function'>println</span>(xs == ys)
+io.<span class='function'>println</span>(xs.<span class='function'>equal</span>(ys))
 </pre>
 </pre>
 </div>
@@ -3770,7 +3770,7 @@ io.<span class='field'>println</span>(xs.<span class='field'>equal</span>(ys))
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 false
 true
 </pre>
@@ -3803,7 +3803,7 @@ Sine in radians.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> theta = <span class='constant'>0.5</span>
-io.<span class='field'>println</span>(theta.<span class='field'>sin</span>())
+io.<span class='function'>println</span>(theta.<span class='function'>sin</span>())
 </pre>
 </pre>
 </div>
@@ -3819,7 +3819,7 @@ io.<span class='field'>println</span>(theta.<span class='field'>sin</span>())
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 0.479425538604203
 </pre>
 </div>
@@ -3875,7 +3875,7 @@ Return the exponential function of the number.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='constant'>2</span>.<span class='field'>exp</span>()) <span class='comment'># Basically e^2</span>
+io.<span class='function'>println</span>(<span class='constant'>2</span>.<span class='function'>exp</span>()) <span class='comment'># Basically e^2</span>
 </pre>
 </pre>
 </div>
@@ -3891,7 +3891,7 @@ io.<span class='field'>println</span>(<span class='constant'>2</span>.<span clas
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 7.38905609893065
 </pre>
 </div>
@@ -3961,9 +3961,9 @@ Return the sign of the number.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>((<span class='constant'>0</span>).<span class='field'>sign</span>())
-io.<span class='field'>println</span>((<span class='constant'>69</span>).<span class='field'>sign</span>())
-io.<span class='field'>println</span>((-<span class='constant'>420</span>).<span class='field'>sign</span>())
+io.<span class='function'>println</span>((<span class='constant'>0</span>).<span class='function'>sign</span>())
+io.<span class='function'>println</span>((<span class='constant'>69</span>).<span class='function'>sign</span>())
+io.<span class='function'>println</span>((-<span class='constant'>420</span>).<span class='function'>sign</span>())
 </pre>
 </pre>
 </div>
@@ -3979,7 +3979,7 @@ io.<span class='field'>println</span>((-<span class='constant'>420</span>).<span
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 0
 1
 -1
@@ -4003,8 +4003,8 @@ Return the maximum between the method receiver and the provided arguments.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='constant'>1</span>.<span class='field'>max</span>(<span class='constant'>2</span>, <span class='constant'>3</span>))
-io.<span class='field'>println</span>(<span class='constant'>3</span>.<span class='field'>max</span>(<span class='constant'>0</span>, <span class='constant'>1</span>, <span class='constant'>2</span>))
+io.<span class='function'>println</span>(<span class='constant'>1</span>.<span class='function'>max</span>(<span class='constant'>2</span>, <span class='constant'>3</span>))
+io.<span class='function'>println</span>(<span class='constant'>3</span>.<span class='function'>max</span>(<span class='constant'>0</span>, <span class='constant'>1</span>, <span class='constant'>2</span>))
 </pre>
 </pre>
 </div>
@@ -4020,7 +4020,7 @@ io.<span class='field'>println</span>(<span class='constant'>3</span>.<span clas
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 3
 3
 </pre>
@@ -4043,8 +4043,8 @@ Return the minimum between the method receiver and the provided arguments.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(<span class='constant'>1</span>.<span class='field'>min</span>(<span class='constant'>2</span>, <span class='constant'>3</span>))
-io.<span class='field'>println</span>(<span class='constant'>3</span>.<span class='field'>min</span>(<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>))
+io.<span class='function'>println</span>(<span class='constant'>1</span>.<span class='function'>min</span>(<span class='constant'>2</span>, <span class='constant'>3</span>))
+io.<span class='function'>println</span>(<span class='constant'>3</span>.<span class='function'>min</span>(<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>))
 </pre>
 </pre>
 </div>
@@ -4060,7 +4060,7 @@ io.<span class='field'>println</span>(<span class='constant'>3</span>.<span clas
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 1
 1
 </pre>
@@ -4096,9 +4096,9 @@ Set the precision (number of decimal digits).
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> n = <span class='constant'>69.1337</span>
-io.<span class='field'>println</span>(n)
-io.<span class='field'>println</span>(n.<span class='field'>precise</span>(<span class='constant'>0</span>))
-io.<span class='field'>println</span>(n.<span class='field'>precise</span>(<span class='constant'>3</span>))
+io.<span class='function'>println</span>(n)
+io.<span class='function'>println</span>(n.<span class='function'>precise</span>(<span class='constant'>0</span>))
+io.<span class='function'>println</span>(n.<span class='function'>precise</span>(<span class='constant'>3</span>))
 </pre>
 </pre>
 </div>
@@ -4114,7 +4114,7 @@ io.<span class='field'>println</span>(n.<span class='field'>precise</span>(<span
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 69.1337
 69
 69.134
@@ -4142,22 +4142,22 @@ runtime.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> a = math.<span class='field'>Random</span>()
-<span class='keyword'>var</span> b = math.<span class='field'>Random</span>(<span class='constant'>1337</span>)
+<span class='keyword'>var</span> a = math.<span class='function'>Random</span>()
+<span class='keyword'>var</span> b = math.<span class='function'>Random</span>(<span class='constant'>1337</span>)
 
-io.<span class='field'>println</span>(a.<span class='field'>number</span>())
-io.<span class='field'>println</span>(a.<span class='field'>number</span>())
-io.<span class='field'>println</span>(a.<span class='field'>number</span>(<span class='constant'>69</span>, <span class='constant'>420</span>))
-io.<span class='field'>println</span>(a.<span class='field'>number</span>(<span class='constant'>69</span>, <span class='constant'>420</span>))
+io.<span class='function'>println</span>(a.<span class='function'>number</span>())
+io.<span class='function'>println</span>(a.<span class='function'>number</span>())
+io.<span class='function'>println</span>(a.<span class='function'>number</span>(<span class='constant'>69</span>, <span class='constant'>420</span>))
+io.<span class='function'>println</span>(a.<span class='function'>number</span>(<span class='constant'>69</span>, <span class='constant'>420</span>))
 
-io.<span class='field'>println</span>()
-io.<span class='field'>println</span>(<span class='string'>"==== Constant ===="</span>)
-io.<span class='field'>println</span>()
+io.<span class='function'>println</span>()
+io.<span class='function'>println</span>(<span class='string'>"==== Constant ===="</span>)
+io.<span class='function'>println</span>()
 
-io.<span class='field'>println</span>(b.<span class='field'>number</span>())
-io.<span class='field'>println</span>(b.<span class='field'>number</span>())
-io.<span class='field'>println</span>(b.<span class='field'>number</span>(<span class='constant'>69</span>, <span class='constant'>420</span>))
-io.<span class='field'>println</span>(b.<span class='field'>number</span>(<span class='constant'>69</span>, <span class='constant'>420</span>))
+io.<span class='function'>println</span>(b.<span class='function'>number</span>())
+io.<span class='function'>println</span>(b.<span class='function'>number</span>())
+io.<span class='function'>println</span>(b.<span class='function'>number</span>(<span class='constant'>69</span>, <span class='constant'>420</span>))
+io.<span class='function'>println</span>(b.<span class='function'>number</span>(<span class='constant'>69</span>, <span class='constant'>420</span>))
 </pre>
 </pre>
 </div>
@@ -4173,7 +4173,7 @@ io.<span class='field'>println</span>(b.<span class='field'>number</span>(<span 
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 0.279107155961776
 0.73815524476827
 225.323320231653
@@ -4207,11 +4207,11 @@ If no arguments are provided, a number between <code>0</code> and <code>1</code>
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> r = math.<span class='field'>Random</span>()
-io.<span class='field'>println</span>(r.<span class='field'>number</span>())
-io.<span class='field'>println</span>(r.<span class='field'>number</span>())
-io.<span class='field'>println</span>(r.<span class='field'>number</span>(<span class='constant'>69</span>, <span class='constant'>420</span>))
-io.<span class='field'>println</span>(r.<span class='field'>number</span>(<span class='constant'>69</span>, <span class='constant'>420</span>))
+<span class='keyword'>var</span> r = math.<span class='function'>Random</span>()
+io.<span class='function'>println</span>(r.<span class='function'>number</span>())
+io.<span class='function'>println</span>(r.<span class='function'>number</span>())
+io.<span class='function'>println</span>(r.<span class='function'>number</span>(<span class='constant'>69</span>, <span class='constant'>420</span>))
+io.<span class='function'>println</span>(r.<span class='function'>number</span>(<span class='constant'>69</span>, <span class='constant'>420</span>))
 </pre>
 </pre>
 </div>
@@ -4227,7 +4227,7 @@ io.<span class='field'>println</span>(r.<span class='field'>number</span>(<span 
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 0.279107155961776
 0.73815524476827
 225.323320231653
@@ -4252,8 +4252,8 @@ Return a random sequence of bytes.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> seq = math.<span class='field'>Random</span>().<span class='field'>bytes</span>(<span class='constant'>9</span>)
-io.<span class='field'>println</span>(seq.<span class='field'>slice</span>())
+<span class='keyword'>var</span> seq = math.<span class='function'>Random</span>().<span class='function'>bytes</span>(<span class='constant'>9</span>)
+io.<span class='function'>println</span>(seq.<span class='function'>slice</span>())
 </pre>
 </pre>
 </div>
@@ -4269,7 +4269,7 @@ io.<span class='field'>println</span>(seq.<span class='field'>slice</span>())
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 {03ah
 "7f
 </pre>
@@ -4296,11 +4296,11 @@ If <code>step</code> is not provided, it is automatically selected.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(math.<span class='field'>range</span>(<span class='constant'>1</span>, <span class='constant'>6</span>))
-io.<span class='field'>println</span>(math.<span class='field'>range</span>(<span class='constant'>6</span>, <span class='constant'>1</span>))
+io.<span class='function'>println</span>(math.<span class='function'>range</span>(<span class='constant'>1</span>, <span class='constant'>6</span>))
+io.<span class='function'>println</span>(math.<span class='function'>range</span>(<span class='constant'>6</span>, <span class='constant'>1</span>))
 
-io.<span class='field'>println</span>(math.<span class='field'>range</span>(<span class='constant'>1</span>, <span class='constant'>6</span>, <span class='constant'>2</span>))
-io.<span class='field'>println</span>(math.<span class='field'>range</span>(<span class='constant'>6</span>, <span class='constant'>1</span>, -<span class='constant'>2</span>))
+io.<span class='function'>println</span>(math.<span class='function'>range</span>(<span class='constant'>1</span>, <span class='constant'>6</span>, <span class='constant'>2</span>))
+io.<span class='function'>println</span>(math.<span class='function'>range</span>(<span class='constant'>6</span>, <span class='constant'>1</span>, -<span class='constant'>2</span>))
 </pre>
 </pre>
 </div>
@@ -4316,7 +4316,7 @@ io.<span class='field'>println</span>(math.<span class='field'>range</span>(<spa
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 [1, 2, 3, 4, 5]
 [6, 5, 4, 3, 2]
 [1, 3, 5]
@@ -4339,7 +4339,7 @@ raised.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(math.<span class='field'>range</span>(<span class='constant'>1</span>, <span class='constant'>6</span>, -<span class='constant'>1</span>))
+io.<span class='function'>println</span>(math.<span class='function'>range</span>(<span class='constant'>1</span>, <span class='constant'>6</span>, -<span class='constant'>1</span>))
 </pre>
 </pre>
 </div>
@@ -4355,7 +4355,7 @@ io.<span class='field'>println</span>(math.<span class='field'>range</span>(<spa
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 demo.bs:1:29: error: a step of -1 in an ascending range would run indefinitely
 
     1 | io.println(math.range(1, 6, -1))
@@ -4403,14 +4403,14 @@ Example usecase:
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = meta.<span class='field'>compile</span>(<span class='string'>"Oops@"</span>)
+<span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(<span class='string'>"Oops@"</span>)
 <span class='keyword'>if</span> f <span class='keyword'>is</span> <span class='string'>"Error"</span> {
-    io.<span class='field'>println</span>(<span class='string'>"Row:"</span>, f.<span class='field'>row</span>())
-    io.<span class='field'>println</span>(<span class='string'>"Col:"</span>, f.<span class='field'>col</span>())
-    io.<span class='field'>println</span>(<span class='string'>"Line:"</span>, f.<span class='field'>line</span>())
-    io.<span class='field'>println</span>(<span class='string'>"Message:"</span>, f.<span class='field'>message</span>())
-    io.<span class='field'>println</span>(<span class='string'>"Explanation:"</span>, f.<span class='field'>explanation</span>())
-    io.<span class='field'>println</span>(<span class='string'>"Example:"</span>, f.<span class='field'>example</span>())
+    io.<span class='function'>println</span>(<span class='string'>"Row:"</span>, f.<span class='function'>row</span>())
+    io.<span class='function'>println</span>(<span class='string'>"Col:"</span>, f.<span class='function'>col</span>())
+    io.<span class='function'>println</span>(<span class='string'>"Line:"</span>, f.<span class='function'>line</span>())
+    io.<span class='function'>println</span>(<span class='string'>"Message:"</span>, f.<span class='function'>message</span>())
+    io.<span class='function'>println</span>(<span class='string'>"Explanation:"</span>, f.<span class='function'>explanation</span>())
+    io.<span class='function'>println</span>(<span class='string'>"Example:"</span>, f.<span class='function'>example</span>())
 }
 </pre>
 </pre>
@@ -4427,7 +4427,7 @@ Example usecase:
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Row: 1
 Col: 5
 Line: Oops@
@@ -4505,8 +4505,8 @@ Compile a string into a function.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = meta.<span class='field'>compile</span>(<span class='string'>"34 + 35"</span>)
-io.<span class='field'>println</span>(f())
+<span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(<span class='string'>"34 + 35"</span>)
+io.<span class='function'>println</span>(<span class='function'>f</span>())
 </pre>
 </pre>
 </div>
@@ -4522,7 +4522,7 @@ io.<span class='field'>println</span>(f())
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 69
 </pre>
 </div>
@@ -4542,14 +4542,14 @@ is returned instead of a function.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = meta.<span class='field'>compile</span>(<span class='string'>"Oops@"</span>)<span class='comment'>;</span> <span class='keyword'>assert</span>(f <span class='keyword'>is</span> <span class='string'>"Error"</span>)
+<span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(<span class='string'>"Oops@"</span>)<span class='comment'>;</span> <span class='keyword'>assert</span>(f <span class='keyword'>is</span> <span class='string'>"Error"</span>)
 
-io.<span class='field'>println</span>(<span class='string'>"Row:"</span>, f.<span class='field'>row</span>())
-io.<span class='field'>println</span>(<span class='string'>"Col:"</span>, f.<span class='field'>col</span>())
-io.<span class='field'>println</span>(<span class='string'>"Line:"</span>, f.<span class='field'>line</span>())
-io.<span class='field'>println</span>(<span class='string'>"Message:"</span>, f.<span class='field'>message</span>())
-io.<span class='field'>println</span>(<span class='string'>"Explanation:"</span>, f.<span class='field'>explanation</span>())
-io.<span class='field'>println</span>(<span class='string'>"Example:"</span>, f.<span class='field'>example</span>())
+io.<span class='function'>println</span>(<span class='string'>"Row:"</span>, f.<span class='function'>row</span>())
+io.<span class='function'>println</span>(<span class='string'>"Col:"</span>, f.<span class='function'>col</span>())
+io.<span class='function'>println</span>(<span class='string'>"Line:"</span>, f.<span class='function'>line</span>())
+io.<span class='function'>println</span>(<span class='string'>"Message:"</span>, f.<span class='function'>message</span>())
+io.<span class='function'>println</span>(<span class='string'>"Explanation:"</span>, f.<span class='function'>explanation</span>())
+io.<span class='function'>println</span>(<span class='string'>"Example:"</span>, f.<span class='function'>example</span>())
 </pre>
 </pre>
 </div>
@@ -4565,7 +4565,7 @@ io.<span class='field'>println</span>(<span class='string'>"Example:"</span>, f.
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Row: 1
 Col: 5
 Line: Oops@
@@ -4589,12 +4589,12 @@ So the usage becomes as straight forward as:
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = meta.<span class='field'>compile</span>(...)
+<span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(...)
 <span class='keyword'>if</span> f <span class='keyword'>is</span> <span class='string'>"Error"</span> {
-    <span class='keyword'>panic</span>(f.<span class='field'>message</span>()) <span class='comment'># Error handling...</span>
+    <span class='keyword'>panic</span>(f.<span class='function'>message</span>()) <span class='comment'># Error handling...</span>
 }
 
-f() <span class='comment'># Or whatever you want to do</span>
+<span class='function'>f</span>() <span class='comment'># Or whatever you want to do</span>
 </pre>
 </pre>
 </div>
@@ -4614,16 +4614,16 @@ otherwise defaulting to <code>nil</code>.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = meta.<span class='field'>compile</span>(<span class='string'>"
+<span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(<span class='string'>"
     for i in 0, 5 {
         io.println('Nice!')
     }
 "</span>)
 
 <span class='keyword'>assert</span>(f <span class='keyword'>is</span> <span class='string'>"function"</span>)
-io.<span class='field'>println</span>(f())
+io.<span class='function'>println</span>(<span class='function'>f</span>())
 
-<span class='keyword'>var</span> g = meta.<span class='field'>compile</span>(<span class='string'>"
+<span class='keyword'>var</span> g = meta.<span class='function'>compile</span>(<span class='string'>"
     for i in 0, 5 {
         io.println('Hehe!')
     }
@@ -4632,9 +4632,9 @@ io.<span class='field'>println</span>(f())
 "</span>)
 
 <span class='keyword'>assert</span>(g <span class='keyword'>is</span> <span class='string'>"function"</span>)
-io.<span class='field'>println</span>(g())
+io.<span class='function'>println</span>(<span class='function'>g</span>())
 
-<span class='keyword'>var</span> h = meta.<span class='field'>compile</span>(<span class='string'>"
+<span class='keyword'>var</span> h = meta.<span class='function'>compile</span>(<span class='string'>"
     for i in 0, 5 {
         io.println('Bruh!')
     }
@@ -4643,7 +4643,7 @@ io.<span class='field'>println</span>(g())
 "</span>)
 
 <span class='keyword'>assert</span>(h <span class='keyword'>is</span> <span class='string'>"function"</span>)
-io.<span class='field'>println</span>(h())
+io.<span class='function'>println</span>(<span class='function'>h</span>())
 </pre>
 </pre>
 </div>
@@ -4659,7 +4659,7 @@ io.<span class='field'>println</span>(h())
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 Nice!
 Nice!
 Nice!
@@ -4700,25 +4700,25 @@ Basically a protected call.
 <pre class='code active'>
 <span class='keyword'>fn</span> <span class='function'>handle</span>(result) {
     <span class='keyword'>if</span> result <span class='keyword'>is</span> <span class='string'>"Error"</span> {
-        io.<span class='field'>println</span>(<span class='string'>"ERROR!"</span>)
-        io.<span class='field'>println</span>(<span class='string'>"Row:"</span>, result.<span class='field'>row</span>())
-        io.<span class='field'>println</span>(<span class='string'>"Col:"</span>, result.<span class='field'>col</span>())
-        io.<span class='field'>println</span>(<span class='string'>"Line:"</span>, result.<span class='field'>line</span>())
-        io.<span class='field'>println</span>(<span class='string'>"Message:"</span>, result.<span class='field'>message</span>())
-        io.<span class='field'>println</span>(<span class='string'>"Explanation:"</span>, result.<span class='field'>explanation</span>())
-        io.<span class='field'>println</span>(<span class='string'>"Example:"</span>, result.<span class='field'>example</span>())
+        io.<span class='function'>println</span>(<span class='string'>"ERROR!"</span>)
+        io.<span class='function'>println</span>(<span class='string'>"Row:"</span>, result.<span class='function'>row</span>())
+        io.<span class='function'>println</span>(<span class='string'>"Col:"</span>, result.<span class='function'>col</span>())
+        io.<span class='function'>println</span>(<span class='string'>"Line:"</span>, result.<span class='function'>line</span>())
+        io.<span class='function'>println</span>(<span class='string'>"Message:"</span>, result.<span class='function'>message</span>())
+        io.<span class='function'>println</span>(<span class='string'>"Explanation:"</span>, result.<span class='function'>explanation</span>())
+        io.<span class='function'>println</span>(<span class='string'>"Example:"</span>, result.<span class='function'>example</span>())
     } <span class='keyword'>else</span> {
-        io.<span class='field'>println</span>(<span class='string'>"OK!"</span>)
-        io.<span class='field'>println</span>(result)
+        io.<span class='function'>println</span>(<span class='string'>"OK!"</span>)
+        io.<span class='function'>println</span>(result)
     }
 }
 
 <span class='comment'># Ok</span>
-handle(meta.<span class='field'>call</span>(<span class='keyword'>fn</span> (a, b) =&gt; a + b, <span class='constant'>34</span>, <span class='constant'>35</span>))
-io.<span class='field'>println</span>()
+<span class='function'>handle</span>(meta.<span class='function'>call</span>(<span class='keyword'>fn</span> (a, b) =&gt; a + b, <span class='constant'>34</span>, <span class='constant'>35</span>))
+io.<span class='function'>println</span>()
 
 <span class='comment'># Error</span>
-handle(meta.<span class='field'>call</span>(<span class='keyword'>fn</span> () =&gt; -<span class='constant'>nil</span>))
+<span class='function'>handle</span>(meta.<span class='function'>call</span>(<span class='keyword'>fn</span> () =&gt; -<span class='constant'>nil</span>))
 </pre>
 </pre>
 </div>
@@ -4734,7 +4734,7 @@ handle(meta.<span class='field'>call</span>(<span class='keyword'>fn</span> () =
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 OK!
 69
 
@@ -4765,8 +4765,8 @@ Evaluate a string.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='field'>println</span>(meta.<span class='field'>eval</span>(<span class='string'>"34 + 35"</span>))
-io.<span class='field'>println</span>(meta.<span class='field'>eval</span>(<span class='string'>"
+io.<span class='function'>println</span>(meta.<span class='function'>eval</span>(<span class='string'>"34 + 35"</span>))
+io.<span class='function'>println</span>(meta.<span class='function'>eval</span>(<span class='string'>"
     for i in 0, 5 {
         io.println('Nice!')
     }
@@ -4786,7 +4786,7 @@ io.<span class='field'>println</span>(meta.<span class='field'>eval</span>(<span
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 69
 Nice!
 Nice!
@@ -4811,7 +4811,7 @@ Errors are thrown as it is.
 </svg>
 </button>
 <pre class='code active'>
-meta.<span class='field'>eval</span>(<span class='string'>"-nil"</span>)
+meta.<span class='function'>eval</span>(<span class='string'>"-nil"</span>)
 </pre>
 </pre>
 </div>
@@ -4827,7 +4827,7 @@ meta.<span class='field'>eval</span>(<span class='string'>"-nil"</span>)
 </svg>
 </button>
 <pre class='code active'>
-<span class='this'>$ </span>bs demo.bs
+<span class='string'>$ </span>bs demo.bs
 &lt;meta&gt;:1:1: error: invalid operand to unary (-): nil
 
     1 | -nil

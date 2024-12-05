@@ -1,3 +1,3 @@
 io.println('Hello, world!')
-io.println('Nice, \(34 + 35)!')
+io.println('Nice, \{34 + 35}!')
 io.println('Here: \'"\'!')

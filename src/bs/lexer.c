@@ -145,7 +145,7 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc, char end) {
             case '\\':
                 break;
 
-            case '(':
+            case '{':
                 token.type = BS_TOKEN_ISTR;
                 token.sv.size -= l->sv.size;
 

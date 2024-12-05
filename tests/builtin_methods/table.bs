@@ -4,10 +4,10 @@ var xs = {
 }
 var ys = xs.copy()
 
-io.println("xs = \(xs)")
-io.println("ys = \(ys)")
+io.println("xs = \{xs}")
+io.println("ys = \{ys}")
 
 xs.bar = 1337
 
-io.println("xs = \(xs)")
-io.println("ys = \(ys)")
+io.println("xs = \{xs}")
+io.println("ys = \{ys}")

@@ -5,7 +5,7 @@ fn grep(f, path, pattern) {
 
         var col = line.find(pattern)
         if col {
-            io.println("\(path):\(row + 1):\(col + 1): \(line)")
+            io.println("\{path}:\{row + 1}:\{col + 1}: \{line}")
         }
 
         row += 1
@@ -13,7 +13,7 @@ fn grep(f, path, pattern) {
 }
 
 if len(os.args) < 2 {
-    io.eprintln("Usage: \(os.args[0]) <pattern> [file...]")
+    io.eprintln("Usage: \{os.args[0]} <pattern> [file...]")
     io.eprintln("Error: pattern not provided")
     os.exit(1)
 }
@@ -35,7 +35,7 @@ for i in 2, len(os.args) {
 
     var f = io.Reader(path)
     if !f {
-        io.println("Error: could not open file '\(path)'")
+        io.println("Error: could not open file '\{path}'")
         code = 1
         continue
     }

@@ -456,9 +456,9 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
         const char end = token.sv.data[-1];
         while (token.type == BS_TOKEN_ISTR) {
-            bs_lexer_expect(&c->lexer, BS_TOKEN_LPAREN);
+            bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE);
             bs_compile_expr(c, BS_POWER_SET);
-            bs_lexer_expect(&c->lexer, BS_TOKEN_RPAREN);
+            bs_lexer_expect(&c->lexer, BS_TOKEN_RBRACE);
 
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_JOIN);
 

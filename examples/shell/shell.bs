@@ -17,7 +17,7 @@ var delim = Regex("[ \n\t]+")
 var previous = nil
 
 while !io.stdin.eof() {
-    var args = io.input("\(pwd()) $ ").split(delim)
+    var args = io.input("\{pwd()} $ ").split(delim)
     if len(args) == 0 {
         continue
     }
@@ -30,13 +30,13 @@ while !io.stdin.eof() {
     #   exit <CODE>  -> Exits with CODE
     if cmd == "exit" {
         if len(args) > 2 {
-            io.eprintln("Error: too many arguments to command '\(cmd)'")
+            io.eprintln("Error: too many arguments to command '\{cmd}'")
             continue
         }
 
         var code = if len(args) == 2 then args[1].tonumber() else 0
         if !code {
-            io.eprintln("Error: invalid exit code '\(args[1])'")
+            io.eprintln("Error: invalid exit code '\{args[1]}'")
             continue
         }
 
@@ -50,7 +50,7 @@ while !io.stdin.eof() {
     #   cd -      -> Go to previous location
     if cmd == "cd" {
         if len(args) > 2 {
-            io.eprintln("Error: too many arguments to command '\(cmd)'")
+            io.eprintln("Error: too many arguments to command '\{cmd}'")
             continue
         }
 
@@ -70,7 +70,7 @@ while !io.stdin.eof() {
 
         var current = os.getcwd()
         if !os.setcwd(path) {
-            io.eprintln("Error: the directory '\(path)' does not exist")
+            io.eprintln("Error: the directory '\{path}' does not exist")
         }
 
         previous = current
@@ -79,7 +79,7 @@ while !io.stdin.eof() {
 
     var p = os.Process(args)
     if !p {
-        io.eprintln("Error: unknown command '\(cmd)'")
+        io.eprintln("Error: unknown command '\{cmd}'")
         continue
     }
     p.wait()

@@ -181,7 +181,7 @@ Use ($) for string concatenation, or use string interpolation instead
 ```
 "Hello, " $ "world!"
 "Hello, " $ 69
-"Hello, \(34 + 35) nice!"
+"Hello, \{34 + 35} nice!"
 ```
 
 :b shell 28

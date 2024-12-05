@@ -11,7 +11,7 @@ provided.
 
 ```bs
 var name = io.input("Enter your name> ")
-io.println("Hello, \(name)!")
+io.println("Hello, \{name}!")
 ```
 
 ```console
@@ -155,7 +155,7 @@ if !f {
     os.exit(1)
 }
 
-io.print("The first 16 bytes: [\(f.read(16))]\n")
+io.print("The first 16 bytes: [\{f.read(16)}]\n")
 io.print("The rest:", f.read())
 ```
 
@@ -220,7 +220,7 @@ if !f {
     os.exit(1)
 }
 
-io.print("The first 16 bytes: [\(f.read(16))]\n")
+io.print("The first 16 bytes: [\{f.read(16)}]\n")
 
 f.seek(5, io.SEEK_SET)
 
@@ -260,7 +260,7 @@ for i in 0, 3 {
 }
 
 io.println()
-io.println("Read \(f.tell()) bytes so far.")
+io.println("Read \{f.tell()} bytes so far.")
 ```
 
 ```console
@@ -411,7 +411,7 @@ var start = os.clock()
 io.println(fib(30))
 
 var elapsed = os.clock() - start
-io.println("Elapsed: \(elapsed)")
+io.println("Elapsed: \{elapsed}")
 ```
 
 ```console
@@ -428,7 +428,7 @@ var start = os.clock()
 os.sleep(0.69)
 
 var elapsed = os.clock() - start
-io.println("Elapsed: \(elapsed)")
+io.println("Elapsed: \{elapsed}")
 ```
 
 ```console
@@ -1087,7 +1087,7 @@ b.push(" world!")
 io.println(b)
 
 var n = b.count()
-io.println("\(n) bytes written.")
+io.println("\{n} bytes written.")
 ```
 
 ```console
