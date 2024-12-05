@@ -34,7 +34,7 @@ match x {
 }
 
 for _, x in [0, 1, 69, 420, 1337, 42, 5] {
-    io.println("x = \{x}")
+    io.println("x = {x}")
     match x {
         0, 1 => io.println("A")
         69, 420, 1337 => io.println("B")

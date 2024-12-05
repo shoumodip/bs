@@ -262,10 +262,13 @@ io.<span class='function'>println</span>(<span class='string'>"Hello!"</span>)
 io.<span class='function'>println</span>(<span class='string'>"Say </span><span class='escape'>\"</span><span class='string'>Hello</span><span class='escape'>\"</span><span class='string'>!</span><span class='escape'>\n</span><span class='string'>Here, a</span><span class='escape'>\t</span><span class='string'> tab!"</span>)
 
 <span class='comment'># Output: Interpolation! 69</span>
-io.<span class='function'>println</span>(<span class='string'>"Interpolation! </span><span class='escape'>\</span><span class='escape'>{</span><span class='constant'>34</span> + <span class='constant'>35</span><span class='escape'>}</span><span class='string'>"</span>)
+io.<span class='function'>println</span>(<span class='string'>"Interpolation! </span><span class='escape'>{</span><span class='constant'>34</span> + <span class='constant'>35</span><span class='escape'>}</span><span class='string'>"</span>)
 
 <span class='comment'># Output: Nested interpolation! 420</span>
-io.<span class='function'>println</span>(<span class='string'>"Nested </span><span class='escape'>\</span><span class='escape'>{</span><span class='string'>"interpolation! </span><span class='escape'>\</span><span class='escape'>{</span><span class='constant'>420</span><span class='escape'>}</span><span class='string'>"</span><span class='escape'>}</span><span class='string'>"</span>)
+io.<span class='function'>println</span>(<span class='string'>"Nested </span><span class='escape'>{</span><span class='string'>"interpolation! </span><span class='escape'>{</span><span class='constant'>420</span><span class='escape'>}</span><span class='string'>"</span><span class='escape'>}</span><span class='string'>"</span>)
+
+<span class='comment'># Output: A literal '{'</span>
+io.<span class='function'>println</span>(<span class='string'>"A literal '</span><span class='escape'>\{</span><span class='string'>'"</span>)
 
 <span class='comment'># Output: 6</span>
 io.<span class='function'>println</span>(<span class='keyword'>len</span>(<span class='string'>"Hello!"</span>))
@@ -975,7 +978,7 @@ Iterate over a string.
 <span class='keyword'>var</span> str = <span class='string'>"foobar"</span>
 
 <span class='keyword'>for</span> i, c <span class='keyword'>in</span> str {
-    io.<span class='function'>println</span>(<span class='string'>"Index: </span><span class='escape'>\</span><span class='escape'>{</span>i<span class='escape'>}</span><span class='string'> Char: </span><span class='escape'>\</span><span class='escape'>{</span>c<span class='escape'>}</span><span class='string'>"</span>)
+    io.<span class='function'>println</span>(<span class='string'>"Index: </span><span class='escape'>{</span>i<span class='escape'>}</span><span class='string'> Char: </span><span class='escape'>{</span>c<span class='escape'>}</span><span class='string'>"</span>)
 }
 </pre>
 </pre>
@@ -1019,7 +1022,7 @@ Iterate over an array.
 <span class='keyword'>var</span> xs = [<span class='constant'>2</span>, <span class='constant'>4</span>, <span class='constant'>6</span>, <span class='constant'>8</span>, <span class='constant'>10</span>]
 
 <span class='keyword'>for</span> i, v <span class='keyword'>in</span> xs {
-    io.<span class='function'>println</span>(<span class='string'>"Index: </span><span class='escape'>\</span><span class='escape'>{</span>i<span class='escape'>}</span><span class='string'> Value: </span><span class='escape'>\</span><span class='escape'>{</span>v<span class='escape'>}</span><span class='string'>"</span>)
+    io.<span class='function'>println</span>(<span class='string'>"Index: </span><span class='escape'>{</span>i<span class='escape'>}</span><span class='string'> Value: </span><span class='escape'>{</span>v<span class='escape'>}</span><span class='string'>"</span>)
 }
 </pre>
 </pre>
@@ -1066,7 +1069,7 @@ Iterate over a table.
 }
 
 <span class='keyword'>for</span> k, v <span class='keyword'>in</span> xs {
-    io.<span class='function'>println</span>(<span class='string'>"Key: </span><span class='escape'>\</span><span class='escape'>{</span>k<span class='escape'>}</span><span class='string'> Value: </span><span class='escape'>\</span><span class='escape'>{</span>v<span class='escape'>}</span><span class='string'>"</span>)
+    io.<span class='function'>println</span>(<span class='string'>"Key: </span><span class='escape'>{</span>k<span class='escape'>}</span><span class='string'> Value: </span><span class='escape'>{</span>v<span class='escape'>}</span><span class='string'>"</span>)
 }
 </pre>
 </pre>
@@ -1167,7 +1170,7 @@ io.<span class='function'>println</span>()
 </button>
 <pre class='code active'>
 <span class='keyword'>fn</span> <span class='function'>greet</span>(name) {
-    io.<span class='function'>println</span>(<span class='string'>"Hello, </span><span class='escape'>\</span><span class='escape'>{</span>name<span class='escape'>}</span><span class='string'>!"</span>)
+    io.<span class='function'>println</span>(<span class='string'>"Hello, </span><span class='escape'>{</span>name<span class='escape'>}</span><span class='string'>!"</span>)
 }
 
 <span class='function'>greet</span>(<span class='string'>"world"</span>)
@@ -1438,9 +1441,7 @@ captured as unique values in the nested closure on each iteration of the loop.
 
 <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>5</span> {
     <span class='keyword'>var</span> z = i * <span class='constant'>2</span>
-    closures[<span class='keyword'>len</span>(closures)] = <span class='keyword'>fn</span> () {
-        io.<span class='function'>println</span>(i, z)
-    }
+    closures.<span class='function'>push</span>(<span class='keyword'>fn</span> () =&gt; io.<span class='function'>println</span>(i, z))
 }
 
 <span class='keyword'>for</span> _, f <span class='keyword'>in</span> closures {
@@ -1590,7 +1591,7 @@ io.<span class='function'>println</span>(x)     <span class='comment'># Output: 
 <span class='keyword'>var</span> x = <span class='constant'>69</span>
 io.<span class='function'>println</span>(x) <span class='comment'># Output: 69</span>
 
-<span class='keyword'>var</span> x = <span class='string'>"x used to be </span><span class='escape'>\</span><span class='escape'>{</span>x<span class='escape'>}</span><span class='string'>"</span>
+<span class='keyword'>var</span> x = <span class='string'>"x used to be </span><span class='escape'>{</span>x<span class='escape'>}</span><span class='string'>"</span>
 io.<span class='function'>println</span>(x) <span class='comment'># Output: x used to be 69</span>
 </pre>
 </pre>
@@ -1986,16 +1987,16 @@ more applicable, albeit involved, example.
     }
 
     <span class='function'>attack</span>(target) {
-        io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>{</span><span class='constant'>this</span>.<span class='field'>name</span><span class='escape'>}</span><span class='string'> attacks </span><span class='escape'>\</span><span class='escape'>{</span>target.<span class='field'>name</span><span class='escape'>}</span><span class='string'> for </span><span class='escape'>\</span><span class='escape'>{</span><span class='constant'>this</span>.<span class='field'>attack_power</span><span class='escape'>}</span><span class='string'> damage!"</span>)
+        io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>{</span><span class='constant'>this</span>.<span class='field'>name</span><span class='escape'>}</span><span class='string'> attacks </span><span class='escape'>{</span>target.<span class='field'>name</span><span class='escape'>}</span><span class='string'> for </span><span class='escape'>{</span><span class='constant'>this</span>.<span class='field'>attack_power</span><span class='escape'>}</span><span class='string'> damage!"</span>)
         target.<span class='function'>take_damage</span>(<span class='constant'>this</span>.<span class='field'>attack_power</span>)
     }
 
     <span class='function'>take_damage</span>(amount) {
         <span class='constant'>this</span>.<span class='field'>health</span> -= amount
         <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='function'>is_alive</span>() {
-            io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>{</span><span class='constant'>this</span>.<span class='field'>name</span><span class='escape'>}</span><span class='string'> has </span><span class='escape'>\</span><span class='escape'>{</span><span class='constant'>this</span>.<span class='field'>health</span><span class='escape'>}</span><span class='string'> health remaining."</span>)
+            io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>{</span><span class='constant'>this</span>.<span class='field'>name</span><span class='escape'>}</span><span class='string'> has </span><span class='escape'>{</span><span class='constant'>this</span>.<span class='field'>health</span><span class='escape'>}</span><span class='string'> health remaining."</span>)
         } <span class='keyword'>else</span> {
-            io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>{</span><span class='constant'>this</span>.<span class='field'>name</span><span class='escape'>}</span><span class='string'> has been defeated!"</span>)
+            io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>{</span><span class='constant'>this</span>.<span class='field'>name</span><span class='escape'>}</span><span class='string'> has been defeated!"</span>)
         }
     }
 
@@ -2014,7 +2015,7 @@ more applicable, albeit involved, example.
 
     <span class='comment'># Special ability of hero: defending</span>
     <span class='function'>defend</span>() {
-        io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>{</span><span class='constant'>this</span>.<span class='field'>name</span><span class='escape'>}</span><span class='string'> is defending!"</span>)
+        io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>{</span><span class='constant'>this</span>.<span class='field'>name</span><span class='escape'>}</span><span class='string'> is defending!"</span>)
         <span class='constant'>this</span>.<span class='field'>defending</span> = <span class='constant'>true</span>
     }
 
@@ -2042,7 +2043,7 @@ more applicable, albeit involved, example.
 
     <span class='comment'># Special ability of enemy: poisoning</span>
     <span class='function'>poison</span>(target) {
-        io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>{</span><span class='constant'>this</span>.<span class='field'>name</span><span class='escape'>}</span><span class='string'> poisons </span><span class='escape'>\</span><span class='escape'>{</span>target.<span class='field'>name</span><span class='escape'>}</span><span class='string'>!"</span>)
+        io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>{</span><span class='constant'>this</span>.<span class='field'>name</span><span class='escape'>}</span><span class='string'> poisons </span><span class='escape'>{</span>target.<span class='field'>name</span><span class='escape'>}</span><span class='string'>!"</span>)
         target.<span class='field'>poisoned</span> = <span class='constant'>true</span>
         target.<span class='function'>take_damage</span>(<span class='constant'>this</span>.<span class='field'>attack_power</span>)
     }
@@ -2061,13 +2062,13 @@ more applicable, albeit involved, example.
 
     <span class='comment'># Hero cannot choose while poisoned</span>
     <span class='keyword'>if</span> hero.<span class='field'>poisoned</span> {
-        io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>{</span>hero.<span class='field'>name</span><span class='escape'>}</span><span class='string'> has been poisoned! skipping turn."</span>)
+        io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>{</span>hero.<span class='field'>name</span><span class='escape'>}</span><span class='string'> has been poisoned! skipping turn."</span>)
 
         <span class='comment'># Prevent consecutive poisoning</span>
         hero.<span class='field'>poisoned</span> = <span class='constant'>false</span>
         enemy.<span class='function'>attack</span>(hero)
     } <span class='keyword'>else</span> {
-        <span class='keyword'>var</span> choice = io.<span class='function'>input</span>(<span class='string'>"Enter </span><span class='escape'>\</span><span class='escape'>{</span>hero.<span class='field'>name</span><span class='escape'>}</span><span class='string'>'s choice (A: attack, D: defend)&gt; "</span>).<span class='function'>toupper</span>()
+        <span class='keyword'>var</span> choice = io.<span class='function'>input</span>(<span class='string'>"Enter </span><span class='escape'>{</span>hero.<span class='field'>name</span><span class='escape'>}</span><span class='string'>'s choice (A: attack, D: defend)&gt; "</span>).<span class='function'>toupper</span>()
 
         <span class='keyword'>if</span> choice == <span class='string'>"A"</span> {
             hero.<span class='function'>attack</span>(enemy)
@@ -2077,7 +2078,7 @@ more applicable, albeit involved, example.
         } <span class='keyword'>else</span> <span class='keyword'>if</span> choice == <span class='string'>"D"</span> {
             hero.<span class='function'>defend</span>()
         } <span class='keyword'>else</span> {
-            io.<span class='function'>println</span>(<span class='string'>"ERROR: invalid choice! skipping </span><span class='escape'>\</span><span class='escape'>{</span>hero.<span class='field'>name</span><span class='escape'>}</span><span class='string'>'s turn."</span>)
+            io.<span class='function'>println</span>(<span class='string'>"ERROR: invalid choice! skipping </span><span class='escape'>{</span>hero.<span class='field'>name</span><span class='escape'>}</span><span class='string'>'s turn."</span>)
         }
 
         <span class='comment'># Enemy will either attack or poison the hero based on a 50-50 chance</span>
@@ -2090,9 +2091,9 @@ more applicable, albeit involved, example.
 }
 
 <span class='keyword'>if</span> hero.<span class='function'>is_alive</span>() {
-    io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>{</span>hero.<span class='field'>name</span><span class='escape'>}</span><span class='string'> won!"</span>)
+    io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>{</span>hero.<span class='field'>name</span><span class='escape'>}</span><span class='string'> won!"</span>)
 } <span class='keyword'>else</span> {
-    io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>{</span>hero.<span class='field'>name</span><span class='escape'>}</span><span class='string'> lost :("</span>)
+    io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>{</span>hero.<span class='field'>name</span><span class='escape'>}</span><span class='string'> lost :("</span>)
 }
 </pre>
 </pre>
@@ -2168,7 +2169,7 @@ constructor failed. Any other return value is strictly forbidden, however.
     <span class='function'>write</span>(s) {
         <span class='comment'># os.clock() returns the current monotonic time in seconds as a</span>
         <span class='comment'># floating point number</span>
-        <span class='constant'>this</span>.<span class='field'>file</span>.<span class='function'>writeln</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>{</span>os.<span class='function'>clock</span>()<span class='escape'>}</span><span class='string'>: </span><span class='escape'>\</span><span class='escape'>{</span>s<span class='escape'>}</span><span class='string'>"</span>)
+        <span class='constant'>this</span>.<span class='field'>file</span>.<span class='function'>writeln</span>(<span class='string'>"</span><span class='escape'>{</span>os.<span class='function'>clock</span>()<span class='escape'>}</span><span class='string'>: </span><span class='escape'>{</span>s<span class='escape'>}</span><span class='string'>"</span>)
     }
 }
 

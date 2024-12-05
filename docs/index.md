@@ -13,7 +13,7 @@ fn factorial(n) {
     return n * factorial(n - 1)
 }
 
-io.println("5! = \{factorial(5)}")
+io.println("5! = {factorial(5)}")
 ```
 
 ```console

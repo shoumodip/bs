@@ -11,7 +11,7 @@ provided.
 
 ```bs
 var name = io.input("Enter your name> ")
-io.println("Hello, \{name}!")
+io.println("Hello, {name}!")
 ```
 
 ```console
@@ -155,7 +155,7 @@ if !f {
     os.exit(1)
 }
 
-io.print("The first 16 bytes: [\{f.read(16)}]\n")
+io.print("The first 16 bytes: [{f.read(16)}]\n")
 io.print("The rest:", f.read())
 ```
 
@@ -220,7 +220,7 @@ if !f {
     os.exit(1)
 }
 
-io.print("The first 16 bytes: [\{f.read(16)}]\n")
+io.print("The first 16 bytes: [{f.read(16)}]\n")
 
 f.seek(5, io.SEEK_SET)
 
@@ -260,7 +260,7 @@ for i in 0, 3 {
 }
 
 io.println()
-io.println("Read \{f.tell()} bytes so far.")
+io.println("Read {f.tell()} bytes so far.")
 ```
 
 ```console
@@ -411,7 +411,7 @@ var start = os.clock()
 io.println(fib(30))
 
 var elapsed = os.clock() - start
-io.println("Elapsed: \{elapsed}")
+io.println("Elapsed: {elapsed}")
 ```
 
 ```console
@@ -428,7 +428,7 @@ var start = os.clock()
 os.sleep(0.69)
 
 var elapsed = os.clock() - start
-io.println("Elapsed: \{elapsed}")
+io.println("Elapsed: {elapsed}")
 ```
 
 ```console
@@ -652,7 +652,7 @@ Returns `nil` if failed.
 
 ```bs
 var r = Regex("([0-9]+) ([a-z]+)")
-io.println("69 apples, 420 oranges".replace(r, "{fruit: '\\2', count: \\1}"))
+io.println("69 apples, 420 oranges".replace(r, "\{fruit: '\\2', count: \\1}"))
 ```
 
 ```console
@@ -811,9 +811,9 @@ io.println("foo bar baz".replace(" ", "---"))
 io.println("foo bar baz".replace("  ", "-"))
 
 var r = Regex("([0-9]+) ([a-z]+)")
-io.println("69 apples, 420 oranges".replace(r, "{type: \\2, count: \\1}"))
-io.println("69 apples, 420  oranges".replace(r, "{type: \\2, count: \\1}"))
-io.println("ayo noice!".replace(r, "{type: \\2, count: \\1}"))
+io.println("69 apples, 420 oranges".replace(r, "\{type: \\2, count: \\1}"))
+io.println("69 apples, 420  oranges".replace(r, "\{type: \\2, count: \\1}"))
+io.println("ayo noice!".replace(r, "\{type: \\2, count: \\1}"))
 ```
 
 ```console
@@ -1087,7 +1087,7 @@ b.push(" world!")
 io.println(b)
 
 var n = b.count()
-io.println("\{n} bytes written.")
+io.println("{n} bytes written.")
 ```
 
 ```console
@@ -2044,7 +2044,7 @@ otherwise defaulting to `nil`.
 
 ```bs
 var f = meta.compile("
-    for i in 0, 5 {
+    for i in 0, 5 \{
         io.println('Nice!')
     }
 ")
@@ -2053,7 +2053,7 @@ assert(f is "function")
 io.println(f())
 
 var g = meta.compile("
-    for i in 0, 5 {
+    for i in 0, 5 \{
         io.println('Hehe!')
     }
 
@@ -2064,7 +2064,7 @@ assert(g is "function")
 io.println(g())
 
 var h = meta.compile("
-    for i in 0, 5 {
+    for i in 0, 5 \{
         io.println('Bruh!')
     }
 
@@ -2144,7 +2144,7 @@ Evaluate a string.
 ```bs
 io.println(meta.eval("34 + 35"))
 io.println(meta.eval("
-    for i in 0, 5 {
+    for i in 0, 5 \{
         io.println('Nice!')
     }
 "))

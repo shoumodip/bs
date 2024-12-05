@@ -8,15 +8,15 @@ io.println([1, 2, 3, 4, 5].reduce(fn (x, y) => x + y, 20))
     var ys = xs.copy()
     var zs = xs
 
-    io.println("xs = \{xs}")
-    io.println("ys = \{ys}")
-    io.println("zs = \{zs}")
+    io.println("xs = {xs}")
+    io.println("ys = {ys}")
+    io.println("zs = {zs}")
 
     xs[0] = 69
 
-    io.println("xs = \{xs}")
-    io.println("ys = \{ys}")
-    io.println("zs = \{zs}")
+    io.println("xs = {xs}")
+    io.println("ys = {ys}")
+    io.println("zs = {zs}")
 }
 
 io.println([1, 2, 3, 4, 2].find(2))

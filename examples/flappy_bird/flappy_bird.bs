@@ -45,7 +45,7 @@ class Assets {
 
         var sound = loader(path)
         if !sound {
-            io.eprintln("Error: could not load sound '\{path}'")
+            io.eprintln("Error: could not load sound '{path}'")
             os.exit(1)
         }
 
@@ -61,7 +61,7 @@ class Assets {
 
         var texture = rl.Texture(path)
         if !texture {
-            io.eprintln("Error: could not load image '\{path}'")
+            io.eprintln("Error: could not load image '{path}'")
             os.exit(1)
         }
 

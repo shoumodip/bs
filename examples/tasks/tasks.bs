@@ -8,18 +8,18 @@ class Tasks {
 
     add(title) {
         this.tasks.push(title)
-        io.println("Added: \{title}")
+        io.println("Added: {title}")
     }
 
     verify(index) {
         var total = len(this.tasks)
         if index >= total {
-            io.eprintln("Error: invalid index '\{index}'")
+            io.eprintln("Error: invalid index '{index}'")
 
             if total == 1 {
                 io.eprintln("Note: there is currently 1 task")
             } else {
-                io.eprintln("Note: there are currently \{total} tasks")
+                io.eprintln("Note: there are currently {total} tasks")
             }
 
             os.exit(1)
@@ -29,13 +29,13 @@ class Tasks {
     done(index) {
         this.verify(index)
         var title = this.tasks.remove(index)
-        io.println("Done #\{index}: \{title}")
+        io.println("Done #{index}: {title}")
     }
 
     edit(index, title) {
         this.verify(index)
         this.tasks[index] = title
-        io.println("Edit #\{index}: \{title}")
+        io.println("Edit #{index}: {title}")
     }
 
     list(query) {
@@ -44,14 +44,14 @@ class Tasks {
                 continue
             }
 
-            io.println("[\{i}] \{t}")
+            io.println("[{i}] {t}")
         }
     }
 
     save() {
         var f = io.Writer(this.path)
         if !f {
-            io.eprintln("Error: could not save tasks to '\{this.path}'")
+            io.eprintln("Error: could not save tasks to '{this.path}'")
             os.exit(1)
         }
 
@@ -61,7 +61,7 @@ class Tasks {
 }
 
 fn usage(f) {
-    f.writeln("Usage: \{os.args[0]} <command> [args...]")
+    f.writeln("Usage: {os.args[0]} <command> [args...]")
     f.writeln("Commands:")
     f.writeln("    add  <title>            Add a task")
     f.writeln("    done <index>            Mark task as done")
@@ -98,7 +98,7 @@ match command {
 
         var index = os.args[2].tonumber()
         if !index {
-            io.eprintln("Error: invalid index '\{os.args[2]}'")
+            io.eprintln("Error: invalid index '{os.args[2]}'")
             os.exit(1)
         }
 
@@ -116,7 +116,7 @@ match command {
 
         var index = os.args[2].tonumber()
         if !index {
-            io.eprintln("Error: invalid index '\{os.args[2]}'")
+            io.eprintln("Error: invalid index '{os.args[2]}'")
             os.exit(1)
         }
 
@@ -136,7 +136,7 @@ match command {
         if len(os.args) > 2 {
             query = Regex(os.args[2])
             if !query {
-                io.eprintln("Error: invalid query '\{os.args[2]}'")
+                io.eprintln("Error: invalid query '{os.args[2]}'")
                 os.exit(1)
             }
         }
@@ -145,7 +145,7 @@ match command {
         tasks.list(query)
     }
 } else {
-    io.eprintln("Error: invalid command '\{command}'")
+    io.eprintln("Error: invalid command '{command}'")
     usage(io.stderr)
     os.exit(1)
 }

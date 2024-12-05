@@ -7,15 +7,15 @@
     var ys = xs.copy()
     var zs = xs
 
-    io.println("xs = \{xs}")
-    io.println("ys = \{ys}")
-    io.println("zs = \{zs}")
+    io.println("xs = {xs}")
+    io.println("ys = {ys}")
+    io.println("zs = {zs}")
 
     xs.bar = 1337
 
-    io.println("xs = \{xs}")
-    io.println("ys = \{ys}")
-    io.println("zs = \{zs}")
+    io.println("xs = {xs}")
+    io.println("ys = {ys}")
+    io.println("zs = {zs}")
 }
 
 {

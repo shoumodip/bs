@@ -37,7 +37,7 @@ provided.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> name = io.<span class='function'>input</span>(<span class='string'>"Enter your name&gt; "</span>)
-io.<span class='function'>println</span>(<span class='string'>"Hello, </span><span class='escape'>\</span><span class='escape'>{</span>name<span class='escape'>}</span><span class='string'>!"</span>)
+io.<span class='function'>println</span>(<span class='string'>"Hello, </span><span class='escape'>{</span>name<span class='escape'>}</span><span class='string'>!"</span>)
 </pre>
 </pre>
 </div>
@@ -331,7 +331,7 @@ Returns <code>nil</code> if failed.
     os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
-io.<span class='function'>print</span>(<span class='string'>"The first 16 bytes: [</span><span class='escape'>\</span><span class='escape'>{</span>f.<span class='function'>read</span>(<span class='constant'>16</span>)<span class='escape'>}</span><span class='string'>]</span><span class='escape'>\n</span><span class='string'>"</span>)
+io.<span class='function'>print</span>(<span class='string'>"The first 16 bytes: [</span><span class='escape'>{</span>f.<span class='function'>read</span>(<span class='constant'>16</span>)<span class='escape'>}</span><span class='string'>]</span><span class='escape'>\n</span><span class='string'>"</span>)
 io.<span class='function'>print</span>(<span class='string'>"The rest:"</span>, f.<span class='function'>read</span>())
 </pre>
 </pre>
@@ -455,7 +455,7 @@ Returns <code>true</code> if succeeded and <code>false</code> if failed.
     os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
-io.<span class='function'>print</span>(<span class='string'>"The first 16 bytes: [</span><span class='escape'>\</span><span class='escape'>{</span>f.<span class='function'>read</span>(<span class='constant'>16</span>)<span class='escape'>}</span><span class='string'>]</span><span class='escape'>\n</span><span class='string'>"</span>)
+io.<span class='function'>print</span>(<span class='string'>"The first 16 bytes: [</span><span class='escape'>{</span>f.<span class='function'>read</span>(<span class='constant'>16</span>)<span class='escape'>}</span><span class='string'>]</span><span class='escape'>\n</span><span class='string'>"</span>)
 
 f.<span class='function'>seek</span>(<span class='constant'>5</span>, io.<span class='field'>SEEK_SET</span>)
 
@@ -523,7 +523,7 @@ io.<span class='function'>println</span>(<span class='string'>"The first 3 lines
 }
 
 io.<span class='function'>println</span>()
-io.<span class='function'>println</span>(<span class='string'>"Read </span><span class='escape'>\</span><span class='escape'>{</span>f.<span class='function'>tell</span>()<span class='escape'>}</span><span class='string'> bytes so far."</span>)
+io.<span class='function'>println</span>(<span class='string'>"Read </span><span class='escape'>{</span>f.<span class='function'>tell</span>()<span class='escape'>}</span><span class='string'> bytes so far."</span>)
 </pre>
 </pre>
 </div>
@@ -817,7 +817,7 @@ in the unit of seconds.
 io.<span class='function'>println</span>(<span class='function'>fib</span>(<span class='constant'>30</span>))
 
 <span class='keyword'>var</span> elapsed = os.<span class='function'>clock</span>() - start
-io.<span class='function'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>\</span><span class='escape'>{</span>elapsed<span class='escape'>}</span><span class='string'>"</span>)
+io.<span class='function'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>{</span>elapsed<span class='escape'>}</span><span class='string'>"</span>)
 </pre>
 </pre>
 </div>
@@ -860,7 +860,7 @@ Sleep for <code>seconds</code> interval, with nanosecond level of precision.
 os.<span class='function'>sleep</span>(<span class='constant'>0.69</span>)
 
 <span class='keyword'>var</span> elapsed = os.<span class='function'>clock</span>() - start
-io.<span class='function'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>\</span><span class='escape'>{</span>elapsed<span class='escape'>}</span><span class='string'>"</span>)
+io.<span class='function'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>{</span>elapsed<span class='escape'>}</span><span class='string'>"</span>)
 </pre>
 </pre>
 </div>
@@ -1395,7 +1395,7 @@ Returns <code>nil</code> if failed.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> r = <span class='function'>Regex</span>(<span class='string'>"([0-9]+) ([a-z]+)"</span>)
-io.<span class='function'>println</span>(<span class='string'>"69 apples, 420 oranges"</span>.<span class='function'>replace</span>(r, <span class='string'>"{fruit: '</span><span class='escape'>\\</span><span class='string'>2', count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
+io.<span class='function'>println</span>(<span class='string'>"69 apples, 420 oranges"</span>.<span class='function'>replace</span>(r, <span class='string'>"</span><span class='escape'>\{</span><span class='string'>fruit: '</span><span class='escape'>\\</span><span class='string'>2', count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
 </pre>
 </pre>
 </div>
@@ -1791,9 +1791,9 @@ io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</spa
 io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>replace</span>(<span class='string'>"  "</span>, <span class='string'>"-"</span>))
 
 <span class='keyword'>var</span> r = <span class='function'>Regex</span>(<span class='string'>"([0-9]+) ([a-z]+)"</span>)
-io.<span class='function'>println</span>(<span class='string'>"69 apples, 420 oranges"</span>.<span class='function'>replace</span>(r, <span class='string'>"{type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
-io.<span class='function'>println</span>(<span class='string'>"69 apples, 420  oranges"</span>.<span class='function'>replace</span>(r, <span class='string'>"{type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
-io.<span class='function'>println</span>(<span class='string'>"ayo noice!"</span>.<span class='function'>replace</span>(r, <span class='string'>"{type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
+io.<span class='function'>println</span>(<span class='string'>"69 apples, 420 oranges"</span>.<span class='function'>replace</span>(r, <span class='string'>"</span><span class='escape'>\{</span><span class='string'>type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
+io.<span class='function'>println</span>(<span class='string'>"69 apples, 420  oranges"</span>.<span class='function'>replace</span>(r, <span class='string'>"</span><span class='escape'>\{</span><span class='string'>type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
+io.<span class='function'>println</span>(<span class='string'>"ayo noice!"</span>.<span class='function'>replace</span>(r, <span class='string'>"</span><span class='escape'>\{</span><span class='string'>type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
 </pre>
 </pre>
 </div>
@@ -2433,7 +2433,7 @@ b.<span class='function'>push</span>(<span class='string'>" world!"</span>)
 io.<span class='function'>println</span>(b)
 
 <span class='keyword'>var</span> n = b.<span class='function'>count</span>()
-io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>{</span>n<span class='escape'>}</span><span class='string'> bytes written."</span>)
+io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>{</span>n<span class='escape'>}</span><span class='string'> bytes written."</span>)
 </pre>
 </pre>
 </div>
@@ -4615,7 +4615,7 @@ otherwise defaulting to <code>nil</code>.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(<span class='string'>"
-    for i in 0, 5 {
+    for i in 0, 5 </span><span class='escape'>\{</span><span class='string'>
         io.println('Nice!')
     }
 "</span>)
@@ -4624,7 +4624,7 @@ otherwise defaulting to <code>nil</code>.
 io.<span class='function'>println</span>(<span class='function'>f</span>())
 
 <span class='keyword'>var</span> g = meta.<span class='function'>compile</span>(<span class='string'>"
-    for i in 0, 5 {
+    for i in 0, 5 </span><span class='escape'>\{</span><span class='string'>
         io.println('Hehe!')
     }
 
@@ -4635,7 +4635,7 @@ io.<span class='function'>println</span>(<span class='function'>f</span>())
 io.<span class='function'>println</span>(<span class='function'>g</span>())
 
 <span class='keyword'>var</span> h = meta.<span class='function'>compile</span>(<span class='string'>"
-    for i in 0, 5 {
+    for i in 0, 5 </span><span class='escape'>\{</span><span class='string'>
         io.println('Bruh!')
     }
 
@@ -4767,7 +4767,7 @@ Evaluate a string.
 <pre class='code active'>
 io.<span class='function'>println</span>(meta.<span class='function'>eval</span>(<span class='string'>"34 + 35"</span>))
 io.<span class='function'>println</span>(meta.<span class='function'>eval</span>(<span class='string'>"
-    for i in 0, 5 {
+    for i in 0, 5 </span><span class='escape'>\{</span><span class='string'>
         io.println('Nice!')
     }
 "</span>))

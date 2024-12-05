@@ -7,7 +7,7 @@ fn fact(n) {
 }
 
 fn main() {
-    io.println("Factorial of 5: \{fact(5)}")
+    io.println("Factorial of 5: {fact(5)}")
 }
 
 main()

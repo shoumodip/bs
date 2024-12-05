@@ -30,11 +30,11 @@ syntax match bsType "\<\a\w*\>\(\s*<\s*\a\w*\>\)\?" contained contains=bsInherit
 syntax keyword bsKeyword class skipwhite skipempty nextgroup=bsType
 
 syntax match bsEscapeInvalid '\\.' contained
-syntax match bsEscape /\\e\|\\n\|\\r\|\\t\|\\0\|\\"\|\\'\|\\\\/ contained
+syntax match bsEscape /\\e\|\\n\|\\r\|\\t\|\\0\|\\"\|\\'\|\\\\\|\\{/ contained
 syntax region bsBraces contains=TOP matchgroup=NONE start='{' end='}'
 syntax region bsString contains=bsEscapeInvalid,bsEscape,bsInterpolation start='"' skip='\\\\\|\\"' end='"'
 syntax region bsString contains=bsEscapeInvalid,bsEscape,bsInterpolation start="'" skip="\\\\\|\\'" end="'"
-syntax region bsInterpolation contained contains=TOP matchgroup=bsEscape start='\\{' end='}'
+syntax region bsInterpolation contained contains=TOP matchgroup=bsEscape start='{' end='}'
 
 highlight! link bsType Type
 highlight! link bsField Identifier

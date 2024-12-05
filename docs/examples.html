@@ -38,7 +38,7 @@ The UNIX <code>cat</code> coreutil.
     <span class='keyword'>var</span> path = os.<span class='field'>args</span>[i]
     <span class='keyword'>var</span> contents = io.<span class='function'>readfile</span>(path)
     <span class='keyword'>if</span> !contents {
-        io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not read file '</span><span class='escape'>\</span><span class='escape'>{</span>path<span class='escape'>}</span><span class='string'>'"</span>)
+        io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not read file '</span><span class='escape'>{</span>path<span class='escape'>}</span><span class='string'>'"</span>)
         code = <span class='constant'>1</span>
         <span class='keyword'>continue</span>
     }
@@ -69,7 +69,7 @@ for i in 1, len(os.args) {
     var path = os.args[i]
     var contents = io.readfile(path)
     if !contents {
-        io.eprintln("Error: could not read file '\{path}'")
+        io.eprintln("Error: could not read file '{path}'")
         code = 1
         continue
     }
@@ -163,7 +163,7 @@ The UNIX <code>grep</code> coreutil.
 
         <span class='keyword'>var</span> col = line.<span class='function'>find</span>(pattern)
         <span class='keyword'>if</span> col {
-            io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>{</span>path<span class='escape'>}</span><span class='string'>:</span><span class='escape'>\</span><span class='escape'>{</span>row + <span class='constant'>1</span><span class='escape'>}</span><span class='string'>:</span><span class='escape'>\</span><span class='escape'>{</span>col + <span class='constant'>1</span><span class='escape'>}</span><span class='string'>: </span><span class='escape'>\</span><span class='escape'>{</span>line<span class='escape'>}</span><span class='string'>"</span>)
+            io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>{</span>path<span class='escape'>}</span><span class='string'>:</span><span class='escape'>{</span>row + <span class='constant'>1</span><span class='escape'>}</span><span class='string'>:</span><span class='escape'>{</span>col + <span class='constant'>1</span><span class='escape'>}</span><span class='string'>: </span><span class='escape'>{</span>line<span class='escape'>}</span><span class='string'>"</span>)
         }
 
         row += <span class='constant'>1</span>
@@ -171,7 +171,7 @@ The UNIX <code>grep</code> coreutil.
 }
 
 <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>2</span> {
-    io.<span class='function'>eprintln</span>(<span class='string'>"Usage: </span><span class='escape'>\</span><span class='escape'>{</span>os.<span class='field'>args</span>[<span class='constant'>0</span>]<span class='escape'>}</span><span class='string'> &lt;pattern&gt; [file...]"</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>"Usage: </span><span class='escape'>{</span>os.<span class='field'>args</span>[<span class='constant'>0</span>]<span class='escape'>}</span><span class='string'> &lt;pattern&gt; [file...]"</span>)
     io.<span class='function'>eprintln</span>(<span class='string'>"Error: pattern not provided"</span>)
     os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
@@ -193,7 +193,7 @@ The UNIX <code>grep</code> coreutil.
 
     <span class='keyword'>var</span> f = io.<span class='function'>Reader</span>(path)
     <span class='keyword'>if</span> !f {
-        io.<span class='function'>println</span>(<span class='string'>"Error: could not open file '</span><span class='escape'>\</span><span class='escape'>{</span>path<span class='escape'>}</span><span class='string'>'"</span>)
+        io.<span class='function'>println</span>(<span class='string'>"Error: could not open file '</span><span class='escape'>{</span>path<span class='escape'>}</span><span class='string'>'"</span>)
         code = <span class='constant'>1</span>
         <span class='keyword'>continue</span>
     }
@@ -222,14 +222,14 @@ os.<span class='function'>exit</span>(code)
 grep.bs:3:13:     while !f.eof() {
 grep.bs:4:21:         var line = f.readln()
 grep.bs:6:23:         var col = line.find(pattern)
-grep.bs:8:15:             io.println("\{path}:\{row + 1}:\{col + 1}: \{line}")
-grep.bs:16:7:     io.eprintln("Usage: \{os.args[0]} &lt;pattern&gt; [file...]")
+grep.bs:8:15:             io.println("{path}:{row + 1}:{col + 1}: {line}")
+grep.bs:16:7:     io.eprintln("Usage: {os.args[0]} &lt;pattern&gt; [file...]")
 grep.bs:17:7:     io.eprintln("Error: pattern not provided")
 grep.bs:18:7:     os.exit(1)
 grep.bs:23:7:     io.eprintln("Error: invalid pattern")
 grep.bs:24:7:     os.exit(1)
 grep.bs:36:15:     var f = io.Reader(path)
-grep.bs:38:11:         io.println("Error: could not open file '\{path}'")
+grep.bs:38:11:         io.println("Error: could not open file '{path}'")
 grep.bs:44:6:     f.close()
 grep.bs:47:3: os.exit(code)
 
@@ -237,14 +237,14 @@ grep.bs:47:3: os.exit(code)
 &lt;stdin&gt;:3:13:     while !f.eof() {
 &lt;stdin&gt;:4:21:         var line = f.readln()
 &lt;stdin&gt;:6:23:         var col = line.find(pattern)
-&lt;stdin&gt;:8:15:             io.println("\{path}:\{row + 1}:\{col + 1}: \{line}")
-&lt;stdin&gt;:16:7:     io.eprintln("Usage: \{os.args[0]} &lt;pattern&gt; [file...]")
+&lt;stdin&gt;:8:15:             io.println("{path}:{row + 1}:{col + 1}: {line}")
+&lt;stdin&gt;:16:7:     io.eprintln("Usage: {os.args[0]} &lt;pattern&gt; [file...]")
 &lt;stdin&gt;:17:7:     io.eprintln("Error: pattern not provided")
 &lt;stdin&gt;:18:7:     os.exit(1)
 &lt;stdin&gt;:23:7:     io.eprintln("Error: invalid pattern")
 &lt;stdin&gt;:24:7:     os.exit(1)
 &lt;stdin&gt;:36:15:     var f = io.Reader(path)
-&lt;stdin&gt;:38:11:         io.println("Error: could not open file '\{path}'")
+&lt;stdin&gt;:38:11:         io.println("Error: could not open file '{path}'")
 &lt;stdin&gt;:44:6:     f.close()
 &lt;stdin&gt;:47:3: os.exit(code)
 </pre>
@@ -288,7 +288,7 @@ A simple UNIX shell.
 <span class='keyword'>var</span> previous = <span class='constant'>nil</span>
 
 <span class='keyword'>while</span> !io.<span class='field'>stdin</span>.<span class='function'>eof</span>() {
-    <span class='keyword'>var</span> args = io.<span class='function'>input</span>(<span class='string'>"</span><span class='escape'>\</span><span class='escape'>{</span><span class='function'>pwd</span>()<span class='escape'>}</span><span class='string'> $ "</span>).<span class='function'>split</span>(delim)
+    <span class='keyword'>var</span> args = io.<span class='function'>input</span>(<span class='string'>"</span><span class='escape'>{</span><span class='function'>pwd</span>()<span class='escape'>}</span><span class='string'> $ "</span>).<span class='function'>split</span>(delim)
     <span class='keyword'>if</span> <span class='keyword'>len</span>(args) == <span class='constant'>0</span> {
         <span class='keyword'>continue</span>
     }
@@ -301,13 +301,13 @@ A simple UNIX shell.
     <span class='comment'>#   exit &lt;CODE&gt;  -&gt; Exits with CODE</span>
     <span class='keyword'>if</span> cmd == <span class='string'>"exit"</span> {
         <span class='keyword'>if</span> <span class='keyword'>len</span>(args) &gt; <span class='constant'>2</span> {
-            io.<span class='function'>eprintln</span>(<span class='string'>"Error: too many arguments to command '</span><span class='escape'>\</span><span class='escape'>{</span>cmd<span class='escape'>}</span><span class='string'>'"</span>)
+            io.<span class='function'>eprintln</span>(<span class='string'>"Error: too many arguments to command '</span><span class='escape'>{</span>cmd<span class='escape'>}</span><span class='string'>'"</span>)
             <span class='keyword'>continue</span>
         }
 
         <span class='keyword'>var</span> code = <span class='keyword'>if</span> <span class='keyword'>len</span>(args) == <span class='constant'>2</span> <span class='keyword'>then</span> args[<span class='constant'>1</span>].<span class='function'>tonumber</span>() <span class='keyword'>else</span> <span class='constant'>0</span>
         <span class='keyword'>if</span> !code {
-            io.<span class='function'>eprintln</span>(<span class='string'>"Error: invalid exit code '</span><span class='escape'>\</span><span class='escape'>{</span>args[<span class='constant'>1</span>]<span class='escape'>}</span><span class='string'>'"</span>)
+            io.<span class='function'>eprintln</span>(<span class='string'>"Error: invalid exit code '</span><span class='escape'>{</span>args[<span class='constant'>1</span>]<span class='escape'>}</span><span class='string'>'"</span>)
             <span class='keyword'>continue</span>
         }
 
@@ -321,7 +321,7 @@ A simple UNIX shell.
     <span class='comment'>#   cd -      -&gt; Go to previous location</span>
     <span class='keyword'>if</span> cmd == <span class='string'>"cd"</span> {
         <span class='keyword'>if</span> <span class='keyword'>len</span>(args) &gt; <span class='constant'>2</span> {
-            io.<span class='function'>eprintln</span>(<span class='string'>"Error: too many arguments to command '</span><span class='escape'>\</span><span class='escape'>{</span>cmd<span class='escape'>}</span><span class='string'>'"</span>)
+            io.<span class='function'>eprintln</span>(<span class='string'>"Error: too many arguments to command '</span><span class='escape'>{</span>cmd<span class='escape'>}</span><span class='string'>'"</span>)
             <span class='keyword'>continue</span>
         }
 
@@ -341,7 +341,7 @@ A simple UNIX shell.
 
         <span class='keyword'>var</span> current = os.<span class='function'>getcwd</span>()
         <span class='keyword'>if</span> !os.<span class='function'>setcwd</span>(path) {
-            io.<span class='function'>eprintln</span>(<span class='string'>"Error: the directory '</span><span class='escape'>\</span><span class='escape'>{</span>path<span class='escape'>}</span><span class='string'>' does not exist"</span>)
+            io.<span class='function'>eprintln</span>(<span class='string'>"Error: the directory '</span><span class='escape'>{</span>path<span class='escape'>}</span><span class='string'>' does not exist"</span>)
         }
 
         previous = current
@@ -350,7 +350,7 @@ A simple UNIX shell.
 
     <span class='keyword'>var</span> p = os.<span class='function'>Process</span>(args)
     <span class='keyword'>if</span> !p {
-        io.<span class='function'>eprintln</span>(<span class='string'>"Error: unknown command '</span><span class='escape'>\</span><span class='escape'>{</span>cmd<span class='escape'>}</span><span class='string'>'"</span>)
+        io.<span class='function'>eprintln</span>(<span class='string'>"Error: unknown command '</span><span class='escape'>{</span>cmd<span class='escape'>}</span><span class='string'>'"</span>)
         <span class='keyword'>continue</span>
     }
     p.<span class='function'>wait</span>()
@@ -620,7 +620,7 @@ gol.<span class='function'>glider</span>(<span class='constant'>1</span>, <span 
 <span class='keyword'>while</span> <span class='constant'>true</span> {
     gol.<span class='function'>show</span>()
     gol.<span class='function'>step</span>()
-    io.<span class='function'>print</span>(<span class='string'>"</span><span class='escape'>\e</span><span class='string'>[</span><span class='escape'>\</span><span class='escape'>{</span>gol.<span class='field'>height</span><span class='escape'>}</span><span class='string'>A</span><span class='escape'>\e</span><span class='string'>[</span><span class='escape'>\</span><span class='escape'>{</span>gol.<span class='field'>width</span><span class='escape'>}</span><span class='string'>D"</span>)
+    io.<span class='function'>print</span>(<span class='string'>"</span><span class='escape'>\e</span><span class='string'>[</span><span class='escape'>{</span>gol.<span class='field'>height</span><span class='escape'>}</span><span class='string'>A</span><span class='escape'>\e</span><span class='string'>[</span><span class='escape'>{</span>gol.<span class='field'>width</span><span class='escape'>}</span><span class='string'>D"</span>)
     os.<span class='function'>sleep</span>(INTERVAL)
 }
 </pre>
@@ -1058,18 +1058,18 @@ Run the program.
 
     <span class='function'>add</span>(title) {
         <span class='constant'>this</span>.<span class='field'>tasks</span>.<span class='function'>push</span>(title)
-        io.<span class='function'>println</span>(<span class='string'>"Added: </span><span class='escape'>\</span><span class='escape'>{</span>title<span class='escape'>}</span><span class='string'>"</span>)
+        io.<span class='function'>println</span>(<span class='string'>"Added: </span><span class='escape'>{</span>title<span class='escape'>}</span><span class='string'>"</span>)
     }
 
     <span class='function'>verify</span>(index) {
         <span class='keyword'>var</span> total = <span class='keyword'>len</span>(<span class='constant'>this</span>.<span class='field'>tasks</span>)
         <span class='keyword'>if</span> index &gt;= total {
-            io.<span class='function'>eprintln</span>(<span class='string'>"Error: invalid index '</span><span class='escape'>\</span><span class='escape'>{</span>index<span class='escape'>}</span><span class='string'>'"</span>)
+            io.<span class='function'>eprintln</span>(<span class='string'>"Error: invalid index '</span><span class='escape'>{</span>index<span class='escape'>}</span><span class='string'>'"</span>)
 
             <span class='keyword'>if</span> total == <span class='constant'>1</span> {
                 io.<span class='function'>eprintln</span>(<span class='string'>"Note: there is currently 1 task"</span>)
             } <span class='keyword'>else</span> {
-                io.<span class='function'>eprintln</span>(<span class='string'>"Note: there are currently </span><span class='escape'>\</span><span class='escape'>{</span>total<span class='escape'>}</span><span class='string'> tasks"</span>)
+                io.<span class='function'>eprintln</span>(<span class='string'>"Note: there are currently </span><span class='escape'>{</span>total<span class='escape'>}</span><span class='string'> tasks"</span>)
             }
 
             os.<span class='function'>exit</span>(<span class='constant'>1</span>)
@@ -1079,13 +1079,13 @@ Run the program.
     <span class='function'>done</span>(index) {
         <span class='constant'>this</span>.<span class='function'>verify</span>(index)
         <span class='keyword'>var</span> title = <span class='constant'>this</span>.<span class='field'>tasks</span>.<span class='function'>remove</span>(index)
-        io.<span class='function'>println</span>(<span class='string'>"Done #</span><span class='escape'>\</span><span class='escape'>{</span>index<span class='escape'>}</span><span class='string'>: </span><span class='escape'>\</span><span class='escape'>{</span>title<span class='escape'>}</span><span class='string'>"</span>)
+        io.<span class='function'>println</span>(<span class='string'>"Done #</span><span class='escape'>{</span>index<span class='escape'>}</span><span class='string'>: </span><span class='escape'>{</span>title<span class='escape'>}</span><span class='string'>"</span>)
     }
 
     <span class='function'>edit</span>(index, title) {
         <span class='constant'>this</span>.<span class='function'>verify</span>(index)
         <span class='constant'>this</span>.<span class='field'>tasks</span>[index] = title
-        io.<span class='function'>println</span>(<span class='string'>"Edit #</span><span class='escape'>\</span><span class='escape'>{</span>index<span class='escape'>}</span><span class='string'>: </span><span class='escape'>\</span><span class='escape'>{</span>title<span class='escape'>}</span><span class='string'>"</span>)
+        io.<span class='function'>println</span>(<span class='string'>"Edit #</span><span class='escape'>{</span>index<span class='escape'>}</span><span class='string'>: </span><span class='escape'>{</span>title<span class='escape'>}</span><span class='string'>"</span>)
     }
 
     <span class='function'>list</span>(query) {
@@ -1094,14 +1094,14 @@ Run the program.
                 <span class='keyword'>continue</span>
             }
 
-            io.<span class='function'>println</span>(<span class='string'>"[</span><span class='escape'>\</span><span class='escape'>{</span>i<span class='escape'>}</span><span class='string'>] </span><span class='escape'>\</span><span class='escape'>{</span>t<span class='escape'>}</span><span class='string'>"</span>)
+            io.<span class='function'>println</span>(<span class='string'>"[</span><span class='escape'>{</span>i<span class='escape'>}</span><span class='string'>] </span><span class='escape'>{</span>t<span class='escape'>}</span><span class='string'>"</span>)
         }
     }
 
     <span class='function'>save</span>() {
         <span class='keyword'>var</span> f = io.<span class='function'>Writer</span>(<span class='constant'>this</span>.<span class='field'>path</span>)
         <span class='keyword'>if</span> !f {
-            io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not save tasks to '</span><span class='escape'>\</span><span class='escape'>{</span><span class='constant'>this</span>.<span class='field'>path</span><span class='escape'>}</span><span class='string'>'"</span>)
+            io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not save tasks to '</span><span class='escape'>{</span><span class='constant'>this</span>.<span class='field'>path</span><span class='escape'>}</span><span class='string'>'"</span>)
             os.<span class='function'>exit</span>(<span class='constant'>1</span>)
         }
 
@@ -1111,7 +1111,7 @@ Run the program.
 }
 
 <span class='keyword'>fn</span> <span class='function'>usage</span>(f) {
-    f.<span class='function'>writeln</span>(<span class='string'>"Usage: </span><span class='escape'>\</span><span class='escape'>{</span>os.<span class='field'>args</span>[<span class='constant'>0</span>]<span class='escape'>}</span><span class='string'> &lt;command&gt; [args...]"</span>)
+    f.<span class='function'>writeln</span>(<span class='string'>"Usage: </span><span class='escape'>{</span>os.<span class='field'>args</span>[<span class='constant'>0</span>]<span class='escape'>}</span><span class='string'> &lt;command&gt; [args...]"</span>)
     f.<span class='function'>writeln</span>(<span class='string'>"Commands:"</span>)
     f.<span class='function'>writeln</span>(<span class='string'>"    add  &lt;title&gt;            Add a task"</span>)
     f.<span class='function'>writeln</span>(<span class='string'>"    done &lt;index&gt;            Mark task as done"</span>)
@@ -1148,7 +1148,7 @@ Run the program.
 
         <span class='keyword'>var</span> index = os.<span class='field'>args</span>[<span class='constant'>2</span>].<span class='function'>tonumber</span>()
         <span class='keyword'>if</span> !index {
-            io.<span class='function'>eprintln</span>(<span class='string'>"Error: invalid index '</span><span class='escape'>\</span><span class='escape'>{</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>}</span><span class='string'>'"</span>)
+            io.<span class='function'>eprintln</span>(<span class='string'>"Error: invalid index '</span><span class='escape'>{</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>}</span><span class='string'>'"</span>)
             os.<span class='function'>exit</span>(<span class='constant'>1</span>)
         }
 
@@ -1166,7 +1166,7 @@ Run the program.
 
         <span class='keyword'>var</span> index = os.<span class='field'>args</span>[<span class='constant'>2</span>].<span class='function'>tonumber</span>()
         <span class='keyword'>if</span> !index {
-            io.<span class='function'>eprintln</span>(<span class='string'>"Error: invalid index '</span><span class='escape'>\</span><span class='escape'>{</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>}</span><span class='string'>'"</span>)
+            io.<span class='function'>eprintln</span>(<span class='string'>"Error: invalid index '</span><span class='escape'>{</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>}</span><span class='string'>'"</span>)
             os.<span class='function'>exit</span>(<span class='constant'>1</span>)
         }
 
@@ -1186,7 +1186,7 @@ Run the program.
         <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &gt; <span class='constant'>2</span> {
             query = <span class='function'>Regex</span>(os.<span class='field'>args</span>[<span class='constant'>2</span>])
             <span class='keyword'>if</span> !query {
-                io.<span class='function'>eprintln</span>(<span class='string'>"Error: invalid query '</span><span class='escape'>\</span><span class='escape'>{</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>}</span><span class='string'>'"</span>)
+                io.<span class='function'>eprintln</span>(<span class='string'>"Error: invalid query '</span><span class='escape'>{</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>}</span><span class='string'>'"</span>)
                 os.<span class='function'>exit</span>(<span class='constant'>1</span>)
             }
         }
@@ -1195,7 +1195,7 @@ Run the program.
         tasks.<span class='function'>list</span>(query)
     }
 } <span class='keyword'>else</span> {
-    io.<span class='function'>eprintln</span>(<span class='string'>"Error: invalid command '</span><span class='escape'>\</span><span class='escape'>{</span>command<span class='escape'>}</span><span class='string'>'"</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>"Error: invalid command '</span><span class='escape'>{</span>command<span class='escape'>}</span><span class='string'>'"</span>)
     <span class='function'>usage</span>(io.<span class='field'>stderr</span>)
     os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
@@ -1614,7 +1614,7 @@ Make sure to provide the compiler and linker flags as required.
 
         <span class='keyword'>var</span> sound = <span class='function'>loader</span>(path)
         <span class='keyword'>if</span> !sound {
-            io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not load sound '</span><span class='escape'>\</span><span class='escape'>{</span>path<span class='escape'>}</span><span class='string'>'"</span>)
+            io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not load sound '</span><span class='escape'>{</span>path<span class='escape'>}</span><span class='string'>'"</span>)
             os.<span class='function'>exit</span>(<span class='constant'>1</span>)
         }
 
@@ -1630,7 +1630,7 @@ Make sure to provide the compiler and linker flags as required.
 
         <span class='keyword'>var</span> texture = rl.<span class='function'>Texture</span>(path)
         <span class='keyword'>if</span> !texture {
-            io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not load image '</span><span class='escape'>\</span><span class='escape'>{</span>path<span class='escape'>}</span><span class='string'>'"</span>)
+            io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not load image '</span><span class='escape'>{</span>path<span class='escape'>}</span><span class='string'>'"</span>)
             os.<span class='function'>exit</span>(<span class='constant'>1</span>)
         }
 

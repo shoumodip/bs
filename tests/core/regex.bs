@@ -25,9 +25,9 @@ io.println(Regex("["))
 
 {
     var r = Regex("([0-9]+) ([a-z]+)")
-    io.println("69 apples, 420 oranges".replace(r, "{type: \\2, count: \\1}"))
-    io.println("69 apples, 420  oranges".replace(r, "{type: \\2, count: \\1}"))
-    io.println("ayo noice!".replace(r, "{type: \\2, count: \\1}"))
+    io.println("69 apples, 420 oranges".replace(r, "\{type: \\2, count: \\1}"))
+    io.println("69 apples, 420  oranges".replace(r, "\{type: \\2, count: \\1}"))
+    io.println("ayo noice!".replace(r, "\{type: \\2, count: \\1}"))
 }
 
 {

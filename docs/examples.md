@@ -14,7 +14,7 @@ for i in 1, len(os.args) {
     var path = os.args[i]
     var contents = io.readfile(path)
     if !contents {
-        io.eprintln("Error: could not read file '\{path}'")
+        io.eprintln("Error: could not read file '{path}'")
         code = 1
         continue
     }
@@ -33,7 +33,7 @@ for i in 1, len(os.args) {
     var path = os.args[i]
     var contents = io.readfile(path)
     if !contents {
-        io.eprintln("Error: could not read file '\{path}'")
+        io.eprintln("Error: could not read file '{path}'")
         code = 1
         continue
     }
@@ -87,7 +87,7 @@ fn grep(f, path, pattern) {
 
         var col = line.find(pattern)
         if col {
-            io.println("\{path}:\{row + 1}:\{col + 1}: \{line}")
+            io.println("{path}:{row + 1}:{col + 1}: {line}")
         }
 
         row += 1
@@ -95,7 +95,7 @@ fn grep(f, path, pattern) {
 }
 
 if len(os.args) < 2 {
-    io.eprintln("Usage: \{os.args[0]} <pattern> [file...]")
+    io.eprintln("Usage: {os.args[0]} <pattern> [file...]")
     io.eprintln("Error: pattern not provided")
     os.exit(1)
 }
@@ -117,7 +117,7 @@ for i in 2, len(os.args) {
 
     var f = io.Reader(path)
     if !f {
-        io.println("Error: could not open file '\{path}'")
+        io.println("Error: could not open file '{path}'")
         code = 1
         continue
     }
@@ -134,14 +134,14 @@ $ bs grep.bs '\.[A-z]+\(' grep.bs
 grep.bs:3:13:     while !f.eof() {
 grep.bs:4:21:         var line = f.readln()
 grep.bs:6:23:         var col = line.find(pattern)
-grep.bs:8:15:             io.println("\{path}:\{row + 1}:\{col + 1}: \{line}")
-grep.bs:16:7:     io.eprintln("Usage: \{os.args[0]} <pattern> [file...]")
+grep.bs:8:15:             io.println("{path}:{row + 1}:{col + 1}: {line}")
+grep.bs:16:7:     io.eprintln("Usage: {os.args[0]} <pattern> [file...]")
 grep.bs:17:7:     io.eprintln("Error: pattern not provided")
 grep.bs:18:7:     os.exit(1)
 grep.bs:23:7:     io.eprintln("Error: invalid pattern")
 grep.bs:24:7:     os.exit(1)
 grep.bs:36:15:     var f = io.Reader(path)
-grep.bs:38:11:         io.println("Error: could not open file '\{path}'")
+grep.bs:38:11:         io.println("Error: could not open file '{path}'")
 grep.bs:44:6:     f.close()
 grep.bs:47:3: os.exit(code)
 
@@ -149,14 +149,14 @@ $ cat grep.bs | bs grep.bs '\.[A-z]+\(' # DON'T CAT INTO GREP!!!
 <stdin>:3:13:     while !f.eof() {
 <stdin>:4:21:         var line = f.readln()
 <stdin>:6:23:         var col = line.find(pattern)
-<stdin>:8:15:             io.println("\{path}:\{row + 1}:\{col + 1}: \{line}")
-<stdin>:16:7:     io.eprintln("Usage: \{os.args[0]} <pattern> [file...]")
+<stdin>:8:15:             io.println("{path}:{row + 1}:{col + 1}: {line}")
+<stdin>:16:7:     io.eprintln("Usage: {os.args[0]} <pattern> [file...]")
 <stdin>:17:7:     io.eprintln("Error: pattern not provided")
 <stdin>:18:7:     os.exit(1)
 <stdin>:23:7:     io.eprintln("Error: invalid pattern")
 <stdin>:24:7:     os.exit(1)
 <stdin>:36:15:     var f = io.Reader(path)
-<stdin>:38:11:         io.println("Error: could not open file '\{path}'")
+<stdin>:38:11:         io.println("Error: could not open file '{path}'")
 <stdin>:44:6:     f.close()
 <stdin>:47:3: os.exit(code)
 ```
@@ -186,7 +186,7 @@ var delim = Regex("[ \n\t]+")
 var previous = nil
 
 while !io.stdin.eof() {
-    var args = io.input("\{pwd()} $ ").split(delim)
+    var args = io.input("{pwd()} $ ").split(delim)
     if len(args) == 0 {
         continue
     }
@@ -199,13 +199,13 @@ while !io.stdin.eof() {
     #   exit <CODE>  -> Exits with CODE
     if cmd == "exit" {
         if len(args) > 2 {
-            io.eprintln("Error: too many arguments to command '\{cmd}'")
+            io.eprintln("Error: too many arguments to command '{cmd}'")
             continue
         }
 
         var code = if len(args) == 2 then args[1].tonumber() else 0
         if !code {
-            io.eprintln("Error: invalid exit code '\{args[1]}'")
+            io.eprintln("Error: invalid exit code '{args[1]}'")
             continue
         }
 
@@ -219,7 +219,7 @@ while !io.stdin.eof() {
     #   cd -      -> Go to previous location
     if cmd == "cd" {
         if len(args) > 2 {
-            io.eprintln("Error: too many arguments to command '\{cmd}'")
+            io.eprintln("Error: too many arguments to command '{cmd}'")
             continue
         }
 
@@ -239,7 +239,7 @@ while !io.stdin.eof() {
 
         var current = os.getcwd()
         if !os.setcwd(path) {
-            io.eprintln("Error: the directory '\{path}' does not exist")
+            io.eprintln("Error: the directory '{path}' does not exist")
         }
 
         previous = current
@@ -248,7 +248,7 @@ while !io.stdin.eof() {
 
     var p = os.Process(args)
     if !p {
-        io.eprintln("Error: unknown command '\{cmd}'")
+        io.eprintln("Error: unknown command '{cmd}'")
         continue
     }
     p.wait()
@@ -445,7 +445,7 @@ gol.glider(1, 1)
 while true {
     gol.show()
     gol.step()
-    io.print("\e[\{gol.height}A\e[\{gol.width}D")
+    io.print("\e[{gol.height}A\e[{gol.width}D")
     os.sleep(INTERVAL)
 }
 ```
@@ -808,18 +808,18 @@ class Tasks {
 
     add(title) {
         this.tasks.push(title)
-        io.println("Added: \{title}")
+        io.println("Added: {title}")
     }
 
     verify(index) {
         var total = len(this.tasks)
         if index >= total {
-            io.eprintln("Error: invalid index '\{index}'")
+            io.eprintln("Error: invalid index '{index}'")
 
             if total == 1 {
                 io.eprintln("Note: there is currently 1 task")
             } else {
-                io.eprintln("Note: there are currently \{total} tasks")
+                io.eprintln("Note: there are currently {total} tasks")
             }
 
             os.exit(1)
@@ -829,13 +829,13 @@ class Tasks {
     done(index) {
         this.verify(index)
         var title = this.tasks.remove(index)
-        io.println("Done #\{index}: \{title}")
+        io.println("Done #{index}: {title}")
     }
 
     edit(index, title) {
         this.verify(index)
         this.tasks[index] = title
-        io.println("Edit #\{index}: \{title}")
+        io.println("Edit #{index}: {title}")
     }
 
     list(query) {
@@ -844,14 +844,14 @@ class Tasks {
                 continue
             }
 
-            io.println("[\{i}] \{t}")
+            io.println("[{i}] {t}")
         }
     }
 
     save() {
         var f = io.Writer(this.path)
         if !f {
-            io.eprintln("Error: could not save tasks to '\{this.path}'")
+            io.eprintln("Error: could not save tasks to '{this.path}'")
             os.exit(1)
         }
 
@@ -861,7 +861,7 @@ class Tasks {
 }
 
 fn usage(f) {
-    f.writeln("Usage: \{os.args[0]} <command> [args...]")
+    f.writeln("Usage: {os.args[0]} <command> [args...]")
     f.writeln("Commands:")
     f.writeln("    add  <title>            Add a task")
     f.writeln("    done <index>            Mark task as done")
@@ -898,7 +898,7 @@ match command {
 
         var index = os.args[2].tonumber()
         if !index {
-            io.eprintln("Error: invalid index '\{os.args[2]}'")
+            io.eprintln("Error: invalid index '{os.args[2]}'")
             os.exit(1)
         }
 
@@ -916,7 +916,7 @@ match command {
 
         var index = os.args[2].tonumber()
         if !index {
-            io.eprintln("Error: invalid index '\{os.args[2]}'")
+            io.eprintln("Error: invalid index '{os.args[2]}'")
             os.exit(1)
         }
 
@@ -936,7 +936,7 @@ match command {
         if len(os.args) > 2 {
             query = Regex(os.args[2])
             if !query {
-                io.eprintln("Error: invalid query '\{os.args[2]}'")
+                io.eprintln("Error: invalid query '{os.args[2]}'")
                 os.exit(1)
             }
         }
@@ -945,7 +945,7 @@ match command {
         tasks.list(query)
     }
 } else {
-    io.eprintln("Error: invalid command '\{command}'")
+    io.eprintln("Error: invalid command '{command}'")
     usage(io.stderr)
     os.exit(1)
 }
@@ -1315,7 +1315,7 @@ class Assets {
 
         var sound = loader(path)
         if !sound {
-            io.eprintln("Error: could not load sound '\{path}'")
+            io.eprintln("Error: could not load sound '{path}'")
             os.exit(1)
         }
 
@@ -1331,7 +1331,7 @@ class Assets {
 
         var texture = rl.Texture(path)
         if !texture {
-            io.eprintln("Error: could not load image '\{path}'")
+            io.eprintln("Error: could not load image '{path}'")
             os.exit(1)
         }
 

@@ -143,20 +143,19 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc, char end) {
             case '\'':
             case '"':
             case '\\':
-                break;
-
             case '{':
-                token.type = BS_TOKEN_ISTR;
-                token.sv.size -= l->sv.size;
-
-                bs_lexer_advance(l);
-                return token;
+                break;
 
             default:
                 bs_lexer_error(l, l->loc, "invalid escape character");
             }
 
             bs_lexer_advance(l);
+        } else if (ch == '{') {
+            token.type = BS_TOKEN_ISTR;
+            token.sv.size -= l->sv.size;
+            bs_lexer_advance(l);
+            return token;
         }
 
         bs_lexer_advance(l);

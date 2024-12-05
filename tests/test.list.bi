@@ -170,7 +170,7 @@ false
 :i returncode 1
 :b stdout 0
 
-:b stderr 295
+:b stderr 294
 strings/error_invalid_addition.bs:1:15: error: invalid operands to binary (+): number, string
 
     1 | io.println(69 + " Nice!")
@@ -181,7 +181,7 @@ Use ($) for string concatenation, or use string interpolation instead
 ```
 "Hello, " $ "world!"
 "Hello, " $ 69
-"Hello, \{34 + 35} nice!"
+"Hello, {34 + 35} nice!"
 ```
 
 :b shell 28

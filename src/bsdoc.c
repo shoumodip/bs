@@ -132,7 +132,7 @@ static void bsdoc_print_token(FILE *f, Bs_Token token, Bsdoc_Style style, const 
 
         if (token.sv.data[token.sv.size] == '"' || token.sv.data[token.sv.size] == '\'') {
             token.sv.size++;
-        } else if (token.sv.data[token.sv.size] == '\\') {
+        } else if (token.sv.data[token.sv.size] == '{') {
             interpolation = true;
         }
     }
@@ -155,7 +155,7 @@ static void bsdoc_print_token(FILE *f, Bs_Token token, Bsdoc_Style style, const 
     }
 
     if (interpolation) {
-        bsdoc_print_styled_sv(f, BSDOC_STYLE_ESCAPE, Bs_Sv_Static("\\"));
+        bsdoc_print_styled_sv(f, BSDOC_STYLE_ESCAPE, Bs_Sv_Static("{"));
         (*last)++;
     }
 }
@@ -326,9 +326,6 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
         case BS_TOKEN_ISTR:
             bsdoc_print_token(f, token, style, &last);
             bsdoc_parens_push(&parens, token.sv.data[-1]);
-
-            token = bs_lexer_expect(&lexer, BS_TOKEN_LBRACE);
-            bsdoc_print_token(f, token, BSDOC_STYLE_ESCAPE, &last);
             break;
 
         case BS_TOKEN_LBRACE:
@@ -347,8 +344,6 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
                 bsdoc_print_token(f, token, bsdoc_token_type_style(token.type), &last);
 
                 if (token.type == BS_TOKEN_ISTR) {
-                    token = bs_lexer_expect(&lexer, BS_TOKEN_LBRACE);
-                    bsdoc_print_token(f, token, BSDOC_STYLE_ESCAPE, &last);
                     bsdoc_parens_push(&parens, ch);
                 }
             } else {

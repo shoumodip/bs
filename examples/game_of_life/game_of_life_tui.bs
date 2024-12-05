@@ -23,6 +23,6 @@ gol.glider(1, 1)
 while true {
     gol.show()
     gol.step()
-    io.print("\e[\{gol.height}A\e[\{gol.width}D")
+    io.print("\e[{gol.height}A\e[{gol.width}D")
     os.sleep(INTERVAL)
 }

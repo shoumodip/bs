@@ -17,7 +17,7 @@
 io.println(meta.eval("500 - 80"))
 
 io.println(meta.eval("
-    for i in 0, 10 {
+    for i in 0, 10 \{
         io.println('Nice!')
     }
 "))
