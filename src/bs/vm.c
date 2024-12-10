@@ -1027,6 +1027,25 @@ void bs_error_standalone(Bs *bs, const char *fmt, ...) {
     bs->config.error.write(&bs->config.error, error);
 }
 
+void bs_error_standalone_unwind(Bs *bs, const char *fmt, ...) {
+    const size_t start = bs->config.buffer.count;
+    Bs_Writer w = bs_buffer_writer(&bs->config.buffer);
+
+    va_list args;
+    va_start(args, fmt);
+    bs_vfmt(&w, fmt, args);
+    va_end(args);
+
+    const Bs_Error error = {
+        .type = BS_ERROR_STANDALONE,
+        .message = bs_buffer_reset(&bs->config.buffer, start),
+    };
+    bs->config.error.write(&bs->config.error, error);
+
+    bs->config.unwind.ok = false;
+    bs_unwind(bs, 1);
+}
+
 // Checks
 void bs_check_arity_at(Bs *bs, size_t location, size_t actual, size_t expected) {
     if (actual != expected) {
@@ -1215,7 +1234,7 @@ void bs_check_ascii_code_at(Bs *bs, size_t location, Bs_Value value, const char 
 // Interpreter
 static void bs_stack_push(Bs *bs, Bs_Value value) {
     if (bs->stack.count >= BS_STACK_CAPACITY) {
-        bs_error(bs, "stack overflow");
+        bs_error_standalone_unwind(bs, "stack overflow");
     }
 
     bs->stack.data[bs->stack.count++] = value;
@@ -1223,7 +1242,7 @@ static void bs_stack_push(Bs *bs, Bs_Value value) {
 
 static void bs_frames_push(Bs *bs, Bs_Frame frame) {
     if (bs->frames.count >= BS_FRAMES_CAPACITY) {
-        bs_error(bs, "call stack overflow");
+        bs_error_standalone_unwind(bs, "call stack overflow");
     }
 
     bs->frames.data[bs->frames.count++] = frame;

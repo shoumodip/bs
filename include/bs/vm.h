@@ -101,6 +101,9 @@ void bs_error_full_at(
 void bs_error_standalone(Bs *bs, const char *fmt, ...)
     __attribute__((__format__(__printf__, 2, 3)));
 
+void bs_error_standalone_unwind(Bs *bs, const char *fmt, ...)
+    __attribute__((__format__(__printf__, 2, 3)));
+
 // Checks
 void bs_check_arity_at(Bs *bs, size_t location, size_t actual, size_t expected);
 #define bs_check_arity(bs, actual, expected) bs_check_arity_at(bs, 0, actual, expected)
