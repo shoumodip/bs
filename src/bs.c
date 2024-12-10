@@ -15,10 +15,14 @@
 
 #include "bs/vm.h"
 
+static bool error_was_standalone;
+
 static void bs_error_write_colors(Bs_Error_Writer *w, Bs_Error error) {
     if (error.native) {
         fprintf(stderr, "[C]: ");
-    } else if (error.type != BS_ERROR_STANDALONE) {
+    } else if (error.type == BS_ERROR_STANDALONE) {
+        error_was_standalone = true;
+    } else {
         fprintf(stderr, Bs_Loc_Fmt, Bs_Loc_Arg(error.loc));
     }
 
@@ -329,7 +333,9 @@ int main(int argc, char **argv) {
                     bs_value_write(bs, w, result.value);
                     crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
                 }
-                bs_fmt(w, "\n");
+
+                if (!error_was_standalone) bs_fmt(w, "\n");
+                error_was_standalone = false;
                 result = (Bs_Result){0};
             }
 
