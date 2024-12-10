@@ -58,4 +58,10 @@ $ bs factorial.bs
 </div>
 </div>
 
+## Editor Support
+
+<ul>
+<li><a href="https://github.com/shoumodip/bs.vim">Vim</a></li>
+</ul>
+
 <!-- no-navigation -->
