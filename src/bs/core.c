@@ -1691,9 +1691,7 @@ static void bs_bytes_show(Bs_Pretty_Printer *p, const void *instance_data) {
     const Bs_Buffer *b = &bs_flex_member_as(instance_data, Bs_Buffer);
     const Bs_Sv sv = Bs_Sv(b->data, b->count);
     if (p->depth) {
-        p->writer->write(p->writer, Bs_Sv_Static("Bytes("));
         bs_pretty_printer_quote(p, sv);
-        p->writer->write(p->writer, Bs_Sv_Static(")"));
     } else {
         p->writer->write(p->writer, sv);
     }
