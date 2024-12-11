@@ -39,7 +39,6 @@ provided.
 <span class='keyword'>var</span> name = io.<span class='function'>input</span>(<span class='string'>"Enter your name&gt; "</span>)
 io.<span class='function'>println</span>(<span class='string'>"Hello, </span><span class='escape'>{</span>name<span class='escape'>}</span><span class='string'>!"</span>)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -77,7 +76,6 @@ Print all the arguments to standard output.
 </button>
 <pre class='code active'>
 io.<span class='function'>print</span>(<span class='string'>"Hello"</span>, <span class='string'>"world"</span>, <span class='constant'>69</span>)
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -143,7 +141,6 @@ Returns <code>nil</code> if failed.
 <span class='keyword'>for</span> _, e <span class='keyword'>in</span> entries {
     io.<span class='function'>println</span>(e.<span class='function'>name</span>(), e.<span class='function'>isdir</span>())
 }
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -211,7 +208,6 @@ Returns <code>nil</code> if failed.
 
 io.<span class='function'>print</span>(contents)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -267,7 +263,6 @@ Returns <code>nil</code> if failed.
 
 <span class='keyword'>var</span> contents = f.<span class='function'>read</span>()
 io.<span class='function'>print</span>(contents)
-</pre>
 </pre>
 </div>
 <p>
@@ -334,7 +329,6 @@ Returns <code>nil</code> if failed.
 io.<span class='function'>print</span>(<span class='string'>"The first 16 bytes: [</span><span class='escape'>{</span>f.<span class='function'>read</span>(<span class='constant'>16</span>)<span class='escape'>}</span><span class='string'>]</span><span class='escape'>\n</span><span class='string'>"</span>)
 io.<span class='function'>print</span>(<span class='string'>"The rest:"</span>, f.<span class='function'>read</span>())
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -386,7 +380,6 @@ Read a line.
     <span class='keyword'>var</span> line = f.<span class='function'>readln</span>()
     io.<span class='function'>println</span>(<span class='string'>"Line:"</span>, line)
 }
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -462,7 +455,6 @@ f.<span class='function'>seek</span>(<span class='constant'>5</span>, io.<span c
 io.<span class='function'>println</span>(<span class='string'>"The full content offset by 5:"</span>)
 io.<span class='function'>print</span>(f.<span class='function'>read</span>())
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -525,7 +517,6 @@ io.<span class='function'>println</span>(<span class='string'>"The first 3 lines
 io.<span class='function'>println</span>()
 io.<span class='function'>println</span>(<span class='string'>"Read </span><span class='escape'>{</span>f.<span class='function'>tell</span>()<span class='escape'>}</span><span class='string'> bytes so far."</span>)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -583,7 +574,6 @@ Returns <code>nil</code> if failed.
 f.<span class='function'>writeln</span>(<span class='string'>"Hello there!"</span>)
 f.<span class='function'>writeln</span>(<span class='string'>"General Kenobi!"</span>)
 f.<span class='function'>writeln</span>(<span class='constant'>69</span>, <span class='string'>"Nice!"</span>)
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -668,7 +658,6 @@ Example usecase:
 <span class='keyword'>for</span> _, e <span class='keyword'>in</span> entries {
     io.<span class='function'>println</span>(e.<span class='function'>name</span>(), e.<span class='function'>isdir</span>())
 }
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -764,7 +753,6 @@ machine can decide what to do.
 <pre class='code active'>
 os.<span class='function'>exit</span>(<span class='constant'>69</span>)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -819,7 +807,6 @@ io.<span class='function'>println</span>(<span class='function'>fib</span>(<span
 <span class='keyword'>var</span> elapsed = os.<span class='function'>clock</span>() - start
 io.<span class='function'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>{</span>elapsed<span class='escape'>}</span><span class='string'>"</span>)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -862,7 +849,6 @@ os.<span class='function'>sleep</span>(<span class='constant'>0.69</span>)
 <span class='keyword'>var</span> elapsed = os.<span class='function'>clock</span>() - start
 io.<span class='function'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>{</span>elapsed<span class='escape'>}</span><span class='string'>"</span>)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -903,7 +889,6 @@ Returns <code>nil</code> if it doesn't exist.
 <pre class='code active'>
 io.<span class='function'>println</span>(os.<span class='function'>getenv</span>(<span class='string'>"FOO"</span>))
 io.<span class='function'>println</span>(os.<span class='function'>getenv</span>(<span class='string'>"BAR"</span>))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -948,7 +933,6 @@ Returns <code>true</code> if successful, else <code>false</code>.
 os.<span class='function'>setenv</span>(<span class='string'>"FOO"</span>, <span class='string'>"lmao"</span>)
 io.<span class='function'>println</span>(os.<span class='function'>getenv</span>(<span class='string'>"FOO"</span>))
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -985,7 +969,6 @@ Get the current working directory.
 </button>
 <pre class='code active'>
 io.<span class='function'>println</span>(os.<span class='function'>getcwd</span>())
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -1027,7 +1010,6 @@ Returns <code>true</code> if successful, else <code>false</code>.
 <pre class='code active'>
 os.<span class='function'>setcwd</span>(<span class='string'>"/usr"</span>)
 io.<span class='function'>println</span>(os.<span class='function'>getcwd</span>())
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -1084,7 +1066,6 @@ Returns <code>nil</code> if failed.
 
 p.<span class='function'>wait</span>()
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1136,7 +1117,6 @@ Returns <code>nil</code> if the process was spawned without capturing stdout.
 }
 
 p.<span class='function'>wait</span>()
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -1200,7 +1180,6 @@ stdin.<span class='function'>writeln</span>(<span class='string'>"Third line let
 stdin.<span class='function'>close</span>()
 p.<span class='function'>wait</span>()
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1263,7 +1242,6 @@ name.
 <pre class='code active'>
 io.<span class='function'>println</span>(os.<span class='field'>args</span>)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1300,7 +1278,6 @@ The name of the OS.
 </button>
 <pre class='code active'>
 io.<span class='function'>println</span>(os.<span class='field'>name</span>)
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -1346,7 +1323,6 @@ The CPU architecture.
 </button>
 <pre class='code active'>
 io.<span class='function'>println</span>(os.<span class='field'>arch</span>)
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -1397,7 +1373,6 @@ Returns <code>nil</code> if failed.
 <span class='keyword'>var</span> r = <span class='function'>Regex</span>(<span class='string'>"([0-9]+) ([a-z]+)"</span>)
 io.<span class='function'>println</span>(<span class='string'>"69 apples, 420 oranges"</span>.<span class='function'>replace</span>(r, <span class='string'>"</span><span class='escape'>\{</span><span class='string'>fruit: '</span><span class='escape'>\\</span><span class='string'>2', count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1442,7 +1417,6 @@ io.<span class='function'>println</span>(<span class='string'>"deez nuts"</span>
 io.<span class='function'>println</span>(<span class='string'>"deez nuts"</span>.<span class='function'>slice</span>(<span class='constant'>5</span>, <span class='constant'>9</span>))
 io.<span class='function'>println</span>(<span class='string'>"deez nuts"</span>.<span class='function'>slice</span>(<span class='constant'>5</span>)) <span class='comment'># No end defaults to string end</span>
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1482,7 +1456,6 @@ Reverse a string.
 <pre class='code active'>
 io.<span class='function'>println</span>(<span class='string'>"sllab amgil"</span>.<span class='function'>reverse</span>())
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1519,7 +1492,6 @@ Repeat a string <code>count</code> times.
 </button>
 <pre class='code active'>
 io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>repeat</span>(<span class='constant'>6</span>))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -1558,7 +1530,6 @@ Convert a string to uppercase.
 <pre class='code active'>
 io.<span class='function'>println</span>(<span class='string'>"Urmom"</span>.<span class='function'>toupper</span>())
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1595,7 +1566,6 @@ Convert a string to lowercase.
 </button>
 <pre class='code active'>
 io.<span class='function'>println</span>(<span class='string'>"Urmom"</span>.<span class='function'>tolower</span>())
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -1637,7 +1607,6 @@ io.<span class='function'>println</span>(<span class='string'>"420.69"</span>.<s
 io.<span class='function'>println</span>(<span class='string'>"0xff"</span>.<span class='function'>tonumber</span>())
 io.<span class='function'>println</span>(<span class='string'>"69e3"</span>.<span class='function'>tonumber</span>())
 io.<span class='function'>println</span>(<span class='string'>"nah"</span>.<span class='function'>tonumber</span>())
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -1693,7 +1662,6 @@ io.<span class='function'>println</span>(<span class='string'>"69a"</span>.<span
 io.<span class='function'>println</span>(<span class='string'>"69a"</span>.<span class='function'>find</span>(r, <span class='constant'>2</span>))
 io.<span class='function'>println</span>(<span class='string'>"yolol"</span>.<span class='function'>find</span>(r))
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1745,7 +1713,6 @@ io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<s
 io.<span class='function'>println</span>(<span class='string'>"foo bar"</span>.<span class='function'>split</span>(r))
 io.<span class='function'>println</span>(<span class='string'>"foo bar   baz"</span>.<span class='function'>split</span>(r))
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1794,7 +1761,6 @@ io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</spa
 io.<span class='function'>println</span>(<span class='string'>"69 apples, 420 oranges"</span>.<span class='function'>replace</span>(r, <span class='string'>"</span><span class='escape'>\{</span><span class='string'>type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
 io.<span class='function'>println</span>(<span class='string'>"69 apples, 420  oranges"</span>.<span class='function'>replace</span>(r, <span class='string'>"</span><span class='escape'>\{</span><span class='string'>type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
 io.<span class='function'>println</span>(<span class='string'>"ayo noice!"</span>.<span class='function'>replace</span>(r, <span class='string'>"</span><span class='escape'>\{</span><span class='string'>type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -1847,7 +1813,6 @@ io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span
 io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>compare</span>(<span class='string'>"food"</span>))
 io.<span class='function'>println</span>(<span class='string'>"food"</span>.<span class='function'>compare</span>(<span class='string'>"foo"</span>))
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1889,7 +1854,6 @@ Trim <code>pattern</code> from the left of a string.
 <pre class='code active'>
 io.<span class='function'>println</span>(<span class='string'>"["</span> $ <span class='string'>"   foo bar baz  "</span>.<span class='function'>ltrim</span>(<span class='string'>" "</span>) $ <span class='string'>"]"</span>)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1927,7 +1891,6 @@ Trim <code>pattern</code> from the right of a string.
 <pre class='code active'>
 io.<span class='function'>println</span>(<span class='string'>"["</span> $ <span class='string'>"   foo bar baz  "</span>.<span class='function'>rtrim</span>(<span class='string'>" "</span>) $ <span class='string'>"]"</span>)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1964,7 +1927,6 @@ Trim <code>pattern</code> from both sides of a string.
 </button>
 <pre class='code active'>
 io.<span class='function'>println</span>(<span class='string'>"["</span> $ <span class='string'>"   foo bar baz  "</span>.<span class='function'>trim</span>(<span class='string'>" "</span>) $ <span class='string'>"]"</span>)
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -2007,7 +1969,6 @@ io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span
 io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>4</span>))
 io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>5</span>))
 io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>6</span>))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -2055,7 +2016,6 @@ io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span
 io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>5</span>))
 io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>6</span>))
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2099,7 +2059,6 @@ io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<s
 io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<span class='function'>prefix</span>(<span class='string'>"Foo"</span>))
 io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<span class='function'>prefix</span>(<span class='string'>"deez nuts"</span>))
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2140,7 +2099,6 @@ Check whether string ends with <code>pattern</code>.
 io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<span class='function'>suffix</span>(<span class='string'>"bar"</span>))
 io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<span class='function'>suffix</span>(<span class='string'>"Bar"</span>))
 io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<span class='function'>suffix</span>(<span class='string'>"deez nuts"</span>))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -2190,7 +2148,6 @@ io.<span class='function'>println</span>(bit.<span class='function'>ceil</span>(
 io.<span class='function'>println</span>(bit.<span class='function'>ceil</span>(<span class='constant'>8</span>))
 io.<span class='function'>println</span>(bit.<span class='function'>ceil</span>(<span class='constant'>9</span>))
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2231,7 +2188,6 @@ Return the bitwise floor of a number.
 io.<span class='function'>println</span>(bit.<span class='function'>floor</span>(<span class='constant'>7</span>))
 io.<span class='function'>println</span>(bit.<span class='function'>floor</span>(<span class='constant'>8</span>))
 io.<span class='function'>println</span>(bit.<span class='function'>floor</span>(<span class='constant'>9</span>))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -2391,7 +2347,6 @@ io.<span class='function'>println</span>(b)
 <span class='keyword'>var</span> nice = <span class='function'>Bytes</span>(<span class='string'>"69 Hehe"</span>)
 io.<span class='function'>println</span>(nice)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2434,7 +2389,6 @@ io.<span class='function'>println</span>(b)
 
 <span class='keyword'>var</span> n = b.<span class='function'>count</span>()
 io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>{</span>n<span class='escape'>}</span><span class='string'> bytes written."</span>)
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -2482,7 +2436,6 @@ io.<span class='function'>println</span>(b)
 b.<span class='function'>reset</span>(p)
 io.<span class='function'>println</span>(b)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2529,7 +2482,6 @@ b.<span class='function'>push</span>(<span class='string'>"Hello world!"</span>)
 io.<span class='function'>println</span>(b.<span class='function'>slice</span>())
 io.<span class='function'>println</span>(b.<span class='function'>slice</span>(<span class='constant'>0</span>, <span class='constant'>5</span>))
 io.<span class='function'>println</span>(b.<span class='function'>slice</span>(<span class='constant'>6</span>, <span class='constant'>12</span>))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -2579,7 +2531,6 @@ buffer
 
 io.<span class='function'>println</span>(buffer)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2625,7 +2576,6 @@ buffer
 
 io.<span class='function'>println</span>(buffer)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2668,7 +2618,6 @@ b.<span class='function'>push</span>(<span class='string'>"Hello"</span>)
     <span class='keyword'>var</span> c = b.<span class='function'>get</span>(i)
     io.<span class='function'>println</span>(ascii.<span class='function'>char</span>(c), c)
 }
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -2720,7 +2669,6 @@ io.<span class='function'>println</span>(b)
 b.<span class='function'>set</span>(<span class='constant'>0</span>, ascii.<span class='function'>code</span>(<span class='string'>"H"</span>))
 io.<span class='function'>println</span>(b)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2771,7 +2719,6 @@ The provided function <code>f</code> must take a single argument.
 io.<span class='function'>println</span>(xs)
 io.<span class='function'>println</span>(ys)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2815,7 +2762,6 @@ The provided function <code>f</code> must take a single argument.
 <span class='keyword'>var</span> ys = xs.<span class='function'>filter</span>(<span class='keyword'>fn</span> (x) =&gt; x % <span class='constant'>2</span> == <span class='constant'>0</span>)
 io.<span class='function'>println</span>(xs)
 io.<span class='function'>println</span>(ys)
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -2866,7 +2812,6 @@ io.<span class='function'>println</span>(a)
 <span class='keyword'>var</span> b = xs.<span class='function'>reduce</span>(<span class='keyword'>fn</span> (x, y) =&gt; x + y, <span class='constant'>10</span>)
 io.<span class='function'>println</span>(b)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2913,7 +2858,6 @@ io.<span class='function'>println</span>(xs)
 io.<span class='function'>println</span>(ys)
 io.<span class='function'>println</span>(zs)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2952,7 +2896,6 @@ Join the elements of an array, separated by <code>separator</code> into a single
 </button>
 <pre class='code active'>
 io.<span class='function'>println</span>([<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>].<span class='function'>join</span>(<span class='string'>" -&gt; "</span>))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -2999,7 +2942,6 @@ io.<span class='function'>println</span>(xs.<span class='function'>find</span>(<
 io.<span class='function'>println</span>(xs.<span class='function'>find</span>(<span class='constant'>3</span>, <span class='constant'>6</span>))
 io.<span class='function'>println</span>(xs.<span class='function'>find</span>(<span class='constant'>true</span>, <span class='constant'>6</span>))
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -3043,7 +2985,6 @@ Compare the elements of two arrays.
 
 io.<span class='function'>println</span>(xs == ys)
 io.<span class='function'>println</span>(xs.<span class='function'>equal</span>(ys))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -3096,7 +3037,6 @@ This modifies the array.
 
 io.<span class='function'>println</span>(xs)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -3133,7 +3073,6 @@ io.<span class='function'>println</span>(
     [<span class='string'>"Nice!"</span>]
         .<span class='function'>push</span>(<span class='constant'>69</span>)
         .<span class='function'>push</span>(<span class='constant'>420</span>))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -3187,7 +3126,6 @@ io.<span class='function'>println</span>(xs)
 xs.<span class='function'>insert</span>(<span class='constant'>2</span>, <span class='constant'>4</span>)
 io.<span class='function'>println</span>(xs)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -3225,7 +3163,6 @@ io.<span class='function'>println</span>(
     [<span class='string'>"Nice!"</span>]
         .<span class='function'>insert</span>(<span class='constant'>0</span>, <span class='constant'>69</span>)
         .<span class='function'>insert</span>(<span class='constant'>1</span>, <span class='constant'>420</span>))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -3266,7 +3203,6 @@ Sort an array inplace with <code>compare</code>, and return itself.
 xs.<span class='function'>sort</span>(<span class='keyword'>fn</span> (x, y) =&gt; x &lt; y) <span class='comment'># This also returns the array so you can chain operations</span>
 
 io.<span class='function'>println</span>(xs)
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -3320,7 +3256,6 @@ io.<span class='function'>println</span>(xs)
 io.<span class='function'>println</span>(xs.<span class='function'>resize</span>(<span class='constant'>3</span>))
 io.<span class='function'>println</span>(xs)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -3366,7 +3301,6 @@ io.<span class='function'>println</span>(xs)
 
 io.<span class='function'>println</span>(xs.<span class='function'>remove</span>(<span class='constant'>2</span>))
 io.<span class='function'>println</span>(xs)
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -3414,7 +3348,6 @@ io.<span class='function'>println</span>(xs)
 xs.<span class='function'>reverse</span>() <span class='comment'># This also returns the array so you can chain operations</span>
 io.<span class='function'>println</span>(xs)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -3460,7 +3393,6 @@ io.<span class='function'>println</span>(xs)
 xs.<span class='function'>fill</span>(<span class='constant'>69</span>) <span class='comment'># This also returns the array so you can chain operations</span>
 io.<span class='function'>println</span>(xs)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -3496,7 +3428,6 @@ Use this with <code>array.resize()</code> to create an array with a preset size 
 <pre class='code active'>
 <span class='keyword'>var</span> xs = [].<span class='function'>resize</span>(<span class='constant'>5</span>).<span class='function'>fill</span>(<span class='string'>"foo"</span>)
 io.<span class='function'>println</span>(xs)
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -3540,7 +3471,6 @@ Here's a 2D version.
 board[<span class='constant'>2</span>][<span class='constant'>2</span>] = <span class='constant'>1</span>
 
 io.<span class='function'>println</span>(board)
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -3589,7 +3519,6 @@ io.<span class='function'>println</span>(xs)
 io.<span class='function'>println</span>(xs.<span class='function'>slice</span>(<span class='constant'>2</span>))
 io.<span class='function'>println</span>(xs.<span class='function'>slice</span>(<span class='constant'>1</span>, <span class='constant'>3</span>))
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -3634,7 +3563,6 @@ This modifies the array.
 <span class='keyword'>var</span> ys = [<span class='constant'>6</span>, <span class='constant'>7</span>, <span class='constant'>8</span>, <span class='constant'>9</span>, <span class='constant'>10</span>]
 io.<span class='function'>println</span>(xs)
 io.<span class='function'>println</span>(xs.<span class='function'>append</span>(ys))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -3703,7 +3631,6 @@ io.<span class='function'>println</span>(xs)
 io.<span class='function'>println</span>(ys)
 io.<span class='function'>println</span>(zs)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -3756,7 +3683,6 @@ Compare the elements of two tables.
 io.<span class='function'>println</span>(xs == ys)
 io.<span class='function'>println</span>(xs.<span class='function'>equal</span>(ys))
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -3804,7 +3730,6 @@ Sine in radians.
 <pre class='code active'>
 <span class='keyword'>var</span> theta = <span class='constant'>0.5</span>
 io.<span class='function'>println</span>(theta.<span class='function'>sin</span>())
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -3876,7 +3801,6 @@ Return the exponential function of the number.
 </button>
 <pre class='code active'>
 io.<span class='function'>println</span>(<span class='constant'>2</span>.<span class='function'>exp</span>()) <span class='comment'># Basically e^2</span>
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -3965,7 +3889,6 @@ io.<span class='function'>println</span>((<span class='constant'>0</span>).<span
 io.<span class='function'>println</span>((<span class='constant'>69</span>).<span class='function'>sign</span>())
 io.<span class='function'>println</span>((-<span class='constant'>420</span>).<span class='function'>sign</span>())
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -4006,7 +3929,6 @@ Return the maximum between the method receiver and the provided arguments.
 io.<span class='function'>println</span>(<span class='constant'>1</span>.<span class='function'>max</span>(<span class='constant'>2</span>, <span class='constant'>3</span>))
 io.<span class='function'>println</span>(<span class='constant'>3</span>.<span class='function'>max</span>(<span class='constant'>0</span>, <span class='constant'>1</span>, <span class='constant'>2</span>))
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -4045,7 +3967,6 @@ Return the minimum between the method receiver and the provided arguments.
 <pre class='code active'>
 io.<span class='function'>println</span>(<span class='constant'>1</span>.<span class='function'>min</span>(<span class='constant'>2</span>, <span class='constant'>3</span>))
 io.<span class='function'>println</span>(<span class='constant'>3</span>.<span class='function'>min</span>(<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -4099,7 +4020,6 @@ Set the precision (number of decimal digits).
 io.<span class='function'>println</span>(n)
 io.<span class='function'>println</span>(n.<span class='function'>precise</span>(<span class='constant'>0</span>))
 io.<span class='function'>println</span>(n.<span class='function'>precise</span>(<span class='constant'>3</span>))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -4159,7 +4079,6 @@ io.<span class='function'>println</span>(b.<span class='function'>number</span>(
 io.<span class='function'>println</span>(b.<span class='function'>number</span>(<span class='constant'>69</span>, <span class='constant'>420</span>))
 io.<span class='function'>println</span>(b.<span class='function'>number</span>(<span class='constant'>69</span>, <span class='constant'>420</span>))
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -4213,7 +4132,6 @@ io.<span class='function'>println</span>(r.<span class='function'>number</span>(
 io.<span class='function'>println</span>(r.<span class='function'>number</span>(<span class='constant'>69</span>, <span class='constant'>420</span>))
 io.<span class='function'>println</span>(r.<span class='function'>number</span>(<span class='constant'>69</span>, <span class='constant'>420</span>))
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -4254,7 +4172,6 @@ Return a random sequence of bytes.
 <pre class='code active'>
 <span class='keyword'>var</span> seq = math.<span class='function'>Random</span>().<span class='function'>bytes</span>(<span class='constant'>9</span>)
 io.<span class='function'>println</span>(seq.<span class='function'>slice</span>())
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -4302,7 +4219,6 @@ io.<span class='function'>println</span>(math.<span class='function'>range</span
 io.<span class='function'>println</span>(math.<span class='function'>range</span>(<span class='constant'>1</span>, <span class='constant'>6</span>, <span class='constant'>2</span>))
 io.<span class='function'>println</span>(math.<span class='function'>range</span>(<span class='constant'>6</span>, <span class='constant'>1</span>, -<span class='constant'>2</span>))
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -4340,7 +4256,6 @@ raised.
 </button>
 <pre class='code active'>
 io.<span class='function'>println</span>(math.<span class='function'>range</span>(<span class='constant'>1</span>, <span class='constant'>6</span>, -<span class='constant'>1</span>))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -4412,7 +4327,6 @@ Example usecase:
     io.<span class='function'>println</span>(<span class='string'>"Explanation:"</span>, f.<span class='function'>explanation</span>())
     io.<span class='function'>println</span>(<span class='string'>"Example:"</span>, f.<span class='function'>example</span>())
 }
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -4508,7 +4422,6 @@ Compile a string into a function.
 <span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(<span class='string'>"34 + 35"</span>)
 io.<span class='function'>println</span>(<span class='function'>f</span>())
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -4550,7 +4463,6 @@ io.<span class='function'>println</span>(<span class='string'>"Line:"</span>, f.
 io.<span class='function'>println</span>(<span class='string'>"Message:"</span>, f.<span class='function'>message</span>())
 io.<span class='function'>println</span>(<span class='string'>"Explanation:"</span>, f.<span class='function'>explanation</span>())
 io.<span class='function'>println</span>(<span class='string'>"Example:"</span>, f.<span class='function'>example</span>())
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -4595,7 +4507,6 @@ So the usage becomes as straight forward as:
 }
 
 <span class='function'>f</span>() <span class='comment'># Or whatever you want to do</span>
-</pre>
 </pre>
 </div>
 <p>
@@ -4644,7 +4555,6 @@ io.<span class='function'>println</span>(<span class='function'>g</span>())
 
 <span class='keyword'>assert</span>(h <span class='keyword'>is</span> <span class='string'>"function"</span>)
 io.<span class='function'>println</span>(<span class='function'>h</span>())
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -4720,7 +4630,6 @@ io.<span class='function'>println</span>()
 <span class='comment'># Error</span>
 <span class='function'>handle</span>(meta.<span class='function'>call</span>(<span class='keyword'>fn</span> () =&gt; -<span class='constant'>nil</span>))
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -4772,7 +4681,6 @@ io.<span class='function'>println</span>(meta.<span class='function'>eval</span>
     }
 "</span>))
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -4812,7 +4720,6 @@ Errors are thrown as it is.
 </button>
 <pre class='code active'>
 meta.<span class='function'>eval</span>(<span class='string'>"-nil"</span>)
-</pre>
 </pre>
 </div>
 <div class='codes'>

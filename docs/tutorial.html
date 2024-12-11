@@ -32,7 +32,6 @@ Let's start with a simple "Hello World" program.
 <pre class='code active'>
 io.<span class='function'>println</span>(<span class='string'>"Hello, world!"</span>)
 </pre>
-</pre>
 </div>
 <p>
 Save this to a file named <code>hello.bs</code> and run it as follows.
@@ -87,7 +86,6 @@ Hello, world!
     Comments
 #/</span>
 </pre>
-</pre>
 </div>
 </section>
 <section id='s2'>
@@ -107,7 +105,6 @@ Hello, world!
 </button>
 <pre class='code active'>
 io.<span class='function'>println</span>(<span class='constant'>nil</span>) <span class='comment'># Output: nil</span>
-</pre>
 </pre>
 </div>
 </section>
@@ -131,7 +128,6 @@ BS supports 64-bit floating point numbers only.
 io.<span class='function'>println</span>(<span class='constant'>69</span>)     <span class='comment'># Output: 69</span>
 io.<span class='function'>println</span>(<span class='constant'>420.69</span>) <span class='comment'># Output: 420.69</span>
 io.<span class='function'>println</span>(<span class='constant'>0xff</span>)   <span class='comment'># Output: 255</span>
-</pre>
 </pre>
 </div>
 <p>
@@ -167,7 +163,6 @@ io.<span class='function'>println</span>(<span class='constant'>77</span> &amp; 
 io.<span class='function'>println</span>(~-<span class='constant'>419</span> + <span class='constant'>10</span> &amp; <span class='constant'>3</span>) <span class='comment'># Output: 420</span>
 io.<span class='function'>println</span>(<span class='constant'>69</span> ^ <span class='constant'>1404</span>)      <span class='comment'># Output: 1337</span>
 </pre>
-</pre>
 </div>
 </section>
 <section id='s5'>
@@ -186,7 +181,6 @@ io.<span class='function'>println</span>(<span class='constant'>69</span> ^ <spa
 <pre class='code active'>
 io.<span class='function'>println</span>(<span class='constant'>true</span>)  <span class='comment'># Output: true</span>
 io.<span class='function'>println</span>(<span class='constant'>false</span>) <span class='comment'># Output: false</span>
-</pre>
 </pre>
 </div>
 <p>
@@ -236,7 +230,6 @@ io.<span class='function'>println</span>(<span class='constant'>false</span> || 
 io.<span class='function'>println</span>(<span class='constant'>nil</span> &amp;&amp; <span class='constant'>true</span>)    <span class='comment'># Output: nil</span>
 io.<span class='function'>println</span>(<span class='constant'>0</span> || <span class='constant'>false</span>)     <span class='comment'># Output: 0</span>
 </pre>
-</pre>
 </div>
 </section>
 <section id='s6'>
@@ -279,7 +272,6 @@ io.<span class='function'>println</span>(<span class='string'>"foobar"</span>[<s
 <span class='comment'># Output: Let's go!</span>
 io.<span class='function'>println</span>(<span class='string'>'Let</span><span class='escape'>\'</span><span class='string'>s go!'</span>) <span class='comment'># Single quotes can also be used</span>
 </pre>
-</pre>
 </div>
 <section id='s7'>
 <h4> (<code>$</code>)</h4>
@@ -300,7 +292,6 @@ io.<span class='function'>println</span>(<span class='keyword'>len</span>($(<spa
 
 <span class='comment'># Binary ($) performs string concatenation</span>
 io.<span class='function'>println</span>(<span class='string'>"Hello, "</span> $ <span class='string'>"world! "</span> $ <span class='constant'>69</span>) <span class='comment'># Output: Hello, world! 69</span>
-</pre>
 </pre>
 </div>
 <blockquote>
@@ -374,7 +365,6 @@ io.<span class='function'>println</span>(xs == zs)     <span class='comment'># O
 
 <span class='comment'># To compare by value, use the equal() method of arrays</span>
 io.<span class='function'>println</span>(xs.<span class='function'>equal</span>(ys)) <span class='comment'># Output: true</span>
-</pre>
 </pre>
 </div>
 </section>
@@ -459,7 +449,6 @@ io.<span class='function'>println</span>(xs == zs)              <span class='com
 <span class='comment'># To compare by value, use the equal() method of tables</span>
 io.<span class='function'>println</span>(xs.<span class='function'>equal</span>(ys))          <span class='comment'># Output: true</span>
 </pre>
-</pre>
 </div>
 </section>
 <section id='s10'>
@@ -486,7 +475,6 @@ io.<span class='function'>println</span>(<span class='keyword'>typeof</span>({})
 <span class='comment'># Functions will be introduced later</span>
 io.<span class='function'>println</span>(<span class='keyword'>typeof</span>(<span class='keyword'>fn</span> () {})) <span class='comment'># Output: function</span>
 </pre>
-</pre>
 </div>
 <section id='s11'>
 <h4> Is</h4>
@@ -512,7 +500,6 @@ io.<span class='function'>println</span>(<span class='keyword'>fn</span> () {} <
 
 io.<span class='function'>println</span>(<span class='constant'>420</span> <span class='keyword'>is</span> <span class='string'>"nil"</span>)           <span class='comment'># Output: false</span>
 io.<span class='function'>println</span>(<span class='constant'>420</span> !<span class='keyword'>is</span> <span class='string'>"nil"</span>)          <span class='comment'># Output: true</span>
-</pre>
 </pre>
 </div>
 </section>
@@ -542,7 +529,6 @@ newlines similarly to Go.
 <span class='comment'># 420</span>
 io.<span class='function'>println</span>(<span class='constant'>69</span>)<span class='comment'>;</span> io.<span class='function'>println</span>(<span class='constant'>420</span>)
 </pre>
-</pre>
 </div>
 <p>
 This does mean, however, that placement of binary operators matter.
@@ -569,7 +555,6 @@ This does mean, however, that placement of binary operators matter.
 <span class='comment'># =&gt; 100; -31;</span>
 <span class='constant'>100</span>
 - <span class='constant'>31</span>
-</pre>
 </pre>
 </div>
 <p>
@@ -601,7 +586,6 @@ something
 
 <span class='comment'># The above expression is equivalent to this.</span>
 something.<span class='field'>foo</span>.<span class='function'>bar</span>(deez, nuts).<span class='field'>baz</span></pre>
-</pre>
 </div>
 </section>
 <section id='s13'>
@@ -635,7 +619,6 @@ something.<span class='field'>foo</span>.<span class='function'>bar</span>(deez,
 <span class='keyword'>if</span> age != <span class='constant'>18</span> {
     io.<span class='function'>println</span>(<span class='string'>"Go to school"</span>)
 }
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -672,7 +655,6 @@ Get a life
 <pre class='code active'>
 <span class='keyword'>var</span> age = <span class='constant'>17</span>
 io.<span class='function'>println</span>(<span class='keyword'>if</span> age &gt;= <span class='constant'>18</span> <span class='keyword'>then</span> <span class='string'>"Adult"</span> <span class='keyword'>else</span> <span class='string'>"Minor"</span>)
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -788,7 +770,6 @@ Minor
     x =&gt; io.<span class='function'>println</span>(<span class='string'>"x"</span>)
 }
 </pre>
-</pre>
 </div>
 </section>
 </section>
@@ -813,7 +794,6 @@ Minor
     io.<span class='function'>println</span>(i)
     i = i + <span class='constant'>1</span>
 }
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -858,7 +838,6 @@ Iterate over range of numbers.
     io.<span class='function'>println</span>(i)
 }
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -899,7 +878,6 @@ Iterate over range of numbers with custom step.
     io.<span class='function'>println</span>(i)
 }
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -937,7 +915,6 @@ Direction of the range iteration is automatically selected.
 <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>5</span>, <span class='constant'>0</span> {
     io.<span class='function'>println</span>(i)
 }
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -981,7 +958,6 @@ Iterate over a string.
     io.<span class='function'>println</span>(<span class='string'>"Index: </span><span class='escape'>{</span>i<span class='escape'>}</span><span class='string'> Char: </span><span class='escape'>{</span>c<span class='escape'>}</span><span class='string'>"</span>)
 }
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1024,7 +1000,6 @@ Iterate over an array.
 <span class='keyword'>for</span> i, v <span class='keyword'>in</span> xs {
     io.<span class='function'>println</span>(<span class='string'>"Index: </span><span class='escape'>{</span>i<span class='escape'>}</span><span class='string'> Value: </span><span class='escape'>{</span>v<span class='escape'>}</span><span class='string'>"</span>)
 }
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -1071,7 +1046,6 @@ Iterate over a table.
 <span class='keyword'>for</span> k, v <span class='keyword'>in</span> xs {
     io.<span class='function'>println</span>(<span class='string'>"Key: </span><span class='escape'>{</span>k<span class='escape'>}</span><span class='string'> Value: </span><span class='escape'>{</span>v<span class='escape'>}</span><span class='string'>"</span>)
 }
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -1126,7 +1100,6 @@ io.<span class='function'>println</span>()
     io.<span class='function'>println</span>(i)
 }
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1174,7 +1147,6 @@ io.<span class='function'>println</span>()
 }
 
 <span class='function'>greet</span>(<span class='string'>"world"</span>)
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -1228,7 +1200,6 @@ io.<span class='function'>println</span>(<span class='function'>factorial</span>
 io.<span class='function'>println</span>(<span class='function'>f</span>())
 io.<span class='function'>println</span>(<span class='function'>g</span>())
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1273,7 +1244,6 @@ nil
 
 io.<span class='function'>println</span>(<span class='function'>combine</span>(add, <span class='constant'>34</span>, <span class='constant'>35</span>))
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1314,7 +1284,6 @@ io.<span class='function'>println</span>(<span class='function'>combine</span>(<
     <span class='keyword'>return</span> x + y
 }, <span class='constant'>34</span>, <span class='constant'>35</span>))
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1353,7 +1322,6 @@ Functions support a shorthand syntax for a single expression body.
 <span class='keyword'>fn</span> <span class='function'>combine</span>(f, x, y) =&gt; <span class='function'>f</span>(x, y)
 
 io.<span class='function'>println</span>(<span class='function'>combine</span>(<span class='keyword'>fn</span> (x, y) =&gt; x + y, <span class='constant'>34</span>, <span class='constant'>35</span>))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -1398,7 +1366,6 @@ io.<span class='function'>println</span>(<span class='function'>combine</span>(<
 
 io.<span class='function'>println</span>(<span class='function'>a</span>())
 io.<span class='function'>println</span>(<span class='function'>b</span>())
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -1448,7 +1415,6 @@ captured as unique values in the nested closure on each iteration of the loop.
     <span class='function'>f</span>()
 }
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1490,7 +1456,6 @@ captured as unique values in the nested closure on each iteration of the loop.
 <span class='keyword'>var</span> b = <span class='constant'>35</span>
 io.<span class='function'>println</span>(a + b) <span class='comment'># Output: 69</span>
 </pre>
-</pre>
 </div>
 <section id='s29'>
 <h3> Assignment</h3>
@@ -1513,7 +1478,6 @@ a = a * <span class='constant'>2</span>
 b = <span class='constant'>35</span>
 
 io.<span class='function'>println</span>(a + b) <span class='comment'># Output: 69</span>
-</pre>
 </pre>
 </div>
 <p>
@@ -1544,7 +1508,6 @@ b $= a
 
 io.<span class='function'>println</span>(b) <span class='comment'># Output: Nice! 69</span>
 </pre>
-</pre>
 </div>
 </section>
 <section id='s30'>
@@ -1571,7 +1534,6 @@ io.<span class='function'>println</span>(x)     <span class='comment'># Output: 
 
 io.<span class='function'>println</span>(x)     <span class='comment'># Output: 69</span>
 </pre>
-</pre>
 </div>
 </section>
 <section id='s31'>
@@ -1593,7 +1555,6 @@ io.<span class='function'>println</span>(x) <span class='comment'># Output: 69</
 
 <span class='keyword'>var</span> x = <span class='string'>"x used to be </span><span class='escape'>{</span>x<span class='escape'>}</span><span class='string'>"</span>
 io.<span class='function'>println</span>(x) <span class='comment'># Output: x used to be 69</span>
-</pre>
 </pre>
 </div>
 </section>
@@ -1620,7 +1581,6 @@ io.<span class='function'>println</span>(x) <span class='comment'># Output: x us
 
 <span class='function'>add</span>(<span class='constant'>34</span>, <span class='constant'>35</span>)
 io.<span class='function'>println</span>(z)
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -1665,7 +1625,6 @@ Here's a pitfall you might run into
 <span class='keyword'>var</span> x = <span class='constant'>69</span>        <span class='comment'># Variable 'x' now defined at the toplevel</span>
 
 <span class='function'>f</span>()               <span class='comment'># "Should" print 69</span>
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -1723,7 +1682,6 @@ they are declared. This is where global variables come into play.
 
 <span class='function'>f</span>()
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1765,7 +1723,6 @@ M.<span class='field'>dec</span> = <span class='keyword'>fn</span> (n) =&gt; n -
 
 <span class='keyword'>return</span> M <span class='comment'># Any arbitrary value can be returned, this is just the usual pattern</span>
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1784,7 +1741,6 @@ M.<span class='field'>dec</span> = <span class='keyword'>fn</span> (n) =&gt; n -
 
 io.<span class='function'>println</span>(one.<span class='function'>inc</span>(<span class='constant'>68</span>))
 io.<span class='function'>println</span>(one.<span class='function'>dec</span>(<span class='constant'>421</span>))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -1830,7 +1786,6 @@ M.<span class='field'>inc</span> = <span class='keyword'>fn</span> (n) =&gt; n +
 M.<span class='field'>dec</span> = <span class='keyword'>fn</span> (n) =&gt; n - <span class='constant'>1</span>
 
 <span class='keyword'>return</span> M</pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1847,7 +1802,6 @@ M.<span class='field'>dec</span> = <span class='keyword'>fn</span> (n) =&gt; n -
 <span class='comment'># main.bs</span>
 io.<span class='function'>println</span>(<span class='keyword'>import</span>(<span class='string'>"one"</span>).<span class='function'>inc</span>(<span class='constant'>68</span>))
 io.<span class='function'>println</span>(<span class='keyword'>import</span>(<span class='string'>"one"</span>).<span class='function'>dec</span>(<span class='constant'>421</span>))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -1894,7 +1848,6 @@ M.<span class='field'>inc</span> = <span class='keyword'>fn</span> (n) =&gt; n +
 M.<span class='field'>dec</span> = <span class='keyword'>fn</span> (n) =&gt; n - <span class='constant'>1</span>
 
 <span class='keyword'>return</span> M</pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1911,7 +1864,6 @@ M.<span class='field'>dec</span> = <span class='keyword'>fn</span> (n) =&gt; n -
 <span class='comment'># main.bs</span>
 io.<span class='function'>println</span>(<span class='keyword'>import</span>(<span class='string'>"one"</span>).<span class='function'>inc</span>(<span class='constant'>68</span>))
 io.<span class='function'>println</span>(<span class='keyword'>import</span>(<span class='string'>"one"</span>).<span class='function'>dec</span>(<span class='constant'>421</span>))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -2096,7 +2048,6 @@ more applicable, albeit involved, example.
     io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>{</span>hero.<span class='field'>name</span><span class='escape'>}</span><span class='string'> lost :("</span>)
 }
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2184,7 +2135,6 @@ constructor failed. Any other return value is strictly forbidden, however.
 
 logger.<span class='function'>write</span>(<span class='string'>"Hello, world!"</span>)
 </pre>
-</pre>
 </div>
 </section>
 <section id='s41'>
@@ -2222,7 +2172,6 @@ Just print the class.
 
 io.<span class='function'>println</span>(Foo)
 io.<span class='function'>println</span>(Bar)
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -2270,7 +2219,6 @@ Just print the class.
 
 io.<span class='function'>println</span>(Lol)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2310,7 +2258,6 @@ class Lol {
 <pre class='code active'>
 <span class='keyword'>panic</span>()
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2344,7 +2291,6 @@ An optional message can also be provided.
 </button>
 <pre class='code active'>
 <span class='keyword'>panic</span>(<span class='string'>"TODO"</span>)
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -2381,7 +2327,6 @@ panic.bs:1:1: TODO
 <span class='keyword'>assert</span>(<span class='constant'>true</span>)
 <span class='keyword'>assert</span>(<span class='constant'>false</span>)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2417,7 +2362,6 @@ An optional message can also be provided.
 <span class='keyword'>assert</span>(<span class='constant'>true</span>, <span class='string'>"Ligma"</span>)
 <span class='keyword'>assert</span>(<span class='constant'>false</span>, <span class='string'>"Ligma"</span>)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2452,7 +2396,6 @@ Assert returns the value being checked.
 <pre class='code active'>
 <span class='keyword'>var</span> x = <span class='keyword'>assert</span>(<span class='constant'>69</span>, <span class='string'>"Ligma"</span>)
 io.<span class='function'>println</span>(x)
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -2568,7 +2511,6 @@ Finally, load it from BS.
 <span class='keyword'>var</span> arith = <span class='keyword'>import</span>(<span class='string'>"arithmetic"</span>)
 io.<span class='function'>println</span>(arith.<span class='function'>add</span>(<span class='constant'>34</span>, <span class='constant'>35</span>))
 io.<span class='function'>println</span>(arith.<span class='function'>sub</span>(<span class='constant'>500</span>, <span class='constant'>80</span>))
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -2740,7 +2682,6 @@ rl.<span class='function'>init_window</span>(<span class='constant'>800</span>, 
     rl.<span class='function'>end_drawing</span>()
 }
 rl.<span class='function'>close_window</span>()
-</pre>
 </pre>
 </div>
 </section>

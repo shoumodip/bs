@@ -48,7 +48,6 @@ The UNIX <code>cat</code> coreutil.
 
 os.<span class='function'>exit</span>(code)
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -116,7 +115,6 @@ io.<span class='function'>readdir</span>(<span class='keyword'>if</span> <span c
     .<span class='function'>map</span>(<span class='keyword'>fn</span> (e) =&gt; e.<span class='function'>name</span>() $ <span class='keyword'>if</span> e.<span class='function'>isdir</span>() <span class='keyword'>then</span> <span class='string'>"/"</span> <span class='keyword'>else</span> <span class='string'>""</span>)
     .<span class='function'>sort</span>(compare)
     .<span class='function'>map</span>(io.<span class='field'>println</span>)
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -203,7 +201,6 @@ The UNIX <code>grep</code> coreutil.
 }
 
 os.<span class='function'>exit</span>(code)
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -359,7 +356,6 @@ A simple UNIX shell.
 <span class='comment'># In case of CTRL-d</span>
 io.<span class='function'>println</span>()
 </pre>
-</pre>
 </div>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -435,7 +431,6 @@ board[<span class='keyword'>len</span>(board) - <span class='constant'>2</span>]
         board[j] = (<span class='constant'>110</span> &gt;&gt; pattern) &amp; <span class='constant'>1</span>
     }
 }
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -577,7 +572,6 @@ An implementation of
 }
 
 <span class='keyword'>return</span> GameOfLife</pre>
-</pre>
 </div>
 <section id='s6'>
 <h3> Console</h3>
@@ -623,7 +617,6 @@ gol.<span class='function'>glider</span>(<span class='constant'>1</span>, <span 
     io.<span class='function'>print</span>(<span class='string'>"</span><span class='escape'>\e</span><span class='string'>[</span><span class='escape'>{</span>gol.<span class='field'>height</span><span class='escape'>}</span><span class='string'>A</span><span class='escape'>\e</span><span class='string'>[</span><span class='escape'>{</span>gol.<span class='field'>width</span><span class='escape'>}</span><span class='string'>D"</span>)
     os.<span class='function'>sleep</span>(INTERVAL)
 }
-</pre>
 </pre>
 </div>
 <p>
@@ -1010,7 +1003,6 @@ gol.<span class='function'>glider</span>(<span class='constant'>2</span>, <span 
 
 rl.<span class='function'>close_window</span>()
 </pre>
-</pre>
 </div>
 <p>
 Run the program.
@@ -1199,7 +1191,6 @@ Run the program.
     <span class='function'>usage</span>(io.<span class='field'>stderr</span>)
     os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
-</pre>
 </pre>
 </div>
 <div class='codes'>
@@ -2048,7 +2039,6 @@ game.<span class='field'>assets</span>.<span class='function'>unload</span>()
 
 rl.<span class='function'>close_audio_device</span>()
 rl.<span class='function'>close_window</span>()
-</pre>
 </pre>
 </div>
 <p>

@@ -661,7 +661,6 @@ int bsdoc_run_file(const char *input) {
                     f, input, bsdoc_split_code(&sv, &row, Bs_Sv_Static("```")), start, false)) {
                 bs_return_defer(1);
             }
-            fprintf(f, "</pre>\n");
 
             fprintf(
                 f,
