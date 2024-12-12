@@ -1814,6 +1814,20 @@ $ bs demo.bs
 69.134
 ```
 
+### number.tohex() @method
+Format an integer as a hexadecimal string.
+
+```bs
+io.println(69.tohex())
+io.println((-420).tohex())
+```
+
+```console
+$ bs demo.bs
+45
+-1a4
+```
+
 ### Random(seed?) @class
 Random number generator using the `xoroshiro128+` algorithm.
 

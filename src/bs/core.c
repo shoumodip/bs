@@ -2372,6 +2372,22 @@ static Bs_Value bs_math_precise(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_num(round(n * l) / l);
 }
 
+static Bs_Value bs_math_tohex(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    bs_check_integer(bs, args[-1], "this");
+
+    char buffer[64];
+    int count = 0;
+    if (args[-1].as.number < 0) {
+        count = snprintf(buffer, sizeof(buffer), "-%lx", (size_t)-args[-1].as.number);
+    } else {
+        count = snprintf(buffer, sizeof(buffer), "%lx", (size_t)args[-1].as.number);
+    }
+    assert(count >= 0 && count + 1 < sizeof(buffer));
+
+    return bs_value_object(bs_str_new(bs, Bs_Sv(buffer, count)));
+}
+
 typedef struct {
     uint64_t state[2];
 } Bs_Random;
@@ -2917,6 +2933,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("clamp"), bs_math_clamp);
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("lerp"), bs_math_lerp);
         bs_builtin_number_methods_add(bs, Bs_Sv_Static("precise"), bs_math_precise);
+        bs_builtin_number_methods_add(bs, Bs_Sv_Static("tohex"), bs_math_tohex);
 
         Bs_Table *math = bs_table_new(bs);
 
