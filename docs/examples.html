@@ -1050,20 +1050,14 @@ Run the program.
 
     <span class='function'>add</span>(title) {
         <span class='constant'>this</span>.<span class='field'>tasks</span>.<span class='function'>push</span>(title)
+        <span class='constant'>this</span>.<span class='function'>save</span>()
         io.<span class='function'>println</span>(<span class='string'>"Added: </span><span class='escape'>{</span>title<span class='escape'>}</span><span class='string'>"</span>)
     }
 
     <span class='function'>verify</span>(index) {
         <span class='keyword'>var</span> total = <span class='keyword'>len</span>(<span class='constant'>this</span>.<span class='field'>tasks</span>)
         <span class='keyword'>if</span> index &gt;= total {
-            io.<span class='function'>eprintln</span>(<span class='string'>"Error: invalid index '</span><span class='escape'>{</span>index<span class='escape'>}</span><span class='string'>'"</span>)
-
-            <span class='keyword'>if</span> total == <span class='constant'>1</span> {
-                io.<span class='function'>eprintln</span>(<span class='string'>"Note: there is currently 1 task"</span>)
-            } <span class='keyword'>else</span> {
-                io.<span class='function'>eprintln</span>(<span class='string'>"Note: there are currently </span><span class='escape'>{</span>total<span class='escape'>}</span><span class='string'> tasks"</span>)
-            }
-
+            io.<span class='function'>eprintln</span>(<span class='string'>"Error: invalid index </span><span class='escape'>{</span>index<span class='escape'>}</span><span class='string'> (total is </span><span class='escape'>{</span>total<span class='escape'>}</span><span class='string'>)"</span>)
             os.<span class='function'>exit</span>(<span class='constant'>1</span>)
         }
     }
@@ -1071,13 +1065,15 @@ Run the program.
     <span class='function'>done</span>(index) {
         <span class='constant'>this</span>.<span class='function'>verify</span>(index)
         <span class='keyword'>var</span> title = <span class='constant'>this</span>.<span class='field'>tasks</span>.<span class='function'>remove</span>(index)
-        io.<span class='function'>println</span>(<span class='string'>"Done #</span><span class='escape'>{</span>index<span class='escape'>}</span><span class='string'>: </span><span class='escape'>{</span>title<span class='escape'>}</span><span class='string'>"</span>)
+        <span class='constant'>this</span>.<span class='function'>save</span>()
+        io.<span class='function'>println</span>(<span class='string'>"Done </span><span class='escape'>{</span>index<span class='escape'>}</span><span class='string'>: </span><span class='escape'>{</span>title<span class='escape'>}</span><span class='string'>"</span>)
     }
 
     <span class='function'>edit</span>(index, title) {
         <span class='constant'>this</span>.<span class='function'>verify</span>(index)
         <span class='constant'>this</span>.<span class='field'>tasks</span>[index] = title
-        io.<span class='function'>println</span>(<span class='string'>"Edit #</span><span class='escape'>{</span>index<span class='escape'>}</span><span class='string'>: </span><span class='escape'>{</span>title<span class='escape'>}</span><span class='string'>"</span>)
+        <span class='constant'>this</span>.<span class='function'>save</span>()
+        io.<span class='function'>println</span>(<span class='string'>"Edit </span><span class='escape'>{</span>index<span class='escape'>}</span><span class='string'>: </span><span class='escape'>{</span>title<span class='escape'>}</span><span class='string'>"</span>)
     }
 
     <span class='function'>list</span>(query) {
@@ -1086,7 +1082,7 @@ Run the program.
                 <span class='keyword'>continue</span>
             }
 
-            io.<span class='function'>println</span>(<span class='string'>"[</span><span class='escape'>{</span>i<span class='escape'>}</span><span class='string'>] </span><span class='escape'>{</span>t<span class='escape'>}</span><span class='string'>"</span>)
+            io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>{</span>i<span class='escape'>}</span><span class='string'>: </span><span class='escape'>{</span>t<span class='escape'>}</span><span class='string'>"</span>)
         }
     }
 
@@ -1103,8 +1099,9 @@ Run the program.
 }
 
 <span class='keyword'>fn</span> <span class='function'>usage</span>(f) {
-    f.<span class='function'>writeln</span>(<span class='string'>"Usage: </span><span class='escape'>{</span>os.<span class='field'>args</span>[<span class='constant'>0</span>]<span class='escape'>}</span><span class='string'> &lt;command&gt; [args...]"</span>)
+    f.<span class='function'>writeln</span>(<span class='string'>"Usage: tasks &lt;command&gt; [args...]"</span>)
     f.<span class='function'>writeln</span>(<span class='string'>"Commands:"</span>)
+    f.<span class='function'>writeln</span>(<span class='string'>"    help                    Show this message and exit"</span>)
     f.<span class='function'>writeln</span>(<span class='string'>"    add  &lt;title&gt;            Add a task"</span>)
     f.<span class='function'>writeln</span>(<span class='string'>"    done &lt;index&gt;            Mark task as done"</span>)
     f.<span class='function'>writeln</span>(<span class='string'>"    edit &lt;index&gt; &lt;title&gt;    Edit a task"</span>)
@@ -1119,22 +1116,22 @@ Run the program.
 
 <span class='keyword'>var</span> command = os.<span class='field'>args</span>[<span class='constant'>1</span>]
 <span class='keyword'>match</span> command {
+    <span class='string'>"help"</span> =&gt; <span class='function'>usage</span>(io.<span class='field'>stdout</span>)
+
     <span class='string'>"add"</span> =&gt; {
         <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>3</span> {
             io.<span class='function'>eprintln</span>(<span class='string'>"Error: task title not provided"</span>)
-            <span class='function'>usage</span>(io.<span class='field'>stderr</span>)
+            io.<span class='function'>eprintln</span>(<span class='string'>"Usage: tasks add &lt;title&gt;"</span>)
             os.<span class='function'>exit</span>(<span class='constant'>1</span>)
         }
 
-        <span class='keyword'>var</span> tasks = <span class='function'>Tasks</span>(TASKS_PATH)
-        tasks.<span class='function'>add</span>(os.<span class='field'>args</span>[<span class='constant'>2</span>])
-        tasks.<span class='function'>save</span>()
+        <span class='function'>Tasks</span>(TASKS_PATH).<span class='function'>add</span>(os.<span class='field'>args</span>[<span class='constant'>2</span>])
     }
 
     <span class='string'>"done"</span> =&gt; {
         <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>3</span> {
             io.<span class='function'>eprintln</span>(<span class='string'>"Error: task index not provided"</span>)
-            <span class='function'>usage</span>(io.<span class='field'>stderr</span>)
+            io.<span class='function'>eprintln</span>(<span class='string'>"Usage: tasks done &lt;index&gt;"</span>)
             os.<span class='function'>exit</span>(<span class='constant'>1</span>)
         }
 
@@ -1144,15 +1141,13 @@ Run the program.
             os.<span class='function'>exit</span>(<span class='constant'>1</span>)
         }
 
-        <span class='keyword'>var</span> tasks = <span class='function'>Tasks</span>(TASKS_PATH)
-        tasks.<span class='function'>done</span>(index)
-        tasks.<span class='function'>save</span>()
+        <span class='function'>Tasks</span>(TASKS_PATH).<span class='function'>done</span>(index)
     }
 
     <span class='string'>"edit"</span> =&gt; {
         <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>3</span> {
-            io.<span class='function'>eprintln</span>(<span class='string'>"Error: task index and title not provided"</span>)
-            <span class='function'>usage</span>(io.<span class='field'>stderr</span>)
+            io.<span class='function'>eprintln</span>(<span class='string'>"Error: task index not provided"</span>)
+            io.<span class='function'>eprintln</span>(<span class='string'>"Usage: tasks edit &lt;index&gt; &lt;title&gt;"</span>)
             os.<span class='function'>exit</span>(<span class='constant'>1</span>)
         }
 
@@ -1164,13 +1159,11 @@ Run the program.
 
         <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>4</span> {
             io.<span class='function'>eprintln</span>(<span class='string'>"Error: task title not provided"</span>)
-            <span class='function'>usage</span>(io.<span class='field'>stderr</span>)
+            io.<span class='function'>eprintln</span>(<span class='string'>"Usage: tasks edit &lt;index&gt; &lt;title&gt;"</span>)
             os.<span class='function'>exit</span>(<span class='constant'>1</span>)
         }
 
-        <span class='keyword'>var</span> tasks = <span class='function'>Tasks</span>(TASKS_PATH)
-        tasks.<span class='function'>edit</span>(index, os.<span class='field'>args</span>[<span class='constant'>3</span>])
-        tasks.<span class='function'>save</span>()
+        <span class='function'>Tasks</span>(TASKS_PATH).<span class='function'>edit</span>(index, os.<span class='field'>args</span>[<span class='constant'>3</span>])
     }
 
     <span class='string'>"list"</span> =&gt; {
@@ -1183,8 +1176,7 @@ Run the program.
             }
         }
 
-        <span class='keyword'>var</span> tasks = <span class='function'>Tasks</span>(TASKS_PATH)
-        tasks.<span class='function'>list</span>(query)
+        <span class='function'>Tasks</span>(TASKS_PATH).<span class='function'>list</span>(query)
     }
 } <span class='keyword'>else</span> {
     io.<span class='function'>eprintln</span>(<span class='string'>"Error: invalid command '</span><span class='escape'>{</span>command<span class='escape'>}</span><span class='string'>'"</span>)

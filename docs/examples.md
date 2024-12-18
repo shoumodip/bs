@@ -808,20 +808,14 @@ class Tasks {
 
     add(title) {
         this.tasks.push(title)
+        this.save()
         io.println("Added: {title}")
     }
 
     verify(index) {
         var total = len(this.tasks)
         if index >= total {
-            io.eprintln("Error: invalid index '{index}'")
-
-            if total == 1 {
-                io.eprintln("Note: there is currently 1 task")
-            } else {
-                io.eprintln("Note: there are currently {total} tasks")
-            }
-
+            io.eprintln("Error: invalid index {index} (total is {total})")
             os.exit(1)
         }
     }
@@ -829,13 +823,15 @@ class Tasks {
     done(index) {
         this.verify(index)
         var title = this.tasks.remove(index)
-        io.println("Done #{index}: {title}")
+        this.save()
+        io.println("Done {index}: {title}")
     }
 
     edit(index, title) {
         this.verify(index)
         this.tasks[index] = title
-        io.println("Edit #{index}: {title}")
+        this.save()
+        io.println("Edit {index}: {title}")
     }
 
     list(query) {
@@ -844,7 +840,7 @@ class Tasks {
                 continue
             }
 
-            io.println("[{i}] {t}")
+            io.println("{i}: {t}")
         }
     }
 
@@ -861,8 +857,9 @@ class Tasks {
 }
 
 fn usage(f) {
-    f.writeln("Usage: {os.args[0]} <command> [args...]")
+    f.writeln("Usage: tasks <command> [args...]")
     f.writeln("Commands:")
+    f.writeln("    help                    Show this message and exit")
     f.writeln("    add  <title>            Add a task")
     f.writeln("    done <index>            Mark task as done")
     f.writeln("    edit <index> <title>    Edit a task")
@@ -877,22 +874,22 @@ if len(os.args) < 2 {
 
 var command = os.args[1]
 match command {
+    "help" => usage(io.stdout)
+
     "add" => {
         if len(os.args) < 3 {
             io.eprintln("Error: task title not provided")
-            usage(io.stderr)
+            io.eprintln("Usage: tasks add <title>")
             os.exit(1)
         }
 
-        var tasks = Tasks(TASKS_PATH)
-        tasks.add(os.args[2])
-        tasks.save()
+        Tasks(TASKS_PATH).add(os.args[2])
     }
 
     "done" => {
         if len(os.args) < 3 {
             io.eprintln("Error: task index not provided")
-            usage(io.stderr)
+            io.eprintln("Usage: tasks done <index>")
             os.exit(1)
         }
 
@@ -902,15 +899,13 @@ match command {
             os.exit(1)
         }
 
-        var tasks = Tasks(TASKS_PATH)
-        tasks.done(index)
-        tasks.save()
+        Tasks(TASKS_PATH).done(index)
     }
 
     "edit" => {
         if len(os.args) < 3 {
-            io.eprintln("Error: task index and title not provided")
-            usage(io.stderr)
+            io.eprintln("Error: task index not provided")
+            io.eprintln("Usage: tasks edit <index> <title>")
             os.exit(1)
         }
 
@@ -922,13 +917,11 @@ match command {
 
         if len(os.args) < 4 {
             io.eprintln("Error: task title not provided")
-            usage(io.stderr)
+            io.eprintln("Usage: tasks edit <index> <title>")
             os.exit(1)
         }
 
-        var tasks = Tasks(TASKS_PATH)
-        tasks.edit(index, os.args[3])
-        tasks.save()
+        Tasks(TASKS_PATH).edit(index, os.args[3])
     }
 
     "list" => {
@@ -941,8 +934,7 @@ match command {
             }
         }
 
-        var tasks = Tasks(TASKS_PATH)
-        tasks.list(query)
+        Tasks(TASKS_PATH).list(query)
     }
 } else {
     io.eprintln("Error: invalid command '{command}'")
