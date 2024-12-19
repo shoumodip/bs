@@ -1977,30 +1977,6 @@ static Bs_Value bs_array_find(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-static Bs_Value bs_array_equal(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 1);
-    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_ARRAY);
-
-    const Bs_Array *a = (const Bs_Array *)args[-1].as.object;
-    const Bs_Array *b = (const Bs_Array *)args[0].as.object;
-
-    if (a == b) {
-        return bs_value_bool(true);
-    }
-
-    if (a->count != b->count) {
-        return bs_value_bool(false);
-    }
-
-    for (size_t i = 0; i < a->count; i++) {
-        if (!bs_value_equal(a->data[i], b->data[i])) {
-            return bs_value_bool(false);
-        }
-    }
-
-    return bs_value_bool(true);
-}
-
 static Bs_Value bs_array_push(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     Bs_Array *a = (Bs_Array *)args[-1].as.object;
@@ -2165,37 +2141,6 @@ static Bs_Value bs_table_copy(Bs *bs, Bs_Value *args, size_t arity) {
 
     bs_map_copy(bs, &dst->map, &src->map);
     return bs_value_object(dst);
-}
-
-static Bs_Value bs_table_equal(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 1);
-    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_TABLE);
-
-    const Bs_Table *a = (const Bs_Table *)args[-1].as.object;
-    const Bs_Table *b = (const Bs_Table *)args[0].as.object;
-
-    if (a == b) {
-        return bs_value_bool(true);
-    }
-
-    if (a->map.length != b->map.length) {
-        return bs_value_bool(false);
-    }
-
-    for (size_t i = 0; i < a->map.capacity; i++) {
-        if (a->map.data[i].key.type != BS_VALUE_NIL) {
-            const Bs_Entry *e = bs_entries_find(b->map.data, b->map.capacity, a->map.data[i].key);
-            if (!e || e->key.type == BS_VALUE_NIL) {
-                return bs_value_bool(false);
-            }
-
-            if (!bs_value_equal(a->map.data[i].value, e->value)) {
-                return bs_value_bool(false);
-            }
-        }
-    }
-
-    return bs_value_bool(true);
 }
 
 // Math
@@ -2887,7 +2832,6 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("copy"), bs_array_copy);
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("join"), bs_array_join);
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("find"), bs_array_find);
-        bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("equal"), bs_array_equal);
 
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("push"), bs_array_push);
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("insert"), bs_array_insert);
@@ -2904,8 +2848,8 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     }
 
     {
+        // Table
         bs_builtin_object_methods_add(bs, BS_OBJECT_TABLE, Bs_Sv_Static("copy"), bs_table_copy);
-        bs_builtin_object_methods_add(bs, BS_OBJECT_TABLE, Bs_Sv_Static("equal"), bs_table_equal);
     }
 
     {

@@ -167,28 +167,28 @@ io.println("Hello, " $ "world! " $ 69) # Output: Hello, world! 69
 var array = [69, 420]
 
 # Pretty printing by default!
-io.println(array)        # Output: [69, 420]
+io.println(array)                 # Output: [69, 420]
 
 # Array access
-io.println(array[0])     # Output: 69
+io.println(array[0])              # Output: 69
 
 # Array access out of bounds is an error
-io.println(array[2])     # Error!
+io.println(array[2])              # Error!
 
 # Array assignment
 array[1] = "nice!"
-io.println(array)        # Output: [69, "nice!"]
+io.println(array)                 # Output: [69, "nice!"]
 
 # Array assignment out of bounds is NOT an error
 array[3] = "Are you serious?"
-io.println(array)        # Output: [69, "nice!", nil, "Are you serious?"]
+io.println(array)                 # Output: [69, "nice!", nil, "Are you serious?"]
 
 # Array length
-io.println(len(array))   # Output: 4
+io.println(len(array))            # Output: 4
 
 # Due to the assignment semantics, appending to arrays is quite easy
 array[len(array)] = 420
-io.println(array)        # Output: [69, "nice!", nil, "Are you serious?", 420]
+io.println(array)                 # Output: [69, "nice!", nil, "Are you serious?", 420]
 
 # Of course, you can also use the push() method of arrays
 array.push(1337)
@@ -204,15 +204,20 @@ array.push(1337)
 # ]
 io.println(array)
 
-# Arrays are compared by reference, not value
+# Check if value exists in an array
+io.println("nice!" in array)      # Output: true
+io.println("something" in array)  # Output: false
+
+# Check if value doesn't exist in an array
+io.println("nice!" !in array)     # Output: false
+io.println("something" !in array) # Output: true
+
+# Arrays are compared by value
 var xs = [1, 2, 3]
 var ys = [1, 2, 3]
-var zs = xs
-io.println(xs == ys)     # Output: false
-io.println(xs == zs)     # Output: true
-
-# To compare by value, use the equal() method of arrays
-io.println(xs.equal(ys)) # Output: true
+var zs = [1, 2, 3, 4]
+io.println(xs == ys)              # Output: true
+io.println(xs == zs)              # Output: false
 ```
 
 ### Tables
@@ -274,15 +279,12 @@ io.println(table)
 # Deletion of non existent key
 io.println(delete(table.wrong))   # Output: false
 
-# Tables are compared by reference, not value
+# Tables are compared by value
 var xs = {a = 1, b = 2}
 var ys = {a = 1, b = 2}
-var zs = xs
-io.println(xs == ys)              # Output: false
-io.println(xs == zs)              # Output: true
-
-# To compare by value, use the equal() method of tables
-io.println(xs.equal(ys))          # Output: true
+var zs = {a = 1, b = 2, c = 3}
+io.println(xs == ys)              # Output: true
+io.println(xs == zs)              # Output: false
 ```
 
 ### Typeof

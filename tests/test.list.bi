@@ -1490,7 +1490,7 @@ foofoofoofoofoofoo
 :b shell 23
 ../bin/bs core/array.bs
 :i returncode 0
-:b stdout 710
+:b stdout 704
 [2, 4, 6, 8, 10]
 [2, 4]
 15
@@ -1503,7 +1503,6 @@ ys = [1, 2, 3, 4, 5]
 zs = [69, 2, 3, 4, 5]
 1
 4
-false
 true
 true
 false

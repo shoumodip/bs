@@ -319,28 +319,28 @@ io.<span class='function'>println</span>(<span class='string'>"Hello, "</span> $
 <span class='keyword'>var</span> array = [<span class='constant'>69</span>, <span class='constant'>420</span>]
 
 <span class='comment'># Pretty printing by default!</span>
-io.<span class='function'>println</span>(array)        <span class='comment'># Output: [69, 420]</span>
+io.<span class='function'>println</span>(array)                 <span class='comment'># Output: [69, 420]</span>
 
 <span class='comment'># Array access</span>
-io.<span class='function'>println</span>(array[<span class='constant'>0</span>])     <span class='comment'># Output: 69</span>
+io.<span class='function'>println</span>(array[<span class='constant'>0</span>])              <span class='comment'># Output: 69</span>
 
 <span class='comment'># Array access out of bounds is an error</span>
-io.<span class='function'>println</span>(array[<span class='constant'>2</span>])     <span class='comment'># Error!</span>
+io.<span class='function'>println</span>(array[<span class='constant'>2</span>])              <span class='comment'># Error!</span>
 
 <span class='comment'># Array assignment</span>
 array[<span class='constant'>1</span>] = <span class='string'>"nice!"</span>
-io.<span class='function'>println</span>(array)        <span class='comment'># Output: [69, "nice!"]</span>
+io.<span class='function'>println</span>(array)                 <span class='comment'># Output: [69, "nice!"]</span>
 
 <span class='comment'># Array assignment out of bounds is NOT an error</span>
 array[<span class='constant'>3</span>] = <span class='string'>"Are you serious?"</span>
-io.<span class='function'>println</span>(array)        <span class='comment'># Output: [69, "nice!", nil, "Are you serious?"]</span>
+io.<span class='function'>println</span>(array)                 <span class='comment'># Output: [69, "nice!", nil, "Are you serious?"]</span>
 
 <span class='comment'># Array length</span>
-io.<span class='function'>println</span>(<span class='keyword'>len</span>(array))   <span class='comment'># Output: 4</span>
+io.<span class='function'>println</span>(<span class='keyword'>len</span>(array))            <span class='comment'># Output: 4</span>
 
 <span class='comment'># Due to the assignment semantics, appending to arrays is quite easy</span>
 array[<span class='keyword'>len</span>(array)] = <span class='constant'>420</span>
-io.<span class='function'>println</span>(array)        <span class='comment'># Output: [69, "nice!", nil, "Are you serious?", 420]</span>
+io.<span class='function'>println</span>(array)                 <span class='comment'># Output: [69, "nice!", nil, "Are you serious?", 420]</span>
 
 <span class='comment'># Of course, you can also use the push() method of arrays</span>
 array.<span class='function'>push</span>(<span class='constant'>1337</span>)
@@ -356,15 +356,20 @@ array.<span class='function'>push</span>(<span class='constant'>1337</span>)
 <span class='comment'># ]</span>
 io.<span class='function'>println</span>(array)
 
-<span class='comment'># Arrays are compared by reference, not value</span>
+<span class='comment'># Check if value exists in an array</span>
+io.<span class='function'>println</span>(<span class='string'>"nice!"</span> <span class='keyword'>in</span> array)      <span class='comment'># Output: true</span>
+io.<span class='function'>println</span>(<span class='string'>"something"</span> <span class='keyword'>in</span> array)  <span class='comment'># Output: false</span>
+
+<span class='comment'># Check if value doesn't exist in an array</span>
+io.<span class='function'>println</span>(<span class='string'>"nice!"</span> !<span class='keyword'>in</span> array)     <span class='comment'># Output: false</span>
+io.<span class='function'>println</span>(<span class='string'>"something"</span> !<span class='keyword'>in</span> array) <span class='comment'># Output: true</span>
+
+<span class='comment'># Arrays are compared by value</span>
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>]
 <span class='keyword'>var</span> ys = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>]
-<span class='keyword'>var</span> zs = xs
-io.<span class='function'>println</span>(xs == ys)     <span class='comment'># Output: false</span>
-io.<span class='function'>println</span>(xs == zs)     <span class='comment'># Output: true</span>
-
-<span class='comment'># To compare by value, use the equal() method of arrays</span>
-io.<span class='function'>println</span>(xs.<span class='function'>equal</span>(ys)) <span class='comment'># Output: true</span>
+<span class='keyword'>var</span> zs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>]
+io.<span class='function'>println</span>(xs == ys)              <span class='comment'># Output: true</span>
+io.<span class='function'>println</span>(xs == zs)              <span class='comment'># Output: false</span>
 </pre>
 </div>
 </section>
@@ -439,15 +444,12 @@ io.<span class='function'>println</span>(table)
 <span class='comment'># Deletion of non existent key</span>
 io.<span class='function'>println</span>(<span class='keyword'>delete</span>(table.<span class='field'>wrong</span>))   <span class='comment'># Output: false</span>
 
-<span class='comment'># Tables are compared by reference, not value</span>
+<span class='comment'># Tables are compared by value</span>
 <span class='keyword'>var</span> xs = {a = <span class='constant'>1</span>, b = <span class='constant'>2</span>}
 <span class='keyword'>var</span> ys = {a = <span class='constant'>1</span>, b = <span class='constant'>2</span>}
-<span class='keyword'>var</span> zs = xs
-io.<span class='function'>println</span>(xs == ys)              <span class='comment'># Output: false</span>
-io.<span class='function'>println</span>(xs == zs)              <span class='comment'># Output: true</span>
-
-<span class='comment'># To compare by value, use the equal() method of tables</span>
-io.<span class='function'>println</span>(xs.<span class='function'>equal</span>(ys))          <span class='comment'># Output: true</span>
+<span class='keyword'>var</span> zs = {a = <span class='constant'>1</span>, b = <span class='constant'>2</span>, c = <span class='constant'>3</span>}
+io.<span class='function'>println</span>(xs == ys)              <span class='comment'># Output: true</span>
+io.<span class='function'>println</span>(xs == zs)              <span class='comment'># Output: false</span>
 </pre>
 </div>
 </section>

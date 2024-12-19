@@ -1341,25 +1341,19 @@ nil
 nil
 ```
 
-### array.equal(that) @method
-Compare the elements of two arrays.
+If you just want to check if a value exists in an array, you can use the `in` operator.
 
 ```bs
-var xs = [1, 2, 3, 4, 5]
-var ys = [1, 2, 3, 4, 5]
-
-io.println(xs == ys)
-io.println(xs.equal(ys))
+var xs = [1, 2, 3, 4, 5, 3]
+io.println(3 in xs)
+io.println(6 in xs)
 ```
 
 ```console
 $ bs demo.bs
-false
 true
+false
 ```
-
-The first expression returns `false` because the `==` operator compares by
-reference.
 
 ### array.push(value) @method
 Push `value` into an array.
@@ -1657,25 +1651,6 @@ $ bs demo.bs
     foo = 69
 }
 ```
-
-### table.equal(that) @method
-Compare the elements of two tables.
-
-```bs
-var xs = { foo = 69, bar = 420 }
-var ys = { foo = 69, bar = 420 }
-
-io.println(xs == ys)
-io.println(xs.equal(ys))
-```
-
-```console
-$ bs demo.bs
-false
-true
-```
-
-Just like arrays, tables are compared by reference with the `==` operator.
 
 ## Math
 Contains simple mathematical primitives.

@@ -29,10 +29,10 @@
         bar = 420
     }
 
-    io.println(xs.equal(xs))
-    io.println(xs.equal(ys))
+    io.println(xs == xs)
+    io.println(xs == ys)
 
     xs.bar = 1337
 
-    io.println(xs.equal(ys))
+    io.println(xs == ys)
 }

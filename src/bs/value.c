@@ -360,7 +360,58 @@ bool bs_value_equal(Bs_Value a, Bs_Value b) {
         return a.as.boolean == b.as.boolean;
 
     case BS_VALUE_OBJECT:
-        return a.as.object == b.as.object;
+        if (a.as.object == b.as.object) {
+            return true;
+        };
+
+        if (a.as.object->type != b.as.object->type) {
+            return false;
+        }
+
+        if (a.as.object->type == BS_OBJECT_ARRAY) {
+            const Bs_Array *a1 = (const Bs_Array *)a.as.object;
+            const Bs_Array *b1 = (const Bs_Array *)b.as.object;
+
+            if (a1->count != b1->count) {
+                return false;
+            }
+
+            for (size_t i = 0; i < a1->count; i++) {
+                if (!bs_value_equal(a1->data[i], b1->data[i])) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        if (a.as.object->type == BS_OBJECT_TABLE) {
+            const Bs_Table *a1 = (const Bs_Table *)a.as.object;
+            const Bs_Table *b1 = (const Bs_Table *)b.as.object;
+
+            if (a1->map.length != b1->map.length) {
+                return false;
+            }
+
+            for (size_t i = 0; i < a1->map.capacity; i++) {
+                if (a1->map.data[i].key.type != BS_VALUE_NIL) {
+                    const Bs_Entry *e =
+                        bs_entries_find(b1->map.data, b1->map.capacity, a1->map.data[i].key);
+
+                    if (!e || e->key.type == BS_VALUE_NIL) {
+                        return false;
+                    }
+
+                    if (!bs_value_equal(a1->map.data[i].value, e->value)) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        return false;
 
     default:
         assert(false && "unreachable");
