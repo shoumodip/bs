@@ -1,4 +1,4 @@
-:i count 137
+:i count 139
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -389,17 +389,6 @@ arrays/error_invalid_index_const_assign.bs:2:4: error: expected array index to b
 ]
 
 :b stderr 0
-
-:b shell 46
-../bin/bs arrays/error_remove_out_of_bounds.bs
-:i returncode 1
-:b stdout 0
-
-:b stderr 144
-arrays/error_remove_out_of_bounds.bs:2:10: error: cannot remove item at index 0 from array of length 0
-
-    2 | xs.remove(0)
-      |          ^
 
 :b shell 24
 ../bin/bs tables/main.bs
@@ -1478,7 +1467,7 @@ foofoofoofoofoofoo
 :b shell 23
 ../bin/bs core/array.bs
 :i returncode 0
-:b stdout 704
+:b stdout 673
 [2, 4, 6, 8, 10]
 [2, 4]
 15
@@ -1526,9 +1515,6 @@ Final:  [3, 4, 1, 5, 2]
     nil,
     nil
 ]
-[1, 2, 3, 4, 5]
-3
-[1, 2, 4, 5]
 [1, 2, 3, 4, 5]
 [3, 4, 5]
 [2, 3]
@@ -2179,4 +2165,36 @@ Explanation: nil
 Example: nil
 
 :b stderr 0
+
+:b shell 25
+../bin/bs delete/array.bs
+:i returncode 0
+:b stdout 31
+[0, 2, 4, 6, 8]
+4
+[0, 2, 6, 8]
+
+:b stderr 0
+
+:b shell 39
+../bin/bs delete/array_invalid_index.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 141
+delete/array_invalid_index.bs:1:11: error: expected array index to be positive integer, got nil
+
+    1 | delete([][nil])
+      |           ^
+
+:b shell 44
+../bin/bs delete/array_out_of_range_index.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 146
+delete/array_out_of_range_index.bs:1:12: error: cannot delete item at index 1 from array of length 1
+
+    1 | delete([1][1])
+      |            ^
 

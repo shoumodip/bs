@@ -2485,6 +2485,28 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const char *label = NULL;
 
             switch (container.as.object->type) {
+            case BS_OBJECT_ARRAY: {
+                bs_check_whole_number_at(bs, 1, index, "array index");
+
+                Bs_Array *a = (Bs_Array *)container.as.object;
+                const size_t pos = index.as.number;
+
+                if (pos >= a->count) {
+                    bs_error_at(
+                        bs,
+                        1,
+                        "cannot delete item at index %zu from array of length %zu",
+                        pos,
+                        a->count);
+                }
+
+                bs_stack_push(bs, a->data[pos]);
+                for (size_t i = pos; i + 1 < a->count; i++) {
+                    a->data[i] = a->data[i + 1];
+                }
+                a->count--;
+            } break;
+
             case BS_OBJECT_TABLE:
                 map = &((Bs_Table *)container.as.object)->map;
                 label = "table key";
@@ -2501,14 +2523,14 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             } break;
             }
 
-            assert(map);
-            assert(label);
+            if (map) {
+                assert(label);
+                bs_check_index_valid_type(bs, 1, index, label);
 
-            bs_check_index_valid_type(bs, 1, index, label);
-
-            const Bs_Value value = bs_check_map_get(bs, 1, map, index, label);
-            bs_map_remove(bs, map, index);
-            bs_stack_push(bs, value);
+                const Bs_Value value = bs_check_map_get(bs, 1, map, index, label);
+                bs_map_remove(bs, map, index);
+                bs_stack_push(bs, value);
+            }
         } break;
 
         case BS_OP_DELETE_CONST: {

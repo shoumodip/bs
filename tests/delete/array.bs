@@ -1,0 +1,4 @@
+var xs = [0, 2, 4, 6, 8]
+io.println(xs)
+io.println(delete(xs[2]))
+io.println(xs)

@@ -2049,25 +2049,6 @@ static Bs_Value bs_array_resize(Bs *bs, Bs_Value *args, size_t arity) {
     return args[-1];
 }
 
-static Bs_Value bs_array_remove(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 1);
-    bs_arg_check_whole_number(bs, args, 0);
-
-    Bs_Array *a = (Bs_Array *)args[-1].as.object;
-    const size_t index = args[0].as.number;
-    if (index >= a->count) {
-        bs_error(bs, "cannot remove item at index %zu from array of length %zu", index, a->count);
-    }
-
-    const Bs_Value removed = a->data[index];
-    for (size_t i = index; i + 1 < a->count; i++) {
-        a->data[i] = a->data[i + 1];
-    }
-    a->count--;
-
-    return removed;
-}
-
 static Bs_Value bs_array_reverse(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
 
@@ -2838,7 +2819,6 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
 
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("sort"), bs_array_sort);
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("resize"), bs_array_resize);
-        bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("remove"), bs_array_remove);
         bs_builtin_object_methods_add(
             bs, BS_OBJECT_ARRAY, Bs_Sv_Static("reverse"), bs_array_reverse);
 

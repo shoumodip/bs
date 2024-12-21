@@ -1471,26 +1471,6 @@ $ bs demo.bs
 [1, 2, 3]
 ```
 
-### array.remove(index) @method
-Removes the item at `index` and returns it.
-
-This modifies the array.
-
-```bs
-var xs = [1, 2, 3, 4, 5]
-io.println(xs)
-
-io.println(xs.remove(2))
-io.println(xs)
-```
-
-```console
-$ bs demo.bs
-[1, 2, 3, 4, 5]
-3
-[1, 2, 4, 5]
-```
-
 ### array.reverse() @method
 Reverse an array.
 

@@ -356,6 +356,13 @@ array.<span class='function'>push</span>(<span class='constant'>1337</span>)
 <span class='comment'># ]</span>
 io.<span class='function'>println</span>(array)
 
+<span class='comment'># Delete value at index</span>
+io.<span class='function'>println</span>(<span class='keyword'>delete</span>(array[<span class='constant'>2</span>]))      <span class='comment'># Output: nil</span>
+io.<span class='function'>println</span>(array)                 <span class='comment'># Output: [69, "nice!", "Are you serious?", 420, 1337]</span>
+
+<span class='comment'># Deletion of index out of range is an error</span>
+io.<span class='function'>println</span>(<span class='keyword'>delete</span>(array[<span class='constant'>69</span>]))     <span class='comment'># Error!</span>
+
 <span class='comment'># Check if value exists in an array</span>
 io.<span class='function'>println</span>(<span class='string'>"nice!"</span> <span class='keyword'>in</span> array)      <span class='comment'># Output: true</span>
 io.<span class='function'>println</span>(<span class='string'>"something"</span> <span class='keyword'>in</span> array)  <span class='comment'># Output: false</span>

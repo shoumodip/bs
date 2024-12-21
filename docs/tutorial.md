@@ -204,6 +204,13 @@ array.push(1337)
 # ]
 io.println(array)
 
+# Delete value at index
+io.println(delete(array[2]))      # Output: nil
+io.println(array)                 # Output: [69, "nice!", "Are you serious?", 420, 1337]
+
+# Deletion of index out of range is an error
+io.println(delete(array[69]))     # Error!
+
 # Check if value exists in an array
 io.println("nice!" in array)      # Output: true
 io.println("something" in array)  # Output: false
