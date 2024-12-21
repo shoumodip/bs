@@ -36,3 +36,28 @@
 
     io.println(xs == ys)
 }
+
+{
+    var xs = {
+        foo = 69,
+        bar = 420
+    }
+
+    var ys = {
+        bar = 1337,
+        baz = 42
+    }
+
+    var zs = {
+        bar = 420,
+        lol = 420
+    }
+
+    io.println(xs)
+
+    xs.extend(ys, true)
+    io.println(xs)
+
+    xs.extend(zs, false)
+    io.println(xs)
+}

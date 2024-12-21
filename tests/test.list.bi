@@ -1537,7 +1537,7 @@ Final:  [3, 4, 1, 5, 2]
 :b shell 23
 ../bin/bs core/table.bs
 :i returncode 0
-:b stdout 240
+:b stdout 381
 xs = {
     bar = 420,
     foo = 69
@@ -1565,6 +1565,21 @@ zs = {
 true
 true
 false
+{
+    bar = 420,
+    foo = 69
+}
+{
+    baz = 42,
+    bar = 1337,
+    foo = 69
+}
+{
+    lol = 420,
+    baz = 42,
+    bar = 1337,
+    foo = 69
+}
 
 :b stderr 0
 

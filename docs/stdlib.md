@@ -1632,6 +1632,53 @@ $ bs demo.bs
 }
 ```
 
+### table.extend(src, overwrite) @method
+Extend a table.
+
+```bs
+var xs = {
+    foo = 69,
+    bar = 420
+}
+
+var ys = {
+    bar = 1337,
+    baz = 42
+}
+
+var zs = {
+    bar = 420,
+    lol = 420
+}
+
+io.println(xs)
+
+xs.extend(ys, true) # This also returns the table so you can chain operations
+io.println(xs)
+
+xs.extend(zs, false)
+io.println(xs)
+```
+
+```console
+$ bs demo.bs
+{
+    bar = 420,
+    foo = 69
+}
+{
+    baz = 42,
+    bar = 1337,
+    foo = 69
+}
+{
+    lol = 420,
+    baz = 42,
+    bar = 1337,
+    foo = 69
+}
+```
+
 ## Math
 Contains simple mathematical primitives.
 

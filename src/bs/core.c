@@ -2124,6 +2124,29 @@ static Bs_Value bs_table_copy(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_object(dst);
 }
 
+static Bs_Value bs_table_extend(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 2);
+    bs_arg_check_object_type(bs, args, 0, BS_OBJECT_TABLE);
+    bs_arg_check_value_type(bs, args, 1, BS_VALUE_BOOL);
+
+    Bs_Table *dst = (Bs_Table *)args[-1].as.object;
+    const Bs_Table *src = (const Bs_Table *)args[0].as.object;
+    const bool overwrite = args[1].as.object;
+
+    for (size_t i = 0; i < src->map.capacity; i++) {
+        const Bs_Entry *entry = &src->map.data[i];
+        if (entry->key.type != BS_VALUE_NIL) {
+            if (bs_map_get(bs, &dst->map, entry->key, NULL) && !overwrite) {
+                continue;
+            }
+
+            bs_map_set(bs, &dst->map, entry->key, entry->value);
+        }
+    }
+
+    return args[-1];
+}
+
 // Math
 static Bs_Value bs_num_sin(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
@@ -2837,8 +2860,8 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     }
 
     {
-        // Table
         bs_builtin_object_methods_add(bs, BS_OBJECT_TABLE, Bs_Sv_Static("copy"), bs_table_copy);
+        bs_builtin_object_methods_add(bs, BS_OBJECT_TABLE, Bs_Sv_Static("extend"), bs_table_extend);
     }
 
     {
