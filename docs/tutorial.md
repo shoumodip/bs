@@ -266,7 +266,7 @@ io.println("something" !in table) # Output: true
 io.println(len(table))            # Output: 4
 
 # Delete keys
-io.println(delete(table[69]))     # Output: true
+io.println(delete(table[69]))     # Output: 420
 
 # Output:
 # {
@@ -276,8 +276,8 @@ io.println(delete(table[69]))     # Output: true
 # }
 io.println(table)
 
-# Deletion of non existent key
-io.println(delete(table.wrong))   # Output: false
+# Deletion of non existent key is an error
+io.println(delete(table.wrong))   # Error!
 
 # Tables are compared by value
 var xs = {a = 1, b = 2}

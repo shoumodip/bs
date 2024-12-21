@@ -11,11 +11,5 @@ io.println(foo)
 io.println(delete(foo.x))
 io.println(foo)
 
-io.println(delete(foo.z))
-io.println(foo)
-
 io.println(delete(foo["y"]))
-io.println(foo)
-
-io.println(delete(foo.y))
 io.println(foo)

@@ -431,7 +431,7 @@ io.<span class='function'>println</span>(<span class='string'>"something"</span>
 io.<span class='function'>println</span>(<span class='keyword'>len</span>(table))            <span class='comment'># Output: 4</span>
 
 <span class='comment'># Delete keys</span>
-io.<span class='function'>println</span>(<span class='keyword'>delete</span>(table[<span class='constant'>69</span>]))     <span class='comment'># Output: true</span>
+io.<span class='function'>println</span>(<span class='keyword'>delete</span>(table[<span class='constant'>69</span>]))     <span class='comment'># Output: 420</span>
 
 <span class='comment'># Output:</span>
 <span class='comment'># {</span>
@@ -441,8 +441,8 @@ io.<span class='function'>println</span>(<span class='keyword'>delete</span>(tab
 <span class='comment'># }</span>
 io.<span class='function'>println</span>(table)
 
-<span class='comment'># Deletion of non existent key</span>
-io.<span class='function'>println</span>(<span class='keyword'>delete</span>(table.<span class='field'>wrong</span>))   <span class='comment'># Output: false</span>
+<span class='comment'># Deletion of non existent key is an error</span>
+io.<span class='function'>println</span>(<span class='keyword'>delete</span>(table.<span class='field'>wrong</span>))   <span class='comment'># Error!</span>
 
 <span class='comment'># Tables are compared by value</span>
 <span class='keyword'>var</span> xs = {a = <span class='constant'>1</span>, b = <span class='constant'>2</span>}

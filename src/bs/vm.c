@@ -1616,7 +1616,7 @@ static void bs_check_index_valid_type(Bs *bs, size_t location, Bs_Value index, c
     if (index.type == BS_VALUE_OBJECT &&
         (index.as.object->type == BS_OBJECT_ARRAY || index.as.object->type == BS_OBJECT_TABLE)) {
         const Bs_Sv sv = bs_value_type_name_full(index);
-        bs_error_at(bs, location, "cannot use '" Bs_Sv_Fmt "' as %s", Bs_Sv_Arg(sv), label);
+        bs_error_at(bs, location, "cannot use " Bs_Sv_Fmt " as %s", Bs_Sv_Arg(sv), label);
     }
 }
 
@@ -2504,8 +2504,11 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             assert(map);
             assert(label);
 
-            bs_check_index_valid_type(bs, 0, index, label);
-            bs_stack_push(bs, bs_value_bool(bs_map_remove(bs, map, index)));
+            bs_check_index_valid_type(bs, 1, index, label);
+
+            const Bs_Value value = bs_check_map_get(bs, 1, map, index, label);
+            bs_map_remove(bs, map, index);
+            bs_stack_push(bs, value);
         } break;
 
         case BS_OP_DELETE_CONST: {
@@ -2540,8 +2543,9 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             assert(map);
             assert(label);
 
-            bs_check_index_valid_type(bs, 0, index, label);
-            bs_stack_push(bs, bs_value_bool(bs_map_remove(bs, map, index)));
+            const Bs_Value value = bs_check_map_get(bs, 1, map, index, label);
+            bs_map_remove(bs, map, index);
+            bs_stack_push(bs, value);
         } break;
 
         case BS_OP_GDEF:

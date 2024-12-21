@@ -1302,42 +1302,36 @@ delete/error_invalid_container.bs:2:9: error: cannot delete from number
 :i returncode 1
 :b stdout 0
 
-:b stderr 143
-delete/error_invalid_instance_property.bs:2:13: error: cannot use 'nil' as instance property
+:b stderr 144
+delete/error_invalid_instance_property.bs:2:14: error: cannot use 'nil' as instance property
 
     2 | delete(Foo()[nil])
-      |             ^
+      |              ^
 
 :b shell 43
 ../bin/bs delete/error_invalid_table_key.bs
 :i returncode 1
 :b stdout 0
 
-:b stderr 121
-delete/error_invalid_table_key.bs:2:10: error: cannot use 'nil' as table key
+:b stderr 122
+delete/error_invalid_table_key.bs:2:11: error: cannot use 'nil' as table key
 
     2 | delete(xs[nil])
-      |          ^
+      |           ^
 
 :b shell 37
 ../bin/bs delete/instance_property.bs
 :i returncode 0
-:b stdout 108
+:b stdout 66
 Foo {
     x = 69,
     y = 420
 }
-true
+69
 Foo {
     y = 420
 }
-false
-Foo {
-    y = 420
-}
-true
-Foo {}
-false
+420
 Foo {}
 
 :b stderr 0
@@ -1345,22 +1339,16 @@ Foo {}
 :b shell 25
 ../bin/bs delete/table.bs
 :i returncode 0
-:b stdout 96
+:b stdout 60
 {
     bar = 420,
     foo = 69
 }
-true
+69
 {
     bar = 420
 }
-false
-{
-    bar = 420
-}
-true
-{}
-false
+420
 {}
 
 :b stderr 0
