@@ -2136,13 +2136,14 @@ core/meta_eval_runtime_error.bs:1:10: in eval()
 :b shell 33
 ../bin/bs core/meta_call_error.bs
 :i returncode 0
-:b stdout 390
+:b stdout 460
 OK!
 69
 
 ERROR!
-Row: 19
+Row: 20
 Col: 27
+Path: core/meta_call_error.bs
 Line: handle(meta.call(fn () => -nil))              # Bs Fail
 Message: invalid operand to unary (-): nil
 Explanation: nil
@@ -2151,14 +2152,16 @@ Example: nil
 ERROR!
 Row: nil
 Col: nil
+Path: nil
 Line: nil
 Message: expected 1 or 2 arguments, got 0
 Explanation: nil
 Example: nil
 
 ERROR!
-Row: 26
+Row: 27
 Col: 15
+Path: core/meta_call_error.bs
 Line:     fn h() => lmao
 Message: undefined identifier 'lmao'
 Explanation: nil

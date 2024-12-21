@@ -1915,6 +1915,7 @@ var f = meta.compile("Oops@")
 if f is "Error" {
     io.println("Row:", f.row())
     io.println("Col:", f.col())
+    io.println("Path:", f.path())
     io.println("Line:", f.line())
     io.println("Message:", f.message())
     io.println("Explanation:", f.explanation())
@@ -1926,6 +1927,7 @@ if f is "Error" {
 $ bs demo.bs
 Row: 1
 Col: 5
+Path: <meta>
 Line: Oops@
 Message: invalid character '@' (64)
 Explanation: nil
@@ -1939,6 +1941,11 @@ Returns `nil` if the error occured in native code.
 
 #### Error.col() @method
 Return the column in which the error occured.
+
+Returns `nil` if the error occured in native code.
+
+#### Error.path() @method
+Return the path in which the error occured.
 
 Returns `nil` if the error occured in native code.
 
@@ -1981,6 +1988,7 @@ var f = meta.compile("Oops@"); assert(f is "Error")
 
 io.println("Row:", f.row())
 io.println("Col:", f.col())
+io.println("Path:", f.path())
 io.println("Line:", f.line())
 io.println("Message:", f.message())
 io.println("Explanation:", f.explanation())
@@ -1991,6 +1999,7 @@ io.println("Example:", f.example())
 $ bs demo.bs
 Row: 1
 Col: 5
+Path: <meta>
 Line: Oops@
 Message: invalid character '@' (64)
 Explanation: nil
@@ -2075,6 +2084,7 @@ fn handle(result) {
         io.println("ERROR!")
         io.println("Row:", result.row())
         io.println("Col:", result.col())
+        io.println("Path:", result.path())
         io.println("Line:", result.line())
         io.println("Message:", result.message())
         io.println("Explanation:", result.explanation())
@@ -2099,8 +2109,9 @@ OK!
 69
 
 ERROR!
-Row: 21
+Row: 22
 Col: 27
+Path: demo.bs
 Line: handle(meta.call(fn () => -nil))
 Message: invalid operand to unary (-): nil
 Explanation: nil

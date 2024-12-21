@@ -4261,6 +4261,7 @@ Example usecase:
 <span class='keyword'>if</span> f <span class='keyword'>is</span> <span class='string'>"Error"</span> {
     io.<span class='function'>println</span>(<span class='string'>"Row:"</span>, f.<span class='function'>row</span>())
     io.<span class='function'>println</span>(<span class='string'>"Col:"</span>, f.<span class='function'>col</span>())
+    io.<span class='function'>println</span>(<span class='string'>"Path:"</span>, f.<span class='function'>path</span>())
     io.<span class='function'>println</span>(<span class='string'>"Line:"</span>, f.<span class='function'>line</span>())
     io.<span class='function'>println</span>(<span class='string'>"Message:"</span>, f.<span class='function'>message</span>())
     io.<span class='function'>println</span>(<span class='string'>"Explanation:"</span>, f.<span class='function'>explanation</span>())
@@ -4283,6 +4284,7 @@ Example usecase:
 <span class='string'>$ </span>bs demo.bs
 Row: 1
 Col: 5
+Path: &lt;meta&gt;
 Line: Oops@
 Message: invalid character '@' (64)
 Explanation: nil
@@ -4308,6 +4310,15 @@ Returns <code>nil</code> if the error occured in native code.
 </p>
 </section>
 <section id='s136'>
+<h4 class='hl-header'><code><span class='class'>Error</span>.<span class='field'>path</span>()</code></h4>
+<p>
+Return the path in which the error occured.
+</p>
+<p>
+Returns <code>nil</code> if the error occured in native code.
+</p>
+</section>
+<section id='s137'>
 <h4 class='hl-header'><code><span class='class'>Error</span>.<span class='field'>line</span>()</code></h4>
 <p>
 Return the line of meta source code in which the error occured as a string.
@@ -4316,13 +4327,13 @@ Return the line of meta source code in which the error occured as a string.
 Returns <code>nil</code> if the error occured in native code.
 </p>
 </section>
-<section id='s137'>
+<section id='s138'>
 <h4 class='hl-header'><code><span class='class'>Error</span>.<span class='field'>message</span>()</code></h4>
 <p>
 Return the error message.
 </p>
 </section>
-<section id='s138'>
+<section id='s139'>
 <h4 class='hl-header'><code><span class='class'>Error</span>.<span class='field'>explanation</span>()</code></h4>
 <p>
 Return the explanation associated with the error.
@@ -4331,7 +4342,7 @@ Return the explanation associated with the error.
 Returns <code>nil</code> if there is no explanation associated with the error.
 </p>
 </section>
-<section id='s139'>
+<section id='s140'>
 <h4 class='hl-header'><code><span class='class'>Error</span>.<span class='field'>example</span>()</code></h4>
 <p>
 Return the example associated with the error.
@@ -4341,7 +4352,7 @@ Returns <code>nil</code> if there is no example associated with the error.
 </p>
 </section>
 </section>
-<section id='s140'>
+<section id='s141'>
 <h3 class='hl-header'><code><span class='function'>compile</span>(str)</code></h3>
 <p>
 Compile a string into a function.
@@ -4398,6 +4409,7 @@ is returned instead of a function.
 
 io.<span class='function'>println</span>(<span class='string'>"Row:"</span>, f.<span class='function'>row</span>())
 io.<span class='function'>println</span>(<span class='string'>"Col:"</span>, f.<span class='function'>col</span>())
+io.<span class='function'>println</span>(<span class='string'>"Path:"</span>, f.<span class='function'>path</span>())
 io.<span class='function'>println</span>(<span class='string'>"Line:"</span>, f.<span class='function'>line</span>())
 io.<span class='function'>println</span>(<span class='string'>"Message:"</span>, f.<span class='function'>message</span>())
 io.<span class='function'>println</span>(<span class='string'>"Explanation:"</span>, f.<span class='function'>explanation</span>())
@@ -4419,6 +4431,7 @@ io.<span class='function'>println</span>(<span class='string'>"Example:"</span>,
 <span class='string'>$ </span>bs demo.bs
 Row: 1
 Col: 5
+Path: &lt;meta&gt;
 Line: Oops@
 Message: invalid character '@' (64)
 Explanation: nil
@@ -4530,7 +4543,7 @@ Bruh!
 </pre>
 </div>
 </section>
-<section id='s141'>
+<section id='s142'>
 <h3 class='hl-header'><code><span class='function'>call</span>(fn, ...args)</code></h3>
 <p>
 Basically a protected call.
@@ -4552,6 +4565,7 @@ Basically a protected call.
         io.<span class='function'>println</span>(<span class='string'>"ERROR!"</span>)
         io.<span class='function'>println</span>(<span class='string'>"Row:"</span>, result.<span class='function'>row</span>())
         io.<span class='function'>println</span>(<span class='string'>"Col:"</span>, result.<span class='function'>col</span>())
+        io.<span class='function'>println</span>(<span class='string'>"Path:"</span>, result.<span class='function'>path</span>())
         io.<span class='function'>println</span>(<span class='string'>"Line:"</span>, result.<span class='function'>line</span>())
         io.<span class='function'>println</span>(<span class='string'>"Message:"</span>, result.<span class='function'>message</span>())
         io.<span class='function'>println</span>(<span class='string'>"Explanation:"</span>, result.<span class='function'>explanation</span>())
@@ -4587,8 +4601,9 @@ OK!
 69
 
 ERROR!
-Row: 21
+Row: 22
 Col: 27
+Path: demo.bs
 Line: handle(meta.call(fn () =&gt; -nil))
 Message: invalid operand to unary (-): nil
 Explanation: nil
@@ -4596,7 +4611,7 @@ Example: nil
 </pre>
 </div>
 </section>
-<section id='s142'>
+<section id='s143'>
 <h3 class='hl-header'><code><span class='function'>eval</span>(str)</code></h3>
 <p>
 Evaluate a string.
@@ -5127,27 +5142,30 @@ demo.bs:1:10: in eval()
 <a href='#s135'>col</a>
 </li>
 <li>
-<a href='#s136'>line</a>
+<a href='#s136'>path</a>
 </li>
 <li>
-<a href='#s137'>message</a>
+<a href='#s137'>line</a>
 </li>
 <li>
-<a href='#s138'>explanation</a>
+<a href='#s138'>message</a>
 </li>
 <li>
-<a href='#s139'>example</a>
+<a href='#s139'>explanation</a>
+</li>
+<li>
+<a href='#s140'>example</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s140'>compile</a>
+<a href='#s141'>compile</a>
 </li>
 <li>
-<a href='#s141'>call</a>
+<a href='#s142'>call</a>
 </li>
 <li>
-<a href='#s142'>eval</a>
+<a href='#s143'>eval</a>
 </li>
 </ul>
 </li>

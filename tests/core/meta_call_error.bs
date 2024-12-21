@@ -3,6 +3,7 @@ fn handle(result) {
         io.println("ERROR!")
         io.println("Row:", result.row())
         io.println("Col:", result.col())
+        io.println("Path:", result.path())
         io.println("Line:", result.line())
         io.println("Message:", result.message())
         io.println("Explanation:", result.explanation())

@@ -2414,6 +2414,7 @@ static Bs_C_Class *bs_meta_error_class;
 typedef struct {
     size_t row;
     size_t col;
+    Bs_Str *path;
     Bs_Str *line;
 
     Bs_Str *message;
@@ -2423,6 +2424,7 @@ typedef struct {
 
 static void bs_meta_error_mark(Bs *bs, void *instance_data) {
     Bs_Meta_Error *e = &bs_flex_member_as(instance_data, Bs_Meta_Error);
+    bs_mark(bs, (Bs_Object *)e->path);
     bs_mark(bs, (Bs_Object *)e->line);
     bs_mark(bs, (Bs_Object *)e->message);
     bs_mark(bs, (Bs_Object *)e->explanation);
@@ -2444,6 +2446,12 @@ static Bs_Value bs_meta_error_col(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     const size_t col = bs_this_c_instance_data_as(args, Bs_Meta_Error).col;
     return col ? bs_value_num(col) : bs_value_nil;
+}
+
+static Bs_Value bs_meta_error_path(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    Bs_Str *path = bs_this_c_instance_data_as(args, Bs_Meta_Error).path;
+    return path ? bs_value_object(path) : bs_value_nil;
 }
 
 static Bs_Value bs_meta_error_line(Bs *bs, Bs_Value *args, size_t arity) {
@@ -2488,6 +2496,7 @@ static void bs_meta_error_write(Bs_Error_Writer *w, Bs_Error error) {
     if (!error.native) {
         e->row = error.loc.row;
         e->col = error.loc.col;
+        e->path = bs_str_new(c->bs, error.loc.path);
         e->line = bs_str_new(c->bs, error.loc.line);
     }
 
@@ -2887,6 +2896,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
 
             bs_c_class_add(bs, bs_meta_error_class, Bs_Sv_Static("row"), bs_meta_error_row);
             bs_c_class_add(bs, bs_meta_error_class, Bs_Sv_Static("col"), bs_meta_error_col);
+            bs_c_class_add(bs, bs_meta_error_class, Bs_Sv_Static("path"), bs_meta_error_path);
             bs_c_class_add(bs, bs_meta_error_class, Bs_Sv_Static("line"), bs_meta_error_line);
             bs_c_class_add(bs, bs_meta_error_class, Bs_Sv_Static("message"), bs_meta_error_message);
             bs_c_class_add(bs, bs_meta_error_class, Bs_Sv_Static("example"), bs_meta_error_example);
