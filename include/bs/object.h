@@ -60,6 +60,7 @@ struct Bs_Fn {
     Bs_Str *name;
 
     size_t arity;
+    bool variadic;
     size_t upvalues;
 
     // In case the function was compiled at runtime using meta.compile() or meta.eval()

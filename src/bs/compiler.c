@@ -16,7 +16,7 @@ typedef enum {
     BS_POWER_DOT,
 } Bs_Power;
 
-static_assert(BS_COUNT_TOKENS == 76, "Update bs_token_type_power()");
+static_assert(BS_COUNT_TOKENS == 77, "Update bs_token_type_power()");
 static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_DOT:
@@ -81,9 +81,10 @@ static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     }
 }
 
-static_assert(BS_COUNT_TOKENS == 76, "Update bs_token_type_can_start()");
+static_assert(BS_COUNT_TOKENS == 77, "Update bs_token_type_can_start()");
 static bool bs_token_type_can_start(Bs_Token_Type type) {
     switch (type) {
+    case BS_TOKEN_SPREAD:
     case BS_TOKEN_NIL:
     case BS_TOKEN_STR:
     case BS_TOKEN_ISTR:
@@ -443,7 +444,7 @@ static void bs_compile_assignment(Bs_Compiler *c, const Bs_Token *token, Bs_Op a
     }
 }
 
-static_assert(BS_COUNT_TOKENS == 76, "Update bs_compile_expr()");
+static_assert(BS_COUNT_TOKENS == 77, "Update bs_compile_expr()");
 static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
     Bs_Loc loc = token.loc;
@@ -1154,8 +1155,10 @@ static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Toke
     bs_compile_block_init(c);
 
     bs_lexer_expect(&c->lexer, BS_TOKEN_LPAREN);
+
+    bool variadic = false;
     while (!bs_lexer_read(&c->lexer, BS_TOKEN_RPAREN)) {
-        const Bs_Token arg = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
+        Bs_Token arg = bs_lexer_either(&c->lexer, BS_TOKEN_IDENT, BS_TOKEN_SPREAD);
 
         if (c->lambda->fn->arity == 0xFF) {
             bs_lexer_error(
@@ -1163,7 +1166,16 @@ static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Toke
         }
         c->lambda->fn->arity++;
 
+        if (arg.type == BS_TOKEN_SPREAD) {
+            variadic = true;
+            arg = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
+        }
         bs_da_push(c->bs, c->lambda, ((Bs_Local){.name = arg.sv, .depth = c->lambda->depth}));
+
+        if (variadic) {
+            bs_lexer_expect(&c->lexer, BS_TOKEN_RPAREN);
+            break;
+        }
 
         if (bs_lexer_either(&c->lexer, BS_TOKEN_COMMA, BS_TOKEN_RPAREN).type != BS_TOKEN_COMMA) {
             break;
@@ -1179,7 +1191,9 @@ static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Toke
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_RET);
     }
 
-    const Bs_Fn *fn = bs_compile_lambda_end(c);
+    Bs_Fn *fn = bs_compile_lambda_end(c);
+    fn->variadic = variadic;
+
     bs_chunk_push_op_value(c->bs, c->chunk, BS_OP_CLOSURE, bs_value_object(fn));
 
     for (size_t i = 0; i < lambda->fn->upvalues; i++) {
@@ -1313,7 +1327,7 @@ static void bs_compile_jumps_reset(Bs_Compiler *c, Bs_Jumps save) {
     c->jumps.start = save.start;
 }
 
-static_assert(BS_COUNT_TOKENS == 76, "Update bs_compile_stmt()");
+static_assert(BS_COUNT_TOKENS == 77, "Update bs_compile_stmt()");
 static void bs_compile_stmt(Bs_Compiler *c) {
     Bs_Token token = bs_lexer_next(&c->lexer);
 

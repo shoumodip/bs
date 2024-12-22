@@ -796,6 +796,41 @@ $ bs functions.bs
 4 8
 ```
 
+### Variadics
+Variadic arguments are collected into an array that is supplied to the variadic
+argument. All array operations work as expected.
+
+```bs
+fn sum(..numbers) {
+    var total = 0
+    for _, n in numbers {
+        total += n
+    }
+    return total
+}
+
+io.println(sum())             # Output: 0
+io.println(sum(69))           # Output: 69
+io.println(sum(90, 110, 220)) # Output: 420
+```
+
+A mix of variadic and non-variadic arguments is also allowed, although the
+variadic argument must be the last one.
+
+```bs
+fn sum(x, y, ..numbers) {
+    var total = x + y
+    for _, n in numbers {
+        total += n
+    }
+    return total
+}
+
+io.println(sum(34, 35))                 # Output: 69
+io.println(sum(90, 110, 110, 110))      # Output: 420
+io.println(sum(90, 110, 220, 400, 517)) # Output: 1337
+```
+
 ## Variables
 ```bs
 var a = 34

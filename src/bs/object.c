@@ -37,6 +37,7 @@ Bs_Fn *bs_fn_new(Bs *bs) {
     fn->name = NULL;
 
     fn->arity = 0;
+    fn->variadic = false;
     fn->upvalues = 0;
 
     fn->source = NULL;

@@ -1,0 +1,26 @@
+fn zero_minimum(..args) {
+    io.println(args)
+}
+
+zero_minimum()
+zero_minimum(69)
+zero_minimum(69, 420, 1337)
+
+fn one_minimum(x, ..args) {
+    io.println(x)
+    io.println(args)
+}
+
+one_minimum(69)
+one_minimum(69, 420)
+one_minimum(69, 420, 1337, 666)
+
+fn two_minimum(x, y, ..args) {
+    io.println(x)
+    io.println(y)
+    io.println(args)
+}
+
+two_minimum(69, 420)
+two_minimum(69, 420, 1337)
+two_minimum(69, 420, 1337, 666, 42)

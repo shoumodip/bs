@@ -1,4 +1,4 @@
-:i count 139
+:i count 140
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -2215,4 +2215,29 @@ delete/array_out_of_range_index.bs:1:12: error: cannot delete item at index 1 fr
 
     1 | delete([1][1])
       |            ^
+
+:b shell 32
+../bin/bs functions/variadics.bs
+:i returncode 0
+:b stdout 106
+[]
+[69]
+[69, 420, 1337]
+69
+[]
+69
+[420]
+69
+[420, 1337, 666]
+69
+420
+[]
+69
+420
+[1337]
+69
+420
+[1337, 666, 42]
+
+:b stderr 0
 

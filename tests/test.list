@@ -137,3 +137,4 @@
 ../bin/bs delete/array.bs
 ../bin/bs delete/array_invalid_index.bs
 ../bin/bs delete/array_out_of_range_index.bs
+../bin/bs functions/variadics.bs

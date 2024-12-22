@@ -1305,14 +1305,45 @@ static void bs_call_c_fn(Bs *bs, size_t offset, const Bs_C_Fn *native, size_t ar
     bs->stack.data[bs->stack.count - 1] = value;
 }
 
-static void bs_call_closure(Bs *bs, size_t offset, Bs_Closure *closure, size_t arity) {
-    bs_check_arity_at(bs, offset, arity, closure->fn->arity);
+static void bs_call_closure(Bs *bs, size_t location, Bs_Closure *closure, size_t arity) {
+    // Preserve the frame base before the variadic resolution
+    const size_t base = bs->stack.count - arity - 1;
+
+    if (closure->fn->variadic) {
+        const size_t minimum = closure->fn->arity - 1;
+        if (arity < minimum) {
+            bs_error_at(
+                bs,
+                location,
+                "expected at least %zu argument%s, got %zu",
+                minimum,
+                minimum == 1 ? "" : "s",
+                arity);
+        }
+
+        const bool handles_on_save = bs->handles_on;
+        const size_t handles_count_save = bs->handles.count;
+        bs->handles_on = true;
+
+        Bs_Array *args = bs_array_new(bs);
+        for (size_t i = base + minimum + 1; i < bs->stack.count; i++) {
+            bs_array_set(bs, args, args->count, bs->stack.data[i]);
+        }
+
+        bs->stack.count = base + minimum + 1;
+        bs_stack_push(bs, bs_value_object(args));
+
+        bs->handles_on = handles_on_save;
+        bs->handles.count = handles_count_save;
+    } else {
+        bs_check_arity_at(bs, location, arity, closure->fn->arity);
+    }
 
     const Bs_Frame frame = {
-        .base = &bs->stack.data[bs->stack.count - arity - 1],
+        .base = &bs->stack.data[base],
         .ip = closure->fn->chunk.data,
         .closure = closure,
-        .locations_offset = offset,
+        .locations_offset = location,
     };
 
     bs_frames_push(bs, frame);

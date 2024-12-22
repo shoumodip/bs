@@ -19,6 +19,7 @@ typedef enum {
     BS_TOKEN_DOT,
     BS_TOKEN_ARROW,
     BS_TOKEN_COMMA,
+    BS_TOKEN_SPREAD,
 
     BS_TOKEN_NIL,
     BS_TOKEN_NUM,
