@@ -61,6 +61,7 @@ bool bs_lexer_read(Bs_Lexer *lexer, Bs_Token_Type type);
 
 Bs_Token bs_lexer_expect(Bs_Lexer *lexer, Bs_Token_Type type);
 Bs_Token bs_lexer_either(Bs_Lexer *lexer, Bs_Token_Type a, Bs_Token_Type b);
+Bs_Token bs_lexer_one_of(Bs_Lexer *lexer, const Bs_Token_Type *types, size_t count);
 
 void bs_lexer_error_full(
     Bs_Lexer *lexer, Bs_Loc loc, Bs_Sv explanation, Bs_Sv example, const char *fmt, ...)

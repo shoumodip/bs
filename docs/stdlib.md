@@ -1285,28 +1285,6 @@ $ bs demo.bs
 25
 ```
 
-### array.copy() @method
-Copy an array.
-
-```bs
-var xs = [1, 2, 3, 4, 5]
-var ys = xs
-var zs = xs.copy()
-
-xs[0] = 69
-
-io.println(xs)
-io.println(ys)
-io.println(zs)
-```
-
-```console
-$ bs demo.bs
-[69, 2, 3, 4, 5]
-[69, 2, 3, 4, 5]
-[1, 2, 3, 4, 5]
-```
-
 ### array.join(separator) @method
 Join the elements of an array, separated by `separator` into a single string.
 
@@ -1596,41 +1574,6 @@ $ bs demo.bs
 
 ## Table
 Methods for the builtin table value.
-
-### table.copy() @method
-Copy a table.
-
-```bs
-var xs = {
-    foo = 69,
-    bar = 420
-}
-
-var ys = xs
-var zs = xs.copy()
-
-xs.bar = 1337
-
-io.println(xs)
-io.println(ys)
-io.println(zs)
-```
-
-```console
-$ bs demo.bs
-{
-    bar = 1337,
-    foo = 69
-}
-{
-    bar = 1337,
-    foo = 69
-}
-{
-    bar = 420,
-    foo = 69
-}
-```
 
 ### table.extend(src, overwrite) @method
 Extend a table.

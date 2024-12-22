@@ -504,23 +504,38 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_TABLE);
 
         while (!bs_lexer_read(&c->lexer, BS_TOKEN_RBRACE)) {
-            token = bs_lexer_either(&c->lexer, BS_TOKEN_IDENT, BS_TOKEN_LBRACKET);
+            const Bs_Token_Type expected[] = {
+                BS_TOKEN_IDENT,
+                BS_TOKEN_LBRACKET,
+                BS_TOKEN_SPREAD,
+            };
+            token = bs_lexer_one_of(&c->lexer, expected, bs_c_array_size(expected));
             loc = token.loc;
 
-            if (token.type == BS_TOKEN_LBRACKET) {
+            if (token.type == BS_TOKEN_IDENT) {
+                bs_chunk_push_op_value(
+                    c->bs, c->chunk, BS_OP_CONST, bs_value_object(bs_str_new(c->bs, token.sv)));
+            } else if (token.type == BS_TOKEN_LBRACKET) {
                 loc = bs_lexer_peek(&c->lexer).loc;
                 bs_compile_expr(c, BS_POWER_SET);
                 bs_lexer_expect(&c->lexer, BS_TOKEN_RBRACKET);
+            } else if (token.type == BS_TOKEN_SPREAD) {
+                bs_lexer_unbuffer(&c->lexer);
+                bs_compile_expr(c, BS_POWER_SET);
+                bs_chunk_push_op(c->bs, c->chunk, BS_OP_APPEND);
+                bs_da_push(c->bs, c->chunk, 1);
+                bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
             } else {
-                bs_chunk_push_op_value(
-                    c->bs, c->chunk, BS_OP_CONST, bs_value_object(bs_str_new(c->bs, token.sv)));
+                assert(false && "unreachable");
             }
 
-            bs_lexer_expect(&c->lexer, BS_TOKEN_SET);
-            bs_compile_expr(c, BS_POWER_SET);
+            if (token.type != BS_TOKEN_SPREAD) {
+                bs_lexer_expect(&c->lexer, BS_TOKEN_SET);
+                bs_compile_expr(c, BS_POWER_SET);
 
-            bs_chunk_push_op(c->bs, c->chunk, BS_OP_ISET_CHAIN);
-            bs_chunk_push_op_loc(c->bs, c->chunk, loc);
+                bs_chunk_push_op(c->bs, c->chunk, BS_OP_ISET_CHAIN);
+                bs_chunk_push_op_loc(c->bs, c->chunk, loc);
+            }
 
             if (bs_lexer_either(&c->lexer, BS_TOKEN_COMMA, BS_TOKEN_RBRACE).type !=
                 BS_TOKEN_COMMA) {
@@ -532,13 +547,19 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     case BS_TOKEN_LBRACKET: {
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_ARRAY);
 
-        size_t index = 0;
         while (!bs_lexer_read(&c->lexer, BS_TOKEN_RBRACKET)) {
-            bs_chunk_push_op_value(c->bs, c->chunk, BS_OP_CONST, bs_value_num(index));
-            bs_compile_expr(c, BS_POWER_SET);
-            index++;
-
-            bs_chunk_push_op(c->bs, c->chunk, BS_OP_ISET_CHAIN);
+            token = bs_lexer_peek(&c->lexer);
+            if (token.type == BS_TOKEN_SPREAD) {
+                bs_lexer_unbuffer(&c->lexer);
+                bs_compile_expr(c, BS_POWER_SET);
+                bs_chunk_push_op(c->bs, c->chunk, BS_OP_APPEND);
+                bs_da_push(c->bs, c->chunk, 1);
+                bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
+            } else {
+                bs_compile_expr(c, BS_POWER_SET);
+                bs_chunk_push_op(c->bs, c->chunk, BS_OP_APPEND);
+                bs_da_push(c->bs, c->chunk, 0);
+            }
 
             if (bs_lexer_either(&c->lexer, BS_TOKEN_COMMA, BS_TOKEN_RBRACKET).type !=
                 BS_TOKEN_COMMA) {
@@ -1522,7 +1543,13 @@ static void bs_compile_stmt(Bs_Compiler *c) {
             bs_lexer_error(&c->lexer, token.loc, "cannot define public values in local scope");
         }
 
-        token = bs_lexer_next(&c->lexer);
+        const Bs_Token_Type expected[] = {
+            BS_TOKEN_FN,
+            BS_TOKEN_VAR,
+            BS_TOKEN_CLASS,
+        };
+        token = bs_lexer_one_of(&c->lexer, expected, bs_c_array_size(expected));
+
         if (token.type == BS_TOKEN_FN) {
             bs_compile_function(c, true);
         } else if (token.type == BS_TOKEN_VAR) {
@@ -1530,14 +1557,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         } else if (token.type == BS_TOKEN_CLASS) {
             bs_compile_class(c, true);
         } else {
-            bs_lexer_error(
-                &c->lexer,
-                token.loc,
-                "expected %s, %s or %s, got %s",
-                bs_token_type_name(BS_TOKEN_FN),
-                bs_token_type_name(BS_TOKEN_VAR),
-                bs_token_type_name(BS_TOKEN_CLASS),
-                bs_token_type_name(token.type));
+            assert(false && "unreachable");
         }
         break;
 

@@ -1877,7 +1877,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 71, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 72, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const bool handles_on_save = bs->handles_on;
@@ -2543,6 +2543,57 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         case BS_OP_TYPEOF: {
             const Bs_Sv name = bs_value_type_name_full(bs_stack_peek(bs, 0));
             bs_stack_set(bs, 0, bs_value_object(bs_str_new(bs, name)));
+        } break;
+
+        case BS_OP_APPEND: {
+            const Bs_Value value = bs_stack_peek(bs, 0);
+            const Bs_Value container = bs_stack_peek(bs, 1);
+
+            switch (*bs->frame->ip++) {
+            case 0: {
+                // The compiler guarantees that the container is an array
+                assert(
+                    container.type == BS_VALUE_OBJECT &&
+                    container.as.object->type == BS_OBJECT_ARRAY);
+
+                Bs_Array *array = (Bs_Array *)container.as.object;
+                bs_array_set(bs, array, array->count, value);
+            } break;
+
+            case 1: {
+                // The compiler guarantees that the container is an array or table
+                assert(container.type == BS_VALUE_OBJECT);
+
+                if (container.as.object->type == BS_OBJECT_ARRAY) {
+                    bs_check_object_type(bs, value, BS_OBJECT_ARRAY, "spread value");
+                    const Bs_Array *src = (const Bs_Array *)value.as.object;
+
+                    Bs_Array *dst = (Bs_Array *)container.as.object;
+                    for (size_t i = 0; i < src->count; i++) {
+                        bs_array_set(bs, dst, dst->count, src->data[i]);
+                    }
+                } else if (container.as.object->type == BS_OBJECT_TABLE) {
+                    bs_check_object_type(bs, value, BS_OBJECT_TABLE, "spread value");
+                    const Bs_Table *src = (const Bs_Table *)value.as.object;
+
+                    Bs_Table *dst = (Bs_Table *)container.as.object;
+                    for (size_t i = 0; i < src->map.capacity; i++) {
+                        const Bs_Entry *e = &src->map.data[i];
+                        if (e->key.type != BS_VALUE_NIL) {
+                            bs_table_set(bs, dst, e->key, e->value);
+                        }
+                    }
+                } else {
+                    // The compiler guarantees that the container is an array or table
+                    assert(false && "unreachable");
+                }
+            } break;
+
+            default:
+                assert(false && "unreachable");
+            }
+
+            bs->stack.count--;
         } break;
 
         case BS_OP_DELETE: {

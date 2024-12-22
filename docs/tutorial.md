@@ -225,6 +225,14 @@ var ys = [1, 2, 3]
 var zs = [1, 2, 3, 4]
 io.println(xs == ys)              # Output: true
 io.println(xs == zs)              # Output: false
+
+# Clone an array using the (..) operator
+var as = [1, 2, 3]
+var bs = [..as]
+
+bs[0] = 69
+io.println(as)                    # Output: [1, 2, 3]
+io.println(bs)                    # Output: [69, 2, 3]
 ```
 
 ### Tables
@@ -292,6 +300,26 @@ var ys = {a = 1, b = 2}
 var zs = {a = 1, b = 2, c = 3}
 io.println(xs == ys)              # Output: true
 io.println(xs == zs)              # Output: false
+
+# Clone a table using the (..) operator
+var as = {a = 1, b = 2}
+var bs = {..as}
+
+bs.a = 69
+
+# Output:
+# {
+#     a = 1,
+#     b = 2
+# }
+io.println(as)
+
+# Output:
+# {
+#     a = 69,
+#     b = 2
+# }
+io.println(bs)
 ```
 
 ### Typeof

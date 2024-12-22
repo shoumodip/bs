@@ -2,7 +2,7 @@ var xs = {
     foo = 69,
     bar = 420
 }
-var ys = xs.copy()
+var ys = {..xs}
 
 io.println("xs = {xs}")
 io.println("ys = {ys}")

@@ -4,7 +4,7 @@
         bar = 420
     }
 
-    var ys = xs.copy()
+    var ys = {..xs}
     var zs = xs
 
     io.println("xs = {xs}")

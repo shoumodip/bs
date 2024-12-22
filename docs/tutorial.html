@@ -377,6 +377,14 @@ io.<span class='function'>println</span>(<span class='string'>"something"</span>
 <span class='keyword'>var</span> zs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>]
 io.<span class='function'>println</span>(xs == ys)              <span class='comment'># Output: true</span>
 io.<span class='function'>println</span>(xs == zs)              <span class='comment'># Output: false</span>
+
+<span class='comment'># Clone an array using the (..) operator</span>
+<span class='keyword'>var</span> as = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>]
+<span class='keyword'>var</span> bs = [..as]
+
+bs[<span class='constant'>0</span>] = <span class='constant'>69</span>
+io.<span class='function'>println</span>(as)                    <span class='comment'># Output: [1, 2, 3]</span>
+io.<span class='function'>println</span>(bs)                    <span class='comment'># Output: [69, 2, 3]</span>
 </pre>
 </div>
 </section>
@@ -457,6 +465,26 @@ io.<span class='function'>println</span>(<span class='keyword'>delete</span>(tab
 <span class='keyword'>var</span> zs = {a = <span class='constant'>1</span>, b = <span class='constant'>2</span>, c = <span class='constant'>3</span>}
 io.<span class='function'>println</span>(xs == ys)              <span class='comment'># Output: true</span>
 io.<span class='function'>println</span>(xs == zs)              <span class='comment'># Output: false</span>
+
+<span class='comment'># Clone a table using the (..) operator</span>
+<span class='keyword'>var</span> as = {a = <span class='constant'>1</span>, b = <span class='constant'>2</span>}
+<span class='keyword'>var</span> bs = {..as}
+
+bs.<span class='field'>a</span> = <span class='constant'>69</span>
+
+<span class='comment'># Output:</span>
+<span class='comment'># {</span>
+<span class='comment'>#     a = 1,</span>
+<span class='comment'>#     b = 2</span>
+<span class='comment'># }</span>
+io.<span class='function'>println</span>(as)
+
+<span class='comment'># Output:</span>
+<span class='comment'># {</span>
+<span class='comment'>#     a = 69,</span>
+<span class='comment'>#     b = 2</span>
+<span class='comment'># }</span>
+io.<span class='function'>println</span>(bs)
 </pre>
 </div>
 </section>

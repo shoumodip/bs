@@ -1919,19 +1919,6 @@ static Bs_Value bs_array_reduce(Bs *bs, Bs_Value *args, size_t arity) {
     return acc;
 }
 
-static Bs_Value bs_array_copy(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 0);
-
-    const Bs_Array *src = (const Bs_Array *)args[-1].as.object;
-
-    Bs_Array *dst = bs_array_new(bs);
-    for (size_t i = src->count; i > 0; i--) {
-        bs_array_set(bs, dst, i - 1, src->data[i - 1]);
-    }
-
-    return bs_value_object(dst);
-}
-
 static Bs_Value bs_array_join(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
@@ -2114,16 +2101,6 @@ static Bs_Value bs_array_append(Bs *bs, Bs_Value *args, size_t arity) {
 }
 
 // Table
-static Bs_Value bs_table_copy(Bs *bs, Bs_Value *args, size_t arity) {
-    bs_check_arity(bs, arity, 0);
-
-    const Bs_Table *src = (const Bs_Table *)args[-1].as.object;
-    Bs_Table *dst = bs_table_new(bs);
-
-    bs_map_copy(bs, &dst->map, &src->map);
-    return bs_value_object(dst);
-}
-
 static Bs_Value bs_table_extend(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_TABLE);
@@ -2842,7 +2819,6 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("filter"), bs_array_filter);
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("reduce"), bs_array_reduce);
 
-        bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("copy"), bs_array_copy);
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("join"), bs_array_join);
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("find"), bs_array_find);
 
@@ -2860,7 +2836,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     }
 
     {
-        bs_builtin_object_methods_add(bs, BS_OBJECT_TABLE, Bs_Sv_Static("copy"), bs_table_copy);
+        // Table
         bs_builtin_object_methods_add(bs, BS_OBJECT_TABLE, Bs_Sv_Static("extend"), bs_table_extend);
     }
 

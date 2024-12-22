@@ -590,6 +590,39 @@ Bs_Token bs_lexer_either(Bs_Lexer *l, Bs_Token_Type a, Bs_Token_Type b) {
     return token;
 }
 
+static char buffer[1024];
+
+Bs_Token bs_lexer_one_of(Bs_Lexer *l, const Bs_Token_Type *types, size_t count) {
+    const Bs_Token token = bs_lexer_next(l);
+    for (size_t i = 0; i < count; i++) {
+        if (token.type == types[i]) {
+            return token;
+        }
+    }
+
+    Bs_Error error = {0};
+    error.loc = token.loc;
+    error.type = BS_ERROR_MAIN;
+
+    size_t end = 0;
+    end += snprintf(buffer + end, sizeof(buffer) - end, "expected ");
+
+    for (size_t i = 0; i < count; i++) {
+        if (i) {
+            end += snprintf(buffer + end, sizeof(buffer) - end, " or ");
+        }
+        end += snprintf(buffer + end, sizeof(buffer) - end, "%s", bs_token_type_name(types[i]));
+    }
+
+    end += snprintf(buffer + end, sizeof(buffer) - end, ", got %s", bs_token_type_name(token.type));
+
+    error.message = Bs_Sv(buffer, end);
+    error.continued = l->is_meta;
+
+    l->error->write(l->error, error);
+    longjmp(l->unwind, 1);
+}
+
 void bs_lexer_error_full(
     Bs_Lexer *l, Bs_Loc loc, Bs_Sv explanation, Bs_Sv example, const char *fmt, ...) {
     Bs_Error error = {0};
@@ -598,7 +631,6 @@ void bs_lexer_error_full(
 
     va_list args;
     va_start(args, fmt);
-    static char buffer[1024];
     const int count = vsnprintf(buffer, sizeof(buffer), fmt, args);
     va_end(args);
 

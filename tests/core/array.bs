@@ -5,7 +5,7 @@ io.println([1, 2, 3, 4, 5].reduce(fn (x, y) => x + y, 20))
 
 {
     var xs = [1, 2, 3, 4, 5]
-    var ys = xs.copy()
+    var ys = [..xs]
     var zs = xs
 
     io.println("xs = {xs}")
