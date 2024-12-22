@@ -1,0 +1,15 @@
+fn add(x, y) => x + y
+
+fn sum(..numbers) {
+    var total = 0
+    for _, n in numbers {
+        total += n
+    }
+    return total
+}
+
+var xs = [34, 35]
+var ys = [150, 201]
+
+io.println(add(..xs))
+io.println(sum(..xs, ..ys))

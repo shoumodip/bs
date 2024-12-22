@@ -4,7 +4,9 @@
 typedef enum {
     BS_OP_RET,
     BS_OP_CALL,
+    BS_OP_SPREAD,
     BS_OP_CLOSURE,
+    BS_OP_CALL_INIT,
 
     BS_OP_DUP,
     BS_OP_DROP,

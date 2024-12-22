@@ -44,6 +44,11 @@ typedef struct {
 } Bs_Frames;
 
 typedef struct {
+    size_t *data;
+    size_t count;
+} Bs_Bases;
+
+typedef struct {
     bool done;
     Bs_Value result;
 
@@ -111,6 +116,7 @@ static_assert(BS_COUNT_OBJECTS == 13, "Update bs.builtin_methods");
 struct Bs {
     // Stack
     Bs_Stack stack;
+    Bs_Bases bases;
     Bs_Frame *frame;
     Bs_Frames frames;
 
@@ -453,6 +459,9 @@ Bs *bs_new(int argc, char **argv) {
     bs->stack.data = malloc(BS_STACK_CAPACITY * sizeof(*bs->stack.data));
     assert(bs->stack.data);
 
+    bs->bases.data = malloc(BS_FRAMES_CAPACITY * sizeof(*bs->bases.data));
+    assert(bs->bases.data);
+
     bs->frames.data = malloc(BS_FRAMES_CAPACITY * sizeof(*bs->frames.data));
     assert(bs->frames.data);
 
@@ -475,6 +484,9 @@ Bs *bs_new(int argc, char **argv) {
 void bs_free(Bs *bs) {
     free(bs->stack.data);
     memset(&bs->stack, 0, sizeof(bs->stack));
+
+    free(bs->bases.data);
+    memset(&bs->bases, 0, sizeof(bs->bases));
 
     free(bs->frames.data);
     memset(&bs->frames, 0, sizeof(bs->frames));
@@ -783,6 +795,7 @@ Bs_Sv bs_buffer_relative_path(Bs_Buffer *b, Bs_Sv path) {
 Bs_Unwind bs_unwind_save(Bs *bs) {
     Bs_Unwind u = bs->config.unwind;
     u.stack_count = bs->stack.count;
+    u.bases_count = bs->bases.count;
     u.frames_count = bs->frames.count;
     return u;
 }
@@ -790,6 +803,7 @@ Bs_Unwind bs_unwind_save(Bs *bs) {
 void bs_unwind_restore(Bs *bs, const Bs_Unwind *u) {
     bs->config.unwind = *u;
     bs->stack.count = u->stack_count;
+    bs->bases.count = u->bases_count;
     bs->frames.count = u->frames_count;
     bs->frame = bs->frames.count ? &bs->frames.data[bs->frames.count - 1] : NULL;
 }
@@ -1240,9 +1254,17 @@ static void bs_stack_push(Bs *bs, Bs_Value value) {
     bs->stack.data[bs->stack.count++] = value;
 }
 
+static void bs_bases_push(Bs *bs, size_t base) {
+    if (bs->bases.count >= BS_FRAMES_CAPACITY) {
+        bs_error_standalone_unwind(bs, "stack overflow");
+    }
+
+    bs->bases.data[bs->bases.count++] = base;
+}
+
 static void bs_frames_push(Bs *bs, Bs_Frame frame) {
     if (bs->frames.count >= BS_FRAMES_CAPACITY) {
-        bs_error_standalone_unwind(bs, "call stack overflow");
+        bs_error_standalone_unwind(bs, "stack overflow");
     }
 
     bs->frames.data[bs->frames.count++] = frame;
@@ -1855,7 +1877,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 69, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 71, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const bool handles_on_save = bs->handles_on;
@@ -1922,8 +1944,19 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         } break;
 
         case BS_OP_CALL:
-            bs_call_stack_top(bs, *bs->frame->ip++);
+            assert(bs->bases.count);
+            bs_call_stack_top(bs, bs->stack.count - bs->bases.data[--bs->bases.count]);
             break;
+
+        case BS_OP_SPREAD: {
+            const Bs_Value value = bs_stack_pop(bs);
+            bs_check_object_type(bs, value, BS_OBJECT_ARRAY, "spread value");
+
+            const Bs_Array *array = (const Bs_Array *)value.as.object;
+            for (size_t i = 0; i < array->count; i++) {
+                bs_stack_push(bs, array->data[i]);
+            }
+        } break;
 
         case BS_OP_CLOSURE: {
             Bs_Closure *closure = bs_closure_new(bs, (Bs_Fn *)bs_chunk_read_const(bs).as.object);
@@ -1940,6 +1973,10 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 }
             }
         } break;
+
+        case BS_OP_CALL_INIT:
+            bs_bases_push(bs, bs->stack.count);
+            break;
 
         case BS_OP_DUP:
             bs_stack_push(bs, bs_stack_peek(bs, *bs->frame->ip++));
@@ -1986,7 +2023,10 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
         case BS_OP_INVOKE: {
             const Bs_Value name = bs_chunk_read_const(bs);
-            const size_t arity = *bs->frame->ip++;
+
+            assert(bs->bases.count);
+            const size_t arity = bs->stack.count - bs->bases.data[--bs->bases.count];
+
             const Bs_Value this = bs_stack_peek(bs, arity);
 
             Bs_Value method;
@@ -2123,10 +2163,12 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
         case BS_OP_SUPER_INVOKE: {
             const Bs_Value name = bs_chunk_read_const(bs);
-            const size_t arity = *bs->frame->ip++;
 
             const Bs_Value super = bs_stack_pop(bs);
             assert(super.type == BS_VALUE_OBJECT && super.as.object->type == BS_OBJECT_CLASS);
+
+            assert(bs->bases.count);
+            const size_t arity = bs->stack.count - bs->bases.data[--bs->bases.count];
 
             const Bs_Value this = bs_stack_peek(bs, arity);
             assert(this.type == BS_VALUE_OBJECT && this.as.object->type == BS_OBJECT_INSTANCE);
@@ -2844,6 +2886,7 @@ Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_repl) {
 
 end:
     bs->stack.count = 0;
+    bs->bases.count = 0;
 
     bs->frame = NULL;
     bs->frames.count = 0;
@@ -2874,6 +2917,7 @@ Bs_Value bs_call(Bs *bs, Bs_Value fn, const Bs_Value *args, size_t arity) {
     }
 
     const size_t stack_count_save = bs->stack.count;
+    const size_t bases_count_save = bs->bases.count;
     const size_t frames_count_save = bs->frames.count;
 
     bs_stack_push(bs, fn);
@@ -2897,6 +2941,7 @@ Bs_Value bs_call(Bs *bs, Bs_Value fn, const Bs_Value *args, size_t arity) {
     }
 
     bs->stack.count = stack_count_save;
+    bs->bases.count = bases_count_save;
     bs->frames.count = frames_count_save;
     bs->frame = bs->frames.count ? &bs->frames.data[bs->frames.count - 1] : NULL;
     return result;

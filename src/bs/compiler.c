@@ -923,20 +923,19 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
             const size_t locations_save = c->locations.count;
 
-            size_t arity = 0;
+            bs_chunk_push_op(c->bs, c->chunk, BS_OP_CALL_INIT);
             while (!bs_lexer_read(&c->lexer, BS_TOKEN_RPAREN)) {
                 token = bs_lexer_peek(&c->lexer);
-                if (arity == 0xFF) {
-                    bs_lexer_error(
-                        &c->lexer,
-                        token.loc,
-                        "too many arguments to function call (maximum 255 allowed)");
-                }
-
                 bs_op_locs_push(c->bs, &c->locations, (Bs_Op_Loc){.loc = token.loc});
 
-                bs_compile_expr(c, BS_POWER_SET);
-                arity++;
+                if (token.type == BS_TOKEN_SPREAD) {
+                    bs_lexer_unbuffer(&c->lexer);
+                    bs_compile_expr(c, BS_POWER_SET);
+                    bs_chunk_push_op(c->bs, c->chunk, BS_OP_SPREAD);
+                    bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
+                } else {
+                    bs_compile_expr(c, BS_POWER_SET);
+                }
 
                 if (bs_lexer_either(&c->lexer, BS_TOKEN_COMMA, BS_TOKEN_RPAREN).type !=
                     BS_TOKEN_COMMA) {
@@ -946,19 +945,14 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
             if (!was_if && op_get == BS_OP_IGET_CONST) {
                 bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_INVOKE, call_const_index);
-                bs_da_push(c->bs, c->chunk, arity);
-
                 bs_chunk_push_op_loc(c->bs, c->chunk, locs[0]);
                 bs_chunk_push_op_loc(c->bs, c->chunk, locs[1]);
             } else if (!was_if && op_get == BS_OP_SUPER_GET) {
                 bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_URECEIVER, super_const_index);
                 bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_SUPER_INVOKE, call_const_index);
-                bs_da_push(c->bs, c->chunk, arity);
-
                 bs_chunk_push_op_loc(c->bs, c->chunk, locs[0]);
             } else {
                 bs_chunk_push_op(c->bs, c->chunk, BS_OP_CALL);
-                bs_da_push(c->bs, c->chunk, arity);
             }
             bs_chunk_push_op_loc(c->bs, c->chunk, loc);
 
@@ -1159,11 +1153,6 @@ static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Toke
     bool variadic = false;
     while (!bs_lexer_read(&c->lexer, BS_TOKEN_RPAREN)) {
         Bs_Token arg = bs_lexer_either(&c->lexer, BS_TOKEN_IDENT, BS_TOKEN_SPREAD);
-
-        if (c->lambda->fn->arity == 0xFF) {
-            bs_lexer_error(
-                &c->lexer, arg.loc, "too many arguments in function (maximum 255 allowed)");
-        }
         c->lambda->fn->arity++;
 
         if (arg.type == BS_TOKEN_SPREAD) {

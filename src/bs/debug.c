@@ -23,13 +23,12 @@ bs_debug_op_invoke(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset, cons
     const size_t constant = *(const size_t *)&c->data[*offset];
     *offset += sizeof(constant);
 
-    const size_t arity = c->data[(*offset)++];
-    bs_fmt(p->writer, "%-16s (%zu args) %4zu '", name, arity, constant);
+    bs_fmt(p->writer, "%-16s %4zu '", name, constant);
     bs_value_write_impl(p, c->constants.data[constant]);
     bs_fmt(p->writer, "'\n");
 }
 
-static_assert(BS_COUNT_OPS == 69, "Update bs_debug_op()");
+static_assert(BS_COUNT_OPS == 71, "Update bs_debug_op()");
 void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
     bs_fmt(p->writer, "%04zu ", *offset);
 
@@ -40,7 +39,11 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
         break;
 
     case BS_OP_CALL:
-        bs_fmt(p->writer, "OP_CALL %d\n", c->data[(*offset)++]);
+        bs_fmt(p->writer, "OP_CALL\n");
+        break;
+
+    case BS_OP_SPREAD:
+        bs_fmt(p->writer, "OP_SPREAD\n");
         break;
 
     case BS_OP_CLOSURE: {
@@ -66,6 +69,10 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
                 index);
         }
     } break;
+
+    case BS_OP_CALL_INIT:
+        bs_fmt(p->writer, "OP_CALL_INIT\n");
+        break;
 
     case BS_OP_DUP:
         bs_fmt(p->writer, "OP_DUP %d\n", c->data[(*offset)++]);

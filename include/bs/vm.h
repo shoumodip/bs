@@ -52,6 +52,7 @@ typedef struct {
     bool ok;
 
     size_t stack_count;
+    size_t bases_count;
     size_t frames_count;
 
     jmp_buf point;

@@ -831,6 +831,58 @@ io.println(sum(90, 110, 110, 110))      # Output: 420
 io.println(sum(90, 110, 220, 400, 517)) # Output: 1337
 ```
 
+### Spread
+The `(..)` operator can be used in function calls to spread the values of an
+array into the call.
+
+```bs
+fn sum(x, y, z) {
+    return x + y + z
+}
+
+var xs = [16, 18, 35]
+io.println(sum(..xs))       # Output: 69
+
+var ys = [100]
+var zs = [120, 200]
+io.println(sum(..ys, ..zs)) # Output: 420
+```
+
+This can also be used in variadic functions.
+
+```bs
+fn sum(..numbers) {
+    var total = 0
+    for _, n in numbers {
+        total += n
+    }
+    return total
+}
+
+var xs = [16, 18, 35]
+io.println(sum(..xs))       # Output: 69
+
+var ys = [100]
+var zs = [120, 200]
+io.println(sum(..ys, ..zs)) # Output: 420
+```
+
+Of course, it goes without saying that normal arguments can be mixed with
+spreaded ones.
+
+```bs
+fn sum(..numbers) {
+    var total = 0
+    for _, n in numbers {
+        total += n
+    }
+    return total
+}
+
+var xs = [100, 125, 126]
+io.println(sum(34, ..xs, 35)) # Output: 420
+```
+
 ## Variables
 ```bs
 var a = 34
