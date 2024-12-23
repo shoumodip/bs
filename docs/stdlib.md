@@ -1233,7 +1233,7 @@ The provided function `f` must take a single argument.
 
 ```bs
 var xs = [1, 2, 3, 4, 5]
-var ys = xs.map(fn (x) => x * 2)
+var ys = xs.map(fn (x) -> x * 2)
 io.println(xs)
 io.println(ys)
 ```
@@ -1251,7 +1251,7 @@ The provided function `f` must take a single argument.
 
 ```bs
 var xs = [1, 2, 3, 4, 5]
-var ys = xs.filter(fn (x) => x % 2 == 0)
+var ys = xs.filter(fn (x) -> x % 2 == 0)
 io.println(xs)
 io.println(ys)
 ```
@@ -1272,10 +1272,10 @@ current value.
 ```bs
 var xs = [1, 2, 3, 4, 5]
 
-var a = xs.reduce(fn (x, y) => x + y)
+var a = xs.reduce(fn (x, y) -> x + y)
 io.println(a)
 
-var b = xs.reduce(fn (x, y) => x + y, 10)
+var b = xs.reduce(fn (x, y) -> x + y, 10)
 io.println(b)
 ```
 
@@ -1413,7 +1413,7 @@ Sort an array inplace with `compare`, and return itself.
 
 ```bs
 var xs = [4, 2, 5, 1, 3]
-xs.sort(fn (x, y) => x < y) // This also returns the array so you can chain operations
+xs.sort(fn (x, y) -> x < y) // This also returns the array so you can chain operations
 
 io.println(xs)
 ```
@@ -1507,7 +1507,7 @@ var height = 6
 
 var board = []
     .resize(height)
-    .map(fn (x) => [].resize(width).fill(0))
+    .map(fn (x) -> [].resize(width).fill(0))
 
 board[2][2] = 1
 
@@ -2086,11 +2086,11 @@ fn handle(result) {
 }
 
 // Ok
-handle(meta.call(fn (a, b) => a + b, 34, 35))
+handle(meta.call(fn (a, b) -> a + b, 34, 35))
 io.println()
 
 // Error
-handle(meta.call(fn () => -nil))
+handle(meta.call(fn () -> -nil))
 ```
 
 ```console
@@ -2102,7 +2102,7 @@ ERROR!
 Row: 22
 Col: 27
 Path: demo.bs
-Line: handle(meta.call(fn () => -nil))
+Line: handle(meta.call(fn () -> -nil))
 Message: invalid operand to unary (-): nil
 Explanation: nil
 Example: nil

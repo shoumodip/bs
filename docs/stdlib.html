@@ -2715,7 +2715,7 @@ The provided function <code>f</code> must take a single argument.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
-<span class='keyword'>var</span> ys = xs.<span class='function'>map</span>(<span class='keyword'>fn</span> (x) =&gt; x * <span class='constant'>2</span>)
+<span class='keyword'>var</span> ys = xs.<span class='function'>map</span>(<span class='keyword'>fn</span> (x) -&gt; x * <span class='constant'>2</span>)
 io.<span class='function'>println</span>(xs)
 io.<span class='function'>println</span>(ys)
 </pre>
@@ -2759,7 +2759,7 @@ The provided function <code>f</code> must take a single argument.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
-<span class='keyword'>var</span> ys = xs.<span class='function'>filter</span>(<span class='keyword'>fn</span> (x) =&gt; x % <span class='constant'>2</span> == <span class='constant'>0</span>)
+<span class='keyword'>var</span> ys = xs.<span class='function'>filter</span>(<span class='keyword'>fn</span> (x) -&gt; x % <span class='constant'>2</span> == <span class='constant'>0</span>)
 io.<span class='function'>println</span>(xs)
 io.<span class='function'>println</span>(ys)
 </pre>
@@ -2806,10 +2806,10 @@ current value.
 <pre class='code active'>
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
 
-<span class='keyword'>var</span> a = xs.<span class='function'>reduce</span>(<span class='keyword'>fn</span> (x, y) =&gt; x + y)
+<span class='keyword'>var</span> a = xs.<span class='function'>reduce</span>(<span class='keyword'>fn</span> (x, y) -&gt; x + y)
 io.<span class='function'>println</span>(a)
 
-<span class='keyword'>var</span> b = xs.<span class='function'>reduce</span>(<span class='keyword'>fn</span> (x, y) =&gt; x + y, <span class='constant'>10</span>)
+<span class='keyword'>var</span> b = xs.<span class='function'>reduce</span>(<span class='keyword'>fn</span> (x, y) -&gt; x + y, <span class='constant'>10</span>)
 io.<span class='function'>println</span>(b)
 </pre>
 </div>
@@ -3144,7 +3144,7 @@ Sort an array inplace with <code>compare</code>, and return itself.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> xs = [<span class='constant'>4</span>, <span class='constant'>2</span>, <span class='constant'>5</span>, <span class='constant'>1</span>, <span class='constant'>3</span>]
-xs.<span class='function'>sort</span>(<span class='keyword'>fn</span> (x, y) =&gt; x &lt; y) <span class='comment'>// This also returns the array so you can chain operations</span>
+xs.<span class='function'>sort</span>(<span class='keyword'>fn</span> (x, y) -&gt; x &lt; y) <span class='comment'>// This also returns the array so you can chain operations</span>
 
 io.<span class='function'>println</span>(xs)
 </pre>
@@ -3364,7 +3364,7 @@ Here's a 2D version.
 
 <span class='keyword'>var</span> board = []
     .<span class='function'>resize</span>(height)
-    .<span class='function'>map</span>(<span class='keyword'>fn</span> (x) =&gt; [].<span class='function'>resize</span>(width).<span class='function'>fill</span>(<span class='constant'>0</span>))
+    .<span class='function'>map</span>(<span class='keyword'>fn</span> (x) -&gt; [].<span class='function'>resize</span>(width).<span class='function'>fill</span>(<span class='constant'>0</span>))
 
 board[<span class='constant'>2</span>][<span class='constant'>2</span>] = <span class='constant'>1</span>
 
@@ -4542,11 +4542,11 @@ Basically a protected call.
 }
 
 <span class='comment'>// Ok</span>
-<span class='function'>handle</span>(meta.<span class='function'>call</span>(<span class='keyword'>fn</span> (a, b) =&gt; a + b, <span class='constant'>34</span>, <span class='constant'>35</span>))
+<span class='function'>handle</span>(meta.<span class='function'>call</span>(<span class='keyword'>fn</span> (a, b) -&gt; a + b, <span class='constant'>34</span>, <span class='constant'>35</span>))
 io.<span class='function'>println</span>()
 
 <span class='comment'>// Error</span>
-<span class='function'>handle</span>(meta.<span class='function'>call</span>(<span class='keyword'>fn</span> () =&gt; -<span class='constant'>nil</span>))
+<span class='function'>handle</span>(meta.<span class='function'>call</span>(<span class='keyword'>fn</span> () -&gt; -<span class='constant'>nil</span>))
 </pre>
 </div>
 <div class='codes'>
@@ -4569,7 +4569,7 @@ ERROR!
 Row: 22
 Col: 27
 Path: demo.bs
-Line: handle(meta.call(fn () =&gt; -nil))
+Line: handle(meta.call(fn () -&gt; -nil))
 Message: invalid operand to unary (-): nil
 Explanation: nil
 Example: nil

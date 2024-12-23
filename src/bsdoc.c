@@ -236,35 +236,17 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
     Bsdoc_Style next = BSDOC_STYLE_NONE;
     const char *last = input.data;
 
-    // 0 - Normal
-    // 1 - (.) or (->)
-    // 2 - (-)
-    int c_mode_prev;
     while (lexer.sv.size) {
         Bs_Token token = bs_lexer_next(&lexer);
-        if (!c) {
-            if (next != BSDOC_STYLE_NONE && token.type != BS_TOKEN_IDENT &&
-                token.type != BS_TOKEN_COMMENT) {
-                if (token.type != BS_TOKEN_LT || next != BSDOC_STYLE_CLASS) {
-                    next = BSDOC_STYLE_NONE;
-                }
-            }
+        if (next != BSDOC_STYLE_NONE && token.type != BS_TOKEN_IDENT &&
+            token.type != BS_TOKEN_COMMENT) {
+            next = BSDOC_STYLE_NONE;
         }
 
         Bsdoc_Style style;
         if (c) {
-            if (token.type == BS_TOKEN_DOT) {
-                c_mode_prev = 1;
-            } else if (token.type == BS_TOKEN_SUB) {
-                c_mode_prev = 2;
-            } else if (c_mode_prev == 2 && token.type == BS_TOKEN_GT) {
-                c_mode_prev = 1;
-            } else if (c_mode_prev == 1 && token.type == BS_TOKEN_IDENT) {
-                bsdoc_print_token(f, token, BSDOC_STYLE_FIELD, &last);
-                c_mode_prev = 0;
-                continue;
-            } else {
-                c_mode_prev = 0;
+            if (token.type == BS_TOKEN_DOT || token.type == BS_TOKEN_ARROW) {
+                next = BSDOC_STYLE_FIELD;
             }
 
             style = bsdoc_token_type_style(token.type);
@@ -277,8 +259,13 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
                     }
                 }
 
-                if (style == BSDOC_STYLE_NONE && bs_lexer_peek(&lexer).type == BS_TOKEN_LPAREN) {
-                    style = BSDOC_STYLE_FUNCTION;
+                if (style == BSDOC_STYLE_NONE) {
+                    if (bs_lexer_peek(&lexer).type == BS_TOKEN_LPAREN) {
+                        style = BSDOC_STYLE_FUNCTION;
+                    } else if (next != BSDOC_STYLE_NONE) {
+                        style = next;
+                        next = BSDOC_STYLE_NONE;
+                    }
                 }
             }
 
@@ -304,9 +291,7 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
                 style = BSDOC_STYLE_FUNCTION;
             } else if (next != BSDOC_STYLE_NONE) {
                 style = next;
-                if (next != BSDOC_STYLE_CLASS) {
-                    next = BSDOC_STYLE_NONE;
-                }
+                next = BSDOC_STYLE_NONE;
             } else {
                 style = bsdoc_token_type_style(token.type);
             }

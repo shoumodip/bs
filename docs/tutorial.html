@@ -582,14 +582,14 @@ This does mean, however, that placement of binary operators matter.
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'>// =&gt; 100 - 31;</span>
+<span class='comment'>// -&gt; 100 - 31;</span>
 <span class='constant'>100</span> - <span class='constant'>31</span>
 
-<span class='comment'>// =&gt; 100 - 31;</span>
+<span class='comment'>// -&gt; 100 - 31;</span>
 <span class='constant'>100</span> -
 <span class='constant'>31</span>
 
-<span class='comment'>// =&gt; 100; -31;</span>
+<span class='comment'>// -&gt; 100; -31;</span>
 <span class='constant'>100</span>
 - <span class='constant'>31</span>
 </pre>
@@ -727,23 +727,23 @@ Minor
 <pre class='code active'>
 <span class='comment'>// Output: A</span>
 <span class='keyword'>match</span> <span class='constant'>69</span> {
-    <span class='constant'>69</span> =&gt; io.<span class='function'>println</span>(<span class='string'>"A"</span>)
-    <span class='constant'>420</span> =&gt; {
+    <span class='constant'>69</span> -&gt; io.<span class='function'>println</span>(<span class='string'>"A"</span>)
+    <span class='constant'>420</span> -&gt; {
         io.<span class='function'>println</span>(<span class='string'>"B"</span>)
     }
 }
 
 <span class='comment'>// Output: B</span>
 <span class='keyword'>match</span> <span class='constant'>420</span> {
-    <span class='constant'>69</span> =&gt; io.<span class='function'>println</span>(<span class='string'>"A"</span>)
-    <span class='constant'>420</span> =&gt; {
+    <span class='constant'>69</span> -&gt; io.<span class='function'>println</span>(<span class='string'>"A"</span>)
+    <span class='constant'>420</span> -&gt; {
         io.<span class='function'>println</span>(<span class='string'>"B"</span>)
     }
 }
 
 <span class='keyword'>match</span> <span class='constant'>1337</span> {
-    <span class='constant'>69</span> =&gt; io.<span class='function'>println</span>(<span class='string'>"A"</span>)
-    <span class='constant'>420</span> =&gt; {
+    <span class='constant'>69</span> -&gt; io.<span class='function'>println</span>(<span class='string'>"A"</span>)
+    <span class='constant'>420</span> -&gt; {
         io.<span class='function'>println</span>(<span class='string'>"B"</span>)
     }
 
@@ -752,8 +752,8 @@ Minor
 
 <span class='comment'>// Output: C</span>
 <span class='keyword'>match</span> <span class='constant'>1337</span> {
-    <span class='constant'>69</span> =&gt; io.<span class='function'>println</span>(<span class='string'>"A"</span>)
-    <span class='constant'>420</span> =&gt; {
+    <span class='constant'>69</span> -&gt; io.<span class='function'>println</span>(<span class='string'>"A"</span>)
+    <span class='constant'>420</span> -&gt; {
         io.<span class='function'>println</span>(<span class='string'>"B"</span>)
     }
 } <span class='keyword'>else</span> {
@@ -764,11 +764,11 @@ Minor
 <span class='comment'>// Output: C</span>
 <span class='keyword'>match</span> <span class='constant'>42</span> {
     <span class='comment'>// Multiple cases for the same branch</span>
-    <span class='constant'>0</span>, <span class='constant'>1</span> =&gt; io.<span class='function'>println</span>(<span class='string'>"A"</span>)
-    <span class='constant'>69</span>, <span class='constant'>420</span>, <span class='constant'>1337</span> =&gt; {
+    <span class='constant'>0</span>, <span class='constant'>1</span> -&gt; io.<span class='function'>println</span>(<span class='string'>"A"</span>)
+    <span class='constant'>69</span>, <span class='constant'>420</span>, <span class='constant'>1337</span> -&gt; {
         io.<span class='function'>println</span>(<span class='string'>"B"</span>)
     }
-    <span class='constant'>42</span> =&gt; io.<span class='function'>println</span>(<span class='string'>"C"</span>)
+    <span class='constant'>42</span> -&gt; io.<span class='function'>println</span>(<span class='string'>"C"</span>)
 } <span class='keyword'>else</span> {
     io.<span class='function'>println</span>(<span class='string'>"D"</span>)
 }
@@ -786,13 +786,13 @@ Minor
 <span class='comment'>// Side effect!</span>
 <span class='comment'>// x</span>
 <span class='keyword'>match</span> <span class='string'>"foobar"</span>.<span class='function'>slice</span>(<span class='constant'>0</span>, <span class='constant'>3</span>) { <span class='comment'>// All values can be matched</span>
-    y =&gt; io.<span class='function'>println</span>(<span class='string'>"y"</span>)
+    y -&gt; io.<span class='function'>println</span>(<span class='string'>"y"</span>)
 
     <span class='comment'>// Expressions are allowed</span>
-    <span class='constant'>22</span> + <span class='constant'>10</span> =&gt; io.<span class='function'>println</span>(<span class='string'>"Deez"</span>)
+    <span class='constant'>22</span> + <span class='constant'>10</span> -&gt; io.<span class='function'>println</span>(<span class='string'>"Deez"</span>)
 
     <span class='comment'>// Arbritary runtime code in general is allowed</span>
-    os.<span class='function'>clock</span>() =&gt; <span class='keyword'>panic</span>(<span class='string'>"What?"</span>)
+    os.<span class='function'>clock</span>() -&gt; <span class='keyword'>panic</span>(<span class='string'>"What?"</span>)
 
     <span class='comment'>// And you thought JS was bad</span>
     (<span class='keyword'>fn</span> () {
@@ -800,11 +800,11 @@ Minor
         <span class='comment'>// 2. The order of operations matter. If a matching case was encountered</span>
         <span class='comment'>//    before this, then this side effect would not have occured</span>
         io.<span class='function'>println</span>(<span class='string'>"Side effect!"</span>)
-    })() =&gt; {
+    })() -&gt; {
         io.<span class='function'>println</span>(<span class='string'>"Why?"</span>)
     }
 
-    x =&gt; io.<span class='function'>println</span>(<span class='string'>"x"</span>)
+    x -&gt; io.<span class='function'>println</span>(<span class='string'>"x"</span>)
 }
 </pre>
 </div>
@@ -1356,9 +1356,9 @@ Functions support a shorthand syntax for a single expression body.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>fn</span> <span class='function'>combine</span>(f, x, y) =&gt; <span class='function'>f</span>(x, y)
+<span class='keyword'>fn</span> <span class='function'>combine</span>(f, x, y) -&gt; <span class='function'>f</span>(x, y)
 
-io.<span class='function'>println</span>(<span class='function'>combine</span>(<span class='keyword'>fn</span> (x, y) =&gt; x + y, <span class='constant'>34</span>, <span class='constant'>35</span>))
+io.<span class='function'>println</span>(<span class='function'>combine</span>(<span class='keyword'>fn</span> (x, y) -&gt; x + y, <span class='constant'>34</span>, <span class='constant'>35</span>))
 </pre>
 </div>
 <div class='codes'>
@@ -1445,7 +1445,7 @@ captured as unique values in the nested closure on each iteration of the loop.
 
 <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>5</span> {
     <span class='keyword'>var</span> z = i * <span class='constant'>2</span>
-    closures.<span class='function'>push</span>(<span class='keyword'>fn</span> () =&gt; io.<span class='function'>println</span>(i, z))
+    closures.<span class='function'>push</span>(<span class='keyword'>fn</span> () -&gt; io.<span class='function'>println</span>(i, z))
 }
 
 <span class='keyword'>for</span> _, f <span class='keyword'>in</span> closures {
@@ -1906,8 +1906,8 @@ they are declared. This is where global variables come into play.
 <span class='comment'>// one.bs</span>
 <span class='keyword'>var</span> M = {}
 
-M.<span class='field'>inc</span> = <span class='keyword'>fn</span> (n) =&gt; n + <span class='constant'>1</span>
-M.<span class='field'>dec</span> = <span class='keyword'>fn</span> (n) =&gt; n - <span class='constant'>1</span>
+M.<span class='field'>inc</span> = <span class='keyword'>fn</span> (n) -&gt; n + <span class='constant'>1</span>
+M.<span class='field'>dec</span> = <span class='keyword'>fn</span> (n) -&gt; n - <span class='constant'>1</span>
 
 <span class='keyword'>return</span> M <span class='comment'>// Any arbitrary value can be returned, this is just the usual pattern</span>
 </pre>
@@ -1970,8 +1970,8 @@ Modules are loaded only once.
 
 io.<span class='function'>println</span>(<span class='string'>"Loading module 'one'"</span>)
 
-M.<span class='field'>inc</span> = <span class='keyword'>fn</span> (n) =&gt; n + <span class='constant'>1</span>
-M.<span class='field'>dec</span> = <span class='keyword'>fn</span> (n) =&gt; n - <span class='constant'>1</span>
+M.<span class='field'>inc</span> = <span class='keyword'>fn</span> (n) -&gt; n + <span class='constant'>1</span>
+M.<span class='field'>dec</span> = <span class='keyword'>fn</span> (n) -&gt; n - <span class='constant'>1</span>
 
 <span class='keyword'>return</span> M</pre>
 </div>
@@ -2032,8 +2032,8 @@ Loading module 'one'
     io.<span class='function'>println</span>(<span class='string'>"Loading module 'one'"</span>)
 }
 
-M.<span class='field'>inc</span> = <span class='keyword'>fn</span> (n) =&gt; n + <span class='constant'>1</span>
-M.<span class='field'>dec</span> = <span class='keyword'>fn</span> (n) =&gt; n - <span class='constant'>1</span>
+M.<span class='field'>inc</span> = <span class='keyword'>fn</span> (n) -&gt; n + <span class='constant'>1</span>
+M.<span class='field'>dec</span> = <span class='keyword'>fn</span> (n) -&gt; n - <span class='constant'>1</span>
 
 <span class='keyword'>return</span> M</pre>
 </div>
@@ -2138,7 +2138,7 @@ more applicable, albeit involved, example.
 }
 
 <span class='comment'>// Inheritance</span>
-<span class='keyword'>class</span> <span class='class'>Hero</span> &lt; <span class='class'>Sprite</span> {
+<span class='keyword'>class</span> <span class='class'>Hero</span> &lt; Sprite {
     <span class='function'>init</span>(name, health, attack_power) {
         <span class='constant'>super</span>.<span class='function'>init</span>(name, health, attack_power)
         <span class='constant'>this</span>.<span class='field'>poisoned</span> = <span class='constant'>false</span>
@@ -2168,7 +2168,7 @@ more applicable, albeit involved, example.
     }
 }
 
-<span class='keyword'>class</span> <span class='class'>Enemy</span> &lt; <span class='class'>Sprite</span> {
+<span class='keyword'>class</span> <span class='class'>Enemy</span> &lt; Sprite {
     <span class='function'>init</span>(name, health, attack_power) {
         <span class='constant'>super</span>.<span class='function'>init</span>(name, health, attack_power)
     }

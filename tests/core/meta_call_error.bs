@@ -14,18 +14,18 @@ fn handle(result) {
     }
 }
 
-handle(meta.call(fn (a, b) => a + b, 34, 35)) // Ok
+handle(meta.call(fn (a, b) -> a + b, 34, 35)) // Ok
 io.println()
 
-handle(meta.call(fn () => -nil))              // Bs Fail
+handle(meta.call(fn () -> -nil))              // Bs Fail
 io.println()
 
 handle(meta.call(io.Reader))                  // Native Fail
 io.println()
 
 {
-    fn h() => lmao
-    fn g() => h()
-    fn f() => g()
+    fn h() -> lmao
+    fn g() -> h()
+    fn f() -> g()
     handle(meta.call(f))                      // No stack trace!
 }

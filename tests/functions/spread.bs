@@ -1,4 +1,4 @@
-fn add(x, y) => x + y
+fn add(x, y) -> x + y
 
 fn sum(..numbers) {
     var total = 0

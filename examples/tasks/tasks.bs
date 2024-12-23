@@ -74,9 +74,9 @@ if len(os.args) < 2 {
 
 var command = os.args[1]
 match command {
-    "help" => usage(io.stdout)
+    "help" -> usage(io.stdout)
 
-    "add" => {
+    "add" -> {
         if len(os.args) < 3 {
             io.eprintln("Error: task title not provided")
             io.eprintln("Usage: tasks add <title>")
@@ -86,7 +86,7 @@ match command {
         Tasks(TASKS_PATH).add(os.args[2])
     }
 
-    "done" => {
+    "done" -> {
         if len(os.args) < 3 {
             io.eprintln("Error: task index not provided")
             io.eprintln("Usage: tasks done <index>")
@@ -102,7 +102,7 @@ match command {
         Tasks(TASKS_PATH).done(index)
     }
 
-    "edit" => {
+    "edit" -> {
         if len(os.args) < 3 {
             io.eprintln("Error: task index not provided")
             io.eprintln("Usage: tasks edit <index> <title>")
@@ -124,7 +124,7 @@ match command {
         Tasks(TASKS_PATH).edit(index, os.args[3])
     }
 
-    "list" => {
+    "list" -> {
         var query = nil
         if len(os.args) > 2 {
             query = Regex(os.args[2])

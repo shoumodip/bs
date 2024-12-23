@@ -112,7 +112,7 @@ The UNIX <code>ls</code> coreutil.
 }
 
 io.<span class='function'>readdir</span>(<span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &gt;= <span class='constant'>2</span> <span class='keyword'>then</span> os.<span class='field'>args</span>[<span class='constant'>1</span>] <span class='keyword'>else</span> <span class='string'>"."</span>)
-    .<span class='function'>map</span>(<span class='keyword'>fn</span> (e) =&gt; e.<span class='function'>name</span>() $ <span class='keyword'>if</span> e.<span class='function'>isdir</span>() <span class='keyword'>then</span> <span class='string'>"/"</span> <span class='keyword'>else</span> <span class='string'>""</span>)
+    .<span class='function'>map</span>(<span class='keyword'>fn</span> (e) -&gt; e.<span class='function'>name</span>() $ <span class='keyword'>if</span> e.<span class='function'>isdir</span>() <span class='keyword'>then</span> <span class='string'>"/"</span> <span class='keyword'>else</span> <span class='string'>""</span>)
     .<span class='function'>sort</span>(compare)
     .<span class='function'>map</span>(io.<span class='field'>println</span>)
 </pre>
@@ -593,7 +593,7 @@ An implementation of
 
 <span class='keyword'>var</span> INTERVAL = <span class='constant'>0.1</span>
 
-<span class='keyword'>class</span> <span class='class'>GameOfLifeTUI</span> &lt; <span class='class'>GameOfLife</span> {
+<span class='keyword'>class</span> <span class='class'>GameOfLifeTUI</span> &lt; GameOfLife {
     <span class='function'>init</span>(width, height) {
         <span class='constant'>super</span>.<span class='function'>init</span>(width, height)
     }
@@ -907,7 +907,7 @@ Make sure to provide the compiler and linker flags as required.
 <span class='keyword'>var</span> padding_x = <span class='constant'>0</span>
 <span class='keyword'>var</span> padding_y = <span class='constant'>0</span>
 
-<span class='keyword'>class</span> <span class='class'>GameOfLifeRaylib</span> &lt; <span class='class'>GameOfLife</span> {
+<span class='keyword'>class</span> <span class='class'>GameOfLifeRaylib</span> &lt; GameOfLife {
     <span class='function'>init</span>(width, height) {
         <span class='constant'>super</span>.<span class='function'>init</span>(width, height)
         <span class='constant'>this</span>.<span class='field'>clock</span> = <span class='constant'>0</span>
@@ -1116,9 +1116,9 @@ Run the program.
 
 <span class='keyword'>var</span> command = os.<span class='field'>args</span>[<span class='constant'>1</span>]
 <span class='keyword'>match</span> command {
-    <span class='string'>"help"</span> =&gt; <span class='function'>usage</span>(io.<span class='field'>stdout</span>)
+    <span class='string'>"help"</span> -&gt; <span class='function'>usage</span>(io.<span class='field'>stdout</span>)
 
-    <span class='string'>"add"</span> =&gt; {
+    <span class='string'>"add"</span> -&gt; {
         <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>3</span> {
             io.<span class='function'>eprintln</span>(<span class='string'>"Error: task title not provided"</span>)
             io.<span class='function'>eprintln</span>(<span class='string'>"Usage: tasks add &lt;title&gt;"</span>)
@@ -1128,7 +1128,7 @@ Run the program.
         <span class='function'>Tasks</span>(TASKS_PATH).<span class='function'>add</span>(os.<span class='field'>args</span>[<span class='constant'>2</span>])
     }
 
-    <span class='string'>"done"</span> =&gt; {
+    <span class='string'>"done"</span> -&gt; {
         <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>3</span> {
             io.<span class='function'>eprintln</span>(<span class='string'>"Error: task index not provided"</span>)
             io.<span class='function'>eprintln</span>(<span class='string'>"Usage: tasks done &lt;index&gt;"</span>)
@@ -1144,7 +1144,7 @@ Run the program.
         <span class='function'>Tasks</span>(TASKS_PATH).<span class='function'>done</span>(index)
     }
 
-    <span class='string'>"edit"</span> =&gt; {
+    <span class='string'>"edit"</span> -&gt; {
         <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>3</span> {
             io.<span class='function'>eprintln</span>(<span class='string'>"Error: task index not provided"</span>)
             io.<span class='function'>eprintln</span>(<span class='string'>"Usage: tasks edit &lt;index&gt; &lt;title&gt;"</span>)
@@ -1166,7 +1166,7 @@ Run the program.
         <span class='function'>Tasks</span>(TASKS_PATH).<span class='function'>edit</span>(index, os.<span class='field'>args</span>[<span class='constant'>3</span>])
     }
 
-    <span class='string'>"list"</span> =&gt; {
+    <span class='string'>"list"</span> -&gt; {
         <span class='keyword'>var</span> query = <span class='constant'>nil</span>
         <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &gt; <span class='constant'>2</span> {
             query = <span class='function'>Regex</span>(os.<span class='field'>args</span>[<span class='constant'>2</span>])
@@ -1839,7 +1839,7 @@ Make sure to provide the compiler and linker flags as required.
                 <span class='constant'>this</span>.<span class='field'>clock</span> %= PIPE_SPAWN_DELAY
             }
 
-            <span class='constant'>this</span>.<span class='field'>items</span> = <span class='constant'>this</span>.<span class='field'>items</span>.<span class='function'>filter</span>(<span class='keyword'>fn</span> (p) =&gt; p.<span class='field'>hitbox</span>.<span class='field'>x</span> &gt;= -p.<span class='field'>hitbox</span>.<span class='field'>width</span>)
+            <span class='constant'>this</span>.<span class='field'>items</span> = <span class='constant'>this</span>.<span class='field'>items</span>.<span class='function'>filter</span>(<span class='keyword'>fn</span> (p) -&gt; p.<span class='field'>hitbox</span>.<span class='field'>x</span> &gt;= -p.<span class='field'>hitbox</span>.<span class='field'>width</span>)
         }
 
         <span class='keyword'>for</span> _, pipe <span class='keyword'>in</span> <span class='constant'>this</span>.<span class='field'>items</span> {
@@ -1892,7 +1892,7 @@ Make sure to provide the compiler and linker flags as required.
                 digits.<span class='function'>reverse</span>()
 
                 scale *= game.<span class='field'>scale</span>
-                <span class='keyword'>var</span> width = digits.<span class='function'>reduce</span>(<span class='keyword'>fn</span> (a, b) =&gt; a + <span class='constant'>this</span>.<span class='field'>textures</span>[b].<span class='function'>width</span>() * scale, <span class='constant'>0</span>)
+                <span class='keyword'>var</span> width = digits.<span class='function'>reduce</span>(<span class='keyword'>fn</span> (a, b) -&gt; a + <span class='constant'>this</span>.<span class='field'>textures</span>[b].<span class='function'>width</span>() * scale, <span class='constant'>0</span>)
                 <span class='keyword'>var</span> x = (WIDTH - width) / <span class='constant'>2</span>
                 <span class='keyword'>for</span> _, n <span class='keyword'>in</span> digits {
                     <span class='constant'>this</span>.<span class='field'>textures</span>[n].<span class='function'>draw</span>(x, y, <span class='constant'>0</span>, scale, tint)

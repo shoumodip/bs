@@ -63,7 +63,7 @@ fn compare(a, b) {
 }
 
 io.readdir(if len(os.args) >= 2 then os.args[1] else ".")
-    .map(fn (e) => e.name() $ if e.isdir() then "/" else "")
+    .map(fn (e) -> e.name() $ if e.isdir() then "/" else "")
     .sort(compare)
     .map(io.println)
 ```
@@ -874,9 +874,9 @@ if len(os.args) < 2 {
 
 var command = os.args[1]
 match command {
-    "help" => usage(io.stdout)
+    "help" -> usage(io.stdout)
 
-    "add" => {
+    "add" -> {
         if len(os.args) < 3 {
             io.eprintln("Error: task title not provided")
             io.eprintln("Usage: tasks add <title>")
@@ -886,7 +886,7 @@ match command {
         Tasks(TASKS_PATH).add(os.args[2])
     }
 
-    "done" => {
+    "done" -> {
         if len(os.args) < 3 {
             io.eprintln("Error: task index not provided")
             io.eprintln("Usage: tasks done <index>")
@@ -902,7 +902,7 @@ match command {
         Tasks(TASKS_PATH).done(index)
     }
 
-    "edit" => {
+    "edit" -> {
         if len(os.args) < 3 {
             io.eprintln("Error: task index not provided")
             io.eprintln("Usage: tasks edit <index> <title>")
@@ -924,7 +924,7 @@ match command {
         Tasks(TASKS_PATH).edit(index, os.args[3])
     }
 
-    "list" => {
+    "list" -> {
         var query = nil
         if len(os.args) > 2 {
             query = Regex(os.args[2])
@@ -1549,7 +1549,7 @@ class Pipes {
                 this.clock %= PIPE_SPAWN_DELAY
             }
 
-            this.items = this.items.filter(fn (p) => p.hitbox.x >= -p.hitbox.width)
+            this.items = this.items.filter(fn (p) -> p.hitbox.x >= -p.hitbox.width)
         }
 
         for _, pipe in this.items {
@@ -1602,7 +1602,7 @@ class Score {
                 digits.reverse()
 
                 scale *= game.scale
-                var width = digits.reduce(fn (a, b) => a + this.textures[b].width() * scale, 0)
+                var width = digits.reduce(fn (a, b) -> a + this.textures[b].width() * scale, 0)
                 var x = (WIDTH - width) / 2
                 for _, n in digits {
                     this.textures[n].draw(x, y, 0, scale, tint)

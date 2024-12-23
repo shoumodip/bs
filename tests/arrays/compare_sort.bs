@@ -7,5 +7,5 @@ var xs = [
 ]
 
 io.println(xs)
-xs.sort(fn (a, b) => a.compare(b) == -1)
+xs.sort(fn (a, b) -> a.compare(b) == -1)
 io.println(xs)

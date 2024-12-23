@@ -1,7 +1,7 @@
-io.println([1, 2, 3, 4, 5].map(fn (x) => x * 2))
-io.println([1, 2, 3, 4, 5].filter(fn (x) => x % 2 == 0))
-io.println([1, 2, 3, 4, 5].reduce(fn (x, y) => x + y))
-io.println([1, 2, 3, 4, 5].reduce(fn (x, y) => x + y, 20))
+io.println([1, 2, 3, 4, 5].map(fn (x) -> x * 2))
+io.println([1, 2, 3, 4, 5].filter(fn (x) -> x % 2 == 0))
+io.println([1, 2, 3, 4, 5].reduce(fn (x, y) -> x + y))
+io.println([1, 2, 3, 4, 5].reduce(fn (x, y) -> x + y, 20))
 
 {
     var xs = [1, 2, 3, 4, 5]
@@ -35,7 +35,7 @@ io.println([1, 2, 3, 4, 2].find(2, 2))
 {
     var xs = [2, 5, 1, 4, 3]
     io.println("Before:", xs)
-    io.println("Return:", xs.sort(fn (x, y) => x < y))
+    io.println("Return:", xs.sort(fn (x, y) -> x < y))
     io.println("Final: ", xs)
 }
 

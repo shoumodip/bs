@@ -2082,7 +2082,7 @@ HERE!
 :b stderr 137
 match/error_cannot_use_class.bs:2:11: error: cannot use 'class' here without wrapping in {}
 
-    2 |     69 => class
+    2 |     69 -> class
       |           ^
 
 :b shell 38
@@ -2093,7 +2093,7 @@ match/error_cannot_use_class.bs:2:11: error: cannot use 'class' here without wra
 :b stderr 128
 match/error_cannot_use_fn.bs:2:11: error: cannot use 'fn' here without wrapping in {}
 
-    2 |     69 => fn
+    2 |     69 -> fn
       |           ^
 
 :b shell 39
@@ -2104,7 +2104,7 @@ match/error_cannot_use_fn.bs:2:11: error: cannot use 'fn' here without wrapping 
 :b stderr 131
 match/error_cannot_use_var.bs:2:11: error: cannot use 'var' here without wrapping in {}
 
-    2 |     69 => var
+    2 |     69 -> var
       |           ^
 
 :b shell 27
@@ -2159,7 +2159,7 @@ ERROR!
 Row: 20
 Col: 27
 Path: core/meta_call_error.bs
-Line: handle(meta.call(fn () => -nil))              // Bs Fail
+Line: handle(meta.call(fn () -> -nil))              // Bs Fail
 Message: invalid operand to unary (-): nil
 Explanation: nil
 Example: nil
@@ -2177,7 +2177,7 @@ ERROR!
 Row: 27
 Col: 15
 Path: core/meta_call_error.bs
-Line:     fn h() => lmao
+Line:     fn h() -> lmao
 Message: undefined identifier 'lmao'
 Explanation: nil
 Example: nil

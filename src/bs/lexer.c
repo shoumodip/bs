@@ -434,6 +434,8 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
     case '-':
         if (bs_lexer_match(l, '=')) {
             token.type = BS_TOKEN_SUB_SET;
+        } else if (bs_lexer_match(l, '>')) {
+            token.type = BS_TOKEN_ARROW;
         } else {
             token.type = BS_TOKEN_SUB;
         }
@@ -534,8 +536,6 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
     case '=':
         if (bs_lexer_match(l, '=')) {
             token.type = BS_TOKEN_EQ;
-        } else if (bs_lexer_match(l, '>')) {
-            token.type = BS_TOKEN_ARROW;
         } else {
             token.type = BS_TOKEN_SET;
         }

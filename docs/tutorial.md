@@ -365,14 +365,14 @@ io.println(69); io.println(420)
 This does mean, however, that placement of binary operators matter.
 
 ```bs
-// => 100 - 31;
+// -> 100 - 31;
 100 - 31
 
-// => 100 - 31;
+// -> 100 - 31;
 100 -
 31
 
-// => 100; -31;
+// -> 100; -31;
 100
 - 31
 ```
@@ -436,23 +436,23 @@ Minor
 ```bs
 // Output: A
 match 69 {
-    69 => io.println("A")
-    420 => {
+    69 -> io.println("A")
+    420 -> {
         io.println("B")
     }
 }
 
 // Output: B
 match 420 {
-    69 => io.println("A")
-    420 => {
+    69 -> io.println("A")
+    420 -> {
         io.println("B")
     }
 }
 
 match 1337 {
-    69 => io.println("A")
-    420 => {
+    69 -> io.println("A")
+    420 -> {
         io.println("B")
     }
 
@@ -461,8 +461,8 @@ match 1337 {
 
 // Output: C
 match 1337 {
-    69 => io.println("A")
-    420 => {
+    69 -> io.println("A")
+    420 -> {
         io.println("B")
     }
 } else {
@@ -473,11 +473,11 @@ match 1337 {
 // Output: C
 match 42 {
     // Multiple cases for the same branch
-    0, 1 => io.println("A")
-    69, 420, 1337 => {
+    0, 1 -> io.println("A")
+    69, 420, 1337 -> {
         io.println("B")
     }
-    42 => io.println("C")
+    42 -> io.println("C")
 } else {
     io.println("D")
 }
@@ -495,13 +495,13 @@ var y = "bar"
 // Side effect!
 // x
 match "foobar".slice(0, 3) { // All values can be matched
-    y => io.println("y")
+    y -> io.println("y")
 
     // Expressions are allowed
-    22 + 10 => io.println("Deez")
+    22 + 10 -> io.println("Deez")
 
     // Arbritary runtime code in general is allowed
-    os.clock() => panic("What?")
+    os.clock() -> panic("What?")
 
     // And you thought JS was bad
     (fn () {
@@ -509,11 +509,11 @@ match "foobar".slice(0, 3) { // All values can be matched
         // 2. The order of operations matter. If a matching case was encountered
         //    before this, then this side effect would not have occured
         io.println("Side effect!")
-    })() => {
+    })() -> {
         io.println("Why?")
     }
 
-    x => io.println("x")
+    x -> io.println("x")
 }
 ```
 
@@ -766,9 +766,9 @@ $ bs functions.bs
 Functions support a shorthand syntax for a single expression body.
 
 ```bs
-fn combine(f, x, y) => f(x, y)
+fn combine(f, x, y) -> f(x, y)
 
-io.println(combine(fn (x, y) => x + y, 34, 35))
+io.println(combine(fn (x, y) -> x + y, 34, 35))
 ```
 
 ```console
@@ -807,7 +807,7 @@ var closures = []
 
 for i in 0, 5 {
     var z = i * 2
-    closures.push(fn () => io.println(i, z))
+    closures.push(fn () -> io.println(i, z))
 }
 
 for _, f in closures {
@@ -1040,8 +1040,8 @@ $ bs variables.bs
 // one.bs
 var M = {}
 
-M.inc = fn (n) => n + 1
-M.dec = fn (n) => n - 1
+M.inc = fn (n) -> n + 1
+M.dec = fn (n) -> n - 1
 
 return M // Any arbitrary value can be returned, this is just the usual pattern
 ```
@@ -1069,8 +1069,8 @@ var M = {}
 
 io.println("Loading module 'one'")
 
-M.inc = fn (n) => n + 1
-M.dec = fn (n) => n - 1
+M.inc = fn (n) -> n + 1
+M.dec = fn (n) -> n - 1
 
 return M
 ```
@@ -1097,8 +1097,8 @@ if is_main_module {
     io.println("Loading module 'one'")
 }
 
-M.inc = fn (n) => n + 1
-M.dec = fn (n) => n - 1
+M.inc = fn (n) -> n + 1
+M.dec = fn (n) -> n - 1
 
 return M
 ```

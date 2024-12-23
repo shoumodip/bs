@@ -15,7 +15,7 @@ const char *bs_token_type_name(Bs_Token_Type type) {
         return "'.'";
 
     case BS_TOKEN_ARROW:
-        return "'=>'";
+        return "'->'";
 
     case BS_TOKEN_COMMA:
         return "','";

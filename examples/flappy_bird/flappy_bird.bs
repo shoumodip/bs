@@ -287,7 +287,7 @@ class Pipes {
                 this.clock %= PIPE_SPAWN_DELAY
             }
 
-            this.items = this.items.filter(fn (p) => p.hitbox.x >= -p.hitbox.width)
+            this.items = this.items.filter(fn (p) -> p.hitbox.x >= -p.hitbox.width)
         }
 
         for _, pipe in this.items {
@@ -340,7 +340,7 @@ class Score {
                 digits.reverse()
 
                 scale *= game.scale
-                var width = digits.reduce(fn (a, b) => a + this.textures[b].width() * scale, 0)
+                var width = digits.reduce(fn (a, b) -> a + this.textures[b].width() * scale, 0)
                 var x = (WIDTH - width) / 2
                 for _, n in digits {
                     this.textures[n].draw(x, y, 0, scale, tint)
