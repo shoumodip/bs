@@ -56,13 +56,13 @@ class GameOfLife {
             }
         }
 
-        # Swap buffers
+        // Swap buffers
         var t = this.board
         this.board = this.buffer
         this.buffer = t
     }
 
-    # (X, Y) is the center of the glider
+    // (X, Y) is the center of the glider
     glider(x, y) {
         this.set(x + 0, y - 1, true)
         this.set(x + 1, y + 0, true)

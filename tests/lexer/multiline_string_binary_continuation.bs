@@ -1,4 +1,4 @@
-# No ASI in nested expressions
+// No ASI in nested expressions
 io.println(69 $ "Nice!
 Lol "
            $ 420)

@@ -227,7 +227,7 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
 
     Bs_Lexer lexer = bs_lexer_new(bs_sv_from_cstr(path), input, &error);
     lexer.loc.row = start;
-    lexer.comments = true;
+    lexer.bsdoc = true;
 
     if (setjmp(lexer.unwind)) {
         return false;
@@ -282,7 +282,7 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
                 }
             }
 
-            if (token.type == BS_TOKEN_COMMENT) {
+            if (token.type == BS_TOKEN_COMMENT && *token.sv.data == '#') {
                 Bs_Sv macro = bs_sv_split(&token.sv, ' ');
                 {
                     const Bs_Sv t = token.sv;
@@ -293,14 +293,6 @@ static bool bsdoc_print_code(FILE *f, const char *path, Bs_Sv input, size_t star
                 bsdoc_print_token(f, token, BSDOC_STYLE_KEYWORD, &last);
                 token.sv = macro;
                 bsdoc_print_token(f, token, BSDOC_STYLE_STRING, &last);
-            } else if (token.type == BS_TOKEN_DIV && lexer.sv.size && *lexer.sv.data == '/') {
-                while (lexer.sv.size && *lexer.sv.data != '\n') {
-                    bs_lexer_advance(&lexer);
-                }
-                bs_lexer_advance(&lexer);
-
-                token.sv.size = lexer.sv.data - token.sv.data;
-                bsdoc_print_token(f, token, BSDOC_STYLE_COMMENT, &last);
             } else {
                 bsdoc_print_token(f, token, style, &last);
             }

@@ -1,2 +1,4 @@
 #!/bin/sh
-cc -I./include -o bin/bsdoc src/bsdoc.c lib/.build/basic.c.o lib/.build/token.c.o lib/.build/lexer.c.o
+
+set -xe
+cc -I./include -o bin/bsdoc src/bsdoc.c src/bs/basic.c src/bs/token.c src/bs/lexer.c

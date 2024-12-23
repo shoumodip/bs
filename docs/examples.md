@@ -6,7 +6,7 @@
 The UNIX `cat` coreutil.
 
 ```bs
-# cat.bs
+// cat.bs
 
 var code = 0
 
@@ -48,7 +48,7 @@ os.exit(code)
 The UNIX `ls` coreutil.
 
 ```bs
-# ls.bs
+// ls.bs
 
 fn compare(a, b) {
     if a.suffix("/") && !b.suffix("/") {
@@ -78,7 +78,7 @@ ls.bs
 The UNIX `grep` coreutil.
 
 ```bs
-# grep.bs
+// grep.bs
 
 fn grep(f, path, pattern) {
     var row = 0
@@ -165,11 +165,11 @@ $ cat grep.bs | bs grep.bs '\.[A-z]+\(' # DON'T CAT INTO GREP!!!
 A simple UNIX shell.
 
 ```bs
-# shell.bs
+// shell.bs
 
 var home = os.getenv("HOME")
 
-# Return a pretty current working directory
+// Return a pretty current working directory
 fn pwd() {
     var cwd = os.getcwd()
     if cwd.prefix(home) {
@@ -179,10 +179,10 @@ fn pwd() {
     return cwd
 }
 
-# Rawdogging shell lexing with regex any%
+// Rawdogging shell lexing with regex any%
 var delim = Regex("[ \n\t]+")
 
-# Previous working directory
+// Previous working directory
 var previous = nil
 
 while !io.stdin.eof() {
@@ -193,10 +193,10 @@ while !io.stdin.eof() {
 
     var cmd = args[0]
 
-    # Builtin 'exit'
-    # Usage:
-    #   exit         -> Exits with 0
-    #   exit <CODE>  -> Exits with CODE
+    // Builtin 'exit'
+    // Usage:
+    //   exit         -> Exits with 0
+    //   exit <CODE>  -> Exits with CODE
     if cmd == "exit" {
         if len(args) > 2 {
             io.eprintln("Error: too many arguments to command '{cmd}'")
@@ -212,11 +212,11 @@ while !io.stdin.eof() {
         os.exit(code)
     }
 
-    # Builtin 'cd'
-    # Usage:
-    #   cd        -> Go to HOME
-    #   cd <DIR>  -> Go to DIR
-    #   cd -      -> Go to previous location
+    // Builtin 'cd'
+    // Usage:
+    //   cd        -> Go to HOME
+    //   cd <DIR>  -> Go to DIR
+    //   cd -      -> Go to previous location
     if cmd == "cd" {
         if len(args) > 2 {
             io.eprintln("Error: too many arguments to command '{cmd}'")
@@ -254,7 +254,7 @@ while !io.stdin.eof() {
     p.wait()
 }
 
-# In case of CTRL-d
+// In case of CTRL-d
 io.println()
 ```
 
@@ -279,7 +279,7 @@ An implementation of
 for proof of Turing Completeness.
 
 ```bs
-# rule110.bs
+// rule110.bs
 
 var board = [].resize(30).fill(0)
 board[len(board) - 2] = 1
@@ -336,7 +336,7 @@ An implementation of
 <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">Conway's Game Of Life</a>
 
 ```bs
-# GameOfLife.bs
+// GameOfLife.bs
 
 class GameOfLife {
     init(width, height) {
@@ -396,13 +396,13 @@ class GameOfLife {
             }
         }
 
-        # Swap buffers
+        // Swap buffers
         var t = this.board
         this.board = this.buffer
         this.buffer = t
     }
 
-    # (X, Y) is the center of the glider
+    // (X, Y) is the center of the glider
     glider(x, y) {
         this.set(x + 0, y - 1, true)
         this.set(x + 1, y + 0, true)
@@ -418,7 +418,7 @@ return GameOfLife
 ### Console
 
 ```bs
-# game_of_life_tui.bs
+// game_of_life_tui.bs
 
 var GameOfLife = import("GameOfLife")
 
@@ -671,7 +671,7 @@ Make sure to provide the compiler and linker flags as required.
 </blockquote>
 
 ```bs
-# game_of_life_raylib.bs
+// game_of_life_raylib.bs
 
 var rl = import("raylib")
 var GameOfLife = import("GameOfLife")
@@ -796,7 +796,7 @@ $ bs game_of_life_raylib.bs
 ## CLI Task Management APP
 
 ```bs
-# tasks.bs
+// tasks.bs
 
 var TASKS_PATH = os.getenv("HOME") $ "/.tasks"
 
@@ -1258,7 +1258,7 @@ Make sure to provide the compiler and linker flags as required.
 </blockquote>
 
 ```bs
-# flappy_bird.bs
+// flappy_bird.bs
 
 var rl = import("raylib")
 var game = {}

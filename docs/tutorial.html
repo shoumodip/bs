@@ -67,7 +67,7 @@ Hello, world!
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># Single Line Comment</span>
+<span class='comment'>// Single Line Comment</span>
 
 <span class='comment'>/*
     Multi
@@ -104,7 +104,7 @@ Hello, world!
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='constant'>nil</span>) <span class='comment'># Output: nil</span>
+io.<span class='function'>println</span>(<span class='constant'>nil</span>) <span class='comment'>// Output: nil</span>
 </pre>
 </div>
 </section>
@@ -125,9 +125,9 @@ BS supports 64-bit floating point numbers only.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='constant'>69</span>)     <span class='comment'># Output: 69</span>
-io.<span class='function'>println</span>(<span class='constant'>420.69</span>) <span class='comment'># Output: 420.69</span>
-io.<span class='function'>println</span>(<span class='constant'>0xff</span>)   <span class='comment'># Output: 255</span>
+io.<span class='function'>println</span>(<span class='constant'>69</span>)     <span class='comment'>// Output: 69</span>
+io.<span class='function'>println</span>(<span class='constant'>420.69</span>) <span class='comment'>// Output: 420.69</span>
+io.<span class='function'>println</span>(<span class='constant'>0xff</span>)   <span class='comment'>// Output: 255</span>
 </pre>
 </div>
 <p>
@@ -145,23 +145,23 @@ Standard arithmetic as well as bitwise operations are supported.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='constant'>34</span> + <span class='constant'>35</span>)        <span class='comment'># Output: 69</span>
-io.<span class='function'>println</span>(<span class='constant'>500</span> - <span class='constant'>80</span>)       <span class='comment'># Output: 420</span>
-io.<span class='function'>println</span>(<span class='constant'>23</span> * <span class='constant'>3</span>)         <span class='comment'># Output: 69</span>
-io.<span class='function'>println</span>(<span class='constant'>840</span> / <span class='constant'>2</span>)        <span class='comment'># Output: 420</span>
-io.<span class='function'>println</span>(<span class='constant'>209</span> % <span class='constant'>70</span>)       <span class='comment'># Output: 69</span>
-io.<span class='function'>println</span>(-<span class='constant'>420</span>)           <span class='comment'># Output: -420</span>
+io.<span class='function'>println</span>(<span class='constant'>34</span> + <span class='constant'>35</span>)        <span class='comment'>// Output: 69</span>
+io.<span class='function'>println</span>(<span class='constant'>500</span> - <span class='constant'>80</span>)       <span class='comment'>// Output: 420</span>
+io.<span class='function'>println</span>(<span class='constant'>23</span> * <span class='constant'>3</span>)         <span class='comment'>// Output: 69</span>
+io.<span class='function'>println</span>(<span class='constant'>840</span> / <span class='constant'>2</span>)        <span class='comment'>// Output: 420</span>
+io.<span class='function'>println</span>(<span class='constant'>209</span> % <span class='constant'>70</span>)       <span class='comment'>// Output: 69</span>
+io.<span class='function'>println</span>(-<span class='constant'>420</span>)           <span class='comment'>// Output: -420</span>
 
-io.<span class='function'>println</span>(<span class='constant'>17</span> * <span class='constant'>2</span> + <span class='constant'>35</span>)    <span class='comment'># Output: 69</span>
-io.<span class='function'>println</span>((<span class='constant'>900</span> - <span class='constant'>60</span>) / <span class='constant'>2</span>) <span class='comment'># Output: 420</span>
+io.<span class='function'>println</span>(<span class='constant'>17</span> * <span class='constant'>2</span> + <span class='constant'>35</span>)    <span class='comment'>// Output: 69</span>
+io.<span class='function'>println</span>((<span class='constant'>900</span> - <span class='constant'>60</span>) / <span class='constant'>2</span>) <span class='comment'>// Output: 420</span>
 
-io.<span class='function'>println</span>(<span class='constant'>276</span> &gt;&gt; <span class='constant'>2</span>)       <span class='comment'># Output: 69</span>
-io.<span class='function'>println</span>(<span class='constant'>105</span> &lt;&lt; <span class='constant'>2</span>)       <span class='comment'># Output: 420</span>
-io.<span class='function'>println</span>(~-<span class='constant'>70</span>)           <span class='comment'># Output: 69</span>
-io.<span class='function'>println</span>(<span class='constant'>160</span> | <span class='constant'>260</span>)      <span class='comment'># Output: 420</span>
-io.<span class='function'>println</span>(<span class='constant'>77</span> &amp; <span class='constant'>103</span>)       <span class='comment'># Output: 69</span>
-io.<span class='function'>println</span>(~-<span class='constant'>419</span> + <span class='constant'>10</span> &amp; <span class='constant'>3</span>) <span class='comment'># Output: 420</span>
-io.<span class='function'>println</span>(<span class='constant'>69</span> ^ <span class='constant'>1404</span>)      <span class='comment'># Output: 1337</span>
+io.<span class='function'>println</span>(<span class='constant'>276</span> &gt;&gt; <span class='constant'>2</span>)       <span class='comment'>// Output: 69</span>
+io.<span class='function'>println</span>(<span class='constant'>105</span> &lt;&lt; <span class='constant'>2</span>)       <span class='comment'>// Output: 420</span>
+io.<span class='function'>println</span>(~-<span class='constant'>70</span>)           <span class='comment'>// Output: 69</span>
+io.<span class='function'>println</span>(<span class='constant'>160</span> | <span class='constant'>260</span>)      <span class='comment'>// Output: 420</span>
+io.<span class='function'>println</span>(<span class='constant'>77</span> &amp; <span class='constant'>103</span>)       <span class='comment'>// Output: 69</span>
+io.<span class='function'>println</span>(~-<span class='constant'>419</span> + <span class='constant'>10</span> &amp; <span class='constant'>3</span>) <span class='comment'>// Output: 420</span>
+io.<span class='function'>println</span>(<span class='constant'>69</span> ^ <span class='constant'>1404</span>)      <span class='comment'>// Output: 1337</span>
 </pre>
 </div>
 </section>
@@ -179,8 +179,8 @@ io.<span class='function'>println</span>(<span class='constant'>69</span> ^ <spa
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='constant'>true</span>)  <span class='comment'># Output: true</span>
-io.<span class='function'>println</span>(<span class='constant'>false</span>) <span class='comment'># Output: false</span>
+io.<span class='function'>println</span>(<span class='constant'>true</span>)  <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(<span class='constant'>false</span>) <span class='comment'>// Output: false</span>
 </pre>
 </div>
 <p>
@@ -198,37 +198,37 @@ Standard logical operations are supported.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(!<span class='constant'>true</span>)          <span class='comment'># Output: false</span>
-io.<span class='function'>println</span>(!<span class='constant'>false</span>)         <span class='comment'># Output: true</span>
-io.<span class='function'>println</span>(!<span class='constant'>nil</span>)           <span class='comment'># Output: true</span>
+io.<span class='function'>println</span>(!<span class='constant'>true</span>)          <span class='comment'>// Output: false</span>
+io.<span class='function'>println</span>(!<span class='constant'>false</span>)         <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(!<span class='constant'>nil</span>)           <span class='comment'>// Output: true</span>
 
-<span class='comment'># All numbers are considered "true"</span>
-io.<span class='function'>println</span>(!<span class='constant'>0</span>)             <span class='comment'># Output: false</span>
-io.<span class='function'>println</span>(!<span class='constant'>1</span>)             <span class='comment'># Output: false</span>
+<span class='comment'>// All numbers are considered "true"</span>
+io.<span class='function'>println</span>(!<span class='constant'>0</span>)             <span class='comment'>// Output: false</span>
+io.<span class='function'>println</span>(!<span class='constant'>1</span>)             <span class='comment'>// Output: false</span>
 
-<span class='comment'># Ordering</span>
-io.<span class='function'>println</span>(<span class='constant'>69</span> &gt; <span class='constant'>420</span>)       <span class='comment'># Output: false</span>
-io.<span class='function'>println</span>(<span class='constant'>69</span> &gt;= <span class='constant'>420</span>)      <span class='comment'># Output: false</span>
-io.<span class='function'>println</span>(<span class='constant'>69</span> &lt; <span class='constant'>420</span>)       <span class='comment'># Output: true</span>
-io.<span class='function'>println</span>(<span class='constant'>69</span> &lt;= <span class='constant'>420</span>)      <span class='comment'># Output: true</span>
-io.<span class='function'>println</span>(<span class='constant'>69</span> == <span class='constant'>420</span>)      <span class='comment'># Output: false</span>
-io.<span class='function'>println</span>(<span class='constant'>69</span> != <span class='constant'>420</span>)      <span class='comment'># Output: true</span>
+<span class='comment'>// Ordering</span>
+io.<span class='function'>println</span>(<span class='constant'>69</span> &gt; <span class='constant'>420</span>)       <span class='comment'>// Output: false</span>
+io.<span class='function'>println</span>(<span class='constant'>69</span> &gt;= <span class='constant'>420</span>)      <span class='comment'>// Output: false</span>
+io.<span class='function'>println</span>(<span class='constant'>69</span> &lt; <span class='constant'>420</span>)       <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(<span class='constant'>69</span> &lt;= <span class='constant'>420</span>)      <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(<span class='constant'>69</span> == <span class='constant'>420</span>)      <span class='comment'>// Output: false</span>
+io.<span class='function'>println</span>(<span class='constant'>69</span> != <span class='constant'>420</span>)      <span class='comment'>// Output: true</span>
 
-<span class='comment'># BS is strongly typed</span>
-io.<span class='function'>println</span>(<span class='constant'>nil</span> == <span class='constant'>nil</span>)     <span class='comment'># Output: true</span>
-io.<span class='function'>println</span>(<span class='constant'>nil</span> == <span class='constant'>true</span>)    <span class='comment'># Output: false</span>
-io.<span class='function'>println</span>(<span class='constant'>nil</span> == <span class='constant'>0</span>)       <span class='comment'># Output: false</span>
-io.<span class='function'>println</span>(<span class='constant'>false</span> == <span class='constant'>0</span>)     <span class='comment'># Output: false</span>
+<span class='comment'>// BS is strongly typed</span>
+io.<span class='function'>println</span>(<span class='constant'>nil</span> == <span class='constant'>nil</span>)     <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(<span class='constant'>nil</span> == <span class='constant'>true</span>)    <span class='comment'>// Output: false</span>
+io.<span class='function'>println</span>(<span class='constant'>nil</span> == <span class='constant'>0</span>)       <span class='comment'>// Output: false</span>
+io.<span class='function'>println</span>(<span class='constant'>false</span> == <span class='constant'>0</span>)     <span class='comment'>// Output: false</span>
 
-<span class='comment'># Logical AND, OR</span>
-io.<span class='function'>println</span>(<span class='constant'>true</span> &amp;&amp; <span class='constant'>true</span>)   <span class='comment'># Output: true</span>
-io.<span class='function'>println</span>(<span class='constant'>true</span> &amp;&amp; <span class='constant'>false</span>)  <span class='comment'># Output: false</span>
-io.<span class='function'>println</span>(<span class='constant'>true</span> || <span class='constant'>false</span>)  <span class='comment'># Output: true</span>
-io.<span class='function'>println</span>(<span class='constant'>false</span> || <span class='constant'>false</span>) <span class='comment'># Output: false</span>
+<span class='comment'>// Logical AND, OR</span>
+io.<span class='function'>println</span>(<span class='constant'>true</span> &amp;&amp; <span class='constant'>true</span>)   <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(<span class='constant'>true</span> &amp;&amp; <span class='constant'>false</span>)  <span class='comment'>// Output: false</span>
+io.<span class='function'>println</span>(<span class='constant'>true</span> || <span class='constant'>false</span>)  <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(<span class='constant'>false</span> || <span class='constant'>false</span>) <span class='comment'>// Output: false</span>
 
-<span class='comment'># Short circuiting</span>
-io.<span class='function'>println</span>(<span class='constant'>nil</span> &amp;&amp; <span class='constant'>true</span>)    <span class='comment'># Output: nil</span>
-io.<span class='function'>println</span>(<span class='constant'>0</span> || <span class='constant'>false</span>)     <span class='comment'># Output: 0</span>
+<span class='comment'>// Short circuiting</span>
+io.<span class='function'>println</span>(<span class='constant'>nil</span> &amp;&amp; <span class='constant'>true</span>)    <span class='comment'>// Output: nil</span>
+io.<span class='function'>println</span>(<span class='constant'>0</span> || <span class='constant'>false</span>)     <span class='comment'>// Output: 0</span>
 </pre>
 </div>
 </section>
@@ -246,31 +246,31 @@ io.<span class='function'>println</span>(<span class='constant'>0</span> || <spa
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># Output: Hello!</span>
+<span class='comment'>// Output: Hello!</span>
 io.<span class='function'>println</span>(<span class='string'>"Hello!"</span>)
 
-<span class='comment'># Output:</span>
-<span class='comment'># Say "Hello"!</span>
-<span class='comment'># Here, a	 tab!</span>
+<span class='comment'>// Output:</span>
+<span class='comment'>// Say "Hello"!</span>
+<span class='comment'>// Here, a	 tab!</span>
 io.<span class='function'>println</span>(<span class='string'>"Say </span><span class='escape'>\"</span><span class='string'>Hello</span><span class='escape'>\"</span><span class='string'>!</span><span class='escape'>\n</span><span class='string'>Here, a</span><span class='escape'>\t</span><span class='string'> tab!"</span>)
 
-<span class='comment'># Output: Interpolation! 69</span>
+<span class='comment'>// Output: Interpolation! 69</span>
 io.<span class='function'>println</span>(<span class='string'>"Interpolation! </span><span class='escape'>{</span><span class='constant'>34</span> + <span class='constant'>35</span><span class='escape'>}</span><span class='string'>"</span>)
 
-<span class='comment'># Output: Nested interpolation! 420</span>
+<span class='comment'>// Output: Nested interpolation! 420</span>
 io.<span class='function'>println</span>(<span class='string'>"Nested </span><span class='escape'>{</span><span class='string'>"interpolation! </span><span class='escape'>{</span><span class='constant'>420</span><span class='escape'>}</span><span class='string'>"</span><span class='escape'>}</span><span class='string'>"</span>)
 
-<span class='comment'># Output: A literal '{'</span>
+<span class='comment'>// Output: A literal '{'</span>
 io.<span class='function'>println</span>(<span class='string'>"A literal '</span><span class='escape'>\{</span><span class='string'>'"</span>)
 
-<span class='comment'># Output: 6</span>
+<span class='comment'>// Output: 6</span>
 io.<span class='function'>println</span>(<span class='keyword'>len</span>(<span class='string'>"Hello!"</span>))
 
-<span class='comment'># Output: b</span>
+<span class='comment'>// Output: b</span>
 io.<span class='function'>println</span>(<span class='string'>"foobar"</span>[<span class='constant'>3</span>])
 
-<span class='comment'># Output: Let's go!</span>
-io.<span class='function'>println</span>(<span class='string'>'Let</span><span class='escape'>\'</span><span class='string'>s go!'</span>) <span class='comment'># Single quotes can also be used</span>
+<span class='comment'>// Output: Let's go!</span>
+io.<span class='function'>println</span>(<span class='string'>'Let</span><span class='escape'>\'</span><span class='string'>s go!'</span>) <span class='comment'>// Single quotes can also be used</span>
 </pre>
 </div>
 <section id='s7'>
@@ -287,11 +287,11 @@ io.<span class='function'>println</span>(<span class='string'>'Let</span><span c
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># Unary ($) converts any value to a string</span>
-io.<span class='function'>println</span>(<span class='keyword'>len</span>($(<span class='constant'>21</span> * <span class='constant'>20</span>)))            <span class='comment'># Output: 3</span>
+<span class='comment'>// Unary ($) converts any value to a string</span>
+io.<span class='function'>println</span>(<span class='keyword'>len</span>($(<span class='constant'>21</span> * <span class='constant'>20</span>)))            <span class='comment'>// Output: 3</span>
 
-<span class='comment'># Binary ($) performs string concatenation</span>
-io.<span class='function'>println</span>(<span class='string'>"Hello, "</span> $ <span class='string'>"world! "</span> $ <span class='constant'>69</span>) <span class='comment'># Output: Hello, world! 69</span>
+<span class='comment'>// Binary ($) performs string concatenation</span>
+io.<span class='function'>println</span>(<span class='string'>"Hello, "</span> $ <span class='string'>"world! "</span> $ <span class='constant'>69</span>) <span class='comment'>// Output: Hello, world! 69</span>
 </pre>
 </div>
 <blockquote>
@@ -315,76 +315,76 @@ io.<span class='function'>println</span>(<span class='string'>"Hello, "</span> $
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># Variables will be introduced later</span>
+<span class='comment'>// Variables will be introduced later</span>
 <span class='keyword'>var</span> array = [<span class='constant'>69</span>, <span class='constant'>420</span>]
 
-<span class='comment'># Pretty printing by default!</span>
-io.<span class='function'>println</span>(array)                 <span class='comment'># Output: [69, 420]</span>
+<span class='comment'>// Pretty printing by default!</span>
+io.<span class='function'>println</span>(array)                 <span class='comment'>// Output: [69, 420]</span>
 
-<span class='comment'># Array access</span>
-io.<span class='function'>println</span>(array[<span class='constant'>0</span>])              <span class='comment'># Output: 69</span>
+<span class='comment'>// Array access</span>
+io.<span class='function'>println</span>(array[<span class='constant'>0</span>])              <span class='comment'>// Output: 69</span>
 
-<span class='comment'># Array access out of bounds is an error</span>
-io.<span class='function'>println</span>(array[<span class='constant'>2</span>])              <span class='comment'># Error!</span>
+<span class='comment'>// Array access out of bounds is an error</span>
+io.<span class='function'>println</span>(array[<span class='constant'>2</span>])              <span class='comment'>// Error!</span>
 
-<span class='comment'># Array assignment</span>
+<span class='comment'>// Array assignment</span>
 array[<span class='constant'>1</span>] = <span class='string'>"nice!"</span>
-io.<span class='function'>println</span>(array)                 <span class='comment'># Output: [69, "nice!"]</span>
+io.<span class='function'>println</span>(array)                 <span class='comment'>// Output: [69, "nice!"]</span>
 
-<span class='comment'># Array assignment out of bounds is NOT an error</span>
+<span class='comment'>// Array assignment out of bounds is NOT an error</span>
 array[<span class='constant'>3</span>] = <span class='string'>"Are you serious?"</span>
-io.<span class='function'>println</span>(array)                 <span class='comment'># Output: [69, "nice!", nil, "Are you serious?"]</span>
+io.<span class='function'>println</span>(array)                 <span class='comment'>// Output: [69, "nice!", nil, "Are you serious?"]</span>
 
-<span class='comment'># Array length</span>
-io.<span class='function'>println</span>(<span class='keyword'>len</span>(array))            <span class='comment'># Output: 4</span>
+<span class='comment'>// Array length</span>
+io.<span class='function'>println</span>(<span class='keyword'>len</span>(array))            <span class='comment'>// Output: 4</span>
 
-<span class='comment'># Due to the assignment semantics, appending to arrays is quite easy</span>
+<span class='comment'>// Due to the assignment semantics, appending to arrays is quite easy</span>
 array[<span class='keyword'>len</span>(array)] = <span class='constant'>420</span>
-io.<span class='function'>println</span>(array)                 <span class='comment'># Output: [69, "nice!", nil, "Are you serious?", 420]</span>
+io.<span class='function'>println</span>(array)                 <span class='comment'>// Output: [69, "nice!", nil, "Are you serious?", 420]</span>
 
-<span class='comment'># Of course, you can also use the push() method of arrays</span>
+<span class='comment'>// Of course, you can also use the push() method of arrays</span>
 array.<span class='function'>push</span>(<span class='constant'>1337</span>)
 
-<span class='comment'># Output:</span>
-<span class='comment'># [</span>
-<span class='comment'>#     69,</span>
-<span class='comment'>#     "nice!",</span>
-<span class='comment'>#     nil,</span>
-<span class='comment'>#     "Are you serious?",</span>
-<span class='comment'>#     420,</span>
-<span class='comment'>#     1337</span>
-<span class='comment'># ]</span>
+<span class='comment'>// Output:</span>
+<span class='comment'>// [</span>
+<span class='comment'>//     69,</span>
+<span class='comment'>//     "nice!",</span>
+<span class='comment'>//     nil,</span>
+<span class='comment'>//     "Are you serious?",</span>
+<span class='comment'>//     420,</span>
+<span class='comment'>//     1337</span>
+<span class='comment'>// ]</span>
 io.<span class='function'>println</span>(array)
 
-<span class='comment'># Delete value at index</span>
-io.<span class='function'>println</span>(<span class='keyword'>delete</span>(array[<span class='constant'>2</span>]))      <span class='comment'># Output: nil</span>
-io.<span class='function'>println</span>(array)                 <span class='comment'># Output: [69, "nice!", "Are you serious?", 420, 1337]</span>
+<span class='comment'>// Delete value at index</span>
+io.<span class='function'>println</span>(<span class='keyword'>delete</span>(array[<span class='constant'>2</span>]))      <span class='comment'>// Output: nil</span>
+io.<span class='function'>println</span>(array)                 <span class='comment'>// Output: [69, "nice!", "Are you serious?", 420, 1337]</span>
 
-<span class='comment'># Deletion of index out of range is an error</span>
-io.<span class='function'>println</span>(<span class='keyword'>delete</span>(array[<span class='constant'>69</span>]))     <span class='comment'># Error!</span>
+<span class='comment'>// Deletion of index out of range is an error</span>
+io.<span class='function'>println</span>(<span class='keyword'>delete</span>(array[<span class='constant'>69</span>]))     <span class='comment'>// Error!</span>
 
-<span class='comment'># Check if value exists in an array</span>
-io.<span class='function'>println</span>(<span class='string'>"nice!"</span> <span class='keyword'>in</span> array)      <span class='comment'># Output: true</span>
-io.<span class='function'>println</span>(<span class='string'>"something"</span> <span class='keyword'>in</span> array)  <span class='comment'># Output: false</span>
+<span class='comment'>// Check if value exists in an array</span>
+io.<span class='function'>println</span>(<span class='string'>"nice!"</span> <span class='keyword'>in</span> array)      <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(<span class='string'>"something"</span> <span class='keyword'>in</span> array)  <span class='comment'>// Output: false</span>
 
-<span class='comment'># Check if value doesn't exist in an array</span>
-io.<span class='function'>println</span>(<span class='string'>"nice!"</span> !<span class='keyword'>in</span> array)     <span class='comment'># Output: false</span>
-io.<span class='function'>println</span>(<span class='string'>"something"</span> !<span class='keyword'>in</span> array) <span class='comment'># Output: true</span>
+<span class='comment'>// Check if value doesn't exist in an array</span>
+io.<span class='function'>println</span>(<span class='string'>"nice!"</span> !<span class='keyword'>in</span> array)     <span class='comment'>// Output: false</span>
+io.<span class='function'>println</span>(<span class='string'>"something"</span> !<span class='keyword'>in</span> array) <span class='comment'>// Output: true</span>
 
-<span class='comment'># Arrays are compared by value</span>
+<span class='comment'>// Arrays are compared by value</span>
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>]
 <span class='keyword'>var</span> ys = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>]
 <span class='keyword'>var</span> zs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>]
-io.<span class='function'>println</span>(xs == ys)              <span class='comment'># Output: true</span>
-io.<span class='function'>println</span>(xs == zs)              <span class='comment'># Output: false</span>
+io.<span class='function'>println</span>(xs == ys)              <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(xs == zs)              <span class='comment'>// Output: false</span>
 
-<span class='comment'># Clone an array using the (..) operator</span>
+<span class='comment'>// Clone an array using the (..) operator</span>
 <span class='keyword'>var</span> as = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>]
 <span class='keyword'>var</span> bs = [..as]
 
 bs[<span class='constant'>0</span>] = <span class='constant'>69</span>
-io.<span class='function'>println</span>(as)                    <span class='comment'># Output: [1, 2, 3]</span>
-io.<span class='function'>println</span>(bs)                    <span class='comment'># Output: [69, 2, 3]</span>
+io.<span class='function'>println</span>(as)                    <span class='comment'>// Output: [1, 2, 3]</span>
+io.<span class='function'>println</span>(bs)                    <span class='comment'>// Output: [69, 2, 3]</span>
 </pre>
 </div>
 </section>
@@ -407,83 +407,83 @@ io.<span class='function'>println</span>(bs)                    <span class='com
     [<span class='constant'>34</span> + <span class='constant'>35</span>] = <span class='constant'>420</span>
 }
 
-<span class='comment'># Output:</span>
-<span class='comment'># {</span>
-<span class='comment'>#     foo = 69,</span>
-<span class='comment'>#     [69] = 420</span>
-<span class='comment'># }</span>
+<span class='comment'>// Output:</span>
+<span class='comment'>// {</span>
+<span class='comment'>//     foo = 69,</span>
+<span class='comment'>//     [69] = 420</span>
+<span class='comment'>// }</span>
 io.<span class='function'>println</span>(table)
 
-<span class='comment'># Key access</span>
-io.<span class='function'>println</span>(table.<span class='field'>foo</span>)             <span class='comment'># Output: 69</span>
-io.<span class='function'>println</span>(table[<span class='constant'>69</span>])             <span class='comment'># Output: 420</span>
+<span class='comment'>// Key access</span>
+io.<span class='function'>println</span>(table.<span class='field'>foo</span>)             <span class='comment'>// Output: 69</span>
+io.<span class='function'>println</span>(table[<span class='constant'>69</span>])             <span class='comment'>// Output: 420</span>
 
-<span class='comment'># Key assignment</span>
+<span class='comment'>// Key assignment</span>
 table.<span class='field'>key</span> = <span class='string'>"value"</span>
 table[<span class='string'>"bar"</span> $ <span class='constant'>69</span>] = <span class='string'>"eh"</span>
 
-<span class='comment'># Output:</span>
-<span class='comment'># {</span>
-<span class='comment'>#     bar69 = "eh",</span>
-<span class='comment'>#     foo = 69,</span>
-<span class='comment'>#     key = "value",</span>
-<span class='comment'>#     [69] = 420</span>
-<span class='comment'># }</span>
+<span class='comment'>// Output:</span>
+<span class='comment'>// {</span>
+<span class='comment'>//     bar69 = "eh",</span>
+<span class='comment'>//     foo = 69,</span>
+<span class='comment'>//     key = "value",</span>
+<span class='comment'>//     [69] = 420</span>
+<span class='comment'>// }</span>
 io.<span class='function'>println</span>(table)
 
-<span class='comment'># Undefined key access is an error</span>
-io.<span class='function'>println</span>(table.<span class='field'>something</span>)       <span class='comment'># Error!</span>
+<span class='comment'>// Undefined key access is an error</span>
+io.<span class='function'>println</span>(table.<span class='field'>something</span>)       <span class='comment'>// Error!</span>
 
-<span class='comment'># Check if key exists in a table</span>
-io.<span class='function'>println</span>(<span class='string'>"foo"</span> <span class='keyword'>in</span> table)        <span class='comment'># Output: true</span>
-io.<span class='function'>println</span>(<span class='string'>"something"</span> <span class='keyword'>in</span> table)  <span class='comment'># Output: false</span>
+<span class='comment'>// Check if key exists in a table</span>
+io.<span class='function'>println</span>(<span class='string'>"foo"</span> <span class='keyword'>in</span> table)        <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(<span class='string'>"something"</span> <span class='keyword'>in</span> table)  <span class='comment'>// Output: false</span>
 
-<span class='comment'># Check if key doesn't exist in a table</span>
-io.<span class='function'>println</span>(<span class='string'>"foo"</span> !<span class='keyword'>in</span> table)       <span class='comment'># Output: false</span>
-io.<span class='function'>println</span>(<span class='string'>"something"</span> !<span class='keyword'>in</span> table) <span class='comment'># Output: true</span>
+<span class='comment'>// Check if key doesn't exist in a table</span>
+io.<span class='function'>println</span>(<span class='string'>"foo"</span> !<span class='keyword'>in</span> table)       <span class='comment'>// Output: false</span>
+io.<span class='function'>println</span>(<span class='string'>"something"</span> !<span class='keyword'>in</span> table) <span class='comment'>// Output: true</span>
 
-<span class='comment'># Table length</span>
-io.<span class='function'>println</span>(<span class='keyword'>len</span>(table))            <span class='comment'># Output: 4</span>
+<span class='comment'>// Table length</span>
+io.<span class='function'>println</span>(<span class='keyword'>len</span>(table))            <span class='comment'>// Output: 4</span>
 
-<span class='comment'># Delete keys</span>
-io.<span class='function'>println</span>(<span class='keyword'>delete</span>(table[<span class='constant'>69</span>]))     <span class='comment'># Output: 420</span>
+<span class='comment'>// Delete keys</span>
+io.<span class='function'>println</span>(<span class='keyword'>delete</span>(table[<span class='constant'>69</span>]))     <span class='comment'>// Output: 420</span>
 
-<span class='comment'># Output:</span>
-<span class='comment'># {</span>
-<span class='comment'>#     bar69 = "eh",</span>
-<span class='comment'>#     foo = 69,</span>
-<span class='comment'>#     key = "value",</span>
-<span class='comment'># }</span>
+<span class='comment'>// Output:</span>
+<span class='comment'>// {</span>
+<span class='comment'>//     bar69 = "eh",</span>
+<span class='comment'>//     foo = 69,</span>
+<span class='comment'>//     key = "value",</span>
+<span class='comment'>// }</span>
 io.<span class='function'>println</span>(table)
 
-<span class='comment'># Deletion of non existent key is an error</span>
-io.<span class='function'>println</span>(<span class='keyword'>delete</span>(table.<span class='field'>wrong</span>))   <span class='comment'># Error!</span>
+<span class='comment'>// Deletion of non existent key is an error</span>
+io.<span class='function'>println</span>(<span class='keyword'>delete</span>(table.<span class='field'>wrong</span>))   <span class='comment'>// Error!</span>
 
-<span class='comment'># Tables are compared by value</span>
+<span class='comment'>// Tables are compared by value</span>
 <span class='keyword'>var</span> xs = {a = <span class='constant'>1</span>, b = <span class='constant'>2</span>}
 <span class='keyword'>var</span> ys = {a = <span class='constant'>1</span>, b = <span class='constant'>2</span>}
 <span class='keyword'>var</span> zs = {a = <span class='constant'>1</span>, b = <span class='constant'>2</span>, c = <span class='constant'>3</span>}
-io.<span class='function'>println</span>(xs == ys)              <span class='comment'># Output: true</span>
-io.<span class='function'>println</span>(xs == zs)              <span class='comment'># Output: false</span>
+io.<span class='function'>println</span>(xs == ys)              <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(xs == zs)              <span class='comment'>// Output: false</span>
 
-<span class='comment'># Clone a table using the (..) operator</span>
+<span class='comment'>// Clone a table using the (..) operator</span>
 <span class='keyword'>var</span> as = {a = <span class='constant'>1</span>, b = <span class='constant'>2</span>}
 <span class='keyword'>var</span> bs = {..as}
 
 bs.<span class='field'>a</span> = <span class='constant'>69</span>
 
-<span class='comment'># Output:</span>
-<span class='comment'># {</span>
-<span class='comment'>#     a = 1,</span>
-<span class='comment'>#     b = 2</span>
-<span class='comment'># }</span>
+<span class='comment'>// Output:</span>
+<span class='comment'>// {</span>
+<span class='comment'>//     a = 1,</span>
+<span class='comment'>//     b = 2</span>
+<span class='comment'>// }</span>
 io.<span class='function'>println</span>(as)
 
-<span class='comment'># Output:</span>
-<span class='comment'># {</span>
-<span class='comment'>#     a = 69,</span>
-<span class='comment'>#     b = 2</span>
-<span class='comment'># }</span>
+<span class='comment'>// Output:</span>
+<span class='comment'>// {</span>
+<span class='comment'>//     a = 69,</span>
+<span class='comment'>//     b = 2</span>
+<span class='comment'>// }</span>
 io.<span class='function'>println</span>(bs)
 </pre>
 </div>
@@ -502,15 +502,15 @@ io.<span class='function'>println</span>(bs)
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='keyword'>typeof</span>(<span class='constant'>nil</span>))      <span class='comment'># Output: nil</span>
-io.<span class='function'>println</span>(<span class='keyword'>typeof</span>(<span class='constant'>true</span>))     <span class='comment'># Output: boolean</span>
-io.<span class='function'>println</span>(<span class='keyword'>typeof</span>(<span class='constant'>69</span>))       <span class='comment'># Output: number</span>
-io.<span class='function'>println</span>(<span class='keyword'>typeof</span>(<span class='string'>"deez"</span>))   <span class='comment'># Output: string</span>
-io.<span class='function'>println</span>(<span class='keyword'>typeof</span>([]))       <span class='comment'># Output: array</span>
-io.<span class='function'>println</span>(<span class='keyword'>typeof</span>({}))       <span class='comment'># Output: table</span>
+io.<span class='function'>println</span>(<span class='keyword'>typeof</span>(<span class='constant'>nil</span>))      <span class='comment'>// Output: nil</span>
+io.<span class='function'>println</span>(<span class='keyword'>typeof</span>(<span class='constant'>true</span>))     <span class='comment'>// Output: boolean</span>
+io.<span class='function'>println</span>(<span class='keyword'>typeof</span>(<span class='constant'>69</span>))       <span class='comment'>// Output: number</span>
+io.<span class='function'>println</span>(<span class='keyword'>typeof</span>(<span class='string'>"deez"</span>))   <span class='comment'>// Output: string</span>
+io.<span class='function'>println</span>(<span class='keyword'>typeof</span>([]))       <span class='comment'>// Output: array</span>
+io.<span class='function'>println</span>(<span class='keyword'>typeof</span>({}))       <span class='comment'>// Output: table</span>
 
-<span class='comment'># Functions will be introduced later</span>
-io.<span class='function'>println</span>(<span class='keyword'>typeof</span>(<span class='keyword'>fn</span> () {})) <span class='comment'># Output: function</span>
+<span class='comment'>// Functions will be introduced later</span>
+io.<span class='function'>println</span>(<span class='keyword'>typeof</span>(<span class='keyword'>fn</span> () {})) <span class='comment'>// Output: function</span>
 </pre>
 </div>
 <section id='s11'>
@@ -527,16 +527,16 @@ io.<span class='function'>println</span>(<span class='keyword'>typeof</span>(<sp
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='constant'>nil</span> <span class='keyword'>is</span> <span class='string'>"nil"</span>)           <span class='comment'># Output: true</span>
-io.<span class='function'>println</span>(<span class='constant'>true</span> <span class='keyword'>is</span> <span class='string'>"boolean"</span>)      <span class='comment'># Output: true</span>
-io.<span class='function'>println</span>(<span class='constant'>69</span> <span class='keyword'>is</span> <span class='string'>"number"</span>)         <span class='comment'># Output: true</span>
-io.<span class='function'>println</span>(<span class='string'>"deez"</span> <span class='keyword'>is</span> <span class='string'>"string"</span>)     <span class='comment'># Output: true</span>
-io.<span class='function'>println</span>([] <span class='keyword'>is</span> <span class='string'>"array"</span>)          <span class='comment'># Output: true</span>
-io.<span class='function'>println</span>({} <span class='keyword'>is</span> <span class='string'>"table"</span>)          <span class='comment'># Output: true</span>
-io.<span class='function'>println</span>(<span class='keyword'>fn</span> () {} <span class='keyword'>is</span> <span class='string'>"function"</span>) <span class='comment'># Output: true</span>
+io.<span class='function'>println</span>(<span class='constant'>nil</span> <span class='keyword'>is</span> <span class='string'>"nil"</span>)           <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(<span class='constant'>true</span> <span class='keyword'>is</span> <span class='string'>"boolean"</span>)      <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(<span class='constant'>69</span> <span class='keyword'>is</span> <span class='string'>"number"</span>)         <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(<span class='string'>"deez"</span> <span class='keyword'>is</span> <span class='string'>"string"</span>)     <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>([] <span class='keyword'>is</span> <span class='string'>"array"</span>)          <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>({} <span class='keyword'>is</span> <span class='string'>"table"</span>)          <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(<span class='keyword'>fn</span> () {} <span class='keyword'>is</span> <span class='string'>"function"</span>) <span class='comment'>// Output: true</span>
 
-io.<span class='function'>println</span>(<span class='constant'>420</span> <span class='keyword'>is</span> <span class='string'>"nil"</span>)           <span class='comment'># Output: false</span>
-io.<span class='function'>println</span>(<span class='constant'>420</span> !<span class='keyword'>is</span> <span class='string'>"nil"</span>)          <span class='comment'># Output: true</span>
+io.<span class='function'>println</span>(<span class='constant'>420</span> <span class='keyword'>is</span> <span class='string'>"nil"</span>)           <span class='comment'>// Output: false</span>
+io.<span class='function'>println</span>(<span class='constant'>420</span> !<span class='keyword'>is</span> <span class='string'>"nil"</span>)          <span class='comment'>// Output: true</span>
 </pre>
 </div>
 </section>
@@ -561,9 +561,9 @@ newlines similarly to Go.
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># Output:</span>
-<span class='comment'># 69</span>
-<span class='comment'># 420</span>
+<span class='comment'>// Output:</span>
+<span class='comment'>// 69</span>
+<span class='comment'>// 420</span>
 io.<span class='function'>println</span>(<span class='constant'>69</span>)<span class='comment'>;</span> io.<span class='function'>println</span>(<span class='constant'>420</span>)
 </pre>
 </div>
@@ -582,14 +582,14 @@ This does mean, however, that placement of binary operators matter.
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># =&gt; 100 - 31;</span>
+<span class='comment'>// =&gt; 100 - 31;</span>
 <span class='constant'>100</span> - <span class='constant'>31</span>
 
-<span class='comment'># =&gt; 100 - 31;</span>
+<span class='comment'>// =&gt; 100 - 31;</span>
 <span class='constant'>100</span> -
 <span class='constant'>31</span>
 
-<span class='comment'># =&gt; 100; -31;</span>
+<span class='comment'>// =&gt; 100; -31;</span>
 <span class='constant'>100</span>
 - <span class='constant'>31</span>
 </pre>
@@ -614,14 +614,14 @@ The field access operator (<code>.</code>) is the only exception to this rule.
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># Considered part of the same expression, even though the binary operator (.)</span>
-<span class='comment'># starts on a new line.</span>
+<span class='comment'>// Considered part of the same expression, even though the binary operator (.)</span>
+<span class='comment'>// starts on a new line.</span>
 something
     .<span class='field'>foo</span>
     .<span class='function'>bar</span>(deez, nuts)
     .<span class='field'>baz</span>
 
-<span class='comment'># The above expression is equivalent to this.</span>
+<span class='comment'>// The above expression is equivalent to this.</span>
 something.<span class='field'>foo</span>.<span class='function'>bar</span>(deez, nuts).<span class='field'>baz</span></pre>
 </div>
 </section>
@@ -725,7 +725,7 @@ Minor
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># Output: A</span>
+<span class='comment'>// Output: A</span>
 <span class='keyword'>match</span> <span class='constant'>69</span> {
     <span class='constant'>69</span> =&gt; io.<span class='function'>println</span>(<span class='string'>"A"</span>)
     <span class='constant'>420</span> =&gt; {
@@ -733,7 +733,7 @@ Minor
     }
 }
 
-<span class='comment'># Output: B</span>
+<span class='comment'>// Output: B</span>
 <span class='keyword'>match</span> <span class='constant'>420</span> {
     <span class='constant'>69</span> =&gt; io.<span class='function'>println</span>(<span class='string'>"A"</span>)
     <span class='constant'>420</span> =&gt; {
@@ -747,23 +747,23 @@ Minor
         io.<span class='function'>println</span>(<span class='string'>"B"</span>)
     }
 
-    <span class='comment'># No output in this case, since none of the cases match</span>
+    <span class='comment'>// No output in this case, since none of the cases match</span>
 }
 
-<span class='comment'># Output: C</span>
+<span class='comment'>// Output: C</span>
 <span class='keyword'>match</span> <span class='constant'>1337</span> {
     <span class='constant'>69</span> =&gt; io.<span class='function'>println</span>(<span class='string'>"A"</span>)
     <span class='constant'>420</span> =&gt; {
         io.<span class='function'>println</span>(<span class='string'>"B"</span>)
     }
 } <span class='keyword'>else</span> {
-    <span class='comment'># Executed when none of the cases match</span>
+    <span class='comment'>// Executed when none of the cases match</span>
     io.<span class='function'>println</span>(<span class='string'>"C"</span>)
 }
 
-<span class='comment'># Output: C</span>
+<span class='comment'>// Output: C</span>
 <span class='keyword'>match</span> <span class='constant'>42</span> {
-    <span class='comment'># Multiple cases for the same branch</span>
+    <span class='comment'>// Multiple cases for the same branch</span>
     <span class='constant'>0</span>, <span class='constant'>1</span> =&gt; io.<span class='function'>println</span>(<span class='string'>"A"</span>)
     <span class='constant'>69</span>, <span class='constant'>420</span>, <span class='constant'>1337</span> =&gt; {
         io.<span class='function'>println</span>(<span class='string'>"B"</span>)
@@ -773,32 +773,32 @@ Minor
     io.<span class='function'>println</span>(<span class='string'>"D"</span>)
 }
 
-<span class='comment'># Output: A</span>
+<span class='comment'>// Output: A</span>
 <span class='keyword'>match</span> <span class='constant'>0</span> {} <span class='keyword'>else</span> {
-    <span class='comment'># Why would you do this though? :/</span>
+    <span class='comment'>// Why would you do this though? :/</span>
     io.<span class='function'>println</span>(<span class='string'>"A"</span>)
 }
 
 <span class='keyword'>var</span> x = <span class='string'>"foo"</span>
 <span class='keyword'>var</span> y = <span class='string'>"bar"</span>
 
-<span class='comment'># Output:</span>
-<span class='comment'># Side effect!</span>
-<span class='comment'># x</span>
-<span class='keyword'>match</span> <span class='string'>"foobar"</span>.<span class='function'>slice</span>(<span class='constant'>0</span>, <span class='constant'>3</span>) { <span class='comment'># All values can be matched</span>
+<span class='comment'>// Output:</span>
+<span class='comment'>// Side effect!</span>
+<span class='comment'>// x</span>
+<span class='keyword'>match</span> <span class='string'>"foobar"</span>.<span class='function'>slice</span>(<span class='constant'>0</span>, <span class='constant'>3</span>) { <span class='comment'>// All values can be matched</span>
     y =&gt; io.<span class='function'>println</span>(<span class='string'>"y"</span>)
 
-    <span class='comment'># Expressions are allowed</span>
+    <span class='comment'>// Expressions are allowed</span>
     <span class='constant'>22</span> + <span class='constant'>10</span> =&gt; io.<span class='function'>println</span>(<span class='string'>"Deez"</span>)
 
-    <span class='comment'># Arbritary runtime code in general is allowed</span>
+    <span class='comment'>// Arbritary runtime code in general is allowed</span>
     os.<span class='function'>clock</span>() =&gt; <span class='keyword'>panic</span>(<span class='string'>"What?"</span>)
 
-    <span class='comment'># And you thought JS was bad</span>
+    <span class='comment'>// And you thought JS was bad</span>
     (<span class='keyword'>fn</span> () {
-        <span class='comment'># 1. Functions will be described later</span>
-        <span class='comment'># 2. The order of operations matter. If a matching case was encountered</span>
-        <span class='comment'>#    before this, then this side effect would not have occured</span>
+        <span class='comment'>// 1. Functions will be described later</span>
+        <span class='comment'>// 2. The order of operations matter. If a matching case was encountered</span>
+        <span class='comment'>//    before this, then this side effect would not have occured</span>
         io.<span class='function'>println</span>(<span class='string'>"Side effect!"</span>)
     })() =&gt; {
         io.<span class='function'>println</span>(<span class='string'>"Why?"</span>)
@@ -1233,7 +1233,7 @@ io.<span class='function'>println</span>(<span class='function'>factorial</span>
     io.<span class='function'>println</span>(<span class='string'>"HERE!"</span>)
 }
 
-<span class='comment'># Functions implicitly return 'nil'</span>
+<span class='comment'>// Functions implicitly return 'nil'</span>
 io.<span class='function'>println</span>(<span class='function'>f</span>())
 io.<span class='function'>println</span>(<span class='function'>g</span>())
 </pre>
@@ -1500,9 +1500,9 @@ argument. All array operations work as expected.
     <span class='keyword'>return</span> total
 }
 
-io.<span class='function'>println</span>(<span class='function'>sum</span>())             <span class='comment'># Output: 0</span>
-io.<span class='function'>println</span>(<span class='function'>sum</span>(<span class='constant'>69</span>))           <span class='comment'># Output: 69</span>
-io.<span class='function'>println</span>(<span class='function'>sum</span>(<span class='constant'>90</span>, <span class='constant'>110</span>, <span class='constant'>220</span>)) <span class='comment'># Output: 420</span>
+io.<span class='function'>println</span>(<span class='function'>sum</span>())             <span class='comment'>// Output: 0</span>
+io.<span class='function'>println</span>(<span class='function'>sum</span>(<span class='constant'>69</span>))           <span class='comment'>// Output: 69</span>
+io.<span class='function'>println</span>(<span class='function'>sum</span>(<span class='constant'>90</span>, <span class='constant'>110</span>, <span class='constant'>220</span>)) <span class='comment'>// Output: 420</span>
 </pre>
 </div>
 <p>
@@ -1529,9 +1529,9 @@ variadic argument must be the last one.
     <span class='keyword'>return</span> total
 }
 
-io.<span class='function'>println</span>(<span class='function'>sum</span>(<span class='constant'>34</span>, <span class='constant'>35</span>))                 <span class='comment'># Output: 69</span>
-io.<span class='function'>println</span>(<span class='function'>sum</span>(<span class='constant'>90</span>, <span class='constant'>110</span>, <span class='constant'>110</span>, <span class='constant'>110</span>))      <span class='comment'># Output: 420</span>
-io.<span class='function'>println</span>(<span class='function'>sum</span>(<span class='constant'>90</span>, <span class='constant'>110</span>, <span class='constant'>220</span>, <span class='constant'>400</span>, <span class='constant'>517</span>)) <span class='comment'># Output: 1337</span>
+io.<span class='function'>println</span>(<span class='function'>sum</span>(<span class='constant'>34</span>, <span class='constant'>35</span>))                 <span class='comment'>// Output: 69</span>
+io.<span class='function'>println</span>(<span class='function'>sum</span>(<span class='constant'>90</span>, <span class='constant'>110</span>, <span class='constant'>110</span>, <span class='constant'>110</span>))      <span class='comment'>// Output: 420</span>
+io.<span class='function'>println</span>(<span class='function'>sum</span>(<span class='constant'>90</span>, <span class='constant'>110</span>, <span class='constant'>220</span>, <span class='constant'>400</span>, <span class='constant'>517</span>)) <span class='comment'>// Output: 1337</span>
 </pre>
 </div>
 </section>
@@ -1558,11 +1558,11 @@ array into the call.
 }
 
 <span class='keyword'>var</span> xs = [<span class='constant'>16</span>, <span class='constant'>18</span>, <span class='constant'>35</span>]
-io.<span class='function'>println</span>(<span class='function'>sum</span>(..xs))       <span class='comment'># Output: 69</span>
+io.<span class='function'>println</span>(<span class='function'>sum</span>(..xs))       <span class='comment'>// Output: 69</span>
 
 <span class='keyword'>var</span> ys = [<span class='constant'>100</span>]
 <span class='keyword'>var</span> zs = [<span class='constant'>120</span>, <span class='constant'>200</span>]
-io.<span class='function'>println</span>(<span class='function'>sum</span>(..ys, ..zs)) <span class='comment'># Output: 420</span>
+io.<span class='function'>println</span>(<span class='function'>sum</span>(..ys, ..zs)) <span class='comment'>// Output: 420</span>
 </pre>
 </div>
 <p>
@@ -1589,11 +1589,11 @@ This can also be used in variadic functions.
 }
 
 <span class='keyword'>var</span> xs = [<span class='constant'>16</span>, <span class='constant'>18</span>, <span class='constant'>35</span>]
-io.<span class='function'>println</span>(<span class='function'>sum</span>(..xs))       <span class='comment'># Output: 69</span>
+io.<span class='function'>println</span>(<span class='function'>sum</span>(..xs))       <span class='comment'>// Output: 69</span>
 
 <span class='keyword'>var</span> ys = [<span class='constant'>100</span>]
 <span class='keyword'>var</span> zs = [<span class='constant'>120</span>, <span class='constant'>200</span>]
-io.<span class='function'>println</span>(<span class='function'>sum</span>(..ys, ..zs)) <span class='comment'># Output: 420</span>
+io.<span class='function'>println</span>(<span class='function'>sum</span>(..ys, ..zs)) <span class='comment'>// Output: 420</span>
 </pre>
 </div>
 <p>
@@ -1621,7 +1621,7 @@ spreaded ones.
 }
 
 <span class='keyword'>var</span> xs = [<span class='constant'>100</span>, <span class='constant'>125</span>, <span class='constant'>126</span>]
-io.<span class='function'>println</span>(<span class='function'>sum</span>(<span class='constant'>34</span>, ..xs, <span class='constant'>35</span>)) <span class='comment'># Output: 420</span>
+io.<span class='function'>println</span>(<span class='function'>sum</span>(<span class='constant'>34</span>, ..xs, <span class='constant'>35</span>)) <span class='comment'>// Output: 420</span>
 </pre>
 </div>
 </section>
@@ -1642,7 +1642,7 @@ io.<span class='function'>println</span>(<span class='function'>sum</span>(<span
 <pre class='code active'>
 <span class='keyword'>var</span> a = <span class='constant'>34</span>
 <span class='keyword'>var</span> b = <span class='constant'>35</span>
-io.<span class='function'>println</span>(a + b) <span class='comment'># Output: 69</span>
+io.<span class='function'>println</span>(a + b) <span class='comment'>// Output: 69</span>
 </pre>
 </div>
 <section id='s31'>
@@ -1660,12 +1660,12 @@ io.<span class='function'>println</span>(a + b) <span class='comment'># Output: 
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> a = <span class='constant'>17</span>
-<span class='keyword'>var</span> b             <span class='comment'># Assigned to 'nil'</span>
+<span class='keyword'>var</span> b             <span class='comment'>// Assigned to 'nil'</span>
 
 a = a * <span class='constant'>2</span>
 b = <span class='constant'>35</span>
 
-io.<span class='function'>println</span>(a + b) <span class='comment'># Output: 69</span>
+io.<span class='function'>println</span>(a + b) <span class='comment'>// Output: 69</span>
 </pre>
 </div>
 <p>
@@ -1685,16 +1685,16 @@ Shorthand assignment operators also work.
 <pre class='code active'>
 <span class='keyword'>var</span> a = <span class='constant'>17</span>
 
-<span class='comment'># All arithmetic operators are supported</span>
+<span class='comment'>// All arithmetic operators are supported</span>
 a *= <span class='constant'>2</span>
 a += <span class='constant'>35</span>
 
 <span class='keyword'>var</span> b = <span class='string'>"Nice! "</span>
 
-<span class='comment'># String concatenation is also supported</span>
+<span class='comment'>// String concatenation is also supported</span>
 b $= a
 
-io.<span class='function'>println</span>(b) <span class='comment'># Output: Nice! 69</span>
+io.<span class='function'>println</span>(b) <span class='comment'>// Output: Nice! 69</span>
 </pre>
 </div>
 </section>
@@ -1713,14 +1713,14 @@ io.<span class='function'>println</span>(b) <span class='comment'># Output: Nice
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> x = <span class='constant'>69</span>
-io.<span class='function'>println</span>(x)     <span class='comment'># Output: 69</span>
+io.<span class='function'>println</span>(x)     <span class='comment'>// Output: 69</span>
 
 {
     <span class='keyword'>var</span> x = <span class='constant'>420</span>
-    io.<span class='function'>println</span>(x) <span class='comment'># Output: 420</span>
+    io.<span class='function'>println</span>(x) <span class='comment'>// Output: 420</span>
 }
 
-io.<span class='function'>println</span>(x)     <span class='comment'># Output: 69</span>
+io.<span class='function'>println</span>(x)     <span class='comment'>// Output: 69</span>
 </pre>
 </div>
 </section>
@@ -1739,10 +1739,10 @@ io.<span class='function'>println</span>(x)     <span class='comment'># Output: 
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> x = <span class='constant'>69</span>
-io.<span class='function'>println</span>(x) <span class='comment'># Output: 69</span>
+io.<span class='function'>println</span>(x) <span class='comment'>// Output: 69</span>
 
 <span class='keyword'>var</span> x = <span class='string'>"x used to be </span><span class='escape'>{</span>x<span class='escape'>}</span><span class='string'>"</span>
-io.<span class='function'>println</span>(x) <span class='comment'># Output: x used to be 69</span>
+io.<span class='function'>println</span>(x) <span class='comment'>// Output: x used to be 69</span>
 </pre>
 </div>
 </section>
@@ -1760,10 +1760,10 @@ io.<span class='function'>println</span>(x) <span class='comment'># Output: x us
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> z = <span class='constant'>420</span> <span class='comment'># Local to the scope of the file</span>
+<span class='keyword'>var</span> z = <span class='constant'>420</span> <span class='comment'>// Local to the scope of the file</span>
 
 <span class='keyword'>fn</span> <span class='function'>add</span>(x, y) {
-    <span class='keyword'>var</span> z = x + y <span class='comment'># Local to the scope of the function</span>
+    <span class='keyword'>var</span> z = x + y <span class='comment'>// Local to the scope of the function</span>
     io.<span class='function'>println</span>(z)
 }
 
@@ -1807,12 +1807,12 @@ Here's a pitfall you might run into
 </button>
 <pre class='code active'>
 <span class='keyword'>fn</span> <span class='function'>f</span>() {
-    io.<span class='function'>println</span>(x) <span class='comment'># Refers to the variable 'x'</span>
+    io.<span class='function'>println</span>(x) <span class='comment'>// Refers to the variable 'x'</span>
 }
 
-<span class='keyword'>var</span> x = <span class='constant'>69</span>        <span class='comment'># Variable 'x' now defined at the toplevel</span>
+<span class='keyword'>var</span> x = <span class='constant'>69</span>        <span class='comment'>// Variable 'x' now defined at the toplevel</span>
 
-<span class='function'>f</span>()               <span class='comment'># "Should" print 69</span>
+<span class='function'>f</span>()               <span class='comment'>// "Should" print 69</span>
 </pre>
 </div>
 <div class='codes'>
@@ -1863,10 +1863,10 @@ they are declared. This is where global variables come into play.
 </button>
 <pre class='code active'>
 <span class='keyword'>fn</span> <span class='function'>f</span>() {
-    io.<span class='function'>println</span>(x) <span class='comment'># Refers to the variable 'x'</span>
+    io.<span class='function'>println</span>(x) <span class='comment'>// Refers to the variable 'x'</span>
 }
 
-<span class='keyword'>pub</span> <span class='keyword'>var</span> x = <span class='constant'>69</span>    <span class='comment'># Global variable 'x' now defined</span>
+<span class='keyword'>pub</span> <span class='keyword'>var</span> x = <span class='constant'>69</span>    <span class='comment'>// Global variable 'x' now defined</span>
 
 <span class='function'>f</span>()
 </pre>
@@ -1903,13 +1903,13 @@ they are declared. This is where global variables come into play.
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># one.bs</span>
+<span class='comment'>// one.bs</span>
 <span class='keyword'>var</span> M = {}
 
 M.<span class='field'>inc</span> = <span class='keyword'>fn</span> (n) =&gt; n + <span class='constant'>1</span>
 M.<span class='field'>dec</span> = <span class='keyword'>fn</span> (n) =&gt; n - <span class='constant'>1</span>
 
-<span class='keyword'>return</span> M <span class='comment'># Any arbitrary value can be returned, this is just the usual pattern</span>
+<span class='keyword'>return</span> M <span class='comment'>// Any arbitrary value can be returned, this is just the usual pattern</span>
 </pre>
 </div>
 <div class='codes'>
@@ -1924,8 +1924,8 @@ M.<span class='field'>dec</span> = <span class='keyword'>fn</span> (n) =&gt; n -
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># main.bs</span>
-<span class='keyword'>var</span> one = <span class='keyword'>import</span>(<span class='string'>"one"</span>) <span class='comment'># Note that the extension is omitted</span>
+<span class='comment'>// main.bs</span>
+<span class='keyword'>var</span> one = <span class='keyword'>import</span>(<span class='string'>"one"</span>) <span class='comment'>// Note that the extension is omitted</span>
 
 io.<span class='function'>println</span>(one.<span class='function'>inc</span>(<span class='constant'>68</span>))
 io.<span class='function'>println</span>(one.<span class='function'>dec</span>(<span class='constant'>421</span>))
@@ -1965,7 +1965,7 @@ Modules are loaded only once.
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># one.bs</span>
+<span class='comment'>// one.bs</span>
 <span class='keyword'>var</span> M = {}
 
 io.<span class='function'>println</span>(<span class='string'>"Loading module 'one'"</span>)
@@ -1987,7 +1987,7 @@ M.<span class='field'>dec</span> = <span class='keyword'>fn</span> (n) =&gt; n -
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># main.bs</span>
+<span class='comment'>// main.bs</span>
 io.<span class='function'>println</span>(<span class='keyword'>import</span>(<span class='string'>"one"</span>).<span class='function'>inc</span>(<span class='constant'>68</span>))
 io.<span class='function'>println</span>(<span class='keyword'>import</span>(<span class='string'>"one"</span>).<span class='function'>dec</span>(<span class='constant'>421</span>))
 </pre>
@@ -2025,7 +2025,7 @@ Loading module 'one'
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># one.bs</span>
+<span class='comment'>// one.bs</span>
 <span class='keyword'>var</span> M = {}
 
 <span class='keyword'>if</span> <span class='constant'>is_main_module</span> {
@@ -2049,7 +2049,7 @@ M.<span class='field'>dec</span> = <span class='keyword'>fn</span> (n) =&gt; n -
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># main.bs</span>
+<span class='comment'>// main.bs</span>
 io.<span class='function'>println</span>(<span class='keyword'>import</span>(<span class='string'>"one"</span>).<span class='function'>inc</span>(<span class='constant'>68</span>))
 io.<span class='function'>println</span>(<span class='keyword'>import</span>(<span class='string'>"one"</span>).<span class='function'>dec</span>(<span class='constant'>421</span>))
 </pre>
@@ -2111,7 +2111,7 @@ more applicable, albeit involved, example.
 </button>
 <pre class='code active'>
 <span class='keyword'>class</span> <span class='class'>Sprite</span> {
-    <span class='comment'># Constructor</span>
+    <span class='comment'>// Constructor</span>
     <span class='function'>init</span>(name, health, attack_power) {
         <span class='constant'>this</span>.<span class='field'>name</span> = name
         <span class='constant'>this</span>.<span class='field'>health</span> = health
@@ -2137,7 +2137,7 @@ more applicable, albeit involved, example.
     }
 }
 
-<span class='comment'># Inheritance</span>
+<span class='comment'>// Inheritance</span>
 <span class='keyword'>class</span> <span class='class'>Hero</span> &lt; <span class='class'>Sprite</span> {
     <span class='function'>init</span>(name, health, attack_power) {
         <span class='constant'>super</span>.<span class='function'>init</span>(name, health, attack_power)
@@ -2145,7 +2145,7 @@ more applicable, albeit involved, example.
         <span class='constant'>this</span>.<span class='field'>defending</span> = <span class='constant'>false</span>
     }
 
-    <span class='comment'># Special ability of hero: defending</span>
+    <span class='comment'>// Special ability of hero: defending</span>
     <span class='function'>defend</span>() {
         io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>{</span><span class='constant'>this</span>.<span class='field'>name</span><span class='escape'>}</span><span class='string'> is defending!"</span>)
         <span class='constant'>this</span>.<span class='field'>defending</span> = <span class='constant'>true</span>
@@ -2154,10 +2154,10 @@ more applicable, albeit involved, example.
     <span class='function'>take_damage</span>(amount) {
         <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>defending</span> {
             <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='field'>poisoned</span> {
-                <span class='comment'># Hero will not be poisoned if defending</span>
+                <span class='comment'>// Hero will not be poisoned if defending</span>
                 <span class='constant'>this</span>.<span class='field'>poisoned</span> = <span class='constant'>false</span>
             } <span class='keyword'>else</span> {
-                <span class='comment'># Hero will take half damage for a normal attack if defending</span>
+                <span class='comment'>// Hero will take half damage for a normal attack if defending</span>
                 amount /= <span class='constant'>2</span>
             }
 
@@ -2173,7 +2173,7 @@ more applicable, albeit involved, example.
         <span class='constant'>super</span>.<span class='function'>init</span>(name, health, attack_power)
     }
 
-    <span class='comment'># Special ability of enemy: poisoning</span>
+    <span class='comment'>// Special ability of enemy: poisoning</span>
     <span class='function'>poison</span>(target) {
         io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>{</span><span class='constant'>this</span>.<span class='field'>name</span><span class='escape'>}</span><span class='string'> poisons </span><span class='escape'>{</span>target.<span class='field'>name</span><span class='escape'>}</span><span class='string'>!"</span>)
         target.<span class='field'>poisoned</span> = <span class='constant'>true</span>
@@ -2181,22 +2181,22 @@ more applicable, albeit involved, example.
     }
 }
 
-<span class='comment'># io.input() is a core library function which optionally prints a prompt and</span>
-<span class='comment'># reads a line from standard input</span>
+<span class='comment'>// io.input() is a core library function which optionally prints a prompt and</span>
+<span class='comment'>// reads a line from standard input</span>
 <span class='keyword'>var</span> hero = <span class='function'>Hero</span>(io.<span class='function'>input</span>(<span class='string'>"Enter hero's name&gt; "</span>), <span class='constant'>30</span>, <span class='constant'>10</span>)
 <span class='keyword'>var</span> enemy = <span class='function'>Enemy</span>(io.<span class='function'>input</span>(<span class='string'>"Enter enemy's name&gt; "</span>), <span class='constant'>25</span>, <span class='constant'>8</span>)
 
-<span class='comment'># Create a random number generator</span>
+<span class='comment'>// Create a random number generator</span>
 <span class='keyword'>var</span> rng = math.<span class='function'>Random</span>()
 
 <span class='keyword'>while</span> hero.<span class='function'>is_alive</span>() &amp;&amp; enemy.<span class='function'>is_alive</span>() {
     io.<span class='function'>println</span>()
 
-    <span class='comment'># Hero cannot choose while poisoned</span>
+    <span class='comment'>// Hero cannot choose while poisoned</span>
     <span class='keyword'>if</span> hero.<span class='field'>poisoned</span> {
         io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>{</span>hero.<span class='field'>name</span><span class='escape'>}</span><span class='string'> has been poisoned! skipping turn."</span>)
 
-        <span class='comment'># Prevent consecutive poisoning</span>
+        <span class='comment'>// Prevent consecutive poisoning</span>
         hero.<span class='field'>poisoned</span> = <span class='constant'>false</span>
         enemy.<span class='function'>attack</span>(hero)
     } <span class='keyword'>else</span> {
@@ -2213,7 +2213,7 @@ more applicable, albeit involved, example.
             io.<span class='function'>println</span>(<span class='string'>"ERROR: invalid choice! skipping </span><span class='escape'>{</span>hero.<span class='field'>name</span><span class='escape'>}</span><span class='string'>'s turn."</span>)
         }
 
-        <span class='comment'># Enemy will either attack or poison the hero based on a 50-50 chance</span>
+        <span class='comment'>// Enemy will either attack or poison the hero based on a 50-50 chance</span>
         <span class='keyword'>if</span> rng.<span class='function'>number</span>() &gt;= <span class='constant'>0.5</span> {
             enemy.<span class='function'>poison</span>(hero)
         } <span class='keyword'>else</span> {
@@ -2289,27 +2289,27 @@ constructor failed. Any other return value is strictly forbidden, however.
 <pre class='code active'>
 <span class='keyword'>class</span> <span class='class'>Logger</span> {
     <span class='function'>init</span>(path) {
-        <span class='comment'># io.Writer is a core C class that handles writeable files. It can fail</span>
+        <span class='comment'>// io.Writer is a core C class that handles writeable files. It can fail</span>
         <span class='constant'>this</span>.<span class='field'>file</span> = io.<span class='function'>Writer</span>(path)
         <span class='keyword'>if</span> !<span class='constant'>this</span>.<span class='field'>file</span> {
-            <span class='comment'># Could not create logger file, return 'nil' to indicate failure</span>
+            <span class='comment'>// Could not create logger file, return 'nil' to indicate failure</span>
             <span class='keyword'>return</span> <span class='constant'>nil</span>
         }
     }
 
     <span class='function'>write</span>(s) {
-        <span class='comment'># os.clock() returns the current monotonic time in seconds as a</span>
-        <span class='comment'># floating point number</span>
+        <span class='comment'>// os.clock() returns the current monotonic time in seconds as a</span>
+        <span class='comment'>// floating point number</span>
         <span class='constant'>this</span>.<span class='field'>file</span>.<span class='function'>writeln</span>(<span class='string'>"</span><span class='escape'>{</span>os.<span class='function'>clock</span>()<span class='escape'>}</span><span class='string'>: </span><span class='escape'>{</span>s<span class='escape'>}</span><span class='string'>"</span>)
     }
 }
 
 <span class='keyword'>var</span> logger = <span class='function'>Logger</span>(<span class='string'>"log.txt"</span>)
 <span class='keyword'>if</span> !logger {
-    <span class='comment'># io.eprintln() prints to standard error</span>
+    <span class='comment'>// io.eprintln() prints to standard error</span>
     io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not create logger"</span>)
 
-    <span class='comment'># os.exit() exits the program with the provided exit code</span>
+    <span class='comment'>// os.exit() exits the program with the provided exit code</span>
     os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
@@ -2617,8 +2617,8 @@ Create a file <code>arithmetic.c</code> with the following content
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'>// arithmetic.c
-</span>
+<span class='comment'>// arithmetic.c</span>
+
 <span class='keyword'>#include</span> <span class='string'>&lt;bs/object.h&gt;</span>
 
 <span class='class'>Bs_Value</span> <span class='function'>arithmetic_add</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
@@ -2635,9 +2635,9 @@ Create a file <code>arithmetic.c</code> with the following content
     <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(args[<span class='constant'>0</span>].<span class='field'>as</span>.<span class='field'>number</span> - args[<span class='constant'>1</span>].<span class='field'>as</span>.<span class='field'>number</span>)<span class='comment'>;</span>
 }
 
-<span class='comment'>// This is the "entry point" of the library. This function will be called when
-</span><span class='comment'>// the native library is loaded into memory. Prepare the FFI here
-</span><span class='constant'>BS_LIBRARY_INIT</span> <span class='class'>void</span> <span class='function'>bs_library_init</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_C_Lib</span> *library) {
+<span class='comment'>// This is the "entry point" of the library. This function will be called when</span>
+<span class='comment'>// the native library is loaded into memory. Prepare the FFI here</span>
+<span class='constant'>BS_LIBRARY_INIT</span> <span class='class'>void</span> <span class='function'>bs_library_init</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_C_Lib</span> *library) {
     <span class='keyword'>static</span> <span class='keyword'>const</span> <span class='class'>Bs_FFI</span> ffi[] = {
         {<span class='string'>"add"</span>, arithmetic_add},
         {<span class='string'>"sub"</span>, arithmetic_sub},
@@ -2686,7 +2686,7 @@ Finally, load it from BS.
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># ffi.bs</span>
+<span class='comment'>// ffi.bs</span>
 
 <span class='keyword'>var</span> arith = <span class='keyword'>import</span>(<span class='string'>"arithmetic"</span>)
 io.<span class='function'>println</span>(arith.<span class='function'>add</span>(<span class='constant'>34</span>, <span class='constant'>35</span>))
@@ -2730,8 +2730,8 @@ library.
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'>// raylib.c
-</span>
+<span class='comment'>// raylib.c</span>
+
 <span class='keyword'>#include</span> <span class='string'>&lt;raylib.h&gt;</span>
 <span class='keyword'>#include</span> <span class='string'>&lt;bs/object.h&gt;</span>
 
@@ -2745,8 +2745,8 @@ library.
     <span class='keyword'>const</span> <span class='class'>int</span> height = args[<span class='constant'>1</span>].<span class='field'>as</span>.<span class='field'>number</span><span class='comment'>;</span>
     <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *title = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>2</span>].<span class='field'>as</span>.<span class='field'>object</span><span class='comment'>;</span>
 
-    <span class='comment'>// BS strings are null terminated by default for FFI convenience
-</span>    <span class='function'>InitWindow</span>(width, height, title-&gt;<span class='field'>data</span>)<span class='comment'>;</span>
+    <span class='comment'>// BS strings are null terminated by default for FFI convenience</span>
+    <span class='function'>InitWindow</span>(width, height, title-&gt;<span class='field'>data</span>)<span class='comment'>;</span>
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span><span class='comment'>;</span>
 }
 

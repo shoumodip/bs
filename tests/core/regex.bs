@@ -1,4 +1,4 @@
-# Invalid regex
+// Invalid regex
 io.println(Regex("["))
 
 {

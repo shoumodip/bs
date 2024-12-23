@@ -1415,7 +1415,7 @@ Slice a string from <code>start</code> (inclusive) to <code>end</code> (exclusiv
 <pre class='code active'>
 io.<span class='function'>println</span>(<span class='string'>"deez nuts"</span>.<span class='function'>slice</span>(<span class='constant'>0</span>, <span class='constant'>4</span>))
 io.<span class='function'>println</span>(<span class='string'>"deez nuts"</span>.<span class='function'>slice</span>(<span class='constant'>5</span>, <span class='constant'>9</span>))
-io.<span class='function'>println</span>(<span class='string'>"deez nuts"</span>.<span class='function'>slice</span>(<span class='constant'>5</span>)) <span class='comment'># No end defaults to string end</span>
+io.<span class='function'>println</span>(<span class='string'>"deez nuts"</span>.<span class='function'>slice</span>(<span class='constant'>5</span>)) <span class='comment'>// No end defaults to string end</span>
 </pre>
 </div>
 <div class='codes'>
@@ -2522,12 +2522,12 @@ Push <code>value</code> to the end.
 <pre class='code active'>
 <span class='keyword'>var</span> buffer = <span class='function'>Bytes</span>()
 
-<span class='comment'># Operations can be chained</span>
+<span class='comment'>// Operations can be chained</span>
 buffer
-    .<span class='function'>push</span>(<span class='string'>"Hello"</span>)           <span class='comment'># A String</span>
-    .<span class='function'>push</span>(<span class='function'>Bytes</span>(<span class='string'>", world!"</span>)) <span class='comment'># Another Bytes instance</span>
-    .<span class='function'>push</span>(<span class='constant'>32</span>)                <span class='comment'># An ASCII code, in this case ' '</span>
-    .<span class='function'>push</span>($<span class='constant'>69</span>)               <span class='comment'># To push the string representation, a string must be provided</span>
+    .<span class='function'>push</span>(<span class='string'>"Hello"</span>)           <span class='comment'>// A String</span>
+    .<span class='function'>push</span>(<span class='function'>Bytes</span>(<span class='string'>", world!"</span>)) <span class='comment'>// Another Bytes instance</span>
+    .<span class='function'>push</span>(<span class='constant'>32</span>)                <span class='comment'>// An ASCII code, in this case ' '</span>
+    .<span class='function'>push</span>($<span class='constant'>69</span>)               <span class='comment'>// To push the string representation, a string must be provided</span>
 
 io.<span class='function'>println</span>(buffer)
 </pre>
@@ -2568,11 +2568,11 @@ Insert <code>value</code> at <code>position</code>.
 <pre class='code active'>
 <span class='keyword'>var</span> buffer = <span class='function'>Bytes</span>(<span class='string'>"world!"</span>)
 
-<span class='comment'># Operations can be chained, just like Bytes.push()</span>
+<span class='comment'>// Operations can be chained, just like Bytes.push()</span>
 buffer
-    .<span class='function'>insert</span>(<span class='constant'>0</span>, <span class='string'>"Hell"</span>)      <span class='comment'># A String</span>
-    .<span class='function'>insert</span>(<span class='constant'>4</span>, <span class='function'>Bytes</span>(<span class='string'>", "</span>)) <span class='comment'># Another Bytes instance</span>
-    .<span class='function'>insert</span>(<span class='constant'>4</span>, <span class='constant'>111</span>)         <span class='comment'># An ASCII code, in this case 'o'</span>
+    .<span class='function'>insert</span>(<span class='constant'>0</span>, <span class='string'>"Hell"</span>)      <span class='comment'>// A String</span>
+    .<span class='function'>insert</span>(<span class='constant'>4</span>, <span class='function'>Bytes</span>(<span class='string'>", "</span>)) <span class='comment'>// Another Bytes instance</span>
+    .<span class='function'>insert</span>(<span class='constant'>4</span>, <span class='constant'>111</span>)         <span class='comment'>// An ASCII code, in this case 'o'</span>
 
 io.<span class='function'>println</span>(buffer)
 </pre>
@@ -3144,7 +3144,7 @@ Sort an array inplace with <code>compare</code>, and return itself.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> xs = [<span class='constant'>4</span>, <span class='constant'>2</span>, <span class='constant'>5</span>, <span class='constant'>1</span>, <span class='constant'>3</span>]
-xs.<span class='function'>sort</span>(<span class='keyword'>fn</span> (x, y) =&gt; x &lt; y) <span class='comment'># This also returns the array so you can chain operations</span>
+xs.<span class='function'>sort</span>(<span class='keyword'>fn</span> (x, y) =&gt; x &lt; y) <span class='comment'>// This also returns the array so you can chain operations</span>
 
 io.<span class='function'>println</span>(xs)
 </pre>
@@ -3243,7 +3243,7 @@ This modifies the array.
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
 io.<span class='function'>println</span>(xs)
 
-xs.<span class='function'>reverse</span>() <span class='comment'># This also returns the array so you can chain operations</span>
+xs.<span class='function'>reverse</span>() <span class='comment'>// This also returns the array so you can chain operations</span>
 io.<span class='function'>println</span>(xs)
 </pre>
 </div>
@@ -3288,7 +3288,7 @@ This modifies the array.
 <span class='keyword'>var</span> xs = [<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>]
 io.<span class='function'>println</span>(xs)
 
-xs.<span class='function'>fill</span>(<span class='constant'>69</span>) <span class='comment'># This also returns the array so you can chain operations</span>
+xs.<span class='function'>fill</span>(<span class='constant'>69</span>) <span class='comment'>// This also returns the array so you can chain operations</span>
 io.<span class='function'>println</span>(xs)
 </pre>
 </div>
@@ -3532,7 +3532,7 @@ Extend a table.
 
 io.<span class='function'>println</span>(xs)
 
-xs.<span class='function'>extend</span>(ys, <span class='constant'>true</span>) <span class='comment'># This also returns the table so you can chain operations</span>
+xs.<span class='function'>extend</span>(ys, <span class='constant'>true</span>) <span class='comment'>// This also returns the table so you can chain operations</span>
 io.<span class='function'>println</span>(xs)
 
 xs.<span class='function'>extend</span>(zs, <span class='constant'>false</span>)
@@ -3665,7 +3665,7 @@ Return the exponential function of the number.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='constant'>2</span>.<span class='function'>exp</span>()) <span class='comment'># Basically e^2</span>
+io.<span class='function'>println</span>(<span class='constant'>2</span>.<span class='function'>exp</span>()) <span class='comment'>// Basically e^2</span>
 </pre>
 </div>
 <div class='codes'>
@@ -4420,10 +4420,10 @@ So the usage becomes as straight forward as:
 <pre class='code active'>
 <span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(...)
 <span class='keyword'>if</span> f <span class='keyword'>is</span> <span class='string'>"Error"</span> {
-    <span class='keyword'>panic</span>(f.<span class='function'>message</span>()) <span class='comment'># Error handling...</span>
+    <span class='keyword'>panic</span>(f.<span class='function'>message</span>()) <span class='comment'>// Error handling...</span>
 }
 
-<span class='function'>f</span>() <span class='comment'># Or whatever you want to do</span>
+<span class='function'>f</span>() <span class='comment'>// Or whatever you want to do</span>
 </pre>
 </div>
 <p>
@@ -4541,11 +4541,11 @@ Basically a protected call.
     }
 }
 
-<span class='comment'># Ok</span>
+<span class='comment'>// Ok</span>
 <span class='function'>handle</span>(meta.<span class='function'>call</span>(<span class='keyword'>fn</span> (a, b) =&gt; a + b, <span class='constant'>34</span>, <span class='constant'>35</span>))
 io.<span class='function'>println</span>()
 
-<span class='comment'># Error</span>
+<span class='comment'>// Error</span>
 <span class='function'>handle</span>(meta.<span class='function'>call</span>(<span class='keyword'>fn</span> () =&gt; -<span class='constant'>nil</span>))
 </pre>
 </div>

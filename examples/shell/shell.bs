@@ -1,6 +1,6 @@
 var home = os.getenv("HOME")
 
-# Return a pretty current working directory
+// Return a pretty current working directory
 fn pwd() {
     var cwd = os.getcwd()
     if cwd.prefix(home) {
@@ -10,10 +10,10 @@ fn pwd() {
     return cwd
 }
 
-# Rawdogging shell lexing with regex any%
+// Rawdogging shell lexing with regex any%
 var delim = Regex("[ \n\t]+")
 
-# Previous working directory
+// Previous working directory
 var previous = nil
 
 while !io.stdin.eof() {
@@ -24,10 +24,10 @@ while !io.stdin.eof() {
 
     var cmd = args[0]
 
-    # Builtin 'exit'
-    # Usage:
-    #   exit         -> Exits with 0
-    #   exit <CODE>  -> Exits with CODE
+    // Builtin 'exit'
+    // Usage:
+    //   exit         -> Exits with 0
+    //   exit <CODE>  -> Exits with CODE
     if cmd == "exit" {
         if len(args) > 2 {
             io.eprintln("Error: too many arguments to command '{cmd}'")
@@ -43,11 +43,11 @@ while !io.stdin.eof() {
         os.exit(code)
     }
 
-    # Builtin 'cd'
-    # Usage:
-    #   cd        -> Go to HOME
-    #   cd <DIR>  -> Go to DIR
-    #   cd -      -> Go to previous location
+    // Builtin 'cd'
+    // Usage:
+    //   cd        -> Go to HOME
+    //   cd <DIR>  -> Go to DIR
+    //   cd -      -> Go to previous location
     if cmd == "cd" {
         if len(args) > 2 {
             io.eprintln("Error: too many arguments to command '{cmd}'")
@@ -85,5 +85,5 @@ while !io.stdin.eof() {
     p.wait()
 }
 
-# In case of CTRL-d
+// In case of CTRL-d
 io.println()

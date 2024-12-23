@@ -18,7 +18,7 @@ Hello, world!
 
 ## Comments
 ```bs
-# Single Line Comment
+// Single Line Comment
 
 /*
     Multi
@@ -41,118 +41,118 @@ Hello, world!
 ## Basic Types
 ### Nil
 ```bs
-io.println(nil) # Output: nil
+io.println(nil) // Output: nil
 ```
 
 ### Numbers
 BS supports 64-bit floating point numbers only.
 
 ```bs
-io.println(69)     # Output: 69
-io.println(420.69) # Output: 420.69
-io.println(0xff)   # Output: 255
+io.println(69)     // Output: 69
+io.println(420.69) // Output: 420.69
+io.println(0xff)   // Output: 255
 ```
 
 Standard arithmetic as well as bitwise operations are supported.
 
 ```bs
-io.println(34 + 35)        # Output: 69
-io.println(500 - 80)       # Output: 420
-io.println(23 * 3)         # Output: 69
-io.println(840 / 2)        # Output: 420
-io.println(209 % 70)       # Output: 69
-io.println(-420)           # Output: -420
+io.println(34 + 35)        // Output: 69
+io.println(500 - 80)       // Output: 420
+io.println(23 * 3)         // Output: 69
+io.println(840 / 2)        // Output: 420
+io.println(209 % 70)       // Output: 69
+io.println(-420)           // Output: -420
 
-io.println(17 * 2 + 35)    # Output: 69
-io.println((900 - 60) / 2) # Output: 420
+io.println(17 * 2 + 35)    // Output: 69
+io.println((900 - 60) / 2) // Output: 420
 
-io.println(276 >> 2)       # Output: 69
-io.println(105 << 2)       # Output: 420
-io.println(~-70)           # Output: 69
-io.println(160 | 260)      # Output: 420
-io.println(77 & 103)       # Output: 69
-io.println(~-419 + 10 & 3) # Output: 420
-io.println(69 ^ 1404)      # Output: 1337
+io.println(276 >> 2)       // Output: 69
+io.println(105 << 2)       // Output: 420
+io.println(~-70)           // Output: 69
+io.println(160 | 260)      // Output: 420
+io.println(77 & 103)       // Output: 69
+io.println(~-419 + 10 & 3) // Output: 420
+io.println(69 ^ 1404)      // Output: 1337
 ```
 
 ### Booleans
 ```bs
-io.println(true)  # Output: true
-io.println(false) # Output: false
+io.println(true)  // Output: true
+io.println(false) // Output: false
 ```
 
 Standard logical operations are supported.
 
 ```bs
-io.println(!true)          # Output: false
-io.println(!false)         # Output: true
-io.println(!nil)           # Output: true
+io.println(!true)          // Output: false
+io.println(!false)         // Output: true
+io.println(!nil)           // Output: true
 
-# All numbers are considered "true"
-io.println(!0)             # Output: false
-io.println(!1)             # Output: false
+// All numbers are considered "true"
+io.println(!0)             // Output: false
+io.println(!1)             // Output: false
 
-# Ordering
-io.println(69 > 420)       # Output: false
-io.println(69 >= 420)      # Output: false
-io.println(69 < 420)       # Output: true
-io.println(69 <= 420)      # Output: true
-io.println(69 == 420)      # Output: false
-io.println(69 != 420)      # Output: true
+// Ordering
+io.println(69 > 420)       // Output: false
+io.println(69 >= 420)      // Output: false
+io.println(69 < 420)       // Output: true
+io.println(69 <= 420)      // Output: true
+io.println(69 == 420)      // Output: false
+io.println(69 != 420)      // Output: true
 
-# BS is strongly typed
-io.println(nil == nil)     # Output: true
-io.println(nil == true)    # Output: false
-io.println(nil == 0)       # Output: false
-io.println(false == 0)     # Output: false
+// BS is strongly typed
+io.println(nil == nil)     // Output: true
+io.println(nil == true)    // Output: false
+io.println(nil == 0)       // Output: false
+io.println(false == 0)     // Output: false
 
-# Logical AND, OR
-io.println(true && true)   # Output: true
-io.println(true && false)  # Output: false
-io.println(true || false)  # Output: true
-io.println(false || false) # Output: false
+// Logical AND, OR
+io.println(true && true)   // Output: true
+io.println(true && false)  // Output: false
+io.println(true || false)  // Output: true
+io.println(false || false) // Output: false
 
-# Short circuiting
-io.println(nil && true)    # Output: nil
-io.println(0 || false)     # Output: 0
+// Short circuiting
+io.println(nil && true)    // Output: nil
+io.println(0 || false)     // Output: 0
 ```
 
 ### Strings
 ```bs
-# Output: Hello!
+// Output: Hello!
 io.println("Hello!")
 
-# Output:
-# Say "Hello"!
-# Here, a	 tab!
+// Output:
+// Say "Hello"!
+// Here, a	 tab!
 io.println("Say \"Hello\"!\nHere, a\t tab!")
 
-# Output: Interpolation! 69
+// Output: Interpolation! 69
 io.println("Interpolation! {34 + 35}")
 
-# Output: Nested interpolation! 420
+// Output: Nested interpolation! 420
 io.println("Nested {"interpolation! {420}"}")
 
-# Output: A literal '{'
+// Output: A literal '{'
 io.println("A literal '\{'")
 
-# Output: 6
+// Output: 6
 io.println(len("Hello!"))
 
-# Output: b
+// Output: b
 io.println("foobar"[3])
 
-# Output: Let's go!
-io.println('Let\'s go!') # Single quotes can also be used
+// Output: Let's go!
+io.println('Let\'s go!') // Single quotes can also be used
 ```
 
 #### (`$`)
 ```bs
-# Unary ($) converts any value to a string
-io.println(len($(21 * 20)))            # Output: 3
+// Unary ($) converts any value to a string
+io.println(len($(21 * 20)))            // Output: 3
 
-# Binary ($) performs string concatenation
-io.println("Hello, " $ "world! " $ 69) # Output: Hello, world! 69
+// Binary ($) performs string concatenation
+io.println("Hello, " $ "world! " $ 69) // Output: Hello, world! 69
 ```
 
 <blockquote>
@@ -163,76 +163,76 @@ io.println("Hello, " $ "world! " $ 69) # Output: Hello, world! 69
 
 ### Arrays
 ```bs
-# Variables will be introduced later
+// Variables will be introduced later
 var array = [69, 420]
 
-# Pretty printing by default!
-io.println(array)                 # Output: [69, 420]
+// Pretty printing by default!
+io.println(array)                 // Output: [69, 420]
 
-# Array access
-io.println(array[0])              # Output: 69
+// Array access
+io.println(array[0])              // Output: 69
 
-# Array access out of bounds is an error
-io.println(array[2])              # Error!
+// Array access out of bounds is an error
+io.println(array[2])              // Error!
 
-# Array assignment
+// Array assignment
 array[1] = "nice!"
-io.println(array)                 # Output: [69, "nice!"]
+io.println(array)                 // Output: [69, "nice!"]
 
-# Array assignment out of bounds is NOT an error
+// Array assignment out of bounds is NOT an error
 array[3] = "Are you serious?"
-io.println(array)                 # Output: [69, "nice!", nil, "Are you serious?"]
+io.println(array)                 // Output: [69, "nice!", nil, "Are you serious?"]
 
-# Array length
-io.println(len(array))            # Output: 4
+// Array length
+io.println(len(array))            // Output: 4
 
-# Due to the assignment semantics, appending to arrays is quite easy
+// Due to the assignment semantics, appending to arrays is quite easy
 array[len(array)] = 420
-io.println(array)                 # Output: [69, "nice!", nil, "Are you serious?", 420]
+io.println(array)                 // Output: [69, "nice!", nil, "Are you serious?", 420]
 
-# Of course, you can also use the push() method of arrays
+// Of course, you can also use the push() method of arrays
 array.push(1337)
 
-# Output:
-# [
-#     69,
-#     "nice!",
-#     nil,
-#     "Are you serious?",
-#     420,
-#     1337
-# ]
+// Output:
+// [
+//     69,
+//     "nice!",
+//     nil,
+//     "Are you serious?",
+//     420,
+//     1337
+// ]
 io.println(array)
 
-# Delete value at index
-io.println(delete(array[2]))      # Output: nil
-io.println(array)                 # Output: [69, "nice!", "Are you serious?", 420, 1337]
+// Delete value at index
+io.println(delete(array[2]))      // Output: nil
+io.println(array)                 // Output: [69, "nice!", "Are you serious?", 420, 1337]
 
-# Deletion of index out of range is an error
-io.println(delete(array[69]))     # Error!
+// Deletion of index out of range is an error
+io.println(delete(array[69]))     // Error!
 
-# Check if value exists in an array
-io.println("nice!" in array)      # Output: true
-io.println("something" in array)  # Output: false
+// Check if value exists in an array
+io.println("nice!" in array)      // Output: true
+io.println("something" in array)  // Output: false
 
-# Check if value doesn't exist in an array
-io.println("nice!" !in array)     # Output: false
-io.println("something" !in array) # Output: true
+// Check if value doesn't exist in an array
+io.println("nice!" !in array)     // Output: false
+io.println("something" !in array) // Output: true
 
-# Arrays are compared by value
+// Arrays are compared by value
 var xs = [1, 2, 3]
 var ys = [1, 2, 3]
 var zs = [1, 2, 3, 4]
-io.println(xs == ys)              # Output: true
-io.println(xs == zs)              # Output: false
+io.println(xs == ys)              // Output: true
+io.println(xs == zs)              // Output: false
 
-# Clone an array using the (..) operator
+// Clone an array using the (..) operator
 var as = [1, 2, 3]
 var bs = [..as]
 
 bs[0] = 69
-io.println(as)                    # Output: [1, 2, 3]
-io.println(bs)                    # Output: [69, 2, 3]
+io.println(as)                    // Output: [1, 2, 3]
+io.println(bs)                    // Output: [69, 2, 3]
 ```
 
 ### Tables
@@ -242,111 +242,111 @@ var table = {
     [34 + 35] = 420
 }
 
-# Output:
-# {
-#     foo = 69,
-#     [69] = 420
-# }
+// Output:
+// {
+//     foo = 69,
+//     [69] = 420
+// }
 io.println(table)
 
-# Key access
-io.println(table.foo)             # Output: 69
-io.println(table[69])             # Output: 420
+// Key access
+io.println(table.foo)             // Output: 69
+io.println(table[69])             // Output: 420
 
-# Key assignment
+// Key assignment
 table.key = "value"
 table["bar" $ 69] = "eh"
 
-# Output:
-# {
-#     bar69 = "eh",
-#     foo = 69,
-#     key = "value",
-#     [69] = 420
-# }
+// Output:
+// {
+//     bar69 = "eh",
+//     foo = 69,
+//     key = "value",
+//     [69] = 420
+// }
 io.println(table)
 
-# Undefined key access is an error
-io.println(table.something)       # Error!
+// Undefined key access is an error
+io.println(table.something)       // Error!
 
-# Check if key exists in a table
-io.println("foo" in table)        # Output: true
-io.println("something" in table)  # Output: false
+// Check if key exists in a table
+io.println("foo" in table)        // Output: true
+io.println("something" in table)  // Output: false
 
-# Check if key doesn't exist in a table
-io.println("foo" !in table)       # Output: false
-io.println("something" !in table) # Output: true
+// Check if key doesn't exist in a table
+io.println("foo" !in table)       // Output: false
+io.println("something" !in table) // Output: true
 
-# Table length
-io.println(len(table))            # Output: 4
+// Table length
+io.println(len(table))            // Output: 4
 
-# Delete keys
-io.println(delete(table[69]))     # Output: 420
+// Delete keys
+io.println(delete(table[69]))     // Output: 420
 
-# Output:
-# {
-#     bar69 = "eh",
-#     foo = 69,
-#     key = "value",
-# }
+// Output:
+// {
+//     bar69 = "eh",
+//     foo = 69,
+//     key = "value",
+// }
 io.println(table)
 
-# Deletion of non existent key is an error
-io.println(delete(table.wrong))   # Error!
+// Deletion of non existent key is an error
+io.println(delete(table.wrong))   // Error!
 
-# Tables are compared by value
+// Tables are compared by value
 var xs = {a = 1, b = 2}
 var ys = {a = 1, b = 2}
 var zs = {a = 1, b = 2, c = 3}
-io.println(xs == ys)              # Output: true
-io.println(xs == zs)              # Output: false
+io.println(xs == ys)              // Output: true
+io.println(xs == zs)              // Output: false
 
-# Clone a table using the (..) operator
+// Clone a table using the (..) operator
 var as = {a = 1, b = 2}
 var bs = {..as}
 
 bs.a = 69
 
-# Output:
-# {
-#     a = 1,
-#     b = 2
-# }
+// Output:
+// {
+//     a = 1,
+//     b = 2
+// }
 io.println(as)
 
-# Output:
-# {
-#     a = 69,
-#     b = 2
-# }
+// Output:
+// {
+//     a = 69,
+//     b = 2
+// }
 io.println(bs)
 ```
 
 ### Typeof
 ```bs
-io.println(typeof(nil))      # Output: nil
-io.println(typeof(true))     # Output: boolean
-io.println(typeof(69))       # Output: number
-io.println(typeof("deez"))   # Output: string
-io.println(typeof([]))       # Output: array
-io.println(typeof({}))       # Output: table
+io.println(typeof(nil))      // Output: nil
+io.println(typeof(true))     // Output: boolean
+io.println(typeof(69))       // Output: number
+io.println(typeof("deez"))   // Output: string
+io.println(typeof([]))       // Output: array
+io.println(typeof({}))       // Output: table
 
-# Functions will be introduced later
-io.println(typeof(fn () {})) # Output: function
+// Functions will be introduced later
+io.println(typeof(fn () {})) // Output: function
 ```
 
 #### Is
 ```bs
-io.println(nil is "nil")           # Output: true
-io.println(true is "boolean")      # Output: true
-io.println(69 is "number")         # Output: true
-io.println("deez" is "string")     # Output: true
-io.println([] is "array")          # Output: true
-io.println({} is "table")          # Output: true
-io.println(fn () {} is "function") # Output: true
+io.println(nil is "nil")           // Output: true
+io.println(true is "boolean")      // Output: true
+io.println(69 is "number")         // Output: true
+io.println("deez" is "string")     // Output: true
+io.println([] is "array")          // Output: true
+io.println({} is "table")          // Output: true
+io.println(fn () {} is "function") // Output: true
 
-io.println(420 is "nil")           # Output: false
-io.println(420 !is "nil")          # Output: true
+io.println(420 is "nil")           // Output: false
+io.println(420 !is "nil")          // Output: true
 ```
 
 ## Semicolons
@@ -356,23 +356,23 @@ newlines similarly to Go.
 
 
 ```bs
-# Output:
-# 69
-# 420
+// Output:
+// 69
+// 420
 io.println(69); io.println(420)
 ```
 
 This does mean, however, that placement of binary operators matter.
 
 ```bs
-# => 100 - 31;
+// => 100 - 31;
 100 - 31
 
-# => 100 - 31;
+// => 100 - 31;
 100 -
 31
 
-# => 100; -31;
+// => 100; -31;
 100
 - 31
 ```
@@ -384,14 +384,14 @@ if you wish the next line to be part of that expression.
 The field access operator (`.`) is the only exception to this rule.
 
 ```bs
-# Considered part of the same expression, even though the binary operator (.)
-# starts on a new line.
+// Considered part of the same expression, even though the binary operator (.)
+// starts on a new line.
 something
     .foo
     .bar(deez, nuts)
     .baz
 
-# The above expression is equivalent to this.
+// The above expression is equivalent to this.
 something.foo.bar(deez, nuts).baz
 ```
 
@@ -434,7 +434,7 @@ Minor
 
 ### Match Statement
 ```bs
-# Output: A
+// Output: A
 match 69 {
     69 => io.println("A")
     420 => {
@@ -442,7 +442,7 @@ match 69 {
     }
 }
 
-# Output: B
+// Output: B
 match 420 {
     69 => io.println("A")
     420 => {
@@ -456,23 +456,23 @@ match 1337 {
         io.println("B")
     }
 
-    # No output in this case, since none of the cases match
+    // No output in this case, since none of the cases match
 }
 
-# Output: C
+// Output: C
 match 1337 {
     69 => io.println("A")
     420 => {
         io.println("B")
     }
 } else {
-    # Executed when none of the cases match
+    // Executed when none of the cases match
     io.println("C")
 }
 
-# Output: C
+// Output: C
 match 42 {
-    # Multiple cases for the same branch
+    // Multiple cases for the same branch
     0, 1 => io.println("A")
     69, 420, 1337 => {
         io.println("B")
@@ -482,32 +482,32 @@ match 42 {
     io.println("D")
 }
 
-# Output: A
+// Output: A
 match 0 {} else {
-    # Why would you do this though? :/
+    // Why would you do this though? :/
     io.println("A")
 }
 
 var x = "foo"
 var y = "bar"
 
-# Output:
-# Side effect!
-# x
-match "foobar".slice(0, 3) { # All values can be matched
+// Output:
+// Side effect!
+// x
+match "foobar".slice(0, 3) { // All values can be matched
     y => io.println("y")
 
-    # Expressions are allowed
+    // Expressions are allowed
     22 + 10 => io.println("Deez")
 
-    # Arbritary runtime code in general is allowed
+    // Arbritary runtime code in general is allowed
     os.clock() => panic("What?")
 
-    # And you thought JS was bad
+    // And you thought JS was bad
     (fn () {
-        # 1. Functions will be described later
-        # 2. The order of operations matter. If a matching case was encountered
-        #    before this, then this side effect would not have occured
+        // 1. Functions will be described later
+        // 2. The order of operations matter. If a matching case was encountered
+        //    before this, then this side effect would not have occured
         io.println("Side effect!")
     })() => {
         io.println("Why?")
@@ -716,7 +716,7 @@ fn g() {
     io.println("HERE!")
 }
 
-# Functions implicitly return 'nil'
+// Functions implicitly return 'nil'
 io.println(f())
 io.println(g())
 ```
@@ -837,9 +837,9 @@ fn sum(..numbers) {
     return total
 }
 
-io.println(sum())             # Output: 0
-io.println(sum(69))           # Output: 69
-io.println(sum(90, 110, 220)) # Output: 420
+io.println(sum())             // Output: 0
+io.println(sum(69))           // Output: 69
+io.println(sum(90, 110, 220)) // Output: 420
 ```
 
 A mix of variadic and non-variadic arguments is also allowed, although the
@@ -854,9 +854,9 @@ fn sum(x, y, ..numbers) {
     return total
 }
 
-io.println(sum(34, 35))                 # Output: 69
-io.println(sum(90, 110, 110, 110))      # Output: 420
-io.println(sum(90, 110, 220, 400, 517)) # Output: 1337
+io.println(sum(34, 35))                 // Output: 69
+io.println(sum(90, 110, 110, 110))      // Output: 420
+io.println(sum(90, 110, 220, 400, 517)) // Output: 1337
 ```
 
 ### Spread
@@ -869,11 +869,11 @@ fn sum(x, y, z) {
 }
 
 var xs = [16, 18, 35]
-io.println(sum(..xs))       # Output: 69
+io.println(sum(..xs))       // Output: 69
 
 var ys = [100]
 var zs = [120, 200]
-io.println(sum(..ys, ..zs)) # Output: 420
+io.println(sum(..ys, ..zs)) // Output: 420
 ```
 
 This can also be used in variadic functions.
@@ -888,11 +888,11 @@ fn sum(..numbers) {
 }
 
 var xs = [16, 18, 35]
-io.println(sum(..xs))       # Output: 69
+io.println(sum(..xs))       // Output: 69
 
 var ys = [100]
 var zs = [120, 200]
-io.println(sum(..ys, ..zs)) # Output: 420
+io.println(sum(..ys, ..zs)) // Output: 420
 ```
 
 Of course, it goes without saying that normal arguments can be mixed with
@@ -908,25 +908,25 @@ fn sum(..numbers) {
 }
 
 var xs = [100, 125, 126]
-io.println(sum(34, ..xs, 35)) # Output: 420
+io.println(sum(34, ..xs, 35)) // Output: 420
 ```
 
 ## Variables
 ```bs
 var a = 34
 var b = 35
-io.println(a + b) # Output: 69
+io.println(a + b) // Output: 69
 ```
 
 ### Assignment
 ```bs
 var a = 17
-var b             # Assigned to 'nil'
+var b             // Assigned to 'nil'
 
 a = a * 2
 b = 35
 
-io.println(a + b) # Output: 69
+io.println(a + b) // Output: 69
 ```
 
 Shorthand assignment operators also work.
@@ -934,46 +934,46 @@ Shorthand assignment operators also work.
 ```bs
 var a = 17
 
-# All arithmetic operators are supported
+// All arithmetic operators are supported
 a *= 2
 a += 35
 
 var b = "Nice! "
 
-# String concatenation is also supported
+// String concatenation is also supported
 b $= a
 
-io.println(b) # Output: Nice! 69
+io.println(b) // Output: Nice! 69
 ```
 
 ### Scoped Variables
 ```bs
 var x = 69
-io.println(x)     # Output: 69
+io.println(x)     // Output: 69
 
 {
     var x = 420
-    io.println(x) # Output: 420
+    io.println(x) // Output: 420
 }
 
-io.println(x)     # Output: 69
+io.println(x)     // Output: 69
 ```
 
 ### Variable Shadowing
 ```bs
 var x = 69
-io.println(x) # Output: 69
+io.println(x) // Output: 69
 
 var x = "x used to be {x}"
-io.println(x) # Output: x used to be 69
+io.println(x) // Output: x used to be 69
 ```
 
 ### Local Variables
 ```bs
-var z = 420 # Local to the scope of the file
+var z = 420 // Local to the scope of the file
 
 fn add(x, y) {
-    var z = x + y # Local to the scope of the function
+    var z = x + y // Local to the scope of the function
     io.println(z)
 }
 
@@ -992,12 +992,12 @@ Here's a pitfall you might run into
 
 ```bs
 fn f() {
-    io.println(x) # Refers to the variable 'x'
+    io.println(x) // Refers to the variable 'x'
 }
 
-var x = 69        # Variable 'x' now defined at the toplevel
+var x = 69        // Variable 'x' now defined at the toplevel
 
-f()               # "Should" print 69
+f()               // "Should" print 69
 ```
 
 ```console
@@ -1022,10 +1022,10 @@ they are declared. This is where global variables come into play.
 
 ```bs
 fn f() {
-    io.println(x) # Refers to the variable 'x'
+    io.println(x) // Refers to the variable 'x'
 }
 
-pub var x = 69    # Global variable 'x' now defined
+pub var x = 69    // Global variable 'x' now defined
 
 f()
 ```
@@ -1037,18 +1037,18 @@ $ bs variables.bs
 
 ## Import
 ```bs
-# one.bs
+// one.bs
 var M = {}
 
 M.inc = fn (n) => n + 1
 M.dec = fn (n) => n - 1
 
-return M # Any arbitrary value can be returned, this is just the usual pattern
+return M // Any arbitrary value can be returned, this is just the usual pattern
 ```
 
 ```bs
-# main.bs
-var one = import("one") # Note that the extension is omitted
+// main.bs
+var one = import("one") // Note that the extension is omitted
 
 io.println(one.inc(68))
 io.println(one.dec(421))
@@ -1064,7 +1064,7 @@ $ bs main.bs
 Modules are loaded only once.
 
 ```bs
-# one.bs
+// one.bs
 var M = {}
 
 io.println("Loading module 'one'")
@@ -1076,7 +1076,7 @@ return M
 ```
 
 ```bs
-# main.bs
+// main.bs
 io.println(import("one").inc(68))
 io.println(import("one").dec(421))
 ```
@@ -1090,7 +1090,7 @@ Loading module 'one'
 
 ### Main Module
 ```bs
-# one.bs
+// one.bs
 var M = {}
 
 if is_main_module {
@@ -1104,7 +1104,7 @@ return M
 ```
 
 ```bs
-# main.bs
+// main.bs
 io.println(import("one").inc(68))
 io.println(import("one").dec(421))
 ```
@@ -1128,7 +1128,7 @@ more applicable, albeit involved, example.
 
 ```bs
 class Sprite {
-    # Constructor
+    // Constructor
     init(name, health, attack_power) {
         this.name = name
         this.health = health
@@ -1154,7 +1154,7 @@ class Sprite {
     }
 }
 
-# Inheritance
+// Inheritance
 class Hero < Sprite {
     init(name, health, attack_power) {
         super.init(name, health, attack_power)
@@ -1162,7 +1162,7 @@ class Hero < Sprite {
         this.defending = false
     }
 
-    # Special ability of hero: defending
+    // Special ability of hero: defending
     defend() {
         io.println("{this.name} is defending!")
         this.defending = true
@@ -1171,10 +1171,10 @@ class Hero < Sprite {
     take_damage(amount) {
         if this.defending {
             if this.poisoned {
-                # Hero will not be poisoned if defending
+                // Hero will not be poisoned if defending
                 this.poisoned = false
             } else {
-                # Hero will take half damage for a normal attack if defending
+                // Hero will take half damage for a normal attack if defending
                 amount /= 2
             }
 
@@ -1190,7 +1190,7 @@ class Enemy < Sprite {
         super.init(name, health, attack_power)
     }
 
-    # Special ability of enemy: poisoning
+    // Special ability of enemy: poisoning
     poison(target) {
         io.println("{this.name} poisons {target.name}!")
         target.poisoned = true
@@ -1198,22 +1198,22 @@ class Enemy < Sprite {
     }
 }
 
-# io.input() is a core library function which optionally prints a prompt and
-# reads a line from standard input
+// io.input() is a core library function which optionally prints a prompt and
+// reads a line from standard input
 var hero = Hero(io.input("Enter hero's name> "), 30, 10)
 var enemy = Enemy(io.input("Enter enemy's name> "), 25, 8)
 
-# Create a random number generator
+// Create a random number generator
 var rng = math.Random()
 
 while hero.is_alive() && enemy.is_alive() {
     io.println()
 
-    # Hero cannot choose while poisoned
+    // Hero cannot choose while poisoned
     if hero.poisoned {
         io.println("{hero.name} has been poisoned! skipping turn.")
 
-        # Prevent consecutive poisoning
+        // Prevent consecutive poisoning
         hero.poisoned = false
         enemy.attack(hero)
     } else {
@@ -1230,7 +1230,7 @@ while hero.is_alive() && enemy.is_alive() {
             io.println("ERROR: invalid choice! skipping {hero.name}'s turn.")
         }
 
-        # Enemy will either attack or poison the hero based on a 50-50 chance
+        // Enemy will either attack or poison the hero based on a 50-50 chance
         if rng.number() >= 0.5 {
             enemy.poison(hero)
         } else {
@@ -1282,27 +1282,27 @@ constructor failed. Any other return value is strictly forbidden, however.
 ```bs
 class Logger {
     init(path) {
-        # io.Writer is a core C class that handles writeable files. It can fail
+        // io.Writer is a core C class that handles writeable files. It can fail
         this.file = io.Writer(path)
         if !this.file {
-            # Could not create logger file, return 'nil' to indicate failure
+            // Could not create logger file, return 'nil' to indicate failure
             return nil
         }
     }
 
     write(s) {
-        # os.clock() returns the current monotonic time in seconds as a
-        # floating point number
+        // os.clock() returns the current monotonic time in seconds as a
+        // floating point number
         this.file.writeln("{os.clock()}: {s}")
     }
 }
 
 var logger = Logger("log.txt")
 if !logger {
-    # io.eprintln() prints to standard error
+    // io.eprintln() prints to standard error
     io.eprintln("Error: could not create logger")
 
-    # os.exit() exits the program with the provided exit code
+    // os.exit() exits the program with the provided exit code
     os.exit(1)
 }
 
@@ -1470,7 +1470,7 @@ Make sure to provide the compiler and linker flags as required.
 Finally, load it from BS.
 
 ```bs
-# ffi.bs
+// ffi.bs
 
 var arith = import("arithmetic")
 io.println(arith.add(34, 35))

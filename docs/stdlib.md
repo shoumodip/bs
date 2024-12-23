@@ -669,7 +669,7 @@ Slice a string from `start` (inclusive) to `end` (exclusive).
 ```bs
 io.println("deez nuts".slice(0, 4))
 io.println("deez nuts".slice(5, 9))
-io.println("deez nuts".slice(5)) # No end defaults to string end
+io.println("deez nuts".slice(5)) // No end defaults to string end
 ```
 
 ```console
@@ -1145,12 +1145,12 @@ Push `value` to the end.
 ```bs
 var buffer = Bytes()
 
-# Operations can be chained
+// Operations can be chained
 buffer
-    .push("Hello")           # A String
-    .push(Bytes(", world!")) # Another Bytes instance
-    .push(32)                # An ASCII code, in this case ' '
-    .push($69)               # To push the string representation, a string must be provided
+    .push("Hello")           // A String
+    .push(Bytes(", world!")) // Another Bytes instance
+    .push(32)                // An ASCII code, in this case ' '
+    .push($69)               // To push the string representation, a string must be provided
 
 io.println(buffer)
 ```
@@ -1166,11 +1166,11 @@ Insert `value` at `position`.
 ```bs
 var buffer = Bytes("world!")
 
-# Operations can be chained, just like Bytes.push()
+// Operations can be chained, just like Bytes.push()
 buffer
-    .insert(0, "Hell")      # A String
-    .insert(4, Bytes(", ")) # Another Bytes instance
-    .insert(4, 111)         # An ASCII code, in this case 'o'
+    .insert(0, "Hell")      // A String
+    .insert(4, Bytes(", ")) // Another Bytes instance
+    .insert(4, 111)         // An ASCII code, in this case 'o'
 
 io.println(buffer)
 ```
@@ -1413,7 +1413,7 @@ Sort an array inplace with `compare`, and return itself.
 
 ```bs
 var xs = [4, 2, 5, 1, 3]
-xs.sort(fn (x, y) => x < y) # This also returns the array so you can chain operations
+xs.sort(fn (x, y) => x < y) // This also returns the array so you can chain operations
 
 io.println(xs)
 ```
@@ -1458,7 +1458,7 @@ This modifies the array.
 var xs = [1, 2, 3, 4, 5]
 io.println(xs)
 
-xs.reverse() # This also returns the array so you can chain operations
+xs.reverse() // This also returns the array so you can chain operations
 io.println(xs)
 ```
 
@@ -1477,7 +1477,7 @@ This modifies the array.
 var xs = [1, 2, 3, 4, 5]
 io.println(xs)
 
-xs.fill(69) # This also returns the array so you can chain operations
+xs.fill(69) // This also returns the array so you can chain operations
 io.println(xs)
 ```
 
@@ -1596,7 +1596,7 @@ var zs = {
 
 io.println(xs)
 
-xs.extend(ys, true) # This also returns the table so you can chain operations
+xs.extend(ys, true) // This also returns the table so you can chain operations
 io.println(xs)
 
 xs.extend(zs, false)
@@ -1660,7 +1660,7 @@ Inverse tangent in radians.
 Return the exponential function of the number.
 
 ```bs
-io.println(2.exp()) # Basically e^2
+io.println(2.exp()) // Basically e^2
 ```
 
 ```console
@@ -2001,10 +2001,10 @@ So the usage becomes as straight forward as:
 ```bs
 var f = meta.compile(...)
 if f is "Error" {
-    panic(f.message()) # Error handling...
+    panic(f.message()) // Error handling...
 }
 
-f() # Or whatever you want to do
+f() // Or whatever you want to do
 ```
 
 The function is compiled such that the last expression in the body is returned,
@@ -2085,11 +2085,11 @@ fn handle(result) {
     }
 }
 
-# Ok
+// Ok
 handle(meta.call(fn (a, b) => a + b, 34, 35))
 io.println()
 
-# Error
+// Error
 handle(meta.call(fn () => -nil))
 ```
 

@@ -30,7 +30,7 @@ The UNIX <code>cat</code> coreutil.
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># cat.bs</span>
+<span class='comment'>// cat.bs</span>
 
 <span class='keyword'>var</span> code = <span class='constant'>0</span>
 
@@ -97,7 +97,7 @@ The UNIX <code>ls</code> coreutil.
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># ls.bs</span>
+<span class='comment'>// ls.bs</span>
 
 <span class='keyword'>fn</span> <span class='function'>compare</span>(a, b) {
     <span class='keyword'>if</span> a.<span class='function'>suffix</span>(<span class='string'>"/"</span>) &amp;&amp; !b.<span class='function'>suffix</span>(<span class='string'>"/"</span>) {
@@ -152,7 +152,7 @@ The UNIX <code>grep</code> coreutil.
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># grep.bs</span>
+<span class='comment'>// grep.bs</span>
 
 <span class='keyword'>fn</span> <span class='function'>grep</span>(f, path, pattern) {
     <span class='keyword'>var</span> row = <span class='constant'>0</span>
@@ -264,11 +264,11 @@ A simple UNIX shell.
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># shell.bs</span>
+<span class='comment'>// shell.bs</span>
 
 <span class='keyword'>var</span> home = os.<span class='function'>getenv</span>(<span class='string'>"HOME"</span>)
 
-<span class='comment'># Return a pretty current working directory</span>
+<span class='comment'>// Return a pretty current working directory</span>
 <span class='keyword'>fn</span> <span class='function'>pwd</span>() {
     <span class='keyword'>var</span> cwd = os.<span class='function'>getcwd</span>()
     <span class='keyword'>if</span> cwd.<span class='function'>prefix</span>(home) {
@@ -278,10 +278,10 @@ A simple UNIX shell.
     <span class='keyword'>return</span> cwd
 }
 
-<span class='comment'># Rawdogging shell lexing with regex any%</span>
+<span class='comment'>// Rawdogging shell lexing with regex any%</span>
 <span class='keyword'>var</span> delim = <span class='function'>Regex</span>(<span class='string'>"[ </span><span class='escape'>\n</span><span class='string'></span><span class='escape'>\t</span><span class='string'>]+"</span>)
 
-<span class='comment'># Previous working directory</span>
+<span class='comment'>// Previous working directory</span>
 <span class='keyword'>var</span> previous = <span class='constant'>nil</span>
 
 <span class='keyword'>while</span> !io.<span class='field'>stdin</span>.<span class='function'>eof</span>() {
@@ -292,10 +292,10 @@ A simple UNIX shell.
 
     <span class='keyword'>var</span> cmd = args[<span class='constant'>0</span>]
 
-    <span class='comment'># Builtin 'exit'</span>
-    <span class='comment'># Usage:</span>
-    <span class='comment'>#   exit         -&gt; Exits with 0</span>
-    <span class='comment'>#   exit &lt;CODE&gt;  -&gt; Exits with CODE</span>
+    <span class='comment'>// Builtin 'exit'</span>
+    <span class='comment'>// Usage:</span>
+    <span class='comment'>//   exit         -&gt; Exits with 0</span>
+    <span class='comment'>//   exit &lt;CODE&gt;  -&gt; Exits with CODE</span>
     <span class='keyword'>if</span> cmd == <span class='string'>"exit"</span> {
         <span class='keyword'>if</span> <span class='keyword'>len</span>(args) &gt; <span class='constant'>2</span> {
             io.<span class='function'>eprintln</span>(<span class='string'>"Error: too many arguments to command '</span><span class='escape'>{</span>cmd<span class='escape'>}</span><span class='string'>'"</span>)
@@ -311,11 +311,11 @@ A simple UNIX shell.
         os.<span class='function'>exit</span>(code)
     }
 
-    <span class='comment'># Builtin 'cd'</span>
-    <span class='comment'># Usage:</span>
-    <span class='comment'>#   cd        -&gt; Go to HOME</span>
-    <span class='comment'>#   cd &lt;DIR&gt;  -&gt; Go to DIR</span>
-    <span class='comment'>#   cd -      -&gt; Go to previous location</span>
+    <span class='comment'>// Builtin 'cd'</span>
+    <span class='comment'>// Usage:</span>
+    <span class='comment'>//   cd        -&gt; Go to HOME</span>
+    <span class='comment'>//   cd &lt;DIR&gt;  -&gt; Go to DIR</span>
+    <span class='comment'>//   cd -      -&gt; Go to previous location</span>
     <span class='keyword'>if</span> cmd == <span class='string'>"cd"</span> {
         <span class='keyword'>if</span> <span class='keyword'>len</span>(args) &gt; <span class='constant'>2</span> {
             io.<span class='function'>eprintln</span>(<span class='string'>"Error: too many arguments to command '</span><span class='escape'>{</span>cmd<span class='escape'>}</span><span class='string'>'"</span>)
@@ -353,7 +353,7 @@ A simple UNIX shell.
     p.<span class='function'>wait</span>()
 }
 
-<span class='comment'># In case of CTRL-d</span>
+<span class='comment'>// In case of CTRL-d</span>
 io.<span class='function'>println</span>()
 </pre>
 </div>
@@ -414,7 +414,7 @@ for proof of Turing Completeness.
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># rule110.bs</span>
+<span class='comment'>// rule110.bs</span>
 
 <span class='keyword'>var</span> board = [].<span class='function'>resize</span>(<span class='constant'>30</span>).<span class='function'>fill</span>(<span class='constant'>0</span>)
 board[<span class='keyword'>len</span>(board) - <span class='constant'>2</span>] = <span class='constant'>1</span>
@@ -495,7 +495,7 @@ An implementation of
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># GameOfLife.bs</span>
+<span class='comment'>// GameOfLife.bs</span>
 
 <span class='keyword'>class</span> <span class='class'>GameOfLife</span> {
     <span class='function'>init</span>(width, height) {
@@ -555,13 +555,13 @@ An implementation of
             }
         }
 
-        <span class='comment'># Swap buffers</span>
+        <span class='comment'>// Swap buffers</span>
         <span class='keyword'>var</span> t = <span class='constant'>this</span>.<span class='field'>board</span>
         <span class='constant'>this</span>.<span class='field'>board</span> = <span class='constant'>this</span>.<span class='field'>buffer</span>
         <span class='constant'>this</span>.<span class='field'>buffer</span> = t
     }
 
-    <span class='comment'># (X, Y) is the center of the glider</span>
+    <span class='comment'>// (X, Y) is the center of the glider</span>
     <span class='function'>glider</span>(x, y) {
         <span class='constant'>this</span>.<span class='function'>set</span>(x + <span class='constant'>0</span>, y - <span class='constant'>1</span>, <span class='constant'>true</span>)
         <span class='constant'>this</span>.<span class='function'>set</span>(x + <span class='constant'>1</span>, y + <span class='constant'>0</span>, <span class='constant'>true</span>)
@@ -587,7 +587,7 @@ An implementation of
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># game_of_life_tui.bs</span>
+<span class='comment'>// game_of_life_tui.bs</span>
 
 <span class='keyword'>var</span> GameOfLife = <span class='keyword'>import</span>(<span class='string'>"GameOfLife"</span>)
 
@@ -652,8 +652,8 @@ Run the program.
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'>// raylib.c
-</span>
+<span class='comment'>// raylib.c</span>
+
 <span class='keyword'>#include</span> <span class='string'>&lt;math.h&gt;</span>
 
 <span class='keyword'>#include</span> <span class='string'>&lt;bs/object.h&gt;</span>
@@ -669,8 +669,8 @@ Run the program.
     <span class='keyword'>const</span> <span class='class'>int</span> height = args[<span class='constant'>1</span>].<span class='field'>as</span>.<span class='field'>number</span><span class='comment'>;</span>
     <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *title = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>2</span>].<span class='field'>as</span>.<span class='field'>object</span><span class='comment'>;</span>
 
-    <span class='comment'>// BS strings are null terminated by default for FFI convenience
-</span>    <span class='function'>InitWindow</span>(width, height, title-&gt;<span class='field'>data</span>)<span class='comment'>;</span>
+    <span class='comment'>// BS strings are null terminated by default for FFI convenience</span>
+    <span class='function'>InitWindow</span>(width, height, title-&gt;<span class='field'>data</span>)<span class='comment'>;</span>
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span><span class='comment'>;</span>
 }
 
@@ -888,7 +888,7 @@ Make sure to provide the compiler and linker flags as required.
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># game_of_life_raylib.bs</span>
+<span class='comment'>// game_of_life_raylib.bs</span>
 
 <span class='keyword'>var</span> rl = <span class='keyword'>import</span>(<span class='string'>"raylib"</span>)
 <span class='keyword'>var</span> GameOfLife = <span class='keyword'>import</span>(<span class='string'>"GameOfLife"</span>)
@@ -1038,7 +1038,7 @@ Run the program.
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># tasks.bs</span>
+<span class='comment'>// tasks.bs</span>
 
 <span class='keyword'>var</span> TASKS_PATH = os.<span class='function'>getenv</span>(<span class='string'>"HOME"</span>) $ <span class='string'>"/.tasks"</span>
 
@@ -1240,8 +1240,8 @@ Flappy Bird using Raylib.
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'>// raylib.c
-</span>
+<span class='comment'>// raylib.c</span>
+
 <span class='keyword'>#include</span> <span class='string'>&lt;bs/object.h&gt;</span>
 <span class='keyword'>#include</span> <span class='string'>&lt;raylib.h&gt;</span>
 
@@ -1433,8 +1433,8 @@ Flappy Bird using Raylib.
         <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span><span class='comment'>;</span>
     }
 
-    <span class='comment'>// An official binding would never do this, but do I care?
-</span>    music.<span class='field'>looping</span> = <span class='constant'>true</span><span class='comment'>;</span>
+    <span class='comment'>// An official binding would never do this, but do I care?</span>
+    music.<span class='field'>looping</span> = <span class='constant'>true</span><span class='comment'>;</span>
     <span class='function'>PlayMusicStream</span>(music)<span class='comment'>;</span>
     <span class='function'>SetMusicVolume</span>(music, <span class='constant'>0.2</span>)<span class='comment'>;</span>
 
@@ -1548,7 +1548,7 @@ Make sure to provide the compiler and linker flags as required.
 </svg>
 </button>
 <pre class='code active'>
-<span class='comment'># flappy_bird.bs</span>
+<span class='comment'>// flappy_bird.bs</span>
 
 <span class='keyword'>var</span> rl = <span class='keyword'>import</span>(<span class='string'>"raylib"</span>)
 <span class='keyword'>var</span> game = {}

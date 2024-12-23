@@ -1,4 +1,4 @@
-# io.println("0")
+// io.println("0")
 
 /*
     io.println("1")
@@ -14,14 +14,14 @@
     io.println("6")
 */
 
-# /*
+// /*
     io.println("7")
     /*
         io.println("8")
         io.println("9")
     */
     io.println("10")
-# */
+// */
 
 /*
     io.println("11")

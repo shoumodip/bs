@@ -10,12 +10,11 @@ process() {
 
         if (basename ~ /\.c$/) {
             print "```c"
-            print "// " basename
         } else if (basename ~ /\.bs$/) {
             print "```bs"
-            print "# " basename
         }
 
+        print "// " basename
         print ""
 
         while ((getline line < filename) > 0) {

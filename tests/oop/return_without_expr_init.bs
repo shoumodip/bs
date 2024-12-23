@@ -3,7 +3,7 @@ class Foo {
         this.a = 69
         return
 
-        # Unreachable
+        // Unreachable
         this.b = 420
     }
 }

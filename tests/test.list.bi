@@ -2151,7 +2151,7 @@ core/meta_eval_runtime_error.bs:1:10: in eval()
 :b shell 33
 ../bin/bs core/meta_call_error.bs
 :i returncode 0
-:b stdout 460
+:b stdout 461
 OK!
 69
 
@@ -2159,7 +2159,7 @@ ERROR!
 Row: 20
 Col: 27
 Path: core/meta_call_error.bs
-Line: handle(meta.call(fn () => -nil))              # Bs Fail
+Line: handle(meta.call(fn () => -nil))              // Bs Fail
 Message: invalid operand to unary (-): nil
 Explanation: nil
 Example: nil
