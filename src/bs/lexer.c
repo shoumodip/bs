@@ -203,7 +203,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
                 l->prev_row = token.loc.row;
                 return token;
             }
-        } else if (l->sv.data[0] == '/' && l->sv.size > 1 && l->sv.data[1] == '#') {
+        } else if (l->sv.data[0] == '/' && l->sv.size > 1 && l->sv.data[1] == '*') {
             if (l->comments) {
                 token.sv = l->sv;
                 token.loc = l->loc;
@@ -211,9 +211,9 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
 
             size_t depth = 0;
             while (l->sv.size >= 2) {
-                if (l->sv.data[0] == '/' && l->sv.data[1] == '#') {
+                if (l->sv.data[0] == '/' && l->sv.data[1] == '*') {
                     depth++;
-                } else if (l->sv.data[0] == '#' && l->sv.data[1] == '/') {
+                } else if (l->sv.data[0] == '*' && l->sv.data[1] == '/') {
                     depth--;
                     if (!depth) {
                         break;
@@ -227,7 +227,7 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
                 bs_lexer_error(l, l->loc, "unterminated comment");
             }
 
-            // Skip the '#/'
+            // Skip the '*/'
             bs_lexer_advance(l);
             bs_lexer_advance(l);
 

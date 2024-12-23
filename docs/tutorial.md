@@ -20,22 +20,22 @@ Hello, world!
 ```bs
 # Single Line Comment
 
-/#
+/*
     Multi
     Line
     Comments
-#/
+*/
 
-/#
+/*
     Nested
 
-    /#
+    /*
         Multi
         Line
-    #/
+    */
 
     Comments
-#/
+*/
 ```
 
 ## Basic Types
