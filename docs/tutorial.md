@@ -1122,11 +1122,6 @@ $ bs one.bs
 Loading module 'one'
 ```
 
-### Extended Modules
-Extended modules can be imported within normal ones, and vice versa. If there
-is an extended as well as a normal module with the same name, the normal one
-will be imported.
-
 ## OOP
 I refuse to showcase the `Animal > Dog, Cat` nonsense, so here's a
 more applicable, albeit involved, example.

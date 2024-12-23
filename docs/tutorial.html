@@ -2091,16 +2091,8 @@ Loading module 'one'
 </pre>
 </div>
 </section>
+</section>
 <section id='s40'>
-<h3> Extended Modules</h3>
-<p>
-Extended modules can be imported within normal ones, and vice versa. If there
-is an extended as well as a normal module with the same name, the normal one
-will be imported.
-</p>
-</section>
-</section>
-<section id='s41'>
 <h2> OOP</h2>
 <p>
 I refuse to showcase the <code>Animal &gt; Dog, Cat</code> nonsense, so here's a
@@ -2275,7 +2267,7 @@ Luffy has been defeated!
 Luffy lost :(
 </pre>
 </div>
-<section id='s42'>
+<section id='s41'>
 <h3> Constructor Failure</h3>
 <p>
 Typical OOP languages mandate that constructors must return the instance under
@@ -2325,7 +2317,7 @@ logger.<span class='function'>write</span>(<span class='string'>"Hello, world!"<
 </pre>
 </div>
 </section>
-<section id='s43'>
+<section id='s42'>
 <h3> How to know if a class can fail?</h3>
 <p>
 Just print the class.
@@ -2382,7 +2374,7 @@ class Bar {}
 </pre>
 </div>
 </section>
-<section id='s44'>
+<section id='s43'>
 <h3> How to know the methods in a class?</h3>
 <p>
 Just print the class.
@@ -2430,7 +2422,7 @@ class Lol {
 </div>
 </section>
 </section>
-<section id='s45'>
+<section id='s44'>
 <h2> Panic</h2>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2498,7 +2490,7 @@ panic.bs:1:1: TODO
 </pre>
 </div>
 </section>
-<section id='s46'>
+<section id='s45'>
 <h2> Assert</h2>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2603,12 +2595,12 @@ io.<span class='function'>println</span>(x)
 </pre>
 </div>
 </section>
-<section id='s47'>
+<section id='s46'>
 <h2> FFI</h2>
 <p>
 BS supports loading of native modules at runtime.
 </p>
-<section id='s48'>
+<section id='s47'>
 <h3> Compiling a native module</h3>
 <p>
 Create a file <code>arithmetic.c</code> with the following content
@@ -2719,7 +2711,7 @@ io.<span class='function'>println</span>(arith.<span class='function'>sub</span>
 </pre>
 </div>
 </section>
-<section id='s49'>
+<section id='s48'>
 <h3> Wrapping an existing C library</h3>
 <p>
 As an example let's create a simple wrapper around the
@@ -3011,39 +3003,36 @@ rl.<span class='function'>close_window</span>()
 <li>
 <a href='#s39'> Main Module</a>
 </li>
+</ul>
+</li>
 <li>
-<a href='#s40'> Extended Modules</a>
+<a href='#s40'> OOP</a>
+<ul>
+<li>
+<a href='#s41'> Constructor Failure</a>
+</li>
+<li>
+<a href='#s42'> How to know if a class can fail?</a>
+</li>
+<li>
+<a href='#s43'> How to know the methods in a class?</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s41'> OOP</a>
+<a href='#s44'> Panic</a>
+</li>
+<li>
+<a href='#s45'> Assert</a>
+</li>
+<li>
+<a href='#s46'> FFI</a>
 <ul>
 <li>
-<a href='#s42'> Constructor Failure</a>
+<a href='#s47'> Compiling a native module</a>
 </li>
 <li>
-<a href='#s43'> How to know if a class can fail?</a>
-</li>
-<li>
-<a href='#s44'> How to know the methods in a class?</a>
-</li>
-</ul>
-</li>
-<li>
-<a href='#s45'> Panic</a>
-</li>
-<li>
-<a href='#s46'> Assert</a>
-</li>
-<li>
-<a href='#s47'> FFI</a>
-<ul>
-<li>
-<a href='#s48'> Compiling a native module</a>
-</li>
-<li>
-<a href='#s49'> Wrapping an existing C library</a>
+<a href='#s48'> Wrapping an existing C library</a>
 </li>
 </ul>
 </li>
