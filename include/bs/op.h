@@ -91,6 +91,7 @@ typedef enum {
     BS_OP_ELSE,
     BS_OP_THEN,
     BS_OP_MATCH,
+    BS_OP_MATCH_IF,
 
     BS_OP_ITER,
     BS_OP_RANGE,

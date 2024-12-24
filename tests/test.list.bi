@@ -1,4 +1,4 @@
-:i count 141
+:i count 142
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -2247,6 +2247,14 @@ delete/array_out_of_range_index.bs:1:12: error: cannot delete item at index 1 fr
 :b stdout 7
 69
 420
+
+:b stderr 0
+
+:b shell 21
+../bin/bs match/if.bs
+:i returncode 0
+:b stdout 2
+4
 
 :b stderr 0
 

@@ -1,0 +1,10 @@
+var z = "foobar"
+
+match z {
+    "nice" -> io.println(1)
+    "hehe" -> io.println(2)
+    if 69 == 420, if z.prefix("bar") -> io.println(3)
+    if z.prefix("foo") -> io.println(4)
+} else {
+    io.println(1337)
+}

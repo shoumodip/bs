@@ -515,6 +515,19 @@ match "foobar".slice(0, 3) { // All values can be matched
 
     x -> io.println("x")
 }
+
+// Output: D
+var z = "foobar"
+match z {
+    "nice" -> io.println("A")
+    "hehe" -> io.println("B")
+
+    // You can check arbitrary conditions
+    if 69 == 420, if z.prefix("bar") -> io.println("C")
+    if z.prefix("foo") -> io.println("D")
+} else {
+    io.println("E")
+}
 ```
 
 ## Loops

@@ -139,3 +139,4 @@
 ../bin/bs delete/array_out_of_range_index.bs
 ../bin/bs functions/variadics.bs
 ../bin/bs functions/spread.bs
+../bin/bs match/if.bs

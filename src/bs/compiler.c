@@ -1380,10 +1380,17 @@ static void bs_compile_stmt(Bs_Compiler *c) {
             const size_t cases_count_save = c->matches.count;
 
             do {
-                bs_compile_expr(c, BS_POWER_SET);
-
-                bs_jumps_push(c->bs, &c->matches, c->chunk->count);
-                bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_MATCH, 0);
+                token = bs_lexer_peek(&c->lexer);
+                if (token.type == BS_TOKEN_IF) {
+                    bs_lexer_unbuffer(&c->lexer);
+                    bs_compile_expr(c, BS_POWER_SET);
+                    bs_jumps_push(c->bs, &c->matches, c->chunk->count);
+                    bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_MATCH_IF, 0);
+                } else {
+                    bs_compile_expr(c, BS_POWER_SET);
+                    bs_jumps_push(c->bs, &c->matches, c->chunk->count);
+                    bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_MATCH, 0);
+                }
 
                 token = bs_lexer_either(&c->lexer, BS_TOKEN_COMMA, BS_TOKEN_ARROW);
             } while (token.type == BS_TOKEN_COMMA);

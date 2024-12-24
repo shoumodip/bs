@@ -806,6 +806,19 @@ Minor
 
     x -&gt; io.<span class='function'>println</span>(<span class='string'>"x"</span>)
 }
+
+<span class='comment'>// Output: D</span>
+<span class='keyword'>var</span> z = <span class='string'>"foobar"</span>
+<span class='keyword'>match</span> z {
+    <span class='string'>"nice"</span> -&gt; io.<span class='function'>println</span>(<span class='string'>"A"</span>)
+    <span class='string'>"hehe"</span> -&gt; io.<span class='function'>println</span>(<span class='string'>"B"</span>)
+
+    <span class='comment'>// You can check arbitrary conditions</span>
+    <span class='keyword'>if</span> <span class='constant'>69</span> == <span class='constant'>420</span>, <span class='keyword'>if</span> z.<span class='function'>prefix</span>(<span class='string'>"bar"</span>) -&gt; io.<span class='function'>println</span>(<span class='string'>"C"</span>)
+    <span class='keyword'>if</span> z.<span class='function'>prefix</span>(<span class='string'>"foo"</span>) -&gt; io.<span class='function'>println</span>(<span class='string'>"D"</span>)
+} <span class='keyword'>else</span> {
+    io.<span class='function'>println</span>(<span class='string'>"E"</span>)
+}
 </pre>
 </div>
 </section>
