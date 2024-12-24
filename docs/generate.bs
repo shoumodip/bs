@@ -1,0 +1,69 @@
+#!/usr/bin/env bs
+
+var examples = [
+    "cat",
+    "ls",
+    "grep",
+    "shell",
+    "rule110",
+    "game_of_life",
+    "tasks",
+    "flappy_bird",
+]
+
+var path = "docs/examples.md"
+var f = io.Writer(path)
+if !f {
+    io.eprintln("Error: could not write '{path}'")
+    os.exit(1)
+}
+
+f.writeln("# Examples")
+f.writeln()
+f.writeln("<!-- home-icon -->")
+
+for _, example in examples {
+    var path = "examples/{example}/README.md"
+    var contents = io.readfile(path)
+    if !contents {
+        io.eprintln("Error: could not read '{path}'")
+        os.exit(1)
+    }
+
+    f.writeln()
+    for _, line in contents.split("\n") {
+        if line.prefix("<!-- embed: ") && line.suffix(" -->") {
+            var path = line.slice(12, len(line) - 4)
+            var contents = io.readfile(path)
+            if !contents {
+                io.eprintln("Error: could not read '{path}'")
+                os.exit(1)
+            }
+
+            var comps = path.split("/")
+            f.writeln(if path.suffix(".c") then "```c" else "```bs")
+            f.writeln("//", comps[len(comps) - 1])
+            f.writeln()
+
+            for _, line in contents.split("\n") {
+                f.writeln(line)
+            }
+
+            f.writeln("```")
+        } else if line.prefix("#") {
+            f.writeln("#" $ line)
+        } else {
+            f.writeln(line)
+        }
+    }
+}
+
+f.close()
+
+var p = os.Process(["bsdoc", "docs/examples.md"])
+if !p {
+    io.eprintln("Error: could not run 'bsdoc'")
+    os.exit(1)
+}
+
+p.wait()
