@@ -1364,7 +1364,14 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
 
         if (bs_lexer_read(&c->lexer, BS_TOKEN_ELSE)) {
-            bs_lexer_buffer(&c->lexer, bs_lexer_either(&c->lexer, BS_TOKEN_LBRACE, BS_TOKEN_IF));
+            const Bs_Token_Type expected[] = {
+                BS_TOKEN_LBRACE,
+                BS_TOKEN_IF,
+                BS_TOKEN_MATCH,
+            };
+
+            bs_lexer_buffer(
+                &c->lexer, bs_lexer_one_of(&c->lexer, expected, bs_c_array_size(expected)));
             bs_compile_stmt(c);
         }
         bs_compile_jump_patch(c, else_addr);
@@ -1423,7 +1430,14 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
 
         if (bs_lexer_read(&c->lexer, BS_TOKEN_ELSE)) {
-            bs_lexer_buffer(&c->lexer, bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE));
+            const Bs_Token_Type expected[] = {
+                BS_TOKEN_LBRACE,
+                BS_TOKEN_IF,
+                BS_TOKEN_MATCH,
+            };
+
+            bs_lexer_buffer(
+                &c->lexer, bs_lexer_one_of(&c->lexer, expected, bs_c_array_size(expected)));
             bs_compile_stmt(c);
         }
 

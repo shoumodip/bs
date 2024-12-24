@@ -1,0 +1,10 @@
+var z = "noice"
+
+if false {
+    io.println(1)
+} else match z {
+    "nice" -> io.println(2)
+    "hehe" -> io.println(3)
+} else if z == "noice" {
+    io.println(4)
+}
