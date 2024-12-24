@@ -506,7 +506,6 @@ int bsdoc_run_file(const char *input) {
     Bs_Sv sv = Bs_Sv(contents, size);
     size_t current_level = 0;
 
-    Bsdoc_Section section = {0};
     Bsdoc_Sections sections = {0};
 
     Bs_Sv line = bs_sv_split(&sv, '\n');
@@ -563,8 +562,10 @@ int bsdoc_run_file(const char *input) {
             Bs_Sv highlight = line;
             line = bs_sv_split(&highlight, '@');
 
-            section.title = line;
-            section.level = level;
+            Bsdoc_Section section = {
+                .title = line,
+                .level = level,
+            };
 
             fprintf(f, "<section id='s%zu'>\n<h%zu", sections.count, level);
             if (highlight.size) {

@@ -1408,6 +1408,23 @@ $ bs demo.bs
 [69, 420, "Nice!"]
 ```
 
+### array.pop() @method
+Pop the last element from an array. If the array is empty, an error is thrown.
+
+This modifies the array.
+
+```bs
+var xs = [1, 2, 3, 4, 5]
+io.println(xs.pop())
+io.println(xs)
+```
+
+```console
+$ bs demo.bs
+5
+[1, 2, 3, 4]
+```
+
 ### array.sort(compare) @method
 Sort an array inplace with `compare`, and return itself.
 

@@ -1993,6 +1993,16 @@ static Bs_Value bs_array_insert(Bs *bs, Bs_Value *args, size_t arity) {
     return args[-1];
 }
 
+static Bs_Value bs_array_pop(Bs *bs, Bs_Value *args, size_t arity) {
+    bs_check_arity(bs, arity, 0);
+    Bs_Array *a = (Bs_Array *)args[-1].as.object;
+    if (!a->count) {
+        bs_error(bs, "cannot pop from empty array");
+    }
+
+    return a->data[--a->count];
+}
+
 typedef struct {
     Bs *bs;
     Bs_Value fn;
@@ -2824,6 +2834,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
 
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("push"), bs_array_push);
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("insert"), bs_array_insert);
+        bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("pop"), bs_array_pop);
 
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("sort"), bs_array_sort);
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("resize"), bs_array_resize);

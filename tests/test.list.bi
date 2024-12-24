@@ -1467,7 +1467,7 @@ foofoofoofoofoofoo
 :b shell 23
 ../bin/bs core/array.bs
 :i returncode 0
-:b stdout 673
+:b stdout 704
 [2, 4, 6, 8, 10]
 [2, 4]
 15
@@ -1531,6 +1531,9 @@ Final:  [3, 4, 1, 5, 2]
     9,
     10
 ]
+[1, 2, 3, 4, 5]
+5
+[1, 2, 3, 4]
 
 :b stderr 0
 
