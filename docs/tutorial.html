@@ -270,7 +270,15 @@ io.<span class='function'>println</span>(<span class='keyword'>len</span>(<span 
 io.<span class='function'>println</span>(<span class='string'>"foobar"</span>[<span class='constant'>3</span>])
 
 <span class='comment'>// Output: Let's go!</span>
-io.<span class='function'>println</span>(<span class='string'>'Let</span><span class='escape'>\'</span><span class='string'>s go!'</span>) <span class='comment'>// Single quotes can also be used</span>
+io.<span class='function'>println</span>(<span class='string'>'Let</span><span class='escape'>\'</span><span class='string'>s go!'</span>)             <span class='comment'>// Single quotes can also be used</span>
+
+<span class='comment'>// Check if substring exists in a string</span>
+io.<span class='function'>println</span>(<span class='string'>"bar"</span> <span class='keyword'>in</span> <span class='string'>"foobar"</span>)        <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(<span class='string'>"something"</span> <span class='keyword'>in</span> <span class='string'>"foobar"</span>)  <span class='comment'>// Output: false</span>
+
+<span class='comment'>// Check if substring doesn't exist in a string</span>
+io.<span class='function'>println</span>(<span class='string'>"bar"</span> !<span class='keyword'>in</span> <span class='string'>"foobar"</span>)       <span class='comment'>// Output: false</span>
+io.<span class='function'>println</span>(<span class='string'>"something"</span> !<span class='keyword'>in</span> <span class='string'>"foobar"</span>) <span class='comment'>// Output: true</span>
 </pre>
 </div>
 <section id='s7'>

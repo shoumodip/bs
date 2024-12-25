@@ -143,7 +143,15 @@ io.println(len("Hello!"))
 io.println("foobar"[3])
 
 // Output: Let's go!
-io.println('Let\'s go!') // Single quotes can also be used
+io.println('Let\'s go!')             // Single quotes can also be used
+
+// Check if substring exists in a string
+io.println("bar" in "foobar")        // Output: true
+io.println("something" in "foobar")  // Output: false
+
+// Check if substring doesn't exist in a string
+io.println("bar" !in "foobar")       // Output: false
+io.println("something" !in "foobar") // Output: true
 ```
 
 #### (`$`)

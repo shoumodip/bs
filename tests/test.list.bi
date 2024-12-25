@@ -151,7 +151,7 @@ false
 :b shell 25
 ../bin/bs strings/main.bs
 :i returncode 0
-:b stdout 121
+:b stdout 143
 Deez nuts
 Joe Mama
 69 Nice!
@@ -162,6 +162,10 @@ true
 false
 false
   69
+true
+false
+false
+true
 
 :b stderr 0
 

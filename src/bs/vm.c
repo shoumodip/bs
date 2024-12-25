@@ -2378,6 +2378,25 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const char *label = NULL;
 
             switch (container.as.object->type) {
+            case BS_OBJECT_STR: {
+                bs_check_object_type(bs, key, BS_OBJECT_STR, "substring");
+
+                const Bs_Str *str = (Bs_Str *)container.as.object;
+                const Bs_Str *sub = (Bs_Str *)key.as.object;
+
+                bool found = false;
+                if (sub->size) {
+                    for (size_t i = 0; i + sub->size <= str->size; i++) {
+                        if (!memcmp(&str->data[i], sub->data, sub->size)) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+
+                bs_stack_push(bs, bs_value_bool(found));
+            } break;
+
             case BS_OBJECT_ARRAY: {
                 const Bs_Array *array = (Bs_Array *)container.as.object;
                 Bs_Value result = bs_value_bool(false);

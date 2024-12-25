@@ -10,3 +10,8 @@ io.println("foo" == "bar")
 io.println("foo" == "foobar")
 
 io.println(($69).lpad(" ", 4))
+
+io.println("bar" in "foobar")
+io.println("something" in "foobar")
+io.println("bar" !in "foobar")
+io.println("something" !in "foobar")
