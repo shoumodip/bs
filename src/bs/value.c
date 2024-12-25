@@ -214,7 +214,7 @@ void bs_pretty_printer_quote(Bs_Pretty_Printer *p, Bs_Sv sv) {
 
         const char c = sv.data[b];
         switch (c) {
-        case '\e':
+        case 033:
             FLUSH("\\e");
             break;
 
