@@ -725,16 +725,7 @@ fn generate(path) {
     io.println("Wrote documentation to '{path}'")
 }
 
-if !is_main_module {
-    return
-}
-
-if len(os.args) < 2 {
-    io.readdir("docs")
-        .map(fn (e) -> "docs/" $ e.name())
-        .filter(fn (f) -> f.suffix(".md"))
-        .map(generate)
-} else if os.args[1] == "examples" {
+fn examples() {
     var path = "docs/examples.md"
     var f = io.Writer(path)
     if !f {
@@ -783,7 +774,21 @@ if len(os.args) < 2 {
     }
 
     f.close()
-    generate(path)
+}
+
+if !is_main_module {
+    return
+}
+
+if len(os.args) < 2 {
+    examples()
+    io.readdir("docs")
+        .map(fn (e) -> "docs/" $ e.name())
+        .filter(fn (f) -> f.suffix(".md"))
+        .map(generate)
+} else if os.args[1] == "examples" {
+    examples()
+    generate("docs/examples.md")
 } else {
     for i, arg in os.args {
         if i != 0 {

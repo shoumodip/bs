@@ -822,7 +822,7 @@ class Tasks {
 
     done(index) {
         this.verify(index)
-        var title = this.tasks.remove(index)
+        var title = delete(this.tasks[index])
         this.save()
         io.println("Done {index}: {title}")
     }

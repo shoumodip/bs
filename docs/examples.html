@@ -1065,7 +1065,7 @@ Run the program.
 
     <span class='function'>done</span>(index) {
         <span class='constant'>this</span>.<span class='function'>verify</span>(index)
-        <span class='keyword'>var</span> title = <span class='constant'>this</span>.<span class='field'>tasks</span>.<span class='function'>remove</span>(index)
+        <span class='keyword'>var</span> title = <span class='keyword'>delete</span>(<span class='constant'>this</span>.<span class='field'>tasks</span>[index])
         <span class='constant'>this</span>.<span class='function'>save</span>()
         io.<span class='function'>println</span>(<span class='string'>&quot;Done </span><span class='escape'>{</span>index<span class='escape'>}</span><span class='string'>: </span><span class='escape'>{</span>title<span class='escape'>}</span><span class='string'>&quot;</span>)
     }
