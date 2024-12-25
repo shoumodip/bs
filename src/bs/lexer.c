@@ -97,7 +97,7 @@ static bool bs_lexer_match(Bs_Lexer *l, char ch) {
 }
 
 static bool bs_lexer_hash_acceptable(Bs_Lexer *l) {
-    return l->bsdoc || (l->loc.row * l->loc.col == 1 && l->sv.size > 1 && l->sv.data[1] == '!');
+    return l->loc.row * l->loc.col == 1 && l->sv.size > 1 && l->sv.data[1] == '!';
 }
 
 Bs_Lexer bs_lexer_new(Bs_Sv path, Bs_Sv input, Bs_Error_Writer *error) {
@@ -192,26 +192,10 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
         if (isspace(*l->sv.data)) {
             bs_lexer_advance(l);
         } else if (*l->sv.data == '#' && bs_lexer_hash_acceptable(l)) {
-            if (l->bsdoc) {
-                token.sv = l->sv;
-                token.loc = l->loc;
-            }
-
             while (l->sv.size > 0 && *l->sv.data != '\n') {
                 bs_lexer_advance(l);
             }
-
-            if (l->bsdoc) {
-                token.type = BS_TOKEN_COMMENT;
-                token.sv.size -= l->sv.size;
-                return token;
-            }
         } else if (l->sv.data[0] == '/' && l->sv.size > 1) {
-            if (l->bsdoc) {
-                token.sv = l->sv;
-                token.loc = l->loc;
-            }
-
             if (l->sv.data[1] == '/') {
                 while (l->sv.size > 0 && *l->sv.data != '\n') {
                     bs_lexer_advance(l);
@@ -240,12 +224,6 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
                 bs_lexer_advance(l);
             } else {
                 break;
-            }
-
-            if (l->bsdoc) {
-                token.type = BS_TOKEN_COMMENT;
-                token.sv.size -= l->sv.size;
-                return token;
             }
         } else {
             break;

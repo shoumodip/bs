@@ -41,7 +41,6 @@ typedef struct {
     size_t prev_row;
 
     bool is_meta;
-    bool bsdoc;
     jmp_buf unwind;
 
     Bs_Error_Writer *error;

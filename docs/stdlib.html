@@ -14,12 +14,13 @@
 <a href='index.html' class='navigation-icon'>
 <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='30px' height='30px' viewBox='0 0 30 30' version='1.1'><g id='surface1'><path fill='#D4BE98' d='M 29.625 13.960938 L 16.132812 2.09375 C 15.507812 1.542969 14.488281 1.542969 13.867188 2.09375 L 0.382812 13.960938 C -0.25 14.511719 -0.0820312 14.960938 0.757812 14.960938 L 4.917969 14.960938 L 4.917969 27.113281 C 4.917969 27.773438 5.464844 28.320312 6.132812 28.320312 L 11.222656 28.320312 L 11.222656 20.328125 C 11.222656 19.667969 11.769531 19.121094 12.433594 19.121094 L 17.574219 19.121094 C 18.246094 19.121094 18.789062 19.65625 18.789062 20.328125 L 18.789062 28.320312 L 23.878906 28.320312 C 24.550781 28.320312 25.089844 27.777344 25.089844 27.113281 L 25.089844 14.957031 L 29.253906 14.957031 C 30.078125 14.957031 30.246094 14.511719 29.625 13.960938 Z M 29.625 13.960938 '/></g></a>
 <section id='s0'>
-<h2> I/O</h2>
+<h2>I/O</h2>
 <p>
 Contains simple I/O primitives.
 </p>
 <section id='s1'>
-<h3 class='hl-header'><code><span class='function'>input</span>(prompt?)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>input</span>(prompt?)</code></h3>
 <p>
 Read a line from standard input, printing the optional argument <code>prompt</code> if
 provided.
@@ -36,8 +37,8 @@ provided.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> name = io.<span class='function'>input</span>(<span class='string'>"Enter your name&gt; "</span>)
-io.<span class='function'>println</span>(<span class='string'>"Hello, </span><span class='escape'>{</span>name<span class='escape'>}</span><span class='string'>!"</span>)
+<span class='keyword'>var</span> name = io.<span class='function'>input</span>(<span class='string'>&quot;Enter your name&gt; &quot;</span>)
+io.<span class='function'>println</span>(<span class='string'>&quot;Hello, </span><span class='escape'>{</span>name<span class='escape'>}</span><span class='string'>!&quot;</span>)
 </pre>
 </div>
 <div class='codes'>
@@ -53,13 +54,14 @@ io.<span class='function'>println</span>(<span class='string'>"Hello, </span><sp
 </button>
 <pre class='code active'>
 <span class='string'>$ </span>bs demo.bs
-Enter your name&gt; Batman
+Enter your name> Batman
 Hello, Batman!
 </pre>
 </div>
 </section>
 <section id='s2'>
-<h3 class='hl-header'><code><span class='function'>print</span>(...)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>print</span>(...)</code></h3>
 <p>
 Print all the arguments to standard output.
 </p>
@@ -75,7 +77,7 @@ Print all the arguments to standard output.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>print</span>(<span class='string'>"Hello"</span>, <span class='string'>"world"</span>, <span class='constant'>69</span>)
+io.<span class='function'>print</span>(<span class='string'>&quot;Hello&quot;</span>, <span class='string'>&quot;world&quot;</span>, <span class='constant'>69</span>)
 </pre>
 </div>
 <div class='codes'>
@@ -99,25 +101,29 @@ The arguments are separated with spaces.
 </p>
 </section>
 <section id='s3'>
-<h3 class='hl-header'><code><span class='function'>println</span>(...)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>println</span>(...)</code></h3>
 <p>
 Print all the arguments to standard output, with a following newline.
 </p>
 </section>
 <section id='s4'>
-<h3 class='hl-header'><code><span class='function'>eprint</span>(...)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>eprint</span>(...)</code></h3>
 <p>
 Print all the arguments to standard error.
 </p>
 </section>
 <section id='s5'>
-<h3 class='hl-header'><code><span class='function'>eprintln</span>(...)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>eprintln</span>(...)</code></h3>
 <p>
 Print all the arguments to standard error, with a following newline.
 </p>
 </section>
 <section id='s6'>
-<h3 class='hl-header'><code><span class='function'>readdir</span>(path)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>readdir</span>(path)</code></h3>
 <p>
 Read a directory into an array of <code>DirEntry</code>.
 </p>
@@ -136,7 +142,7 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> entries = <span class='keyword'>assert</span>(io.<span class='function'>readdir</span>(<span class='string'>"."</span>))
+<span class='keyword'>var</span> entries = <span class='keyword'>assert</span>(io.<span class='function'>readdir</span>(<span class='string'>&quot;.&quot;</span>))
 
 <span class='keyword'>for</span> _, e <span class='keyword'>in</span> entries {
     io.<span class='function'>println</span>(e.<span class='function'>name</span>(), e.<span class='function'>isdir</span>())
@@ -177,7 +183,8 @@ LICENSE false
 </div>
 </section>
 <section id='s7'>
-<h3 class='hl-header'><code><span class='function'>readfile</span>(path, binary?)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>readfile</span>(path, binary?)</code></h3>
 <p>
 Read a file into a string.
 </p>
@@ -200,9 +207,9 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> contents = io.<span class='function'>readfile</span>(<span class='string'>"input.txt"</span>)
+<span class='keyword'>var</span> contents = io.<span class='function'>readfile</span>(<span class='string'>&quot;input.txt&quot;</span>)
 <span class='keyword'>if</span> !contents {
-    io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not read file 'input.txt'"</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: could not read file &apos;input.txt&apos;&quot;</span>)
     os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
@@ -232,7 +239,8 @@ People's dreams have no end! ~ Blackbeard
 </div>
 </section>
 <section id='s8'>
-<h3 class='hl-header'><code><span class='class'>Reader</span>(path, binary?)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>Reader</span>(path, binary?)</code></h3>
 <p>
 Native C class that opens <code>path</code> in readable mode.
 </p>
@@ -255,9 +263,9 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='function'>Reader</span>(<span class='string'>"input.txt"</span>)
+<span class='keyword'>var</span> f = io.<span class='function'>Reader</span>(<span class='string'>&quot;input.txt&quot;</span>)
 <span class='keyword'>if</span> !f {
-    io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: could not read file!&quot;</span>)
     os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
@@ -290,7 +298,8 @@ People's dreams have no end! ~ Blackbeard
 </pre>
 </div>
 <section id='s9'>
-<h4 class='hl-header'><code><span class='class'>Reader</span>.<span class='field'>close</span>()</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Reader</span>.<span class='field'>close</span>()</code></h4>
 <p>
 Close the file.
 </p>
@@ -300,7 +309,8 @@ short programs.
 </p>
 </section>
 <section id='s10'>
-<h4 class='hl-header'><code><span class='class'>Reader</span>.<span class='field'>read</span>(count?)</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Reader</span>.<span class='field'>read</span>(count?)</code></h4>
 <p>
 Read <code>count</code> bytes from the current position. If the argument <code>count</code> is not
 provided, it reads all of the available bytes.
@@ -320,14 +330,14 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='function'>Reader</span>(<span class='string'>"input.txt"</span>)
+<span class='keyword'>var</span> f = io.<span class='function'>Reader</span>(<span class='string'>&quot;input.txt&quot;</span>)
 <span class='keyword'>if</span> !f {
-    io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: could not read file!&quot;</span>)
     os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
-io.<span class='function'>print</span>(<span class='string'>"The first 16 bytes: [</span><span class='escape'>{</span>f.<span class='function'>read</span>(<span class='constant'>16</span>)<span class='escape'>}</span><span class='string'>]</span><span class='escape'>\n</span><span class='string'>"</span>)
-io.<span class='function'>print</span>(<span class='string'>"The rest:"</span>, f.<span class='function'>read</span>())
+io.<span class='function'>print</span>(<span class='string'>&quot;The first 16 bytes: [</span><span class='escape'>{</span>f.<span class='function'>read</span>(<span class='constant'>16</span>)<span class='escape'>}</span><span class='string'>]</span><span class='escape'>\n</span><span class='string'>&quot;</span>)
+io.<span class='function'>print</span>(<span class='string'>&quot;The rest:&quot;</span>, f.<span class='function'>read</span>())
 </pre>
 </div>
 <div class='codes'>
@@ -354,7 +364,8 @@ People's dreams have no end! ~ Blackbeard
 </div>
 </section>
 <section id='s11'>
-<h4 class='hl-header'><code><span class='class'>Reader</span>.<span class='field'>readln</span>()</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Reader</span>.<span class='field'>readln</span>()</code></h4>
 <p>
 Read a line.
 </p>
@@ -370,15 +381,15 @@ Read a line.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='function'>Reader</span>(<span class='string'>"input.txt"</span>)
+<span class='keyword'>var</span> f = io.<span class='function'>Reader</span>(<span class='string'>&quot;input.txt&quot;</span>)
 <span class='keyword'>if</span> !f {
-    io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: could not read file!&quot;</span>)
     os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
 <span class='keyword'>while</span> !f.<span class='function'>eof</span>() {
     <span class='keyword'>var</span> line = f.<span class='function'>readln</span>()
-    io.<span class='function'>println</span>(<span class='string'>"Line:"</span>, line)
+    io.<span class='function'>println</span>(<span class='string'>&quot;Line:&quot;</span>, line)
 }
 </pre>
 </div>
@@ -406,24 +417,26 @@ Line:
 </div>
 </section>
 <section id='s12'>
-<h4 class='hl-header'><code><span class='class'>Reader</span>.<span class='field'>eof</span>()</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Reader</span>.<span class='field'>eof</span>()</code></h4>
 <p>
 Return whether the end of file has been reached.
 </p>
 </section>
 <section id='s13'>
-<h4 class='hl-header'><code><span class='class'>Reader</span>.<span class='field'>seek</span>(offset, whence)</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Reader</span>.<span class='field'>seek</span>(offset, whence)</code></h4>
 <p>
 Change the read position of the file.
 </p>
 <p>
 Any of the following values can be used for <code>whence</code>.
 </p>
-<ul>
-<li><code>SEEK_SET</code> - Seek from beginning of file</li>
-<li><code>SEEK_CUR</code> - Seek from current position</li>
-<li><code>SEEK_END</code> - Seek from end of file</li>
-</ul>
+<p>
+- <code>SEEK_SET</code> - Seek from beginning of file
+- <code>SEEK_CUR</code> - Seek from current position
+- <code>SEEK_END</code> - Seek from end of file
+</p>
 <p>
 This function only works if the file was opened in binary mode.
 </p>
@@ -442,17 +455,17 @@ Returns <code>true</code> if succeeded and <code>false</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='function'>Reader</span>(<span class='string'>"input.txt"</span>, <span class='constant'>true</span>)
+<span class='keyword'>var</span> f = io.<span class='function'>Reader</span>(<span class='string'>&quot;input.txt&quot;</span>, <span class='constant'>true</span>)
 <span class='keyword'>if</span> !f {
-    io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: could not read file!&quot;</span>)
     os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
-io.<span class='function'>print</span>(<span class='string'>"The first 16 bytes: [</span><span class='escape'>{</span>f.<span class='function'>read</span>(<span class='constant'>16</span>)<span class='escape'>}</span><span class='string'>]</span><span class='escape'>\n</span><span class='string'>"</span>)
+io.<span class='function'>print</span>(<span class='string'>&quot;The first 16 bytes: [</span><span class='escape'>{</span>f.<span class='function'>read</span>(<span class='constant'>16</span>)<span class='escape'>}</span><span class='string'>]</span><span class='escape'>\n</span><span class='string'>&quot;</span>)
 
 f.<span class='function'>seek</span>(<span class='constant'>5</span>, io.<span class='field'>SEEK_SET</span>)
 
-io.<span class='function'>println</span>(<span class='string'>"The full content offset by 5:"</span>)
+io.<span class='function'>println</span>(<span class='string'>&quot;The full content offset by 5:&quot;</span>)
 io.<span class='function'>print</span>(f.<span class='function'>read</span>())
 </pre>
 </div>
@@ -481,7 +494,8 @@ People's dreams have no end! ~ Blackbeard
 </div>
 </section>
 <section id='s14'>
-<h4 class='hl-header'><code><span class='class'>Reader</span>.<span class='field'>tell</span>()</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Reader</span>.<span class='field'>tell</span>()</code></h4>
 <p>
 Get the current position of the file.
 </p>
@@ -503,19 +517,19 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='function'>Reader</span>(<span class='string'>"input.txt"</span>, <span class='constant'>true</span>)
+<span class='keyword'>var</span> f = io.<span class='function'>Reader</span>(<span class='string'>&quot;input.txt&quot;</span>, <span class='constant'>true</span>)
 <span class='keyword'>if</span> !f {
-    io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not read file!"</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: could not read file!&quot;</span>)
     os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
-io.<span class='function'>println</span>(<span class='string'>"The first 3 lines:"</span>)
+io.<span class='function'>println</span>(<span class='string'>&quot;The first 3 lines:&quot;</span>)
 <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>3</span> {
     io.<span class='function'>println</span>(f.<span class='function'>readln</span>())
 }
 
 io.<span class='function'>println</span>()
-io.<span class='function'>println</span>(<span class='string'>"Read </span><span class='escape'>{</span>f.<span class='function'>tell</span>()<span class='escape'>}</span><span class='string'> bytes so far."</span>)
+io.<span class='function'>println</span>(<span class='string'>&quot;Read </span><span class='escape'>{</span>f.<span class='function'>tell</span>()<span class='escape'>}</span><span class='string'> bytes so far.&quot;</span>)
 </pre>
 </div>
 <div class='codes'>
@@ -542,7 +556,8 @@ Read 41 bytes so far.
 </section>
 </section>
 <section id='s15'>
-<h3 class='hl-header'><code><span class='class'>Writer</span>(path, binary?)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>Writer</span>(path, binary?)</code></h3>
 <p>
 Native C class that opens <code>path</code> in writeable mode.
 </p>
@@ -565,15 +580,15 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = io.<span class='function'>Writer</span>(<span class='string'>"output.txt"</span>)
+<span class='keyword'>var</span> f = io.<span class='function'>Writer</span>(<span class='string'>&quot;output.txt&quot;</span>)
 <span class='keyword'>if</span> !f {
-    io.<span class='function'>eprintln</span>(<span class='string'>"Error: could not create file!"</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: could not create file!&quot;</span>)
     os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
-f.<span class='function'>writeln</span>(<span class='string'>"Hello there!"</span>)
-f.<span class='function'>writeln</span>(<span class='string'>"General Kenobi!"</span>)
-f.<span class='function'>writeln</span>(<span class='constant'>69</span>, <span class='string'>"Nice!"</span>)
+f.<span class='function'>writeln</span>(<span class='string'>&quot;Hello there!&quot;</span>)
+f.<span class='function'>writeln</span>(<span class='string'>&quot;General Kenobi!&quot;</span>)
+f.<span class='function'>writeln</span>(<span class='constant'>69</span>, <span class='string'>&quot;Nice!&quot;</span>)
 </pre>
 </div>
 <div class='codes'>
@@ -596,7 +611,8 @@ General Kenobi!
 </pre>
 </div>
 <section id='s16'>
-<h4 class='hl-header'><code><span class='class'>Writer</span>.<span class='field'>close</span>()</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Writer</span>.<span class='field'>close</span>()</code></h4>
 <p>
 Close the file.
 </p>
@@ -606,14 +622,16 @@ short programs.
 </p>
 </section>
 <section id='s17'>
-<h4 class='hl-header'><code><span class='class'>Writer</span>.<span class='field'>flush</span>()</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Writer</span>.<span class='field'>flush</span>()</code></h4>
 <p>
 Flush the contents of the file, since I/O is buffered in C, which is the
 language BS is written in.
 </p>
 </section>
 <section id='s18'>
-<h4 class='hl-header'><code><span class='class'>Writer</span>.<span class='field'>write</span>(...)</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Writer</span>.<span class='field'>write</span>(...)</code></h4>
 <p>
 Write all the arguments into the file.
 </p>
@@ -622,7 +640,8 @@ Returns <code>false</code> if any errors were encountered, else <code>true</code
 </p>
 </section>
 <section id='s19'>
-<h4 class='hl-header'><code><span class='class'>Writer</span>.<span class='field'>writeln</span>(...)</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Writer</span>.<span class='field'>writeln</span>(...)</code></h4>
 <p>
 Write all the arguments into the file, with a following newline.
 </p>
@@ -632,9 +651,10 @@ Returns <code>false</code> if any errors were encountered, else <code>true</code
 </section>
 </section>
 <section id='s20'>
-<h3 class='hl-header'><code><span class='class'>DirEntry</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>DirEntry</span>()</code></h3>
 <p>
-Native C class that wraps over a directory entry. This doesn't really do
+Native C class that wraps over a directory entry. This doesn&apos;t really do
 anything, and only serves as an implementation detail for <code>readdir()</code>. Attempt
 to call this constructor directly will throw a runtime error.
 </p>
@@ -653,7 +673,7 @@ Example usecase:
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> entries = <span class='keyword'>assert</span>(io.<span class='function'>readdir</span>(<span class='string'>"."</span>))
+<span class='keyword'>var</span> entries = <span class='keyword'>assert</span>(io.<span class='function'>readdir</span>(<span class='string'>&quot;.&quot;</span>))
 
 <span class='keyword'>for</span> _, e <span class='keyword'>in</span> entries {
     io.<span class='function'>println</span>(e.<span class='function'>name</span>(), e.<span class='function'>isdir</span>())
@@ -693,49 +713,55 @@ LICENSE false
 </pre>
 </div>
 <section id='s21'>
-<h4 class='hl-header'><code><span class='class'>DirEntry</span>.<span class='field'>name</span>()</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>DirEntry</span>.<span class='field'>name</span>()</code></h4>
 <p>
 Get the name of the entry.
 </p>
 </section>
 <section id='s22'>
-<h4 class='hl-header'><code><span class='class'>DirEntry</span>.<span class='field'>isdir</span>()</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>DirEntry</span>.<span class='field'>isdir</span>()</code></h4>
 <p>
 Get whether the entry is a directory.
 </p>
 </section>
 </section>
 <section id='s23'>
-<h3 class='hl-header'><code><span class='constant'>stdin</span></code></h3>
+<h3 class='hl-header'>
+<code><span class='constant'>stdin</span></code></h3>
 <p>
 <code>Reader</code> for standard input.
 </p>
 </section>
 <section id='s24'>
-<h3 class='hl-header'><code><span class='constant'>stdout</span></code></h3>
+<h3 class='hl-header'>
+<code><span class='constant'>stdout</span></code></h3>
 <p>
 <code>Writer</code> for standard output.
 </p>
 </section>
 <section id='s25'>
-<h3 class='hl-header'><code><span class='constant'>stderr</span></code></h3>
+<h3 class='hl-header'>
+<code><span class='constant'>stderr</span></code></h3>
 <p>
 <code>Writer</code> for standard error.
 </p>
 </section>
 </section>
 <section id='s26'>
-<h2> OS</h2>
+<h2>OS</h2>
 <p>
 Contains simple primitives for OS functions.
 </p>
 <section id='s27'>
-<h3 class='hl-header'><code><span class='function'>exit</span>(code)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>exit</span>(code)</code></h3>
 <p>
 Halt the BS runtime with exit code <code>code</code>.
 </p>
 <p>
-This doesn't actually exit the process itself in embedded usecase.
+This doesn&apos;t actually exit the process itself in embedded usecase.
 It just halts the BS interpreter, and the caller of the virtual
 machine can decide what to do.
 </p>
@@ -773,7 +799,8 @@ os.<span class='function'>exit</span>(<span class='constant'>69</span>)
 </div>
 </section>
 <section id='s28'>
-<h3 class='hl-header'><code><span class='function'>clock</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>clock</span>()</code></h3>
 <p>
 Get the monotonic time passed since boot.
 </p>
@@ -805,7 +832,7 @@ in the unit of seconds.
 io.<span class='function'>println</span>(<span class='function'>fib</span>(<span class='constant'>30</span>))
 
 <span class='keyword'>var</span> elapsed = os.<span class='function'>clock</span>() - start
-io.<span class='function'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>{</span>elapsed<span class='escape'>}</span><span class='string'>"</span>)
+io.<span class='function'>println</span>(<span class='string'>&quot;Elapsed: </span><span class='escape'>{</span>elapsed<span class='escape'>}</span><span class='string'>&quot;</span>)
 </pre>
 </div>
 <div class='codes'>
@@ -827,7 +854,8 @@ Elapsed: 0.137143968999226
 </div>
 </section>
 <section id='s29'>
-<h3 class='hl-header'><code><span class='function'>sleep</span>(seconds)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>sleep</span>(seconds)</code></h3>
 <p>
 Sleep for <code>seconds</code> interval, with nanosecond level of precision.
 </p>
@@ -847,7 +875,7 @@ Sleep for <code>seconds</code> interval, with nanosecond level of precision.
 os.<span class='function'>sleep</span>(<span class='constant'>0.69</span>)
 
 <span class='keyword'>var</span> elapsed = os.<span class='function'>clock</span>() - start
-io.<span class='function'>println</span>(<span class='string'>"Elapsed: </span><span class='escape'>{</span>elapsed<span class='escape'>}</span><span class='string'>"</span>)
+io.<span class='function'>println</span>(<span class='string'>&quot;Elapsed: </span><span class='escape'>{</span>elapsed<span class='escape'>}</span><span class='string'>&quot;</span>)
 </pre>
 </div>
 <div class='codes'>
@@ -868,12 +896,13 @@ Elapsed: 0.690292477000185
 </div>
 </section>
 <section id='s30'>
-<h3 class='hl-header'><code><span class='function'>getenv</span>(name)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>getenv</span>(name)</code></h3>
 <p>
 Get the environment variable <code>name</code>.
 </p>
 <p>
-Returns <code>nil</code> if it doesn't exist.
+Returns <code>nil</code> if it doesn&apos;t exist.
 </p>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -887,8 +916,8 @@ Returns <code>nil</code> if it doesn't exist.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(os.<span class='function'>getenv</span>(<span class='string'>"FOO"</span>))
-io.<span class='function'>println</span>(os.<span class='function'>getenv</span>(<span class='string'>"BAR"</span>))
+io.<span class='function'>println</span>(os.<span class='function'>getenv</span>(<span class='string'>&quot;FOO&quot;</span>))
+io.<span class='function'>println</span>(os.<span class='function'>getenv</span>(<span class='string'>&quot;BAR&quot;</span>))
 </pre>
 </div>
 <div class='codes'>
@@ -911,7 +940,8 @@ nil
 </div>
 </section>
 <section id='s31'>
-<h3 class='hl-header'><code><span class='function'>setenv</span>(name, value)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>setenv</span>(name, value)</code></h3>
 <p>
 Set the environment variable <code>name</code> to <code>value</code>.
 </p>
@@ -930,8 +960,8 @@ Returns <code>true</code> if successful, else <code>false</code>.
 </svg>
 </button>
 <pre class='code active'>
-os.<span class='function'>setenv</span>(<span class='string'>"FOO"</span>, <span class='string'>"lmao"</span>)
-io.<span class='function'>println</span>(os.<span class='function'>getenv</span>(<span class='string'>"FOO"</span>))
+os.<span class='function'>setenv</span>(<span class='string'>&quot;FOO&quot;</span>, <span class='string'>&quot;lmao&quot;</span>)
+io.<span class='function'>println</span>(os.<span class='function'>getenv</span>(<span class='string'>&quot;FOO&quot;</span>))
 </pre>
 </div>
 <div class='codes'>
@@ -952,7 +982,8 @@ lmao
 </div>
 </section>
 <section id='s32'>
-<h3 class='hl-header'><code><span class='function'>getcwd</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>getcwd</span>()</code></h3>
 <p>
 Get the current working directory.
 </p>
@@ -989,7 +1020,8 @@ io.<span class='function'>println</span>(os.<span class='function'>getcwd</span>
 </div>
 </section>
 <section id='s33'>
-<h3 class='hl-header'><code><span class='function'>setcwd</span>(dir)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>setcwd</span>(dir)</code></h3>
 <p>
 Set the current working directory to <code>dir</code>.
 </p>
@@ -1008,7 +1040,7 @@ Returns <code>true</code> if successful, else <code>false</code>.
 </svg>
 </button>
 <pre class='code active'>
-os.<span class='function'>setcwd</span>(<span class='string'>"/usr"</span>)
+os.<span class='function'>setcwd</span>(<span class='string'>&quot;/usr&quot;</span>)
 io.<span class='function'>println</span>(os.<span class='function'>getcwd</span>())
 </pre>
 </div>
@@ -1030,7 +1062,8 @@ io.<span class='function'>println</span>(os.<span class='function'>getcwd</span>
 </div>
 </section>
 <section id='s34'>
-<h3 class='hl-header'><code><span class='class'>Process</span>(args, capture_stdout?, capture_stderr?, capture_stdin?, binary?)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>Process</span>(args, capture_stdout?, capture_stderr?, capture_stdin?, binary?)</code></h3>
 <p>
 Native C class that spawns a process. Expects <code>args</code> to be an
 array of strings that represent the command line arguments.
@@ -1058,9 +1091,9 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> p = os.<span class='function'>Process</span>([<span class='string'>"ls"</span>, <span class='string'>"-l"</span>])
+<span class='keyword'>var</span> p = os.<span class='function'>Process</span>([<span class='string'>&quot;ls&quot;</span>, <span class='string'>&quot;-l&quot;</span>])
 <span class='keyword'>if</span> !p {
-    io.<span class='function'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>&quot;ERROR: could not start process&quot;</span>)
     os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
@@ -1085,7 +1118,8 @@ total 4
 </pre>
 </div>
 <section id='s35'>
-<h4 class='hl-header'><code><span class='class'>Process</span>.<span class='field'>stdout</span>()</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Process</span>.<span class='field'>stdout</span>()</code></h4>
 <p>
 Get the standard output of the process as an <code>io.Reader</code> instance.
 </p>
@@ -1104,16 +1138,16 @@ Returns <code>nil</code> if the process was spawned without capturing stdout.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> p = os.<span class='function'>Process</span>([<span class='string'>"ls"</span>, <span class='string'>"-l"</span>], <span class='constant'>true</span>)
+<span class='keyword'>var</span> p = os.<span class='function'>Process</span>([<span class='string'>&quot;ls&quot;</span>, <span class='string'>&quot;-l&quot;</span>], <span class='constant'>true</span>)
 <span class='keyword'>if</span> !p {
-    io.<span class='function'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>&quot;ERROR: could not start process&quot;</span>)
     os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
 <span class='keyword'>var</span> stdout = p.<span class='function'>stdout</span>()
 <span class='keyword'>while</span> !stdout.<span class='function'>eof</span>() {
     <span class='keyword'>var</span> line = stdout.<span class='function'>readln</span>()
-    io.<span class='function'>println</span>(<span class='string'>"Line:"</span>, line)
+    io.<span class='function'>println</span>(<span class='string'>&quot;Line:&quot;</span>, line)
 }
 
 p.<span class='function'>wait</span>()
@@ -1139,7 +1173,8 @@ Line:
 </div>
 </section>
 <section id='s36'>
-<h4 class='hl-header'><code><span class='class'>Process</span>.<span class='field'>stderr</span>()</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Process</span>.<span class='field'>stderr</span>()</code></h4>
 <p>
 Get the standard error of the process as an <code>io.Reader</code> instance.
 </p>
@@ -1148,7 +1183,8 @@ Returns <code>nil</code> if the process was spawned without capturing stderr.
 </p>
 </section>
 <section id='s37'>
-<h4 class='hl-header'><code><span class='class'>Process</span>.<span class='field'>stdin</span>()</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Process</span>.<span class='field'>stdin</span>()</code></h4>
 <p>
 Get the standard input of the process as an <code>io.Writer</code> instance.
 </p>
@@ -1167,16 +1203,16 @@ Returns <code>nil</code> if the process was spawned without capturing stdin.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> p = os.<span class='function'>Process</span>([<span class='string'>"grep"</span>, <span class='string'>"foobar"</span>], <span class='constant'>false</span>, <span class='constant'>false</span>, <span class='constant'>true</span>)
+<span class='keyword'>var</span> p = os.<span class='function'>Process</span>([<span class='string'>&quot;grep&quot;</span>, <span class='string'>&quot;foobar&quot;</span>], <span class='constant'>false</span>, <span class='constant'>false</span>, <span class='constant'>true</span>)
 <span class='keyword'>if</span> !p {
-    io.<span class='function'>eprintln</span>(<span class='string'>"ERROR: could not start process"</span>)
+    io.<span class='function'>eprintln</span>(<span class='string'>&quot;ERROR: could not start process&quot;</span>)
     os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
 <span class='keyword'>var</span> stdin = p.<span class='function'>stdin</span>()
-stdin.<span class='function'>writeln</span>(<span class='string'>"First line foobar lmao"</span>)
-stdin.<span class='function'>writeln</span>(<span class='string'>"Second line lmao"</span>)
-stdin.<span class='function'>writeln</span>(<span class='string'>"Third line lets goooo foobar"</span>)
+stdin.<span class='function'>writeln</span>(<span class='string'>&quot;First line foobar lmao&quot;</span>)
+stdin.<span class='function'>writeln</span>(<span class='string'>&quot;Second line lmao&quot;</span>)
+stdin.<span class='function'>writeln</span>(<span class='string'>&quot;Third line lets goooo foobar&quot;</span>)
 stdin.<span class='function'>close</span>()
 p.<span class='function'>wait</span>()
 </pre>
@@ -1200,7 +1236,8 @@ Third line lets goooo foobar
 </div>
 </section>
 <section id='s38'>
-<h4 class='hl-header'><code><span class='class'>Process</span>.<span class='field'>kill</span>(signal)</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Process</span>.<span class='field'>kill</span>(signal)</code></h4>
 <p>
 Kill the process with <code>signal</code>.
 </p>
@@ -1213,7 +1250,8 @@ Returns <code>false</code> if any errors were encountered, else <code>true</code
 </p>
 </section>
 <section id='s39'>
-<h4 class='hl-header'><code><span class='class'>Process</span>.<span class='field'>wait</span>()</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Process</span>.<span class='field'>wait</span>()</code></h4>
 <p>
 Wait for the process to exit, and return its exit code.
 </p>
@@ -1223,7 +1261,8 @@ Returns <code>nil</code> if failed.
 </section>
 </section>
 <section id='s40'>
-<h3 class='hl-header'><code><span class='constant'>args</span></code></h3>
+<h3 class='hl-header'>
+<code><span class='constant'>args</span></code></h3>
 <p>
 Array of command line arguments. First element is the program
 name.
@@ -1261,7 +1300,8 @@ io.<span class='function'>println</span>(os.<span class='field'>args</span>)
 </div>
 </section>
 <section id='s41'>
-<h3 class='hl-header'><code><span class='constant'>name</span></code></h3>
+<h3 class='hl-header'>
+<code><span class='constant'>name</span></code></h3>
 <p>
 The name of the OS.
 </p>
@@ -1299,14 +1339,15 @@ Windows    # On windows
 Unknown    # On unknown
 </pre>
 </div>
-<blockquote>
 <p>
+<blockquote>
 The output depends on the OS.
 </blockquote>
 </p>
 </section>
 <section id='s42'>
-<h3 class='hl-header'><code><span class='constant'>arch</span></code></h3>
+<h3 class='hl-header'>
+<code><span class='constant'>arch</span></code></h3>
 <p>
 The CPU architecture.
 </p>
@@ -1343,15 +1384,16 @@ ARM64      # On arm64
 Unknown    # On unknown
 </pre>
 </div>
-<blockquote>
 <p>
+<blockquote>
 The output depends on the architecture.
 </blockquote>
 </p>
 </section>
 </section>
 <section id='s43'>
-<h2 class='hl-header'><code><span class='class'>Regex</span>(pattern)</code></h2>
+<h2 class='hl-header'>
+<code><span class='class'>Regex</span>(pattern)</code></h2>
 <p>
 POSIX compatible regular expressions.
 </p>
@@ -1370,8 +1412,8 @@ Returns <code>nil</code> if failed.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> r = <span class='function'>Regex</span>(<span class='string'>"([0-9]+) ([a-z]+)"</span>)
-io.<span class='function'>println</span>(<span class='string'>"69 apples, 420 oranges"</span>.<span class='function'>replace</span>(r, <span class='string'>"</span><span class='escape'>\{</span><span class='string'>fruit: '</span><span class='escape'>\\</span><span class='string'>2', count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
+<span class='keyword'>var</span> r = <span class='function'>Regex</span>(<span class='string'>&quot;([0-9]+) ([a-z]+)&quot;</span>)
+io.<span class='function'>println</span>(<span class='string'>&quot;69 apples, 420 oranges&quot;</span>.<span class='function'>replace</span>(r, <span class='string'>&quot;</span><span class='escape'>\{</span><span class='string'>fruit: &apos;</span><span class='escape'>\\</span><span class='string'>2&apos;, count: </span><span class='escape'>\\</span><span class='string'>1}&quot;</span>))
 </pre>
 </div>
 <div class='codes'>
@@ -1392,12 +1434,13 @@ io.<span class='function'>println</span>(<span class='string'>"69 apples, 420 or
 </div>
 </section>
 <section id='s44'>
-<h2> String</h2>
+<h2>String</h2>
 <p>
 Methods for the builtin string value.
 </p>
 <section id='s45'>
-<h3 class='hl-header'><code><span class='class'>string</span>.<span class='field'>slice</span>(start, end?)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>string</span>.<span class='field'>slice</span>(start, end?)</code></h3>
 <p>
 Slice a string from <code>start</code> (inclusive) to <code>end</code> (exclusive).
 </p>
@@ -1413,9 +1456,9 @@ Slice a string from <code>start</code> (inclusive) to <code>end</code> (exclusiv
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='string'>"deez nuts"</span>.<span class='function'>slice</span>(<span class='constant'>0</span>, <span class='constant'>4</span>))
-io.<span class='function'>println</span>(<span class='string'>"deez nuts"</span>.<span class='function'>slice</span>(<span class='constant'>5</span>, <span class='constant'>9</span>))
-io.<span class='function'>println</span>(<span class='string'>"deez nuts"</span>.<span class='function'>slice</span>(<span class='constant'>5</span>)) <span class='comment'>// No end defaults to string end</span>
+io.<span class='function'>println</span>(<span class='string'>&quot;deez nuts&quot;</span>.<span class='function'>slice</span>(<span class='constant'>0</span>, <span class='constant'>4</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;deez nuts&quot;</span>.<span class='function'>slice</span>(<span class='constant'>5</span>, <span class='constant'>9</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;deez nuts&quot;</span>.<span class='function'>slice</span>(<span class='constant'>5</span>)) <span class='comment'>// No end defaults to string end</span>
 </pre>
 </div>
 <div class='codes'>
@@ -1438,7 +1481,8 @@ nuts
 </div>
 </section>
 <section id='s46'>
-<h3 class='hl-header'><code><span class='class'>string</span>.<span class='field'>reverse</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>string</span>.<span class='field'>reverse</span>()</code></h3>
 <p>
 Reverse a string.
 </p>
@@ -1454,7 +1498,7 @@ Reverse a string.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='string'>"sllab amgil"</span>.<span class='function'>reverse</span>())
+io.<span class='function'>println</span>(<span class='string'>&quot;sllab amgil&quot;</span>.<span class='function'>reverse</span>())
 </pre>
 </div>
 <div class='codes'>
@@ -1475,7 +1519,8 @@ ligma balls
 </div>
 </section>
 <section id='s47'>
-<h3 class='hl-header'><code><span class='class'>string</span>.<span class='field'>repeat</span>(count)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>string</span>.<span class='field'>repeat</span>(count)</code></h3>
 <p>
 Repeat a string <code>count</code> times.
 </p>
@@ -1491,7 +1536,7 @@ Repeat a string <code>count</code> times.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>repeat</span>(<span class='constant'>6</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo&quot;</span>.<span class='function'>repeat</span>(<span class='constant'>6</span>))
 </pre>
 </div>
 <div class='codes'>
@@ -1512,7 +1557,8 @@ foofoofoofoofoofoo
 </div>
 </section>
 <section id='s48'>
-<h3 class='hl-header'><code><span class='class'>string</span>.<span class='field'>toupper</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>string</span>.<span class='field'>toupper</span>()</code></h3>
 <p>
 Convert a string to uppercase.
 </p>
@@ -1528,7 +1574,7 @@ Convert a string to uppercase.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='string'>"Urmom"</span>.<span class='function'>toupper</span>())
+io.<span class='function'>println</span>(<span class='string'>&quot;Urmom&quot;</span>.<span class='function'>toupper</span>())
 </pre>
 </div>
 <div class='codes'>
@@ -1549,7 +1595,8 @@ URMOM
 </div>
 </section>
 <section id='s49'>
-<h3 class='hl-header'><code><span class='class'>string</span>.<span class='field'>tolower</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>string</span>.<span class='field'>tolower</span>()</code></h3>
 <p>
 Convert a string to lowercase.
 </p>
@@ -1565,7 +1612,7 @@ Convert a string to lowercase.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='string'>"Urmom"</span>.<span class='function'>tolower</span>())
+io.<span class='function'>println</span>(<span class='string'>&quot;Urmom&quot;</span>.<span class='function'>tolower</span>())
 </pre>
 </div>
 <div class='codes'>
@@ -1586,7 +1633,8 @@ urmom
 </div>
 </section>
 <section id='s50'>
-<h3 class='hl-header'><code><span class='class'>string</span>.<span class='field'>tonumber</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>string</span>.<span class='field'>tonumber</span>()</code></h3>
 <p>
 Convert a string to a number.
 </p>
@@ -1602,11 +1650,11 @@ Convert a string to a number.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='string'>"69"</span>.<span class='function'>tonumber</span>())
-io.<span class='function'>println</span>(<span class='string'>"420.69"</span>.<span class='function'>tonumber</span>())
-io.<span class='function'>println</span>(<span class='string'>"0xff"</span>.<span class='function'>tonumber</span>())
-io.<span class='function'>println</span>(<span class='string'>"69e3"</span>.<span class='function'>tonumber</span>())
-io.<span class='function'>println</span>(<span class='string'>"nah"</span>.<span class='function'>tonumber</span>())
+io.<span class='function'>println</span>(<span class='string'>&quot;69&quot;</span>.<span class='function'>tonumber</span>())
+io.<span class='function'>println</span>(<span class='string'>&quot;420.69&quot;</span>.<span class='function'>tonumber</span>())
+io.<span class='function'>println</span>(<span class='string'>&quot;0xff&quot;</span>.<span class='function'>tonumber</span>())
+io.<span class='function'>println</span>(<span class='string'>&quot;69e3&quot;</span>.<span class='function'>tonumber</span>())
+io.<span class='function'>println</span>(<span class='string'>&quot;nah&quot;</span>.<span class='function'>tonumber</span>())
 </pre>
 </div>
 <div class='codes'>
@@ -1631,7 +1679,8 @@ nil
 </div>
 </section>
 <section id='s51'>
-<h3 class='hl-header'><code><span class='class'>string</span>.<span class='field'>find</span>(pattern, start?)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>string</span>.<span class='field'>find</span>(pattern, start?)</code></h3>
 <p>
 Find <code>pattern</code> within a string starting from position <code>start</code> (which defaults
 to <code>0</code>).
@@ -1651,16 +1700,16 @@ Returns the position if found, else <code>nil</code>.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>find</span>(<span class='string'>"ba"</span>))
-io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>find</span>(<span class='string'>"ba"</span>, <span class='constant'>5</span>))
-io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>find</span>(<span class='string'>"ba"</span>, <span class='constant'>9</span>))
-io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>find</span>(<span class='string'>"lmao"</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo bar baz&quot;</span>.<span class='function'>find</span>(<span class='string'>&quot;ba&quot;</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo bar baz&quot;</span>.<span class='function'>find</span>(<span class='string'>&quot;ba&quot;</span>, <span class='constant'>5</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo bar baz&quot;</span>.<span class='function'>find</span>(<span class='string'>&quot;ba&quot;</span>, <span class='constant'>9</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo bar baz&quot;</span>.<span class='function'>find</span>(<span class='string'>&quot;lmao&quot;</span>))
 
-<span class='keyword'>var</span> r = <span class='function'>Regex</span>(<span class='string'>"[0-9]"</span>)
-io.<span class='function'>println</span>(<span class='string'>"69a"</span>.<span class='function'>find</span>(r))
-io.<span class='function'>println</span>(<span class='string'>"69a"</span>.<span class='function'>find</span>(r, <span class='constant'>1</span>))
-io.<span class='function'>println</span>(<span class='string'>"69a"</span>.<span class='function'>find</span>(r, <span class='constant'>2</span>))
-io.<span class='function'>println</span>(<span class='string'>"yolol"</span>.<span class='function'>find</span>(r))
+<span class='keyword'>var</span> r = <span class='function'>Regex</span>(<span class='string'>&quot;[0-9]&quot;</span>)
+io.<span class='function'>println</span>(<span class='string'>&quot;69a&quot;</span>.<span class='function'>find</span>(r))
+io.<span class='function'>println</span>(<span class='string'>&quot;69a&quot;</span>.<span class='function'>find</span>(r, <span class='constant'>1</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;69a&quot;</span>.<span class='function'>find</span>(r, <span class='constant'>2</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;yolol&quot;</span>.<span class='function'>find</span>(r))
 </pre>
 </div>
 <div class='codes'>
@@ -1688,7 +1737,8 @@ nil
 </div>
 </section>
 <section id='s52'>
-<h3 class='hl-header'><code><span class='class'>string</span>.<span class='field'>split</span>(pattern)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>string</span>.<span class='field'>split</span>(pattern)</code></h3>
 <p>
 Split string by <code>pattern</code>.
 </p>
@@ -1704,14 +1754,14 @@ Split string by <code>pattern</code>.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>split</span>(<span class='string'>""</span>))
-io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>split</span>(<span class='string'>" "</span>))
-io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>split</span>(<span class='string'>"  "</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo bar baz&quot;</span>.<span class='function'>split</span>(<span class='string'>&quot;&quot;</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo bar baz&quot;</span>.<span class='function'>split</span>(<span class='string'>&quot; &quot;</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo bar baz&quot;</span>.<span class='function'>split</span>(<span class='string'>&quot;  &quot;</span>))
 
-<span class='keyword'>var</span> r = <span class='function'>Regex</span>(<span class='string'>" +"</span>)
-io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<span class='function'>split</span>(r))
-io.<span class='function'>println</span>(<span class='string'>"foo bar"</span>.<span class='function'>split</span>(r))
-io.<span class='function'>println</span>(<span class='string'>"foo bar   baz"</span>.<span class='function'>split</span>(r))
+<span class='keyword'>var</span> r = <span class='function'>Regex</span>(<span class='string'>&quot; +&quot;</span>)
+io.<span class='function'>println</span>(<span class='string'>&quot;foobar&quot;</span>.<span class='function'>split</span>(r))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo bar&quot;</span>.<span class='function'>split</span>(r))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo bar   baz&quot;</span>.<span class='function'>split</span>(r))
 </pre>
 </div>
 <div class='codes'>
@@ -1737,7 +1787,8 @@ io.<span class='function'>println</span>(<span class='string'>"foo bar   baz"</s
 </div>
 </section>
 <section id='s53'>
-<h3 class='hl-header'><code><span class='class'>string</span>.<span class='field'>replace</span>(pattern, replacement)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>string</span>.<span class='field'>replace</span>(pattern, replacement)</code></h3>
 <p>
 Replace <code>pattern</code> with <code>replacement</code>.
 </p>
@@ -1753,14 +1804,14 @@ Replace <code>pattern</code> with <code>replacement</code>.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>replace</span>(<span class='string'>""</span>, <span class='string'>"-"</span>))
-io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>replace</span>(<span class='string'>" "</span>, <span class='string'>"---"</span>))
-io.<span class='function'>println</span>(<span class='string'>"foo bar baz"</span>.<span class='function'>replace</span>(<span class='string'>"  "</span>, <span class='string'>"-"</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo bar baz&quot;</span>.<span class='function'>replace</span>(<span class='string'>&quot;&quot;</span>, <span class='string'>&quot;-&quot;</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo bar baz&quot;</span>.<span class='function'>replace</span>(<span class='string'>&quot; &quot;</span>, <span class='string'>&quot;---&quot;</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo bar baz&quot;</span>.<span class='function'>replace</span>(<span class='string'>&quot;  &quot;</span>, <span class='string'>&quot;-&quot;</span>))
 
-<span class='keyword'>var</span> r = <span class='function'>Regex</span>(<span class='string'>"([0-9]+) ([a-z]+)"</span>)
-io.<span class='function'>println</span>(<span class='string'>"69 apples, 420 oranges"</span>.<span class='function'>replace</span>(r, <span class='string'>"</span><span class='escape'>\{</span><span class='string'>type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
-io.<span class='function'>println</span>(<span class='string'>"69 apples, 420  oranges"</span>.<span class='function'>replace</span>(r, <span class='string'>"</span><span class='escape'>\{</span><span class='string'>type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
-io.<span class='function'>println</span>(<span class='string'>"ayo noice!"</span>.<span class='function'>replace</span>(r, <span class='string'>"</span><span class='escape'>\{</span><span class='string'>type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}"</span>))
+<span class='keyword'>var</span> r = <span class='function'>Regex</span>(<span class='string'>&quot;([0-9]+) ([a-z]+)&quot;</span>)
+io.<span class='function'>println</span>(<span class='string'>&quot;69 apples, 420 oranges&quot;</span>.<span class='function'>replace</span>(r, <span class='string'>&quot;</span><span class='escape'>\{</span><span class='string'>type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}&quot;</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;69 apples, 420  oranges&quot;</span>.<span class='function'>replace</span>(r, <span class='string'>&quot;</span><span class='escape'>\{</span><span class='string'>type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}&quot;</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;ayo noice!&quot;</span>.<span class='function'>replace</span>(r, <span class='string'>&quot;</span><span class='escape'>\{</span><span class='string'>type: </span><span class='escape'>\\</span><span class='string'>2, count: </span><span class='escape'>\\</span><span class='string'>1}&quot;</span>))
 </pre>
 </div>
 <div class='codes'>
@@ -1786,15 +1837,16 @@ ayo noice!
 </div>
 </section>
 <section id='s54'>
-<h3 class='hl-header'><code><span class='class'>string</span>.<span class='field'>compare</span>(other)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>string</span>.<span class='field'>compare</span>(other)</code></h3>
 <p>
 Compare two strings together.
 </p>
-<ul>
-<li><code>0</code> means the string is equal to the other string</li>
-<li><code>1</code> means the string is "greater than" the other string</li>
-<li><code>-1</code> means the string is "less than" the other string</li>
-</ul>
+<p>
+- <code>0</code> means the string is equal to the other string
+- <code>1</code> means the string is &quot;greater than&quot; the other string
+- <code>-1</code> means the string is &quot;less than&quot; the other string
+</p>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
 <svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
@@ -1807,11 +1859,11 @@ Compare two strings together.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>compare</span>(<span class='string'>"bar"</span>))
-io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>compare</span>(<span class='string'>"lol"</span>))
-io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>compare</span>(<span class='string'>"foo"</span>))
-io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>compare</span>(<span class='string'>"food"</span>))
-io.<span class='function'>println</span>(<span class='string'>"food"</span>.<span class='function'>compare</span>(<span class='string'>"foo"</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo&quot;</span>.<span class='function'>compare</span>(<span class='string'>&quot;bar&quot;</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo&quot;</span>.<span class='function'>compare</span>(<span class='string'>&quot;lol&quot;</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo&quot;</span>.<span class='function'>compare</span>(<span class='string'>&quot;foo&quot;</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo&quot;</span>.<span class='function'>compare</span>(<span class='string'>&quot;food&quot;</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;food&quot;</span>.<span class='function'>compare</span>(<span class='string'>&quot;foo&quot;</span>))
 </pre>
 </div>
 <div class='codes'>
@@ -1836,7 +1888,8 @@ io.<span class='function'>println</span>(<span class='string'>"food"</span>.<spa
 </div>
 </section>
 <section id='s55'>
-<h3 class='hl-header'><code><span class='class'>string</span>.<span class='field'>ltrim</span>(pattern)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>string</span>.<span class='field'>ltrim</span>(pattern)</code></h3>
 <p>
 Trim <code>pattern</code> from the left of a string.
 </p>
@@ -1852,7 +1905,7 @@ Trim <code>pattern</code> from the left of a string.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='string'>"["</span> $ <span class='string'>"   foo bar baz  "</span>.<span class='function'>ltrim</span>(<span class='string'>" "</span>) $ <span class='string'>"]"</span>)
+io.<span class='function'>println</span>(<span class='string'>&quot;[&quot;</span> $ <span class='string'>&quot;   foo bar baz  &quot;</span>.<span class='function'>ltrim</span>(<span class='string'>&quot; &quot;</span>) $ <span class='string'>&quot;]&quot;</span>)
 </pre>
 </div>
 <div class='codes'>
@@ -1873,7 +1926,8 @@ io.<span class='function'>println</span>(<span class='string'>"["</span> $ <span
 </div>
 </section>
 <section id='s56'>
-<h3 class='hl-header'><code><span class='class'>string</span>.<span class='field'>rtrim</span>(pattern)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>string</span>.<span class='field'>rtrim</span>(pattern)</code></h3>
 <p>
 Trim <code>pattern</code> from the right of a string.
 </p>
@@ -1889,7 +1943,7 @@ Trim <code>pattern</code> from the right of a string.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='string'>"["</span> $ <span class='string'>"   foo bar baz  "</span>.<span class='function'>rtrim</span>(<span class='string'>" "</span>) $ <span class='string'>"]"</span>)
+io.<span class='function'>println</span>(<span class='string'>&quot;[&quot;</span> $ <span class='string'>&quot;   foo bar baz  &quot;</span>.<span class='function'>rtrim</span>(<span class='string'>&quot; &quot;</span>) $ <span class='string'>&quot;]&quot;</span>)
 </pre>
 </div>
 <div class='codes'>
@@ -1910,7 +1964,8 @@ io.<span class='function'>println</span>(<span class='string'>"["</span> $ <span
 </div>
 </section>
 <section id='s57'>
-<h3 class='hl-header'><code><span class='class'>string</span>.<span class='field'>trim</span>(pattern)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>string</span>.<span class='field'>trim</span>(pattern)</code></h3>
 <p>
 Trim <code>pattern</code> from both sides of a string.
 </p>
@@ -1926,7 +1981,7 @@ Trim <code>pattern</code> from both sides of a string.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='string'>"["</span> $ <span class='string'>"   foo bar baz  "</span>.<span class='function'>trim</span>(<span class='string'>" "</span>) $ <span class='string'>"]"</span>)
+io.<span class='function'>println</span>(<span class='string'>&quot;[&quot;</span> $ <span class='string'>&quot;   foo bar baz  &quot;</span>.<span class='function'>trim</span>(<span class='string'>&quot; &quot;</span>) $ <span class='string'>&quot;]&quot;</span>)
 </pre>
 </div>
 <div class='codes'>
@@ -1947,7 +2002,8 @@ io.<span class='function'>println</span>(<span class='string'>"["</span> $ <span
 </div>
 </section>
 <section id='s58'>
-<h3 class='hl-header'><code><span class='class'>string</span>.<span class='field'>lpad</span>(pattern, count)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>string</span>.<span class='field'>lpad</span>(pattern, count)</code></h3>
 <p>
 Pad string with <code>pattern</code> on the left side, till the total length reaches
 <code>count</code>.
@@ -1964,11 +2020,11 @@ Pad string with <code>pattern</code> on the left side, till the total length rea
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>0</span>))
-io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>3</span>))
-io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>4</span>))
-io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>5</span>))
-io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>lpad</span>(<span class='string'>"69"</span>, <span class='constant'>6</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo&quot;</span>.<span class='function'>lpad</span>(<span class='string'>&quot;69&quot;</span>, <span class='constant'>0</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo&quot;</span>.<span class='function'>lpad</span>(<span class='string'>&quot;69&quot;</span>, <span class='constant'>3</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo&quot;</span>.<span class='function'>lpad</span>(<span class='string'>&quot;69&quot;</span>, <span class='constant'>4</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo&quot;</span>.<span class='function'>lpad</span>(<span class='string'>&quot;69&quot;</span>, <span class='constant'>5</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo&quot;</span>.<span class='function'>lpad</span>(<span class='string'>&quot;69&quot;</span>, <span class='constant'>6</span>))
 </pre>
 </div>
 <div class='codes'>
@@ -1993,7 +2049,8 @@ foo
 </div>
 </section>
 <section id='s59'>
-<h3 class='hl-header'><code><span class='class'>string</span>.<span class='field'>rpad</span>(pattern, count)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>string</span>.<span class='field'>rpad</span>(pattern, count)</code></h3>
 <p>
 Pad string with <code>pattern</code> on the right side, till the total length reaches
 <code>count</code>.
@@ -2010,11 +2067,11 @@ Pad string with <code>pattern</code> on the right side, till the total length re
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>0</span>))
-io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>3</span>))
-io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>4</span>))
-io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>5</span>))
-io.<span class='function'>println</span>(<span class='string'>"foo"</span>.<span class='function'>rpad</span>(<span class='string'>"69"</span>, <span class='constant'>6</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo&quot;</span>.<span class='function'>rpad</span>(<span class='string'>&quot;69&quot;</span>, <span class='constant'>0</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo&quot;</span>.<span class='function'>rpad</span>(<span class='string'>&quot;69&quot;</span>, <span class='constant'>3</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo&quot;</span>.<span class='function'>rpad</span>(<span class='string'>&quot;69&quot;</span>, <span class='constant'>4</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo&quot;</span>.<span class='function'>rpad</span>(<span class='string'>&quot;69&quot;</span>, <span class='constant'>5</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foo&quot;</span>.<span class='function'>rpad</span>(<span class='string'>&quot;69&quot;</span>, <span class='constant'>6</span>))
 </pre>
 </div>
 <div class='codes'>
@@ -2039,7 +2096,8 @@ foo696
 </div>
 </section>
 <section id='s60'>
-<h3 class='hl-header'><code><span class='class'>string</span>.<span class='field'>prefix</span>(pattern)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>string</span>.<span class='field'>prefix</span>(pattern)</code></h3>
 <p>
 Check whether string starts with <code>pattern</code>.
 </p>
@@ -2055,9 +2113,9 @@ Check whether string starts with <code>pattern</code>.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<span class='function'>prefix</span>(<span class='string'>"foo"</span>))
-io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<span class='function'>prefix</span>(<span class='string'>"Foo"</span>))
-io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<span class='function'>prefix</span>(<span class='string'>"deez nuts"</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foobar&quot;</span>.<span class='function'>prefix</span>(<span class='string'>&quot;foo&quot;</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foobar&quot;</span>.<span class='function'>prefix</span>(<span class='string'>&quot;Foo&quot;</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foobar&quot;</span>.<span class='function'>prefix</span>(<span class='string'>&quot;deez nuts&quot;</span>))
 </pre>
 </div>
 <div class='codes'>
@@ -2080,7 +2138,8 @@ false
 </div>
 </section>
 <section id='s61'>
-<h3 class='hl-header'><code><span class='class'>string</span>.<span class='field'>suffix</span>(pattern)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>string</span>.<span class='field'>suffix</span>(pattern)</code></h3>
 <p>
 Check whether string ends with <code>pattern</code>.
 </p>
@@ -2096,9 +2155,9 @@ Check whether string ends with <code>pattern</code>.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<span class='function'>suffix</span>(<span class='string'>"bar"</span>))
-io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<span class='function'>suffix</span>(<span class='string'>"Bar"</span>))
-io.<span class='function'>println</span>(<span class='string'>"foobar"</span>.<span class='function'>suffix</span>(<span class='string'>"deez nuts"</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foobar&quot;</span>.<span class='function'>suffix</span>(<span class='string'>&quot;bar&quot;</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foobar&quot;</span>.<span class='function'>suffix</span>(<span class='string'>&quot;Bar&quot;</span>))
+io.<span class='function'>println</span>(<span class='string'>&quot;foobar&quot;</span>.<span class='function'>suffix</span>(<span class='string'>&quot;deez nuts&quot;</span>))
 </pre>
 </div>
 <div class='codes'>
@@ -2122,13 +2181,14 @@ false
 </section>
 </section>
 <section id='s62'>
-<h2> Bit</h2>
+<h2>Bit</h2>
 <p>
 Contains bitwise operations which are not frequent enough to warrant a
 dedicated operator, but which still finds occasional uses.
 </p>
 <section id='s63'>
-<h3 class='hl-header'><code><span class='function'>ceil</span>(n)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>ceil</span>(n)</code></h3>
 <p>
 Return the bitwise ceiling of a number.
 </p>
@@ -2169,7 +2229,8 @@ io.<span class='function'>println</span>(bit.<span class='function'>ceil</span>(
 </div>
 </section>
 <section id='s64'>
-<h3 class='hl-header'><code><span class='function'>floor</span>(n)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>floor</span>(n)</code></h3>
 <p>
 Return the bitwise floor of a number.
 </p>
@@ -2211,18 +2272,20 @@ io.<span class='function'>println</span>(bit.<span class='function'>floor</span>
 </section>
 </section>
 <section id='s65'>
-<h2> ASCII</h2>
+<h2>ASCII</h2>
 <p>
 Contains functions for dealing with ASCII codes and characters.
 </p>
 <section id='s66'>
-<h3 class='hl-header'><code><span class='function'>char</span>(code)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>char</span>(code)</code></h3>
 <p>
 Return the character associated with an ASCII code.
 </p>
 </section>
 <section id='s67'>
-<h3 class='hl-header'><code><span class='function'>code</span>(char)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>code</span>(char)</code></h3>
 <p>
 Return the ASCII code associated with a character.
 </p>
@@ -2231,7 +2294,8 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s68'>
-<h3 class='hl-header'><code><span class='function'>isalnum</span>(char)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>isalnum</span>(char)</code></h3>
 <p>
 Return whether a character is an alphabet or a digit.
 </p>
@@ -2240,7 +2304,8 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s69'>
-<h3 class='hl-header'><code><span class='function'>isalpha</span>(char)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>isalpha</span>(char)</code></h3>
 <p>
 Return whether a character is an alphabet.
 </p>
@@ -2249,7 +2314,8 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s70'>
-<h3 class='hl-header'><code><span class='function'>iscntrl</span>(char)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>iscntrl</span>(char)</code></h3>
 <p>
 Return whether a character is a control character.
 </p>
@@ -2258,7 +2324,8 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s71'>
-<h3 class='hl-header'><code><span class='function'>isdigit</span>(char)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>isdigit</span>(char)</code></h3>
 <p>
 Return whether a character is a digit.
 </p>
@@ -2267,7 +2334,8 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s72'>
-<h3 class='hl-header'><code><span class='function'>islower</span>(char)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>islower</span>(char)</code></h3>
 <p>
 Return whether a character is lowercase.
 </p>
@@ -2276,7 +2344,8 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s73'>
-<h3 class='hl-header'><code><span class='function'>isupper</span>(char)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>isupper</span>(char)</code></h3>
 <p>
 Return whether a character is uppercase.
 </p>
@@ -2285,7 +2354,8 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s74'>
-<h3 class='hl-header'><code><span class='function'>isgraph</span>(char)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>isgraph</span>(char)</code></h3>
 <p>
 Return whether a character is graphable.
 </p>
@@ -2294,7 +2364,8 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s75'>
-<h3 class='hl-header'><code><span class='function'>isprint</span>(char)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>isprint</span>(char)</code></h3>
 <p>
 Return whether a character is printable.
 </p>
@@ -2303,7 +2374,8 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s76'>
-<h3 class='hl-header'><code><span class='function'>ispunct</span>(char)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>ispunct</span>(char)</code></h3>
 <p>
 Return whether a character is a punctuation.
 </p>
@@ -2312,7 +2384,8 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </p>
 </section>
 <section id='s77'>
-<h3 class='hl-header'><code><span class='function'>isspace</span>(char)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>isspace</span>(char)</code></h3>
 <p>
 Return whether a character is whitespace.
 </p>
@@ -2322,7 +2395,8 @@ Expects <code>char</code> to be a string of length <code>1</code>.
 </section>
 </section>
 <section id='s78'>
-<h2 class='hl-header'><code><span class='class'>Bytes</span>(str?)</code></h2>
+<h2 class='hl-header'>
+<code><span class='class'>Bytes</span>(str?)</code></h2>
 <p>
 Strings are immutable in BS. The native class <code>Bytes</code> provides a mutable string
 builder for optimized string modification operations.
@@ -2340,11 +2414,11 @@ builder for optimized string modification operations.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> b = <span class='function'>Bytes</span>()
-b.<span class='function'>push</span>(<span class='string'>"Hello, "</span>)
-b.<span class='function'>push</span>(<span class='string'>"world!"</span>)
+b.<span class='function'>push</span>(<span class='string'>&quot;Hello, &quot;</span>)
+b.<span class='function'>push</span>(<span class='string'>&quot;world!&quot;</span>)
 io.<span class='function'>println</span>(b)
 
-<span class='keyword'>var</span> nice = <span class='function'>Bytes</span>(<span class='string'>"69 Hehe"</span>)
+<span class='keyword'>var</span> nice = <span class='function'>Bytes</span>(<span class='string'>&quot;69 Hehe&quot;</span>)
 io.<span class='function'>println</span>(nice)
 </pre>
 </div>
@@ -2366,7 +2440,8 @@ Hello, world!
 </pre>
 </div>
 <section id='s79'>
-<h3 class='hl-header'><code><span class='class'>Bytes</span>.<span class='field'>count</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>Bytes</span>.<span class='field'>count</span>()</code></h3>
 <p>
 Return the current number of bytes written.
 </p>
@@ -2383,12 +2458,12 @@ Return the current number of bytes written.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> b = <span class='function'>Bytes</span>()
-b.<span class='function'>push</span>(<span class='string'>"Hello"</span>)
-b.<span class='function'>push</span>(<span class='string'>" world!"</span>)
+b.<span class='function'>push</span>(<span class='string'>&quot;Hello&quot;</span>)
+b.<span class='function'>push</span>(<span class='string'>&quot; world!&quot;</span>)
 io.<span class='function'>println</span>(b)
 
 <span class='keyword'>var</span> n = b.<span class='function'>count</span>()
-io.<span class='function'>println</span>(<span class='string'>"</span><span class='escape'>{</span>n<span class='escape'>}</span><span class='string'> bytes written."</span>)
+io.<span class='function'>println</span>(<span class='string'>&quot;</span><span class='escape'>{</span>n<span class='escape'>}</span><span class='string'> bytes written.&quot;</span>)
 </pre>
 </div>
 <div class='codes'>
@@ -2410,7 +2485,8 @@ Hello world!
 </div>
 </section>
 <section id='s80'>
-<h3 class='hl-header'><code><span class='class'>Bytes</span>.<span class='field'>reset</span>(position)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>Bytes</span>.<span class='field'>reset</span>(position)</code></h3>
 <p>
 Move back the writer head to <code>position</code>.
 </p>
@@ -2427,10 +2503,10 @@ Move back the writer head to <code>position</code>.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> b = <span class='function'>Bytes</span>()
-b.<span class='function'>push</span>(<span class='string'>"Hello"</span>)
+b.<span class='function'>push</span>(<span class='string'>&quot;Hello&quot;</span>)
 
 <span class='keyword'>var</span> p = b.<span class='function'>count</span>()
-b.<span class='function'>push</span>(<span class='string'>" world!"</span>)
+b.<span class='function'>push</span>(<span class='string'>&quot; world!&quot;</span>)
 
 io.<span class='function'>println</span>(b)
 b.<span class='function'>reset</span>(p)
@@ -2456,7 +2532,8 @@ Hello
 </div>
 </section>
 <section id='s81'>
-<h3 class='hl-header'><code><span class='class'>Bytes</span>.<span class='field'>slice</span>(start?, end?)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>Bytes</span>.<span class='field'>slice</span>(start?, end?)</code></h3>
 <p>
 Return a slice from <code>start</code> (inclusive) to <code>end</code> (exclusive).
 </p>
@@ -2477,7 +2554,7 @@ a string.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> b = <span class='function'>Bytes</span>()
-b.<span class='function'>push</span>(<span class='string'>"Hello world!"</span>)
+b.<span class='function'>push</span>(<span class='string'>&quot;Hello world!&quot;</span>)
 
 io.<span class='function'>println</span>(b.<span class='function'>slice</span>())
 io.<span class='function'>println</span>(b.<span class='function'>slice</span>(<span class='constant'>0</span>, <span class='constant'>5</span>))
@@ -2504,7 +2581,8 @@ world!
 </div>
 </section>
 <section id='s82'>
-<h3 class='hl-header'><code><span class='class'>Bytes</span>.<span class='field'>push</span>(value)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>Bytes</span>.<span class='field'>push</span>(value)</code></h3>
 <p>
 Push <code>value</code> to the end.
 </p>
@@ -2524,9 +2602,9 @@ Push <code>value</code> to the end.
 
 <span class='comment'>// Operations can be chained</span>
 buffer
-    .<span class='function'>push</span>(<span class='string'>"Hello"</span>)           <span class='comment'>// A String</span>
-    .<span class='function'>push</span>(<span class='function'>Bytes</span>(<span class='string'>", world!"</span>)) <span class='comment'>// Another Bytes instance</span>
-    .<span class='function'>push</span>(<span class='constant'>32</span>)                <span class='comment'>// An ASCII code, in this case ' '</span>
+    .<span class='function'>push</span>(<span class='string'>&quot;Hello&quot;</span>)           <span class='comment'>// A String</span>
+    .<span class='function'>push</span>(<span class='function'>Bytes</span>(<span class='string'>&quot;, world!&quot;</span>)) <span class='comment'>// Another Bytes instance</span>
+    .<span class='function'>push</span>(<span class='constant'>32</span>)                <span class='comment'>// An ASCII code, in this case &apos; &apos;</span>
     .<span class='function'>push</span>($<span class='constant'>69</span>)               <span class='comment'>// To push the string representation, a string must be provided</span>
 
 io.<span class='function'>println</span>(buffer)
@@ -2550,7 +2628,8 @@ Hello, world! 69
 </div>
 </section>
 <section id='s83'>
-<h3 class='hl-header'><code><span class='class'>Bytes</span>.<span class='field'>insert</span>(position, value)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>Bytes</span>.<span class='field'>insert</span>(position, value)</code></h3>
 <p>
 Insert <code>value</code> at <code>position</code>.
 </p>
@@ -2566,13 +2645,13 @@ Insert <code>value</code> at <code>position</code>.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> buffer = <span class='function'>Bytes</span>(<span class='string'>"world!"</span>)
+<span class='keyword'>var</span> buffer = <span class='function'>Bytes</span>(<span class='string'>&quot;world!&quot;</span>)
 
 <span class='comment'>// Operations can be chained, just like Bytes.push()</span>
 buffer
-    .<span class='function'>insert</span>(<span class='constant'>0</span>, <span class='string'>"Hell"</span>)      <span class='comment'>// A String</span>
-    .<span class='function'>insert</span>(<span class='constant'>4</span>, <span class='function'>Bytes</span>(<span class='string'>", "</span>)) <span class='comment'>// Another Bytes instance</span>
-    .<span class='function'>insert</span>(<span class='constant'>4</span>, <span class='constant'>111</span>)         <span class='comment'>// An ASCII code, in this case 'o'</span>
+    .<span class='function'>insert</span>(<span class='constant'>0</span>, <span class='string'>&quot;Hell&quot;</span>)      <span class='comment'>// A String</span>
+    .<span class='function'>insert</span>(<span class='constant'>4</span>, <span class='function'>Bytes</span>(<span class='string'>&quot;, &quot;</span>)) <span class='comment'>// Another Bytes instance</span>
+    .<span class='function'>insert</span>(<span class='constant'>4</span>, <span class='constant'>111</span>)         <span class='comment'>// An ASCII code, in this case &apos;o&apos;</span>
 
 io.<span class='function'>println</span>(buffer)
 </pre>
@@ -2595,7 +2674,8 @@ Hello, world!
 </div>
 </section>
 <section id='s84'>
-<h3 class='hl-header'><code><span class='class'>Bytes</span>.<span class='field'>get</span>(position)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>Bytes</span>.<span class='field'>get</span>(position)</code></h3>
 <p>
 Get the byte at <code>position</code> as a number.
 </p>
@@ -2612,7 +2692,7 @@ Get the byte at <code>position</code> as a number.
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> b = <span class='function'>Bytes</span>()
-b.<span class='function'>push</span>(<span class='string'>"Hello"</span>)
+b.<span class='function'>push</span>(<span class='string'>&quot;Hello&quot;</span>)
 
 <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, b.<span class='function'>count</span>() {
     <span class='keyword'>var</span> c = b.<span class='function'>get</span>(i)
@@ -2642,7 +2722,8 @@ o 111
 </div>
 </section>
 <section id='s85'>
-<h3 class='hl-header'><code><span class='class'>Bytes</span>.<span class='field'>set</span>(position, value)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>Bytes</span>.<span class='field'>set</span>(position, value)</code></h3>
 <p>
 Set the byte at <code>position</code> to <code>value</code>.
 </p>
@@ -2663,10 +2744,10 @@ The argument <code>value</code> has to be a number.
 <pre class='code active'>
 <span class='keyword'>var</span> b = <span class='function'>Bytes</span>()
 
-b.<span class='function'>push</span>(<span class='string'>"Cello"</span>)
+b.<span class='function'>push</span>(<span class='string'>&quot;Cello&quot;</span>)
 io.<span class='function'>println</span>(b)
 
-b.<span class='function'>set</span>(<span class='constant'>0</span>, ascii.<span class='function'>code</span>(<span class='string'>"H"</span>))
+b.<span class='function'>set</span>(<span class='constant'>0</span>, ascii.<span class='function'>code</span>(<span class='string'>&quot;H&quot;</span>))
 io.<span class='function'>println</span>(b)
 </pre>
 </div>
@@ -2690,12 +2771,13 @@ Hello
 </section>
 </section>
 <section id='s86'>
-<h2> Array</h2>
+<h2>Array</h2>
 <p>
 Methods for the builtin array value.
 </p>
 <section id='s87'>
-<h3 class='hl-header'><code><span class='class'>array</span>.<span class='field'>map</span>(f)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>array</span>.<span class='field'>map</span>(f)</code></h3>
 <p>
 Functional map.
 </p>
@@ -2739,7 +2821,8 @@ io.<span class='function'>println</span>(ys)
 </div>
 </section>
 <section id='s88'>
-<h3 class='hl-header'><code><span class='class'>array</span>.<span class='field'>filter</span>(f)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>array</span>.<span class='field'>filter</span>(f)</code></h3>
 <p>
 Functional filter.
 </p>
@@ -2783,7 +2866,8 @@ io.<span class='function'>println</span>(ys)
 </div>
 </section>
 <section id='s89'>
-<h3 class='hl-header'><code><span class='class'>array</span>.<span class='field'>reduce</span>(f, accumulator?)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>array</span>.<span class='field'>reduce</span>(f, accumulator?)</code></h3>
 <p>
 Functional reduce.
 </p>
@@ -2832,7 +2916,8 @@ io.<span class='function'>println</span>(b)
 </div>
 </section>
 <section id='s90'>
-<h3 class='hl-header'><code><span class='class'>array</span>.<span class='field'>join</span>(separator)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>array</span>.<span class='field'>join</span>(separator)</code></h3>
 <p>
 Join the elements of an array, separated by <code>separator</code> into a single string.
 </p>
@@ -2848,7 +2933,7 @@ Join the elements of an array, separated by <code>separator</code> into a single
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>([<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>].<span class='function'>join</span>(<span class='string'>" -&gt; "</span>))
+io.<span class='function'>println</span>([<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>, <span class='constant'>4</span>, <span class='constant'>5</span>].<span class='function'>join</span>(<span class='string'>&quot; -&gt; &quot;</span>))
 </pre>
 </div>
 <div class='codes'>
@@ -2864,12 +2949,13 @@ io.<span class='function'>println</span>([<span class='constant'>1</span>, <span
 </button>
 <pre class='code active'>
 <span class='string'>$ </span>bs demo.bs
-1 -&gt; 2 -&gt; 3 -&gt; 4 -&gt; 5
+1 -> 2 -> 3 -> 4 -> 5
 </pre>
 </div>
 </section>
 <section id='s91'>
-<h3 class='hl-header'><code><span class='class'>array</span>.<span class='field'>find</span>(value, start?)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>array</span>.<span class='field'>find</span>(value, start?)</code></h3>
 <p>
 Find <code>value</code> within an array starting from position <code>start</code> (which defaults to
 <code>0</code>).
@@ -2954,7 +3040,8 @@ false
 </div>
 </section>
 <section id='s92'>
-<h3 class='hl-header'><code><span class='class'>array</span>.<span class='field'>push</span>(value)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>array</span>.<span class='field'>push</span>(value)</code></h3>
 <p>
 Push <code>value</code> into an array.
 </p>
@@ -3014,7 +3101,7 @@ Operations can be chained.
 </button>
 <pre class='code active'>
 io.<span class='function'>println</span>(
-    [<span class='string'>"Nice!"</span>]
+    [<span class='string'>&quot;Nice!&quot;</span>]
         .<span class='function'>push</span>(<span class='constant'>69</span>)
         .<span class='function'>push</span>(<span class='constant'>420</span>))
 </pre>
@@ -3037,7 +3124,8 @@ io.<span class='function'>println</span>(
 </div>
 </section>
 <section id='s93'>
-<h3 class='hl-header'><code><span class='class'>array</span>.<span class='field'>insert</span>(position, value)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>array</span>.<span class='field'>insert</span>(position, value)</code></h3>
 <p>
 Insert <code>value</code> into an array at <code>position</code>.
 </p>
@@ -3104,7 +3192,7 @@ Operations can be chained, like <code>array.push()</code>
 </button>
 <pre class='code active'>
 io.<span class='function'>println</span>(
-    [<span class='string'>"Nice!"</span>]
+    [<span class='string'>&quot;Nice!&quot;</span>]
         .<span class='function'>insert</span>(<span class='constant'>0</span>, <span class='constant'>69</span>)
         .<span class='function'>insert</span>(<span class='constant'>1</span>, <span class='constant'>420</span>))
 </pre>
@@ -3127,7 +3215,8 @@ io.<span class='function'>println</span>(
 </div>
 </section>
 <section id='s94'>
-<h3 class='hl-header'><code><span class='class'>array</span>.<span class='field'>pop</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>array</span>.<span class='field'>pop</span>()</code></h3>
 <p>
 Pop the last element from an array. If the array is empty, an error is thrown.
 </p>
@@ -3170,7 +3259,8 @@ io.<span class='function'>println</span>(xs)
 </div>
 </section>
 <section id='s95'>
-<h3 class='hl-header'><code><span class='class'>array</span>.<span class='field'>sort</span>(compare)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>array</span>.<span class='field'>sort</span>(compare)</code></h3>
 <p>
 Sort an array inplace with <code>compare</code>, and return itself.
 </p>
@@ -3210,11 +3300,12 @@ io.<span class='function'>println</span>(xs)
 </div>
 <p>
 The compare function must take two arguments. If it returns <code>true</code>, then the
-left argument shall be considered "less than", and vice versa for <code>false</code>.
+left argument shall be considered &quot;less than&quot;, and vice versa for <code>false</code>.
 </p>
 </section>
 <section id='s96'>
-<h3 class='hl-header'><code><span class='class'>array</span>.<span class='field'>resize</span>(size)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>array</span>.<span class='field'>resize</span>(size)</code></h3>
 <p>
 Resize an array to one having <code>size</code> elements, and return itself.
 </p>
@@ -3264,7 +3355,8 @@ io.<span class='function'>println</span>(xs)
 </div>
 </section>
 <section id='s97'>
-<h3 class='hl-header'><code><span class='class'>array</span>.<span class='field'>reverse</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>array</span>.<span class='field'>reverse</span>()</code></h3>
 <p>
 Reverse an array.
 </p>
@@ -3309,7 +3401,8 @@ io.<span class='function'>println</span>(xs)
 </div>
 </section>
 <section id='s98'>
-<h3 class='hl-header'><code><span class='class'>array</span>.<span class='field'>fill</span>(value)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>array</span>.<span class='field'>fill</span>(value)</code></h3>
 <p>
 Fill an array with <code>value</code>.
 </p>
@@ -3367,7 +3460,7 @@ Use this with <code>array.resize()</code> to create an array with a preset size 
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> xs = [].<span class='function'>resize</span>(<span class='constant'>5</span>).<span class='function'>fill</span>(<span class='string'>"foo"</span>)
+<span class='keyword'>var</span> xs = [].<span class='function'>resize</span>(<span class='constant'>5</span>).<span class='function'>fill</span>(<span class='string'>&quot;foo&quot;</span>)
 io.<span class='function'>println</span>(xs)
 </pre>
 </div>
@@ -3388,7 +3481,7 @@ io.<span class='function'>println</span>(xs)
 </pre>
 </div>
 <p>
-Here's a 2D version.
+Here&apos;s a 2D version.
 </p>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -3439,7 +3532,8 @@ io.<span class='function'>println</span>(board)
 </div>
 </section>
 <section id='s99'>
-<h3 class='hl-header'><code><span class='class'>array</span>.<span class='field'>slice</span>(start, end?)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>array</span>.<span class='field'>slice</span>(start, end?)</code></h3>
 <p>
 Slice an array from <code>start</code> (inclusive) to <code>end</code> (exclusive).
 </p>
@@ -3481,7 +3575,8 @@ io.<span class='function'>println</span>(xs.<span class='function'>slice</span>(
 </div>
 </section>
 <section id='s100'>
-<h3 class='hl-header'><code><span class='class'>array</span>.<span class='field'>append</span>(other)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>array</span>.<span class='field'>append</span>(other)</code></h3>
 <p>
 Append an array.
 </p>
@@ -3537,12 +3632,13 @@ io.<span class='function'>println</span>(xs.<span class='function'>append</span>
 </section>
 </section>
 <section id='s101'>
-<h2> Table</h2>
+<h2>Table</h2>
 <p>
 Methods for the builtin table value.
 </p>
 <section id='s102'>
-<h3 class='hl-header'><code><span class='class'>table</span>.<span class='field'>extend</span>(src, overwrite)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>table</span>.<span class='field'>extend</span>(src, overwrite)</code></h3>
 <p>
 Extend a table.
 </p>
@@ -3615,12 +3711,13 @@ io.<span class='function'>println</span>(xs)
 </section>
 </section>
 <section id='s103'>
-<h2> Math</h2>
+<h2>Math</h2>
 <p>
 Contains simple mathematical primitives.
 </p>
 <section id='s104'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>sin</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>sin</span>()</code></h3>
 <p>
 Sine in radians.
 </p>
@@ -3662,37 +3759,43 @@ compiler and the platform. This is inherent to computing in general.
 </p>
 </section>
 <section id='s105'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>cos</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>cos</span>()</code></h3>
 <p>
 Cosine in radians.
 </p>
 </section>
 <section id='s106'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>tan</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>tan</span>()</code></h3>
 <p>
 Tangent in radians.
 </p>
 </section>
 <section id='s107'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>asin</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>asin</span>()</code></h3>
 <p>
 Inverse sine in radians.
 </p>
 </section>
 <section id='s108'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>acos</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>acos</span>()</code></h3>
 <p>
 Inverse cosine in radians.
 </p>
 </section>
 <section id='s109'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>atan</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>atan</span>()</code></h3>
 <p>
 Inverse tangent in radians.
 </p>
 </section>
 <section id='s110'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>exp</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>exp</span>()</code></h3>
 <p>
 Return the exponential function of the number.
 </p>
@@ -3708,7 +3811,7 @@ Return the exponential function of the number.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='constant'>2</span>.<span class='function'>exp</span>()) <span class='comment'>// Basically e^2</span>
+io.<span class='function'>println</span>(<span class='constant'>2.</span><span class='function'>exp</span>()) <span class='comment'>// Basically e^2</span>
 </pre>
 </div>
 <div class='codes'>
@@ -3729,55 +3832,64 @@ io.<span class='function'>println</span>(<span class='constant'>2</span>.<span c
 </div>
 </section>
 <section id='s111'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>log</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>log</span>()</code></h3>
 <p>
 Return the natural logarithm (base <code>e</code>) of the number.
 </p>
 </section>
 <section id='s112'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>log10</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>log10</span>()</code></h3>
 <p>
 Return the common logarithm (base <code>10</code>) of the number.
 </p>
 </section>
 <section id='s113'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>pow</span>(exponent)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>pow</span>(exponent)</code></h3>
 <p>
 Raise the number to <code>exponent</code>.
 </p>
 </section>
 <section id='s114'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>sqrt</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>sqrt</span>()</code></h3>
 <p>
 Square root.
 </p>
 </section>
 <section id='s115'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>ceil</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>ceil</span>()</code></h3>
 <p>
 Ceiling.
 </p>
 </section>
 <section id='s116'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>floor</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>floor</span>()</code></h3>
 <p>
 Floor.
 </p>
 </section>
 <section id='s117'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>round</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>round</span>()</code></h3>
 <p>
 Return the nearest integer.
 </p>
 </section>
 <section id='s118'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>abs</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>abs</span>()</code></h3>
 <p>
 Return the absolute value (Basically make a number positive).
 </p>
 </section>
 <section id='s119'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>sign</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>sign</span>()</code></h3>
 <p>
 Return the sign of the number.
 </p>
@@ -3818,7 +3930,8 @@ io.<span class='function'>println</span>((-<span class='constant'>420</span>).<s
 </div>
 </section>
 <section id='s120'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>max</span>(...)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>max</span>(...)</code></h3>
 <p>
 Return the maximum between the method receiver and the provided arguments.
 </p>
@@ -3834,8 +3947,8 @@ Return the maximum between the method receiver and the provided arguments.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='constant'>1</span>.<span class='function'>max</span>(<span class='constant'>2</span>, <span class='constant'>3</span>))
-io.<span class='function'>println</span>(<span class='constant'>3</span>.<span class='function'>max</span>(<span class='constant'>0</span>, <span class='constant'>1</span>, <span class='constant'>2</span>))
+io.<span class='function'>println</span>(<span class='constant'>1.</span><span class='function'>max</span>(<span class='constant'>2</span>, <span class='constant'>3</span>))
+io.<span class='function'>println</span>(<span class='constant'>3.</span><span class='function'>max</span>(<span class='constant'>0</span>, <span class='constant'>1</span>, <span class='constant'>2</span>))
 </pre>
 </div>
 <div class='codes'>
@@ -3857,7 +3970,8 @@ io.<span class='function'>println</span>(<span class='constant'>3</span>.<span c
 </div>
 </section>
 <section id='s121'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>min</span>(...)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>min</span>(...)</code></h3>
 <p>
 Return the minimum between the method receiver and the provided arguments.
 </p>
@@ -3873,8 +3987,8 @@ Return the minimum between the method receiver and the provided arguments.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='constant'>1</span>.<span class='function'>min</span>(<span class='constant'>2</span>, <span class='constant'>3</span>))
-io.<span class='function'>println</span>(<span class='constant'>3</span>.<span class='function'>min</span>(<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>))
+io.<span class='function'>println</span>(<span class='constant'>1.</span><span class='function'>min</span>(<span class='constant'>2</span>, <span class='constant'>3</span>))
+io.<span class='function'>println</span>(<span class='constant'>3.</span><span class='function'>min</span>(<span class='constant'>1</span>, <span class='constant'>2</span>, <span class='constant'>3</span>))
 </pre>
 </div>
 <div class='codes'>
@@ -3896,19 +4010,22 @@ io.<span class='function'>println</span>(<span class='constant'>3</span>.<span c
 </div>
 </section>
 <section id='s122'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>clamp</span>(low, high)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>clamp</span>(low, high)</code></h3>
 <p>
 Clamp the number between <code>low</code> and <code>high</code>.
 </p>
 </section>
 <section id='s123'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>lerp</span>(a, b, t)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>lerp</span>(a, b, t)</code></h3>
 <p>
 Linear interpolation.
 </p>
 </section>
 <section id='s124'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>precise</span>(level)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>precise</span>(level)</code></h3>
 <p>
 Set the precision (number of decimal digits).
 </p>
@@ -3950,7 +4067,8 @@ io.<span class='function'>println</span>(n.<span class='function'>precise</span>
 </div>
 </section>
 <section id='s125'>
-<h3 class='hl-header'><code><span class='class'>number</span>.<span class='field'>tohex</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>number</span>.<span class='field'>tohex</span>()</code></h3>
 <p>
 Format an integer as a hexadecimal string.
 </p>
@@ -3966,7 +4084,7 @@ Format an integer as a hexadecimal string.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(<span class='constant'>69</span>.<span class='function'>tohex</span>())
+io.<span class='function'>println</span>(<span class='constant'>69.</span><span class='function'>tohex</span>())
 io.<span class='function'>println</span>((-<span class='constant'>420</span>).<span class='function'>tohex</span>())
 </pre>
 </div>
@@ -3989,7 +4107,8 @@ io.<span class='function'>println</span>((-<span class='constant'>420</span>).<s
 </div>
 </section>
 <section id='s126'>
-<h3 class='hl-header'><code><span class='class'>Random</span>(seed?)</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>Random</span>(seed?)</code></h3>
 <p>
 Random number generator using the <code>xoroshiro128+</code> algorithm.
 </p>
@@ -4018,7 +4137,7 @@ io.<span class='function'>println</span>(a.<span class='function'>number</span>(
 io.<span class='function'>println</span>(a.<span class='function'>number</span>(<span class='constant'>69</span>, <span class='constant'>420</span>))
 
 io.<span class='function'>println</span>()
-io.<span class='function'>println</span>(<span class='string'>"==== Constant ===="</span>)
+io.<span class='function'>println</span>(<span class='string'>&quot;==== Constant ====&quot;</span>)
 io.<span class='function'>println</span>()
 
 io.<span class='function'>println</span>(b.<span class='function'>number</span>())
@@ -4054,7 +4173,8 @@ io.<span class='function'>println</span>(b.<span class='function'>number</span>(
 </pre>
 </div>
 <section id='s127'>
-<h4 class='hl-header'><code><span class='class'>Random</span>.<span class='field'>number</span>(min?, max?)</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Random</span>.<span class='field'>number</span>(min?, max?)</code></h4>
 <p>
 Return a random number between <code>low</code> and <code>high</code>.
 </p>
@@ -4101,7 +4221,8 @@ io.<span class='function'>println</span>(r.<span class='function'>number</span>(
 </div>
 </section>
 <section id='s128'>
-<h4 class='hl-header'><code><span class='class'>Random</span>.<span class='field'>bytes</span>(count)</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Random</span>.<span class='field'>bytes</span>(count)</code></h4>
 <p>
 Return a random sequence of bytes.
 </p>
@@ -4141,7 +4262,8 @@ io.<span class='function'>println</span>(seq.<span class='function'>slice</span>
 </section>
 </section>
 <section id='s129'>
-<h3 class='hl-header'><code><span class='function'>range</span>(begin, end, step?)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>range</span>(begin, end, step?)</code></h3>
 <p>
 Return an array containing a range.
 </p>
@@ -4226,27 +4348,30 @@ demo.bs:1:29: error: a step of -1 in an ascending range would run indefinitely
 </div>
 </section>
 <section id='s130'>
-<h3 class='hl-header'><code><span class='constant'>E</span></code></h3>
+<h3 class='hl-header'>
+<code><span class='constant'>E</span></code></h3>
 <p>
-Euler's constant.
+Euler&apos;s constant.
 </p>
 </section>
 <section id='s131'>
-<h3 class='hl-header'><code><span class='constant'>PI</span></code></h3>
+<h3 class='hl-header'>
+<code><span class='constant'>PI</span></code></h3>
 <p>
 PI.
 </p>
 </section>
 </section>
 <section id='s132'>
-<h2> Meta</h2>
+<h2>Meta</h2>
 <p>
 Contains simple metaprogramming primitives.
 </p>
 <section id='s133'>
-<h3 class='hl-header'><code><span class='class'>Error</span>()</code></h3>
+<h3 class='hl-header'>
+<code><span class='class'>Error</span>()</code></h3>
 <p>
-Native C class that wraps over a metaprogram error. This doesn't really do
+Native C class that wraps over a metaprogram error. This doesn&apos;t really do
 anything, and only serves as an implementation detail for the <code>meta</code> functions.
 Attempt to call this constructor directly will throw a runtime error.
 </p>
@@ -4265,15 +4390,15 @@ Example usecase:
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(<span class='string'>"Oops@"</span>)
-<span class='keyword'>if</span> f <span class='keyword'>is</span> <span class='string'>"Error"</span> {
-    io.<span class='function'>println</span>(<span class='string'>"Row:"</span>, f.<span class='function'>row</span>())
-    io.<span class='function'>println</span>(<span class='string'>"Col:"</span>, f.<span class='function'>col</span>())
-    io.<span class='function'>println</span>(<span class='string'>"Path:"</span>, f.<span class='function'>path</span>())
-    io.<span class='function'>println</span>(<span class='string'>"Line:"</span>, f.<span class='function'>line</span>())
-    io.<span class='function'>println</span>(<span class='string'>"Message:"</span>, f.<span class='function'>message</span>())
-    io.<span class='function'>println</span>(<span class='string'>"Explanation:"</span>, f.<span class='function'>explanation</span>())
-    io.<span class='function'>println</span>(<span class='string'>"Example:"</span>, f.<span class='function'>example</span>())
+<span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(<span class='string'>&quot;Oops@&quot;</span>)
+<span class='keyword'>if</span> f <span class='keyword'>is</span> <span class='string'>&quot;Error&quot;</span> {
+    io.<span class='function'>println</span>(<span class='string'>&quot;Row:&quot;</span>, f.<span class='function'>row</span>())
+    io.<span class='function'>println</span>(<span class='string'>&quot;Col:&quot;</span>, f.<span class='function'>col</span>())
+    io.<span class='function'>println</span>(<span class='string'>&quot;Path:&quot;</span>, f.<span class='function'>path</span>())
+    io.<span class='function'>println</span>(<span class='string'>&quot;Line:&quot;</span>, f.<span class='function'>line</span>())
+    io.<span class='function'>println</span>(<span class='string'>&quot;Message:&quot;</span>, f.<span class='function'>message</span>())
+    io.<span class='function'>println</span>(<span class='string'>&quot;Explanation:&quot;</span>, f.<span class='function'>explanation</span>())
+    io.<span class='function'>println</span>(<span class='string'>&quot;Example:&quot;</span>, f.<span class='function'>example</span>())
 }
 </pre>
 </div>
@@ -4292,7 +4417,7 @@ Example usecase:
 <span class='string'>$ </span>bs demo.bs
 Row: 1
 Col: 5
-Path: &lt;meta&gt;
+Path: <meta>
 Line: Oops@
 Message: invalid character '@' (64)
 Explanation: nil
@@ -4300,7 +4425,8 @@ Example: nil
 </pre>
 </div>
 <section id='s134'>
-<h4 class='hl-header'><code><span class='class'>Error</span>.<span class='field'>row</span>()</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Error</span>.<span class='field'>row</span>()</code></h4>
 <p>
 Return the row in which the error occured.
 </p>
@@ -4309,7 +4435,8 @@ Returns <code>nil</code> if the error occured in native code.
 </p>
 </section>
 <section id='s135'>
-<h4 class='hl-header'><code><span class='class'>Error</span>.<span class='field'>col</span>()</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Error</span>.<span class='field'>col</span>()</code></h4>
 <p>
 Return the column in which the error occured.
 </p>
@@ -4318,7 +4445,8 @@ Returns <code>nil</code> if the error occured in native code.
 </p>
 </section>
 <section id='s136'>
-<h4 class='hl-header'><code><span class='class'>Error</span>.<span class='field'>path</span>()</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Error</span>.<span class='field'>path</span>()</code></h4>
 <p>
 Return the path in which the error occured.
 </p>
@@ -4327,7 +4455,8 @@ Returns <code>nil</code> if the error occured in native code.
 </p>
 </section>
 <section id='s137'>
-<h4 class='hl-header'><code><span class='class'>Error</span>.<span class='field'>line</span>()</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Error</span>.<span class='field'>line</span>()</code></h4>
 <p>
 Return the line of meta source code in which the error occured as a string.
 </p>
@@ -4336,13 +4465,15 @@ Returns <code>nil</code> if the error occured in native code.
 </p>
 </section>
 <section id='s138'>
-<h4 class='hl-header'><code><span class='class'>Error</span>.<span class='field'>message</span>()</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Error</span>.<span class='field'>message</span>()</code></h4>
 <p>
 Return the error message.
 </p>
 </section>
 <section id='s139'>
-<h4 class='hl-header'><code><span class='class'>Error</span>.<span class='field'>explanation</span>()</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Error</span>.<span class='field'>explanation</span>()</code></h4>
 <p>
 Return the explanation associated with the error.
 </p>
@@ -4351,7 +4482,8 @@ Returns <code>nil</code> if there is no explanation associated with the error.
 </p>
 </section>
 <section id='s140'>
-<h4 class='hl-header'><code><span class='class'>Error</span>.<span class='field'>example</span>()</code></h4>
+<h4 class='hl-header'>
+<code><span class='class'>Error</span>.<span class='field'>example</span>()</code></h4>
 <p>
 Return the example associated with the error.
 </p>
@@ -4361,7 +4493,8 @@ Returns <code>nil</code> if there is no example associated with the error.
 </section>
 </section>
 <section id='s141'>
-<h3 class='hl-header'><code><span class='function'>compile</span>(str)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>compile</span>(str)</code></h3>
 <p>
 Compile a string into a function.
 </p>
@@ -4377,7 +4510,7 @@ Compile a string into a function.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(<span class='string'>"34 + 35"</span>)
+<span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(<span class='string'>&quot;34 + 35&quot;</span>)
 io.<span class='function'>println</span>(<span class='function'>f</span>())
 </pre>
 </div>
@@ -4413,15 +4546,15 @@ is returned instead of a function.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(<span class='string'>"Oops@"</span>)<span class='comment'>;</span> <span class='keyword'>assert</span>(f <span class='keyword'>is</span> <span class='string'>"Error"</span>)
+<span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(<span class='string'>&quot;Oops@&quot;</span>); <span class='keyword'>assert</span>(f <span class='keyword'>is</span> <span class='string'>&quot;Error&quot;</span>)
 
-io.<span class='function'>println</span>(<span class='string'>"Row:"</span>, f.<span class='function'>row</span>())
-io.<span class='function'>println</span>(<span class='string'>"Col:"</span>, f.<span class='function'>col</span>())
-io.<span class='function'>println</span>(<span class='string'>"Path:"</span>, f.<span class='function'>path</span>())
-io.<span class='function'>println</span>(<span class='string'>"Line:"</span>, f.<span class='function'>line</span>())
-io.<span class='function'>println</span>(<span class='string'>"Message:"</span>, f.<span class='function'>message</span>())
-io.<span class='function'>println</span>(<span class='string'>"Explanation:"</span>, f.<span class='function'>explanation</span>())
-io.<span class='function'>println</span>(<span class='string'>"Example:"</span>, f.<span class='function'>example</span>())
+io.<span class='function'>println</span>(<span class='string'>&quot;Row:&quot;</span>, f.<span class='function'>row</span>())
+io.<span class='function'>println</span>(<span class='string'>&quot;Col:&quot;</span>, f.<span class='function'>col</span>())
+io.<span class='function'>println</span>(<span class='string'>&quot;Path:&quot;</span>, f.<span class='function'>path</span>())
+io.<span class='function'>println</span>(<span class='string'>&quot;Line:&quot;</span>, f.<span class='function'>line</span>())
+io.<span class='function'>println</span>(<span class='string'>&quot;Message:&quot;</span>, f.<span class='function'>message</span>())
+io.<span class='function'>println</span>(<span class='string'>&quot;Explanation:&quot;</span>, f.<span class='function'>explanation</span>())
+io.<span class='function'>println</span>(<span class='string'>&quot;Example:&quot;</span>, f.<span class='function'>example</span>())
 </pre>
 </div>
 <div class='codes'>
@@ -4439,7 +4572,7 @@ io.<span class='function'>println</span>(<span class='string'>"Example:"</span>,
 <span class='string'>$ </span>bs demo.bs
 Row: 1
 Col: 5
-Path: &lt;meta&gt;
+Path: <meta>
 Line: Oops@
 Message: invalid character '@' (64)
 Explanation: nil
@@ -4462,7 +4595,7 @@ So the usage becomes as straight forward as:
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(...)
-<span class='keyword'>if</span> f <span class='keyword'>is</span> <span class='string'>"Error"</span> {
+<span class='keyword'>if</span> f <span class='keyword'>is</span> <span class='string'>&quot;Error&quot;</span> {
     <span class='keyword'>panic</span>(f.<span class='function'>message</span>()) <span class='comment'>// Error handling...</span>
 }
 
@@ -4485,35 +4618,35 @@ otherwise defaulting to <code>nil</code>.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(<span class='string'>"
+<span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(<span class='string'>&quot;
     for i in 0, 5 </span><span class='escape'>\{</span><span class='string'>
-        io.println('Nice!')
+        io.println(&apos;Nice!&apos;)
     }
-"</span>)
+&quot;</span>)
 
-<span class='keyword'>assert</span>(f <span class='keyword'>is</span> <span class='string'>"function"</span>)
+<span class='keyword'>assert</span>(f <span class='keyword'>is</span> <span class='string'>&quot;function&quot;</span>)
 io.<span class='function'>println</span>(<span class='function'>f</span>())
 
-<span class='keyword'>var</span> g = meta.<span class='function'>compile</span>(<span class='string'>"
+<span class='keyword'>var</span> g = meta.<span class='function'>compile</span>(<span class='string'>&quot;
     for i in 0, 5 </span><span class='escape'>\{</span><span class='string'>
-        io.println('Hehe!')
+        io.println(&apos;Hehe!&apos;)
     }
 
     69
-"</span>)
+&quot;</span>)
 
-<span class='keyword'>assert</span>(g <span class='keyword'>is</span> <span class='string'>"function"</span>)
+<span class='keyword'>assert</span>(g <span class='keyword'>is</span> <span class='string'>&quot;function&quot;</span>)
 io.<span class='function'>println</span>(<span class='function'>g</span>())
 
-<span class='keyword'>var</span> h = meta.<span class='function'>compile</span>(<span class='string'>"
+<span class='keyword'>var</span> h = meta.<span class='function'>compile</span>(<span class='string'>&quot;
     for i in 0, 5 </span><span class='escape'>\{</span><span class='string'>
-        io.println('Bruh!')
+        io.println(&apos;Bruh!&apos;)
     }
 
     return 420
-"</span>)
+&quot;</span>)
 
-<span class='keyword'>assert</span>(h <span class='keyword'>is</span> <span class='string'>"function"</span>)
+<span class='keyword'>assert</span>(h <span class='keyword'>is</span> <span class='string'>&quot;function&quot;</span>)
 io.<span class='function'>println</span>(<span class='function'>h</span>())
 </pre>
 </div>
@@ -4552,7 +4685,8 @@ Bruh!
 </div>
 </section>
 <section id='s142'>
-<h3 class='hl-header'><code><span class='function'>call</span>(fn, ...args)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>call</span>(fn, ...args)</code></h3>
 <p>
 Basically a protected call.
 </p>
@@ -4569,17 +4703,17 @@ Basically a protected call.
 </button>
 <pre class='code active'>
 <span class='keyword'>fn</span> <span class='function'>handle</span>(result) {
-    <span class='keyword'>if</span> result <span class='keyword'>is</span> <span class='string'>"Error"</span> {
-        io.<span class='function'>println</span>(<span class='string'>"ERROR!"</span>)
-        io.<span class='function'>println</span>(<span class='string'>"Row:"</span>, result.<span class='function'>row</span>())
-        io.<span class='function'>println</span>(<span class='string'>"Col:"</span>, result.<span class='function'>col</span>())
-        io.<span class='function'>println</span>(<span class='string'>"Path:"</span>, result.<span class='function'>path</span>())
-        io.<span class='function'>println</span>(<span class='string'>"Line:"</span>, result.<span class='function'>line</span>())
-        io.<span class='function'>println</span>(<span class='string'>"Message:"</span>, result.<span class='function'>message</span>())
-        io.<span class='function'>println</span>(<span class='string'>"Explanation:"</span>, result.<span class='function'>explanation</span>())
-        io.<span class='function'>println</span>(<span class='string'>"Example:"</span>, result.<span class='function'>example</span>())
+    <span class='keyword'>if</span> result <span class='keyword'>is</span> <span class='string'>&quot;Error&quot;</span> {
+        io.<span class='function'>println</span>(<span class='string'>&quot;ERROR!&quot;</span>)
+        io.<span class='function'>println</span>(<span class='string'>&quot;Row:&quot;</span>, result.<span class='function'>row</span>())
+        io.<span class='function'>println</span>(<span class='string'>&quot;Col:&quot;</span>, result.<span class='function'>col</span>())
+        io.<span class='function'>println</span>(<span class='string'>&quot;Path:&quot;</span>, result.<span class='function'>path</span>())
+        io.<span class='function'>println</span>(<span class='string'>&quot;Line:&quot;</span>, result.<span class='function'>line</span>())
+        io.<span class='function'>println</span>(<span class='string'>&quot;Message:&quot;</span>, result.<span class='function'>message</span>())
+        io.<span class='function'>println</span>(<span class='string'>&quot;Explanation:&quot;</span>, result.<span class='function'>explanation</span>())
+        io.<span class='function'>println</span>(<span class='string'>&quot;Example:&quot;</span>, result.<span class='function'>example</span>())
     } <span class='keyword'>else</span> {
-        io.<span class='function'>println</span>(<span class='string'>"OK!"</span>)
+        io.<span class='function'>println</span>(<span class='string'>&quot;OK!&quot;</span>)
         io.<span class='function'>println</span>(result)
     }
 }
@@ -4612,7 +4746,7 @@ ERROR!
 Row: 22
 Col: 27
 Path: demo.bs
-Line: handle(meta.call(fn () -&gt; -nil))
+Line: handle(meta.call(fn () -> -nil))
 Message: invalid operand to unary (-): nil
 Explanation: nil
 Example: nil
@@ -4620,7 +4754,8 @@ Example: nil
 </div>
 </section>
 <section id='s143'>
-<h3 class='hl-header'><code><span class='function'>eval</span>(str)</code></h3>
+<h3 class='hl-header'>
+<code><span class='function'>eval</span>(str)</code></h3>
 <p>
 Evaluate a string.
 </p>
@@ -4636,12 +4771,12 @@ Evaluate a string.
 </svg>
 </button>
 <pre class='code active'>
-io.<span class='function'>println</span>(meta.<span class='function'>eval</span>(<span class='string'>"34 + 35"</span>))
-io.<span class='function'>println</span>(meta.<span class='function'>eval</span>(<span class='string'>"
+io.<span class='function'>println</span>(meta.<span class='function'>eval</span>(<span class='string'>&quot;34 + 35&quot;</span>))
+io.<span class='function'>println</span>(meta.<span class='function'>eval</span>(<span class='string'>&quot;
     for i in 0, 5 </span><span class='escape'>\{</span><span class='string'>
-        io.println('Nice!')
+        io.println(&apos;Nice!&apos;)
     }
-"</span>))
+&quot;</span>))
 </pre>
 </div>
 <div class='codes'>
@@ -4681,7 +4816,7 @@ Errors are thrown as it is.
 </svg>
 </button>
 <pre class='code active'>
-meta.<span class='function'>eval</span>(<span class='string'>"-nil"</span>)
+meta.<span class='function'>eval</span>(<span class='string'>&quot;-nil&quot;</span>)
 </pre>
 </div>
 <div class='codes'>
@@ -4697,7 +4832,7 @@ meta.<span class='function'>eval</span>(<span class='string'>"-nil"</span>)
 </button>
 <pre class='code active'>
 <span class='string'>$ </span>bs demo.bs
-&lt;meta&gt;:1:1: error: invalid operand to unary (-): nil
+<meta>:1:1: error: invalid operand to unary (-): nil
 
     1 | -nil
       | ^
@@ -4714,7 +4849,7 @@ demo.bs:1:10: in eval()
 <nav id='sidebar' class='collapsed'>
 <ul>
 <li>
-<a href='#s0'> I/O</a>
+<a href='#s0'>I/O</a>
 <ul>
 <li>
 <a href='#s1'>input</a>
@@ -4789,18 +4924,18 @@ demo.bs:1:10: in eval()
 </ul>
 </li>
 <li>
-<a href='#s23'> stdin </a>
+<a href='#s23'>stdin</a>
 </li>
 <li>
-<a href='#s24'> stdout </a>
+<a href='#s24'>stdout</a>
 </li>
 <li>
-<a href='#s25'> stderr </a>
+<a href='#s25'>stderr</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s26'> OS</a>
+<a href='#s26'>OS</a>
 <ul>
 <li>
 <a href='#s27'>exit</a>
@@ -4844,13 +4979,13 @@ demo.bs:1:10: in eval()
 </ul>
 </li>
 <li>
-<a href='#s40'> args </a>
+<a href='#s40'>args</a>
 </li>
 <li>
-<a href='#s41'> name </a>
+<a href='#s41'>name</a>
 </li>
 <li>
-<a href='#s42'> arch </a>
+<a href='#s42'>arch</a>
 </li>
 </ul>
 </li>
@@ -4858,7 +4993,7 @@ demo.bs:1:10: in eval()
 <a href='#s43'>Regex</a>
 </li>
 <li>
-<a href='#s44'> String</a>
+<a href='#s44'>String</a>
 <ul>
 <li>
 <a href='#s45'>slice</a>
@@ -4914,7 +5049,7 @@ demo.bs:1:10: in eval()
 </ul>
 </li>
 <li>
-<a href='#s62'> Bit</a>
+<a href='#s62'>Bit</a>
 <ul>
 <li>
 <a href='#s63'>ceil</a>
@@ -4925,7 +5060,7 @@ demo.bs:1:10: in eval()
 </ul>
 </li>
 <li>
-<a href='#s65'> ASCII</a>
+<a href='#s65'>ASCII</a>
 <ul>
 <li>
 <a href='#s66'>char</a>
@@ -4992,7 +5127,7 @@ demo.bs:1:10: in eval()
 </ul>
 </li>
 <li>
-<a href='#s86'> Array</a>
+<a href='#s86'>Array</a>
 <ul>
 <li>
 <a href='#s87'>map</a>
@@ -5039,7 +5174,7 @@ demo.bs:1:10: in eval()
 </ul>
 </li>
 <li>
-<a href='#s101'> Table</a>
+<a href='#s101'>Table</a>
 <ul>
 <li>
 <a href='#s102'>extend</a>
@@ -5047,7 +5182,7 @@ demo.bs:1:10: in eval()
 </ul>
 </li>
 <li>
-<a href='#s103'> Math</a>
+<a href='#s103'>Math</a>
 <ul>
 <li>
 <a href='#s104'>sin</a>
@@ -5130,15 +5265,15 @@ demo.bs:1:10: in eval()
 <a href='#s129'>range</a>
 </li>
 <li>
-<a href='#s130'> E </a>
+<a href='#s130'>E</a>
 </li>
 <li>
-<a href='#s131'> PI </a>
+<a href='#s131'>PI</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s132'> Meta</a>
+<a href='#s132'>Meta</a>
 <ul>
 <li>
 <a href='#s133'>Error</a>
