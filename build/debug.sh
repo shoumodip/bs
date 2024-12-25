@@ -3,7 +3,7 @@
 
 set -xe
 
-CFLAGS="-I./include -I./thirdparty"
+CFLAGS="-I./include -I./thirdparty -ggdb"
 LIBS="-lm"
 
 rm -rf bin lib

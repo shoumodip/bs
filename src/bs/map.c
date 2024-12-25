@@ -153,6 +153,7 @@ static void bs_map_grow(Bs *bs, Bs_Map *m, size_t capacity) {
     bs_map_free(bs, m);
     m->data = entries;
     m->count = count;
+    m->length = count;
     m->capacity = capacity;
 }
 
@@ -163,8 +164,11 @@ bool bs_map_set(Bs *bs, Bs_Map *m, Bs_Value key, Bs_Value value) {
     Bs_Entry *entry = bs_entries_find(m->data, m->capacity, key);
 
     bool is_new = entry->key.type == BS_VALUE_NIL;
-    if (is_new && entry->value.type == BS_VALUE_NIL) {
-        m->count++;
+    if (is_new) {
+        if (entry->value.type == BS_VALUE_NIL) {
+            m->count++;
+        }
+
         m->length++;
     }
 
