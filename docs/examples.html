@@ -61,14 +61,14 @@ os.<span class='function'>exit</span>(code)
 </svg>
 </button>
 <pre class='code active'>
-<span class='string'>$ </span>bs cat.bs cat.bs <span class='comment'># Poor man's quine</span>
+<span class='string'>$ </span>bs cat.bs cat.bs <span class='comment'># Poor man&apos;s quine</span>
 var code = 0
 
 for i in 1, len(os.args) {
     var path = os.args[i]
     var contents = io.readfile(path)
     if !contents {
-        io.eprintln("Error: could not read file '{path}'")
+        io.eprintln(&quot;Error: could not read file &apos;{path}&apos;&quot;)
         code = 1
         continue
     }
@@ -215,35 +215,35 @@ os.<span class='function'>exit</span>(code)
 </svg>
 </button>
 <pre class='code active'>
-<span class='string'>$ </span>bs grep.bs '\.[A-z]+\(' grep.bs
+<span class='string'>$ </span>bs grep.bs &apos;\.[A-z]+\(&apos; grep.bs
 grep.bs:3:13:     while !f.eof() {
 grep.bs:4:21:         var line = f.readln()
 grep.bs:6:23:         var col = line.find(pattern)
-grep.bs:8:15:             io.println("{path}:{row + 1}:{col + 1}: {line}")
-grep.bs:16:7:     io.eprintln("Usage: {os.args[0]} <pattern> [file...]")
-grep.bs:17:7:     io.eprintln("Error: pattern not provided")
+grep.bs:8:15:             io.println(&quot;{path}:{row + 1}:{col + 1}: {line}&quot;)
+grep.bs:16:7:     io.eprintln(&quot;Usage: {os.args[0]} &lt;pattern&gt; [file...]&quot;)
+grep.bs:17:7:     io.eprintln(&quot;Error: pattern not provided&quot;)
 grep.bs:18:7:     os.exit(1)
-grep.bs:23:7:     io.eprintln("Error: invalid pattern")
+grep.bs:23:7:     io.eprintln(&quot;Error: invalid pattern&quot;)
 grep.bs:24:7:     os.exit(1)
 grep.bs:36:15:     var f = io.Reader(path)
-grep.bs:38:11:         io.println("Error: could not open file '{path}'")
+grep.bs:38:11:         io.println(&quot;Error: could not open file &apos;{path}&apos;&quot;)
 grep.bs:44:6:     f.close()
 grep.bs:47:3: os.exit(code)
 
-<span class='string'>$ </span>cat grep.bs | bs grep.bs '\.[A-z]+\(' <span class='comment'># DON'T CAT INTO GREP!!!</span>
-<stdin>:3:13:     while !f.eof() {
-<stdin>:4:21:         var line = f.readln()
-<stdin>:6:23:         var col = line.find(pattern)
-<stdin>:8:15:             io.println("{path}:{row + 1}:{col + 1}: {line}")
-<stdin>:16:7:     io.eprintln("Usage: {os.args[0]} <pattern> [file...]")
-<stdin>:17:7:     io.eprintln("Error: pattern not provided")
-<stdin>:18:7:     os.exit(1)
-<stdin>:23:7:     io.eprintln("Error: invalid pattern")
-<stdin>:24:7:     os.exit(1)
-<stdin>:36:15:     var f = io.Reader(path)
-<stdin>:38:11:         io.println("Error: could not open file '{path}'")
-<stdin>:44:6:     f.close()
-<stdin>:47:3: os.exit(code)
+<span class='string'>$ </span>cat grep.bs | bs grep.bs &apos;\.[A-z]+\(&apos; <span class='comment'># DON&apos;T CAT INTO GREP!!!</span>
+&lt;stdin&gt;:3:13:     while !f.eof() {
+&lt;stdin&gt;:4:21:         var line = f.readln()
+&lt;stdin&gt;:6:23:         var col = line.find(pattern)
+&lt;stdin&gt;:8:15:             io.println(&quot;{path}:{row + 1}:{col + 1}: {line}&quot;)
+&lt;stdin&gt;:16:7:     io.eprintln(&quot;Usage: {os.args[0]} &lt;pattern&gt; [file...]&quot;)
+&lt;stdin&gt;:17:7:     io.eprintln(&quot;Error: pattern not provided&quot;)
+&lt;stdin&gt;:18:7:     os.exit(1)
+&lt;stdin&gt;:23:7:     io.eprintln(&quot;Error: invalid pattern&quot;)
+&lt;stdin&gt;:24:7:     os.exit(1)
+&lt;stdin&gt;:36:15:     var f = io.Reader(path)
+&lt;stdin&gt;:38:11:         io.println(&quot;Error: could not open file &apos;{path}&apos;&quot;)
+&lt;stdin&gt;:44:6:     f.close()
+&lt;stdin&gt;:47:3: os.exit(code)
 </pre>
 </div>
 </section>
@@ -1198,13 +1198,13 @@ Run the program.
 </svg>
 </button>
 <pre class='code active'>
-<span class='string'>$ </span>bs tasks.bs add "Finish reading book"
+<span class='string'>$ </span>bs tasks.bs add &quot;Finish reading book&quot;
 Added: Finish reading book
 
-<span class='string'>$ </span>bs tasks.bs add "Submit project report"
+<span class='string'>$ </span>bs tasks.bs add &quot;Submit project report&quot;
 Added: Submit project report
 
-<span class='string'>$ </span>bs tasks.bs add "Submit homework"
+<span class='string'>$ </span>bs tasks.bs add &quot;Submit homework&quot;
 Added: Submit homework
 
 <span class='string'>$ </span>bs tasks.bs list
@@ -1212,7 +1212,7 @@ Added: Submit homework
 [1] Submit project report
 [2] Submit homework
 
-<span class='string'>$ </span>bs tasks.bs list 'Submit.*report'
+<span class='string'>$ </span>bs tasks.bs list &apos;Submit.*report&apos;
 [1] Submit project report
 
 <span class='string'>$ </span>bs tasks.bs done 0

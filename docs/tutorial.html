@@ -1852,14 +1852,14 @@ Here&apos;s a pitfall you might run into
 </button>
 <pre class='code active'>
 <span class='string'>$ </span>bs variables.bs
-variables.bs:2:16: error: undefined identifier 'x'
+variables.bs:2:16: error: undefined identifier &apos;x&apos;
 
-    2 |     io.println(x) # Refers to the variable 'x'
+    2 |     io.println(x) # Refers to the variable &apos;x&apos;
       |                ^
 
 variables.bs:7:2: in f()
 
-    7 | f()               # "Should" print 69
+    7 | f()               # &quot;Should&quot; print 69
       |  ^
 </pre>
 </div>
@@ -2030,7 +2030,7 @@ io.<span class='function'>println</span>(<span class='keyword'>import</span>(<sp
 </button>
 <pre class='code active'>
 <span class='string'>$ </span>bs main.bs
-Loading module 'one'
+Loading module &apos;one&apos;
 69
 420
 </pre>
@@ -2113,7 +2113,7 @@ But if the module <code>one</code> is executed directly...
 </button>
 <pre class='code active'>
 <span class='string'>$ </span>bs one.bs
-Loading module 'one'
+Loading module &apos;one&apos;
 </pre>
 </div>
 </section>
@@ -2268,10 +2268,10 @@ more applicable, albeit involved, example.
 </button>
 <pre class='code active'>
 <span class='string'>$ </span>bs oop.bs
-Enter hero's name> Luffy
-Enter enemy's name> Magellan
+Enter hero&apos;s name&gt; Luffy
+Enter enemy&apos;s name&gt; Magellan
 
-Enter Luffy's choice (A: attack, D: defend)> a
+Enter Luffy&apos;s choice (A: attack, D: defend)&gt; a
 Luffy attacks Magellan for 10 damage!
 Magellan has 15 health remaining.
 Magellan poisons Luffy!
@@ -2281,7 +2281,7 @@ Luffy has been poisoned! skipping turn.
 Magellan attacks Luffy for 8 damage!
 Luffy has 14 health remaining.
 
-Enter Luffy's choice (A: attack, D: defend)> a
+Enter Luffy&apos;s choice (A: attack, D: defend)&gt; a
 Luffy attacks Magellan for 10 damage!
 Magellan has 5 health remaining.
 Magellan poisons Luffy!
@@ -2440,9 +2440,9 @@ io.<span class='function'>println</span>(Lol)
 <pre class='code active'>
 <span class='string'>$ </span>bs oop.bs
 class Lol {
-    baz = <fn>,
-    bar = <fn>,
-    foo = <fn>
+    baz = &lt;fn&gt;,
+    bar = &lt;fn&gt;,
+    foo = &lt;fn&gt;
 }
 </pre>
 </div>

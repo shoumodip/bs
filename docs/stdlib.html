@@ -54,7 +54,7 @@ io.<span class='function'>println</span>(<span class='string'>&quot;Hello, </spa
 </button>
 <pre class='code active'>
 <span class='string'>$ </span>bs demo.bs
-Enter your name> Batman
+Enter your name&gt; Batman
 Hello, Batman!
 </pre>
 </div>
@@ -234,7 +234,7 @@ Nothing to see here
 Foo
 Bar
 Baz
-People's dreams have no end! ~ Blackbeard
+People&apos;s dreams have no end! ~ Blackbeard
 </pre>
 </div>
 </section>
@@ -294,7 +294,7 @@ Nothing to see here
 Foo
 Bar
 Baz
-People's dreams have no end! ~ Blackbeard
+People&apos;s dreams have no end! ~ Blackbeard
 </pre>
 </div>
 <section id='s9'>
@@ -359,7 +359,7 @@ Nothing to see here
 Foo
 Bar
 Baz
-People's dreams have no end! ~ Blackbeard
+People&apos;s dreams have no end! ~ Blackbeard
 </pre>
 </div>
 </section>
@@ -411,7 +411,7 @@ Line: Nothing to see here
 Line: Foo
 Line: Bar
 Line: Baz
-Line: People's dreams have no end! ~ Blackbeard
+Line: People&apos;s dreams have no end! ~ Blackbeard
 Line:
 </pre>
 </div>
@@ -489,7 +489,7 @@ Nothing to see here
 Foo
 Bar
 Baz
-People's dreams have no end! ~ Blackbeard
+People&apos;s dreams have no end! ~ Blackbeard
 </pre>
 </div>
 </section>
@@ -604,7 +604,7 @@ f.<span class='function'>writeln</span>(<span class='constant'>69</span>, <span 
 </button>
 <pre class='code active'>
 <span class='string'>$ </span>bs demo.bs
-<span class='string'>$ </span>cat output.txt <span class='comment'># `type output.txt` on windows</span>
+<span class='string'>$ </span>cat output.txt <span class='comment'># <code>type output.txt</code> on windows</span>
 Hello there!
 General Kenobi!
 69 Nice!
@@ -793,7 +793,7 @@ os.<span class='function'>exit</span>(<span class='constant'>69</span>)
 </button>
 <pre class='code active'>
 <span class='string'>$ </span>bs demo.bs
-<span class='string'>$ </span>echo $? <span class='comment'># `echo %errorlevel%` on windows</span>
+<span class='string'>$ </span>echo $? <span class='comment'># <code>echo %errorlevel%</code> on windows</span>
 69
 </pre>
 </div>
@@ -932,7 +932,7 @@ io.<span class='function'>println</span>(os.<span class='function'>getenv</span>
 </svg>
 </button>
 <pre class='code active'>
-<span class='string'>$ </span>export FOO=lmao <span class='comment'># `set FOO=lmao` on windows</span>
+<span class='string'>$ </span>export FOO=lmao <span class='comment'># <code>set FOO=lmao</code> on windows</span>
 <span class='string'>$ </span>bs demo.bs
 lmao
 nil
@@ -1295,7 +1295,7 @@ io.<span class='function'>println</span>(os.<span class='field'>args</span>)
 </button>
 <pre class='code active'>
 <span class='string'>$ </span>bs demo.bs foo bar baz
-["demo.bs", "foo", "bar", "baz"]
+[&quot;demo.bs&quot;, &quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;]
 </pre>
 </div>
 </section>
@@ -1429,7 +1429,7 @@ io.<span class='function'>println</span>(<span class='string'>&quot;69 apples, 4
 </button>
 <pre class='code active'>
 <span class='string'>$ </span>bs demo.bs
-{fruit: 'apples', count: 69}, {fruit: 'oranges', count: 420}
+{fruit: &apos;apples&apos;, count: 69}, {fruit: &apos;oranges&apos;, count: 420}
 </pre>
 </div>
 </section>
@@ -1777,12 +1777,12 @@ io.<span class='function'>println</span>(<span class='string'>&quot;foo bar   ba
 </button>
 <pre class='code active'>
 <span class='string'>$ </span>bs demo.bs
-["foo bar baz"]
-["foo", "bar", "baz"]
-["foo bar baz"]
-["foobar"]
-["foo", "bar"]
-["foo", "bar", "baz"]
+[&quot;foo bar baz&quot;]
+[&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;]
+[&quot;foo bar baz&quot;]
+[&quot;foobar&quot;]
+[&quot;foo&quot;, &quot;bar&quot;]
+[&quot;foo&quot;, &quot;bar&quot;, &quot;baz&quot;]
 </pre>
 </div>
 </section>
@@ -2949,7 +2949,7 @@ io.<span class='function'>println</span>([<span class='constant'>1</span>, <span
 </button>
 <pre class='code active'>
 <span class='string'>$ </span>bs demo.bs
-1 -> 2 -> 3 -> 4 -> 5
+1 -&gt; 2 -&gt; 3 -&gt; 4 -&gt; 5
 </pre>
 </div>
 </section>
@@ -3119,7 +3119,7 @@ io.<span class='function'>println</span>(
 </button>
 <pre class='code active'>
 <span class='string'>$ </span>bs demo.bs
-["Nice!", 69, 420]
+[&quot;Nice!&quot;, 69, 420]
 </pre>
 </div>
 </section>
@@ -3210,7 +3210,7 @@ io.<span class='function'>println</span>(
 </button>
 <pre class='code active'>
 <span class='string'>$ </span>bs demo.bs
-[69, 420, "Nice!"]
+[69, 420, &quot;Nice!&quot;]
 </pre>
 </div>
 </section>
@@ -3477,7 +3477,7 @@ io.<span class='function'>println</span>(xs)
 </button>
 <pre class='code active'>
 <span class='string'>$ </span>bs demo.bs
-["foo", "foo", "foo", "foo", "foo"]
+[&quot;foo&quot;, &quot;foo&quot;, &quot;foo&quot;, &quot;foo&quot;, &quot;foo&quot;]
 </pre>
 </div>
 <p>
@@ -4256,7 +4256,7 @@ io.<span class='function'>println</span>(seq.<span class='function'>slice</span>
 <pre class='code active'>
 <span class='string'>$ </span>bs demo.bs
 {03ah
-"7f
+&quot;7f
 </pre>
 </div>
 </section>
@@ -4417,9 +4417,9 @@ Example usecase:
 <span class='string'>$ </span>bs demo.bs
 Row: 1
 Col: 5
-Path: <meta>
+Path: &lt;meta&gt;
 Line: Oops@
-Message: invalid character '@' (64)
+Message: invalid character &apos;@&apos; (64)
 Explanation: nil
 Example: nil
 </pre>
@@ -4572,9 +4572,9 @@ io.<span class='function'>println</span>(<span class='string'>&quot;Example:&quo
 <span class='string'>$ </span>bs demo.bs
 Row: 1
 Col: 5
-Path: <meta>
+Path: &lt;meta&gt;
 Line: Oops@
-Message: invalid character '@' (64)
+Message: invalid character &apos;@&apos; (64)
 Explanation: nil
 Example: nil
 </pre>
@@ -4746,7 +4746,7 @@ ERROR!
 Row: 22
 Col: 27
 Path: demo.bs
-Line: handle(meta.call(fn () -> -nil))
+Line: handle(meta.call(fn () -&gt; -nil))
 Message: invalid operand to unary (-): nil
 Explanation: nil
 Example: nil
@@ -4832,14 +4832,14 @@ meta.<span class='function'>eval</span>(<span class='string'>&quot;-nil&quot;</s
 </button>
 <pre class='code active'>
 <span class='string'>$ </span>bs demo.bs
-<meta>:1:1: error: invalid operand to unary (-): nil
+&lt;meta&gt;:1:1: error: invalid operand to unary (-): nil
 
     1 | -nil
       | ^
 
 demo.bs:1:10: in eval()
 
-    1 | meta.eval("-nil")
+    1 | meta.eval(&quot;-nil&quot;)
       |          ^
 </pre>
 </div>

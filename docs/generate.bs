@@ -518,13 +518,13 @@ fn generate(path) {
 
                                 var comment = line.find("#")
                                 if comment {
-                                    f.write(line.slice(2, comment))
-                                    f.write("<span class='comment'>{line.slice(comment)}</span>")
+                                    f.write(escape(line.slice(2, comment)))
+                                    f.write("<span class='comment'>{escape(line.slice(comment))}</span>")
                                 } else {
-                                    f.write(line.slice(2))
+                                    f.write(escape(line.slice(2)))
                                 }
                             } else {
-                                f.write(line)
+                                f.write(escape(line))
                             }
 
                             f.writeln()
