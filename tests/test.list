@@ -141,3 +141,4 @@
 ../bin/bs functions/spread.bs
 ../bin/bs match/if.bs
 ../bin/bs conditions/match.bs
+../bin/bs strings/quoted_print.bs

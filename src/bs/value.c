@@ -199,18 +199,61 @@ void bs_pretty_printer_map(Bs_Pretty_Printer *p, const Bs_Map *map) {
 }
 
 void bs_pretty_printer_quote(Bs_Pretty_Printer *p, Bs_Sv sv) {
-    bs_fmt(p->writer, "\"");
-    while (sv.size) {
-        size_t index;
-        if (bs_sv_find(sv, '"', &index)) {
-            p->writer->write(p->writer, bs_sv_drop(&sv, index));
-            p->writer->write(p->writer, Bs_Sv_Static("\\\""));
-            bs_sv_drop(&sv, 1);
-        } else {
-            p->writer->write(p->writer, bs_sv_drop(&sv, sv.size));
+    p->writer->write(p->writer, Bs_Sv_Static("\""));
+
+    size_t a = 0;
+    size_t b = 0;
+    while (b < sv.size) {
+
+#define FLUSH(s)                                                                                   \
+    do {                                                                                           \
+        if (b - a) p->writer->write(p->writer, Bs_Sv(sv.data + a, b - a));                         \
+        p->writer->write(p->writer, Bs_Sv_Static(s));                                              \
+        a = b + 1;                                                                                 \
+    } while (0)
+
+        const char c = sv.data[b];
+        switch (c) {
+        case '\e':
+            FLUSH("\\e");
+            break;
+
+        case '\n':
+            FLUSH("\\n");
+            break;
+
+        case '\r':
+            FLUSH("\\r");
+            break;
+
+        case '\t':
+            FLUSH("\\t");
+            break;
+
+        case '\0':
+            FLUSH("\\0");
+            break;
+
+        case '"':
+            FLUSH("\\\"");
+            break;
+
+        case '\\':
+            FLUSH("\\\\");
+            break;
+
+        case '{':
+            FLUSH("\\{");
+            break;
         }
+
+#undef FLUSH
+
+        b++;
     }
-    bs_fmt(p->writer, "\"");
+
+    if (b - a) p->writer->write(p->writer, Bs_Sv(sv.data + a, b - a));
+    p->writer->write(p->writer, Bs_Sv_Static("\""));
 }
 
 static_assert(BS_COUNT_OBJECTS == 13, "Update bs_object_write()");
