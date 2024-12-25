@@ -65,6 +65,8 @@ struct Bs_Fn {
 
     // In case the function was compiled at runtime using meta.compile() or meta.eval()
     Bs_Str *source;
+
+    size_t compiled_in_module;
 };
 
 Bs_Fn *bs_fn_new(Bs *bs);

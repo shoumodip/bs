@@ -142,3 +142,4 @@
 ../bin/bs match/if.bs
 ../bin/bs conditions/match.bs
 ../bin/bs strings/quoted_print.bs
+../bin/bs import/from_file_dirname.bs

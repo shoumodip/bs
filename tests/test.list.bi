@@ -1,4 +1,4 @@
-:i count 144
+:i count 145
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -2278,6 +2278,18 @@ delete/array_out_of_range_index.bs:1:12: error: cannot delete item at index 1 fr
 :i returncode 0
 :b stdout 30
 ["Hello \e\n\r\t\0\"''\\\{}"]
+
+:b stderr 0
+
+:b shell 37
+../bin/bs import/from_file_dirname.bs
+:i returncode 0
+:b stdout 60
+Module 'arith'
+Module 'arith/add'
+Module 'arith/sub'
+69
+420
 
 :b stderr 0
 

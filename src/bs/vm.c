@@ -690,11 +690,14 @@ Bs_Sv bs_buffer_reset(Bs_Buffer *b, size_t pos) {
     return sv;
 }
 
-Bs_Sv bs_buffer_absolute_path(Bs_Buffer *b, Bs_Sv path) {
-    const size_t start = b->count;
+Bs_Sv bs_buffer_absolute_path(Bs_Buffer *b, Bs_Sv path, Bs_Sv cwd) {
+    if (!cwd.size) {
+        cwd = Bs_Sv(b->bs->config.cwd->data, b->bs->config.cwd->size);
+    }
 
+    const size_t start = b->count;
     if (path.size && !bs_issep(*path.data)) {
-        bs_da_push_many(b->bs, b, b->bs->config.cwd->data, b->bs->config.cwd->size);
+        bs_da_push_many(b->bs, b, cwd.data, cwd.size);
         if (b->count != start + 1) {
             bs_da_push(b->bs, b, '/');
         }
@@ -752,18 +755,20 @@ Bs_Sv bs_buffer_absolute_path(Bs_Buffer *b, Bs_Sv path) {
     return (Bs_Sv){b->data + start, b->count - start};
 }
 
-Bs_Sv bs_buffer_relative_path(Bs_Buffer *b, Bs_Sv path) {
-    const size_t start = b->count;
+Bs_Sv bs_buffer_relative_path(Bs_Buffer *b, Bs_Sv path, Bs_Sv cwd) {
+    if (!cwd.size) {
+        cwd = Bs_Sv(b->bs->config.cwd->data, b->bs->config.cwd->size);
+    }
 
-    const Bs_Str *cwd = b->bs->config.cwd;
-    const size_t max = bs_min(path.size, cwd->size);
+    const size_t start = b->count;
+    const size_t max = bs_min(path.size, cwd.size);
 
     size_t i = 0;
-    if (!bs_sv_eq(Bs_Sv(cwd->data, cwd->size), Bs_Sv_Static("/"))) {
+    if (!bs_sv_eq(Bs_Sv(cwd.data, cwd.size), Bs_Sv_Static("/"))) {
         while (i < max) {
-            if (path.data[i] != cwd->data[i]) {
+            if (path.data[i] != cwd.data[i]) {
                 // More video game OS shenanigans
-                if (!bs_issep(path.data[i]) || !bs_issep(cwd->data[i])) {
+                if (!bs_issep(path.data[i]) || !bs_issep(cwd.data[i])) {
                     break;
                 }
             }
@@ -771,10 +776,10 @@ Bs_Sv bs_buffer_relative_path(Bs_Buffer *b, Bs_Sv path) {
             i++;
         }
 
-        if (i != cwd->size || !bs_issep(path.data[i])) {
+        if (i != cwd.size || !bs_issep(path.data[i])) {
             bs_da_push_many(b->bs, b, "../", 3);
-            for (size_t j = i; j < cwd->size; j++) {
-                if (bs_issep(cwd->data[j])) {
+            for (size_t j = i; j < cwd.size; j++) {
+                if (bs_issep(cwd.data[j])) {
                     bs_da_push_many(b->bs, b, "../", 3);
                 }
             }
@@ -1502,20 +1507,19 @@ const Bs_Closure *bs_compile_module(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_mai
     }
 
     // Do not use the paramater 'path' directly as the same buffer is being written into
-    const Bs_Sv relative =
-        bs_buffer_relative_path(&bs->paths, Bs_Sv(module.name->data, module.name->size));
+    const Bs_Sv relative = bs_buffer_relative_path(
+        &bs->paths, Bs_Sv(module.name->data, module.name->size), (Bs_Sv){0});
 
-    Bs_Closure *closure = bs_compile(bs, relative, input, is_main, is_repl, false);
+    Bs_Closure *closure = bs_compile(
+        bs, relative, input, is_main, is_repl, false, is_repl ? 1 : bs->modules.count + 1);
     if (!closure) {
         return NULL;
     }
 
     if (is_repl) {
         bs->modules.data[0] = module;
-        closure->fn->module = 1;
     } else {
         bs_modules_push(bs, &bs->modules, module);
-        closure->fn->module = bs->modules.count;
     }
     return closure;
 }
@@ -1528,40 +1532,26 @@ static bool bs_import_language(Bs *bs, Bs_Sv path) {
     }
 
     path.size--;
-    const Bs_Closure *fn = bs_compile_module(bs, path, Bs_Sv(contents, size), false, false);
+    const Bs_Closure *closure = bs_compile_module(bs, path, Bs_Sv(contents, size), false, false);
 
-    if (!fn) {
+    if (!closure) {
         bs_unwind(bs, 1);
     }
 
 #ifdef BS_STEP_DEBUG
-    bs_debug_chunk(bs_pretty_printer(bs, &bs->config.log), &fn->fn->chunk);
+    bs_debug_chunk(bs_pretty_printer(bs, &bs->config.log), &closure->fn->chunk);
 #endif // BS_STEP_DEBUG
 
-    bs_stack_push(bs, bs_value_object(fn));
+    bs_stack_push(bs, bs_value_object(closure));
     bs_call_stack_top(bs, 0);
     return true;
 }
 
-static void bs_import(Bs *bs) {
-    const bool gc_on_save = bs->gc_on;
-    bs->gc_on = false;
-
-    const bool handles_on_save = bs->handles_on;
-    bs->handles_on = false;
-
-    const Bs_Value a = bs_stack_pop(bs);
-    bs_check_object_type(bs, a, BS_OBJECT_STR, "module name");
-
-    const Bs_Str *path = (const Bs_Str *)a.as.object;
-    if (!path->size) {
-        bs_error(bs, "module name cannot be empty");
-    }
-
+static bool bs_import_try(Bs *bs, const Bs_Str *path, Bs_Sv cwd) {
     Bs_Buffer *b = &bs->paths;
 
     const size_t start = b->count;
-    const Bs_Sv resolved = bs_buffer_absolute_path(b, Bs_Sv(path->data, path->size));
+    const Bs_Sv resolved = bs_buffer_absolute_path(b, Bs_Sv(path->data, path->size), cwd);
 
     size_t index;
     if (bs_modules_find(&bs->modules, resolved, &index)) {
@@ -1571,14 +1561,14 @@ static void bs_import(Bs *bs) {
         }
 
         bs_stack_push(bs, m->result);
-        goto defer;
+        return true;
     }
 
     // BS
     {
         bs_da_push_many(bs, b, ".bs", 4);
         if (bs_import_language(bs, bs_buffer_reset(b, start))) {
-            goto defer;
+            return true;
         }
         b->count = start + resolved.size;
     }
@@ -1587,26 +1577,19 @@ static void bs_import(Bs *bs) {
     {
 #if defined(_WIN32) || defined(_WIN64)
         bs_da_push_many(bs, b, ".dll", 5);
-
         Bs_C_Lib_Handle handle = LoadLibrary(b->data + start);
-        if (!handle) {
-            bs_error(bs, "could not import module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*path));
-        }
 #elif defined(__APPLE__) || defined(__MACH__)
         bs_da_push_many(bs, b, ".dylib", 7);
-
         Bs_C_Lib_Handle handle = dlopen(b->data + start, RTLD_LAZY);
-        if (!handle) {
-            bs_error(bs, "could not import module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*path));
-        }
 #else
         bs_da_push_many(bs, b, ".so", 4);
-
         Bs_C_Lib_Handle handle = dlopen(b->data + start, RTLD_LAZY);
-        if (!handle) {
-            bs_error(bs, "could not import module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*path));
-        }
 #endif
+
+        if (!handle) {
+            b->count = start;
+            return false;
+        }
 
         Bs_C_Lib *library = bs_c_lib_new(bs, handle);
 
@@ -1655,9 +1638,7 @@ static void bs_import(Bs *bs) {
         bs_stack_push(bs, module.result);
     }
 
-defer:
-    bs->gc_on = gc_on_save;
-    bs->handles_on = handles_on_save;
+    return true;
 }
 
 static void bs_check_index_valid_type(Bs *bs, size_t location, Bs_Value index, const char *label) {
@@ -2555,9 +2536,50 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             }
         } break;
 
-        case BS_OP_IMPORT:
-            bs_import(bs);
-            break;
+        case BS_OP_IMPORT: {
+            const bool gc_on_save = bs->gc_on;
+            bs->gc_on = false;
+
+            const bool handles_on_save = bs->handles_on;
+            bs->handles_on = false;
+
+            const Bs_Value a = bs_stack_pop(bs);
+            bs_check_object_type(bs, a, BS_OBJECT_STR, "module name");
+
+            const Bs_Str *path = (const Bs_Str *)a.as.object;
+            if (!path->size) {
+                bs_error(bs, "module name cannot be empty");
+            }
+
+            bool ok = bs_import_try(bs, path, (Bs_Sv){0});
+            if (!ok) {
+                const size_t module = bs->frame->closure->fn->compiled_in_module;
+                if (module) {
+                    const Bs_Module *m = &bs->modules.data[module - 1];
+
+                    Bs_Sv cwd = Bs_Sv(m->name->data, m->name->size);
+                    bool found = false;
+                    for (size_t i = cwd.size; i > 0; i--) {
+                        if (bs_issep(cwd.data[i - 1])) {
+                            found = true;
+                            cwd.size = bs_max(i - 1, 1);
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        ok = bs_import_try(bs, path, cwd);
+                    }
+                }
+            }
+
+            if (!ok) {
+                bs_error(bs, "could not import module '" Bs_Sv_Fmt "'", Bs_Sv_Arg(*path));
+            }
+
+            bs->gc_on = gc_on_save;
+            bs->handles_on = handles_on_save;
+        } break;
 
         case BS_OP_TYPEOF: {
             const Bs_Sv name = bs_value_type_name_full(bs_stack_peek(bs, 0));
@@ -2935,31 +2957,31 @@ Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_repl) {
     Bs_Buffer *b = &bs->paths;
     const size_t start = b->count;
 
-    bs_buffer_absolute_path(b, path);
+    bs_buffer_absolute_path(b, path, (Bs_Sv){0});
 
-    const Bs_Closure *fn;
+    const Bs_Closure *closure;
     if (is_repl) {
         Bs_Str *source = bs_str_new(bs, input);
 
-        fn = bs_compile_module(
+        closure = bs_compile_module(
             bs, bs_buffer_reset(b, start), Bs_Sv(source->data, source->size), true, is_repl);
 
-        if (fn) {
-            fn->fn->source = source;
+        if (closure) {
+            closure->fn->source = source;
         }
     } else {
-        fn = bs_compile_module(bs, bs_buffer_reset(b, start), input, true, is_repl);
+        closure = bs_compile_module(bs, bs_buffer_reset(b, start), input, true, is_repl);
     }
 
-    if (!fn) {
+    if (!closure) {
         return (Bs_Result){.exit = 1};
     }
 
 #ifdef BS_STEP_DEBUG
-    bs_debug_chunk(bs_pretty_printer(bs, &bs->config.log), &fn->fn->chunk);
+    bs_debug_chunk(bs_pretty_printer(bs, &bs->config.log), &closure->fn->chunk);
 #endif // BS_STEP_DEBUG
 
-    result.value = bs_call(bs, bs_value_object(fn), NULL, 0);
+    result.value = bs_call(bs, bs_value_object(closure), NULL, 0);
 
 end:
     bs->stack.count = 0;

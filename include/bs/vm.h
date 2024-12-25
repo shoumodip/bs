@@ -43,8 +43,8 @@ typedef struct {
 Bs_Writer bs_buffer_writer(Bs_Buffer *buffer);
 
 Bs_Sv bs_buffer_reset(Bs_Buffer *buffer, size_t pos);
-Bs_Sv bs_buffer_absolute_path(Bs_Buffer *buffer, Bs_Sv path);
-Bs_Sv bs_buffer_relative_path(Bs_Buffer *buffer, Bs_Sv path);
+Bs_Sv bs_buffer_absolute_path(Bs_Buffer *buffer, Bs_Sv path, Bs_Sv cwd);
+Bs_Sv bs_buffer_relative_path(Bs_Buffer *buffer, Bs_Sv path, Bs_Sv cwd);
 
 // Config
 typedef struct {

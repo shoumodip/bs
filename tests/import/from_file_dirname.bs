@@ -1,0 +1,2 @@
+io.println(import("arith/arith").add(34, 35))
+io.println(import("arith/arith").sub(500, 80))

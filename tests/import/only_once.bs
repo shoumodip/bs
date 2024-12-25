@@ -1,2 +1,2 @@
-import("import/common")
-import("import/common")
+import("common")
+import("common")

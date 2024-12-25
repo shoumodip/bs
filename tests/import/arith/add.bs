@@ -1,0 +1,3 @@
+io.println("Module 'arith/add'")
+
+return fn (x, y) -> x + y

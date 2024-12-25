@@ -256,6 +256,8 @@ typedef struct {
     Bs_Jumps matches;
     Bs_Op_Locs locations;
 
+    size_t module;
+
     bool is_main;
     bool last_stmt_was_expr;
 
@@ -1121,6 +1123,7 @@ static void bs_compile_lambda_init(Bs_Compiler *c, Bs_Lambda *lambda, Bs_Sv name
     }
 
     c->chunk = &c->lambda->fn->chunk;
+    c->lambda->fn->compiled_in_module = c->module;
 
     if (lambda->type == BS_LAMBDA_FN) {
         bs_lambda_push(c->bs, lambda, (Bs_Local){0});
@@ -1664,10 +1667,12 @@ static void bs_compile_stmt(Bs_Compiler *c) {
     bs_compile_consume_eol(c);
 }
 
-Bs_Closure *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl, bool is_meta) {
+Bs_Closure *bs_compile(
+    Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_repl, bool is_meta, size_t module) {
     Bs_Compiler compiler = {
         .bs = bs,
         .is_main = is_main,
+        .module = module,
     };
 
     Bs_Lambda *lambda = bs_lambda_new(BS_LAMBDA_FN, is_repl, is_meta);
@@ -1713,6 +1718,7 @@ Bs_Closure *bs_compile(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_main, bool is_re
     }
 
     Bs_Fn *fn = bs_compile_lambda_end(&compiler);
+    fn->module = module;
     bs_lambda_free(compiler.bs, lambda);
     bs_jumps_free(compiler.bs, &compiler.jumps);
     bs_jumps_free(compiler.bs, &compiler.matches);

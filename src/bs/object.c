@@ -41,6 +41,7 @@ Bs_Fn *bs_fn_new(Bs *bs) {
     fn->upvalues = 0;
 
     fn->source = NULL;
+    fn->compiled_in_module = 0;
     return fn;
 }
 

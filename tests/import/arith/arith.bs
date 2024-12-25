@@ -1,0 +1,6 @@
+io.println("Module 'arith'")
+
+return {
+    add = import("add"),
+    sub = import("sub"),
+}

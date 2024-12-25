@@ -2538,7 +2538,9 @@ static Bs_Value bs_meta_compile(Bs *bs, Bs_Value *args, size_t arity) {
         .write = bs_meta_error_write,
     };
 
-    const Bs_Closure *closure = bs_compile(bs, Bs_Sv_Static("<meta>"), input, false, false, true);
+    const Bs_Closure *closure =
+        bs_compile(bs, Bs_Sv_Static("<meta>"), input, false, false, true, 0);
+
     config->error = save;
 
     if (!closure) {
@@ -2588,7 +2590,9 @@ static Bs_Value bs_meta_eval(Bs *bs, Bs_Value *args, size_t arity) {
     Bs_Str *str = (Bs_Str *)args[0].as.object;
     const Bs_Sv input = Bs_Sv(str->data, str->size);
 
-    const Bs_Closure *closure = bs_compile(bs, Bs_Sv_Static("<meta>"), input, false, false, true);
+    const Bs_Closure *closure =
+        bs_compile(bs, Bs_Sv_Static("<meta>"), input, false, false, true, 0);
+
     if (!closure) {
         Bs_Error error = bs_error_begin(bs);
         error.type = BS_ERROR_TRACE;
