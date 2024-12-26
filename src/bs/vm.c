@@ -55,6 +55,10 @@ typedef struct {
     Bs_Str *name;
     size_t length;
 
+    // A view into the `name` field that stores the parent directory of the module. Zero
+    // initialized if parent not found
+    Bs_Sv parent_dir;
+
     const char *source;
 } Bs_Module;
 
@@ -1519,6 +1523,15 @@ const Bs_Closure *bs_compile_module(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_mai
     if (is_repl) {
         bs->modules.data[0] = module;
     } else {
+        Bs_Sv dir = Bs_Sv(module.name->data, module.name->size);
+        for (size_t i = dir.size; i > 0; i--) {
+            if (bs_issep(dir.data[i - 1])) {
+                dir.size = bs_max(i - 1, 1);
+                module.parent_dir = dir;
+                break;
+            }
+        }
+
         bs_modules_push(bs, &bs->modules, module);
     }
     return closure;
@@ -2551,26 +2564,17 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 bs_error(bs, "module name cannot be empty");
             }
 
-            bool ok = bs_import_try(bs, path, (Bs_Sv){0});
-            if (!ok) {
-                const size_t module = bs->frame->closure->fn->compiled_in_module;
-                if (module) {
-                    const Bs_Module *m = &bs->modules.data[module - 1];
-
-                    Bs_Sv cwd = Bs_Sv(m->name->data, m->name->size);
-                    bool found = false;
-                    for (size_t i = cwd.size; i > 0; i--) {
-                        if (bs_issep(cwd.data[i - 1])) {
-                            found = true;
-                            cwd.size = bs_max(i - 1, 1);
-                            break;
-                        }
-                    }
-
-                    if (found) {
-                        ok = bs_import_try(bs, path, cwd);
-                    }
+            bool ok = false;
+            const size_t module = bs->frame->closure->fn->compiled_in_module;
+            if (module) {
+                const Bs_Sv dir = bs->modules.data[module - 1].parent_dir;
+                if (dir.size) {
+                    ok = bs_import_try(bs, path, dir);
                 }
+            }
+
+            if (!ok) {
+                ok = bs_import_try(bs, path, (Bs_Sv){0});
             }
 
             if (!ok) {

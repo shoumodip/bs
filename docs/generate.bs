@@ -782,10 +782,12 @@ if !is_main_module {
 
 if len(os.args) < 2 {
     examples()
-    io.readdir("docs")
-        .map(fn (e) -> "docs/" $ e.name())
-        .filter(fn (f) -> f.suffix(".md"))
-        .map(generate)
+    for _, e in io.readdir("docs") {
+        var path = "docs/" $ e.name()
+        if path.suffix(".md") {
+            generate(path)
+        }
+    }
 } else if os.args[1] == "examples" {
     examples()
     generate("docs/examples.md")
