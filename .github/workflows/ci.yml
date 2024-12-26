@@ -36,20 +36,15 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           cd tests
-          cc -o executables/echo_args executables/echo_args.c
-          cc -o executables/echo_stdin executables/echo_stdin.c
-          cc -I../include -o executables/addsub.so -fPIC -shared executables/addsub.c ../lib/libbs.so
-          cc -I../include -o executables/invalid.so -fPIC -shared executables/invalid.c ../lib/libbs.so
+          ../build/tests/linux.sh
           ./rere.py replay test.list
 
       - name: macOS tests
         if: matrix.os == 'macos-latest'
         run: |
+          export DYLD_LIBRARY_PATH=$PWD/lib:$DYLD_LIBRARY_PATH
           cd tests
-          cc -o executables/echo_args executables/echo_args.c
-          cc -o executables/echo_stdin executables/echo_stdin.c
-          cc -I../include -o executables/addsub.dylib -fPIC -shared executables/addsub.c -L../lib -lbs -Wl,-rpath,"@executable_path/../../lib"
-          cc -I../include -o executables/invalid.dylib -fPIC -shared executables/invalid.c -L../lib -lbs -Wl,-rpath,"@executable_path/../../lib"
+          ../build/tests/macos.sh
           ./rere.py replay test.list
 
       - name: Windows tests
@@ -57,10 +52,7 @@ jobs:
         run: |
           call "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat"
           cd tests
-          cl /Foexecutables\ /Fe:executables\echo_args.exe executables\echo_args.c
-          cl /Foexecutables\ /Fe:executables\echo_stdin.exe executables\echo_stdin.c
-          cl /I..\include /LD /Foexecutables\ /Fe:executables\addsub.dll executables\addsub.c ..\lib\bs.lib
-          cl /I..\include /LD /Foexecutables\ /Fe:executables\invalid.dll executables\invalid.c ..\lib\bs.lib
+          ..\build\tests\windows.bat
           python3 rere.py replay test.list
         shell: cmd
 
