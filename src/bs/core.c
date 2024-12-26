@@ -156,7 +156,18 @@ static Bs_Value bs_io_reader_readln(Bs *bs, Bs_Value *args, size_t arity) {
 static Bs_Value bs_io_reader_eof(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     Bs_File *f = &bs_this_c_instance_data_as(args, Bs_File);
-    return bs_value_bool(f->file ? feof(f->file) : true);
+    if (!f->file || feof(f->file)) {
+        return bs_value_bool(true);
+    }
+
+    // Typical libc shenanigans
+    const char peek = fgetc(f->file);
+    if (peek == EOF) {
+        return bs_value_bool(true);
+    }
+
+    ungetc(peek, f->file);
+    return bs_value_bool(false);
 }
 
 static Bs_Value bs_io_reader_seek(Bs *bs, Bs_Value *args, size_t arity) {
