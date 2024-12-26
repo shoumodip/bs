@@ -180,7 +180,7 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc, char end) {
     return token;
 }
 
-static_assert(BS_COUNT_TOKENS == 77, "Update bs_lexer_next()");
+static_assert(BS_COUNT_TOKENS == 76, "Update bs_lexer_next()");
 Bs_Token bs_lexer_next(Bs_Lexer *l) {
     if (l->peeked) {
         bs_lexer_unbuffer(l);

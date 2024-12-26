@@ -104,7 +104,6 @@ typedef enum {
     BS_TOKEN_SUPER,
     BS_TOKEN_CLASS,
 
-    BS_TOKEN_COMMENT,
     BS_TOKEN_IS_MAIN_MODULE,
     BS_COUNT_TOKENS
 } Bs_Token_Type;
