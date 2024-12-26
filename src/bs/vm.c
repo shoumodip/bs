@@ -2715,6 +2715,10 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const char *label = NULL;
 
             switch (container.as.object->type) {
+            case BS_OBJECT_ARRAY:
+                bs_error_at(bs, 1, "expected array index to be positive integer, got string");
+                break;
+
             case BS_OBJECT_TABLE:
                 map = &((Bs_Table *)container.as.object)->map;
                 label = "table key";

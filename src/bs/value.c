@@ -326,7 +326,7 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
         const Bs_Class *class = (const Bs_Class *)object;
         const Bs_Str *name = class->name;
         bs_fmt(p->writer, "class " Bs_Sv_Fmt " ", Bs_Sv_Arg(*name));
-        bs_pretty_printer_map_extra(p, &class->methods, class->can_fail ? "# Can fail" : NULL);
+        bs_pretty_printer_map_extra(p, &class->methods, class->can_fail ? "// Can fail" : NULL);
     } break;
 
     case BS_OBJECT_INSTANCE: {
@@ -343,7 +343,7 @@ static void bs_object_write_impl(Bs_Pretty_Printer *p, const Bs_Object *object) 
     case BS_OBJECT_C_CLASS: {
         const Bs_C_Class *class = (const Bs_C_Class *)object;
         bs_fmt(p->writer, "class " Bs_Sv_Fmt " ", Bs_Sv_Arg(class->name));
-        bs_pretty_printer_map_extra(p, &class->methods, class->can_fail ? "# Can fail" : NULL);
+        bs_pretty_printer_map_extra(p, &class->methods, class->can_fail ? "// Can fail" : NULL);
     } break;
 
     case BS_OBJECT_C_INSTANCE: {

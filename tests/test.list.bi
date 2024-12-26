@@ -911,7 +911,7 @@ ligma
 :i returncode 1
 :b stdout 0
 
-:b stderr 737
+:b stderr 741
 oop/error_cannot_return_from_init.bs:3:16: error: can only explicity return 'nil' from an initializer method
 
     3 |         return 69
@@ -927,19 +927,20 @@ class Log {
     init(path) {
         this.file = io.Writer(path)
         if !this.file {
-            return nil # Failed to open log file
+            return nil // Failed to open log file
         }
     }
 
-    write(s) => this.file.writeln(s)
+    write(s) -> this.file.writeln(s)
 }
 
 var log = Log("log.txt")
 if !log {
-    panic() # Handle error
+    panic() // Handle error
 }
 
-log.write("Hello, world!") # Or whatever you want to do
+log.write("Hello, world!") // Or whatever you want to do
+
 ```
 
 :b shell 41
@@ -1266,7 +1267,7 @@ delete/error_cannot_delete_super.bs:4:16: error: cannot use 'delete' on super
 :i returncode 1
 :b stdout 0
 
-:b stderr 237
+:b stderr 239
 delete/error_expected_index_expression.bs:2:8: error: expected index expression
 
     2 | delete(xs)
@@ -1275,8 +1276,8 @@ delete/error_expected_index_expression.bs:2:8: error: expected index expression
 Index expression can be any of the following:
 
 ```
-xs.foo;    # Constant index
-xs["bar"]; # Expression based index
+xs.foo;    // Constant index
+xs["bar"]; // Expression based index
 ```
 
 :b shell 43

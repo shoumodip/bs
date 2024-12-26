@@ -659,8 +659,8 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
                 &c->lexer,
                 loc,
                 Bs_Sv_Static("Index expression can be any of the following:"),
-                Bs_Sv_Static("xs.foo;    # Constant index\n"
-                             "xs[\"bar\"]; # Expression based index"),
+                Bs_Sv_Static("xs.foo;    // Constant index\n"
+                             "xs[\"bar\"]; // Expression based index"),
                 "expected index expression");
         }
     } break;
@@ -1613,23 +1613,24 @@ static void bs_compile_stmt(Bs_Compiler *c) {
                                      "missed the part where\n"
                                      "that's my problem."),
 
-                        Bs_Sv_Static("class Log {\n"
-                                     "    init(path) {\n"
-                                     "        this.file = io.Writer(path)\n"
-                                     "        if !this.file {\n"
-                                     "            return nil # Failed to open log file\n"
-                                     "        }\n"
-                                     "    }\n"
-                                     "\n"
-                                     "    write(s) => this.file.writeln(s)\n"
-                                     "}\n"
-                                     "\n"
-                                     "var log = Log(\"log.txt\")\n"
-                                     "if !log {\n"
-                                     "    panic() # Handle error\n"
-                                     "}\n"
-                                     "\n"
-                                     "log.write(\"Hello, world!\") # Or whatever you want to do"),
+                        Bs_Sv_Static(
+                            "class Log {\n"
+                            "    init(path) {\n"
+                            "        this.file = io.Writer(path)\n"
+                            "        if !this.file {\n"
+                            "            return nil // Failed to open log file\n"
+                            "        }\n"
+                            "    }\n"
+                            "\n"
+                            "    write(s) -> this.file.writeln(s)\n"
+                            "}\n"
+                            "\n"
+                            "var log = Log(\"log.txt\")\n"
+                            "if !log {\n"
+                            "    panic() // Handle error\n"
+                            "}\n"
+                            "\n"
+                            "log.write(\"Hello, world!\") // Or whatever you want to do\n"),
 
                         "can only explicity return 'nil' from an initializer method");
                 }

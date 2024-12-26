@@ -1025,12 +1025,12 @@ f()               // "Should" print 69
 $ bs variables.bs
 variables.bs:2:16: error: undefined identifier 'x'
 
-    2 |     io.println(x) # Refers to the variable 'x'
+    2 |     io.println(x) // Refers to the variable 'x'
       |                ^
 
 variables.bs:7:2: in f()
 
-    7 | f()               # "Should" print 69
+    7 | f()               // "Should" print 69
       |  ^
 ```
 
@@ -1357,7 +1357,7 @@ io.println(Bar)
 ```console
 $ bs oop.bs
 class Foo {
-    # Can fail
+    // Can fail
 }
 class Bar {}
 ```
