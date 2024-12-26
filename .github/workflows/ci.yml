@@ -48,8 +48,8 @@ jobs:
           cd tests
           cc -o executables/echo_args executables/echo_args.c
           cc -o executables/echo_stdin executables/echo_stdin.c
-          cc -I../include -o executables/addsub.dylib -fPIC -shared executables/addsub.c -L../lib -lbs -Wl,-rpath,"$(dirname $PWD)/lib"
-          cc -I../include -o executables/invalid.dylib -fPIC -shared executables/invalid.c -L../lib -lbs -Wl,-rpath,"$(dirname $PWD)/lib"
+          cc -I../include -o executables/addsub.dylib -fPIC -shared executables/addsub.c -L../lib -lbs -Wl,-rpath,"@executable_path/../lib"
+          cc -I../include -o executables/invalid.dylib -fPIC -shared executables/invalid.c -L../lib -lbs -Wl,-rpath,"@executable_path/../lib"
           ./rere.py replay test.list
 
       - name: Windows tests
