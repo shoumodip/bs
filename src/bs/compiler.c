@@ -523,7 +523,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
                 bs_lexer_expect(&c->lexer, BS_TOKEN_RBRACKET);
             } else if (token.type == BS_TOKEN_SPREAD) {
                 bs_lexer_unbuffer(&c->lexer);
-                bs_compile_expr(c, BS_POWER_SET);
+                bs_compile_expr(c, BS_POWER_IN);
                 bs_chunk_push_op(c->bs, c->chunk, BS_OP_APPEND);
                 bs_da_push(c->bs, c->chunk, 1);
                 bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
@@ -553,7 +553,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             token = bs_lexer_peek(&c->lexer);
             if (token.type == BS_TOKEN_SPREAD) {
                 bs_lexer_unbuffer(&c->lexer);
-                bs_compile_expr(c, BS_POWER_SET);
+                bs_compile_expr(c, BS_POWER_IN);
                 bs_chunk_push_op(c->bs, c->chunk, BS_OP_APPEND);
                 bs_da_push(c->bs, c->chunk, 1);
                 bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
@@ -953,7 +953,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
 
                 if (token.type == BS_TOKEN_SPREAD) {
                     bs_lexer_unbuffer(&c->lexer);
-                    bs_compile_expr(c, BS_POWER_SET);
+                    bs_compile_expr(c, BS_POWER_IN);
                     bs_chunk_push_op(c->bs, c->chunk, BS_OP_SPREAD);
                     bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
                 } else {
