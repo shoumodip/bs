@@ -62,7 +62,6 @@ $ bs factorial.bs
 
 <ul>
 <li><a href="https://github.com/shoumodip/bs.vim">Vim</a></li>
-<li><a href="https://github.com/shoumodip/bs-mode">Emacs</a></li>
 </ul>
 
 <!-- no-navigation -->
