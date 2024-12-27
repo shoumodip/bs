@@ -169,6 +169,48 @@ io.println("Hello, " $ "world! " $ 69) // Output: Hello, world! 69
 <b>A.</b> In my defense, I am just a silly goose.
 </blockquote>
 
+#### Raw Strings
+```bs
+io.println({{
+    This is a raw string literal.
+
+    The indentation of the first non empty line is considered zero.
+
+    Escape characters are NOT escaped: \n\t\r.
+
+    The first and last newline surrounding the braces are trimmed off.
+}})
+```
+
+```console
+$ bs string.bs
+This is a raw string literal.
+
+The indentation of the first non empty line is considered zero.
+
+Escape characters are NOT escaped: \n\t\r.
+
+The first and last newline surrounding the braces are trimmed off.
+```
+
+The number of starting `{` can be two or more, and the ending must contain the
+same number of `}`
+
+```bs
+io.println({{{
+    io.println({{
+        Yoho!!
+    }})
+}}})
+```
+
+```console
+$ bs string.bs
+io.println({{
+    Yoho!!
+}})
+```
+
 ### Arrays
 ```bs
 // Variables will be introduced later

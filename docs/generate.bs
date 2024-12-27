@@ -20,6 +20,7 @@ var TokenType = {
     String = "string",
     Keyword = "keyword",
     Comment = "comment",
+    RawString = "raw string",
 }
 
 class Token {
@@ -312,7 +313,23 @@ fn source(f, source, bs) {
             if type == TokenType.Delim {
                 if bs {
                     if literal == "\{" {
-                        braces.push(nil)
+                        if isprefix("\{") {
+                            take(fn (c) -> c == "\{")
+                            var end = source.slice(start, i).replace("\{", "}")
+
+                            while i < n && !isprefix(end) {
+                                i += 1
+                            }
+
+                            if isprefix(end) {
+                                i += len(end)
+                            }
+
+                            type = TokenType.RawString
+                            literal = source.slice(start, i)
+                        } else {
+                            braces.push(nil)
+                        }
                     } else if literal == "}" {
                         var quote = braces.pop()
                         if quote {
@@ -410,6 +427,7 @@ fn source(f, source, bs) {
 
             TokenType.Keyword -> f.write("<span class='keyword'>{l}</span>")
             TokenType.Comment -> f.write("<span class='comment'>{escape(l)}</span>")
+            TokenType.RawString -> f.write("<span class='string'>{escape(l)}</span>")
         }
     }
 
