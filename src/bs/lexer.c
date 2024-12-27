@@ -180,7 +180,7 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc, char end) {
     return token;
 }
 
-static_assert(BS_COUNT_TOKENS == 76, "Update bs_lexer_next()");
+static_assert(BS_COUNT_TOKENS == 77, "Update bs_lexer_next()");
 Bs_Token bs_lexer_next(Bs_Lexer *l) {
     if (l->peeked) {
         bs_lexer_unbuffer(l);
@@ -234,6 +234,58 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
     token.loc = l->loc;
     if (l->sv.size == 0) {
         l->prev_row = token.loc.row;
+        return token;
+    }
+
+    if (bs_sv_prefix(l->sv, Bs_Sv_Static("{{"))) {
+        size_t begin = 0;
+        while (l->sv.size && *l->sv.data == '{') {
+            bs_lexer_advance(l);
+            begin++;
+        }
+
+        if (l->sv.size && *l->sv.data != '\n') {
+            bs_lexer_error(
+                l,
+                l->loc,
+                "expected newline at start of raw string, got '%c' (%d)",
+                *l->sv.data,
+                *l->sv.data);
+        }
+
+        bool can_end = false;
+        size_t end = 0;
+        while (l->sv.size) {
+            const char c = *l->sv.data;
+            if (c == '\n') {
+                end = 0;
+                can_end = true;
+            } else if (c == '}') {
+                if (++end == begin) {
+                    if (!can_end) {
+                        bs_lexer_error(l, l->loc, "a raw string can only end on a new line");
+                    }
+                    break;
+                }
+            } else if (isspace(c)) {
+                end = 0;
+            } else {
+                end = 0;
+                can_end = false;
+            }
+
+            bs_lexer_advance(l);
+        }
+
+        if (!l->sv.size) {
+            bs_lexer_error(l, l->loc, "unterminated string");
+        }
+
+        bs_lexer_advance(l); // Consume the last ending '}'
+        l->prev_row = l->loc.row;
+
+        token.type = BS_TOKEN_RSTR;
+        token.sv.size -= l->sv.size;
         return token;
     }
 

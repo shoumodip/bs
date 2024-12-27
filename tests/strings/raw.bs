@@ -1,0 +1,13 @@
+var source = {{
+    fn fact(n) {
+        if n < 2 {
+            return n
+        }
+
+        return n * fact(n - 1)
+    }
+
+    io.println("6! = {fact(6)}")
+}}
+
+io.println(source)

@@ -16,7 +16,7 @@ typedef enum {
     BS_POWER_DOT,
 } Bs_Power;
 
-static_assert(BS_COUNT_TOKENS == 76, "Update bs_token_type_power()");
+static_assert(BS_COUNT_TOKENS == 77, "Update bs_token_type_power()");
 static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_DOT:
@@ -81,13 +81,14 @@ static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     }
 }
 
-static_assert(BS_COUNT_TOKENS == 76, "Update bs_token_type_can_start()");
+static_assert(BS_COUNT_TOKENS == 77, "Update bs_token_type_can_start()");
 static bool bs_token_type_can_start(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_SPREAD:
     case BS_TOKEN_NIL:
     case BS_TOKEN_STR:
     case BS_TOKEN_ISTR:
+    case BS_TOKEN_RSTR:
     case BS_TOKEN_NUM:
     case BS_TOKEN_TRUE:
     case BS_TOKEN_FALSE:
@@ -446,7 +447,7 @@ static void bs_compile_assignment(Bs_Compiler *c, const Bs_Token *token, Bs_Op a
     }
 }
 
-static_assert(BS_COUNT_TOKENS == 76, "Update bs_compile_expr()");
+static_assert(BS_COUNT_TOKENS == 77, "Update bs_compile_expr()");
 static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
     Bs_Loc loc = token.loc;
@@ -478,6 +479,54 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
                 bs_chunk_push_op(c->bs, c->chunk, BS_OP_JOIN);
             }
         }
+    } break;
+
+    case BS_TOKEN_RSTR: {
+        Bs_Buffer *b = &bs_config(c->bs)->buffer;
+        const size_t start = b->count;
+
+        Bs_Sv sv = token.sv;
+
+        size_t count = 0;
+        while (count < sv.size && sv.data[count] == '{') {
+            count++;
+        }
+
+        bs_sv_drop(&sv, count);
+        sv.size -= count;
+
+        assert(sv.size);
+        bs_sv_drop(&sv, 1); // Drop the beginning newline
+
+        size_t indent = 0;
+        bool indent_set = false;
+        bool first = true;
+        while (sv.size) {
+            const Bs_Sv line = bs_sv_split(&sv, '\n');
+            if (!indent_set) {
+                const Bs_Sv trimmed = bs_sv_trim(line, ' ');
+                if (trimmed.size) {
+                    indent = trimmed.data - line.data;
+                    indent_set = true;
+                }
+            }
+
+            if (first) {
+                first = false;
+            } else {
+                bs_da_push(c->bs, b, '\n');
+            }
+
+            if (indent_set && line.size > indent) {
+                bs_da_push_many(c->bs, b, line.data + indent, line.size - indent);
+            }
+        }
+
+        bs_chunk_push_op_value(
+            c->bs,
+            c->chunk,
+            BS_OP_CONST,
+            bs_value_object(bs_str_new(c->bs, bs_buffer_reset(b, start))));
     } break;
 
     case BS_TOKEN_NUM:
@@ -1340,7 +1389,7 @@ static void bs_compile_jumps_reset(Bs_Compiler *c, Bs_Jumps save) {
     c->jumps.start = save.start;
 }
 
-static_assert(BS_COUNT_TOKENS == 76, "Update bs_compile_stmt()");
+static_assert(BS_COUNT_TOKENS == 77, "Update bs_compile_stmt()");
 static void bs_compile_stmt(Bs_Compiler *c) {
     Bs_Token token = bs_lexer_next(&c->lexer);
 

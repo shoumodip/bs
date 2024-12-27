@@ -1,4 +1,4 @@
-:i count 145
+:i count 149
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -2293,4 +2293,53 @@ Module 'arith/sub'
 420
 
 :b stderr 0
+
+:b shell 24
+../bin/bs strings/raw.bs
+:i returncode 0
+:b stdout 111
+fn fact(n) {
+    if n < 2 {
+        return n
+    }
+
+    return n * fact(n - 1)
+}
+
+io.println("6! = {fact(6)}")
+
+:b stderr 0
+
+:b shell 46
+../bin/bs strings/raw_error_cannot_end_here.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 114
+strings/raw_error_cannot_end_here.bs:2:3: error: a raw string can only end on a new line
+
+    2 | o}}
+      |   ^
+
+:b shell 56
+../bin/bs strings/raw_error_expected_newline_at_begin.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 140
+strings/raw_error_expected_newline_at_begin.bs:1:3: error: expected newline at start of raw string, got '}' (125)
+
+    1 | {{}}
+      |   ^
+
+:b shell 43
+../bin/bs strings/raw_error_unterminated.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 90
+strings/raw_error_unterminated.bs:2:3: error: unterminated string
+
+    2 | }}
+      |   ^
 
