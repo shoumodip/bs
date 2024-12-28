@@ -1083,41 +1083,46 @@ $ bs variables.bs
 Here's a pitfall you might run into
 
 ```bs
+var x = 69
+
 fn f() {
     io.println(x) // Refers to the variable 'x'
+    io.println(y) // Refers to the variable 'y'
 }
 
-var x = 69        // Variable 'x' now defined at the toplevel
+var y = 420       // Variable 'y' now defined at the toplevel
 
-f()               // "Should" print 69
+f()               // "Should" print 69 and 420
 ```
 
 ```console
 $ bs variables.bs
-variables.bs:2:16: error: undefined identifier 'x'
+69
+variables.bs:5:16: error: undefined identifier 'y'
 
-    2 |     io.println(x) // Refers to the variable 'x'
+    5 |     io.println(y) // Refers to the variable 'y'
       |                ^
 
-variables.bs:7:2: in f()
+variables.bs:10:2: in f()
 
-    7 | f()               // "Should" print 69
-      |  ^
+    10 | f()               // "Should" print 69 and 420
+       |  ^
 ```
 
-What is going on?
-
-### Global Variables
 Variables defined at the toplevel are local to the scope of the file, which
 behaves as a function itself. To put simply, variables cannot be used before
 they are declared. This is where global variables come into play.
 
+### Global Variables
 ```bs
+var x = 69
+
 fn f() {
     io.println(x) // Refers to the variable 'x'
+    io.println(y) // Refers to the variable 'y'
 }
 
-pub var x = 69    // Global variable 'x' now defined
+pub var y = 420   // Global variable 'y' now defined
 
 f()
 ```
@@ -1125,7 +1130,12 @@ f()
 ```console
 $ bs variables.bs
 69
+420
 ```
+
+<blockquote>
+Global variables can be accessed from all modules. More on that later.
+</blockquote>
 
 ## Import
 ```bs
@@ -1212,6 +1222,24 @@ But if the module `one` is executed directly...
 ```console
 $ bs one.bs
 Loading module 'one'
+```
+
+### Global variables across modules
+```bs
+// one.bs
+pub var x = 69
+```
+
+```bs
+// main.bs
+import("one")
+
+io.println(x)
+```
+
+```console
+$ bs main.bs
+69
 ```
 
 ## OOP
