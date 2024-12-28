@@ -1,4 +1,4 @@
-:i count 149
+:i count 150
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -2342,4 +2342,15 @@ strings/raw_error_unterminated.bs:2:3: error: unterminated string
 
     2 | }}
       |   ^
+
+:b shell 28
+../bin/bs functions/defer.bs
+:i returncode 0
+:b stdout 35
+Hello, world!
+69
+Hello, world!
+420
+
+:b stderr 0
 

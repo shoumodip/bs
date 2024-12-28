@@ -102,9 +102,18 @@ bool bs_table_remove(Bs *bs, Bs_Table *table, Bs_Value key);
 bool bs_table_get(Bs *bs, Bs_Table *table, Bs_Value key, Bs_Value *value);
 bool bs_table_set(Bs *bs, Bs_Table *table, Bs_Value key, Bs_Value value);
 
+typedef struct {
+    Bs_Closure **data;
+    size_t count;
+    size_t capacity;
+} Bs_Defers;
+
 struct Bs_Closure {
     Bs_Object meta;
     Bs_Fn *fn;
+
+    Bs_Defers defers; // Owned
+    bool defer_started;
 
     size_t upvalues;
     Bs_Upvalue *data[];

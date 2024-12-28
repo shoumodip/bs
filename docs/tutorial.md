@@ -974,6 +974,35 @@ var xs = [100, 125, 126]
 io.println(sum(34, ..xs, 35)) // Output: 420
 ```
 
+### Defer
+Defers are like in Go. They are executed at the end of the function in reverse order.
+
+```bs
+fn main(x, y) {
+    io.print("Hello")
+    defer {
+        var f = io.println
+        f("!")
+    }
+
+    io.print(", ")
+    defer io.print("world")
+
+    return x + y
+}
+
+io.println(main(34, 35))
+io.println(main(200, 220))
+```
+
+```console
+$ bs defer.bs
+Hello, world!
+69
+Hello, world!
+420
+```
+
 ## Variables
 ```bs
 var a = 34

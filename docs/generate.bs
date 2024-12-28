@@ -84,6 +84,7 @@ var KeywordsBs = [
     "pub",
     "var",
     "return",
+    "defer",
     "class",
 ]
 

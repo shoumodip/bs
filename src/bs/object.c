@@ -115,6 +115,10 @@ Bs_Closure *bs_closure_new(Bs *bs, Bs_Fn *fn) {
 
     closure->fn = fn;
     closure->upvalues = fn->upvalues;
+
+    closure->defers = (Bs_Defers){0};
+    closure->defer_started = false;
+
     memset(closure->data, 0, upvalues);
     return closure;
 }

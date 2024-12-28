@@ -191,6 +191,7 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
 
     case BS_OBJECT_CLOSURE: {
         Bs_Closure *closure = (Bs_Closure *)object;
+        bs_da_free(bs, &closure->defers);
         bs_realloc(bs, closure, sizeof(*closure) + sizeof(Bs_Upvalue *) * closure->upvalues, 0);
     } break;
 
@@ -302,6 +303,10 @@ static void bs_blacken_object(Bs *bs, Bs_Object *object) {
     case BS_OBJECT_CLOSURE: {
         Bs_Closure *closure = (Bs_Closure *)object;
         bs_mark(bs, (Bs_Object *)closure->fn);
+
+        for (size_t i = 0; i < closure->defers.count; i++) {
+            bs_mark(bs, (Bs_Object *)closure->defers.data[i]);
+        }
 
         for (size_t i = 0; i < closure->upvalues; i++) {
             bs_mark(bs, (Bs_Object *)closure->data[i]);
@@ -1379,6 +1384,8 @@ static void bs_call_closure(Bs *bs, size_t location, Bs_Closure *closure, size_t
 
     bs_frames_push(bs, frame);
     bs->frame = &bs->frames.data[bs->frames.count - 1];
+
+    closure->defer_started = false;
 }
 
 static_assert(BS_COUNT_OBJECTS == 13, "Update bs_call_value()");
@@ -1871,7 +1878,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 73, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 74, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const bool handles_on_save = bs->handles_on;
@@ -1910,37 +1917,59 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
         const Bs_Op op = *bs->frame->ip++;
         switch (op) {
-        case BS_OP_RET: {
-            const Bs_Value value = bs_stack_pop(bs);
-            bs_close_upvalues(bs, bs->frame->base);
-            bs->frames.count--;
+        case BS_OP_RET:
+            if (bs->frame->closure->defer_started) {
+                bs->stack.count--; // Drop the result of the previous deferred call
+            }
 
-            if (bs->frames.count + 1 == frames_count_save) {
-                if (output) {
-                    *output = value;
+            if (bs->frame->closure->defers.count) {
+                bs->frame->ip--; // Not ready to return yet!
+                bs->frame->closure->defer_started = true;
+
+                Bs_Closure *closure =
+                    bs->frame->closure->defers.data[--bs->frame->closure->defers.count];
+                bs_stack_push(bs, bs_value_object(closure));
+                bs_call_stack_top(bs, 0);
+            } else {
+                const Bs_Value value = bs_stack_pop(bs);
+                bs_close_upvalues(bs, bs->frame->base);
+                bs->frames.count--;
+
+                if (bs->frames.count + 1 == frames_count_save) {
+                    if (output) {
+                        *output = value;
+                    }
+
+                    bs->gc_on = gc_on_save;
+                    bs->handles_on = handles_on_save;
+                    return;
                 }
 
-                bs->gc_on = gc_on_save;
-                bs->handles_on = handles_on_save;
-                return;
-            }
+                const Bs_Frame *frame = &bs->frames.data[bs->frames.count];
+                bs->stack.count = bs->frame->base - bs->stack.data;
+                bs_stack_push(bs, value);
 
-            const Bs_Frame *frame = &bs->frames.data[bs->frames.count];
-            bs->stack.count = bs->frame->base - bs->stack.data;
-            bs_stack_push(bs, value);
-
-            bs->frame = &bs->frames.data[bs->frames.count - 1];
-            if (frame->closure->fn->module) {
-                Bs_Module *m = &bs->modules.data[frame->closure->fn->module - 1];
-                m->done = true;
-                m->result = value;
+                bs->frame = &bs->frames.data[bs->frames.count - 1];
+                if (frame->closure->fn->module) {
+                    Bs_Module *m = &bs->modules.data[frame->closure->fn->module - 1];
+                    m->done = true;
+                    m->result = value;
+                }
             }
-        } break;
+            break;
 
         case BS_OP_CALL:
             assert(bs->bases.count);
             bs_call_stack_top(bs, bs->stack.count - bs->bases.data[--bs->bases.count]);
             break;
+
+        case BS_OP_DEFER: {
+            const Bs_Value value = bs_stack_peek(bs, 0);
+            assert(value.type == BS_VALUE_OBJECT && value.as.object->type == BS_OBJECT_CLOSURE);
+
+            bs_da_push(bs, &bs->frame->closure->defers, (Bs_Closure *)value.as.object);
+            bs->stack.count--; // Make sure the deferred closure survives the GC
+        } break;
 
         case BS_OP_SPREAD: {
             const Bs_Value value = bs_stack_pop(bs);

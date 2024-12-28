@@ -147,3 +147,4 @@
 ../bin/bs strings/raw_error_cannot_end_here.bs
 ../bin/bs strings/raw_error_expected_newline_at_begin.bs
 ../bin/bs strings/raw_error_unterminated.bs
+../bin/bs functions/defer.bs

@@ -1,0 +1,15 @@
+fn main(x, y) {
+    io.print("Hello")
+    defer {
+        var f = io.println
+        f("!")
+    }
+
+    io.print(", ")
+    defer io.print("world")
+
+    return x + y
+}
+
+io.println(main(34, 35))
+io.println(main(200, 220))

@@ -16,7 +16,7 @@ typedef enum {
     BS_POWER_DOT,
 } Bs_Power;
 
-static_assert(BS_COUNT_TOKENS == 77, "Update bs_token_type_power()");
+static_assert(BS_COUNT_TOKENS == 78, "Update bs_token_type_power()");
 static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_DOT:
@@ -81,7 +81,7 @@ static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     }
 }
 
-static_assert(BS_COUNT_TOKENS == 77, "Update bs_token_type_can_start()");
+static_assert(BS_COUNT_TOKENS == 78, "Update bs_token_type_can_start()");
 static bool bs_token_type_can_start(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_SPREAD:
@@ -450,7 +450,7 @@ static void bs_compile_assignment(Bs_Compiler *c, const Bs_Token *token, Bs_Op a
     }
 }
 
-static_assert(BS_COUNT_TOKENS == 77, "Update bs_compile_expr()");
+static_assert(BS_COUNT_TOKENS == 78, "Update bs_compile_expr()");
 static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
     Bs_Loc loc = token.loc;
@@ -1205,6 +1205,23 @@ static Bs_Fn *bs_compile_lambda_end(Bs_Compiler *c) {
     return fn;
 }
 
+static void bs_compile_lambda_end_ops(Bs_Compiler *c, Bs_Lambda *lambda, bool variadic) {
+    Bs_Fn *fn = bs_compile_lambda_end(c);
+    fn->variadic = variadic;
+
+    bs_chunk_push_op_value(c->bs, c->chunk, BS_OP_CLOSURE, bs_value_object(fn));
+
+    for (size_t i = 0; i < lambda->fn->upvalues; i++) {
+        bs_chunk_push_op_int(
+            c->bs,
+            c->chunk,
+            lambda->uplocals.data[i].local ? 1 : 0,
+            lambda->uplocals.data[i].index);
+    }
+
+    bs_lambda_free(c->bs, lambda);
+}
+
 static size_t bs_compile_definition(Bs_Compiler *c, Bs_Token *name, bool public) {
     *name = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
 
@@ -1256,20 +1273,7 @@ static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Toke
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_RET);
     }
 
-    Bs_Fn *fn = bs_compile_lambda_end(c);
-    fn->variadic = variadic;
-
-    bs_chunk_push_op_value(c->bs, c->chunk, BS_OP_CLOSURE, bs_value_object(fn));
-
-    for (size_t i = 0; i < lambda->fn->upvalues; i++) {
-        bs_chunk_push_op_int(
-            c->bs,
-            c->chunk,
-            lambda->uplocals.data[i].local ? 1 : 0,
-            lambda->uplocals.data[i].index);
-    }
-
-    bs_lambda_free(c->bs, lambda);
+    bs_compile_lambda_end_ops(c, lambda, variadic);
 }
 
 static void bs_compile_class(Bs_Compiler *c, bool public) {
@@ -1392,7 +1396,7 @@ static void bs_compile_jumps_reset(Bs_Compiler *c, Bs_Jumps save) {
     c->lambda->jumps.start = save.start;
 }
 
-static_assert(BS_COUNT_TOKENS == 77, "Update bs_compile_stmt()");
+static_assert(BS_COUNT_TOKENS == 78, "Update bs_compile_stmt()");
 static void bs_compile_stmt(Bs_Compiler *c) {
     Bs_Token token = bs_lexer_next(&c->lexer);
 
@@ -1709,6 +1713,22 @@ static void bs_compile_stmt(Bs_Compiler *c) {
 
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_RET);
         break;
+
+    case BS_TOKEN_DEFER: {
+        Bs_Lambda *lambda = bs_lambda_new(BS_LAMBDA_FN, false, false);
+        bs_compile_lambda_init(c, lambda, (Bs_Sv){0});
+        bs_compile_block_init(c);
+
+        if (bs_lexer_peek(&c->lexer).type == BS_TOKEN_LBRACE) {
+            bs_compile_stmt(c);
+        } else {
+            bs_compile_expr(c, BS_POWER_NIL);
+            bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
+        }
+
+        bs_compile_lambda_end_ops(c, lambda, false);
+        bs_chunk_push_op(c->bs, c->chunk, BS_OP_DEFER);
+    } break;
 
     default:
         bs_lexer_buffer(&c->lexer, token);

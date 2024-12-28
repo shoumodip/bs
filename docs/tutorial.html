@@ -1738,8 +1738,62 @@ io.<span class='function'>println</span>(<span class='function'>sum</span>(<span
 </pre>
 </div>
 </section>
-</section>
 <section id='s31'>
+<h3>Defer</h3>
+<p>
+Defers are like in Go. They are executed at the end of the function in reverse order.
+</p>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='keyword'>fn</span> <span class='function'>main</span>(x, y) {
+    io.<span class='function'>print</span>(<span class='string'>&quot;Hello&quot;</span>)
+    <span class='keyword'>defer</span> {
+        <span class='keyword'>var</span> f = io.<span class='field'>println</span>
+        <span class='function'>f</span>(<span class='string'>&quot;!&quot;</span>)
+    }
+
+    io.<span class='function'>print</span>(<span class='string'>&quot;, &quot;</span>)
+    <span class='keyword'>defer</span> io.<span class='function'>print</span>(<span class='string'>&quot;world&quot;</span>)
+
+    <span class='keyword'>return</span> x + y
+}
+
+io.<span class='function'>println</span>(<span class='function'>main</span>(<span class='constant'>34</span>, <span class='constant'>35</span>))
+io.<span class='function'>println</span>(<span class='function'>main</span>(<span class='constant'>200</span>, <span class='constant'>220</span>))
+</pre>
+</div>
+<div class='codes'>
+<button class='copy' onclick='copyClick(this)'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z'></path><path d='M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'></path>
+</svg>
+</button>
+<button class='copied hidden'>
+<svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
+    <path d='M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'></path>
+</svg>
+</button>
+<pre class='code active'>
+<span class='string'>$ </span>bs defer.bs
+Hello, world!
+69
+Hello, world!
+420
+</pre>
+</div>
+</section>
+</section>
+<section id='s32'>
 <h2>Variables</h2>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1758,7 +1812,7 @@ io.<span class='function'>println</span>(<span class='function'>sum</span>(<span
 io.<span class='function'>println</span>(a + b) <span class='comment'>// Output: 69</span>
 </pre>
 </div>
-<section id='s32'>
+<section id='s33'>
 <h3>Assignment</h3>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1811,7 +1865,7 @@ io.<span class='function'>println</span>(b) <span class='comment'>// Output: Nic
 </pre>
 </div>
 </section>
-<section id='s33'>
+<section id='s34'>
 <h3>Scoped Variables</h3>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1837,7 +1891,7 @@ io.<span class='function'>println</span>(x)     <span class='comment'>// Output:
 </pre>
 </div>
 </section>
-<section id='s34'>
+<section id='s35'>
 <h3>Variable Shadowing</h3>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1859,7 +1913,7 @@ io.<span class='function'>println</span>(x) <span class='comment'>// Output: x u
 </pre>
 </div>
 </section>
-<section id='s35'>
+<section id='s36'>
 <h3>Local Variables</h3>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -1902,7 +1956,7 @@ io.<span class='function'>println</span>(z)
 </pre>
 </div>
 </section>
-<section id='s36'>
+<section id='s37'>
 <h3>File Local Variables</h3>
 <p>
 Here&apos;s a pitfall you might run into
@@ -1956,7 +2010,7 @@ variables.bs:7:2: in f()
 What is going on?
 </p>
 </section>
-<section id='s37'>
+<section id='s38'>
 <h3>Global Variables</h3>
 <p>
 Variables defined at the toplevel are local to the scope of the file, which
@@ -2002,7 +2056,7 @@ they are declared. This is where global variables come into play.
 </div>
 </section>
 </section>
-<section id='s38'>
+<section id='s39'>
 <h2>Import</h2>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2061,7 +2115,7 @@ io.<span class='function'>println</span>(one.<span class='function'>dec</span>(<
 420
 </pre>
 </div>
-<section id='s39'>
+<section id='s40'>
 <h3>Singular Load</h3>
 <p>
 Modules are loaded only once.
@@ -2125,7 +2179,7 @@ Loading module &apos;one&apos;
 </pre>
 </div>
 </section>
-<section id='s40'>
+<section id='s41'>
 <h3>Main Module</h3>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2207,7 +2261,7 @@ Loading module &apos;one&apos;
 </div>
 </section>
 </section>
-<section id='s41'>
+<section id='s42'>
 <h2>OOP</h2>
 <p>
 I refuse to showcase the <code>Animal &gt; Dog, Cat</code> nonsense, so here&apos;s a
@@ -2382,7 +2436,7 @@ Luffy has been defeated!
 Luffy lost :(
 </pre>
 </div>
-<section id='s42'>
+<section id='s43'>
 <h3>Constructor Failure</h3>
 <p>
 Typical OOP languages mandate that constructors must return the instance under
@@ -2432,7 +2486,7 @@ logger.<span class='function'>write</span>(<span class='string'>&quot;Hello, wor
 </pre>
 </div>
 </section>
-<section id='s43'>
+<section id='s44'>
 <h3>How to know if a class can fail?</h3>
 <p>
 Just print the class.
@@ -2489,7 +2543,7 @@ class Bar {}
 </pre>
 </div>
 </section>
-<section id='s44'>
+<section id='s45'>
 <h3>How to know the methods in a class?</h3>
 <p>
 Just print the class.
@@ -2537,7 +2591,7 @@ class Lol {
 </div>
 </section>
 </section>
-<section id='s45'>
+<section id='s46'>
 <h2>Panic</h2>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2605,7 +2659,7 @@ panic.bs:1:1: TODO
 </pre>
 </div>
 </section>
-<section id='s46'>
+<section id='s47'>
 <h2>Assert</h2>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
@@ -2710,12 +2764,12 @@ io.<span class='function'>println</span>(x)
 </pre>
 </div>
 </section>
-<section id='s47'>
+<section id='s48'>
 <h2>FFI</h2>
 <p>
 BS supports loading of native modules at runtime.
 </p>
-<section id='s48'>
+<section id='s49'>
 <h3>Compiling a native module</h3>
 <p>
 Create a file <code>arithmetic.c</code> with the following content
@@ -2826,7 +2880,7 @@ io.<span class='function'>println</span>(arith.<span class='function'>sub</span>
 </pre>
 </div>
 </section>
-<section id='s49'>
+<section id='s50'>
 <h3>Wrapping an existing C library</h3>
 <p>
 As an example let&apos;s create a simple wrapper around the
@@ -3087,70 +3141,73 @@ rl.<span class='function'>close_window</span>()
 <li>
 <a href='#s30'>Spread</a>
 </li>
-</ul>
-</li>
 <li>
-<a href='#s31'>Variables</a>
-<ul>
-<li>
-<a href='#s32'>Assignment</a>
-</li>
-<li>
-<a href='#s33'>Scoped Variables</a>
-</li>
-<li>
-<a href='#s34'>Variable Shadowing</a>
-</li>
-<li>
-<a href='#s35'>Local Variables</a>
-</li>
-<li>
-<a href='#s36'>File Local Variables</a>
-</li>
-<li>
-<a href='#s37'>Global Variables</a>
+<a href='#s31'>Defer</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s38'>Import</a>
+<a href='#s32'>Variables</a>
 <ul>
 <li>
-<a href='#s39'>Singular Load</a>
+<a href='#s33'>Assignment</a>
 </li>
 <li>
-<a href='#s40'>Main Module</a>
+<a href='#s34'>Scoped Variables</a>
+</li>
+<li>
+<a href='#s35'>Variable Shadowing</a>
+</li>
+<li>
+<a href='#s36'>Local Variables</a>
+</li>
+<li>
+<a href='#s37'>File Local Variables</a>
+</li>
+<li>
+<a href='#s38'>Global Variables</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s41'>OOP</a>
+<a href='#s39'>Import</a>
 <ul>
 <li>
-<a href='#s42'>Constructor Failure</a>
+<a href='#s40'>Singular Load</a>
 </li>
 <li>
-<a href='#s43'>How to know if a class can fail?</a>
-</li>
-<li>
-<a href='#s44'>How to know the methods in a class?</a>
+<a href='#s41'>Main Module</a>
 </li>
 </ul>
 </li>
 <li>
-<a href='#s45'>Panic</a>
-</li>
-<li>
-<a href='#s46'>Assert</a>
-</li>
-<li>
-<a href='#s47'>FFI</a>
+<a href='#s42'>OOP</a>
 <ul>
 <li>
-<a href='#s48'>Compiling a native module</a>
+<a href='#s43'>Constructor Failure</a>
 </li>
 <li>
-<a href='#s49'>Wrapping an existing C library</a>
+<a href='#s44'>How to know if a class can fail?</a>
+</li>
+<li>
+<a href='#s45'>How to know the methods in a class?</a>
+</li>
+</ul>
+</li>
+<li>
+<a href='#s46'>Panic</a>
+</li>
+<li>
+<a href='#s47'>Assert</a>
+</li>
+<li>
+<a href='#s48'>FFI</a>
+<ul>
+<li>
+<a href='#s49'>Compiling a native module</a>
+</li>
+<li>
+<a href='#s50'>Wrapping an existing C library</a>
 </li>
 </ul>
 </li>
