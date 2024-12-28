@@ -177,6 +177,9 @@ struct Bs_Lambda {
     Bs_Fn *fn;
     Bs_Uplocals uplocals;
 
+    Bs_Jumps jumps;
+    Bs_Jumps matches;
+
     bool is_repl;
     bool is_meta;
 };
@@ -186,6 +189,8 @@ struct Bs_Lambda {
 static void bs_lambda_free(Bs *bs, Bs_Lambda *l) {
     if (l) {
         bs_uplocals_free(bs, &l->uplocals);
+        bs_jumps_free(bs, &l->jumps);
+        bs_jumps_free(bs, &l->matches);
         bs_da_free(bs, l);
         free(l);
     }
@@ -253,8 +258,6 @@ typedef struct {
     Bs *bs;
     Bs_Chunk *chunk;
 
-    Bs_Jumps jumps;
-    Bs_Jumps matches;
     Bs_Op_Locs locations;
 
     size_t module;
@@ -1373,20 +1376,20 @@ static void bs_compile_variable(Bs_Compiler *c, bool public) {
 }
 
 static Bs_Jumps bs_compile_jumps_save(Bs_Compiler *c, size_t start) {
-    const Bs_Jumps save = c->jumps;
-    c->jumps.depth = c->lambda->depth;
-    c->jumps.start = start;
+    const Bs_Jumps save = c->lambda->jumps;
+    c->lambda->jumps.depth = c->lambda->depth;
+    c->lambda->jumps.start = start;
     return save;
 }
 
 static void bs_compile_jumps_reset(Bs_Compiler *c, Bs_Jumps save) {
-    for (size_t i = save.count; i < c->jumps.count; i++) {
-        bs_compile_jump_patch(c, c->jumps.data[i]);
+    for (size_t i = save.count; i < c->lambda->jumps.count; i++) {
+        bs_compile_jump_patch(c, c->lambda->jumps.data[i]);
     }
 
-    c->jumps.count = save.count;
-    c->jumps.depth = save.depth;
-    c->jumps.start = save.start;
+    c->lambda->jumps.count = save.count;
+    c->lambda->jumps.depth = save.depth;
+    c->lambda->jumps.start = save.start;
 }
 
 static_assert(BS_COUNT_TOKENS == 77, "Update bs_compile_stmt()");
@@ -1433,21 +1436,21 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         bs_compile_expr(c, BS_POWER_SET);
         bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE);
 
-        const size_t matches_count_save = c->matches.count;
+        const size_t matches_count_save = c->lambda->matches.count;
 
         while (!bs_lexer_read(&c->lexer, BS_TOKEN_RBRACE)) {
-            const size_t cases_count_save = c->matches.count;
+            const size_t cases_count_save = c->lambda->matches.count;
 
             do {
                 token = bs_lexer_peek(&c->lexer);
                 if (token.type == BS_TOKEN_IF) {
                     bs_lexer_unbuffer(&c->lexer);
                     bs_compile_expr(c, BS_POWER_SET);
-                    bs_jumps_push(c->bs, &c->matches, c->chunk->count);
+                    bs_jumps_push(c->bs, &c->lambda->matches, c->chunk->count);
                     bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_MATCH_IF, 0);
                 } else {
                     bs_compile_expr(c, BS_POWER_SET);
-                    bs_jumps_push(c->bs, &c->matches, c->chunk->count);
+                    bs_jumps_push(c->bs, &c->lambda->matches, c->chunk->count);
                     bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_MATCH, 0);
                 }
 
@@ -1456,10 +1459,10 @@ static void bs_compile_stmt(Bs_Compiler *c) {
 
             const size_t skip_addr = bs_compile_jump_start(c, BS_OP_JUMP);
 
-            for (size_t i = cases_count_save; i < c->matches.count; i++) {
-                bs_compile_jump_patch(c, c->matches.data[i]);
+            for (size_t i = cases_count_save; i < c->lambda->matches.count; i++) {
+                bs_compile_jump_patch(c, c->lambda->matches.data[i]);
             }
-            c->matches.count = cases_count_save;
+            c->lambda->matches.count = cases_count_save;
 
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP);
 
@@ -1474,7 +1477,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
             }
             bs_compile_stmt(c);
 
-            bs_jumps_push(c->bs, &c->matches, c->chunk->count);
+            bs_jumps_push(c->bs, &c->lambda->matches, c->chunk->count);
             bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_JUMP, 0);
 
             bs_compile_jump_patch(c, skip_addr);
@@ -1493,10 +1496,10 @@ static void bs_compile_stmt(Bs_Compiler *c) {
             bs_compile_stmt(c);
         }
 
-        for (size_t i = matches_count_save; i < c->matches.count; i++) {
-            bs_compile_jump_patch(c, c->matches.data[i]);
+        for (size_t i = matches_count_save; i < c->lambda->matches.count; i++) {
+            bs_compile_jump_patch(c, c->lambda->matches.data[i]);
         }
-        c->matches.count = matches_count_save;
+        c->lambda->matches.count = matches_count_save;
     } break;
 
     case BS_TOKEN_FOR: {
@@ -1591,22 +1594,22 @@ static void bs_compile_stmt(Bs_Compiler *c) {
     } break;
 
     case BS_TOKEN_BREAK: {
-        if (!c->jumps.depth) {
+        if (!c->lambda->jumps.depth) {
             bs_compile_error_unexpected(c, &token);
         }
 
-        bs_compile_block_drop(c, c->jumps.depth);
-        bs_jumps_push(c->bs, &c->jumps, c->chunk->count);
+        bs_compile_block_drop(c, c->lambda->jumps.depth);
+        bs_jumps_push(c->bs, &c->lambda->jumps, c->chunk->count);
         bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_JUMP, 0);
     } break;
 
     case BS_TOKEN_CONTINUE: {
-        if (!c->jumps.depth) {
+        if (!c->lambda->jumps.depth) {
             bs_compile_error_unexpected(c, &token);
         }
 
-        bs_compile_block_drop(c, c->jumps.depth);
-        bs_compile_jump_direct(c, BS_OP_JUMP, c->jumps.start);
+        bs_compile_block_drop(c, c->lambda->jumps.depth);
+        bs_compile_jump_direct(c, BS_OP_JUMP, c->lambda->jumps.start);
     } break;
 
     case BS_TOKEN_FN:
@@ -1749,8 +1752,6 @@ Bs_Closure *bs_compile(
         compiler.lambda = NULL;
         compiler.chunk = NULL;
 
-        bs_jumps_free(compiler.bs, &compiler.jumps);
-        bs_jumps_free(compiler.bs, &compiler.matches);
         bs_op_locs_free(compiler.bs, &compiler.locations);
         return NULL;
     }
@@ -1772,8 +1773,6 @@ Bs_Closure *bs_compile(
     Bs_Fn *fn = bs_compile_lambda_end(&compiler);
     fn->module = module;
     bs_lambda_free(compiler.bs, lambda);
-    bs_jumps_free(compiler.bs, &compiler.jumps);
-    bs_jumps_free(compiler.bs, &compiler.matches);
     bs_op_locs_free(compiler.bs, &compiler.locations);
     return bs_closure_new(bs, fn);
 }
