@@ -1510,7 +1510,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
             bs_lexer_expect(&c->lexer, BS_TOKEN_IN);
         }
 
-        Bs_Loc locs[3];
+        Bs_Loc locs[3] = {0};
 
         // Container / Start
         locs[0] = bs_lexer_peek(&c->lexer).loc;
@@ -1555,7 +1555,9 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         bs_chunk_push_op_loc(c->bs, c->chunk, locs[0]);
         if (b.type == BS_TOKEN_IN) {
             bs_chunk_push_op_loc(c->bs, c->chunk, locs[1]);
-            bs_chunk_push_op_loc(c->bs, c->chunk, locs[2]);
+            if (locs[2].row) {
+                bs_chunk_push_op_loc(c->bs, c->chunk, locs[2]);
+            }
         }
 
         bs_lexer_buffer(&c->lexer, bs_lexer_expect(&c->lexer, BS_TOKEN_LBRACE));
