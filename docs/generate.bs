@@ -455,6 +455,7 @@ fn generate(path) {
         io.eprintln("Error: could not create '{output}'")
         os.exit(1)
     }
+    defer f.close()
 
     var lines = contents.split("\n")
     if len(lines) == 0 || !lines[0].prefix("# ") {
@@ -739,7 +740,6 @@ fn generate(path) {
     f.writeln("<script src='script.js'></script>")
     f.writeln("</body>")
     f.writeln("</html>")
-    f.close()
 
     io.println("Wrote documentation to '{path}'")
 }
@@ -751,6 +751,7 @@ fn examples() {
         io.eprintln("Error: could not write '{path}'")
         os.exit(1)
     }
+    defer f.close()
 
     f.writeln("# Examples")
     f.writeln()
@@ -791,8 +792,6 @@ fn examples() {
             }
         }
     }
-
-    f.close()
 }
 
 if !is_main_module {
