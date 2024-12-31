@@ -1917,7 +1917,7 @@ Example usecase:
 
 ```bs
 var f = meta.compile("Oops@")
-if f is "Error" {
+if f instanceof meta.Error {
     io.println("Row:", f.row())
     io.println("Col:", f.col())
     io.println("Path:", f.path())
@@ -1989,7 +1989,7 @@ If any errors were encountered while compiling the string, an `Error` instance
 is returned instead of a function.
 
 ```bs
-var f = meta.compile("Oops@"); assert(f is "Error")
+var f = meta.compile("Oops@"); assert(f instanceof meta.Error)
 
 io.println("Row:", f.row())
 io.println("Col:", f.col())
@@ -2015,7 +2015,7 @@ So the usage becomes as straight forward as:
 
 ```bs
 var f = meta.compile(...)
-if f is "Error" {
+if f instanceof meta.Error {
     panic(f.message()) // Error handling...
 }
 
@@ -2026,35 +2026,35 @@ The function is compiled such that the last expression in the body is returned,
 otherwise defaulting to `nil`.
 
 ```bs
-var f = meta.compile("
-    for i in 0, 5 \{
+var f = meta.compile({{
+    for i in 0, 5 {
         io.println('Nice!')
     }
-")
+}})
 
-assert(f is "function")
+assert(f !instanceof meta.Error)
 io.println(f())
 
-var g = meta.compile("
-    for i in 0, 5 \{
+var g = meta.compile({{
+    for i in 0, 5 {
         io.println('Hehe!')
     }
 
     69
-")
+}})
 
-assert(g is "function")
+assert(g !instanceof meta.Error)
 io.println(g())
 
-var h = meta.compile("
-    for i in 0, 5 \{
+var h = meta.compile({{
+    for i in 0, 5 {
         io.println('Bruh!')
     }
 
     return 420
-")
+}})
 
-assert(h is "function")
+assert(h !instanceof meta.Error)
 io.println(h())
 ```
 
@@ -2085,7 +2085,7 @@ Basically a protected call.
 
 ```bs
 fn handle(result) {
-    if result is "Error" {
+    if result instanceof meta.Error {
         io.println("ERROR!")
         io.println("Row:", result.row())
         io.println("Col:", result.col())
@@ -2128,11 +2128,11 @@ Evaluate a string.
 
 ```bs
 io.println(meta.eval("34 + 35"))
-io.println(meta.eval("
-    for i in 0, 5 \{
+io.println(meta.eval({{
+    for i in 0, 5 {
         io.println('Nice!')
     }
-"))
+}}))
 ```
 
 ```console

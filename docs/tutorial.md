@@ -385,7 +385,7 @@ io.println(typeof({}))       // Output: table
 io.println(typeof(fn () {})) // Output: function
 ```
 
-#### Is
+### Is
 ```bs
 io.println(nil is "nil")           // Output: true
 io.println(true is "boolean")      // Output: true
@@ -1391,6 +1391,34 @@ Luffy has been poisoned! skipping turn.
 Magellan attacks Luffy for 8 damage!
 Luffy has been defeated!
 Luffy lost :(
+```
+
+### Instanceof
+```bs
+class Foo {}
+class Bar {}
+
+var foo = Foo()
+var bar = Bar()
+
+io.println(foo instanceof Foo)             // Output: true
+io.println(bar instanceof Bar)             // Output: true
+
+io.println(foo instanceof Bar)             // Output: false
+io.println(bar instanceof Foo)             // Output: false
+
+io.println(io.stdin instanceof io.Reader)  // Output: true
+io.println(io.stdout instanceof io.Writer) // Output: true
+
+io.println(io.stdin instanceof io.Writer)  // Output: false
+io.println(io.stdout instanceof io.Reader) // Output: false
+
+// '!instanceof' works as well
+io.println(foo !instanceof Foo)             // Output: false
+io.println(bar !instanceof Bar)             // Output: false
+
+io.println(foo !instanceof Bar)             // Output: true
+io.println(bar !instanceof Foo)             // Output: true
 ```
 
 ### Constructor Failure

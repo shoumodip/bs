@@ -76,6 +76,7 @@ var KeywordsBs = [
     "match",
     "in",
     "is",
+    "instanceof",
     "for",
     "while",
     "break",

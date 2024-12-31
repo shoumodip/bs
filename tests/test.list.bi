@@ -1,4 +1,4 @@
-:i count 150
+:i count 151
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -1907,7 +1907,7 @@ assert/with_message.bs:2:1: Ligma
 :b shell 25
 ../bin/bs core/readdir.bs
 :i returncode 0
-:b stdout 402
+:b stdout 417
 arithmetics DIR
 arrays DIR
 assert DIR
@@ -1923,6 +1923,7 @@ executables DIR
 ffi DIR
 functions DIR
 import DIR
+instanceof DIR
 invokation DIR
 lexer DIR
 loops DIR
@@ -2351,6 +2352,32 @@ Hello, world!
 69
 Hello, world!
 420
+
+:b stderr 0
+
+:b shell 28
+../bin/bs instanceof/main.bs
+:i returncode 0
+:b stdout 110
+false
+false
+false
+false
+false
+true
+true
+false
+false
+false
+false
+false
+false
+false
+false
+true
+false
+false
+true
 
 :b stderr 0
 

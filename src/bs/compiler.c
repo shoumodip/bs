@@ -16,7 +16,7 @@ typedef enum {
     BS_POWER_DOT,
 } Bs_Power;
 
-static_assert(BS_COUNT_TOKENS == 78, "Update bs_token_type_power()");
+static_assert(BS_COUNT_TOKENS == 79, "Update bs_token_type_power()");
 static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_DOT:
@@ -26,6 +26,7 @@ static Bs_Power bs_token_type_power(Bs_Token_Type type) {
 
     case BS_TOKEN_IN:
     case BS_TOKEN_IS:
+    case BS_TOKEN_INSTANCEOF:
     case BS_TOKEN_LNOT:
         return BS_POWER_IN;
 
@@ -81,7 +82,7 @@ static Bs_Power bs_token_type_power(Bs_Token_Type type) {
     }
 }
 
-static_assert(BS_COUNT_TOKENS == 78, "Update bs_token_type_can_start()");
+static_assert(BS_COUNT_TOKENS == 79, "Update bs_token_type_can_start()");
 static bool bs_token_type_can_start(Bs_Token_Type type) {
     switch (type) {
     case BS_TOKEN_SPREAD:
@@ -450,7 +451,7 @@ static void bs_compile_assignment(Bs_Compiler *c, const Bs_Token *token, Bs_Op a
     }
 }
 
-static_assert(BS_COUNT_TOKENS == 78, "Update bs_compile_expr()");
+static_assert(BS_COUNT_TOKENS == 79, "Update bs_compile_expr()");
 static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
     Bs_Loc loc = token.loc;
@@ -1119,20 +1120,39 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             bs_chunk_push_op_loc(c->bs, c->chunk, loc);
             break;
 
-        case BS_TOKEN_LNOT:
-            token = bs_lexer_either(&c->lexer, BS_TOKEN_IN, BS_TOKEN_IS);
+        case BS_TOKEN_INSTANCEOF:
+            loc = bs_lexer_peek(&c->lexer).loc;
+            bs_compile_expr(c, lbp);
+            bs_chunk_push_op(c->bs, c->chunk, BS_OP_INSTANCEOF);
+            bs_chunk_push_op_loc(c->bs, c->chunk, loc);
+            break;
+
+        case BS_TOKEN_LNOT: {
+            const Bs_Token_Type expected[] = {
+                BS_TOKEN_IN,
+                BS_TOKEN_IS,
+                BS_TOKEN_INSTANCEOF,
+            };
+            token = bs_lexer_one_of(&c->lexer, expected, bs_c_array_size(expected));
             if (token.type == BS_TOKEN_IN) {
                 bs_compile_expr(c, lbp);
                 bs_chunk_push_op(c->bs, c->chunk, BS_OP_IN);
                 bs_chunk_push_op_loc(c->bs, c->chunk, loc);
-            } else {
+            } else if (token.type == BS_TOKEN_IS) {
                 loc = bs_lexer_peek(&c->lexer).loc;
                 bs_compile_expr(c, lbp);
                 bs_chunk_push_op(c->bs, c->chunk, BS_OP_IS);
                 bs_chunk_push_op_loc(c->bs, c->chunk, loc);
+            } else if (token.type == BS_TOKEN_INSTANCEOF) {
+                loc = bs_lexer_peek(&c->lexer).loc;
+                bs_compile_expr(c, lbp);
+                bs_chunk_push_op(c->bs, c->chunk, BS_OP_INSTANCEOF);
+                bs_chunk_push_op_loc(c->bs, c->chunk, loc);
+            } else {
+                assert(false && "unreachable");
             }
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_LNOT);
-            break;
+        } break;
 
         default:
             assert(false && "unreachable");
@@ -1396,7 +1416,7 @@ static void bs_compile_jumps_reset(Bs_Compiler *c, Bs_Jumps save) {
     c->lambda->jumps.start = save.start;
 }
 
-static_assert(BS_COUNT_TOKENS == 78, "Update bs_compile_stmt()");
+static_assert(BS_COUNT_TOKENS == 79, "Update bs_compile_stmt()");
 static void bs_compile_stmt(Bs_Compiler *c) {
     Bs_Token token = bs_lexer_next(&c->lexer);
 

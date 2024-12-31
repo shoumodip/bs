@@ -1878,7 +1878,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 74, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 75, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const bool handles_on_save = bs->handles_on;
@@ -2617,6 +2617,38 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         case BS_OP_TYPEOF: {
             const Bs_Sv name = bs_value_type_name_full(bs_stack_peek(bs, 0));
             bs_stack_set(bs, 0, bs_value_object(bs_str_new(bs, name)));
+        } break;
+
+        case BS_OP_INSTANCEOF: {
+            const Bs_Value type = bs_stack_pop(bs);
+
+            bool ok = false;
+            if (type.type == BS_VALUE_OBJECT) {
+                if (type.as.object->type == BS_OBJECT_CLASS ||
+                    type.as.object->type == BS_OBJECT_C_CLASS) {
+                    ok = true;
+                }
+            }
+
+            if (!ok) {
+                const Bs_Sv sv = bs_value_type_name_full(type);
+                bs_error(bs, "expected class, got " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
+            }
+
+            const Bs_Value value = bs_stack_pop(bs);
+            ok = false;
+            if (value.type == BS_VALUE_OBJECT) {
+                if (value.as.object->type == BS_OBJECT_INSTANCE &&
+                    type.as.object->type == BS_OBJECT_CLASS) {
+                    ok = ((Bs_Instance *)value.as.object)->class == (Bs_Class *)type.as.object;
+                }
+
+                if (value.as.object->type == BS_OBJECT_C_INSTANCE &&
+                    type.as.object->type == BS_OBJECT_C_CLASS) {
+                    ok = ((Bs_C_Instance *)value.as.object)->class == (Bs_C_Class *)type.as.object;
+                }
+            }
+            bs_stack_push(bs, bs_value_bool(ok));
         } break;
 
         case BS_OP_APPEND: {

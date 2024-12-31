@@ -1,0 +1,26 @@
+io.println(nil instanceof io.Writer)
+io.println(69 instanceof io.Writer)
+io.println("deez" instanceof io.Writer)
+io.println(io.stdin instanceof io.Writer)
+io.println(io.Writer instanceof io.Writer)
+io.println(io.stdout instanceof io.Writer)
+io.println(io.stderr instanceof io.Writer)
+
+class Foo {}
+class Bar {}
+var foo = Foo()
+var bar = Bar()
+
+io.println(nil instanceof Foo)
+io.println(69 instanceof Bar)
+io.println("deez" instanceof Foo)
+io.println(io.stdin instanceof Bar)
+io.println(Foo instanceof Foo)
+io.println(Foo instanceof Bar)
+io.println(Bar instanceof Foo)
+io.println(Bar instanceof Bar)
+
+io.println(foo instanceof Foo)
+io.println(foo instanceof Bar)
+io.println(bar instanceof Foo)
+io.println(bar instanceof Bar)
