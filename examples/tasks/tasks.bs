@@ -67,9 +67,7 @@ fn usage(f) {
 }
 
 if len(os.args) < 2 {
-    io.eprintln("Error: command not provided")
-    usage(io.stderr)
-    os.exit(1)
+    return Tasks(TASKS_PATH).list(nil)
 }
 
 var command = os.args[1]

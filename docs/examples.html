@@ -1110,9 +1110,7 @@ Run the program.
 }
 
 <span class='keyword'>if</span> <span class='keyword'>len</span>(os.<span class='field'>args</span>) &lt; <span class='constant'>2</span> {
-    io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: command not provided&quot;</span>)
-    <span class='function'>usage</span>(io.<span class='field'>stderr</span>)
-    os.<span class='function'>exit</span>(<span class='constant'>1</span>)
+    <span class='keyword'>return</span> <span class='function'>Tasks</span>(TASKS_PATH).<span class='function'>list</span>(<span class='constant'>nil</span>)
 }
 
 <span class='keyword'>var</span> command = os.<span class='field'>args</span>[<span class='constant'>1</span>]
