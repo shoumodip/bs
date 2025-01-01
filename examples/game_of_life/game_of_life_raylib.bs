@@ -50,18 +50,18 @@ class GameOfLifeRaylib < GameOfLife {
                 FOREGROUND)
         }
 
-        for i in 0, this.width + 1 {
+        for i in 0..=this.width {
             var x = padding_x + i * cell_size
             rl.draw_line(x, 0, x, this.height * cell_size, GRID)
         }
 
-        for i in 0, this.height + 1 {
+        for i in 0..=this.height {
             var y = padding_y + i * cell_size
             rl.draw_line(padding_x, y, padding_x + this.width * cell_size, y, GRID)
         }
 
-        for y in 0, this.height {
-            for x in 0, this.width {
+        for y in 0..this.height {
+            for x in 0..this.width {
                 if this.get(x, y) {
                     rl.draw_rectangle(
                         padding_x + x * cell_size,

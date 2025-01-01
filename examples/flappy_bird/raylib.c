@@ -100,7 +100,7 @@ Bs_Value rl_texture_init(Bs *bs, Bs_Value *args, size_t arity) {
     const Bs_Str *path = (const Bs_Str *)args[0].as.object;
 
     Texture texture = LoadTexture(path->data);
-    if (!IsTextureReady(texture)) {
+    if (!IsTextureValid(texture)) {
         return bs_value_nil;
     }
 
@@ -158,7 +158,7 @@ Bs_Value rl_sound_init(Bs *bs, Bs_Value *args, size_t arity) {
     const Bs_Str *path = (const Bs_Str *)args[0].as.object;
 
     Sound sound = LoadSound(path->data);
-    if (!IsSoundReady(sound)) {
+    if (!IsSoundValid(sound)) {
         return bs_value_nil;
     }
 
@@ -185,7 +185,7 @@ Bs_Value rl_music_init(Bs *bs, Bs_Value *args, size_t arity) {
     const Bs_Str *path = (const Bs_Str *)args[0].as.object;
 
     Music music = LoadMusicStream(path->data);
-    if (!IsMusicReady(music)) {
+    if (!IsMusicValid(music)) {
         return bs_value_nil;
     }
 

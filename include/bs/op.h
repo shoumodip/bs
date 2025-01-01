@@ -97,6 +97,7 @@ typedef enum {
 
     BS_OP_ITER,
     BS_OP_RANGE,
+    BS_OP_IRANGE,
     BS_COUNT_OPS,
 } Bs_Op;
 

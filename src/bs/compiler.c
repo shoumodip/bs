@@ -1537,9 +1537,11 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         bs_compile_expr(c, BS_POWER_SET);
         bs_lambda_push(c->bs, c->lambda, (Bs_Local){.depth = c->lambda->depth});
 
+        bool inclusive = false;
         if (b.type == BS_TOKEN_IN) {
             // End
-            bs_lexer_expect(&c->lexer, BS_TOKEN_COMMA);
+            bs_lexer_expect(&c->lexer, BS_TOKEN_SPREAD);
+            inclusive = bs_lexer_read(&c->lexer, BS_TOKEN_SET);
 
             locs[1] = bs_lexer_peek(&c->lexer).loc;
             bs_compile_expr(c, BS_POWER_SET);
@@ -1569,8 +1571,11 @@ static void bs_compile_stmt(Bs_Compiler *c) {
             bs_da_push(c->bs, c->lambda, ((Bs_Local){.name = b.sv, .depth = c->lambda->depth}));
         }
 
-        const size_t loop_addr =
-            bs_compile_jump_start(c, b.type == BS_TOKEN_IN ? BS_OP_RANGE : BS_OP_ITER);
+        Bs_Op op = BS_OP_ITER;
+        if (b.type == BS_TOKEN_IN) {
+            op = inclusive ? BS_OP_IRANGE : BS_OP_RANGE;
+        }
+        const size_t loop_addr = bs_compile_jump_start(c, op);
 
         bs_chunk_push_op_loc(c->bs, c->chunk, locs[0]);
         if (b.type == BS_TOKEN_IN) {

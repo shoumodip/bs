@@ -7,7 +7,7 @@ The UNIX `cat` coreutil.
 $ bs cat.bs cat.bs # Poor man's quine
 var code = 0
 
-for i in 1, len(os.args) {
+for i in 1..len(os.args) {
     var path = os.args[i]
     var contents = io.readfile(path)
     if !contents {

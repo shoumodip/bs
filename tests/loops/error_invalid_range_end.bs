@@ -1,1 +1,1 @@
-for i in 0, nil {}
+for i in 0..nil {}

@@ -1,1 +1,1 @@
-for i in 0, 10, true {}
+for i in 0..10, true {}

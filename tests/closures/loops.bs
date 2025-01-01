@@ -17,7 +17,7 @@ for _, f in a {
 
 var a = []
 
-for i in 4, 0 {
+for i in 4..0 {
     a[len(a)] = fn () {
         io.println("Captured value is {i}")
     }

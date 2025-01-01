@@ -51,7 +51,7 @@ io.println([1, 2, 3, 4, 2].find(2, 2))
     var count = len(xs)
 
     io.println(xs)
-    for i in 0, 5 {
+    for i in 0..5 {
         xs[len(xs)] = "Temp #" $ i
     }
 

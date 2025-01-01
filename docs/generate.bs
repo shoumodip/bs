@@ -248,7 +248,7 @@ fn source(f, source, bs) {
                         take(ishex)
                     } else {
                         take(ascii.isdigit)
-                        if i < n && source[i] == "." {
+                        if i + 1 < n && source[i] == "." && ascii.isdigit(source[i + 1]) {
                             i += 1
                             take(ascii.isdigit)
                         }
@@ -624,7 +624,7 @@ fn generate(path) {
                 }
 
                 if count <= level {
-                    for i in count, level + 1 {
+                    for i in count..level + 1 {
                         f.writeln("</section>")
                     }
                 }
@@ -689,7 +689,7 @@ fn generate(path) {
         }
     }
 
-    for i in 1, level {
+    for i in 1..level {
         f.writeln("</section>")
     }
 
@@ -742,7 +742,7 @@ fn generate(path) {
     f.writeln("</body>")
     f.writeln("</html>")
 
-    io.println("Wrote documentation to '{path}'")
+    io.println("Wrote documentation to '{output}'")
 }
 
 fn examples() {

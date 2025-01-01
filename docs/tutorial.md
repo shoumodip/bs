@@ -603,7 +603,7 @@ $ bs loops.bs
 Iterate over range of numbers.
 
 ```bs
-for i in 0, 5 {
+for i in 0..5 {
     io.println(i)
 }
 ```
@@ -620,7 +620,7 @@ $ bs loops.bs
 Iterate over range of numbers with custom step.
 
 ```bs
-for i in 0, 5, 2 {
+for i in 0..5, 2 {
     io.println(i)
 }
 ```
@@ -635,7 +635,7 @@ $ bs loops.bs
 Direction of the range iteration is automatically selected.
 
 ```bs
-for i in 5, 0 {
+for i in 5..0 {
     io.println(i)
 }
 ```
@@ -647,6 +647,24 @@ $ bs loops.bs
 3
 2
 1
+```
+
+The end of the range can be made inclusive.
+
+```bs
+for i in 0..=5 {
+    io.println(i)
+}
+```
+
+```console
+$ bs loops.bs
+0
+1
+2
+3
+4
+5
 ```
 
 Iterate over a string.
@@ -724,7 +742,7 @@ while i < 10 {
 
 io.println()
 
-for i in 0, 5 {
+for i in 0..5 {
     if i == 3 {
         continue
     }
@@ -868,7 +886,7 @@ captured as unique values in the nested closure on each iteration of the loop.
 ```bs
 var closures = []
 
-for i in 0, 5 {
+for i in 0..5 {
     var z = i * 2
     closures.push(fn () -> io.println(i, z))
 }

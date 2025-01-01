@@ -34,7 +34,7 @@ The UNIX <code>cat</code> coreutil.
 
 <span class='keyword'>var</span> code = <span class='constant'>0</span>
 
-<span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>1</span>, <span class='keyword'>len</span>(os.<span class='field'>args</span>) {
+<span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>1</span>..<span class='keyword'>len</span>(os.<span class='field'>args</span>) {
     <span class='keyword'>var</span> path = os.<span class='field'>args</span>[i]
     <span class='keyword'>var</span> contents = io.<span class='function'>readfile</span>(path)
     <span class='keyword'>if</span> !contents {
@@ -64,7 +64,7 @@ os.<span class='function'>exit</span>(code)
 <span class='string'>$ </span>bs cat.bs cat.bs <span class='comment'># Poor man&apos;s quine</span>
 var code = 0
 
-for i in 1, len(os.args) {
+for i in 1..len(os.args) {
     var path = os.args[i]
     var contents = io.readfile(path)
     if !contents {
@@ -186,7 +186,7 @@ The UNIX <code>grep</code> coreutil.
 
 <span class='keyword'>var</span> code = <span class='constant'>0</span>
 
-<span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>2</span>, <span class='keyword'>len</span>(os.<span class='field'>args</span>) {
+<span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>2</span>..<span class='keyword'>len</span>(os.<span class='field'>args</span>) {
     <span class='keyword'>var</span> path = os.<span class='field'>args</span>[i]
 
     <span class='keyword'>var</span> f = io.<span class='function'>Reader</span>(path)
@@ -419,14 +419,14 @@ for proof of Turing Completeness.
 <span class='keyword'>var</span> board = [].<span class='function'>resize</span>(<span class='constant'>30</span>).<span class='function'>fill</span>(<span class='constant'>0</span>)
 board[<span class='keyword'>len</span>(board) - <span class='constant'>2</span>] = <span class='constant'>1</span>
 
-<span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='keyword'>len</span>(board) - <span class='constant'>2</span> {
+<span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>..<span class='keyword'>len</span>(board) - <span class='constant'>2</span> {
     <span class='keyword'>for</span> _, j <span class='keyword'>in</span> board {
         io.<span class='function'>print</span>(<span class='keyword'>if</span> j != <span class='constant'>0</span> <span class='keyword'>then</span> <span class='string'>&quot;*&quot;</span> <span class='keyword'>else</span> <span class='string'>&quot; &quot;</span>)
     }
     io.<span class='function'>println</span>()
 
     <span class='keyword'>var</span> pattern = (board[<span class='constant'>0</span>] &lt;&lt; <span class='constant'>1</span>) | board[<span class='constant'>1</span>]
-    <span class='keyword'>for</span> j <span class='keyword'>in</span> <span class='constant'>1</span>, <span class='keyword'>len</span>(board) - <span class='constant'>1</span> {
+    <span class='keyword'>for</span> j <span class='keyword'>in</span> <span class='constant'>1</span>..<span class='keyword'>len</span>(board) - <span class='constant'>1</span> {
         pattern = ((pattern &lt;&lt; <span class='constant'>1</span>) &amp; <span class='constant'>7</span>) | board[j + <span class='constant'>1</span>]
         board[j] = (<span class='constant'>110</span> &gt;&gt; pattern) &amp; <span class='constant'>1</span>
     }
@@ -530,8 +530,8 @@ An implementation of
 
         <span class='keyword'>fn</span> <span class='function'>nbors</span>(x, y) {
             <span class='keyword'>var</span> count = <span class='constant'>0</span>
-            <span class='keyword'>for</span> dy <span class='keyword'>in</span> -<span class='constant'>1</span>, <span class='constant'>2</span> {
-                <span class='keyword'>for</span> dx <span class='keyword'>in</span> -<span class='constant'>1</span>, <span class='constant'>2</span> {
+            <span class='keyword'>for</span> dy <span class='keyword'>in</span> -<span class='constant'>1</span>..<span class='constant'>2</span> {
+                <span class='keyword'>for</span> dx <span class='keyword'>in</span> -<span class='constant'>1</span>..<span class='constant'>2</span> {
                     <span class='keyword'>if</span> dx == <span class='constant'>0</span> &amp;&amp; dy == <span class='constant'>0</span> {
                         <span class='keyword'>continue</span>
                     }
@@ -544,8 +544,8 @@ An implementation of
             <span class='keyword'>return</span> count
         }
 
-        <span class='keyword'>for</span> y <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>this</span>.<span class='field'>height</span> {
-            <span class='keyword'>for</span> x <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>this</span>.<span class='field'>width</span> {
+        <span class='keyword'>for</span> y <span class='keyword'>in</span> <span class='constant'>0</span>..<span class='constant'>this</span>.<span class='field'>height</span> {
+            <span class='keyword'>for</span> x <span class='keyword'>in</span> <span class='constant'>0</span>..<span class='constant'>this</span>.<span class='field'>width</span> {
                 <span class='keyword'>var</span> n = <span class='function'>nbors</span>(x, y)
                 <span class='keyword'>if</span> n == <span class='constant'>2</span> {
                     <span class='function'>set</span>(x, y, <span class='constant'>this</span>.<span class='function'>get</span>(x, y))
@@ -600,8 +600,8 @@ An implementation of
     }
 
     <span class='function'>show</span>() {
-        <span class='keyword'>for</span> y <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>this</span>.<span class='field'>height</span> {
-            <span class='keyword'>for</span> x <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>this</span>.<span class='field'>width</span> {
+        <span class='keyword'>for</span> y <span class='keyword'>in</span> <span class='constant'>0</span>..<span class='constant'>this</span>.<span class='field'>height</span> {
+            <span class='keyword'>for</span> x <span class='keyword'>in</span> <span class='constant'>0</span>..<span class='constant'>this</span>.<span class='field'>width</span> {
                 io.<span class='function'>print</span>(<span class='keyword'>if</span> <span class='constant'>this</span>.<span class='function'>get</span>(x, y) <span class='keyword'>then</span> <span class='string'>&quot;#&quot;</span> <span class='keyword'>else</span> <span class='string'>&quot;.&quot;</span>)
             }
             io.<span class='function'>println</span>()
@@ -943,18 +943,18 @@ Make sure to provide the compiler and linker flags as required.
                 FOREGROUND)
         }
 
-        <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>this</span>.<span class='field'>width</span> + <span class='constant'>1</span> {
+        <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>..=<span class='constant'>this</span>.<span class='field'>width</span> {
             <span class='keyword'>var</span> x = padding_x + i * cell_size
             rl.<span class='function'>draw_line</span>(x, <span class='constant'>0</span>, x, <span class='constant'>this</span>.<span class='field'>height</span> * cell_size, GRID)
         }
 
-        <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>this</span>.<span class='field'>height</span> + <span class='constant'>1</span> {
+        <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>..=<span class='constant'>this</span>.<span class='field'>height</span> {
             <span class='keyword'>var</span> y = padding_y + i * cell_size
             rl.<span class='function'>draw_line</span>(padding_x, y, padding_x + <span class='constant'>this</span>.<span class='field'>width</span> * cell_size, y, GRID)
         }
 
-        <span class='keyword'>for</span> y <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>this</span>.<span class='field'>height</span> {
-            <span class='keyword'>for</span> x <span class='keyword'>in</span> <span class='constant'>0</span>, <span class='constant'>this</span>.<span class='field'>width</span> {
+        <span class='keyword'>for</span> y <span class='keyword'>in</span> <span class='constant'>0</span>..<span class='constant'>this</span>.<span class='field'>height</span> {
+            <span class='keyword'>for</span> x <span class='keyword'>in</span> <span class='constant'>0</span>..<span class='constant'>this</span>.<span class='field'>width</span> {
                 <span class='keyword'>if</span> <span class='constant'>this</span>.<span class='function'>get</span>(x, y) {
                     rl.<span class='function'>draw_rectangle</span>(
                         padding_x + x * cell_size,
@@ -1345,7 +1345,7 @@ Flappy Bird using Raylib.
     <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *path = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>0</span>].<span class='field'>as</span>.<span class='field'>object</span>;
 
     <span class='class'>Texture</span> texture = <span class='function'>LoadTexture</span>(path-&gt;<span class='field'>data</span>);
-    <span class='keyword'>if</span> (!<span class='function'>IsTextureReady</span>(texture)) {
+    <span class='keyword'>if</span> (!<span class='function'>IsTextureValid</span>(texture)) {
         <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
     }
 
@@ -1403,7 +1403,7 @@ Flappy Bird using Raylib.
     <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *path = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>0</span>].<span class='field'>as</span>.<span class='field'>object</span>;
 
     <span class='class'>Sound</span> sound = <span class='function'>LoadSound</span>(path-&gt;<span class='field'>data</span>);
-    <span class='keyword'>if</span> (!<span class='function'>IsSoundReady</span>(sound)) {
+    <span class='keyword'>if</span> (!<span class='function'>IsSoundValid</span>(sound)) {
         <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
     }
 
@@ -1430,7 +1430,7 @@ Flappy Bird using Raylib.
     <span class='keyword'>const</span> <span class='class'>Bs_Str</span> *path = (<span class='keyword'>const</span> <span class='class'>Bs_Str</span> *)args[<span class='constant'>0</span>].<span class='field'>as</span>.<span class='field'>object</span>;
 
     <span class='class'>Music</span> music = <span class='function'>LoadMusicStream</span>(path-&gt;<span class='field'>data</span>);
-    <span class='keyword'>if</span> (!<span class='function'>IsMusicReady</span>(music)) {
+    <span class='keyword'>if</span> (!<span class='function'>IsMusicValid</span>(music)) {
         <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
     }
 

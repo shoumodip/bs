@@ -1889,7 +1889,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 75, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 76, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const bool handles_on_save = bs->handles_on;
@@ -2994,7 +2994,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             }
         } break;
 
-        case BS_OP_RANGE: {
+        case BS_OP_RANGE:
+        case BS_OP_IRANGE: {
             const size_t offset = bs_chunk_read_int(bs);
 
             const Bs_Value start = bs_stack_peek(bs, 2);
@@ -3010,8 +3011,16 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             }
             bs_check_value_type_at(bs, 2, step, BS_VALUE_NUM, "range step");
 
-            const bool over = step.as.number > 0 ? (start.as.number >= end.as.number)
-                                                 : (start.as.number <= end.as.number);
+            bool over;
+            if (op == BS_OP_RANGE) {
+                over = step.as.number > 0 ? (start.as.number >= end.as.number)
+                                          : (start.as.number <= end.as.number);
+            } else {
+                // Inclusive
+                over = step.as.number > 0 ? (start.as.number > end.as.number)
+                                          : (start.as.number < end.as.number);
+            }
+
             if (over) {
                 bs->frame->ip += offset;
             } else {

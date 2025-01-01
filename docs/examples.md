@@ -10,7 +10,7 @@ The UNIX `cat` coreutil.
 
 var code = 0
 
-for i in 1, len(os.args) {
+for i in 1..len(os.args) {
     var path = os.args[i]
     var contents = io.readfile(path)
     if !contents {
@@ -29,7 +29,7 @@ os.exit(code)
 $ bs cat.bs cat.bs # Poor man's quine
 var code = 0
 
-for i in 1, len(os.args) {
+for i in 1..len(os.args) {
     var path = os.args[i]
     var contents = io.readfile(path)
     if !contents {
@@ -112,7 +112,7 @@ if len(os.args) == 2 {
 
 var code = 0
 
-for i in 2, len(os.args) {
+for i in 2..len(os.args) {
     var path = os.args[i]
 
     var f = io.Reader(path)
@@ -284,14 +284,14 @@ for proof of Turing Completeness.
 var board = [].resize(30).fill(0)
 board[len(board) - 2] = 1
 
-for i in 0, len(board) - 2 {
+for i in 0..len(board) - 2 {
     for _, j in board {
         io.print(if j != 0 then "*" else " ")
     }
     io.println()
 
     var pattern = (board[0] << 1) | board[1]
-    for j in 1, len(board) - 1 {
+    for j in 1..len(board) - 1 {
         pattern = ((pattern << 1) & 7) | board[j + 1]
         board[j] = (110 >> pattern) & 1
     }
@@ -371,8 +371,8 @@ class GameOfLife {
 
         fn nbors(x, y) {
             var count = 0
-            for dy in -1, 2 {
-                for dx in -1, 2 {
+            for dy in -1..2 {
+                for dx in -1..2 {
                     if dx == 0 && dy == 0 {
                         continue
                     }
@@ -385,8 +385,8 @@ class GameOfLife {
             return count
         }
 
-        for y in 0, this.height {
-            for x in 0, this.width {
+        for y in 0..this.height {
+            for x in 0..this.width {
                 var n = nbors(x, y)
                 if n == 2 {
                     set(x, y, this.get(x, y))
@@ -430,8 +430,8 @@ class GameOfLifeTUI < GameOfLife {
     }
 
     show() {
-        for y in 0, this.height {
-            for x in 0, this.width {
+        for y in 0..this.height {
+            for x in 0..this.width {
                 io.print(if this.get(x, y) then "#" else ".")
             }
             io.println()
@@ -725,18 +725,18 @@ class GameOfLifeRaylib < GameOfLife {
                 FOREGROUND)
         }
 
-        for i in 0, this.width + 1 {
+        for i in 0..=this.width {
             var x = padding_x + i * cell_size
             rl.draw_line(x, 0, x, this.height * cell_size, GRID)
         }
 
-        for i in 0, this.height + 1 {
+        for i in 0..=this.height {
             var y = padding_y + i * cell_size
             rl.draw_line(padding_x, y, padding_x + this.width * cell_size, y, GRID)
         }
 
-        for y in 0, this.height {
-            for x in 0, this.width {
+        for y in 0..this.height {
+            for x in 0..this.width {
                 if this.get(x, y) {
                     rl.draw_rectangle(
                         padding_x + x * cell_size,
@@ -1078,7 +1078,7 @@ Bs_Value rl_texture_init(Bs *bs, Bs_Value *args, size_t arity) {
     const Bs_Str *path = (const Bs_Str *)args[0].as.object;
 
     Texture texture = LoadTexture(path->data);
-    if (!IsTextureReady(texture)) {
+    if (!IsTextureValid(texture)) {
         return bs_value_nil;
     }
 
@@ -1136,7 +1136,7 @@ Bs_Value rl_sound_init(Bs *bs, Bs_Value *args, size_t arity) {
     const Bs_Str *path = (const Bs_Str *)args[0].as.object;
 
     Sound sound = LoadSound(path->data);
-    if (!IsSoundReady(sound)) {
+    if (!IsSoundValid(sound)) {
         return bs_value_nil;
     }
 
@@ -1163,7 +1163,7 @@ Bs_Value rl_music_init(Bs *bs, Bs_Value *args, size_t arity) {
     const Bs_Str *path = (const Bs_Str *)args[0].as.object;
 
     Music music = LoadMusicStream(path->data);
-    if (!IsMusicReady(music)) {
+    if (!IsMusicValid(music)) {
         return bs_value_nil;
     }
 

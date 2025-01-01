@@ -8,8 +8,8 @@ class GameOfLifeTUI < GameOfLife {
     }
 
     show() {
-        for y in 0, this.height {
-            for x in 0, this.width {
+        for y in 0..this.height {
+            for x in 0..this.width {
                 io.print(if this.get(x, y) then "#" else ".")
             }
             io.println()

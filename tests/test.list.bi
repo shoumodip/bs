@@ -621,7 +621,7 @@ Directly called
 :b shell 22
 ../bin/bs loops/for.bs
 :i returncode 0
-:b stdout 65
+:b stdout 89
 0
 1
 2
@@ -643,6 +643,18 @@ Directly called
 2 1337
 bar 420
 foo 69
+0
+1
+2
+3
+4
+5
+5
+4
+3
+2
+1
+0
 
 :b stderr 0
 
@@ -707,7 +719,7 @@ loops/error_invalid_iterator.bs:1:13: error: cannot iterate over number
 :b stderr 140
 loops/error_invalid_range_start.bs:1:10: error: expected range start to be number, got nil
 
-    1 | for i in nil, nil {}
+    1 | for i in nil..nil {}
       |          ^
 
 :b shell 42
@@ -718,7 +730,7 @@ loops/error_invalid_range_start.bs:1:10: error: expected range start to be numbe
 :b stderr 137
 loops/error_invalid_range_end.bs:1:13: error: expected range end to be number, got nil
 
-    1 | for i in 0, nil {}
+    1 | for i in 0..nil {}
       |             ^
 
 :b shell 43
@@ -729,7 +741,7 @@ loops/error_invalid_range_end.bs:1:13: error: expected range end to be number, g
 :b stderr 152
 loops/error_invalid_range_step.bs:1:17: error: expected range step to be number, got boolean
 
-    1 | for i in 0, 10, true {}
+    1 | for i in 0..10, true {}
       |                 ^
 
 :b shell 27

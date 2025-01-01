@@ -254,7 +254,7 @@ if !f {
 }
 
 io.println("The first 3 lines:")
-for i in 0, 3 {
+for i in 0..3 {
     io.println(f.readln())
 }
 
@@ -1185,7 +1185,7 @@ Get the byte at `position` as a number.
 var b = Bytes()
 b.push("Hello")
 
-for i in 0, b.count() {
+for i in 0..b.count() {
     var c = b.get(i)
     io.println(ascii.char(c), c)
 }
@@ -1339,7 +1339,7 @@ This modifies the array.
 ```bs
 var xs = []
 
-for i in 0, 5 {
+for i in 0..5 {
     xs.push(i * 2)
 }
 
@@ -1373,7 +1373,7 @@ This modifies the array.
 ```bs
 var xs = []
 
-for i in 0, 5 {
+for i in 0..5 {
     if i == 2 {
         continue
     }
@@ -2027,7 +2027,7 @@ otherwise defaulting to `nil`.
 
 ```bs
 var f = meta.compile({{
-    for i in 0, 5 {
+    for i in 0..5 {
         io.println('Nice!')
     }
 }})
@@ -2036,7 +2036,7 @@ assert(f !is meta.Error)
 io.println(f())
 
 var g = meta.compile({{
-    for i in 0, 5 {
+    for i in 0..5 {
         io.println('Hehe!')
     }
 
@@ -2047,7 +2047,7 @@ assert(g !is meta.Error)
 io.println(g())
 
 var h = meta.compile({{
-    for i in 0, 5 {
+    for i in 0..5 {
         io.println('Bruh!')
     }
 
@@ -2129,7 +2129,7 @@ Evaluate a string.
 ```bs
 io.println(meta.eval("34 + 35"))
 io.println(meta.eval({{
-    for i in 0, 5 {
+    for i in 0..5 {
         io.println('Nice!')
     }
 }}))
