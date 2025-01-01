@@ -149,3 +149,4 @@
 ../bin/bs strings/raw_error_unterminated.bs
 ../bin/bs functions/defer.bs
 ../bin/bs oop/classof.bs
+../bin/bs loops/error_break_inside_lambda_inside_loop.bs

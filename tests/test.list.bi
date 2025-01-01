@@ -1,4 +1,4 @@
-:i count 151
+:i count 152
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -2399,4 +2399,15 @@ class Foo {}
 class Bar {}
 
 :b stderr 0
+
+:b shell 56
+../bin/bs loops/error_break_inside_lambda_inside_loop.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 119
+loops/error_break_inside_lambda_inside_loop.bs:3:9: error: unexpected 'break'
+
+    3 |         break
+      |         ^
 

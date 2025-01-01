@@ -1,0 +1,5 @@
+while true {
+    fn f() {
+        break
+    }
+}
