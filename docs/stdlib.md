@@ -1917,7 +1917,7 @@ Example usecase:
 
 ```bs
 var f = meta.compile("Oops@")
-if f instanceof meta.Error {
+if f is meta.Error {
     io.println("Row:", f.row())
     io.println("Col:", f.col())
     io.println("Path:", f.path())
@@ -1989,7 +1989,7 @@ If any errors were encountered while compiling the string, an `Error` instance
 is returned instead of a function.
 
 ```bs
-var f = meta.compile("Oops@"); assert(f instanceof meta.Error)
+var f = meta.compile("Oops@"); assert(f is meta.Error)
 
 io.println("Row:", f.row())
 io.println("Col:", f.col())
@@ -2015,7 +2015,7 @@ So the usage becomes as straight forward as:
 
 ```bs
 var f = meta.compile(...)
-if f instanceof meta.Error {
+if f is meta.Error {
     panic(f.message()) // Error handling...
 }
 
@@ -2032,7 +2032,7 @@ var f = meta.compile({{
     }
 }})
 
-assert(f !instanceof meta.Error)
+assert(f !is meta.Error)
 io.println(f())
 
 var g = meta.compile({{
@@ -2043,7 +2043,7 @@ var g = meta.compile({{
     69
 }})
 
-assert(g !instanceof meta.Error)
+assert(g !is meta.Error)
 io.println(g())
 
 var h = meta.compile({{
@@ -2054,7 +2054,7 @@ var h = meta.compile({{
     return 420
 }})
 
-assert(h !instanceof meta.Error)
+assert(h !is meta.Error)
 io.println(h())
 ```
 
@@ -2085,7 +2085,7 @@ Basically a protected call.
 
 ```bs
 fn handle(result) {
-    if result instanceof meta.Error {
+    if result is meta.Error {
         io.println("ERROR!")
         io.println("Row:", result.row())
         io.println("Col:", result.col())

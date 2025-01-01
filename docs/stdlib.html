@@ -4389,7 +4389,7 @@ Example usecase:
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(<span class='string'>&quot;Oops@&quot;</span>)
-<span class='keyword'>if</span> f <span class='keyword'>instanceof</span> meta.<span class='field'>Error</span> {
+<span class='keyword'>if</span> f <span class='keyword'>is</span> meta.<span class='field'>Error</span> {
     io.<span class='function'>println</span>(<span class='string'>&quot;Row:&quot;</span>, f.<span class='function'>row</span>())
     io.<span class='function'>println</span>(<span class='string'>&quot;Col:&quot;</span>, f.<span class='function'>col</span>())
     io.<span class='function'>println</span>(<span class='string'>&quot;Path:&quot;</span>, f.<span class='function'>path</span>())
@@ -4544,7 +4544,7 @@ is returned instead of a function.
 </svg>
 </button>
 <pre class='code active'>
-<span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(<span class='string'>&quot;Oops@&quot;</span>); <span class='keyword'>assert</span>(f <span class='keyword'>instanceof</span> meta.<span class='field'>Error</span>)
+<span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(<span class='string'>&quot;Oops@&quot;</span>); <span class='keyword'>assert</span>(f <span class='keyword'>is</span> meta.<span class='field'>Error</span>)
 
 io.<span class='function'>println</span>(<span class='string'>&quot;Row:&quot;</span>, f.<span class='function'>row</span>())
 io.<span class='function'>println</span>(<span class='string'>&quot;Col:&quot;</span>, f.<span class='function'>col</span>())
@@ -4593,7 +4593,7 @@ So the usage becomes as straight forward as:
 </button>
 <pre class='code active'>
 <span class='keyword'>var</span> f = meta.<span class='function'>compile</span>(...)
-<span class='keyword'>if</span> f <span class='keyword'>instanceof</span> meta.<span class='field'>Error</span> {
+<span class='keyword'>if</span> f <span class='keyword'>is</span> meta.<span class='field'>Error</span> {
     <span class='keyword'>panic</span>(f.<span class='function'>message</span>()) <span class='comment'>// Error handling...</span>
 }
 
@@ -4622,7 +4622,7 @@ otherwise defaulting to <code>nil</code>.
     }
 }}</span>)
 
-<span class='keyword'>assert</span>(f !<span class='keyword'>instanceof</span> meta.<span class='field'>Error</span>)
+<span class='keyword'>assert</span>(f !<span class='keyword'>is</span> meta.<span class='field'>Error</span>)
 io.<span class='function'>println</span>(<span class='function'>f</span>())
 
 <span class='keyword'>var</span> g = meta.<span class='function'>compile</span>(<span class='string'>{{
@@ -4633,7 +4633,7 @@ io.<span class='function'>println</span>(<span class='function'>f</span>())
     69
 }}</span>)
 
-<span class='keyword'>assert</span>(g !<span class='keyword'>instanceof</span> meta.<span class='field'>Error</span>)
+<span class='keyword'>assert</span>(g !<span class='keyword'>is</span> meta.<span class='field'>Error</span>)
 io.<span class='function'>println</span>(<span class='function'>g</span>())
 
 <span class='keyword'>var</span> h = meta.<span class='function'>compile</span>(<span class='string'>{{
@@ -4644,7 +4644,7 @@ io.<span class='function'>println</span>(<span class='function'>g</span>())
     return 420
 }}</span>)
 
-<span class='keyword'>assert</span>(h !<span class='keyword'>instanceof</span> meta.<span class='field'>Error</span>)
+<span class='keyword'>assert</span>(h !<span class='keyword'>is</span> meta.<span class='field'>Error</span>)
 io.<span class='function'>println</span>(<span class='function'>h</span>())
 </pre>
 </div>
@@ -4701,7 +4701,7 @@ Basically a protected call.
 </button>
 <pre class='code active'>
 <span class='keyword'>fn</span> <span class='function'>handle</span>(result) {
-    <span class='keyword'>if</span> result <span class='keyword'>instanceof</span> meta.<span class='field'>Error</span> {
+    <span class='keyword'>if</span> result <span class='keyword'>is</span> meta.<span class='field'>Error</span> {
         io.<span class='function'>println</span>(<span class='string'>&quot;ERROR!&quot;</span>)
         io.<span class='function'>println</span>(<span class='string'>&quot;Row:&quot;</span>, result.<span class='function'>row</span>())
         io.<span class='function'>println</span>(<span class='string'>&quot;Col:&quot;</span>, result.<span class='function'>col</span>())

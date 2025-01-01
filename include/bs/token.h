@@ -69,7 +69,6 @@ typedef enum {
     BS_TOKEN_DELETE,
     BS_TOKEN_IMPORT,
     BS_TOKEN_TYPEOF,
-    BS_TOKEN_INSTANCEOF,
 
     BS_TOKEN_SET,
 

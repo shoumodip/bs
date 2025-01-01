@@ -117,6 +117,7 @@ typedef enum {
     BS_CHECK_INT,
     BS_CHECK_WHOLE,
     BS_CHECK_ASCII,
+    BS_CHECK_CLASS_OR_C_CLASS,
 } Bs_Check_Type;
 
 typedef struct {
@@ -135,6 +136,7 @@ typedef struct {
 #define bs_check_int ((Bs_Check){.type = BS_CHECK_INT})
 #define bs_check_whole ((Bs_Check){.type = BS_CHECK_WHOLE})
 #define bs_check_ascii ((Bs_Check){.type = BS_CHECK_ASCII})
+#define bs_check_class_or_c_class ((Bs_Check){.type = BS_CHECK_CLASS_OR_C_CLASS})
 
 void bs_check_multi_at(
     Bs *bs,

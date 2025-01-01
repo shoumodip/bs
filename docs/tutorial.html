@@ -2500,7 +2500,7 @@ Luffy lost :(
 </pre>
 </div>
 <section id='s44'>
-<h3>Instanceof</h3>
+<h3>Is</h3>
 <div class='codes'>
 <button class='copy' onclick='copyClick(this)'>
 <svg height='16' viewBox='0 0 16 16' version='1.1' width='16'>
@@ -2519,24 +2519,24 @@ Luffy lost :(
 <span class='keyword'>var</span> foo = <span class='function'>Foo</span>()
 <span class='keyword'>var</span> bar = <span class='function'>Bar</span>()
 
-io.<span class='function'>println</span>(foo <span class='keyword'>instanceof</span> Foo)             <span class='comment'>// Output: true</span>
-io.<span class='function'>println</span>(bar <span class='keyword'>instanceof</span> Bar)             <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(foo <span class='keyword'>is</span> Foo)              <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(bar <span class='keyword'>is</span> Bar)              <span class='comment'>// Output: true</span>
 
-io.<span class='function'>println</span>(foo <span class='keyword'>instanceof</span> Bar)             <span class='comment'>// Output: false</span>
-io.<span class='function'>println</span>(bar <span class='keyword'>instanceof</span> Foo)             <span class='comment'>// Output: false</span>
+io.<span class='function'>println</span>(foo <span class='keyword'>is</span> Bar)              <span class='comment'>// Output: false</span>
+io.<span class='function'>println</span>(bar <span class='keyword'>is</span> Foo)              <span class='comment'>// Output: false</span>
 
-io.<span class='function'>println</span>(io.<span class='field'>stdin</span> <span class='keyword'>instanceof</span> io.<span class='field'>Reader</span>)  <span class='comment'>// Output: true</span>
-io.<span class='function'>println</span>(io.<span class='field'>stdout</span> <span class='keyword'>instanceof</span> io.<span class='field'>Writer</span>) <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(io.<span class='field'>stdin</span> <span class='keyword'>is</span> io.<span class='field'>Reader</span>)   <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(io.<span class='field'>stdout</span> <span class='keyword'>is</span> io.<span class='field'>Writer</span>)  <span class='comment'>// Output: true</span>
 
-io.<span class='function'>println</span>(io.<span class='field'>stdin</span> <span class='keyword'>instanceof</span> io.<span class='field'>Writer</span>)  <span class='comment'>// Output: false</span>
-io.<span class='function'>println</span>(io.<span class='field'>stdout</span> <span class='keyword'>instanceof</span> io.<span class='field'>Reader</span>) <span class='comment'>// Output: false</span>
+io.<span class='function'>println</span>(io.<span class='field'>stdin</span> <span class='keyword'>is</span> io.<span class='field'>Writer</span>)   <span class='comment'>// Output: false</span>
+io.<span class='function'>println</span>(io.<span class='field'>stdout</span> <span class='keyword'>is</span> io.<span class='field'>Reader</span>)  <span class='comment'>// Output: false</span>
 
-<span class='comment'>// &apos;!instanceof&apos; works as well</span>
-io.<span class='function'>println</span>(foo !<span class='keyword'>instanceof</span> Foo)             <span class='comment'>// Output: false</span>
-io.<span class='function'>println</span>(bar !<span class='keyword'>instanceof</span> Bar)             <span class='comment'>// Output: false</span>
+<span class='comment'>// &apos;!is&apos; works as well</span>
+io.<span class='function'>println</span>(foo !<span class='keyword'>is</span> Foo)             <span class='comment'>// Output: false</span>
+io.<span class='function'>println</span>(bar !<span class='keyword'>is</span> Bar)             <span class='comment'>// Output: false</span>
 
-io.<span class='function'>println</span>(foo !<span class='keyword'>instanceof</span> Bar)             <span class='comment'>// Output: true</span>
-io.<span class='function'>println</span>(bar !<span class='keyword'>instanceof</span> Foo)             <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(foo !<span class='keyword'>is</span> Bar)             <span class='comment'>// Output: true</span>
+io.<span class='function'>println</span>(bar !<span class='keyword'>is</span> Foo)             <span class='comment'>// Output: true</span>
 </pre>
 </div>
 </section>
@@ -3289,7 +3289,7 @@ rl.<span class='function'>close_window</span>()
 <a href='#s43'>OOP</a>
 <ul>
 <li>
-<a href='#s44'>Instanceof</a>
+<a href='#s44'>Is</a>
 </li>
 <li>
 <a href='#s45'>Constructor Failure</a>

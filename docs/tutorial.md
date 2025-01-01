@@ -1393,7 +1393,7 @@ Luffy has been defeated!
 Luffy lost :(
 ```
 
-### Instanceof
+### Is
 ```bs
 class Foo {}
 class Bar {}
@@ -1401,24 +1401,24 @@ class Bar {}
 var foo = Foo()
 var bar = Bar()
 
-io.println(foo instanceof Foo)             // Output: true
-io.println(bar instanceof Bar)             // Output: true
+io.println(foo is Foo)              // Output: true
+io.println(bar is Bar)              // Output: true
 
-io.println(foo instanceof Bar)             // Output: false
-io.println(bar instanceof Foo)             // Output: false
+io.println(foo is Bar)              // Output: false
+io.println(bar is Foo)              // Output: false
 
-io.println(io.stdin instanceof io.Reader)  // Output: true
-io.println(io.stdout instanceof io.Writer) // Output: true
+io.println(io.stdin is io.Reader)   // Output: true
+io.println(io.stdout is io.Writer)  // Output: true
 
-io.println(io.stdin instanceof io.Writer)  // Output: false
-io.println(io.stdout instanceof io.Reader) // Output: false
+io.println(io.stdin is io.Writer)   // Output: false
+io.println(io.stdout is io.Reader)  // Output: false
 
-// '!instanceof' works as well
-io.println(foo !instanceof Foo)             // Output: false
-io.println(bar !instanceof Bar)             // Output: false
+// '!is' works as well
+io.println(foo !is Foo)             // Output: false
+io.println(bar !is Bar)             // Output: false
 
-io.println(foo !instanceof Bar)             // Output: true
-io.println(bar !instanceof Foo)             // Output: true
+io.println(foo !is Bar)             // Output: true
+io.println(bar !is Foo)             // Output: true
 ```
 
 ### Constructor Failure

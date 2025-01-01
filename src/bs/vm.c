@@ -1159,6 +1159,13 @@ void bs_check_multi_at(
             }
             break;
 
+        case BS_CHECK_CLASS_OR_C_CLASS:
+            if (value.type == BS_VALUE_OBJECT && (value.as.object->type == BS_OBJECT_CLASS ||
+                                                  value.as.object->type == BS_OBJECT_C_CLASS)) {
+                return;
+            }
+            break;
+
         default:
             assert(false && "unreachable");
         }
@@ -1210,6 +1217,10 @@ void bs_check_multi_at(
 
         case BS_CHECK_ASCII:
             bs_fmt(&w, "ASCII code (0 to 127)");
+            break;
+
+        case BS_CHECK_CLASS_OR_C_CLASS:
+            bs_fmt(&w, "class");
             break;
 
         default:
@@ -1878,7 +1889,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 75, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 74, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const bool handles_on_save = bs->handles_on;
@@ -2474,14 +2485,40 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
         case BS_OP_IS: {
             const Bs_Value type = bs_stack_pop(bs);
-            bs_check_object_type(bs, type, BS_OBJECT_STR, "type name");
 
-            const Bs_Str *str = (const Bs_Str *)type.as.object;
+            const Bs_Check checks[] = {
+                bs_check_object(BS_OBJECT_STR),
+                bs_check_class_or_c_class,
+            };
+            bs_check_multi(bs, type, checks, bs_c_array_size(checks), "type");
+
+            bool ok = false;
             const Bs_Value value = bs_stack_pop(bs);
-            bs_stack_push(
-                bs,
-                bs_value_bool(
-                    bs_sv_eq(bs_value_type_name_full(value), Bs_Sv(str->data, str->size))));
+
+            switch (type.as.object->type) {
+            case BS_OBJECT_STR: {
+                const Bs_Str *str = (const Bs_Str *)type.as.object;
+                ok = bs_sv_eq(bs_value_type_name_full(value), Bs_Sv(str->data, str->size));
+            } break;
+
+            case BS_OBJECT_CLASS:
+                if (value.type == BS_VALUE_OBJECT && value.as.object->type == BS_OBJECT_INSTANCE) {
+                    ok = ((Bs_Instance *)value.as.object)->class == (Bs_Class *)type.as.object;
+                }
+                break;
+
+            case BS_OBJECT_C_CLASS:
+                if (value.type == BS_VALUE_OBJECT &&
+                    value.as.object->type == BS_OBJECT_C_INSTANCE) {
+                    ok = ((Bs_C_Instance *)value.as.object)->class == (Bs_C_Class *)type.as.object;
+                }
+                break;
+
+            default:
+                assert(false && "unreachable");
+            }
+
+            bs_stack_push(bs, bs_value_bool(ok));
         } break;
 
         case BS_OP_LEN: {
@@ -2617,38 +2654,6 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         case BS_OP_TYPEOF: {
             const Bs_Sv name = bs_value_type_name_full(bs_stack_peek(bs, 0));
             bs_stack_set(bs, 0, bs_value_object(bs_str_new(bs, name)));
-        } break;
-
-        case BS_OP_INSTANCEOF: {
-            const Bs_Value type = bs_stack_pop(bs);
-
-            bool ok = false;
-            if (type.type == BS_VALUE_OBJECT) {
-                if (type.as.object->type == BS_OBJECT_CLASS ||
-                    type.as.object->type == BS_OBJECT_C_CLASS) {
-                    ok = true;
-                }
-            }
-
-            if (!ok) {
-                const Bs_Sv sv = bs_value_type_name_full(type);
-                bs_error(bs, "expected class, got " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
-            }
-
-            const Bs_Value value = bs_stack_pop(bs);
-            ok = false;
-            if (value.type == BS_VALUE_OBJECT) {
-                if (value.as.object->type == BS_OBJECT_INSTANCE &&
-                    type.as.object->type == BS_OBJECT_CLASS) {
-                    ok = ((Bs_Instance *)value.as.object)->class == (Bs_Class *)type.as.object;
-                }
-
-                if (value.as.object->type == BS_OBJECT_C_INSTANCE &&
-                    type.as.object->type == BS_OBJECT_C_CLASS) {
-                    ok = ((Bs_C_Instance *)value.as.object)->class == (Bs_C_Class *)type.as.object;
-                }
-            }
-            bs_stack_push(bs, bs_value_bool(ok));
         } break;
 
         case BS_OP_APPEND: {

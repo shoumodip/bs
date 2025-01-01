@@ -18,3 +18,30 @@ io.println({} is "nil")
 io.println("".reverse is "nil")
 io.println(Regex is "nil")
 io.println(Regex("") is "nil")
+
+io.println(nil is io.Writer)
+io.println(69 is io.Writer)
+io.println("deez" is io.Writer)
+io.println(io.stdin is io.Writer)
+io.println(io.Writer is io.Writer)
+io.println(io.stdout is io.Writer)
+io.println(io.stderr is io.Writer)
+
+class Foo {}
+class Bar {}
+var foo = Foo()
+var bar = Bar()
+
+io.println(nil is Foo)
+io.println(69 is Bar)
+io.println("deez" is Foo)
+io.println(io.stdin is Bar)
+io.println(Foo is Foo)
+io.println(Foo is Bar)
+io.println(Bar is Foo)
+io.println(Bar is Bar)
+
+io.println(foo is Foo)
+io.println(foo is Bar)
+io.println(bar is Foo)
+io.println(bar is Bar)
