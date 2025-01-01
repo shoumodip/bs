@@ -1889,7 +1889,7 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 74, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 75, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
     const bool gc_on_save = bs->gc_on;
     const bool handles_on_save = bs->handles_on;
@@ -2654,6 +2654,19 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         case BS_OP_TYPEOF: {
             const Bs_Sv name = bs_value_type_name_full(bs_stack_peek(bs, 0));
             bs_stack_set(bs, 0, bs_value_object(bs_str_new(bs, name)));
+        } break;
+
+        case BS_OP_CLASSOF: {
+            const Bs_Value value = bs_stack_peek(bs, 0);
+            Bs_Value result = bs_value_nil;
+            if (value.type == BS_VALUE_OBJECT) {
+                if (value.as.object->type == BS_OBJECT_INSTANCE) {
+                    result = bs_value_object(((const Bs_Instance *)value.as.object)->class);
+                } else if (value.as.object->type == BS_OBJECT_C_INSTANCE) {
+                    result = bs_value_object(((const Bs_C_Instance *)value.as.object)->class);
+                }
+            }
+            bs_stack_set(bs, 0, result);
         } break;
 
         case BS_OP_APPEND: {

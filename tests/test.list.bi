@@ -1,4 +1,4 @@
-:i count 150
+:i count 151
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -2370,6 +2370,33 @@ Hello, world!
 69
 Hello, world!
 420
+
+:b stderr 0
+
+:b shell 24
+../bin/bs oop/classof.bs
+:i returncode 0
+:b stdout 276
+nil
+nil
+class Reader {
+    // Can fail
+    eof = <fn>,
+    tell = <fn>,
+    close = <fn>,
+    seek = <fn>,
+    read = <fn>,
+    readln = <fn>
+}
+class Writer {
+    // Can fail
+    flush = <fn>,
+    close = <fn>,
+    writeln = <fn>,
+    write = <fn>
+}
+class Foo {}
+class Bar {}
 
 :b stderr 0
 

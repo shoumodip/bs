@@ -1421,6 +1421,48 @@ io.println(foo !is Bar)             // Output: true
 io.println(bar !is Foo)             // Output: true
 ```
 
+### Classof
+```bs
+class Foo {}
+class Bar {}
+
+var foo = Foo()
+var bar = Bar()
+
+// Output:
+// class Foo {}
+io.println(classof(foo))
+
+// Output:
+// class Bar {}
+io.println(classof(bar))
+
+// Output:
+// class Reader {
+//     // Can fail
+//     eof = <fn>,
+//     tell = <fn>,
+//     close = <fn>,
+//     seek = <fn>,
+//     read = <fn>,
+//     readln = <fn>
+// }
+io.println(classof(io.stdin))
+
+// Output:
+// class Writer {
+//     // Can fail
+//     flush = <fn>,
+//     close = <fn>,
+//     writeln = <fn>,
+//     write = <fn>
+// }
+io.println(classof(io.stdout))
+
+// Output: nil
+io.println(classof(69))
+```
+
 ### Constructor Failure
 Typical OOP languages mandate that constructors must return the instance under
 all circumstances, even at the cost of error handling. In BS however,

@@ -1,0 +1,11 @@
+class Foo {}
+class Bar {}
+var foo = Foo()
+var bar = Bar()
+
+io.println(classof(nil))
+io.println(classof("deez"))
+io.println(classof(io.stdin))
+io.println(classof(io.stdout))
+io.println(classof(foo))
+io.println(classof(bar))

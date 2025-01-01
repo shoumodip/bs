@@ -148,3 +148,4 @@
 ../bin/bs strings/raw_error_expected_newline_at_begin.bs
 ../bin/bs strings/raw_error_unterminated.bs
 ../bin/bs functions/defer.bs
+../bin/bs oop/classof.bs
