@@ -194,6 +194,7 @@ Line: Foo
 Line: Bar
 Line: Baz
 Line: People's dreams have no end! ~ Blackbeard
+Line:
 ```
 
 #### Reader.eof() @method
@@ -547,6 +548,7 @@ p.wait()
 $ bs demo.bs
 Line: total 4
 Line: -rw-r--r-- 1 shoumodip shoumodip 241 Oct  6 15:44 demo.bs
+Line:
 ```
 
 #### Process.stderr() @method
