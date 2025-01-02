@@ -100,6 +100,7 @@ typedef enum {
     BS_TOKEN_FN,
     BS_TOKEN_PUB,
     BS_TOKEN_VAR,
+    BS_TOKEN_CONST,
     BS_TOKEN_RETURN,
     BS_TOKEN_DEFER,
 

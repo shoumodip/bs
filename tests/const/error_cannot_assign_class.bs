@@ -1,0 +1,2 @@
+const class Foo {}
+Foo = 69

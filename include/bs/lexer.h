@@ -7,6 +7,7 @@
 
 typedef enum {
     BS_ERROR_MAIN,
+    BS_ERROR_WARN,
     BS_ERROR_PANIC,
     BS_ERROR_TRACE,
     BS_ERROR_STANDALONE,

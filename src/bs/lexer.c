@@ -13,6 +13,8 @@ void bs_error_write_default(Bs_Error_Writer *w, Bs_Error error) {
 
     if (error.type == BS_ERROR_TRACE) {
         fprintf(stderr, "in ");
+    } else if (error.type == BS_ERROR_WARN) {
+        fprintf(stderr, "warning: ");
     } else if (error.type != BS_ERROR_PANIC) {
         fprintf(stderr, "error: ");
     }
@@ -180,7 +182,7 @@ Bs_Token bs_lexer_str(Bs_Lexer *l, Bs_Loc loc, char end) {
     return token;
 }
 
-static_assert(BS_COUNT_TOKENS == 79, "Update bs_lexer_next()");
+static_assert(BS_COUNT_TOKENS == 80, "Update bs_lexer_next()");
 Bs_Token bs_lexer_next(Bs_Lexer *l) {
     if (l->peeked) {
         bs_lexer_unbuffer(l);
@@ -382,6 +384,8 @@ Bs_Token bs_lexer_next(Bs_Lexer *l) {
             token.type = BS_TOKEN_PUB;
         } else if (bs_sv_eq(token.sv, Bs_Sv_Static("var"))) {
             token.type = BS_TOKEN_VAR;
+        } else if (bs_sv_eq(token.sv, Bs_Sv_Static("const"))) {
+            token.type = BS_TOKEN_CONST;
         } else if (bs_sv_eq(token.sv, Bs_Sv_Static("return"))) {
             token.type = BS_TOKEN_RETURN;
         } else if (bs_sv_eq(token.sv, Bs_Sv_Static("defer"))) {

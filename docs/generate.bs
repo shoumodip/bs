@@ -84,6 +84,7 @@ var KeywordsBs = [
     "fn",
     "pub",
     "var",
+    "const",
     "return",
     "defer",
     "class",

@@ -1,4 +1,4 @@
-:i count 152
+:i count 159
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -1938,7 +1938,7 @@ assert/with_message.bs:2:1: Ligma
 :b shell 25
 ../bin/bs core/readdir.bs
 :i returncode 0
-:b stdout 402
+:b stdout 412
 arithmetics DIR
 arrays DIR
 assert DIR
@@ -1947,6 +1947,7 @@ builtin_methods DIR
 closures DIR
 comparisons DIR
 conditions DIR
+const DIR
 containers DIR
 core DIR
 delete DIR
@@ -2166,9 +2167,9 @@ match/error_cannot_use_var.bs:2:11: error: cannot use 'var' here without wrappin
 Lol 420
 
 :b stderr 141
-lexer/multiline_string_binary_continuation.bs:18:6: error: invalid operands to binary (-): string, number
+lexer/multiline_string_binary_continuation.bs:16:6: error: invalid operands to binary (-): string, number
 
-    18 | Bar" - 1
+    16 | Bar" - 1
        |      ^
 
 :b shell 41
@@ -2422,4 +2423,79 @@ loops/error_break_inside_lambda_inside_loop.bs:3:9: error: unexpected 'break'
 
     3 |         break
       |         ^
+
+:b shell 44
+../bin/bs const/error_cannot_assign_local.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 98
+const/error_cannot_assign_local.bs:2:1: error: cannot assign to constant
+
+    2 | a = 1
+      | ^
+
+:b shell 50
+../bin/bs const/error_cannot_assign_local_in_fn.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 112
+const/error_cannot_assign_local_in_fn.bs:3:5: error: cannot assign to constant
+
+    3 |     a = 1
+      |     ^
+
+:b shell 46
+../bin/bs const/error_cannot_assign_upvalue.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 116
+const/error_cannot_assign_upvalue.bs:4:9: error: cannot assign to constant
+
+    4 |         a = 1
+      |         ^
+
+:b shell 53
+../bin/bs const/error_cannot_assign_upvalue_nested.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 141
+const/error_cannot_assign_upvalue_nested.bs:9:17: error: cannot assign to constant
+
+    9 |                 a = 69
+      |                 ^
+
+:b shell 47
+../bin/bs const/error_cannot_assign_function.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 102
+const/error_cannot_assign_function.bs:2:1: error: cannot assign to constant
+
+    2 | f = 69
+      | ^
+
+:b shell 44
+../bin/bs const/error_cannot_assign_class.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 101
+const/error_cannot_assign_class.bs:2:1: error: cannot assign to constant
+
+    2 | Foo = 69
+      | ^
+
+:b shell 23
+../bin/bs const/main.bs
+:i returncode 0
+:b stdout 11
+69
+0 1 2 3
+
+:b stderr 0
 

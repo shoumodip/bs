@@ -150,3 +150,10 @@
 ../bin/bs functions/defer.bs
 ../bin/bs oop/classof.bs
 ../bin/bs loops/error_break_inside_lambda_inside_loop.bs
+../bin/bs const/error_cannot_assign_local.bs
+../bin/bs const/error_cannot_assign_local_in_fn.bs
+../bin/bs const/error_cannot_assign_upvalue.bs
+../bin/bs const/error_cannot_assign_upvalue_nested.bs
+../bin/bs const/error_cannot_assign_function.bs
+../bin/bs const/error_cannot_assign_class.bs
+../bin/bs const/main.bs

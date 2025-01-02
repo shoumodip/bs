@@ -30,6 +30,10 @@ static void bs_error_write_colors(Bs_Error_Writer *w, Bs_Error error) {
         crossline_color_set_on(0, CROSSLINE_FGCOLOR_YELLOW);
         fprintf(stderr, "in ");
         crossline_color_set_on(0, CROSSLINE_FGCOLOR_DEFAULT);
+    } else if (error.type == BS_ERROR_WARN) {
+        crossline_color_set_on(0, CROSSLINE_FGCOLOR_YELLOW);
+        fprintf(stderr, "warning: ");
+        crossline_color_set_on(0, CROSSLINE_FGCOLOR_DEFAULT);
     } else if (error.type != BS_ERROR_PANIC) {
         crossline_color_set_on(0, CROSSLINE_FGCOLOR_RED);
         fprintf(stderr, "error: ");

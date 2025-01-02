@@ -1,0 +1,13 @@
+fn f() {
+    const a = 0
+    return fn () {
+        const b = 1
+        return fn () {
+            const c = 2
+            return fn () {
+                const d = 3
+                a = 69
+            }
+        }
+    }
+}

@@ -71,6 +71,8 @@ typedef struct {
     Bs_Str *cwd;
 
     Bs_Unwind unwind;
+
+    bool showed_const_correctness_warning_repl;
 } Bs_Config;
 
 Bs_Config *bs_config(Bs *bs);

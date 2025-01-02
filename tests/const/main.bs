@@ -1,0 +1,16 @@
+const x = 69
+io.println(x)
+
+(fn () {
+    const a = 0
+    return fn () {
+        const b = 1
+        return fn () {
+            const c = 2
+            return fn () {
+                const d = 3
+                io.println(a, b, c, d)
+            }
+        }
+    }
+})()()()()

@@ -1155,6 +1155,30 @@ $ bs variables.bs
 Global variables can be accessed from all modules. More on that later.
 </blockquote>
 
+## Constants
+```bs
+const a = 34
+const b = 35
+io.println(a + b) // Output: 69
+```
+
+Constants cannot be assigned to.
+
+```bs
+const a = 69
+a = 420           // Compile Time Error!
+```
+
+Functions and classes can also be defined as constant.
+
+```bs
+const fn f() {}
+f = 69    // Compile Time Error!
+
+const class Foo {}
+Foo = 420 // Compile Time Error!
+```
+
 ## Import
 ```bs
 // one.bs
