@@ -1,0 +1,13 @@
+const M = {
+    N = {
+        O = {}
+    }
+}
+
+fn M.add(x, y) -> x + y
+fn M.N.sub(x, y) -> x - y
+fn M.N.O.mul(x, y) -> x * y
+
+io.println(M.add(34, 35))
+io.println(M.N.sub(500, 80))
+io.println(M.N.O.mul(7, 191))

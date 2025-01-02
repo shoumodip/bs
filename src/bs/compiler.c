@@ -1381,11 +1381,51 @@ static void bs_compile_function(Bs_Compiler *c, bool public, bool constant) {
     Bs_Token token;
 
     const size_t const_index = bs_compile_definition(c, &token, public, constant);
+
+    Bs_Token dot = {0};
+    bool field = false;
+    if (!public) {
+        dot = bs_lexer_peek(&c->lexer);
+        if (dot.type == BS_TOKEN_DOT) {
+            if (constant) {
+                bs_lexer_error(
+                    &c->lexer, dot.loc, "unexpected '.' in constant function definition");
+            }
+
+            c->lambda->count--;
+            field = true;
+
+            bs_compile_identifier(c, &token);
+            bs_lexer_unbuffer(&c->lexer);
+
+            token = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
+            while (bs_lexer_peek(&c->lexer).type == BS_TOKEN_DOT) {
+                bs_chunk_push_op_value(
+                    c->bs,
+                    c->chunk,
+                    BS_OP_IGET_CONST,
+                    bs_value_object(bs_str_new(c->bs, token.sv)));
+
+                bs_chunk_push_op_loc(c->bs, c->chunk, dot.loc);
+                bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
+
+                dot = bs_lexer_next(&c->lexer);
+                token = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
+            }
+        }
+    }
+
     bs_compile_lambda(c, BS_LAMBDA_FN, &token);
 
     if (public) {
         bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_GDEF, const_index);
         bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
+    } else if (field) {
+        bs_chunk_push_op_value(
+            c->bs, c->chunk, BS_OP_ISET_CONST, bs_value_object(bs_str_new(c->bs, token.sv)));
+        bs_chunk_push_op_loc(c->bs, c->chunk, dot.loc);
+        bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
+        bs_chunk_push_op(c->bs, c->chunk, BS_OP_DROP); // The container
     }
 }
 

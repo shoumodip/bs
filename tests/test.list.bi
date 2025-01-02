@@ -1,4 +1,4 @@
-:i count 159
+:i count 161
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -2498,4 +2498,25 @@ const/error_cannot_assign_class.bs:2:1: error: cannot assign to constant
 0 1 2 3
 
 :b stderr 0
+
+:b shell 35
+../bin/bs functions/field_define.bs
+:i returncode 0
+:b stdout 12
+69
+420
+1337
+
+:b stderr 0
+
+:b shell 50
+../bin/bs functions/error_field_define_constant.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 154
+functions/error_field_define_constant.bs:1:13: error: unexpected '.' in constant function definition
+
+    1 | const fn foo.bar() {}
+      |             ^
 

@@ -857,6 +857,15 @@ $ bs functions.bs
 69
 ```
 
+### Field Functions
+```bs
+var M = {}
+
+fn M.add(x, y) -> x + y
+
+io.println(M.add(34, 35)) // Output: 69
+```
+
 ### Closures
 
 ```bs
