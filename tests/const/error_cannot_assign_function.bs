@@ -1,2 +1,2 @@
-const fn f() {}
+fn f() {}
 f = 69

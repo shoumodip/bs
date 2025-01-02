@@ -1,2 +1,2 @@
-const class Foo {}
+class Foo {}
 Foo = 69

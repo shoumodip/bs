@@ -1175,17 +1175,24 @@ Constants cannot be assigned to.
 
 ```bs
 const a = 69
-a = 420           // Compile Time Error!
+a = 420 // Compile Time Error!
 ```
 
-Functions and classes can also be defined as constant.
+Functions and classes are constant.
 
 ```bs
-const fn f() {}
+fn f() {}
 f = 69    // Compile Time Error!
 
-const class Foo {}
+class Foo {}
 Foo = 420 // Compile Time Error!
+```
+
+A variable function needs to be declared as a lambda bound to a `var`.
+
+```bs
+var g = fn () {}
+g = 1337  // Not An Error!
 ```
 
 ## Import

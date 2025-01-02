@@ -1303,10 +1303,10 @@ static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Toke
     bs_compile_lambda_end_ops(c, lambda, variadic);
 }
 
-static void bs_compile_class(Bs_Compiler *c, bool public, bool constant) {
+static void bs_compile_class(Bs_Compiler *c, bool public) {
     Bs_Token token;
 
-    size_t const_index = bs_compile_definition(c, &token, true, constant);
+    size_t const_index = bs_compile_definition(c, &token, true, true);
     if (!public) {
         bs_da_push(
             c->bs,
@@ -1314,7 +1314,7 @@ static void bs_compile_class(Bs_Compiler *c, bool public, bool constant) {
             ((Bs_Local){
                 .name = token.sv,
                 .depth = c->lambda->depth,
-                .constant = constant,
+                .constant = true,
             }));
     }
 
@@ -1377,21 +1377,16 @@ static void bs_compile_class(Bs_Compiler *c, bool public, bool constant) {
     c->class = c->class->outer;
 }
 
-static void bs_compile_function(Bs_Compiler *c, bool public, bool constant) {
+static void bs_compile_function(Bs_Compiler *c, bool public) {
     Bs_Token token;
 
-    const size_t const_index = bs_compile_definition(c, &token, public, constant);
+    const size_t const_index = bs_compile_definition(c, &token, public, true);
 
     Bs_Token dot = {0};
     bool field = false;
     if (!public) {
         dot = bs_lexer_peek(&c->lexer);
         if (dot.type == BS_TOKEN_DOT) {
-            if (constant) {
-                bs_lexer_error(
-                    &c->lexer, dot.loc, "unexpected '.' in constant function definition");
-            }
-
             c->lambda->count--;
             field = true;
 
@@ -1440,6 +1435,9 @@ static void bs_compile_variable(Bs_Compiler *c, bool public, bool constant) {
     }
 
     if (bs_lexer_read(&c->lexer, BS_TOKEN_SET)) {
+        bs_compile_expr(c, BS_POWER_SET);
+    } else if (constant) {
+        bs_lexer_expect(&c->lexer, BS_TOKEN_SET);
         bs_compile_expr(c, BS_POWER_SET);
     } else {
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
@@ -1707,7 +1705,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
     } break;
 
     case BS_TOKEN_FN:
-        bs_compile_function(c, c->lambda->is_repl && c->lambda->depth == 1, false);
+        bs_compile_function(c, c->lambda->is_repl && c->lambda->depth == 1);
         break;
 
     case BS_TOKEN_PUB:
@@ -1723,11 +1721,11 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         token = bs_lexer_one_of(&c->lexer, expected, bs_c_array_size(expected));
 
         if (token.type == BS_TOKEN_FN) {
-            bs_compile_function(c, true, false);
+            bs_compile_function(c, true);
         } else if (token.type == BS_TOKEN_VAR) {
             bs_compile_variable(c, true, false);
         } else if (token.type == BS_TOKEN_CLASS) {
-            bs_compile_class(c, true, false);
+            bs_compile_class(c, true);
         } else {
             assert(false && "unreachable");
         }
@@ -1755,34 +1753,11 @@ static void bs_compile_stmt(Bs_Compiler *c) {
             }
         }
 
-        const Bs_Token_Type expected[] = {
-            BS_TOKEN_IDENT,
-            BS_TOKEN_FN,
-            BS_TOKEN_CLASS,
-        };
-        token = bs_lexer_one_of(&c->lexer, expected, bs_c_array_size(expected));
-
-        switch (token.type) {
-        case BS_TOKEN_IDENT:
-            bs_lexer_buffer(&c->lexer, token);
-            bs_compile_variable(c, c->lambda->is_repl && c->lambda->depth == 1, true);
-            break;
-
-        case BS_TOKEN_FN:
-            bs_compile_function(c, c->lambda->is_repl && c->lambda->depth == 1, true);
-            break;
-
-        case BS_TOKEN_CLASS:
-            bs_compile_class(c, c->lambda->is_repl && c->lambda->depth == 1, true);
-            break;
-
-        default:
-            assert(false && "unreachable");
-        }
+        bs_compile_variable(c, c->lambda->is_repl && c->lambda->depth == 1, true);
     } break;
 
     case BS_TOKEN_CLASS:
-        bs_compile_class(c, c->lambda->is_repl && c->lambda->depth == 1, false);
+        bs_compile_class(c, c->lambda->is_repl && c->lambda->depth == 1);
         break;
 
     case BS_TOKEN_RETURN:

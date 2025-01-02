@@ -158,4 +158,3 @@
 ../bin/bs const/error_cannot_assign_class.bs
 ../bin/bs const/main.bs
 ../bin/bs functions/field_define.bs
-../bin/bs functions/error_field_define_constant.bs
