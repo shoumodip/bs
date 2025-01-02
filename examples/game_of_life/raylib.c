@@ -3,7 +3,7 @@
 #include <bs/object.h>
 #include <raylib.h>
 
-Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
     bs_arg_check_whole_number(bs, args, 0);
     bs_arg_check_whole_number(bs, args, 1);
@@ -18,51 +18,51 @@ Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-Bs_Value rl_close_window(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_close_window(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     CloseWindow();
     return bs_value_nil;
 }
 
-Bs_Value rl_window_should_close(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_window_should_close(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_bool(WindowShouldClose());
 }
 
-Bs_Value rl_begin_drawing(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_begin_drawing(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     BeginDrawing();
     return bs_value_nil;
 }
 
-Bs_Value rl_end_drawing(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_end_drawing(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     EndDrawing();
     return bs_value_nil;
 }
 
-Bs_Value rl_clear_background(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_clear_background(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
     ClearBackground(GetColor(args[0].as.number));
     return bs_value_nil;
 }
 
-Bs_Value rl_set_exit_key(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_set_exit_key(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
     SetExitKey(args[0].as.number);
     return bs_value_nil;
 }
 
-Bs_Value rl_set_config_flags(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_set_config_flags(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
     SetConfigFlags(args[0].as.number);
     return bs_value_nil;
 }
 
-Bs_Value rl_draw_line(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_draw_line(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 5);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
@@ -80,7 +80,7 @@ Bs_Value rl_draw_line(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-Bs_Value rl_draw_text(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_draw_text(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 5);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
@@ -98,7 +98,7 @@ Bs_Value rl_draw_text(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-Bs_Value rl_draw_rectangle(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_draw_rectangle(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 5);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
@@ -116,44 +116,44 @@ Bs_Value rl_draw_rectangle(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-Bs_Value rl_get_screen_width(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_get_screen_width(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_num(GetScreenWidth());
 }
 
-Bs_Value rl_get_screen_height(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_get_screen_height(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_num(GetScreenHeight());
 }
 
-Bs_Value rl_get_frame_time(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_get_frame_time(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_num(GetFrameTime());
 }
 
-Bs_Value rl_get_mouse_x(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_get_mouse_x(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_num(GetMouseX());
 }
 
-Bs_Value rl_get_mouse_y(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_get_mouse_y(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_num(GetMouseY());
 }
 
-Bs_Value rl_is_mouse_button_released(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_is_mouse_button_released(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
     return bs_value_bool(IsMouseButtonReleased(args[0].as.number));
 }
 
-Bs_Value rl_is_key_pressed(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_is_key_pressed(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
     return bs_value_bool(IsKeyPressed(args[0].as.number));
 }
 
-Bs_Value rl_measure_text(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_measure_text(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     bs_arg_check_whole_number(bs, args, 1);

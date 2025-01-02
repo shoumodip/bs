@@ -47,7 +47,7 @@ class GameOfLife {
 
         for y in 0..this.height {
             for x in 0..this.width {
-                var n = nbors(x, y)
+                const n = nbors(x, y)
                 if n == 2 {
                     set(x, y, this.get(x, y))
                 } else {
@@ -57,7 +57,7 @@ class GameOfLife {
         }
 
         // Swap buffers
-        var t = this.board
+        const t = this.board
         this.board = this.buffer
         this.buffer = t
     }

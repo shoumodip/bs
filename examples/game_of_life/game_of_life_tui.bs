@@ -1,6 +1,6 @@
-var GameOfLife = import("GameOfLife")
+const GameOfLife = import("GameOfLife")
 
-var INTERVAL = 0.1
+const INTERVAL = 0.1
 
 class GameOfLifeTUI < GameOfLife {
     init(width, height) {
@@ -17,7 +17,7 @@ class GameOfLifeTUI < GameOfLife {
     }
 }
 
-var gol = GameOfLifeTUI(20, 10)
+const gol = GameOfLifeTUI(20, 10)
 gol.glider(1, 1)
 
 while true {

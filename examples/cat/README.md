@@ -8,8 +8,8 @@ $ bs cat.bs cat.bs # Poor man's quine
 var code = 0
 
 for i in 1..len(os.args) {
-    var path = os.args[i]
-    var contents = io.readfile(path)
+    const path = os.args[i]
+    const contents = io.readfile(path)
     if !contents {
         io.eprintln("Error: could not read file '{path}'")
         code = 1

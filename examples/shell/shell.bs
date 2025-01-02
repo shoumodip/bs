@@ -1,8 +1,8 @@
-var home = os.getenv("HOME")
+const home = os.getenv("HOME")
 
 // Return a pretty current working directory
 fn pwd() {
-    var cwd = os.getcwd()
+    const cwd = os.getcwd()
     if cwd.prefix(home) {
         return "~" $ cwd.slice(len(home))
     }
@@ -11,78 +11,78 @@ fn pwd() {
 }
 
 // Rawdogging shell lexing with regex any%
-var delim = Regex("[ \n\t]+")
+const delim = Regex("[ \n\t]+")
 
 // Previous working directory
 var previous = nil
 
 while !io.stdin.eof() {
-    var args = io.input("{pwd()} $ ").split(delim)
+    const args = io.input("{pwd()} $ ").split(delim)
     if len(args) == 0 {
         continue
     }
 
-    var cmd = args[0]
-
-    // Builtin 'exit'
-    // Usage:
-    //   exit         -> Exits with 0
-    //   exit <CODE>  -> Exits with CODE
-    if cmd == "exit" {
-        if len(args) > 2 {
-            io.eprintln("Error: too many arguments to command '{cmd}'")
-            continue
-        }
-
-        var code = if len(args) == 2 then args[1].tonumber() else 0
-        if !code {
-            io.eprintln("Error: invalid exit code '{args[1]}'")
-            continue
-        }
-
-        os.exit(code)
-    }
-
-    // Builtin 'cd'
-    // Usage:
-    //   cd        -> Go to HOME
-    //   cd <DIR>  -> Go to DIR
-    //   cd -      -> Go to previous location
-    if cmd == "cd" {
-        if len(args) > 2 {
-            io.eprintln("Error: too many arguments to command '{cmd}'")
-            continue
-        }
-
-        var path = if len(args) == 2 then args[1] else "~"
-        if path == "-" {
-            if !previous {
-                io.eprintln("Error: no previous directory to go into")
+    const cmd = args[0]
+    match cmd {
+        // Builtin 'exit'
+        // Usage:
+        //   exit         -> Exits with 0
+        //   exit <CODE>  -> Exits with CODE
+        "exit" -> {
+            if len(args) > 2 {
+                io.eprintln("Error: too many arguments to command '{cmd}'")
                 continue
             }
 
-            path = previous
+            const code = if len(args) == 2 then args[1].tonumber() else 0
+            if !code {
+                io.eprintln("Error: invalid exit code '{args[1]}'")
+                continue
+            }
+
+            os.exit(code)
         }
 
-        if path.prefix("~") {
-            path = home $ path.slice(1)
-        }
+        // Builtin 'cd'
+        // Usage:
+        //   cd        -> Go to HOME
+        //   cd <DIR>  -> Go to DIR
+        //   cd -      -> Go to previous location
+        "cd" -> {
+            if len(args) > 2 {
+                io.eprintln("Error: too many arguments to command '{cmd}'")
+                continue
+            }
 
-        var current = os.getcwd()
-        if !os.setcwd(path) {
-            io.eprintln("Error: the directory '{path}' does not exist")
-        }
+            var path = if len(args) == 2 then args[1] else "~"
+            if path == "-" {
+                if !previous {
+                    io.eprintln("Error: no previous directory to go into")
+                    continue
+                }
 
-        previous = current
-        continue
+                path = previous
+            }
+
+            if path.prefix("~") {
+                path = home $ path.slice(1)
+            }
+
+            const current = os.getcwd()
+            if !os.setcwd(path) {
+                io.eprintln("Error: the directory '{path}' does not exist")
+            }
+
+            previous = current
+        }
+    } else {
+        const p = os.Process(args)
+        if !p {
+            io.eprintln("Error: unknown command '{cmd}'")
+            continue
+        }
+        p.wait()
     }
-
-    var p = os.Process(args)
-    if !p {
-        io.eprintln("Error: unknown command '{cmd}'")
-        continue
-    }
-    p.wait()
 }
 
 // In case of CTRL-d

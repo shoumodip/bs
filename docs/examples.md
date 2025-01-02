@@ -11,8 +11,8 @@ The UNIX `cat` coreutil.
 var code = 0
 
 for i in 1..len(os.args) {
-    var path = os.args[i]
-    var contents = io.readfile(path)
+    const path = os.args[i]
+    const contents = io.readfile(path)
     if !contents {
         io.eprintln("Error: could not read file '{path}'")
         code = 1
@@ -30,8 +30,8 @@ $ bs cat.bs cat.bs # Poor man's quine
 var code = 0
 
 for i in 1..len(os.args) {
-    var path = os.args[i]
-    var contents = io.readfile(path)
+    const path = os.args[i]
+    const contents = io.readfile(path)
     if !contents {
         io.eprintln("Error: could not read file '{path}'")
         code = 1
@@ -83,9 +83,9 @@ The UNIX `grep` coreutil.
 fn grep(f, path, pattern) {
     var row = 0
     while !f.eof() {
-        var line = f.readln()
+        const line = f.readln()
 
-        var col = line.find(pattern)
+        const col = line.find(pattern)
         if col {
             io.println("{path}:{row + 1}:{col + 1}: {line}")
         }
@@ -100,7 +100,7 @@ if len(os.args) < 2 {
     os.exit(1)
 }
 
-var pattern = Regex(os.args[1])
+const pattern = Regex(os.args[1])
 if !pattern {
     io.eprintln("Error: invalid pattern")
     os.exit(1)
@@ -113,9 +113,9 @@ if len(os.args) == 2 {
 var code = 0
 
 for i in 2..len(os.args) {
-    var path = os.args[i]
+    const path = os.args[i]
 
-    var f = io.Reader(path)
+    const f = io.Reader(path)
     if !f {
         io.println("Error: could not open file '{path}'")
         code = 1
@@ -132,30 +132,32 @@ os.exit(code)
 ```console
 $ bs grep.bs '\.[A-z]+\(' grep.bs
 grep.bs:3:13:     while !f.eof() {
-grep.bs:4:21:         var line = f.readln()
-grep.bs:6:23:         var col = line.find(pattern)
+grep.bs:4:23:         const line = f.readln()
+grep.bs:6:25:         const col = line.find(pattern)
 grep.bs:8:15:             io.println("{path}:{row + 1}:{col + 1}: {line}")
 grep.bs:16:7:     io.eprintln("Usage: {os.args[0]} <pattern> [file...]")
 grep.bs:17:7:     io.eprintln("Error: pattern not provided")
 grep.bs:18:7:     os.exit(1)
 grep.bs:23:7:     io.eprintln("Error: invalid pattern")
 grep.bs:24:7:     os.exit(1)
-grep.bs:36:15:     var f = io.Reader(path)
+grep.bs:33:12: for i in 2..len(os.args) {
+grep.bs:36:17:     const f = io.Reader(path)
 grep.bs:38:11:         io.println("Error: could not open file '{path}'")
 grep.bs:44:6:     f.close()
 grep.bs:47:3: os.exit(code)
 
 $ cat grep.bs | bs grep.bs '\.[A-z]+\(' # DON'T CAT INTO GREP!!!
 <stdin>:3:13:     while !f.eof() {
-<stdin>:4:21:         var line = f.readln()
-<stdin>:6:23:         var col = line.find(pattern)
+<stdin>:4:23:         const line = f.readln()
+<stdin>:6:25:         const col = line.find(pattern)
 <stdin>:8:15:             io.println("{path}:{row + 1}:{col + 1}: {line}")
 <stdin>:16:7:     io.eprintln("Usage: {os.args[0]} <pattern> [file...]")
 <stdin>:17:7:     io.eprintln("Error: pattern not provided")
 <stdin>:18:7:     os.exit(1)
 <stdin>:23:7:     io.eprintln("Error: invalid pattern")
 <stdin>:24:7:     os.exit(1)
-<stdin>:36:15:     var f = io.Reader(path)
+<stdin>:33:12: for i in 2..len(os.args) {
+<stdin>:36:17:     const f = io.Reader(path)
 <stdin>:38:11:         io.println("Error: could not open file '{path}'")
 <stdin>:44:6:     f.close()
 <stdin>:47:3: os.exit(code)
@@ -167,11 +169,11 @@ A simple UNIX shell.
 ```bs
 // shell.bs
 
-var home = os.getenv("HOME")
+const home = os.getenv("HOME")
 
 // Return a pretty current working directory
 fn pwd() {
-    var cwd = os.getcwd()
+    const cwd = os.getcwd()
     if cwd.prefix(home) {
         return "~" $ cwd.slice(len(home))
     }
@@ -180,78 +182,78 @@ fn pwd() {
 }
 
 // Rawdogging shell lexing with regex any%
-var delim = Regex("[ \n\t]+")
+const delim = Regex("[ \n\t]+")
 
 // Previous working directory
 var previous = nil
 
 while !io.stdin.eof() {
-    var args = io.input("{pwd()} $ ").split(delim)
+    const args = io.input("{pwd()} $ ").split(delim)
     if len(args) == 0 {
         continue
     }
 
-    var cmd = args[0]
-
-    // Builtin 'exit'
-    // Usage:
-    //   exit         -> Exits with 0
-    //   exit <CODE>  -> Exits with CODE
-    if cmd == "exit" {
-        if len(args) > 2 {
-            io.eprintln("Error: too many arguments to command '{cmd}'")
-            continue
-        }
-
-        var code = if len(args) == 2 then args[1].tonumber() else 0
-        if !code {
-            io.eprintln("Error: invalid exit code '{args[1]}'")
-            continue
-        }
-
-        os.exit(code)
-    }
-
-    // Builtin 'cd'
-    // Usage:
-    //   cd        -> Go to HOME
-    //   cd <DIR>  -> Go to DIR
-    //   cd -      -> Go to previous location
-    if cmd == "cd" {
-        if len(args) > 2 {
-            io.eprintln("Error: too many arguments to command '{cmd}'")
-            continue
-        }
-
-        var path = if len(args) == 2 then args[1] else "~"
-        if path == "-" {
-            if !previous {
-                io.eprintln("Error: no previous directory to go into")
+    const cmd = args[0]
+    match cmd {
+        // Builtin 'exit'
+        // Usage:
+        //   exit         -> Exits with 0
+        //   exit <CODE>  -> Exits with CODE
+        "exit" -> {
+            if len(args) > 2 {
+                io.eprintln("Error: too many arguments to command '{cmd}'")
                 continue
             }
 
-            path = previous
+            const code = if len(args) == 2 then args[1].tonumber() else 0
+            if !code {
+                io.eprintln("Error: invalid exit code '{args[1]}'")
+                continue
+            }
+
+            os.exit(code)
         }
 
-        if path.prefix("~") {
-            path = home $ path.slice(1)
-        }
+        // Builtin 'cd'
+        // Usage:
+        //   cd        -> Go to HOME
+        //   cd <DIR>  -> Go to DIR
+        //   cd -      -> Go to previous location
+        "cd" -> {
+            if len(args) > 2 {
+                io.eprintln("Error: too many arguments to command '{cmd}'")
+                continue
+            }
 
-        var current = os.getcwd()
-        if !os.setcwd(path) {
-            io.eprintln("Error: the directory '{path}' does not exist")
-        }
+            var path = if len(args) == 2 then args[1] else "~"
+            if path == "-" {
+                if !previous {
+                    io.eprintln("Error: no previous directory to go into")
+                    continue
+                }
 
-        previous = current
-        continue
+                path = previous
+            }
+
+            if path.prefix("~") {
+                path = home $ path.slice(1)
+            }
+
+            const current = os.getcwd()
+            if !os.setcwd(path) {
+                io.eprintln("Error: the directory '{path}' does not exist")
+            }
+
+            previous = current
+        }
+    } else {
+        const p = os.Process(args)
+        if !p {
+            io.eprintln("Error: unknown command '{cmd}'")
+            continue
+        }
+        p.wait()
     }
-
-    var p = os.Process(args)
-    if !p {
-        io.eprintln("Error: unknown command '{cmd}'")
-        continue
-    }
-    p.wait()
 }
 
 // In case of CTRL-d
@@ -281,7 +283,7 @@ for proof of Turing Completeness.
 ```bs
 // rule110.bs
 
-var board = [].resize(30).fill(0)
+const board = [].resize(30).fill(0)
 board[len(board) - 2] = 1
 
 for i in 0..len(board) - 2 {
@@ -387,7 +389,7 @@ class GameOfLife {
 
         for y in 0..this.height {
             for x in 0..this.width {
-                var n = nbors(x, y)
+                const n = nbors(x, y)
                 if n == 2 {
                     set(x, y, this.get(x, y))
                 } else {
@@ -397,7 +399,7 @@ class GameOfLife {
         }
 
         // Swap buffers
-        var t = this.board
+        const t = this.board
         this.board = this.buffer
         this.buffer = t
     }
@@ -420,9 +422,9 @@ return GameOfLife
 ```bs
 // game_of_life_tui.bs
 
-var GameOfLife = import("GameOfLife")
+const GameOfLife = import("GameOfLife")
 
-var INTERVAL = 0.1
+const INTERVAL = 0.1
 
 class GameOfLifeTUI < GameOfLife {
     init(width, height) {
@@ -439,7 +441,7 @@ class GameOfLifeTUI < GameOfLife {
     }
 }
 
-var gol = GameOfLifeTUI(20, 10)
+const gol = GameOfLifeTUI(20, 10)
 gol.glider(1, 1)
 
 while true {
@@ -466,7 +468,7 @@ $ bs game_of_life_tui.bs
 #include <bs/object.h>
 #include <raylib.h>
 
-Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
     bs_arg_check_whole_number(bs, args, 0);
     bs_arg_check_whole_number(bs, args, 1);
@@ -481,51 +483,51 @@ Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-Bs_Value rl_close_window(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_close_window(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     CloseWindow();
     return bs_value_nil;
 }
 
-Bs_Value rl_window_should_close(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_window_should_close(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_bool(WindowShouldClose());
 }
 
-Bs_Value rl_begin_drawing(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_begin_drawing(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     BeginDrawing();
     return bs_value_nil;
 }
 
-Bs_Value rl_end_drawing(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_end_drawing(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     EndDrawing();
     return bs_value_nil;
 }
 
-Bs_Value rl_clear_background(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_clear_background(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
     ClearBackground(GetColor(args[0].as.number));
     return bs_value_nil;
 }
 
-Bs_Value rl_set_exit_key(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_set_exit_key(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
     SetExitKey(args[0].as.number);
     return bs_value_nil;
 }
 
-Bs_Value rl_set_config_flags(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_set_config_flags(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
     SetConfigFlags(args[0].as.number);
     return bs_value_nil;
 }
 
-Bs_Value rl_draw_line(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_draw_line(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 5);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
@@ -543,7 +545,7 @@ Bs_Value rl_draw_line(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-Bs_Value rl_draw_text(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_draw_text(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 5);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
@@ -561,7 +563,7 @@ Bs_Value rl_draw_text(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-Bs_Value rl_draw_rectangle(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_draw_rectangle(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 5);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
@@ -579,44 +581,44 @@ Bs_Value rl_draw_rectangle(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-Bs_Value rl_get_screen_width(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_get_screen_width(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_num(GetScreenWidth());
 }
 
-Bs_Value rl_get_screen_height(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_get_screen_height(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_num(GetScreenHeight());
 }
 
-Bs_Value rl_get_frame_time(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_get_frame_time(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_num(GetFrameTime());
 }
 
-Bs_Value rl_get_mouse_x(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_get_mouse_x(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_num(GetMouseX());
 }
 
-Bs_Value rl_get_mouse_y(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_get_mouse_y(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_num(GetMouseY());
 }
 
-Bs_Value rl_is_mouse_button_released(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_is_mouse_button_released(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
     return bs_value_bool(IsMouseButtonReleased(args[0].as.number));
 }
 
-Bs_Value rl_is_key_pressed(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_is_key_pressed(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
     return bs_value_bool(IsKeyPressed(args[0].as.number));
 }
 
-Bs_Value rl_measure_text(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_measure_text(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     bs_arg_check_whole_number(bs, args, 1);
@@ -673,15 +675,15 @@ Make sure to provide the compiler and linker flags as required.
 ```bs
 // game_of_life_raylib.bs
 
-var rl = import("raylib")
-var GameOfLife = import("GameOfLife")
+const rl = import("raylib")
+const GameOfLife = import("GameOfLife")
 
-var GRID = 0x5A524CFF
-var BACKGROUND = 0x282828FF
-var FOREGROUND = 0x89B482FF
+const GRID = 0x5A524CFF
+const BACKGROUND = 0x282828FF
+const FOREGROUND = 0x89B482FF
 
-var INTERVAL = 0.1
-var FONT_SIZE = 30
+const INTERVAL = 0.1
+const FONT_SIZE = 30
 
 var width = 800
 var height = 600
@@ -701,8 +703,8 @@ class GameOfLifeRaylib < GameOfLife {
         width = rl.get_screen_width()
         height = rl.get_screen_height() - FONT_SIZE * 1.2
 
-        var cw = width / this.width
-        var ch = height / this.height
+        const cw = width / this.width
+        const ch = height / this.height
         cell_size = cw.min(ch)
 
         padding_x = (width - this.width * cell_size) / 2
@@ -716,7 +718,7 @@ class GameOfLifeRaylib < GameOfLife {
             BACKGROUND)
 
         {
-            var label = "Click to toggle cell, Space to play/pause"
+            const label = "Click to toggle cell, Space to play/pause"
             rl.draw_text(
                 label,
                 (width - rl.measure_text(label, FONT_SIZE)) / 2,
@@ -726,12 +728,12 @@ class GameOfLifeRaylib < GameOfLife {
         }
 
         for i in 0..=this.width {
-            var x = padding_x + i * cell_size
+            const x = padding_x + i * cell_size
             rl.draw_line(x, 0, x, this.height * cell_size, GRID)
         }
 
         for i in 0..=this.height {
-            var y = padding_y + i * cell_size
+            const y = padding_y + i * cell_size
             rl.draw_line(padding_x, y, padding_x + this.width * cell_size, y, GRID)
         }
 
@@ -754,7 +756,7 @@ rl.init_window(width, height, "Game Of Life")
 rl.set_exit_key(ascii.code("Q"))
 rl.set_config_flags(rl.FLAG_WINDOW_RESIZABLE)
 
-var gol = GameOfLifeRaylib(20, 20)
+const gol = GameOfLifeRaylib(20, 20)
 gol.glider(2, 2)
 
 while !rl.window_should_close() {
@@ -776,8 +778,8 @@ while !rl.window_should_close() {
     }
 
     if rl.is_mouse_button_released(rl.MOUSE_BUTTON_LEFT) {
-        var x = ((rl.get_mouse_x() - padding_x) / cell_size).floor()
-        var y = ((rl.get_mouse_y() - padding_y) / cell_size).floor()
+        const x = ((rl.get_mouse_x() - padding_x) / cell_size).floor()
+        const y = ((rl.get_mouse_y() - padding_y) / cell_size).floor()
         gol.set(x, y, !gol.get(x, y))
     }
 
@@ -798,7 +800,7 @@ $ bs game_of_life_raylib.bs
 ```bs
 // tasks.bs
 
-var TASKS_PATH = os.getenv("HOME") $ "/.tasks"
+const TASKS_PATH = os.getenv("HOME") $ "/.tasks"
 
 class Tasks {
     init(path) {
@@ -813,7 +815,7 @@ class Tasks {
     }
 
     verify(index) {
-        var total = len(this.tasks)
+        const total = len(this.tasks)
         if index >= total {
             io.eprintln("Error: invalid index {index} (total is {total})")
             os.exit(1)
@@ -822,7 +824,7 @@ class Tasks {
 
     done(index) {
         this.verify(index)
-        var title = delete(this.tasks[index])
+        const title = delete(this.tasks[index])
         this.save()
         io.println("Done {index}: {title}")
     }
@@ -845,7 +847,7 @@ class Tasks {
     }
 
     save() {
-        var f = io.Writer(this.path)
+        const f = io.Writer(this.path)
         if !f {
             io.eprintln("Error: could not save tasks to '{this.path}'")
             os.exit(1)
@@ -870,7 +872,7 @@ if len(os.args) < 2 {
     return Tasks(TASKS_PATH).list(nil)
 }
 
-var command = os.args[1]
+const command = os.args[1]
 match command {
     "help" -> usage(io.stdout)
 
@@ -891,7 +893,7 @@ match command {
             os.exit(1)
         }
 
-        var index = os.args[2].tonumber()
+        const index = os.args[2].tonumber()
         if !index {
             io.eprintln("Error: invalid index '{os.args[2]}'")
             os.exit(1)
@@ -907,7 +909,7 @@ match command {
             os.exit(1)
         }
 
-        var index = os.args[2].tonumber()
+        const index = os.args[2].tonumber()
         if !index {
             io.eprintln("Error: invalid index '{os.args[2]}'")
             os.exit(1)
@@ -977,7 +979,7 @@ Flappy Bird using Raylib.
 #include <bs/object.h>
 #include <raylib.h>
 
-Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
     bs_arg_check_whole_number(bs, args, 0);
     bs_arg_check_whole_number(bs, args, 1);
@@ -991,56 +993,56 @@ Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-Bs_Value rl_init_audio_device(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_init_audio_device(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     InitAudioDevice();
     return bs_value_nil;
 }
 
-Bs_Value rl_set_target_fps(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_set_target_fps(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
     SetTargetFPS(args[0].as.number);
     return bs_value_nil;
 }
 
-Bs_Value rl_close_window(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_close_window(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     CloseWindow();
     return bs_value_nil;
 }
 
-Bs_Value rl_close_audio_device(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_close_audio_device(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     CloseAudioDevice();
     return bs_value_nil;
 }
 
-Bs_Value rl_window_should_close(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_window_should_close(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_bool(WindowShouldClose());
 }
 
-Bs_Value rl_begin_drawing(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_begin_drawing(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     BeginDrawing();
     return bs_value_nil;
 }
 
-Bs_Value rl_end_drawing(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_end_drawing(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     EndDrawing();
     return bs_value_nil;
 }
 
-Bs_Value rl_clear_background(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_clear_background(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
     ClearBackground(GetColor(args[0].as.number));
     return bs_value_nil;
 }
 
-Bs_Value rl_draw_rectangle(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_draw_rectangle(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 5);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
@@ -1058,18 +1060,18 @@ Bs_Value rl_draw_rectangle(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-Bs_Value rl_is_key_pressed(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_is_key_pressed(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
     return bs_value_bool(IsKeyPressed(args[0].as.number));
 }
 
-Bs_Value rl_get_frame_time(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_get_frame_time(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_num(GetFrameTime());
 }
 
-Bs_Value rl_texture_init(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_texture_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
@@ -1084,7 +1086,7 @@ Bs_Value rl_texture_init(Bs *bs, Bs_Value *args, size_t arity) {
     return args[-1];
 }
 
-Bs_Value rl_texture_draw(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_texture_draw(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 5);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
@@ -1111,23 +1113,23 @@ Bs_Value rl_texture_draw(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-Bs_Value rl_texture_width(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_texture_width(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_num(bs_this_c_instance_data_as(args, Texture).width);
 }
 
-Bs_Value rl_texture_height(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_texture_height(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_num(bs_this_c_instance_data_as(args, Texture).height);
 }
 
-Bs_Value rl_texture_unload(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_texture_unload(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     UnloadTexture(bs_this_c_instance_data_as(args, Texture));
     return bs_value_nil;
 }
 
-Bs_Value rl_sound_init(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_sound_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
@@ -1142,19 +1144,19 @@ Bs_Value rl_sound_init(Bs *bs, Bs_Value *args, size_t arity) {
     return args[-1];
 }
 
-Bs_Value rl_sound_play(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_sound_play(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     PlaySound(bs_this_c_instance_data_as(args, Sound));
     return bs_value_nil;
 }
 
-Bs_Value rl_sound_unload(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_sound_unload(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     UnloadSound(bs_this_c_instance_data_as(args, Sound));
     return bs_value_nil;
 }
 
-Bs_Value rl_music_init(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_music_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
@@ -1174,7 +1176,7 @@ Bs_Value rl_music_init(Bs *bs, Bs_Value *args, size_t arity) {
     return args[-1];
 }
 
-Bs_Value rl_music_toggle(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_music_toggle(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     Music music = bs_this_c_instance_data_as(args, Music);
     if (IsMusicStreamPlaying(music)) {
@@ -1185,13 +1187,13 @@ Bs_Value rl_music_toggle(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-Bs_Value rl_music_update(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_music_update(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     UpdateMusicStream(bs_this_c_instance_data_as(args, Music));
     return bs_value_nil;
 }
 
-Bs_Value rl_music_unload(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_music_unload(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     UnloadMusicStream(bs_this_c_instance_data_as(args, Music));
     return bs_value_nil;
@@ -1258,38 +1260,45 @@ Make sure to provide the compiler and linker flags as required.
 ```bs
 // flappy_bird.bs
 
-var rl = import("raylib")
-var game = {}
+const rl = import("raylib")
+const game = {}
 
-var WIDTH = 800
-var HEIGHT = 600
+const WIDTH = 800
+const HEIGHT = 600
 
-var GRAVITY = 0.5
-var IMPULSE = -7
+const GRAVITY = 0.5
+const IMPULSE = -7
 
-var BIRD_TILT = 20
-var BIRD_STARTOFF_SPEED = 7
-var BIRD_ANIMATION_SPEED = 0.2
+const BIRD_TILT = 20
+const BIRD_STARTOFF_SPEED = 7
+const BIRD_ANIMATION_SPEED = 0.2
 
-var BIRD_MIN_X = 100
-var BIRD_MIN_Y = 50
+const BIRD_MIN_X = 100
+const BIRD_MIN_Y = 50
 
-var PIPE_GAP = 120
-var PIPE_SPEED = -4
-var PIPE_SPAWN_DELAY = 1.5
-var PIPE_SPAWN_RANGE = HEIGHT / 5
+const PIPE_GAP = 120
+const PIPE_SPEED = -4
+const PIPE_SPAWN_DELAY = 1.5
+const PIPE_SPAWN_RANGE = HEIGHT / 5
 
-var BACKGROUND_SCROLL_SPEED = 0.5
+const BACKGROUND_SCROLL_SPEED = 0.5
 
-var MESSAGE_PADDING = 30
-var OVER_MESSAGE_SCALE = 1.2
-var TITLE_MESSAGE_SCALE = 1.2
-var CONTINUE_MESSAGE_SCALE = 0.7
+const MESSAGE_PADDING = 30
+const OVER_MESSAGE_SCALE = 1.2
+const TITLE_MESSAGE_SCALE = 1.2
+const CONTINUE_MESSAGE_SCALE = 0.7
 
-var BACKGROUND_MUSIC_DELAY = 1.2
+const BACKGROUND_MUSIC_DELAY = 1.2
 
-var DEBUG_COLOR = 0xFF0000FF
-var DEBUG_HITBOX = false
+const DEBUG_COLOR = 0xFF0000FF
+const DEBUG_HITBOX = false
+
+fn exit(code) {
+    game.assets.unload()
+    rl.close_audio_device()
+    rl.close_window()
+    os.exit(code)
+}
 
 class Assets {
     init() {
@@ -1303,10 +1312,10 @@ class Assets {
             return this.sounds[path]
         }
 
-        var sound = loader(path)
+        const sound = loader(path)
         if !sound {
             io.eprintln("Error: could not load sound '{path}'")
-            os.exit(1)
+            exit(1)
         }
 
         this.sounds[path] = sound
@@ -1319,10 +1328,10 @@ class Assets {
             return this.textures[path]
         }
 
-        var texture = rl.Texture(path)
+        const texture = rl.Texture(path)
         if !texture {
             io.eprintln("Error: could not load image '{path}'")
-            os.exit(1)
+            exit(1)
         }
 
         this.textures[path] = texture
@@ -1375,8 +1384,8 @@ class Bird {
             game.assets.texture("bird2.png"),
         ]
 
-        var w = this.textures[0].width() * game.scale
-        var h = this.textures[0].height() * game.scale
+        const w = this.textures[0].width() * game.scale
+        const h = this.textures[0].height() * game.scale
         this.hitbox = Hitbox((WIDTH - w) / 2, HEIGHT / 3, w, h)
     }
 
@@ -1387,7 +1396,7 @@ class Bird {
                 this.dy -= 0.3 * GRAVITY
             }
 
-            var needs_dy = !game.over || this.hitbox.y + this.hitbox.height * game.scale < game.base.y
+            const needs_dy = !game.over || this.hitbox.y + this.hitbox.height * game.scale < game.base.y
             if needs_dy {
                 this.dy += GRAVITY
             }
@@ -1518,10 +1527,10 @@ class Pipe {
             }
         }
 
-        var top = this.top()
+        const top = this.top()
         this.texture.draw(top.x, top.y, 180, game.scale, 0xFFFFFFFF)
 
-        var bottom = this.bottom()
+        const bottom = this.bottom()
         this.texture.draw(bottom.x, bottom.y, 0, game.scale, 0xFFFFFFFF)
 
         top.debug()
@@ -1588,7 +1597,7 @@ class Score {
     display() {
         if game.started {
             fn show(n, y, scale, tint) {
-                var digits = []
+                const digits = []
                 if n < 10 {
                     digits.push(n)
                 } else {
@@ -1600,7 +1609,7 @@ class Score {
                 digits.reverse()
 
                 scale *= game.scale
-                var width = digits.reduce(fn (a, b) -> a + this.textures[b].width() * scale, 0)
+                const width = digits.reduce(fn (a, b) -> a + this.textures[b].width() * scale, 0)
                 var x = (WIDTH - width) / 2
                 for _, n in digits {
                     this.textures[n].draw(x, y, 0, scale, tint)
@@ -1625,7 +1634,7 @@ game.started = false
 game.over = false
 game.rng = math.Random()
 
-game.die = fn () {
+fn game.die() {
     if game.over {
         return
     }
@@ -1639,12 +1648,12 @@ game.die = fn () {
     game.background_music_delay = BACKGROUND_MUSIC_DELAY
 }
 
-game.point = fn () {
+fn game.point() {
     game.score.current += 1
     game.point_sound.play()
 }
 
-game.start = fn () {
+fn game.start() {
     game.start_sound.play()
     game.background_music.toggle()
 }
@@ -1687,10 +1696,10 @@ while !rl.window_should_close() {
     game.bird.update()
 
     if !game.started {
-        var x = (WIDTH - game.title_message.width() * TITLE_MESSAGE_SCALE) / 2
+        const x = (WIDTH - game.title_message.width() * TITLE_MESSAGE_SCALE) / 2
         game.title_message.draw(x, HEIGHT / 7, 0, TITLE_MESSAGE_SCALE, 0xFFFFFFFF)
 
-        var x = (WIDTH - game.continue_message.width() * CONTINUE_MESSAGE_SCALE) / 2
+        const x = (WIDTH - game.continue_message.width() * CONTINUE_MESSAGE_SCALE) / 2
         game.continue_message.draw(
             x,
             HEIGHT / 3 + game.continue_message.height() * CONTINUE_MESSAGE_SCALE + MESSAGE_PADDING,
@@ -1706,11 +1715,11 @@ while !rl.window_should_close() {
     }
 
     if game.over {
-        var x = (WIDTH - game.over_message.width() * OVER_MESSAGE_SCALE) / 2
+        const x = (WIDTH - game.over_message.width() * OVER_MESSAGE_SCALE) / 2
         game.over_message.draw(x, HEIGHT / 7, 0, OVER_MESSAGE_SCALE, 0xFFFFFFFF)
 
         if game.background_music_delay <= 0 {
-            var x = (WIDTH - game.continue_message.width() * CONTINUE_MESSAGE_SCALE) / 2
+            const x = (WIDTH - game.continue_message.width() * CONTINUE_MESSAGE_SCALE) / 2
             game.continue_message.draw(
                 x,
                 HEIGHT / 3 + game.continue_message.height() * CONTINUE_MESSAGE_SCALE + MESSAGE_PADDING,
@@ -1735,10 +1744,7 @@ while !rl.window_should_close() {
     rl.end_drawing()
 }
 
-game.assets.unload()
-
-rl.close_audio_device()
-rl.close_window()
+exit(0)
 ```
 
 Download and extract the

@@ -1,4 +1,4 @@
-var board = [].resize(30).fill(0)
+const board = [].resize(30).fill(0)
 board[len(board) - 2] = 1
 
 for i in 0..len(board) - 2 {

@@ -2207,8 +2207,8 @@ Foo = <span class='constant'>420</span> <span class='comment'>// Compile Time Er
 <span class='comment'>// one.bs</span>
 <span class='keyword'>var</span> M = {}
 
-M.<span class='field'>inc</span> = <span class='keyword'>fn</span> (n) -&gt; n + <span class='constant'>1</span>
-M.<span class='field'>dec</span> = <span class='keyword'>fn</span> (n) -&gt; n - <span class='constant'>1</span>
+<span class='keyword'>fn</span> M.<span class='function'>inc</span>(n) -&gt; n + <span class='constant'>1</span>
+<span class='keyword'>fn</span> M.<span class='function'>dec</span>(n) -&gt; n - <span class='constant'>1</span>
 
 <span class='keyword'>return</span> M <span class='comment'>// Any arbitrary value can be returned, this is just the usual pattern</span>
 </pre>
@@ -2271,8 +2271,8 @@ Modules are loaded only once.
 
 io.<span class='function'>println</span>(<span class='string'>&quot;Loading module &apos;one&apos;&quot;</span>)
 
-M.<span class='field'>inc</span> = <span class='keyword'>fn</span> (n) -&gt; n + <span class='constant'>1</span>
-M.<span class='field'>dec</span> = <span class='keyword'>fn</span> (n) -&gt; n - <span class='constant'>1</span>
+<span class='keyword'>fn</span> M.<span class='function'>inc</span>(n) -&gt; n + <span class='constant'>1</span>
+<span class='keyword'>fn</span> M.<span class='function'>dec</span>(n) -&gt; n - <span class='constant'>1</span>
 
 <span class='keyword'>return</span> M
 </pre>
@@ -2334,8 +2334,8 @@ Loading module &apos;one&apos;
     io.<span class='function'>println</span>(<span class='string'>&quot;Loading module &apos;one&apos;&quot;</span>)
 }
 
-M.<span class='field'>inc</span> = <span class='keyword'>fn</span> (n) -&gt; n + <span class='constant'>1</span>
-M.<span class='field'>dec</span> = <span class='keyword'>fn</span> (n) -&gt; n - <span class='constant'>1</span>
+<span class='keyword'>fn</span> M.<span class='function'>inc</span>(n) -&gt; n + <span class='constant'>1</span>
+<span class='keyword'>fn</span> M.<span class='function'>dec</span>(n) -&gt; n - <span class='constant'>1</span>
 
 <span class='keyword'>return</span> M
 </pre>
@@ -3073,14 +3073,14 @@ Create a file <code>arithmetic.c</code> with the following content
 
 <span class='keyword'>#include</span> <span class='string'>&lt;bs/object.h&gt;</span>
 
-<span class='class'>Bs_Value</span> <span class='function'>arithmetic_add</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>arithmetic_add</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>2</span>);
     <span class='constant'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_VALUE_NUM</span>);
     <span class='constant'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>1</span>, <span class='constant'>BS_VALUE_NUM</span>);
     <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(args[<span class='constant'>0</span>].<span class='field'>as</span>.<span class='field'>number</span> + args[<span class='constant'>1</span>].<span class='field'>as</span>.<span class='field'>number</span>);
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>arithmetic_sub</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>arithmetic_sub</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>2</span>);
     <span class='constant'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_VALUE_NUM</span>);
     <span class='constant'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>1</span>, <span class='constant'>BS_VALUE_NUM</span>);
@@ -3187,7 +3187,7 @@ library.
 <span class='keyword'>#include</span> <span class='string'>&lt;raylib.h&gt;</span>
 <span class='keyword'>#include</span> <span class='string'>&lt;bs/object.h&gt;</span>
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_init_window</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_init_window</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>3</span>);
     <span class='constant'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
     <span class='constant'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>1</span>);
@@ -3202,37 +3202,37 @@ library.
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_close_window</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_close_window</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='function'>CloseWindow</span>();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_window_should_close</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_window_should_close</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='keyword'>return</span> <span class='constant'>bs_value_bool</span>(<span class='function'>WindowShouldClose</span>());
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_begin_drawing</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_begin_drawing</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='function'>BeginDrawing</span>();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_end_drawing</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_end_drawing</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='function'>EndDrawing</span>();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_clear_background</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_clear_background</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
     <span class='constant'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
     <span class='function'>ClearBackground</span>(<span class='function'>GetColor</span>(args[<span class='constant'>0</span>].<span class='field'>as</span>.<span class='field'>number</span>));
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_draw_text</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_draw_text</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>5</span>);
     <span class='constant'>bs_arg_check_object_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_OBJECT_STR</span>);
     <span class='constant'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>1</span>);

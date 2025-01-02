@@ -1,12 +1,12 @@
-var rl = import("raylib")
-var GameOfLife = import("GameOfLife")
+const rl = import("raylib")
+const GameOfLife = import("GameOfLife")
 
-var GRID = 0x5A524CFF
-var BACKGROUND = 0x282828FF
-var FOREGROUND = 0x89B482FF
+const GRID = 0x5A524CFF
+const BACKGROUND = 0x282828FF
+const FOREGROUND = 0x89B482FF
 
-var INTERVAL = 0.1
-var FONT_SIZE = 30
+const INTERVAL = 0.1
+const FONT_SIZE = 30
 
 var width = 800
 var height = 600
@@ -26,8 +26,8 @@ class GameOfLifeRaylib < GameOfLife {
         width = rl.get_screen_width()
         height = rl.get_screen_height() - FONT_SIZE * 1.2
 
-        var cw = width / this.width
-        var ch = height / this.height
+        const cw = width / this.width
+        const ch = height / this.height
         cell_size = cw.min(ch)
 
         padding_x = (width - this.width * cell_size) / 2
@@ -41,7 +41,7 @@ class GameOfLifeRaylib < GameOfLife {
             BACKGROUND)
 
         {
-            var label = "Click to toggle cell, Space to play/pause"
+            const label = "Click to toggle cell, Space to play/pause"
             rl.draw_text(
                 label,
                 (width - rl.measure_text(label, FONT_SIZE)) / 2,
@@ -51,12 +51,12 @@ class GameOfLifeRaylib < GameOfLife {
         }
 
         for i in 0..=this.width {
-            var x = padding_x + i * cell_size
+            const x = padding_x + i * cell_size
             rl.draw_line(x, 0, x, this.height * cell_size, GRID)
         }
 
         for i in 0..=this.height {
-            var y = padding_y + i * cell_size
+            const y = padding_y + i * cell_size
             rl.draw_line(padding_x, y, padding_x + this.width * cell_size, y, GRID)
         }
 
@@ -79,7 +79,7 @@ rl.init_window(width, height, "Game Of Life")
 rl.set_exit_key(ascii.code("Q"))
 rl.set_config_flags(rl.FLAG_WINDOW_RESIZABLE)
 
-var gol = GameOfLifeRaylib(20, 20)
+const gol = GameOfLifeRaylib(20, 20)
 gol.glider(2, 2)
 
 while !rl.window_should_close() {
@@ -101,8 +101,8 @@ while !rl.window_should_close() {
     }
 
     if rl.is_mouse_button_released(rl.MOUSE_BUTTON_LEFT) {
-        var x = ((rl.get_mouse_x() - padding_x) / cell_size).floor()
-        var y = ((rl.get_mouse_y() - padding_y) / cell_size).floor()
+        const x = ((rl.get_mouse_x() - padding_x) / cell_size).floor()
+        const y = ((rl.get_mouse_y() - padding_y) / cell_size).floor()
         gol.set(x, y, !gol.get(x, y))
     }
 

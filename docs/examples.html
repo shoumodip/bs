@@ -35,8 +35,8 @@ The UNIX <code>cat</code> coreutil.
 <span class='keyword'>var</span> code = <span class='constant'>0</span>
 
 <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>1</span>..<span class='keyword'>len</span>(os.<span class='field'>args</span>) {
-    <span class='keyword'>var</span> path = os.<span class='field'>args</span>[i]
-    <span class='keyword'>var</span> contents = io.<span class='function'>readfile</span>(path)
+    <span class='keyword'>const</span> path = os.<span class='field'>args</span>[i]
+    <span class='keyword'>const</span> contents = io.<span class='function'>readfile</span>(path)
     <span class='keyword'>if</span> !contents {
         io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: could not read file &apos;</span><span class='escape'>{</span>path<span class='escape'>}</span><span class='string'>&apos;&quot;</span>)
         code = <span class='constant'>1</span>
@@ -65,8 +65,8 @@ os.<span class='function'>exit</span>(code)
 var code = 0
 
 for i in 1..len(os.args) {
-    var path = os.args[i]
-    var contents = io.readfile(path)
+    const path = os.args[i]
+    const contents = io.readfile(path)
     if !contents {
         io.eprintln(&quot;Error: could not read file &apos;{path}&apos;&quot;)
         code = 1
@@ -157,9 +157,9 @@ The UNIX <code>grep</code> coreutil.
 <span class='keyword'>fn</span> <span class='function'>grep</span>(f, path, pattern) {
     <span class='keyword'>var</span> row = <span class='constant'>0</span>
     <span class='keyword'>while</span> !f.<span class='function'>eof</span>() {
-        <span class='keyword'>var</span> line = f.<span class='function'>readln</span>()
+        <span class='keyword'>const</span> line = f.<span class='function'>readln</span>()
 
-        <span class='keyword'>var</span> col = line.<span class='function'>find</span>(pattern)
+        <span class='keyword'>const</span> col = line.<span class='function'>find</span>(pattern)
         <span class='keyword'>if</span> col {
             io.<span class='function'>println</span>(<span class='string'>&quot;</span><span class='escape'>{</span>path<span class='escape'>}</span><span class='string'>:</span><span class='escape'>{</span>row + <span class='constant'>1</span><span class='escape'>}</span><span class='string'>:</span><span class='escape'>{</span>col + <span class='constant'>1</span><span class='escape'>}</span><span class='string'>: </span><span class='escape'>{</span>line<span class='escape'>}</span><span class='string'>&quot;</span>)
         }
@@ -174,7 +174,7 @@ The UNIX <code>grep</code> coreutil.
     os.<span class='function'>exit</span>(<span class='constant'>1</span>)
 }
 
-<span class='keyword'>var</span> pattern = <span class='function'>Regex</span>(os.<span class='field'>args</span>[<span class='constant'>1</span>])
+<span class='keyword'>const</span> pattern = <span class='function'>Regex</span>(os.<span class='field'>args</span>[<span class='constant'>1</span>])
 <span class='keyword'>if</span> !pattern {
     io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: invalid pattern&quot;</span>)
     os.<span class='function'>exit</span>(<span class='constant'>1</span>)
@@ -187,9 +187,9 @@ The UNIX <code>grep</code> coreutil.
 <span class='keyword'>var</span> code = <span class='constant'>0</span>
 
 <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>2</span>..<span class='keyword'>len</span>(os.<span class='field'>args</span>) {
-    <span class='keyword'>var</span> path = os.<span class='field'>args</span>[i]
+    <span class='keyword'>const</span> path = os.<span class='field'>args</span>[i]
 
-    <span class='keyword'>var</span> f = io.<span class='function'>Reader</span>(path)
+    <span class='keyword'>const</span> f = io.<span class='function'>Reader</span>(path)
     <span class='keyword'>if</span> !f {
         io.<span class='function'>println</span>(<span class='string'>&quot;Error: could not open file &apos;</span><span class='escape'>{</span>path<span class='escape'>}</span><span class='string'>&apos;&quot;</span>)
         code = <span class='constant'>1</span>
@@ -217,30 +217,32 @@ os.<span class='function'>exit</span>(code)
 <pre class='code active'>
 <span class='string'>$ </span>bs grep.bs &apos;\.[A-z]+\(&apos; grep.bs
 grep.bs:3:13:     while !f.eof() {
-grep.bs:4:21:         var line = f.readln()
-grep.bs:6:23:         var col = line.find(pattern)
+grep.bs:4:23:         const line = f.readln()
+grep.bs:6:25:         const col = line.find(pattern)
 grep.bs:8:15:             io.println(&quot;{path}:{row + 1}:{col + 1}: {line}&quot;)
 grep.bs:16:7:     io.eprintln(&quot;Usage: {os.args[0]} &lt;pattern&gt; [file...]&quot;)
 grep.bs:17:7:     io.eprintln(&quot;Error: pattern not provided&quot;)
 grep.bs:18:7:     os.exit(1)
 grep.bs:23:7:     io.eprintln(&quot;Error: invalid pattern&quot;)
 grep.bs:24:7:     os.exit(1)
-grep.bs:36:15:     var f = io.Reader(path)
+grep.bs:33:12: for i in 2..len(os.args) {
+grep.bs:36:17:     const f = io.Reader(path)
 grep.bs:38:11:         io.println(&quot;Error: could not open file &apos;{path}&apos;&quot;)
 grep.bs:44:6:     f.close()
 grep.bs:47:3: os.exit(code)
 
 <span class='string'>$ </span>cat grep.bs | bs grep.bs &apos;\.[A-z]+\(&apos; <span class='comment'># DON&apos;T CAT INTO GREP!!!</span>
 &lt;stdin&gt;:3:13:     while !f.eof() {
-&lt;stdin&gt;:4:21:         var line = f.readln()
-&lt;stdin&gt;:6:23:         var col = line.find(pattern)
+&lt;stdin&gt;:4:23:         const line = f.readln()
+&lt;stdin&gt;:6:25:         const col = line.find(pattern)
 &lt;stdin&gt;:8:15:             io.println(&quot;{path}:{row + 1}:{col + 1}: {line}&quot;)
 &lt;stdin&gt;:16:7:     io.eprintln(&quot;Usage: {os.args[0]} &lt;pattern&gt; [file...]&quot;)
 &lt;stdin&gt;:17:7:     io.eprintln(&quot;Error: pattern not provided&quot;)
 &lt;stdin&gt;:18:7:     os.exit(1)
 &lt;stdin&gt;:23:7:     io.eprintln(&quot;Error: invalid pattern&quot;)
 &lt;stdin&gt;:24:7:     os.exit(1)
-&lt;stdin&gt;:36:15:     var f = io.Reader(path)
+&lt;stdin&gt;:33:12: for i in 2..len(os.args) {
+&lt;stdin&gt;:36:17:     const f = io.Reader(path)
 &lt;stdin&gt;:38:11:         io.println(&quot;Error: could not open file &apos;{path}&apos;&quot;)
 &lt;stdin&gt;:44:6:     f.close()
 &lt;stdin&gt;:47:3: os.exit(code)
@@ -266,11 +268,11 @@ A simple UNIX shell.
 <pre class='code active'>
 <span class='comment'>// shell.bs</span>
 
-<span class='keyword'>var</span> home = os.<span class='function'>getenv</span>(<span class='string'>&quot;HOME&quot;</span>)
+<span class='keyword'>const</span> home = os.<span class='function'>getenv</span>(<span class='string'>&quot;HOME&quot;</span>)
 
 <span class='comment'>// Return a pretty current working directory</span>
 <span class='keyword'>fn</span> <span class='function'>pwd</span>() {
-    <span class='keyword'>var</span> cwd = os.<span class='function'>getcwd</span>()
+    <span class='keyword'>const</span> cwd = os.<span class='function'>getcwd</span>()
     <span class='keyword'>if</span> cwd.<span class='function'>prefix</span>(home) {
         <span class='keyword'>return</span> <span class='string'>&quot;~&quot;</span> $ cwd.<span class='function'>slice</span>(<span class='keyword'>len</span>(home))
     }
@@ -279,78 +281,78 @@ A simple UNIX shell.
 }
 
 <span class='comment'>// Rawdogging shell lexing with regex any%</span>
-<span class='keyword'>var</span> delim = <span class='function'>Regex</span>(<span class='string'>&quot;[ </span><span class='escape'>\n</span><span class='string'></span><span class='escape'>\t</span><span class='string'>]+&quot;</span>)
+<span class='keyword'>const</span> delim = <span class='function'>Regex</span>(<span class='string'>&quot;[ </span><span class='escape'>\n</span><span class='string'></span><span class='escape'>\t</span><span class='string'>]+&quot;</span>)
 
 <span class='comment'>// Previous working directory</span>
 <span class='keyword'>var</span> previous = <span class='constant'>nil</span>
 
 <span class='keyword'>while</span> !io.<span class='field'>stdin</span>.<span class='function'>eof</span>() {
-    <span class='keyword'>var</span> args = io.<span class='function'>input</span>(<span class='string'>&quot;</span><span class='escape'>{</span><span class='function'>pwd</span>()<span class='escape'>}</span><span class='string'> $ &quot;</span>).<span class='function'>split</span>(delim)
+    <span class='keyword'>const</span> args = io.<span class='function'>input</span>(<span class='string'>&quot;</span><span class='escape'>{</span><span class='function'>pwd</span>()<span class='escape'>}</span><span class='string'> $ &quot;</span>).<span class='function'>split</span>(delim)
     <span class='keyword'>if</span> <span class='keyword'>len</span>(args) == <span class='constant'>0</span> {
         <span class='keyword'>continue</span>
     }
 
-    <span class='keyword'>var</span> cmd = args[<span class='constant'>0</span>]
-
-    <span class='comment'>// Builtin &apos;exit&apos;</span>
-    <span class='comment'>// Usage:</span>
-    <span class='comment'>//   exit         -&gt; Exits with 0</span>
-    <span class='comment'>//   exit &lt;CODE&gt;  -&gt; Exits with CODE</span>
-    <span class='keyword'>if</span> cmd == <span class='string'>&quot;exit&quot;</span> {
-        <span class='keyword'>if</span> <span class='keyword'>len</span>(args) &gt; <span class='constant'>2</span> {
-            io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: too many arguments to command &apos;</span><span class='escape'>{</span>cmd<span class='escape'>}</span><span class='string'>&apos;&quot;</span>)
-            <span class='keyword'>continue</span>
-        }
-
-        <span class='keyword'>var</span> code = <span class='keyword'>if</span> <span class='keyword'>len</span>(args) == <span class='constant'>2</span> <span class='keyword'>then</span> args[<span class='constant'>1</span>].<span class='function'>tonumber</span>() <span class='keyword'>else</span> <span class='constant'>0</span>
-        <span class='keyword'>if</span> !code {
-            io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: invalid exit code &apos;</span><span class='escape'>{</span>args[<span class='constant'>1</span>]<span class='escape'>}</span><span class='string'>&apos;&quot;</span>)
-            <span class='keyword'>continue</span>
-        }
-
-        os.<span class='function'>exit</span>(code)
-    }
-
-    <span class='comment'>// Builtin &apos;cd&apos;</span>
-    <span class='comment'>// Usage:</span>
-    <span class='comment'>//   cd        -&gt; Go to HOME</span>
-    <span class='comment'>//   cd &lt;DIR&gt;  -&gt; Go to DIR</span>
-    <span class='comment'>//   cd -      -&gt; Go to previous location</span>
-    <span class='keyword'>if</span> cmd == <span class='string'>&quot;cd&quot;</span> {
-        <span class='keyword'>if</span> <span class='keyword'>len</span>(args) &gt; <span class='constant'>2</span> {
-            io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: too many arguments to command &apos;</span><span class='escape'>{</span>cmd<span class='escape'>}</span><span class='string'>&apos;&quot;</span>)
-            <span class='keyword'>continue</span>
-        }
-
-        <span class='keyword'>var</span> path = <span class='keyword'>if</span> <span class='keyword'>len</span>(args) == <span class='constant'>2</span> <span class='keyword'>then</span> args[<span class='constant'>1</span>] <span class='keyword'>else</span> <span class='string'>&quot;~&quot;</span>
-        <span class='keyword'>if</span> path == <span class='string'>&quot;-&quot;</span> {
-            <span class='keyword'>if</span> !previous {
-                io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: no previous directory to go into&quot;</span>)
+    <span class='keyword'>const</span> cmd = args[<span class='constant'>0</span>]
+    <span class='keyword'>match</span> cmd {
+        <span class='comment'>// Builtin &apos;exit&apos;</span>
+        <span class='comment'>// Usage:</span>
+        <span class='comment'>//   exit         -&gt; Exits with 0</span>
+        <span class='comment'>//   exit &lt;CODE&gt;  -&gt; Exits with CODE</span>
+        <span class='string'>&quot;exit&quot;</span> -&gt; {
+            <span class='keyword'>if</span> <span class='keyword'>len</span>(args) &gt; <span class='constant'>2</span> {
+                io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: too many arguments to command &apos;</span><span class='escape'>{</span>cmd<span class='escape'>}</span><span class='string'>&apos;&quot;</span>)
                 <span class='keyword'>continue</span>
             }
 
-            path = previous
+            <span class='keyword'>const</span> code = <span class='keyword'>if</span> <span class='keyword'>len</span>(args) == <span class='constant'>2</span> <span class='keyword'>then</span> args[<span class='constant'>1</span>].<span class='function'>tonumber</span>() <span class='keyword'>else</span> <span class='constant'>0</span>
+            <span class='keyword'>if</span> !code {
+                io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: invalid exit code &apos;</span><span class='escape'>{</span>args[<span class='constant'>1</span>]<span class='escape'>}</span><span class='string'>&apos;&quot;</span>)
+                <span class='keyword'>continue</span>
+            }
+
+            os.<span class='function'>exit</span>(code)
         }
 
-        <span class='keyword'>if</span> path.<span class='function'>prefix</span>(<span class='string'>&quot;~&quot;</span>) {
-            path = home $ path.<span class='function'>slice</span>(<span class='constant'>1</span>)
-        }
+        <span class='comment'>// Builtin &apos;cd&apos;</span>
+        <span class='comment'>// Usage:</span>
+        <span class='comment'>//   cd        -&gt; Go to HOME</span>
+        <span class='comment'>//   cd &lt;DIR&gt;  -&gt; Go to DIR</span>
+        <span class='comment'>//   cd -      -&gt; Go to previous location</span>
+        <span class='string'>&quot;cd&quot;</span> -&gt; {
+            <span class='keyword'>if</span> <span class='keyword'>len</span>(args) &gt; <span class='constant'>2</span> {
+                io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: too many arguments to command &apos;</span><span class='escape'>{</span>cmd<span class='escape'>}</span><span class='string'>&apos;&quot;</span>)
+                <span class='keyword'>continue</span>
+            }
 
-        <span class='keyword'>var</span> current = os.<span class='function'>getcwd</span>()
-        <span class='keyword'>if</span> !os.<span class='function'>setcwd</span>(path) {
-            io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: the directory &apos;</span><span class='escape'>{</span>path<span class='escape'>}</span><span class='string'>&apos; does not exist&quot;</span>)
-        }
+            <span class='keyword'>var</span> path = <span class='keyword'>if</span> <span class='keyword'>len</span>(args) == <span class='constant'>2</span> <span class='keyword'>then</span> args[<span class='constant'>1</span>] <span class='keyword'>else</span> <span class='string'>&quot;~&quot;</span>
+            <span class='keyword'>if</span> path == <span class='string'>&quot;-&quot;</span> {
+                <span class='keyword'>if</span> !previous {
+                    io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: no previous directory to go into&quot;</span>)
+                    <span class='keyword'>continue</span>
+                }
 
-        previous = current
-        <span class='keyword'>continue</span>
+                path = previous
+            }
+
+            <span class='keyword'>if</span> path.<span class='function'>prefix</span>(<span class='string'>&quot;~&quot;</span>) {
+                path = home $ path.<span class='function'>slice</span>(<span class='constant'>1</span>)
+            }
+
+            <span class='keyword'>const</span> current = os.<span class='function'>getcwd</span>()
+            <span class='keyword'>if</span> !os.<span class='function'>setcwd</span>(path) {
+                io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: the directory &apos;</span><span class='escape'>{</span>path<span class='escape'>}</span><span class='string'>&apos; does not exist&quot;</span>)
+            }
+
+            previous = current
+        }
+    } <span class='keyword'>else</span> {
+        <span class='keyword'>const</span> p = os.<span class='function'>Process</span>(args)
+        <span class='keyword'>if</span> !p {
+            io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: unknown command &apos;</span><span class='escape'>{</span>cmd<span class='escape'>}</span><span class='string'>&apos;&quot;</span>)
+            <span class='keyword'>continue</span>
+        }
+        p.<span class='function'>wait</span>()
     }
-
-    <span class='keyword'>var</span> p = os.<span class='function'>Process</span>(args)
-    <span class='keyword'>if</span> !p {
-        io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: unknown command &apos;</span><span class='escape'>{</span>cmd<span class='escape'>}</span><span class='string'>&apos;&quot;</span>)
-        <span class='keyword'>continue</span>
-    }
-    p.<span class='function'>wait</span>()
 }
 
 <span class='comment'>// In case of CTRL-d</span>
@@ -416,7 +418,7 @@ for proof of Turing Completeness.
 <pre class='code active'>
 <span class='comment'>// rule110.bs</span>
 
-<span class='keyword'>var</span> board = [].<span class='function'>resize</span>(<span class='constant'>30</span>).<span class='function'>fill</span>(<span class='constant'>0</span>)
+<span class='keyword'>const</span> board = [].<span class='function'>resize</span>(<span class='constant'>30</span>).<span class='function'>fill</span>(<span class='constant'>0</span>)
 board[<span class='keyword'>len</span>(board) - <span class='constant'>2</span>] = <span class='constant'>1</span>
 
 <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>..<span class='keyword'>len</span>(board) - <span class='constant'>2</span> {
@@ -546,7 +548,7 @@ An implementation of
 
         <span class='keyword'>for</span> y <span class='keyword'>in</span> <span class='constant'>0</span>..<span class='constant'>this</span>.<span class='field'>height</span> {
             <span class='keyword'>for</span> x <span class='keyword'>in</span> <span class='constant'>0</span>..<span class='constant'>this</span>.<span class='field'>width</span> {
-                <span class='keyword'>var</span> n = <span class='function'>nbors</span>(x, y)
+                <span class='keyword'>const</span> n = <span class='function'>nbors</span>(x, y)
                 <span class='keyword'>if</span> n == <span class='constant'>2</span> {
                     <span class='function'>set</span>(x, y, <span class='constant'>this</span>.<span class='function'>get</span>(x, y))
                 } <span class='keyword'>else</span> {
@@ -556,7 +558,7 @@ An implementation of
         }
 
         <span class='comment'>// Swap buffers</span>
-        <span class='keyword'>var</span> t = <span class='constant'>this</span>.<span class='field'>board</span>
+        <span class='keyword'>const</span> t = <span class='constant'>this</span>.<span class='field'>board</span>
         <span class='constant'>this</span>.<span class='field'>board</span> = <span class='constant'>this</span>.<span class='field'>buffer</span>
         <span class='constant'>this</span>.<span class='field'>buffer</span> = t
     }
@@ -590,9 +592,9 @@ An implementation of
 <pre class='code active'>
 <span class='comment'>// game_of_life_tui.bs</span>
 
-<span class='keyword'>var</span> GameOfLife = <span class='keyword'>import</span>(<span class='string'>&quot;GameOfLife&quot;</span>)
+<span class='keyword'>const</span> GameOfLife = <span class='keyword'>import</span>(<span class='string'>&quot;GameOfLife&quot;</span>)
 
-<span class='keyword'>var</span> INTERVAL = <span class='constant'>0.1</span>
+<span class='keyword'>const</span> INTERVAL = <span class='constant'>0.1</span>
 
 <span class='keyword'>class</span> <span class='class'>GameOfLifeTUI</span> &lt; GameOfLife {
     <span class='function'>init</span>(width, height) {
@@ -609,7 +611,7 @@ An implementation of
     }
 }
 
-<span class='keyword'>var</span> gol = <span class='function'>GameOfLifeTUI</span>(<span class='constant'>20</span>, <span class='constant'>10</span>)
+<span class='keyword'>const</span> gol = <span class='function'>GameOfLifeTUI</span>(<span class='constant'>20</span>, <span class='constant'>10</span>)
 gol.<span class='function'>glider</span>(<span class='constant'>1</span>, <span class='constant'>1</span>)
 
 <span class='keyword'>while</span> <span class='constant'>true</span> {
@@ -660,7 +662,7 @@ Run the program.
 <span class='keyword'>#include</span> <span class='string'>&lt;bs/object.h&gt;</span>
 <span class='keyword'>#include</span> <span class='string'>&lt;raylib.h&gt;</span>
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_init_window</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_init_window</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>3</span>);
     <span class='constant'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
     <span class='constant'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>1</span>);
@@ -675,51 +677,51 @@ Run the program.
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_close_window</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_close_window</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='function'>CloseWindow</span>();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_window_should_close</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_window_should_close</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='keyword'>return</span> <span class='constant'>bs_value_bool</span>(<span class='function'>WindowShouldClose</span>());
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_begin_drawing</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_begin_drawing</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='function'>BeginDrawing</span>();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_end_drawing</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_end_drawing</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='function'>EndDrawing</span>();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_clear_background</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_clear_background</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
     <span class='constant'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
     <span class='function'>ClearBackground</span>(<span class='function'>GetColor</span>(args[<span class='constant'>0</span>].<span class='field'>as</span>.<span class='field'>number</span>));
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_set_exit_key</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_set_exit_key</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
     <span class='constant'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
     <span class='function'>SetExitKey</span>(args[<span class='constant'>0</span>].<span class='field'>as</span>.<span class='field'>number</span>);
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_set_config_flags</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_set_config_flags</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
     <span class='constant'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
     <span class='function'>SetConfigFlags</span>(args[<span class='constant'>0</span>].<span class='field'>as</span>.<span class='field'>number</span>);
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_draw_line</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_draw_line</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>5</span>);
     <span class='constant'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_VALUE_NUM</span>);
     <span class='constant'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>1</span>, <span class='constant'>BS_VALUE_NUM</span>);
@@ -737,7 +739,7 @@ Run the program.
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_draw_text</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_draw_text</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>5</span>);
     <span class='constant'>bs_arg_check_object_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_OBJECT_STR</span>);
     <span class='constant'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>1</span>, <span class='constant'>BS_VALUE_NUM</span>);
@@ -755,7 +757,7 @@ Run the program.
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_draw_rectangle</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_draw_rectangle</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>5</span>);
     <span class='constant'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_VALUE_NUM</span>);
     <span class='constant'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>1</span>, <span class='constant'>BS_VALUE_NUM</span>);
@@ -773,44 +775,44 @@ Run the program.
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_get_screen_width</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_get_screen_width</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(<span class='function'>GetScreenWidth</span>());
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_get_screen_height</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_get_screen_height</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(<span class='function'>GetScreenHeight</span>());
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_get_frame_time</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_get_frame_time</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(<span class='function'>GetFrameTime</span>());
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_get_mouse_x</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_get_mouse_x</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(<span class='function'>GetMouseX</span>());
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_get_mouse_y</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_get_mouse_y</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(<span class='function'>GetMouseY</span>());
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_is_mouse_button_released</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_is_mouse_button_released</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
     <span class='constant'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
     <span class='keyword'>return</span> <span class='constant'>bs_value_bool</span>(<span class='function'>IsMouseButtonReleased</span>(args[<span class='constant'>0</span>].<span class='field'>as</span>.<span class='field'>number</span>));
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_is_key_pressed</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_is_key_pressed</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
     <span class='constant'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
     <span class='keyword'>return</span> <span class='constant'>bs_value_bool</span>(<span class='function'>IsKeyPressed</span>(args[<span class='constant'>0</span>].<span class='field'>as</span>.<span class='field'>number</span>));
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_measure_text</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_measure_text</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>2</span>);
     <span class='constant'>bs_arg_check_object_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_OBJECT_STR</span>);
     <span class='constant'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>1</span>);
@@ -891,15 +893,15 @@ Make sure to provide the compiler and linker flags as required.
 <pre class='code active'>
 <span class='comment'>// game_of_life_raylib.bs</span>
 
-<span class='keyword'>var</span> rl = <span class='keyword'>import</span>(<span class='string'>&quot;raylib&quot;</span>)
-<span class='keyword'>var</span> GameOfLife = <span class='keyword'>import</span>(<span class='string'>&quot;GameOfLife&quot;</span>)
+<span class='keyword'>const</span> rl = <span class='keyword'>import</span>(<span class='string'>&quot;raylib&quot;</span>)
+<span class='keyword'>const</span> GameOfLife = <span class='keyword'>import</span>(<span class='string'>&quot;GameOfLife&quot;</span>)
 
-<span class='keyword'>var</span> GRID = <span class='constant'>0x5A524CFF</span>
-<span class='keyword'>var</span> BACKGROUND = <span class='constant'>0x282828FF</span>
-<span class='keyword'>var</span> FOREGROUND = <span class='constant'>0x89B482FF</span>
+<span class='keyword'>const</span> GRID = <span class='constant'>0x5A524CFF</span>
+<span class='keyword'>const</span> BACKGROUND = <span class='constant'>0x282828FF</span>
+<span class='keyword'>const</span> FOREGROUND = <span class='constant'>0x89B482FF</span>
 
-<span class='keyword'>var</span> INTERVAL = <span class='constant'>0.1</span>
-<span class='keyword'>var</span> FONT_SIZE = <span class='constant'>30</span>
+<span class='keyword'>const</span> INTERVAL = <span class='constant'>0.1</span>
+<span class='keyword'>const</span> FONT_SIZE = <span class='constant'>30</span>
 
 <span class='keyword'>var</span> width = <span class='constant'>800</span>
 <span class='keyword'>var</span> height = <span class='constant'>600</span>
@@ -919,8 +921,8 @@ Make sure to provide the compiler and linker flags as required.
         width = rl.<span class='function'>get_screen_width</span>()
         height = rl.<span class='function'>get_screen_height</span>() - FONT_SIZE * <span class='constant'>1.2</span>
 
-        <span class='keyword'>var</span> cw = width / <span class='constant'>this</span>.<span class='field'>width</span>
-        <span class='keyword'>var</span> ch = height / <span class='constant'>this</span>.<span class='field'>height</span>
+        <span class='keyword'>const</span> cw = width / <span class='constant'>this</span>.<span class='field'>width</span>
+        <span class='keyword'>const</span> ch = height / <span class='constant'>this</span>.<span class='field'>height</span>
         cell_size = cw.<span class='function'>min</span>(ch)
 
         padding_x = (width - <span class='constant'>this</span>.<span class='field'>width</span> * cell_size) / <span class='constant'>2</span>
@@ -934,7 +936,7 @@ Make sure to provide the compiler and linker flags as required.
             BACKGROUND)
 
         {
-            <span class='keyword'>var</span> label = <span class='string'>&quot;Click to toggle cell, Space to play/pause&quot;</span>
+            <span class='keyword'>const</span> label = <span class='string'>&quot;Click to toggle cell, Space to play/pause&quot;</span>
             rl.<span class='function'>draw_text</span>(
                 label,
                 (width - rl.<span class='function'>measure_text</span>(label, FONT_SIZE)) / <span class='constant'>2</span>,
@@ -944,12 +946,12 @@ Make sure to provide the compiler and linker flags as required.
         }
 
         <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>..=<span class='constant'>this</span>.<span class='field'>width</span> {
-            <span class='keyword'>var</span> x = padding_x + i * cell_size
+            <span class='keyword'>const</span> x = padding_x + i * cell_size
             rl.<span class='function'>draw_line</span>(x, <span class='constant'>0</span>, x, <span class='constant'>this</span>.<span class='field'>height</span> * cell_size, GRID)
         }
 
         <span class='keyword'>for</span> i <span class='keyword'>in</span> <span class='constant'>0</span>..=<span class='constant'>this</span>.<span class='field'>height</span> {
-            <span class='keyword'>var</span> y = padding_y + i * cell_size
+            <span class='keyword'>const</span> y = padding_y + i * cell_size
             rl.<span class='function'>draw_line</span>(padding_x, y, padding_x + <span class='constant'>this</span>.<span class='field'>width</span> * cell_size, y, GRID)
         }
 
@@ -972,7 +974,7 @@ rl.<span class='function'>init_window</span>(width, height, <span class='string'
 rl.<span class='function'>set_exit_key</span>(ascii.<span class='function'>code</span>(<span class='string'>&quot;Q&quot;</span>))
 rl.<span class='function'>set_config_flags</span>(rl.<span class='field'>FLAG_WINDOW_RESIZABLE</span>)
 
-<span class='keyword'>var</span> gol = <span class='function'>GameOfLifeRaylib</span>(<span class='constant'>20</span>, <span class='constant'>20</span>)
+<span class='keyword'>const</span> gol = <span class='function'>GameOfLifeRaylib</span>(<span class='constant'>20</span>, <span class='constant'>20</span>)
 gol.<span class='function'>glider</span>(<span class='constant'>2</span>, <span class='constant'>2</span>)
 
 <span class='keyword'>while</span> !rl.<span class='function'>window_should_close</span>() {
@@ -994,8 +996,8 @@ gol.<span class='function'>glider</span>(<span class='constant'>2</span>, <span 
     }
 
     <span class='keyword'>if</span> rl.<span class='function'>is_mouse_button_released</span>(rl.<span class='field'>MOUSE_BUTTON_LEFT</span>) {
-        <span class='keyword'>var</span> x = ((rl.<span class='function'>get_mouse_x</span>() - padding_x) / cell_size).<span class='function'>floor</span>()
-        <span class='keyword'>var</span> y = ((rl.<span class='function'>get_mouse_y</span>() - padding_y) / cell_size).<span class='function'>floor</span>()
+        <span class='keyword'>const</span> x = ((rl.<span class='function'>get_mouse_x</span>() - padding_x) / cell_size).<span class='function'>floor</span>()
+        <span class='keyword'>const</span> y = ((rl.<span class='function'>get_mouse_y</span>() - padding_y) / cell_size).<span class='function'>floor</span>()
         gol.<span class='function'>set</span>(x, y, !gol.<span class='function'>get</span>(x, y))
     }
 
@@ -1041,7 +1043,7 @@ Run the program.
 <pre class='code active'>
 <span class='comment'>// tasks.bs</span>
 
-<span class='keyword'>var</span> TASKS_PATH = os.<span class='function'>getenv</span>(<span class='string'>&quot;HOME&quot;</span>) $ <span class='string'>&quot;/.tasks&quot;</span>
+<span class='keyword'>const</span> TASKS_PATH = os.<span class='function'>getenv</span>(<span class='string'>&quot;HOME&quot;</span>) $ <span class='string'>&quot;/.tasks&quot;</span>
 
 <span class='keyword'>class</span> <span class='class'>Tasks</span> {
     <span class='function'>init</span>(path) {
@@ -1056,7 +1058,7 @@ Run the program.
     }
 
     <span class='function'>verify</span>(index) {
-        <span class='keyword'>var</span> total = <span class='keyword'>len</span>(<span class='constant'>this</span>.<span class='field'>tasks</span>)
+        <span class='keyword'>const</span> total = <span class='keyword'>len</span>(<span class='constant'>this</span>.<span class='field'>tasks</span>)
         <span class='keyword'>if</span> index &gt;= total {
             io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: invalid index </span><span class='escape'>{</span>index<span class='escape'>}</span><span class='string'> (total is </span><span class='escape'>{</span>total<span class='escape'>}</span><span class='string'>)&quot;</span>)
             os.<span class='function'>exit</span>(<span class='constant'>1</span>)
@@ -1065,7 +1067,7 @@ Run the program.
 
     <span class='function'>done</span>(index) {
         <span class='constant'>this</span>.<span class='function'>verify</span>(index)
-        <span class='keyword'>var</span> title = <span class='keyword'>delete</span>(<span class='constant'>this</span>.<span class='field'>tasks</span>[index])
+        <span class='keyword'>const</span> title = <span class='keyword'>delete</span>(<span class='constant'>this</span>.<span class='field'>tasks</span>[index])
         <span class='constant'>this</span>.<span class='function'>save</span>()
         io.<span class='function'>println</span>(<span class='string'>&quot;Done </span><span class='escape'>{</span>index<span class='escape'>}</span><span class='string'>: </span><span class='escape'>{</span>title<span class='escape'>}</span><span class='string'>&quot;</span>)
     }
@@ -1088,7 +1090,7 @@ Run the program.
     }
 
     <span class='function'>save</span>() {
-        <span class='keyword'>var</span> f = io.<span class='function'>Writer</span>(<span class='constant'>this</span>.<span class='field'>path</span>)
+        <span class='keyword'>const</span> f = io.<span class='function'>Writer</span>(<span class='constant'>this</span>.<span class='field'>path</span>)
         <span class='keyword'>if</span> !f {
             io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: could not save tasks to &apos;</span><span class='escape'>{</span><span class='constant'>this</span>.<span class='field'>path</span><span class='escape'>}</span><span class='string'>&apos;&quot;</span>)
             os.<span class='function'>exit</span>(<span class='constant'>1</span>)
@@ -1113,7 +1115,7 @@ Run the program.
     <span class='keyword'>return</span> <span class='function'>Tasks</span>(TASKS_PATH).<span class='function'>list</span>(<span class='constant'>nil</span>)
 }
 
-<span class='keyword'>var</span> command = os.<span class='field'>args</span>[<span class='constant'>1</span>]
+<span class='keyword'>const</span> command = os.<span class='field'>args</span>[<span class='constant'>1</span>]
 <span class='keyword'>match</span> command {
     <span class='string'>&quot;help&quot;</span> -&gt; <span class='function'>usage</span>(io.<span class='field'>stdout</span>)
 
@@ -1134,7 +1136,7 @@ Run the program.
             os.<span class='function'>exit</span>(<span class='constant'>1</span>)
         }
 
-        <span class='keyword'>var</span> index = os.<span class='field'>args</span>[<span class='constant'>2</span>].<span class='function'>tonumber</span>()
+        <span class='keyword'>const</span> index = os.<span class='field'>args</span>[<span class='constant'>2</span>].<span class='function'>tonumber</span>()
         <span class='keyword'>if</span> !index {
             io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: invalid index &apos;</span><span class='escape'>{</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>}</span><span class='string'>&apos;&quot;</span>)
             os.<span class='function'>exit</span>(<span class='constant'>1</span>)
@@ -1150,7 +1152,7 @@ Run the program.
             os.<span class='function'>exit</span>(<span class='constant'>1</span>)
         }
 
-        <span class='keyword'>var</span> index = os.<span class='field'>args</span>[<span class='constant'>2</span>].<span class='function'>tonumber</span>()
+        <span class='keyword'>const</span> index = os.<span class='field'>args</span>[<span class='constant'>2</span>].<span class='function'>tonumber</span>()
         <span class='keyword'>if</span> !index {
             io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: invalid index &apos;</span><span class='escape'>{</span>os.<span class='field'>args</span>[<span class='constant'>2</span>]<span class='escape'>}</span><span class='string'>&apos;&quot;</span>)
             os.<span class='function'>exit</span>(<span class='constant'>1</span>)
@@ -1244,7 +1246,7 @@ Flappy Bird using Raylib.
 <span class='keyword'>#include</span> <span class='string'>&lt;bs/object.h&gt;</span>
 <span class='keyword'>#include</span> <span class='string'>&lt;raylib.h&gt;</span>
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_init_window</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_init_window</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>3</span>);
     <span class='constant'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
     <span class='constant'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>1</span>);
@@ -1258,56 +1260,56 @@ Flappy Bird using Raylib.
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_init_audio_device</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_init_audio_device</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='function'>InitAudioDevice</span>();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_set_target_fps</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_set_target_fps</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
     <span class='constant'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
     <span class='function'>SetTargetFPS</span>(args[<span class='constant'>0</span>].<span class='field'>as</span>.<span class='field'>number</span>);
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_close_window</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_close_window</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='function'>CloseWindow</span>();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_close_audio_device</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_close_audio_device</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='function'>CloseAudioDevice</span>();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_window_should_close</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_window_should_close</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='keyword'>return</span> <span class='constant'>bs_value_bool</span>(<span class='function'>WindowShouldClose</span>());
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_begin_drawing</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_begin_drawing</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='function'>BeginDrawing</span>();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_end_drawing</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_end_drawing</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='function'>EndDrawing</span>();
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_clear_background</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_clear_background</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
     <span class='constant'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
     <span class='function'>ClearBackground</span>(<span class='function'>GetColor</span>(args[<span class='constant'>0</span>].<span class='field'>as</span>.<span class='field'>number</span>));
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_draw_rectangle</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_draw_rectangle</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>5</span>);
     <span class='constant'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_VALUE_NUM</span>);
     <span class='constant'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>1</span>, <span class='constant'>BS_VALUE_NUM</span>);
@@ -1325,18 +1327,18 @@ Flappy Bird using Raylib.
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_is_key_pressed</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_is_key_pressed</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
     <span class='constant'>bs_arg_check_whole_number</span>(bs, args, <span class='constant'>0</span>);
     <span class='keyword'>return</span> <span class='constant'>bs_value_bool</span>(<span class='function'>IsKeyPressed</span>(args[<span class='constant'>0</span>].<span class='field'>as</span>.<span class='field'>number</span>));
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_get_frame_time</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_get_frame_time</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(<span class='function'>GetFrameTime</span>());
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_texture_init</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_texture_init</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
     <span class='constant'>bs_arg_check_object_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_OBJECT_STR</span>);
 
@@ -1351,7 +1353,7 @@ Flappy Bird using Raylib.
     <span class='keyword'>return</span> args[-<span class='constant'>1</span>];
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_texture_draw</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_texture_draw</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>5</span>);
     <span class='constant'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_VALUE_NUM</span>);
     <span class='constant'>bs_arg_check_value_type</span>(bs, args, <span class='constant'>1</span>, <span class='constant'>BS_VALUE_NUM</span>);
@@ -1378,23 +1380,23 @@ Flappy Bird using Raylib.
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_texture_width</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_texture_width</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(<span class='constant'>bs_this_c_instance_data_as</span>(args, <span class='class'>Texture</span>).<span class='field'>width</span>);
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_texture_height</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_texture_height</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='keyword'>return</span> <span class='constant'>bs_value_num</span>(<span class='constant'>bs_this_c_instance_data_as</span>(args, <span class='class'>Texture</span>).<span class='field'>height</span>);
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_texture_unload</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_texture_unload</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='function'>UnloadTexture</span>(<span class='constant'>bs_this_c_instance_data_as</span>(args, <span class='class'>Texture</span>));
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_sound_init</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_sound_init</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
     <span class='constant'>bs_arg_check_object_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_OBJECT_STR</span>);
 
@@ -1409,19 +1411,19 @@ Flappy Bird using Raylib.
     <span class='keyword'>return</span> args[-<span class='constant'>1</span>];
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_sound_play</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_sound_play</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='function'>PlaySound</span>(<span class='constant'>bs_this_c_instance_data_as</span>(args, <span class='class'>Sound</span>));
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_sound_unload</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_sound_unload</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='function'>UnloadSound</span>(<span class='constant'>bs_this_c_instance_data_as</span>(args, <span class='class'>Sound</span>));
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_music_init</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_music_init</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>1</span>);
     <span class='constant'>bs_arg_check_object_type</span>(bs, args, <span class='constant'>0</span>, <span class='constant'>BS_OBJECT_STR</span>);
 
@@ -1441,7 +1443,7 @@ Flappy Bird using Raylib.
     <span class='keyword'>return</span> args[-<span class='constant'>1</span>];
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_music_toggle</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_music_toggle</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='class'>Music</span> music = <span class='constant'>bs_this_c_instance_data_as</span>(args, <span class='class'>Music</span>);
     <span class='keyword'>if</span> (<span class='function'>IsMusicStreamPlaying</span>(music)) {
@@ -1452,13 +1454,13 @@ Flappy Bird using Raylib.
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_music_update</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_music_update</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='function'>UpdateMusicStream</span>(<span class='constant'>bs_this_c_instance_data_as</span>(args, <span class='class'>Music</span>));
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
 }
 
-<span class='class'>Bs_Value</span> <span class='function'>rl_music_unload</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
+<span class='keyword'>static</span> <span class='class'>Bs_Value</span> <span class='function'>rl_music_unload</span>(<span class='class'>Bs</span> *bs, <span class='class'>Bs_Value</span> *args, <span class='class'>size_t</span> arity) {
     <span class='constant'>bs_check_arity</span>(bs, arity, <span class='constant'>0</span>);
     <span class='function'>UnloadMusicStream</span>(<span class='constant'>bs_this_c_instance_data_as</span>(args, <span class='class'>Music</span>));
     <span class='keyword'>return</span> <span class='constant'>bs_value_nil</span>;
@@ -1549,38 +1551,45 @@ Make sure to provide the compiler and linker flags as required.
 <pre class='code active'>
 <span class='comment'>// flappy_bird.bs</span>
 
-<span class='keyword'>var</span> rl = <span class='keyword'>import</span>(<span class='string'>&quot;raylib&quot;</span>)
-<span class='keyword'>var</span> game = {}
+<span class='keyword'>const</span> rl = <span class='keyword'>import</span>(<span class='string'>&quot;raylib&quot;</span>)
+<span class='keyword'>const</span> game = {}
 
-<span class='keyword'>var</span> WIDTH = <span class='constant'>800</span>
-<span class='keyword'>var</span> HEIGHT = <span class='constant'>600</span>
+<span class='keyword'>const</span> WIDTH = <span class='constant'>800</span>
+<span class='keyword'>const</span> HEIGHT = <span class='constant'>600</span>
 
-<span class='keyword'>var</span> GRAVITY = <span class='constant'>0.5</span>
-<span class='keyword'>var</span> IMPULSE = -<span class='constant'>7</span>
+<span class='keyword'>const</span> GRAVITY = <span class='constant'>0.5</span>
+<span class='keyword'>const</span> IMPULSE = -<span class='constant'>7</span>
 
-<span class='keyword'>var</span> BIRD_TILT = <span class='constant'>20</span>
-<span class='keyword'>var</span> BIRD_STARTOFF_SPEED = <span class='constant'>7</span>
-<span class='keyword'>var</span> BIRD_ANIMATION_SPEED = <span class='constant'>0.2</span>
+<span class='keyword'>const</span> BIRD_TILT = <span class='constant'>20</span>
+<span class='keyword'>const</span> BIRD_STARTOFF_SPEED = <span class='constant'>7</span>
+<span class='keyword'>const</span> BIRD_ANIMATION_SPEED = <span class='constant'>0.2</span>
 
-<span class='keyword'>var</span> BIRD_MIN_X = <span class='constant'>100</span>
-<span class='keyword'>var</span> BIRD_MIN_Y = <span class='constant'>50</span>
+<span class='keyword'>const</span> BIRD_MIN_X = <span class='constant'>100</span>
+<span class='keyword'>const</span> BIRD_MIN_Y = <span class='constant'>50</span>
 
-<span class='keyword'>var</span> PIPE_GAP = <span class='constant'>120</span>
-<span class='keyword'>var</span> PIPE_SPEED = -<span class='constant'>4</span>
-<span class='keyword'>var</span> PIPE_SPAWN_DELAY = <span class='constant'>1.5</span>
-<span class='keyword'>var</span> PIPE_SPAWN_RANGE = HEIGHT / <span class='constant'>5</span>
+<span class='keyword'>const</span> PIPE_GAP = <span class='constant'>120</span>
+<span class='keyword'>const</span> PIPE_SPEED = -<span class='constant'>4</span>
+<span class='keyword'>const</span> PIPE_SPAWN_DELAY = <span class='constant'>1.5</span>
+<span class='keyword'>const</span> PIPE_SPAWN_RANGE = HEIGHT / <span class='constant'>5</span>
 
-<span class='keyword'>var</span> BACKGROUND_SCROLL_SPEED = <span class='constant'>0.5</span>
+<span class='keyword'>const</span> BACKGROUND_SCROLL_SPEED = <span class='constant'>0.5</span>
 
-<span class='keyword'>var</span> MESSAGE_PADDING = <span class='constant'>30</span>
-<span class='keyword'>var</span> OVER_MESSAGE_SCALE = <span class='constant'>1.2</span>
-<span class='keyword'>var</span> TITLE_MESSAGE_SCALE = <span class='constant'>1.2</span>
-<span class='keyword'>var</span> CONTINUE_MESSAGE_SCALE = <span class='constant'>0.7</span>
+<span class='keyword'>const</span> MESSAGE_PADDING = <span class='constant'>30</span>
+<span class='keyword'>const</span> OVER_MESSAGE_SCALE = <span class='constant'>1.2</span>
+<span class='keyword'>const</span> TITLE_MESSAGE_SCALE = <span class='constant'>1.2</span>
+<span class='keyword'>const</span> CONTINUE_MESSAGE_SCALE = <span class='constant'>0.7</span>
 
-<span class='keyword'>var</span> BACKGROUND_MUSIC_DELAY = <span class='constant'>1.2</span>
+<span class='keyword'>const</span> BACKGROUND_MUSIC_DELAY = <span class='constant'>1.2</span>
 
-<span class='keyword'>var</span> DEBUG_COLOR = <span class='constant'>0xFF0000FF</span>
-<span class='keyword'>var</span> DEBUG_HITBOX = <span class='constant'>false</span>
+<span class='keyword'>const</span> DEBUG_COLOR = <span class='constant'>0xFF0000FF</span>
+<span class='keyword'>const</span> DEBUG_HITBOX = <span class='constant'>false</span>
+
+<span class='keyword'>fn</span> <span class='function'>exit</span>(code) {
+    game.<span class='field'>assets</span>.<span class='function'>unload</span>()
+    rl.<span class='function'>close_audio_device</span>()
+    rl.<span class='function'>close_window</span>()
+    os.<span class='function'>exit</span>(code)
+}
 
 <span class='keyword'>class</span> <span class='class'>Assets</span> {
     <span class='function'>init</span>() {
@@ -1594,10 +1603,10 @@ Make sure to provide the compiler and linker flags as required.
             <span class='keyword'>return</span> <span class='constant'>this</span>.<span class='field'>sounds</span>[path]
         }
 
-        <span class='keyword'>var</span> sound = <span class='function'>loader</span>(path)
+        <span class='keyword'>const</span> sound = <span class='function'>loader</span>(path)
         <span class='keyword'>if</span> !sound {
             io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: could not load sound &apos;</span><span class='escape'>{</span>path<span class='escape'>}</span><span class='string'>&apos;&quot;</span>)
-            os.<span class='function'>exit</span>(<span class='constant'>1</span>)
+            <span class='function'>exit</span>(<span class='constant'>1</span>)
         }
 
         <span class='constant'>this</span>.<span class='field'>sounds</span>[path] = sound
@@ -1610,10 +1619,10 @@ Make sure to provide the compiler and linker flags as required.
             <span class='keyword'>return</span> <span class='constant'>this</span>.<span class='field'>textures</span>[path]
         }
 
-        <span class='keyword'>var</span> texture = rl.<span class='function'>Texture</span>(path)
+        <span class='keyword'>const</span> texture = rl.<span class='function'>Texture</span>(path)
         <span class='keyword'>if</span> !texture {
             io.<span class='function'>eprintln</span>(<span class='string'>&quot;Error: could not load image &apos;</span><span class='escape'>{</span>path<span class='escape'>}</span><span class='string'>&apos;&quot;</span>)
-            os.<span class='function'>exit</span>(<span class='constant'>1</span>)
+            <span class='function'>exit</span>(<span class='constant'>1</span>)
         }
 
         <span class='constant'>this</span>.<span class='field'>textures</span>[path] = texture
@@ -1666,8 +1675,8 @@ Make sure to provide the compiler and linker flags as required.
             game.<span class='field'>assets</span>.<span class='function'>texture</span>(<span class='string'>&quot;bird2.png&quot;</span>),
         ]
 
-        <span class='keyword'>var</span> w = <span class='constant'>this</span>.<span class='field'>textures</span>[<span class='constant'>0</span>].<span class='function'>width</span>() * game.<span class='field'>scale</span>
-        <span class='keyword'>var</span> h = <span class='constant'>this</span>.<span class='field'>textures</span>[<span class='constant'>0</span>].<span class='function'>height</span>() * game.<span class='field'>scale</span>
+        <span class='keyword'>const</span> w = <span class='constant'>this</span>.<span class='field'>textures</span>[<span class='constant'>0</span>].<span class='function'>width</span>() * game.<span class='field'>scale</span>
+        <span class='keyword'>const</span> h = <span class='constant'>this</span>.<span class='field'>textures</span>[<span class='constant'>0</span>].<span class='function'>height</span>() * game.<span class='field'>scale</span>
         <span class='constant'>this</span>.<span class='field'>hitbox</span> = <span class='function'>Hitbox</span>((WIDTH - w) / <span class='constant'>2</span>, HEIGHT / <span class='constant'>3</span>, w, h)
     }
 
@@ -1678,7 +1687,7 @@ Make sure to provide the compiler and linker flags as required.
                 <span class='constant'>this</span>.<span class='field'>dy</span> -= <span class='constant'>0.3</span> * GRAVITY
             }
 
-            <span class='keyword'>var</span> needs_dy = !game.<span class='field'>over</span> || <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span> + <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>height</span> * game.<span class='field'>scale</span> &lt; game.<span class='field'>base</span>.<span class='field'>y</span>
+            <span class='keyword'>const</span> needs_dy = !game.<span class='field'>over</span> || <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>y</span> + <span class='constant'>this</span>.<span class='field'>hitbox</span>.<span class='field'>height</span> * game.<span class='field'>scale</span> &lt; game.<span class='field'>base</span>.<span class='field'>y</span>
             <span class='keyword'>if</span> needs_dy {
                 <span class='constant'>this</span>.<span class='field'>dy</span> += GRAVITY
             }
@@ -1809,10 +1818,10 @@ Make sure to provide the compiler and linker flags as required.
             }
         }
 
-        <span class='keyword'>var</span> top = <span class='constant'>this</span>.<span class='function'>top</span>()
+        <span class='keyword'>const</span> top = <span class='constant'>this</span>.<span class='function'>top</span>()
         <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='function'>draw</span>(top.<span class='field'>x</span>, top.<span class='field'>y</span>, <span class='constant'>180</span>, game.<span class='field'>scale</span>, <span class='constant'>0xFFFFFFFF</span>)
 
-        <span class='keyword'>var</span> bottom = <span class='constant'>this</span>.<span class='function'>bottom</span>()
+        <span class='keyword'>const</span> bottom = <span class='constant'>this</span>.<span class='function'>bottom</span>()
         <span class='constant'>this</span>.<span class='field'>texture</span>.<span class='function'>draw</span>(bottom.<span class='field'>x</span>, bottom.<span class='field'>y</span>, <span class='constant'>0</span>, game.<span class='field'>scale</span>, <span class='constant'>0xFFFFFFFF</span>)
 
         top.<span class='function'>debug</span>()
@@ -1879,7 +1888,7 @@ Make sure to provide the compiler and linker flags as required.
     <span class='function'>display</span>() {
         <span class='keyword'>if</span> game.<span class='field'>started</span> {
             <span class='keyword'>fn</span> <span class='function'>show</span>(n, y, scale, tint) {
-                <span class='keyword'>var</span> digits = []
+                <span class='keyword'>const</span> digits = []
                 <span class='keyword'>if</span> n &lt; <span class='constant'>10</span> {
                     digits.<span class='function'>push</span>(n)
                 } <span class='keyword'>else</span> {
@@ -1891,7 +1900,7 @@ Make sure to provide the compiler and linker flags as required.
                 digits.<span class='function'>reverse</span>()
 
                 scale *= game.<span class='field'>scale</span>
-                <span class='keyword'>var</span> width = digits.<span class='function'>reduce</span>(<span class='keyword'>fn</span> (a, b) -&gt; a + <span class='constant'>this</span>.<span class='field'>textures</span>[b].<span class='function'>width</span>() * scale, <span class='constant'>0</span>)
+                <span class='keyword'>const</span> width = digits.<span class='function'>reduce</span>(<span class='keyword'>fn</span> (a, b) -&gt; a + <span class='constant'>this</span>.<span class='field'>textures</span>[b].<span class='function'>width</span>() * scale, <span class='constant'>0</span>)
                 <span class='keyword'>var</span> x = (WIDTH - width) / <span class='constant'>2</span>
                 <span class='keyword'>for</span> _, n <span class='keyword'>in</span> digits {
                     <span class='constant'>this</span>.<span class='field'>textures</span>[n].<span class='function'>draw</span>(x, y, <span class='constant'>0</span>, scale, tint)
@@ -1916,7 +1925,7 @@ game.<span class='field'>started</span> = <span class='constant'>false</span>
 game.<span class='field'>over</span> = <span class='constant'>false</span>
 game.<span class='field'>rng</span> = math.<span class='function'>Random</span>()
 
-game.<span class='field'>die</span> = <span class='keyword'>fn</span> () {
+<span class='keyword'>fn</span> game.<span class='function'>die</span>() {
     <span class='keyword'>if</span> game.<span class='field'>over</span> {
         <span class='keyword'>return</span>
     }
@@ -1930,12 +1939,12 @@ game.<span class='field'>die</span> = <span class='keyword'>fn</span> () {
     game.<span class='field'>background_music_delay</span> = BACKGROUND_MUSIC_DELAY
 }
 
-game.<span class='field'>point</span> = <span class='keyword'>fn</span> () {
+<span class='keyword'>fn</span> game.<span class='function'>point</span>() {
     game.<span class='field'>score</span>.<span class='field'>current</span> += <span class='constant'>1</span>
     game.<span class='field'>point_sound</span>.<span class='function'>play</span>()
 }
 
-game.<span class='field'>start</span> = <span class='keyword'>fn</span> () {
+<span class='keyword'>fn</span> game.<span class='function'>start</span>() {
     game.<span class='field'>start_sound</span>.<span class='function'>play</span>()
     game.<span class='field'>background_music</span>.<span class='function'>toggle</span>()
 }
@@ -1978,10 +1987,10 @@ game.<span class='field'>background_music_delay</span> = <span class='constant'>
     game.<span class='field'>bird</span>.<span class='function'>update</span>()
 
     <span class='keyword'>if</span> !game.<span class='field'>started</span> {
-        <span class='keyword'>var</span> x = (WIDTH - game.<span class='field'>title_message</span>.<span class='function'>width</span>() * TITLE_MESSAGE_SCALE) / <span class='constant'>2</span>
+        <span class='keyword'>const</span> x = (WIDTH - game.<span class='field'>title_message</span>.<span class='function'>width</span>() * TITLE_MESSAGE_SCALE) / <span class='constant'>2</span>
         game.<span class='field'>title_message</span>.<span class='function'>draw</span>(x, HEIGHT / <span class='constant'>7</span>, <span class='constant'>0</span>, TITLE_MESSAGE_SCALE, <span class='constant'>0xFFFFFFFF</span>)
 
-        <span class='keyword'>var</span> x = (WIDTH - game.<span class='field'>continue_message</span>.<span class='function'>width</span>() * CONTINUE_MESSAGE_SCALE) / <span class='constant'>2</span>
+        <span class='keyword'>const</span> x = (WIDTH - game.<span class='field'>continue_message</span>.<span class='function'>width</span>() * CONTINUE_MESSAGE_SCALE) / <span class='constant'>2</span>
         game.<span class='field'>continue_message</span>.<span class='function'>draw</span>(
             x,
             HEIGHT / <span class='constant'>3</span> + game.<span class='field'>continue_message</span>.<span class='function'>height</span>() * CONTINUE_MESSAGE_SCALE + MESSAGE_PADDING,
@@ -1997,11 +2006,11 @@ game.<span class='field'>background_music_delay</span> = <span class='constant'>
     }
 
     <span class='keyword'>if</span> game.<span class='field'>over</span> {
-        <span class='keyword'>var</span> x = (WIDTH - game.<span class='field'>over_message</span>.<span class='function'>width</span>() * OVER_MESSAGE_SCALE) / <span class='constant'>2</span>
+        <span class='keyword'>const</span> x = (WIDTH - game.<span class='field'>over_message</span>.<span class='function'>width</span>() * OVER_MESSAGE_SCALE) / <span class='constant'>2</span>
         game.<span class='field'>over_message</span>.<span class='function'>draw</span>(x, HEIGHT / <span class='constant'>7</span>, <span class='constant'>0</span>, OVER_MESSAGE_SCALE, <span class='constant'>0xFFFFFFFF</span>)
 
         <span class='keyword'>if</span> game.<span class='field'>background_music_delay</span> &lt;= <span class='constant'>0</span> {
-            <span class='keyword'>var</span> x = (WIDTH - game.<span class='field'>continue_message</span>.<span class='function'>width</span>() * CONTINUE_MESSAGE_SCALE) / <span class='constant'>2</span>
+            <span class='keyword'>const</span> x = (WIDTH - game.<span class='field'>continue_message</span>.<span class='function'>width</span>() * CONTINUE_MESSAGE_SCALE) / <span class='constant'>2</span>
             game.<span class='field'>continue_message</span>.<span class='function'>draw</span>(
                 x,
                 HEIGHT / <span class='constant'>3</span> + game.<span class='field'>continue_message</span>.<span class='function'>height</span>() * CONTINUE_MESSAGE_SCALE + MESSAGE_PADDING,
@@ -2026,10 +2035,7 @@ game.<span class='field'>background_music_delay</span> = <span class='constant'>
     rl.<span class='function'>end_drawing</span>()
 }
 
-game.<span class='field'>assets</span>.<span class='function'>unload</span>()
-
-rl.<span class='function'>close_audio_device</span>()
-rl.<span class='function'>close_window</span>()
+<span class='function'>exit</span>(<span class='constant'>0</span>)
 </pre>
 </div>
 <p>

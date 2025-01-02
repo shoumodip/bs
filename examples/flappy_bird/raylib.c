@@ -1,7 +1,7 @@
 #include <bs/object.h>
 #include <raylib.h>
 
-Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
     bs_arg_check_whole_number(bs, args, 0);
     bs_arg_check_whole_number(bs, args, 1);
@@ -15,56 +15,56 @@ Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-Bs_Value rl_init_audio_device(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_init_audio_device(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     InitAudioDevice();
     return bs_value_nil;
 }
 
-Bs_Value rl_set_target_fps(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_set_target_fps(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
     SetTargetFPS(args[0].as.number);
     return bs_value_nil;
 }
 
-Bs_Value rl_close_window(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_close_window(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     CloseWindow();
     return bs_value_nil;
 }
 
-Bs_Value rl_close_audio_device(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_close_audio_device(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     CloseAudioDevice();
     return bs_value_nil;
 }
 
-Bs_Value rl_window_should_close(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_window_should_close(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_bool(WindowShouldClose());
 }
 
-Bs_Value rl_begin_drawing(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_begin_drawing(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     BeginDrawing();
     return bs_value_nil;
 }
 
-Bs_Value rl_end_drawing(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_end_drawing(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     EndDrawing();
     return bs_value_nil;
 }
 
-Bs_Value rl_clear_background(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_clear_background(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
     ClearBackground(GetColor(args[0].as.number));
     return bs_value_nil;
 }
 
-Bs_Value rl_draw_rectangle(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_draw_rectangle(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 5);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
@@ -82,18 +82,18 @@ Bs_Value rl_draw_rectangle(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-Bs_Value rl_is_key_pressed(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_is_key_pressed(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
     return bs_value_bool(IsKeyPressed(args[0].as.number));
 }
 
-Bs_Value rl_get_frame_time(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_get_frame_time(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_num(GetFrameTime());
 }
 
-Bs_Value rl_texture_init(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_texture_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
@@ -108,7 +108,7 @@ Bs_Value rl_texture_init(Bs *bs, Bs_Value *args, size_t arity) {
     return args[-1];
 }
 
-Bs_Value rl_texture_draw(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_texture_draw(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 5);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
@@ -135,23 +135,23 @@ Bs_Value rl_texture_draw(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-Bs_Value rl_texture_width(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_texture_width(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_num(bs_this_c_instance_data_as(args, Texture).width);
 }
 
-Bs_Value rl_texture_height(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_texture_height(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_num(bs_this_c_instance_data_as(args, Texture).height);
 }
 
-Bs_Value rl_texture_unload(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_texture_unload(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     UnloadTexture(bs_this_c_instance_data_as(args, Texture));
     return bs_value_nil;
 }
 
-Bs_Value rl_sound_init(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_sound_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
@@ -166,19 +166,19 @@ Bs_Value rl_sound_init(Bs *bs, Bs_Value *args, size_t arity) {
     return args[-1];
 }
 
-Bs_Value rl_sound_play(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_sound_play(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     PlaySound(bs_this_c_instance_data_as(args, Sound));
     return bs_value_nil;
 }
 
-Bs_Value rl_sound_unload(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_sound_unload(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     UnloadSound(bs_this_c_instance_data_as(args, Sound));
     return bs_value_nil;
 }
 
-Bs_Value rl_music_init(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_music_init(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
 
@@ -198,7 +198,7 @@ Bs_Value rl_music_init(Bs *bs, Bs_Value *args, size_t arity) {
     return args[-1];
 }
 
-Bs_Value rl_music_toggle(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_music_toggle(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     Music music = bs_this_c_instance_data_as(args, Music);
     if (IsMusicStreamPlaying(music)) {
@@ -209,13 +209,13 @@ Bs_Value rl_music_toggle(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-Bs_Value rl_music_update(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_music_update(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     UpdateMusicStream(bs_this_c_instance_data_as(args, Music));
     return bs_value_nil;
 }
 
-Bs_Value rl_music_unload(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_music_unload(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     UnloadMusicStream(bs_this_c_instance_data_as(args, Music));
     return bs_value_nil;

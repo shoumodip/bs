@@ -1,4 +1,4 @@
-var TASKS_PATH = os.getenv("HOME") $ "/.tasks"
+const TASKS_PATH = os.getenv("HOME") $ "/.tasks"
 
 class Tasks {
     init(path) {
@@ -13,7 +13,7 @@ class Tasks {
     }
 
     verify(index) {
-        var total = len(this.tasks)
+        const total = len(this.tasks)
         if index >= total {
             io.eprintln("Error: invalid index {index} (total is {total})")
             os.exit(1)
@@ -22,7 +22,7 @@ class Tasks {
 
     done(index) {
         this.verify(index)
-        var title = delete(this.tasks[index])
+        const title = delete(this.tasks[index])
         this.save()
         io.println("Done {index}: {title}")
     }
@@ -45,7 +45,7 @@ class Tasks {
     }
 
     save() {
-        var f = io.Writer(this.path)
+        const f = io.Writer(this.path)
         if !f {
             io.eprintln("Error: could not save tasks to '{this.path}'")
             os.exit(1)
@@ -70,7 +70,7 @@ if len(os.args) < 2 {
     return Tasks(TASKS_PATH).list(nil)
 }
 
-var command = os.args[1]
+const command = os.args[1]
 match command {
     "help" -> usage(io.stdout)
 
@@ -91,7 +91,7 @@ match command {
             os.exit(1)
         }
 
-        var index = os.args[2].tonumber()
+        const index = os.args[2].tonumber()
         if !index {
             io.eprintln("Error: invalid index '{os.args[2]}'")
             os.exit(1)
@@ -107,7 +107,7 @@ match command {
             os.exit(1)
         }
 
-        var index = os.args[2].tonumber()
+        const index = os.args[2].tonumber()
         if !index {
             io.eprintln("Error: invalid index '{os.args[2]}'")
             os.exit(1)

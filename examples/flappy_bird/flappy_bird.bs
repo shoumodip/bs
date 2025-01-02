@@ -1,35 +1,42 @@
-var rl = import("raylib")
-var game = {}
+const rl = import("raylib")
+const game = {}
 
-var WIDTH = 800
-var HEIGHT = 600
+const WIDTH = 800
+const HEIGHT = 600
 
-var GRAVITY = 0.5
-var IMPULSE = -7
+const GRAVITY = 0.5
+const IMPULSE = -7
 
-var BIRD_TILT = 20
-var BIRD_STARTOFF_SPEED = 7
-var BIRD_ANIMATION_SPEED = 0.2
+const BIRD_TILT = 20
+const BIRD_STARTOFF_SPEED = 7
+const BIRD_ANIMATION_SPEED = 0.2
 
-var BIRD_MIN_X = 100
-var BIRD_MIN_Y = 50
+const BIRD_MIN_X = 100
+const BIRD_MIN_Y = 50
 
-var PIPE_GAP = 120
-var PIPE_SPEED = -4
-var PIPE_SPAWN_DELAY = 1.5
-var PIPE_SPAWN_RANGE = HEIGHT / 5
+const PIPE_GAP = 120
+const PIPE_SPEED = -4
+const PIPE_SPAWN_DELAY = 1.5
+const PIPE_SPAWN_RANGE = HEIGHT / 5
 
-var BACKGROUND_SCROLL_SPEED = 0.5
+const BACKGROUND_SCROLL_SPEED = 0.5
 
-var MESSAGE_PADDING = 30
-var OVER_MESSAGE_SCALE = 1.2
-var TITLE_MESSAGE_SCALE = 1.2
-var CONTINUE_MESSAGE_SCALE = 0.7
+const MESSAGE_PADDING = 30
+const OVER_MESSAGE_SCALE = 1.2
+const TITLE_MESSAGE_SCALE = 1.2
+const CONTINUE_MESSAGE_SCALE = 0.7
 
-var BACKGROUND_MUSIC_DELAY = 1.2
+const BACKGROUND_MUSIC_DELAY = 1.2
 
-var DEBUG_COLOR = 0xFF0000FF
-var DEBUG_HITBOX = false
+const DEBUG_COLOR = 0xFF0000FF
+const DEBUG_HITBOX = false
+
+fn exit(code) {
+    game.assets.unload()
+    rl.close_audio_device()
+    rl.close_window()
+    os.exit(code)
+}
 
 class Assets {
     init() {
@@ -43,10 +50,10 @@ class Assets {
             return this.sounds[path]
         }
 
-        var sound = loader(path)
+        const sound = loader(path)
         if !sound {
             io.eprintln("Error: could not load sound '{path}'")
-            os.exit(1)
+            exit(1)
         }
 
         this.sounds[path] = sound
@@ -59,10 +66,10 @@ class Assets {
             return this.textures[path]
         }
 
-        var texture = rl.Texture(path)
+        const texture = rl.Texture(path)
         if !texture {
             io.eprintln("Error: could not load image '{path}'")
-            os.exit(1)
+            exit(1)
         }
 
         this.textures[path] = texture
@@ -115,8 +122,8 @@ class Bird {
             game.assets.texture("bird2.png"),
         ]
 
-        var w = this.textures[0].width() * game.scale
-        var h = this.textures[0].height() * game.scale
+        const w = this.textures[0].width() * game.scale
+        const h = this.textures[0].height() * game.scale
         this.hitbox = Hitbox((WIDTH - w) / 2, HEIGHT / 3, w, h)
     }
 
@@ -127,7 +134,7 @@ class Bird {
                 this.dy -= 0.3 * GRAVITY
             }
 
-            var needs_dy = !game.over || this.hitbox.y + this.hitbox.height * game.scale < game.base.y
+            const needs_dy = !game.over || this.hitbox.y + this.hitbox.height * game.scale < game.base.y
             if needs_dy {
                 this.dy += GRAVITY
             }
@@ -258,10 +265,10 @@ class Pipe {
             }
         }
 
-        var top = this.top()
+        const top = this.top()
         this.texture.draw(top.x, top.y, 180, game.scale, 0xFFFFFFFF)
 
-        var bottom = this.bottom()
+        const bottom = this.bottom()
         this.texture.draw(bottom.x, bottom.y, 0, game.scale, 0xFFFFFFFF)
 
         top.debug()
@@ -328,7 +335,7 @@ class Score {
     display() {
         if game.started {
             fn show(n, y, scale, tint) {
-                var digits = []
+                const digits = []
                 if n < 10 {
                     digits.push(n)
                 } else {
@@ -340,7 +347,7 @@ class Score {
                 digits.reverse()
 
                 scale *= game.scale
-                var width = digits.reduce(fn (a, b) -> a + this.textures[b].width() * scale, 0)
+                const width = digits.reduce(fn (a, b) -> a + this.textures[b].width() * scale, 0)
                 var x = (WIDTH - width) / 2
                 for _, n in digits {
                     this.textures[n].draw(x, y, 0, scale, tint)
@@ -365,7 +372,7 @@ game.started = false
 game.over = false
 game.rng = math.Random()
 
-game.die = fn () {
+fn game.die() {
     if game.over {
         return
     }
@@ -379,12 +386,12 @@ game.die = fn () {
     game.background_music_delay = BACKGROUND_MUSIC_DELAY
 }
 
-game.point = fn () {
+fn game.point() {
     game.score.current += 1
     game.point_sound.play()
 }
 
-game.start = fn () {
+fn game.start() {
     game.start_sound.play()
     game.background_music.toggle()
 }
@@ -427,10 +434,10 @@ while !rl.window_should_close() {
     game.bird.update()
 
     if !game.started {
-        var x = (WIDTH - game.title_message.width() * TITLE_MESSAGE_SCALE) / 2
+        const x = (WIDTH - game.title_message.width() * TITLE_MESSAGE_SCALE) / 2
         game.title_message.draw(x, HEIGHT / 7, 0, TITLE_MESSAGE_SCALE, 0xFFFFFFFF)
 
-        var x = (WIDTH - game.continue_message.width() * CONTINUE_MESSAGE_SCALE) / 2
+        const x = (WIDTH - game.continue_message.width() * CONTINUE_MESSAGE_SCALE) / 2
         game.continue_message.draw(
             x,
             HEIGHT / 3 + game.continue_message.height() * CONTINUE_MESSAGE_SCALE + MESSAGE_PADDING,
@@ -446,11 +453,11 @@ while !rl.window_should_close() {
     }
 
     if game.over {
-        var x = (WIDTH - game.over_message.width() * OVER_MESSAGE_SCALE) / 2
+        const x = (WIDTH - game.over_message.width() * OVER_MESSAGE_SCALE) / 2
         game.over_message.draw(x, HEIGHT / 7, 0, OVER_MESSAGE_SCALE, 0xFFFFFFFF)
 
         if game.background_music_delay <= 0 {
-            var x = (WIDTH - game.continue_message.width() * CONTINUE_MESSAGE_SCALE) / 2
+            const x = (WIDTH - game.continue_message.width() * CONTINUE_MESSAGE_SCALE) / 2
             game.continue_message.draw(
                 x,
                 HEIGHT / 3 + game.continue_message.height() * CONTINUE_MESSAGE_SCALE + MESSAGE_PADDING,
@@ -475,7 +482,4 @@ while !rl.window_should_close() {
     rl.end_drawing()
 }
 
-game.assets.unload()
-
-rl.close_audio_device()
-rl.close_window()
+exit(0)

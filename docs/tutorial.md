@@ -1193,8 +1193,8 @@ Foo = 420 // Compile Time Error!
 // one.bs
 var M = {}
 
-M.inc = fn (n) -> n + 1
-M.dec = fn (n) -> n - 1
+fn M.inc(n) -> n + 1
+fn M.dec(n) -> n - 1
 
 return M // Any arbitrary value can be returned, this is just the usual pattern
 ```
@@ -1222,8 +1222,8 @@ var M = {}
 
 io.println("Loading module 'one'")
 
-M.inc = fn (n) -> n + 1
-M.dec = fn (n) -> n - 1
+fn M.inc(n) -> n + 1
+fn M.dec(n) -> n - 1
 
 return M
 ```
@@ -1250,8 +1250,8 @@ if is_main_module {
     io.println("Loading module 'one'")
 }
 
-M.inc = fn (n) -> n + 1
-M.dec = fn (n) -> n - 1
+fn M.inc(n) -> n + 1
+fn M.dec(n) -> n - 1
 
 return M
 ```
@@ -1671,14 +1671,14 @@ Create a file `arithmetic.c` with the following content
 
 #include <bs/object.h>
 
-Bs_Value arithmetic_add(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value arithmetic_add(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
     return bs_value_num(args[0].as.number + args[1].as.number);
 }
 
-Bs_Value arithmetic_sub(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value arithmetic_sub(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 2);
     bs_arg_check_value_type(bs, args, 0, BS_VALUE_NUM);
     bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
@@ -1735,7 +1735,7 @@ library.
 #include <raylib.h>
 #include <bs/object.h>
 
-Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 3);
     bs_arg_check_whole_number(bs, args, 0);
     bs_arg_check_whole_number(bs, args, 1);
@@ -1750,37 +1750,37 @@ Bs_Value rl_init_window(Bs *bs, Bs_Value *args, size_t arity) {
     return bs_value_nil;
 }
 
-Bs_Value rl_close_window(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_close_window(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     CloseWindow();
     return bs_value_nil;
 }
 
-Bs_Value rl_window_should_close(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_window_should_close(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     return bs_value_bool(WindowShouldClose());
 }
 
-Bs_Value rl_begin_drawing(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_begin_drawing(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     BeginDrawing();
     return bs_value_nil;
 }
 
-Bs_Value rl_end_drawing(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_end_drawing(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 0);
     EndDrawing();
     return bs_value_nil;
 }
 
-Bs_Value rl_clear_background(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_clear_background(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 1);
     bs_arg_check_whole_number(bs, args, 0);
     ClearBackground(GetColor(args[0].as.number));
     return bs_value_nil;
 }
 
-Bs_Value rl_draw_text(Bs *bs, Bs_Value *args, size_t arity) {
+static Bs_Value rl_draw_text(Bs *bs, Bs_Value *args, size_t arity) {
     bs_check_arity(bs, arity, 5);
     bs_arg_check_object_type(bs, args, 0, BS_OBJECT_STR);
     bs_arg_check_whole_number(bs, args, 1);
