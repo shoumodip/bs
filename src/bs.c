@@ -5,8 +5,8 @@
 
 #if defined(_WIN32) || defined(_WIN64)
 #    include <io.h>
-#    define isatty _isatty
-#    define fileno _fileno
+#    define isatty         _isatty
+#    define fileno         _fileno
 #    define PATH_SEPARATOR '\\'
 #else
 #    include <unistd.h>
@@ -225,8 +225,8 @@ int main(int argc, char **argv) {
                     bs_fmt(
                         w,
                         ":{\n"
-                        "for _ in 0, 5 {\n"
-                        "    io.println(\"Hello, world!\");\n"
+                        "for _ in 0..5 {\n"
+                        "    io.println(\"Hello, world!\")\n"
                         "}\n"
                         ":}\n\n");
                     crossline_color_set(CROSSLINE_FGCOLOR_DEFAULT);
@@ -284,7 +284,7 @@ int main(int argc, char **argv) {
                     if (bs_sv_prefix(command, Bs_Sv_Static(":u "))) {
                         bs_sv_drop(&command, 3);
 
-                        char *end = NULL;
+                        char        *end = NULL;
                         const size_t index = strtoul(command.data, &end, 10);
 
                         if (end == command.data || index == ULONG_MAX ||
@@ -340,7 +340,7 @@ int main(int argc, char **argv) {
 
                 if (!error_was_standalone) bs_fmt(w, "\n");
                 error_was_standalone = false;
-                result = (Bs_Result){0};
+                result = (Bs_Result) {0};
             }
 
             crossline_history_save(history_path);
@@ -363,7 +363,7 @@ int main(int argc, char **argv) {
     const char *path = argv[1];
 
     size_t size = 0;
-    char *contents = bs_read_file(path, &size, false);
+    char  *contents = bs_read_file(path, &size, false);
     if (!contents) {
         bs_error_standalone(bs, "could not read file '%s'", path);
         bs_free(bs);
