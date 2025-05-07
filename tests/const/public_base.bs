@@ -1,0 +1,5 @@
+pub var a = 69
+pub const b = 420
+
+pub fn c() -> 1337
+pub class d {}

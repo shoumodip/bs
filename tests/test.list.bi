@@ -1,4 +1,4 @@
-:i count 160
+:i count 164
 :b shell 29
 ../bin/bs arithmetics/main.bs
 :i returncode 0
@@ -2506,6 +2506,48 @@ const/error_cannot_assign_class.bs:2:1: error: cannot assign to constant
 69
 420
 1337
+
+:b stderr 0
+
+:b shell 45
+../bin/bs const/error_cannot_assign_global.bs
+:i returncode 1
+:b stdout 7
+69
+420
+
+:b stderr 102
+const/error_cannot_assign_global.bs:7:1: error: cannot assign to constant
+
+    7 | b = 1337
+      | ^
+
+:b shell 51
+../bin/bs const/error_cannot_assign_global_class.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 106
+const/error_cannot_assign_global_class.bs:3:1: error: cannot assign to constant
+
+    3 | d = 69
+      | ^
+
+:b shell 48
+../bin/bs const/error_cannot_assign_global_fn.bs
+:i returncode 1
+:b stdout 0
+
+:b stderr 103
+const/error_cannot_assign_global_fn.bs:3:1: error: cannot assign to constant
+
+    3 | c = 69
+      | ^
+
+:b shell 30
+../bin/bs const/public_base.bs
+:i returncode 0
+:b stdout 0
 
 :b stderr 0
 

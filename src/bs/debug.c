@@ -2,7 +2,7 @@
 
 static void
 bs_debug_op_int(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset, const char *name) {
-    const size_t slot = *(const size_t *)&c->data[*offset];
+    const size_t slot = *(const size_t *) &c->data[*offset];
     *offset += sizeof(slot);
 
     bs_fmt(p->writer, "%-16s %4ld\n", name, slot);
@@ -10,7 +10,7 @@ bs_debug_op_int(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset, const c
 
 static void
 bs_debug_op_value(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset, const char *name) {
-    const size_t constant = *(const size_t *)&c->data[*offset];
+    const size_t constant = *(const size_t *) &c->data[*offset];
     *offset += sizeof(constant);
 
     bs_fmt(p->writer, "%-16s %4zu '", name, constant);
@@ -20,7 +20,7 @@ bs_debug_op_value(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset, const
 
 static void
 bs_debug_op_invoke(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset, const char *name) {
-    const size_t constant = *(const size_t *)&c->data[*offset];
+    const size_t constant = *(const size_t *) &c->data[*offset];
     *offset += sizeof(constant);
 
     bs_fmt(p->writer, "%-16s %4zu '", name, constant);
@@ -28,7 +28,7 @@ bs_debug_op_invoke(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset, cons
     bs_fmt(p->writer, "'\n");
 }
 
-static_assert(BS_COUNT_OPS == 76, "Update bs_debug_op()");
+static_assert(BS_COUNT_OPS == 77, "Update bs_debug_op()");
 void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
     bs_fmt(p->writer, "%04zu ", *offset);
 
@@ -51,7 +51,7 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
         break;
 
     case BS_OP_CLOSURE: {
-        const size_t constant = *(const size_t *)&c->data[*offset];
+        const size_t constant = *(const size_t *) &c->data[*offset];
         *offset += sizeof(constant);
 
         const Bs_Value value = c->constants.data[constant];
@@ -59,10 +59,10 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
         bs_value_write_impl(p, value);
         bs_fmt(p->writer, "'\n");
 
-        const Bs_Fn *fn = (const Bs_Fn *)value.as.object;
+        const Bs_Fn *fn = (const Bs_Fn *) value.as.object;
         for (size_t i = 0; i < fn->upvalues; i++) {
-            const bool local = c->data[(*offset)++];
-            const size_t index = *(const size_t *)&c->data[*offset];
+            const bool   local = c->data[(*offset)++];
+            const size_t index = *(const size_t *) &c->data[*offset];
             *offset += sizeof(index);
 
             bs_fmt(
@@ -293,6 +293,10 @@ void bs_debug_op(Bs_Pretty_Printer *p, const Bs_Chunk *c, size_t *offset) {
         bs_debug_op_value(p, c, offset, "OP_GSET");
         break;
 
+    case BS_OP_GCONST:
+        bs_debug_op_value(p, c, offset, "OP_GCONST");
+        break;
+
     case BS_OP_LGET:
         bs_debug_op_int(p, c, offset, "OP_LGET");
         break;
@@ -399,7 +403,7 @@ void bs_debug_chunks(Bs_Pretty_Printer *p, const Bs_Object *objects) {
     const Bs_Object *object = objects;
     while (object) {
         if (object->type == BS_OBJECT_FN) {
-            const Bs_Fn *fn = (const Bs_Fn *)object;
+            const Bs_Fn *fn = (const Bs_Fn *) object;
 
             bs_fmt(p->writer, "==== ");
             bs_value_write_impl(p, bs_value_object(fn));

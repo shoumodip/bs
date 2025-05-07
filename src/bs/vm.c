@@ -27,11 +27,11 @@
 #endif // BS_STEP_DEBUG
 
 typedef struct {
-    Bs_Value *base;
+    Bs_Value      *base;
     const uint8_t *ip;
 
     union {
-        Bs_Closure *closure;
+        Bs_Closure    *closure;
         const Bs_C_Fn *native;
     };
 
@@ -40,20 +40,20 @@ typedef struct {
 
 typedef struct {
     Bs_Frame *data;
-    size_t count;
+    size_t    count;
 } Bs_Frames;
 
 typedef struct {
     size_t *data;
-    size_t count;
+    size_t  count;
 } Bs_Bases;
 
 typedef struct {
-    bool done;
+    bool     done;
     Bs_Value result;
 
     Bs_Str *name;
-    size_t length;
+    size_t  length;
 
     // A view into the `name` field that stores the parent directory of the module. Zero
     // initialized if parent not found
@@ -64,13 +64,13 @@ typedef struct {
 
 static void bs_module_free(Bs_Module *m) {
     // The const correctness is *not* a bug. See: https://yarchive.net/comp/const.html
-    free((char *)m->source);
+    free((char *) m->source);
 }
 
 typedef struct {
     Bs_Module *data;
-    size_t count;
-    size_t capacity;
+    size_t     count;
+    size_t     capacity;
 } Bs_Modules;
 
 static void bs_modules_free(Bs *bs, Bs_Modules *m) {
@@ -97,13 +97,13 @@ static bool bs_modules_find(Bs_Modules *modules, Bs_Sv name, size_t *index) {
 
 typedef struct {
     Bs_Value *data;
-    size_t count;
+    size_t    count;
 } Bs_Stack;
 
 typedef struct {
     Bs_Object **data;
-    size_t count;
-    size_t capacity;
+    size_t      count;
+    size_t      capacity;
 } Bs_Object_List;
 
 static void bs_object_list_push(Bs_Object_List *l, Bs_Object *object) {
@@ -119,13 +119,13 @@ static void bs_object_list_push(Bs_Object_List *l, Bs_Object *object) {
 static_assert(BS_COUNT_OBJECTS == 13, "Update bs.builtin_methods");
 struct Bs {
     // Stack
-    Bs_Stack stack;
-    Bs_Bases bases;
+    Bs_Stack  stack;
+    Bs_Bases  bases;
     Bs_Frame *frame;
     Bs_Frames frames;
 
     // Filesystem
-    Bs_Buffer paths;
+    Bs_Buffer  paths;
     Bs_Modules modules;
 
     // Methods for builtin types:
@@ -136,23 +136,24 @@ struct Bs {
     Bs_Map builtin_methods[4];
 
     // Roots
-    Bs_Map globals;
-    Bs_Map strings;
+    Bs_Map      globals;
+    Bs_Map      constGlobals;
+    Bs_Map      strings;
     Bs_Upvalue *upvalues;
 
     // Garbage Collector
-    bool gc_on;
+    bool   gc_on;
     size_t gc_max;
     size_t gc_bytes;
 
     Bs_Object_List grays;
-    Bs_Object *objects;
+    Bs_Object     *objects;
 
     // Handles
-    bool handles_on;
+    bool           handles_on;
     Bs_Object_List handles;
 
-    Bs_Config config;
+    Bs_Config         config;
     Bs_Pretty_Printer printer;
 
     // Exit
@@ -168,29 +169,29 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
 
     switch (object->type) {
     case BS_OBJECT_FN: {
-        Bs_Fn *fn = (Bs_Fn *)object;
+        Bs_Fn *fn = (Bs_Fn *) object;
         bs_chunk_free(bs, &fn->chunk);
         bs_realloc(bs, fn, sizeof(*fn), 0);
     } break;
 
     case BS_OBJECT_STR: {
-        Bs_Str *str = (Bs_Str *)object;
+        Bs_Str *str = (Bs_Str *) object;
         bs_realloc(bs, str, sizeof(*str) + str->size + 1, 0);
     } break;
 
     case BS_OBJECT_ARRAY: {
-        Bs_Array *array = (Bs_Array *)object;
+        Bs_Array *array = (Bs_Array *) object;
         bs_realloc(bs, array->data, sizeof(*array->data) * array->capacity, 0);
         bs_realloc(bs, array, sizeof(*array), 0);
     } break;
 
     case BS_OBJECT_TABLE: {
-        bs_table_free(bs, (Bs_Table *)object);
+        bs_table_free(bs, (Bs_Table *) object);
         bs_realloc(bs, object, sizeof(Bs_Table), 0);
     } break;
 
     case BS_OBJECT_CLOSURE: {
-        Bs_Closure *closure = (Bs_Closure *)object;
+        Bs_Closure *closure = (Bs_Closure *) object;
         bs_da_free(bs, &closure->defers);
         bs_realloc(bs, closure, sizeof(*closure) + sizeof(Bs_Upvalue *) * closure->upvalues, 0);
     } break;
@@ -200,25 +201,25 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
         break;
 
     case BS_OBJECT_CLASS: {
-        Bs_Class *class = (Bs_Class *)object;
+        Bs_Class *class = (Bs_Class *) object;
         bs_map_free(bs, &class->methods);
         bs_realloc(bs, class, sizeof(*class), 0);
     } break;
 
     case BS_OBJECT_INSTANCE: {
-        Bs_Instance *instance = (Bs_Instance *)object;
+        Bs_Instance *instance = (Bs_Instance *) object;
         bs_map_free(bs, &instance->properties);
         bs_realloc(bs, instance, sizeof(*instance), 0);
     } break;
 
     case BS_OBJECT_C_CLASS: {
-        Bs_C_Class *class = (Bs_C_Class *)object;
+        Bs_C_Class *class = (Bs_C_Class *) object;
         bs_map_free(bs, &class->methods);
         bs_realloc(bs, class, sizeof(*class), 0);
     } break;
 
     case BS_OBJECT_C_INSTANCE: {
-        Bs_C_Instance *instance = (Bs_C_Instance *)object;
+        Bs_C_Instance *instance = (Bs_C_Instance *) object;
         if (instance->class->free) {
             instance->class->free(bs->config.userdata, instance->data);
         }
@@ -226,7 +227,7 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
     } break;
 
     case BS_OBJECT_BOUND_METHOD: {
-        Bs_Bound_Method *method = (Bs_Bound_Method *)object;
+        Bs_Bound_Method *method = (Bs_Bound_Method *) object;
         bs_realloc(bs, method, sizeof(*method), 0);
     } break;
 
@@ -235,7 +236,7 @@ static void bs_free_object(Bs *bs, Bs_Object *object) {
         break;
 
     case BS_OBJECT_C_LIB: {
-        Bs_C_Lib *library = (Bs_C_Lib *)object;
+        Bs_C_Lib *library = (Bs_C_Lib *) object;
         bs_map_free(bs, &library->map);
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -275,9 +276,9 @@ static void bs_blacken_object(Bs *bs, Bs_Object *object) {
 
     switch (object->type) {
     case BS_OBJECT_FN: {
-        Bs_Fn *fn = (Bs_Fn *)object;
-        bs_mark(bs, (Bs_Object *)fn->name);
-        bs_mark(bs, (Bs_Object *)fn->source);
+        Bs_Fn *fn = (Bs_Fn *) object;
+        bs_mark(bs, (Bs_Object *) fn->name);
+        bs_mark(bs, (Bs_Object *) fn->source);
 
         for (size_t i = 0; i < fn->chunk.constants.count; i++) {
             bs_mark_value(bs, fn->chunk.constants.data[i]);
@@ -289,69 +290,69 @@ static void bs_blacken_object(Bs *bs, Bs_Object *object) {
         break;
 
     case BS_OBJECT_ARRAY: {
-        Bs_Array *array = (Bs_Array *)object;
+        Bs_Array *array = (Bs_Array *) object;
         for (size_t i = 0; i < array->count; i++) {
             bs_mark_value(bs, array->data[i]);
         }
     } break;
 
     case BS_OBJECT_TABLE: {
-        Bs_Table *table = (Bs_Table *)object;
+        Bs_Table *table = (Bs_Table *) object;
         bs_mark_map(bs, &table->map);
     } break;
 
     case BS_OBJECT_CLOSURE: {
-        Bs_Closure *closure = (Bs_Closure *)object;
-        bs_mark(bs, (Bs_Object *)closure->fn);
+        Bs_Closure *closure = (Bs_Closure *) object;
+        bs_mark(bs, (Bs_Object *) closure->fn);
 
         for (size_t i = 0; i < closure->defers.count; i++) {
-            bs_mark(bs, (Bs_Object *)closure->defers.data[i]);
+            bs_mark(bs, (Bs_Object *) closure->defers.data[i]);
         }
 
         for (size_t i = 0; i < closure->upvalues; i++) {
-            bs_mark(bs, (Bs_Object *)closure->data[i]);
+            bs_mark(bs, (Bs_Object *) closure->data[i]);
         }
     } break;
 
     case BS_OBJECT_UPVALUE:
-        bs_mark_value(bs, ((Bs_Upvalue *)object)->closed);
+        bs_mark_value(bs, ((Bs_Upvalue *) object)->closed);
         break;
 
     case BS_OBJECT_CLASS: {
-        Bs_Class *class = (Bs_Class *)object;
-        bs_mark(bs, (Bs_Object *)class->name);
-        bs_mark(bs, (Bs_Object *)class->init);
+        Bs_Class *class = (Bs_Class *) object;
+        bs_mark(bs, (Bs_Object *) class->name);
+        bs_mark(bs, (Bs_Object *) class->init);
         bs_mark_map(bs, &class->methods);
     } break;
 
     case BS_OBJECT_INSTANCE: {
-        Bs_Instance *instance = (Bs_Instance *)object;
-        bs_mark(bs, (Bs_Object *)instance->class);
+        Bs_Instance *instance = (Bs_Instance *) object;
+        bs_mark(bs, (Bs_Object *) instance->class);
         bs_mark_map(bs, &instance->properties);
     } break;
 
     case BS_OBJECT_C_CLASS: {
-        Bs_C_Class *class = (Bs_C_Class *)object;
-        bs_mark(bs, (Bs_Object *)class->init);
+        Bs_C_Class *class = (Bs_C_Class *) object;
+        bs_mark(bs, (Bs_Object *) class->init);
         bs_mark_map(bs, &class->methods);
     } break;
 
     case BS_OBJECT_C_INSTANCE: {
-        Bs_C_Instance *instance = (Bs_C_Instance *)object;
-        bs_mark(bs, (Bs_Object *)instance->class);
+        Bs_C_Instance *instance = (Bs_C_Instance *) object;
+        bs_mark(bs, (Bs_Object *) instance->class);
         if (instance->class->mark) {
             instance->class->mark(bs, instance->data);
         }
     } break;
 
     case BS_OBJECT_BOUND_METHOD: {
-        Bs_Bound_Method *method = (Bs_Bound_Method *)object;
+        Bs_Bound_Method *method = (Bs_Bound_Method *) object;
         bs_mark_value(bs, method->this);
         bs_mark_value(bs, method->fn);
     } break;
 
     case BS_OBJECT_C_LIB: {
-        Bs_C_Lib *library = ((Bs_C_Lib *)object);
+        Bs_C_Lib *library = ((Bs_C_Lib *) object);
         bs_mark_map(bs, &library->map);
     } break;
 
@@ -376,22 +377,23 @@ static void bs_collect(Bs *bs) {
     }
 
     for (size_t i = 0; i < bs->frames.count; i++) {
-        bs_mark(bs, (Bs_Object *)bs->frames.data[i].closure);
+        bs_mark(bs, (Bs_Object *) bs->frames.data[i].closure);
     }
 
-    bs_mark(bs, (Bs_Object *)bs->config.cwd);
+    bs_mark(bs, (Bs_Object *) bs->config.cwd);
 
     for (size_t i = 0; i < bs->modules.count; i++) {
         Bs_Module *m = &bs->modules.data[i];
-        bs_mark(bs, (Bs_Object *)m->name);
+        bs_mark(bs, (Bs_Object *) m->name);
         bs_mark_value(bs, m->result);
     }
 
     for (Bs_Upvalue *upvalue = bs->upvalues; upvalue; upvalue = upvalue->next) {
-        bs_mark(bs, (Bs_Object *)upvalue);
+        bs_mark(bs, (Bs_Object *) upvalue);
     }
 
     bs_mark_map(bs, &bs->globals);
+    bs_mark_map(bs, &bs->constGlobals);
 
     for (size_t i = 0; i < bs->handles.count; i++) {
         bs_mark(bs, bs->handles.data[i]);
@@ -486,7 +488,7 @@ Bs *bs_new(int argc, char **argv) {
     bs_core_init(bs, argc, argv);
 
     // The Repl module
-    bs_modules_push(bs, &bs->modules, (Bs_Module){0});
+    bs_modules_push(bs, &bs->modules, (Bs_Module) {0});
     return bs;
 }
 
@@ -503,6 +505,8 @@ void bs_free(Bs *bs) {
     bs_modules_free(bs, &bs->modules);
 
     bs_map_free(bs, &bs->globals);
+    bs_map_free(bs, &bs->constGlobals);
+
     bs_map_free(bs, &bs->strings);
 
     for (size_t i = 0; i < bs_c_array_size(bs->builtin_methods); i++) {
@@ -584,12 +588,12 @@ Bs_Object *bs_object_new(Bs *bs, Bs_Object_Type type, size_t size) {
 
 Bs_Str *bs_str_new(Bs *bs, Bs_Sv sv) {
     const uint32_t hash = bs_hash_bytes(sv.data, sv.size);
-    Bs_Entry *entry = bs_entries_find_sv(bs->strings.data, bs->strings.capacity, sv, hash);
+    Bs_Entry      *entry = bs_entries_find_sv(bs->strings.data, bs->strings.capacity, sv, hash);
     if (entry && entry->key.type != BS_VALUE_NIL) {
-        return (Bs_Str *)entry->key.as.object;
+        return (Bs_Str *) entry->key.as.object;
     }
 
-    Bs_Str *str = (Bs_Str *)bs_object_new(bs, BS_OBJECT_STR, sizeof(Bs_Str) + sv.size + 1);
+    Bs_Str *str = (Bs_Str *) bs_object_new(bs, BS_OBJECT_STR, sizeof(Bs_Str) + sv.size + 1);
     str->size = sv.size;
     str->hash = hash;
 
@@ -610,13 +614,17 @@ void bs_global_set(Bs *bs, Bs_Sv name, Bs_Value value) {
     bs_map_set(bs, &bs->globals, bs_value_object(bs_str_new(bs, name)), value);
 }
 
+void bs_global_const(Bs *bs, Bs_Sv name, Bs_Value value) {
+    bs_map_set(bs, &bs->constGlobals, bs_value_object(bs_str_new(bs, name)), value);
+}
+
 bool bs_update_cwd(Bs *bs) {
     bool result = true;
 
     const bool gc_on_save = bs->gc_on;
     bs->gc_on = false;
 
-    Bs_Buffer *b = &bs->paths;
+    Bs_Buffer   *b = &bs->paths;
     const size_t start = b->count;
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -689,7 +697,7 @@ void bs_builtin_object_methods_add(Bs *bs, Bs_Object_Type type, Bs_Sv name, Bs_C
 
 // Buffer
 Bs_Writer bs_buffer_writer(Bs_Buffer *b) {
-    return (Bs_Writer){.data = b, .write = bs_buffer_write};
+    return (Bs_Writer) {.data = b, .write = bs_buffer_write};
 }
 
 Bs_Sv bs_buffer_reset(Bs_Buffer *b, size_t pos) {
@@ -716,7 +724,7 @@ Bs_Sv bs_buffer_absolute_path(Bs_Buffer *b, Bs_Sv path, Bs_Sv cwd) {
     bs_da_push(b->bs, b, '\0');
 
     const char *p = b->data + start;
-    char *r = b->data + start;
+    char       *r = b->data + start;
 
     while (*p) {
         // Skip consecutive slashes
@@ -761,7 +769,7 @@ Bs_Sv bs_buffer_absolute_path(Bs_Buffer *b, Bs_Sv path, Bs_Sv cwd) {
     }
 
     b->count = r - b->data;
-    return (Bs_Sv){b->data + start, b->count - start};
+    return (Bs_Sv) {b->data + start, b->count - start};
 }
 
 Bs_Sv bs_buffer_relative_path(Bs_Buffer *b, Bs_Sv path, Bs_Sv cwd) {
@@ -907,7 +915,7 @@ Bs_Error bs_error_begin_at(Bs *bs, size_t location) {
     } else {
         error.native = true;
         if (bs->frames.data[bs->frames.count - 2].ip) {
-            const Bs_Frame *prev = &bs->frames.data[bs->frames.count - 2];
+            const Bs_Frame  *prev = &bs->frames.data[bs->frames.count - 2];
             const Bs_Op_Loc *oploc = bs_chunk_get_op_loc(
                 &prev->closure->fn->chunk, prev->ip - prev->closure->fn->chunk.data);
 
@@ -925,7 +933,7 @@ Bs_Error bs_error_begin_at(Bs *bs, size_t location) {
 
 void bs_error_end_at(Bs *bs, size_t location, bool native) {
     const size_t start = bs->config.buffer.count;
-    Bs_Writer w = bs_buffer_writer(&bs->config.buffer);
+    Bs_Writer    w = bs_buffer_writer(&bs->config.buffer);
 
     for (size_t i = bs->frames.count; i > 1; i--) {
         const Bs_Frame *callee = &bs->frames.data[i - 1];
@@ -941,7 +949,7 @@ void bs_error_end_at(Bs *bs, size_t location, bool native) {
         Bs_Error error = {.type = BS_ERROR_TRACE};
 
         if (caller->ip) {
-            const Bs_Fn *fn = caller->closure->fn;
+            const Bs_Fn     *fn = caller->closure->fn;
             const Bs_Op_Loc *oploc = bs_chunk_get_op_loc(&fn->chunk, caller->ip - fn->chunk.data);
             if (native) {
                 oploc += location;
@@ -978,7 +986,7 @@ void bs_error_end_at(Bs *bs, size_t location, bool native) {
             } else if (callee->closure->fn->name) {
                 const Bs_Value this = *callee->base;
                 if (this.type == BS_VALUE_OBJECT && this.as.object->type == BS_OBJECT_INSTANCE) {
-                    const Bs_Instance *instance = (const Bs_Instance *)this.as.object;
+                    const Bs_Instance *instance = (const Bs_Instance *) this.as.object;
                     if (callee->closure != instance->class->init) {
                         bs_fmt(&w, Bs_Sv_Fmt ".", Bs_Sv_Arg(*instance->class->name));
                     }
@@ -995,7 +1003,7 @@ void bs_error_end_at(Bs *bs, size_t location, bool native) {
             const Bs_C_Fn *fn = callee->native;
             const Bs_Value this = callee->base[-1];
             if (this.type == BS_VALUE_OBJECT && this.as.object->type == BS_OBJECT_C_INSTANCE) {
-                const Bs_C_Instance *instance = (const Bs_C_Instance *)this.as.object;
+                const Bs_C_Instance *instance = (const Bs_C_Instance *) this.as.object;
                 if (fn != instance->class->init) {
                     bs_fmt(&w, Bs_Sv_Fmt ".", Bs_Sv_Arg(instance->class->name));
                 }
@@ -1023,7 +1031,7 @@ void bs_error_end_at(Bs *bs, size_t location, bool native) {
 void bs_error_full_at(
     Bs *bs, size_t location, Bs_Sv explanation, Bs_Sv example, const char *fmt, ...) {
     const size_t start = bs->config.buffer.count;
-    Bs_Writer w = bs_buffer_writer(&bs->config.buffer);
+    Bs_Writer    w = bs_buffer_writer(&bs->config.buffer);
 
     va_list args;
     va_start(args, fmt);
@@ -1041,7 +1049,7 @@ void bs_error_full_at(
 
 void bs_error_standalone(Bs *bs, const char *fmt, ...) {
     const size_t start = bs->config.buffer.count;
-    Bs_Writer w = bs_buffer_writer(&bs->config.buffer);
+    Bs_Writer    w = bs_buffer_writer(&bs->config.buffer);
 
     va_list args;
     va_start(args, fmt);
@@ -1057,7 +1065,7 @@ void bs_error_standalone(Bs *bs, const char *fmt, ...) {
 
 void bs_error_standalone_unwind(Bs *bs, const char *fmt, ...) {
     const size_t start = bs->config.buffer.count;
-    Bs_Writer w = bs_buffer_writer(&bs->config.buffer);
+    Bs_Writer    w = bs_buffer_writer(&bs->config.buffer);
 
     va_list args;
     va_start(args, fmt);
@@ -1088,12 +1096,12 @@ void bs_check_arity_at(Bs *bs, size_t location, size_t actual, size_t expected) 
 }
 
 void bs_check_multi_at(
-    Bs *bs,
-    size_t location,
-    Bs_Value value,
+    Bs             *bs,
+    size_t          location,
+    Bs_Value        value,
     const Bs_Check *checks,
-    size_t count,
-    const char *label) {
+    size_t          count,
+    const char     *label) {
 
     if (!count) {
         return;
@@ -1116,7 +1124,7 @@ void bs_check_multi_at(
 
         case BS_CHECK_C_INSTANCE:
             if (value.type == BS_VALUE_OBJECT && value.as.object->type == BS_OBJECT_C_INSTANCE) {
-                if (((Bs_C_Instance *)value.as.object)->class == c.as.c_instance) {
+                if (((Bs_C_Instance *) value.as.object)->class == c.as.c_instance) {
                     return;
                 }
             }
@@ -1140,20 +1148,20 @@ void bs_check_multi_at(
             break;
 
         case BS_CHECK_INT:
-            if (value.type == BS_VALUE_NUM && value.as.number == (long)value.as.number) {
+            if (value.type == BS_VALUE_NUM && value.as.number == (long) value.as.number) {
                 return;
             }
             break;
 
         case BS_CHECK_WHOLE:
             if (value.type == BS_VALUE_NUM && value.as.number >= 0 &&
-                value.as.number == (long)value.as.number) {
+                value.as.number == (long) value.as.number) {
                 return;
             }
             break;
 
         case BS_CHECK_ASCII:
-            if (value.type == BS_VALUE_NUM && value.as.number == (long)value.as.number &&
+            if (value.type == BS_VALUE_NUM && value.as.number == (long) value.as.number &&
                 value.as.number >= 0 && value.as.number <= 127) {
                 return;
             }
@@ -1172,7 +1180,7 @@ void bs_check_multi_at(
     }
 
     const size_t start = bs->config.buffer.count;
-    Bs_Writer w = bs_buffer_writer(&bs->config.buffer);
+    Bs_Writer    w = bs_buffer_writer(&bs->config.buffer);
 
     if (label) {
         bs_fmt(&w, "expected %s to be ", label);
@@ -1308,7 +1316,7 @@ static void bs_stack_set(Bs *bs, size_t offset, Bs_Value value) {
 }
 
 static size_t bs_chunk_read_int(Bs *bs) {
-    const size_t index = *(size_t *)bs->frame->ip;
+    const size_t index = *(size_t *) bs->frame->ip;
     bs->frame->ip += sizeof(index);
     return index;
 }
@@ -1368,7 +1376,7 @@ static void bs_call_closure(Bs *bs, size_t location, Bs_Closure *closure, size_t
                 arity);
         }
 
-        const bool handles_on_save = bs->handles_on;
+        const bool   handles_on_save = bs->handles_on;
         const size_t handles_count_save = bs->handles.count;
         bs->handles_on = true;
 
@@ -1412,11 +1420,11 @@ static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
         break;
 
     case BS_OBJECT_CLOSURE:
-        bs_call_closure(bs, offset, (Bs_Closure *)value.as.object, arity);
+        bs_call_closure(bs, offset, (Bs_Closure *) value.as.object, arity);
         break;
 
     case BS_OBJECT_CLASS: {
-        Bs_Class *class = (Bs_Class *)value.as.object;
+        Bs_Class *class = (Bs_Class *) value.as.object;
         bs->stack.data[bs->stack.count - arity - 1] = bs_value_object(bs_instance_new(bs, class));
 
         if (class->init) {
@@ -1427,12 +1435,12 @@ static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
     } break;
 
     case BS_OBJECT_C_CLASS: {
-        Bs_C_Class *class = (Bs_C_Class *)value.as.object;
+        Bs_C_Class *class = (Bs_C_Class *) value.as.object;
         Bs_Value instance = bs_value_object(bs_c_instance_new(bs, class));
         bs->stack.data[bs->stack.count - arity - 1] = instance;
 
         if (class->init) {
-            const bool handles_on_save = bs->handles_on;
+            const bool   handles_on_save = bs->handles_on;
             const size_t handles_count_save = bs->handles.count;
             bs->handles_on = true;
 
@@ -1451,15 +1459,15 @@ static void bs_call_value(Bs *bs, size_t offset, Bs_Value value, size_t arity) {
     } break;
 
     case BS_OBJECT_BOUND_METHOD: {
-        Bs_Bound_Method *method = (Bs_Bound_Method *)value.as.object;
+        Bs_Bound_Method *method = (Bs_Bound_Method *) value.as.object;
         bs->stack.data[bs->stack.count - arity - 1] = method->this;
         bs_call_value(bs, offset, method->fn, arity);
     } break;
 
     case BS_OBJECT_C_FN: {
-        const Bs_C_Fn *native = (Bs_C_Fn *)value.as.object;
+        const Bs_C_Fn *native = (Bs_C_Fn *) value.as.object;
 
-        const bool handles_on_save = bs->handles_on;
+        const bool   handles_on_save = bs->handles_on;
         const size_t handles_count_save = bs->handles.count;
         bs->handles_on = true;
 
@@ -1530,7 +1538,7 @@ const Bs_Closure *bs_compile_module(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_mai
 
     // Do not use the paramater 'path' directly as the same buffer is being written into
     const Bs_Sv relative = bs_buffer_relative_path(
-        &bs->paths, Bs_Sv(module.name->data, module.name->size), (Bs_Sv){0});
+        &bs->paths, Bs_Sv(module.name->data, module.name->size), (Bs_Sv) {0});
 
     Bs_Closure *closure = bs_compile(
         bs, relative, input, is_main, is_repl, false, is_repl ? 1 : bs->modules.count + 1);
@@ -1557,7 +1565,7 @@ const Bs_Closure *bs_compile_module(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_mai
 
 static bool bs_import_language(Bs *bs, Bs_Sv path) {
     size_t size = 0;
-    char *contents = bs_read_file(path.data, &size, false);
+    char  *contents = bs_read_file(path.data, &size, false);
     if (!contents) {
         return false;
     }
@@ -1582,7 +1590,7 @@ static bool bs_import_try(Bs *bs, const Bs_Str *path, Bs_Sv cwd) {
     Bs_Buffer *b = &bs->paths;
 
     const size_t start = b->count;
-    const Bs_Sv resolved = bs_buffer_absolute_path(b, Bs_Sv(path->data, path->size), cwd);
+    const Bs_Sv  resolved = bs_buffer_absolute_path(b, Bs_Sv(path->data, path->size), cwd);
 
     size_t index;
     if (bs_modules_find(&bs->modules, resolved, &index)) {
@@ -1625,7 +1633,7 @@ static bool bs_import_try(Bs *bs, const Bs_Str *path, Bs_Sv cwd) {
         Bs_C_Lib *library = bs_c_lib_new(bs, handle);
 
 #if defined(_WIN32) || defined(_WIN64)
-        void (*init)(Bs *, Bs_C_Lib *) = (void *)GetProcAddress(handle, "bs_library_init");
+        void (*init)(Bs *, Bs_C_Lib *) = (void *) GetProcAddress(handle, "bs_library_init");
 #else
         void (*init)(Bs *, Bs_C_Lib *) = dlsym(handle, "bs_library_init");
 #endif
@@ -1691,7 +1699,7 @@ bs_check_map_get(Bs *bs, size_t location, Bs_Map *map, Bs_Value index, const cha
 
     Bs_Value value;
     if (!bs_map_get(bs, map, index, &value)) {
-        Bs_Buffer *b = &bs->config.buffer;
+        Bs_Buffer   *b = &bs->config.buffer;
         const size_t start = b->count;
 
         Bs_Writer w = bs_buffer_writer(b);
@@ -1728,7 +1736,7 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
             bs_check_map_get(bs, 1, bs_builtin_number_methods_map(bs), index, "method")));
     }
 
-    Bs_Map *map = NULL;
+    Bs_Map     *map = NULL;
     const char *label = NULL;
 
     switch (container.as.object->type) {
@@ -1742,14 +1750,14 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
             bs, 1, index, checks, bs_c_array_size(checks), "array index or method name");
 
         if (index.type == BS_VALUE_NUM) {
-            Bs_Array *array = (Bs_Array *)container.as.object;
+            Bs_Array *array = (Bs_Array *) container.as.object;
 
             Bs_Value value;
             if (!bs_array_get(bs, array, index.as.number, &value)) {
                 bs_error(
                     bs,
                     "cannot get value at index %zu in array of length %zu",
-                    (size_t)index.as.number,
+                    (size_t) index.as.number,
                     array->count);
             }
             return value;
@@ -1776,7 +1784,7 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
             bs, 1, index, checks, bs_c_array_size(checks), "string index or method name");
 
         if (index.type == BS_VALUE_NUM) {
-            Bs_Str *str = (Bs_Str *)container.as.object;
+            Bs_Str      *str = (Bs_Str *) container.as.object;
             const size_t at = index.as.number;
 
             if (at >= str->size) {
@@ -1805,12 +1813,12 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
             return bs_value_object(bs_bound_method_new(bs, container, value));
         }
 
-        map = &((Bs_Table *)container.as.object)->map;
+        map = &((Bs_Table *) container.as.object)->map;
         label = "table key";
     } break;
 
     case BS_OBJECT_INSTANCE: {
-        Bs_Instance *instance = (Bs_Instance *)container.as.object;
+        Bs_Instance *instance = (Bs_Instance *) container.as.object;
 
         Bs_Value value;
         if (bs_map_get(bs, &instance->class->methods, index, &value)) {
@@ -1822,7 +1830,7 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
     } break;
 
     case BS_OBJECT_C_INSTANCE: {
-        Bs_C_Instance *instance = (Bs_C_Instance *)container.as.object;
+        Bs_C_Instance *instance = (Bs_C_Instance *) container.as.object;
         return bs_value_object(bs_bound_method_new(
             bs,
             container,
@@ -1831,7 +1839,7 @@ static Bs_Value bs_container_get(Bs *bs, Bs_Value container, Bs_Value index) {
     } break;
 
     case BS_OBJECT_C_LIB:
-        map = &((Bs_C_Lib *)container.as.object)->map;
+        map = &((Bs_C_Lib *) container.as.object)->map;
         label = "library symbol";
         break;
 
@@ -1854,13 +1862,13 @@ static void bs_container_set(Bs *bs, Bs_Value container, Bs_Value index, Bs_Valu
 
     if (container.as.object->type == BS_OBJECT_ARRAY) {
         bs_check_whole_number_at(bs, 1, index, "array index");
-        bs_array_set(bs, (Bs_Array *)container.as.object, index.as.number, value);
+        bs_array_set(bs, (Bs_Array *) container.as.object, index.as.number, value);
     } else if (container.as.object->type == BS_OBJECT_TABLE) {
         bs_check_index_valid_type(bs, 1, index, "table key");
-        bs_table_set(bs, (Bs_Table *)container.as.object, index, value);
+        bs_table_set(bs, (Bs_Table *) container.as.object, index, value);
     } else if (container.as.object->type == BS_OBJECT_INSTANCE) {
         bs_check_index_valid_type(bs, 1, index, "instance property");
-        bs_map_set(bs, &((Bs_Instance *)container.as.object)->properties, index, value);
+        bs_map_set(bs, &((Bs_Instance *) container.as.object)->properties, index, value);
     } else {
         const Bs_Sv sv = bs_value_type_name_full(container);
         bs_error(bs, "cannot take mutable index into " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
@@ -1889,10 +1897,10 @@ static void bs_iter_map(Bs *bs, size_t offset, const Bs_Map *map, Bs_Value itera
     }
 }
 
-static_assert(BS_COUNT_OPS == 76, "Update bs_interpret()");
+static_assert(BS_COUNT_OPS == 77, "Update bs_interpret()");
 static void bs_interpret(Bs *bs, Bs_Value *output) {
-    const bool gc_on_save = bs->gc_on;
-    const bool handles_on_save = bs->handles_on;
+    const bool   gc_on_save = bs->gc_on;
+    const bool   handles_on_save = bs->handles_on;
     const size_t frames_count_save = bs->frames.count;
 
     bs->gc_on = true;
@@ -1978,7 +1986,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value value = bs_stack_peek(bs, 0);
             assert(value.type == BS_VALUE_OBJECT && value.as.object->type == BS_OBJECT_CLOSURE);
 
-            bs_da_push(bs, &bs->frame->closure->defers, (Bs_Closure *)value.as.object);
+            bs_da_push(bs, &bs->frame->closure->defers, (Bs_Closure *) value.as.object);
             bs->stack.count--; // Make sure the deferred closure survives the GC
         } break;
 
@@ -1986,18 +1994,18 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value value = bs_stack_pop(bs);
             bs_check_object_type(bs, value, BS_OBJECT_ARRAY, "spread value");
 
-            const Bs_Array *array = (const Bs_Array *)value.as.object;
+            const Bs_Array *array = (const Bs_Array *) value.as.object;
             for (size_t i = 0; i < array->count; i++) {
                 bs_stack_push(bs, array->data[i]);
             }
         } break;
 
         case BS_OP_CLOSURE: {
-            Bs_Closure *closure = bs_closure_new(bs, (Bs_Fn *)bs_chunk_read_const(bs).as.object);
+            Bs_Closure *closure = bs_closure_new(bs, (Bs_Fn *) bs_chunk_read_const(bs).as.object);
             bs_stack_push(bs, bs_value_object(closure));
 
             for (size_t i = 0; i < closure->upvalues; i++) {
-                const bool local = *bs->frame->ip++;
+                const bool   local = *bs->frame->ip++;
                 const size_t index = bs_chunk_read_int(bs);
 
                 if (local) {
@@ -2052,7 +2060,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         case BS_OP_CLASS: {
             const Bs_Value name = bs_chunk_read_const(bs);
             assert(name.type == BS_VALUE_OBJECT && name.as.object->type == BS_OBJECT_STR);
-            bs_stack_push(bs, bs_value_object(bs_class_new(bs, (Bs_Str *)name.as.object)));
+            bs_stack_push(bs, bs_value_object(bs_class_new(bs, (Bs_Str *) name.as.object)));
         } break;
 
         case BS_OP_INVOKE: {
@@ -2079,7 +2087,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                     break;
 
                 case BS_OBJECT_TABLE: {
-                    Bs_Table *table = (Bs_Table *)this.as.object;
+                    Bs_Table *table = (Bs_Table *) this.as.object;
                     if (bs_map_get(bs, &table->map, name, &method)) {
                         bs_stack_set(bs, arity, method);
                     } else {
@@ -2093,7 +2101,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 } break;
 
                 case BS_OBJECT_INSTANCE: {
-                    Bs_Instance *instance = (Bs_Instance *)this.as.object;
+                    Bs_Instance *instance = (Bs_Instance *) this.as.object;
                     if (bs_map_get(bs, &instance->properties, name, &method)) {
                         bs_stack_set(bs, arity, method);
                     } else {
@@ -2103,13 +2111,13 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 } break;
 
                 case BS_OBJECT_C_INSTANCE: {
-                    Bs_C_Instance *instance = (Bs_C_Instance *)this.as.object;
+                    Bs_C_Instance *instance = (Bs_C_Instance *) this.as.object;
                     method = bs_check_map_get(
                         bs, 1, &instance->class->methods, name, "instance property or method");
                 } break;
 
                 case BS_OBJECT_C_LIB: {
-                    Bs_C_Lib *library = (Bs_C_Lib *)this.as.object;
+                    Bs_C_Lib *library = (Bs_C_Lib *) this.as.object;
                     method = bs_check_map_get(bs, 1, &library->map, name, "library symbol");
                     bs_stack_set(bs, arity, method);
                 } break;
@@ -2133,7 +2141,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value class = bs_stack_peek(bs, 1);
 
             assert(class.type == BS_VALUE_OBJECT && class.as.object->type == BS_OBJECT_CLASS);
-            bs_map_set(bs, &((Bs_Class *)class.as.object)->methods, name, method);
+            bs_map_set(bs, &((Bs_Class *) class.as.object)->methods, name, method);
 
             bs->stack.count--;
         } break;
@@ -2147,8 +2155,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value class0 = bs_stack_peek(bs, 1);
             assert(class0.type == BS_VALUE_OBJECT && class0.as.object->type == BS_OBJECT_CLASS);
 
-            Bs_Class *class = (Bs_Class *)class0.as.object;
-            class->init = (Bs_Closure *)method.as.object;
+            Bs_Class *class = (Bs_Class *) class0.as.object;
+            class->init = (Bs_Closure *) method.as.object;
             class->can_fail = can_fail;
             bs->stack.count--;
         } break;
@@ -2163,8 +2171,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value class = bs_stack_peek(bs, 0);
             bs_map_copy(
                 bs,
-                &((Bs_Class *)class.as.object)->methods,
-                &((Bs_Class *)super.as.object)->methods);
+                &((Bs_Class *) class.as.object)->methods,
+                &((Bs_Class *) super.as.object)->methods);
 
             bs->stack.count--;
         } break;
@@ -2177,8 +2185,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value this = bs_stack_peek(bs, 0);
             assert(this.type == BS_VALUE_OBJECT && this.as.object->type == BS_OBJECT_INSTANCE);
 
-            Bs_Class *superclass = (Bs_Class *)super.as.object;
-            Bs_Value value;
+            Bs_Class *superclass = (Bs_Class *) super.as.object;
+            Bs_Value  value;
 
             if (name.type == BS_VALUE_NIL) {
                 // Requested init()
@@ -2207,8 +2215,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value this = bs_stack_peek(bs, arity);
             assert(this.type == BS_VALUE_OBJECT && this.as.object->type == BS_OBJECT_INSTANCE);
 
-            Bs_Class *superclass = (Bs_Class *)super.as.object;
-            Bs_Value method;
+            Bs_Class *superclass = (Bs_Class *) super.as.object;
+            Bs_Value  method;
 
             if (name.type == BS_VALUE_NIL) {
                 // Requested init()
@@ -2408,15 +2416,15 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 bs_error(bs, "cannot index into " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
             }
 
-            Bs_Map *map = NULL;
+            Bs_Map     *map = NULL;
             const char *label = NULL;
 
             switch (container.as.object->type) {
             case BS_OBJECT_STR: {
                 bs_check_object_type(bs, key, BS_OBJECT_STR, "substring");
 
-                const Bs_Str *str = (Bs_Str *)container.as.object;
-                const Bs_Str *sub = (Bs_Str *)key.as.object;
+                const Bs_Str *str = (Bs_Str *) container.as.object;
+                const Bs_Str *sub = (Bs_Str *) key.as.object;
 
                 bool found = false;
                 if (sub->size) {
@@ -2432,8 +2440,8 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             } break;
 
             case BS_OBJECT_ARRAY: {
-                const Bs_Array *array = (Bs_Array *)container.as.object;
-                Bs_Value result = bs_value_bool(false);
+                const Bs_Array *array = (Bs_Array *) container.as.object;
+                Bs_Value        result = bs_value_bool(false);
 
                 for (size_t i = 0; i < array->count; i++) {
                     if (bs_value_equal(key, array->data[i])) {
@@ -2446,27 +2454,27 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             } break;
 
             case BS_OBJECT_TABLE:
-                map = &((Bs_Table *)container.as.object)->map;
+                map = &((Bs_Table *) container.as.object)->map;
                 label = "table key";
                 break;
 
             case BS_OBJECT_CLASS:
-                map = &((Bs_Class *)container.as.object)->methods;
+                map = &((Bs_Class *) container.as.object)->methods;
                 label = "class method";
                 break;
 
             case BS_OBJECT_INSTANCE:
-                map = &((Bs_Instance *)container.as.object)->properties;
+                map = &((Bs_Instance *) container.as.object)->properties;
                 label = "instance property";
                 break;
 
             case BS_OBJECT_C_CLASS:
-                map = &((Bs_C_Class *)container.as.object)->methods;
+                map = &((Bs_C_Class *) container.as.object)->methods;
                 label = "class method";
                 break;
 
             case BS_OBJECT_C_LIB:
-                map = &((Bs_C_Lib *)container.as.object)->map;
+                map = &((Bs_C_Lib *) container.as.object)->map;
                 label = "library symbol";
                 break;
 
@@ -2492,25 +2500,26 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             };
             bs_check_multi(bs, type, checks, bs_c_array_size(checks), "type");
 
-            bool ok = false;
+            bool           ok = false;
             const Bs_Value value = bs_stack_pop(bs);
 
             switch (type.as.object->type) {
             case BS_OBJECT_STR: {
-                const Bs_Str *str = (const Bs_Str *)type.as.object;
+                const Bs_Str *str = (const Bs_Str *) type.as.object;
                 ok = bs_sv_eq(bs_value_type_name_full(value), Bs_Sv(str->data, str->size));
             } break;
 
             case BS_OBJECT_CLASS:
                 if (value.type == BS_VALUE_OBJECT && value.as.object->type == BS_OBJECT_INSTANCE) {
-                    ok = ((Bs_Instance *)value.as.object)->class == (Bs_Class *)type.as.object;
+                    ok = ((Bs_Instance *) value.as.object)->class == (Bs_Class *) type.as.object;
                 }
                 break;
 
             case BS_OBJECT_C_CLASS:
                 if (value.type == BS_VALUE_OBJECT &&
                     value.as.object->type == BS_OBJECT_C_INSTANCE) {
-                    ok = ((Bs_C_Instance *)value.as.object)->class == (Bs_C_Class *)type.as.object;
+                    ok =
+                        ((Bs_C_Instance *) value.as.object)->class == (Bs_C_Class *) type.as.object;
                 }
                 break;
 
@@ -2531,15 +2540,15 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             size_t size;
             switch (a.as.object->type) {
             case BS_OBJECT_STR:
-                size = ((Bs_Str *)a.as.object)->size;
+                size = ((Bs_Str *) a.as.object)->size;
                 break;
 
             case BS_OBJECT_ARRAY:
-                size = ((Bs_Array *)a.as.object)->count;
+                size = ((Bs_Array *) a.as.object)->count;
                 break;
 
             case BS_OBJECT_TABLE:
-                size = ((Bs_Table *)a.as.object)->map.length;
+                size = ((Bs_Table *) a.as.object)->map.length;
                 break;
 
             default: {
@@ -2553,7 +2562,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         } break;
 
         case BS_OP_JOIN: {
-            Bs_Buffer *buffer = &bs->config.buffer;
+            Bs_Buffer   *buffer = &bs->config.buffer;
             const size_t start = buffer->count;
 
             const Bs_Value b = bs_stack_peek(bs, 0);
@@ -2569,7 +2578,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         } break;
 
         case BS_OP_TOSTR: {
-            Bs_Buffer *buffer = &bs->config.buffer;
+            Bs_Buffer   *buffer = &bs->config.buffer;
             const size_t start = buffer->count;
 
             Bs_Writer w = bs_buffer_writer(buffer);
@@ -2581,7 +2590,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
         case BS_OP_PANIC: {
             const size_t start = bs->config.buffer.count;
-            Bs_Writer w = bs_buffer_writer(&bs->config.buffer);
+            Bs_Writer    w = bs_buffer_writer(&bs->config.buffer);
 
             const Bs_Value value = bs_stack_peek(bs, 0);
             bs_value_write(bs, &w, value);
@@ -2598,7 +2607,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         case BS_OP_ASSERT: {
             if (bs_value_is_falsey(bs_stack_peek(bs, 1))) {
                 const size_t start = bs->config.buffer.count;
-                Bs_Writer w = bs_buffer_writer(&bs->config.buffer);
+                Bs_Writer    w = bs_buffer_writer(&bs->config.buffer);
 
                 const Bs_Value message = bs_stack_peek(bs, 0);
                 bs_value_write(bs, &w, message);
@@ -2625,12 +2634,12 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             const Bs_Value a = bs_stack_pop(bs);
             bs_check_object_type(bs, a, BS_OBJECT_STR, "module name");
 
-            const Bs_Str *path = (const Bs_Str *)a.as.object;
+            const Bs_Str *path = (const Bs_Str *) a.as.object;
             if (!path->size) {
                 bs_error(bs, "module name cannot be empty");
             }
 
-            bool ok = false;
+            bool         ok = false;
             const size_t module = bs->frame->closure->fn->compiled_in_module;
             if (module) {
                 const Bs_Sv dir = bs->modules.data[module - 1].parent_dir;
@@ -2640,7 +2649,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             }
 
             if (!ok) {
-                ok = bs_import_try(bs, path, (Bs_Sv){0});
+                ok = bs_import_try(bs, path, (Bs_Sv) {0});
             }
 
             if (!ok) {
@@ -2658,12 +2667,12 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
         case BS_OP_CLASSOF: {
             const Bs_Value value = bs_stack_peek(bs, 0);
-            Bs_Value result = bs_value_nil;
+            Bs_Value       result = bs_value_nil;
             if (value.type == BS_VALUE_OBJECT) {
                 if (value.as.object->type == BS_OBJECT_INSTANCE) {
-                    result = bs_value_object(((const Bs_Instance *)value.as.object)->class);
+                    result = bs_value_object(((const Bs_Instance *) value.as.object)->class);
                 } else if (value.as.object->type == BS_OBJECT_C_INSTANCE) {
-                    result = bs_value_object(((const Bs_C_Instance *)value.as.object)->class);
+                    result = bs_value_object(((const Bs_C_Instance *) value.as.object)->class);
                 }
             }
             bs_stack_set(bs, 0, result);
@@ -2680,7 +2689,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                     container.type == BS_VALUE_OBJECT &&
                     container.as.object->type == BS_OBJECT_ARRAY);
 
-                Bs_Array *array = (Bs_Array *)container.as.object;
+                Bs_Array *array = (Bs_Array *) container.as.object;
                 bs_array_set(bs, array, array->count, value);
             } break;
 
@@ -2690,17 +2699,17 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
                 if (container.as.object->type == BS_OBJECT_ARRAY) {
                     bs_check_object_type(bs, value, BS_OBJECT_ARRAY, "spread value");
-                    const Bs_Array *src = (const Bs_Array *)value.as.object;
+                    const Bs_Array *src = (const Bs_Array *) value.as.object;
 
-                    Bs_Array *dst = (Bs_Array *)container.as.object;
+                    Bs_Array *dst = (Bs_Array *) container.as.object;
                     for (size_t i = 0; i < src->count; i++) {
                         bs_array_set(bs, dst, dst->count, src->data[i]);
                     }
                 } else if (container.as.object->type == BS_OBJECT_TABLE) {
                     bs_check_object_type(bs, value, BS_OBJECT_TABLE, "spread value");
-                    const Bs_Table *src = (const Bs_Table *)value.as.object;
+                    const Bs_Table *src = (const Bs_Table *) value.as.object;
 
-                    Bs_Table *dst = (Bs_Table *)container.as.object;
+                    Bs_Table *dst = (Bs_Table *) container.as.object;
                     for (size_t i = 0; i < src->map.capacity; i++) {
                         const Bs_Entry *e = &src->map.data[i];
                         if (e->key.type != BS_VALUE_NIL) {
@@ -2729,14 +2738,14 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 bs_error(bs, "cannot delete from " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
             }
 
-            Bs_Map *map = NULL;
+            Bs_Map     *map = NULL;
             const char *label = NULL;
 
             switch (container.as.object->type) {
             case BS_OBJECT_ARRAY: {
                 bs_check_whole_number_at(bs, 1, index, "array index");
 
-                Bs_Array *a = (Bs_Array *)container.as.object;
+                Bs_Array    *a = (Bs_Array *) container.as.object;
                 const size_t pos = index.as.number;
 
                 if (pos >= a->count) {
@@ -2756,12 +2765,12 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             } break;
 
             case BS_OBJECT_TABLE:
-                map = &((Bs_Table *)container.as.object)->map;
+                map = &((Bs_Table *) container.as.object)->map;
                 label = "table key";
                 break;
 
             case BS_OBJECT_INSTANCE:
-                map = &((Bs_Instance *)container.as.object)->properties;
+                map = &((Bs_Instance *) container.as.object)->properties;
                 label = "instance property";
                 break;
 
@@ -2790,7 +2799,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 bs_error(bs, "cannot delete from " Bs_Sv_Fmt, Bs_Sv_Arg(sv));
             }
 
-            Bs_Map *map = NULL;
+            Bs_Map     *map = NULL;
             const char *label = NULL;
 
             switch (container.as.object->type) {
@@ -2799,12 +2808,12 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                 break;
 
             case BS_OBJECT_TABLE:
-                map = &((Bs_Table *)container.as.object)->map;
+                map = &((Bs_Table *) container.as.object)->map;
                 label = "table key";
                 break;
 
             case BS_OBJECT_INSTANCE:
-                map = &((Bs_Instance *)container.as.object)->properties;
+                map = &((Bs_Instance *) container.as.object)->properties;
                 label = "instance property";
                 break;
 
@@ -2827,15 +2836,21 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             bs_stack_pop(bs);
             break;
 
+        case BS_OP_GCONST:
+            bs_map_set(bs, &bs->constGlobals, bs_chunk_read_const(bs), bs_stack_peek(bs, 0));
+            bs_stack_pop(bs);
+            break;
+
         case BS_OP_GGET: {
             const Bs_Value name = bs_chunk_read_const(bs);
 
             Bs_Value value;
-            if (!bs_map_get(bs, &bs->globals, name, &value)) {
+            if (!bs_map_get(bs, &bs->globals, name, &value) &&
+                !bs_map_get(bs, &bs->constGlobals, name, &value)) {
                 bs_error(
                     bs,
                     "undefined identifier '" Bs_Sv_Fmt "'",
-                    Bs_Sv_Arg(*(const Bs_Str *)name.as.object));
+                    Bs_Sv_Arg(*(const Bs_Str *) name.as.object));
             }
 
             bs_stack_push(bs, value);
@@ -2848,10 +2863,14 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             if (bs_map_set(bs, &bs->globals, name, value)) {
                 bs_map_remove(bs, &bs->globals, name);
 
+                if (bs_map_get(bs, &bs->constGlobals, name, NULL)) {
+                    bs_error(bs, "cannot assign to constant");
+                }
+
                 bs_error(
                     bs,
                     "undefined identifier '" Bs_Sv_Fmt "'",
-                    Bs_Sv_Arg(*(const Bs_Str *)name.as.object));
+                    Bs_Sv_Arg(*(const Bs_Str *) name.as.object));
             }
         } break;
 
@@ -2872,7 +2891,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
 
         case BS_OP_USET: {
             const Bs_Value value = bs_stack_peek(bs, 0);
-            Bs_Upvalue *upvalue = bs->frame->closure->data[bs_chunk_read_int(bs)];
+            Bs_Upvalue    *upvalue = bs->frame->closure->data[bs_chunk_read_int(bs)];
             *upvalue->value = value;
         } break;
 
@@ -2922,7 +2941,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
         } break;
 
         case BS_OP_MATCH: {
-            const size_t offset = bs_chunk_read_int(bs);
+            const size_t   offset = bs_chunk_read_int(bs);
             const Bs_Value pred = bs_stack_pop(bs);
             if (bs_value_equal(bs_stack_peek(bs, 0), pred)) {
                 bs->frame->ip += offset;
@@ -2948,7 +2967,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
             }
 
             if (container.as.object->type == BS_OBJECT_ARRAY) {
-                const Bs_Array *array = (const Bs_Array *)container.as.object;
+                const Bs_Array *array = (const Bs_Array *) container.as.object;
 
                 size_t index;
                 if (iterator.type == BS_VALUE_NIL) {
@@ -2965,7 +2984,7 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                     bs_stack_push(bs, array->data[index]);    // Value
                 }
             } else if (container.as.object->type == BS_OBJECT_STR) {
-                const Bs_Str *str = (const Bs_Str *)container.as.object;
+                const Bs_Str *str = (const Bs_Str *) container.as.object;
 
                 size_t index;
                 if (iterator.type == BS_VALUE_NIL) {
@@ -2983,10 +3002,10 @@ static void bs_interpret(Bs *bs, Bs_Value *output) {
                         bs, bs_value_object(bs_str_new(bs, Bs_Sv(&str->data[index], 1)))); // Value
                 }
             } else if (container.as.object->type == BS_OBJECT_TABLE) {
-                const Bs_Table *table = (const Bs_Table *)container.as.object;
+                const Bs_Table *table = (const Bs_Table *) container.as.object;
                 bs_iter_map(bs, offset, &table->map, iterator);
             } else if (container.as.object->type == BS_OBJECT_INSTANCE) {
-                const Bs_Instance *instance = (const Bs_Instance *)container.as.object;
+                const Bs_Instance *instance = (const Bs_Instance *) container.as.object;
                 bs_iter_map(bs, offset, &instance->properties, iterator);
             } else {
                 const Bs_Sv sv = bs_value_type_name_full(container);
@@ -3050,10 +3069,10 @@ Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_repl) {
 
     Bs_Result result = {0};
 
-    Bs_Buffer *b = &bs->paths;
+    Bs_Buffer   *b = &bs->paths;
     const size_t start = b->count;
 
-    bs_buffer_absolute_path(b, path, (Bs_Sv){0});
+    bs_buffer_absolute_path(b, path, (Bs_Sv) {0});
 
     const Bs_Closure *closure;
     if (is_repl) {
@@ -3070,7 +3089,7 @@ Bs_Result bs_run(Bs *bs, Bs_Sv path, Bs_Sv input, bool is_repl) {
     }
 
     if (!closure) {
-        return (Bs_Result){.exit = 1};
+        return (Bs_Result) {.exit = 1};
     }
 
 #ifdef BS_STEP_DEBUG
@@ -3125,7 +3144,7 @@ Bs_Value bs_call(Bs *bs, Bs_Value fn, const Bs_Value *args, size_t arity) {
     if (fn.as.object->type == BS_OBJECT_CLOSURE) {
         bs_interpret(bs, &result);
     } else if (fn.as.object->type == BS_OBJECT_CLASS) {
-        Bs_Class *class = (Bs_Class *)fn.as.object;
+        Bs_Class *class = (Bs_Class *) fn.as.object;
         if (class->init) {
             bs_interpret(bs, &result);
         } else {

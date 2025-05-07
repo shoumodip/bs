@@ -121,32 +121,32 @@ static bool bs_token_type_can_start(Bs_Token_Type type) {
 
 typedef struct {
     size_t *data;
-    size_t count;
-    size_t depth;
-    size_t start;
-    size_t capacity;
+    size_t  count;
+    size_t  depth;
+    size_t  start;
+    size_t  capacity;
 } Bs_Jumps;
 
 #define bs_jumps_free bs_da_free
 #define bs_jumps_push bs_da_push
 
 typedef struct {
-    Bs_Sv name;
+    Bs_Sv  name;
     size_t depth;
-    bool captured;
-    bool constant;
+    bool   captured;
+    bool   constant;
 } Bs_Local;
 
 typedef struct {
-    bool local;
-    bool constant;
+    bool   local;
+    bool   constant;
     size_t index;
 } Bs_Uplocal;
 
 typedef struct {
     Bs_Uplocal *data;
-    size_t count;
-    size_t capacity;
+    size_t      count;
+    size_t      capacity;
 } Bs_Uplocals;
 
 #define bs_uplocals_free bs_da_free
@@ -156,8 +156,8 @@ typedef struct Bs_Class_Compiler Bs_Class_Compiler;
 
 struct Bs_Class_Compiler {
     Bs_Class_Compiler *outer;
-    bool can_fail;
-    bool has_super;
+    bool               can_fail;
+    bool               has_super;
 };
 
 typedef enum {
@@ -170,14 +170,14 @@ typedef struct Bs_Lambda Bs_Lambda;
 
 struct Bs_Lambda {
     Bs_Lambda_Type type;
-    Bs_Lambda *outer;
+    Bs_Lambda     *outer;
 
     Bs_Local *data;
-    size_t count;
-    size_t depth;
-    size_t capacity;
+    size_t    count;
+    size_t    depth;
+    size_t    capacity;
 
-    Bs_Fn *fn;
+    Bs_Fn      *fn;
     Bs_Uplocals uplocals;
 
     bool is_repl;
@@ -201,7 +201,7 @@ static Bs_Lambda *bs_lambda_new(Bs_Lambda_Type type, bool is_repl, bool is_meta)
     // which changes the stack pointer
     Bs_Lambda *p = malloc(sizeof(Bs_Lambda));
     assert(p);
-    *p = (Bs_Lambda){.type = type, .is_repl = is_repl, .is_meta = is_meta};
+    *p = (Bs_Lambda) {.type = type, .is_repl = is_repl, .is_meta = is_meta};
     return p;
 }
 
@@ -257,15 +257,15 @@ static bool bs_lambda_find_upvalue(Bs *bs, Bs_Lambda *l, Bs_Sv name, size_t *ind
 }
 
 typedef struct {
-    Bs_Lexer lexer;
+    Bs_Lexer   lexer;
     Bs_Lambda *lambda;
     Bs_Class_Compiler *class;
 
-    Bs *bs;
+    Bs       *bs;
     Bs_Chunk *chunk;
 
-    Bs_Jumps jumps;
-    Bs_Jumps matches;
+    Bs_Jumps   jumps;
+    Bs_Jumps   matches;
     Bs_Op_Locs locations;
 
     size_t module;
@@ -285,7 +285,7 @@ static size_t bs_compile_jump_start(Bs_Compiler *c, Bs_Op op) {
 }
 
 static void bs_compile_jump_patch(Bs_Compiler *c, size_t addr) {
-    *(size_t *)&c->chunk->data[addr + 1] = c->chunk->count - 1 - sizeof(size_t) - addr;
+    *(size_t *) &c->chunk->data[addr + 1] = c->chunk->count - 1 - sizeof(size_t) - addr;
 }
 
 static void bs_compile_jump_direct(Bs_Compiler *c, Bs_Op op, size_t addr) {
@@ -303,7 +303,7 @@ static void bs_compile_consume_eol(Bs_Compiler *c) {
 static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Token *name);
 
 static void bs_compile_string(Bs_Compiler *c, Bs_Sv sv) {
-    Bs_Buffer *b = &bs_config(c->bs)->buffer;
+    Bs_Buffer   *b = &bs_config(c->bs)->buffer;
     const size_t start = b->count;
 
     for (size_t i = 0; i < sv.size; i++) {
@@ -407,7 +407,7 @@ static void bs_compile_assignment(Bs_Compiler *c, const Bs_Token *token, Bs_Op a
 
     size_t index;
     if (assign_op != BS_OP_ISET) {
-        index = *(size_t *)&c->chunk->data[c->chunk->last + 1];
+        index = *(size_t *) &c->chunk->data[c->chunk->last + 1];
         if (assign_op == BS_OP_LSET) {
             if (c->lambda->data[index].constant) {
                 bs_lexer_error(&c->lexer, locs[0], "cannot assign to constant");
@@ -470,7 +470,7 @@ static void bs_compile_assignment(Bs_Compiler *c, const Bs_Token *token, Bs_Op a
 static_assert(BS_COUNT_TOKENS == 80, "Update bs_compile_expr()");
 static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     Bs_Token token = bs_lexer_next(&c->lexer);
-    Bs_Loc loc = token.loc;
+    Bs_Loc   loc = token.loc;
 
     c->last_expr_was_if = false;
     switch (token.type) {
@@ -502,7 +502,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
     } break;
 
     case BS_TOKEN_RSTR: {
-        Bs_Buffer *b = &bs_config(c->bs)->buffer;
+        Bs_Buffer   *b = &bs_config(c->bs)->buffer;
         const size_t start = b->count;
 
         Bs_Sv sv = token.sv;
@@ -519,8 +519,8 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
         bs_sv_drop(&sv, 1); // Drop the beginning newline
 
         size_t indent = 0;
-        bool indent_set = false;
-        bool first = true;
+        bool   indent_set = false;
+        bool   first = true;
         while (sv.size) {
             const Bs_Sv line = bs_sv_split(&sv, '\n');
             if (!indent_set) {
@@ -991,19 +991,19 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             const bool was_if = c->last_expr_was_if;
             if (!was_if) {
                 if (op_get == BS_OP_IGET_CONST) {
-                    call_const_index = *(size_t *)&c->chunk->data[c->chunk->last + 1];
+                    call_const_index = *(size_t *) &c->chunk->data[c->chunk->last + 1];
                     c->chunk->count = c->chunk->last;
 
                     locs[1] = c->chunk->locations.data[--c->chunk->locations.count].loc;
                     locs[0] = c->chunk->locations.data[--c->chunk->locations.count].loc;
                 } else if (op_get == BS_OP_SUPER_GET) {
-                    call_const_index = *(size_t *)&c->chunk->data[c->chunk->last + 1];
+                    call_const_index = *(size_t *) &c->chunk->data[c->chunk->last + 1];
 
                     assert(c->chunk->last > 1 + sizeof(size_t));
                     c->chunk->count = c->chunk->last - 1 - sizeof(size_t);
 
                     assert(c->chunk->data[c->chunk->count] == BS_OP_URECEIVER);
-                    super_const_index = *(size_t *)&c->chunk->data[c->chunk->count + 1];
+                    super_const_index = *(size_t *) &c->chunk->data[c->chunk->count + 1];
 
                     locs[0] = c->chunk->locations.data[--c->chunk->locations.count].loc;
                 }
@@ -1014,7 +1014,7 @@ static void bs_compile_expr(Bs_Compiler *c, Bs_Power mbp) {
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_CALL_INIT);
             while (!bs_lexer_read(&c->lexer, BS_TOKEN_RPAREN)) {
                 token = bs_lexer_peek(&c->lexer);
-                bs_op_locs_push(c->bs, &c->locations, (Bs_Op_Loc){.loc = token.loc});
+                bs_op_locs_push(c->bs, &c->locations, (Bs_Op_Loc) {.loc = token.loc});
 
                 if (token.type == BS_TOKEN_SPREAD) {
                     bs_lexer_unbuffer(&c->lexer);
@@ -1193,9 +1193,9 @@ static void bs_compile_lambda_init(Bs_Compiler *c, Bs_Lambda *lambda, Bs_Sv name
     c->lambda->fn->compiled_in_module = c->module;
 
     if (lambda->type == BS_LAMBDA_FN) {
-        bs_lambda_push(c->bs, lambda, (Bs_Local){0});
+        bs_lambda_push(c->bs, lambda, (Bs_Local) {0});
     } else {
-        bs_lambda_push(c->bs, lambda, (Bs_Local){.name = Bs_Sv_Static("this")});
+        bs_lambda_push(c->bs, lambda, (Bs_Local) {.name = Bs_Sv_Static("this")});
     }
 }
 
@@ -1248,7 +1248,7 @@ static size_t bs_compile_definition(Bs_Compiler *c, Bs_Token *name, bool public,
     bs_da_push(
         c->bs,
         c->lambda,
-        ((Bs_Local){
+        ((Bs_Local) {
             .name = name->sv,
             .depth = c->lambda->depth,
             .constant = constant,
@@ -1260,7 +1260,7 @@ static void bs_compile_stmt(Bs_Compiler *c);
 
 static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Token *name) {
     Bs_Lambda *lambda = bs_lambda_new(type, false, false);
-    bs_compile_lambda_init(c, lambda, name ? name->sv : (Bs_Sv){0});
+    bs_compile_lambda_init(c, lambda, name ? name->sv : (Bs_Sv) {0});
     bs_compile_block_init(c);
 
     bs_lexer_expect(&c->lexer, BS_TOKEN_LPAREN);
@@ -1274,7 +1274,7 @@ static void bs_compile_lambda(Bs_Compiler *c, Bs_Lambda_Type type, const Bs_Toke
             variadic = true;
             arg = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
         }
-        bs_da_push(c->bs, c->lambda, ((Bs_Local){.name = arg.sv, .depth = c->lambda->depth}));
+        bs_da_push(c->bs, c->lambda, ((Bs_Local) {.name = arg.sv, .depth = c->lambda->depth}));
 
         if (variadic) {
             bs_lexer_expect(&c->lexer, BS_TOKEN_RPAREN);
@@ -1311,7 +1311,7 @@ static void bs_compile_class(Bs_Compiler *c, bool public) {
         bs_da_push(
             c->bs,
             c->lambda,
-            ((Bs_Local){
+            ((Bs_Local) {
                 .name = token.sv,
                 .depth = c->lambda->depth,
                 .constant = true,
@@ -1320,7 +1320,7 @@ static void bs_compile_class(Bs_Compiler *c, bool public) {
 
     bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_CLASS, const_index);
     if (public) {
-        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_GDEF, const_index);
+        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_GCONST, const_index);
         bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
     }
 
@@ -1339,7 +1339,7 @@ static void bs_compile_class(Bs_Compiler *c, bool public) {
         bs_lambda_push(
             c->bs,
             c->lambda,
-            ((Bs_Local){.name = Bs_Sv_Static("super"), .depth = c->lambda->depth}));
+            ((Bs_Local) {.name = Bs_Sv_Static("super"), .depth = c->lambda->depth}));
 
         bs_compile_identifier(c, &token);
         bs_chunk_push_op(c->bs, c->chunk, BS_OP_INHERIT);
@@ -1383,7 +1383,7 @@ static void bs_compile_function(Bs_Compiler *c, bool public) {
     const size_t const_index = bs_compile_definition(c, &token, public, true);
 
     Bs_Token dot = {0};
-    bool field = false;
+    bool     field = false;
     if (!public) {
         dot = bs_lexer_peek(&c->lexer);
         if (dot.type == BS_TOKEN_DOT) {
@@ -1413,7 +1413,7 @@ static void bs_compile_function(Bs_Compiler *c, bool public) {
     bs_compile_lambda(c, BS_LAMBDA_FN, &token);
 
     if (public) {
-        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_GDEF, const_index);
+        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_GCONST, const_index);
         bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
     } else if (field) {
         bs_chunk_push_op_value(
@@ -1431,7 +1431,7 @@ static void bs_compile_variable(Bs_Compiler *c, bool public, bool constant) {
     const size_t const_index = bs_compile_definition(c, &token, public, constant);
 
     if (!public) {
-        c->lambda->data[lambda_index].name = (Bs_Sv){0};
+        c->lambda->data[lambda_index].name = (Bs_Sv) {0};
     }
 
     if (bs_lexer_read(&c->lexer, BS_TOKEN_SET)) {
@@ -1444,7 +1444,7 @@ static void bs_compile_variable(Bs_Compiler *c, bool public, bool constant) {
     }
 
     if (public) {
-        bs_chunk_push_op_int(c->bs, c->chunk, BS_OP_GDEF, const_index);
+        bs_chunk_push_op_int(c->bs, c->chunk, constant ? BS_OP_GCONST : BS_OP_GDEF, const_index);
         bs_chunk_push_op_loc(c->bs, c->chunk, token.loc);
     } else {
         c->lambda->data[lambda_index].name = token.sv;
@@ -1582,7 +1582,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         bs_compile_block_init(c);
 
         const Bs_Token a = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
-        Bs_Token b = bs_lexer_either(&c->lexer, BS_TOKEN_COMMA, BS_TOKEN_IN);
+        Bs_Token       b = bs_lexer_either(&c->lexer, BS_TOKEN_COMMA, BS_TOKEN_IN);
 
         if (b.type != BS_TOKEN_IN) {
             b = bs_lexer_expect(&c->lexer, BS_TOKEN_IDENT);
@@ -1594,7 +1594,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         // Container / Start
         locs[0] = bs_lexer_peek(&c->lexer).loc;
         bs_compile_expr(c, BS_POWER_SET);
-        bs_lambda_push(c->bs, c->lambda, (Bs_Local){.depth = c->lambda->depth});
+        bs_lambda_push(c->bs, c->lambda, (Bs_Local) {.depth = c->lambda->depth});
 
         bool inclusive = false;
         if (b.type == BS_TOKEN_IN) {
@@ -1604,7 +1604,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
 
             locs[1] = bs_lexer_peek(&c->lexer).loc;
             bs_compile_expr(c, BS_POWER_SET);
-            bs_lambda_push(c->bs, c->lambda, (Bs_Local){.depth = c->lambda->depth});
+            bs_lambda_push(c->bs, c->lambda, (Bs_Local) {.depth = c->lambda->depth});
 
             // Step
             if (bs_lexer_read(&c->lexer, BS_TOKEN_COMMA)) {
@@ -1617,17 +1617,17 @@ static void bs_compile_stmt(Bs_Compiler *c) {
             // Iterator
             bs_chunk_push_op(c->bs, c->chunk, BS_OP_NIL);
         }
-        bs_lambda_push(c->bs, c->lambda, (Bs_Local){.depth = c->lambda->depth});
+        bs_lambda_push(c->bs, c->lambda, (Bs_Local) {.depth = c->lambda->depth});
 
         const Bs_Jumps jumps_save = bs_compile_jumps_save(c, c->chunk->count);
         bs_compile_block_init(c);
 
         // Key
-        bs_da_push(c->bs, c->lambda, ((Bs_Local){.name = a.sv, .depth = c->lambda->depth}));
+        bs_da_push(c->bs, c->lambda, ((Bs_Local) {.name = a.sv, .depth = c->lambda->depth}));
 
         if (b.type != BS_TOKEN_IN) {
             // Value
-            bs_da_push(c->bs, c->lambda, ((Bs_Local){.name = b.sv, .depth = c->lambda->depth}));
+            bs_da_push(c->bs, c->lambda, ((Bs_Local) {.name = b.sv, .depth = c->lambda->depth}));
         }
 
         Bs_Op op = BS_OP_ITER;
@@ -1717,6 +1717,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
             BS_TOKEN_FN,
             BS_TOKEN_VAR,
             BS_TOKEN_CLASS,
+            BS_TOKEN_CONST,
         };
         token = bs_lexer_one_of(&c->lexer, expected, bs_c_array_size(expected));
 
@@ -1726,6 +1727,8 @@ static void bs_compile_stmt(Bs_Compiler *c) {
             bs_compile_variable(c, true, false);
         } else if (token.type == BS_TOKEN_CLASS) {
             bs_compile_class(c, true);
+        } else if (token.type == BS_TOKEN_CONST) {
+            bs_compile_variable(c, true, true);
         } else {
             assert(false && "unreachable");
         }
@@ -1736,23 +1739,6 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         break;
 
     case BS_TOKEN_CONST: {
-        if (c->lambda->is_repl && c->lambda->depth == 1) {
-            Bs_Config *config = bs_config(c->bs);
-            if (!config->showed_const_correctness_warning_repl) {
-                config->showed_const_correctness_warning_repl = true;
-
-                Bs_Error error = {0};
-                error.loc = token.loc;
-                error.type = BS_ERROR_WARN;
-
-                // TODO: try to brainstorm a way to figure out the const correctness
-                error.message =
-                    Bs_Sv_Static("constants defined at the top level in the REPL can be modified");
-
-                c->lexer.error->write(c->lexer.error, error);
-            }
-        }
-
         bs_compile_variable(c, c->lambda->is_repl && c->lambda->depth == 1, true);
     } break;
 
@@ -1764,7 +1750,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
         if (bs_lexer_peek_row(&c->lexer, &token) && bs_token_type_can_start(token.type)) {
             if (c->lambda->type == BS_LAMBDA_INIT) {
                 const Bs_Loc loc = token.loc;
-                const bool ok = token.type == BS_TOKEN_NIL;
+                const bool   ok = token.type == BS_TOKEN_NIL;
                 bs_lexer_unbuffer(&c->lexer);
 
                 if (!ok) {
@@ -1825,7 +1811,7 @@ static void bs_compile_stmt(Bs_Compiler *c) {
 
     case BS_TOKEN_DEFER: {
         Bs_Lambda *lambda = bs_lambda_new(BS_LAMBDA_FN, false, false);
-        bs_compile_lambda_init(c, lambda, (Bs_Sv){0});
+        bs_compile_lambda_init(c, lambda, (Bs_Sv) {0});
         bs_compile_block_init(c);
 
         if (bs_lexer_peek(&c->lexer).type == BS_TOKEN_LBRACE) {
