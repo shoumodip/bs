@@ -1865,6 +1865,21 @@ $ bs demo.bs
 "7f
 ```
 
+#### Random.index(container) @method
+Return a random element in a string or array.
+
+```bs
+var rng = math.Random(69)
+io.println(rng.index("foobar"))
+io.println(rng.index([1, 2, 3, 4, 5]))
+```
+
+```console
+$ bs demo.bs
+r
+1
+```
+
 ### range(begin, end, step?) @function
 Return an array containing a range.
 
