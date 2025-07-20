@@ -674,7 +674,17 @@ fn generate(path) {
 
             if line != "" -> {
                 f.writeln("<p>")
-                f.writeln(if line.prefix("<") then line else escape(line))
+
+                var list = false
+                if line.prefix("- ") {
+                    if !list {
+                        f.writeln("<ul>")
+                    }
+                    list = true
+                    f.writeln("<li>{escape(line.slice(2))}</li>")
+                } else {
+                    f.writeln(if line.prefix("<") then line else escape(line))
+                }
 
                 while row < len(lines) {
                     line = lines[row]; row += 1
@@ -682,9 +692,23 @@ fn generate(path) {
                         break
                     }
 
-                    f.writeln(if line.prefix("<") then line else escape(line))
+                    if line.prefix("- ") {
+                        if !list {
+                            f.writeln("<ul>")
+                        }
+                        list = true
+                        f.writeln("<li>{escape(line.slice(2))}</li>")
+                    } else {
+                        if list {
+                            f.writeln("</ul>")
+                        }
+                        f.writeln(if line.prefix("<") then line else escape(line))
+                    }
                 }
 
+                if list {
+                    f.writeln("</ul>")
+                }
                 f.writeln("</p>")
             }
         }
