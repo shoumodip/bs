@@ -521,8 +521,7 @@ static Bs_Value bs_os_sleep(Bs *bs, Bs_Value *args, size_t arity) {
             if (!QueryPerformanceCounter(&end)) {
                 bs_error(bs, "could not sleep");
             }
-        } while (((end.QuadPart - start.QuadPart) * 1000000 / frequency.QuadPart) <
-                 remaining_microseconds);
+        } while (((end.QuadPart - start.QuadPart) * 1000000 / frequency.QuadPart) < remaining_microseconds);
     }
 #else
 
@@ -627,8 +626,7 @@ static void bs_process_mark(Bs *bs, void *instance_data) {
 }
 
 static Bs_C_Instance *bs_pipe_new(Bs *bs, int fd, bool write, bool binary) {
-    Bs_C_Instance *instance =
-        bs_c_instance_new(bs, write ? bs_io_writer_class : bs_io_reader_class);
+    Bs_C_Instance *instance = bs_c_instance_new(bs, write ? bs_io_writer_class : bs_io_reader_class);
 
     Bs_File *f = &bs_flex_member_as(instance->data, Bs_File);
     f->file = FD_OPEN(fd, write ? "w" : "r");
@@ -743,8 +741,8 @@ static Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
         const Bs_Str *it_str = (const Bs_Str *) array->data[i].as.object;
         Bs_Sv         it = Bs_Sv(it_str->data, it_str->size);
 
-        const bool need_quoting = it.size == 0 || bs_sv_find(it, '\t', NULL) ||
-                                  bs_sv_find(it, '\v', NULL) || bs_sv_find(it, ' ', NULL);
+        const bool need_quoting =
+            it.size == 0 || bs_sv_find(it, '\t', NULL) || bs_sv_find(it, '\v', NULL) || bs_sv_find(it, ' ', NULL);
 
         if (need_quoting) {
             bs_da_push(bs, b, '"');
@@ -782,28 +780,26 @@ static Bs_Value bs_process_init(Bs *bs, Bs_Value *args, size_t arity) {
     char *cmdline = b->data + start;
     b->count = start;
 
-    if (!CreateProcessA(
-            NULL, cmdline, NULL, NULL, TRUE, 0, NULL, NULL, &siStartInfo, &p->piProcInfo)) {
+    if (!CreateProcessA(NULL, cmdline, NULL, NULL, TRUE, 0, NULL, NULL, &siStartInfo, &p->piProcInfo)) {
         return bs_value_nil;
     }
 
     CloseHandle(p->piProcInfo.hThread);
 
     if (capture_stdout) {
-        p->stdout_read = bs_pipe_new(
-            bs, _open_osfhandle((intptr_t) stdout_pipe_read, _O_RDONLY), false, capture_binary);
+        p->stdout_read =
+            bs_pipe_new(bs, _open_osfhandle((intptr_t) stdout_pipe_read, _O_RDONLY), false, capture_binary);
         CloseHandle(stdout_pipe_write);
     }
 
     if (capture_stderr) {
-        p->stderr_read = bs_pipe_new(
-            bs, _open_osfhandle((intptr_t) stderr_pipe_read, _O_RDONLY), false, capture_binary);
+        p->stderr_read =
+            bs_pipe_new(bs, _open_osfhandle((intptr_t) stderr_pipe_read, _O_RDONLY), false, capture_binary);
         CloseHandle(stderr_pipe_write);
     }
 
     if (capture_stdin) {
-        p->stdin_write = bs_pipe_new(
-            bs, _open_osfhandle((intptr_t) stdin_pipe_write, _O_WRONLY), true, capture_binary);
+        p->stdin_write = bs_pipe_new(bs, _open_osfhandle((intptr_t) stdin_pipe_write, _O_WRONLY), true, capture_binary);
         CloseHandle(stdin_pipe_read);
     }
 #else
@@ -970,8 +966,7 @@ static Bs_Value bs_process_wait(Bs *bs, Bs_Value *args, size_t arity) {
 
     p->pid = 0;
 
-    const Bs_Value return_value =
-        WIFEXITED(status) ? bs_value_num(WEXITSTATUS(status)) : bs_value_nil;
+    const Bs_Value return_value = WIFEXITED(status) ? bs_value_num(WEXITSTATUS(status)) : bs_value_nil;
 #endif // _WIN32
 
     p->stdout_read = NULL;
@@ -1164,8 +1159,7 @@ static Bs_Value bs_str_find(Bs *bs, Bs_Value *args, size_t arity) {
             }
         }
     } else {
-        const regex_t regex =
-            bs_flex_member_as(((Bs_C_Instance *) args[0].as.object)->data, regex_t);
+        const regex_t regex = bs_flex_member_as(((Bs_C_Instance *) args[0].as.object)->data, regex_t);
 
         regmatch_t match;
         if (!regexec(&regex, str->data + offset, 1, &match, 0)) {
@@ -1201,8 +1195,7 @@ static Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
         size_t i = 0;
         while (i + pattern->size <= str->size) {
             if (bs_sv_eq(Bs_Sv(str->data + i, pattern->size), pattern_sv)) {
-                bs_array_set(
-                    bs, a, a->count, bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, i - j))));
+                bs_array_set(bs, a, a->count, bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, i - j))));
 
                 i += pattern->size;
                 j = i;
@@ -1211,8 +1204,7 @@ static Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
             }
         }
     } else {
-        const regex_t regex =
-            bs_flex_member_as(((Bs_C_Instance *) args[0].as.object)->data, regex_t);
+        const regex_t regex = bs_flex_member_as(((Bs_C_Instance *) args[0].as.object)->data, regex_t);
 
         int        eflags = 0;
         regmatch_t match;
@@ -1222,19 +1214,14 @@ static Bs_Value bs_str_split(Bs *bs, Bs_Value *args, size_t arity) {
                 break;
             }
 
-            bs_array_set(
-                bs,
-                a,
-                a->count,
-                bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, match.rm_so))));
+            bs_array_set(bs, a, a->count, bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, match.rm_so))));
 
             j += match.rm_eo;
         }
     }
 
     if (j != str->size) {
-        bs_array_set(
-            bs, a, a->count, bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, str->size - j))));
+        bs_array_set(bs, a, a->count, bs_value_object(bs_str_new(bs, Bs_Sv(str->data + j, str->size - j))));
     }
 
     return bs_value_object(a);
@@ -1272,7 +1259,12 @@ static Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
                 bs_da_push_many(bs, b, replacement->data, replacement->size);
                 i += pattern->size - 1;
             } else {
-                bs_da_push(bs, b, str->data[i]);
+                if (i + pattern->size >= str->size) {
+                    bs_da_push_many(bs, b, str->data + i, str->size - i);
+                    break;
+                } else {
+                    bs_da_push(bs, b, str->data[i]);
+                }
             }
         }
         return bs_value_object(bs_str_new(bs, bs_buffer_reset(b, start)));
@@ -1281,8 +1273,7 @@ static Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
         const size_t start = b->count;
 
         const char   *cursor = str->data;
-        const regex_t regex =
-            bs_flex_member_as(((Bs_C_Instance *) args[0].as.object)->data, regex_t);
+        const regex_t regex = bs_flex_member_as(((Bs_C_Instance *) args[0].as.object)->data, regex_t);
 
         int        eflags = 0;
         regmatch_t matches[10];
@@ -1298,8 +1289,7 @@ static Bs_Value bs_str_replace(Bs *bs, Bs_Value *args, size_t arity) {
                 if (replacement->data[i] == '\\' && isdigit(replacement->data[i + 1])) {
                     const size_t j = replacement->data[++i] - '0';
                     if (j < bs_c_array_size(matches) && matches[j].rm_so != -1) {
-                        bs_da_push_many(
-                            bs, b, cursor + matches[j].rm_so, matches[j].rm_eo - matches[j].rm_so);
+                        bs_da_push_many(bs, b, cursor + matches[j].rm_so, matches[j].rm_eo - matches[j].rm_so);
                     }
                 } else {
                     bs_da_push(bs, b, replacement->data[i]);
@@ -1483,8 +1473,7 @@ static Bs_Value bs_str_prefix(Bs *bs, Bs_Value *args, size_t arity) {
     const Bs_Str *str = (const Bs_Str *) args[-1].as.object;
     const Bs_Str *pattern = (const Bs_Str *) args[0].as.object;
 
-    return bs_value_bool(
-        bs_sv_prefix(Bs_Sv(str->data, str->size), Bs_Sv(pattern->data, pattern->size)));
+    return bs_value_bool(bs_sv_prefix(Bs_Sv(str->data, str->size), Bs_Sv(pattern->data, pattern->size)));
 }
 
 static Bs_Value bs_str_suffix(Bs *bs, Bs_Value *args, size_t arity) {
@@ -1494,8 +1483,7 @@ static Bs_Value bs_str_suffix(Bs *bs, Bs_Value *args, size_t arity) {
     const Bs_Str *str = (const Bs_Str *) args[-1].as.object;
     const Bs_Str *pattern = (const Bs_Str *) args[0].as.object;
 
-    return bs_value_bool(
-        bs_sv_suffix(Bs_Sv(str->data, str->size), Bs_Sv(pattern->data, pattern->size)));
+    return bs_value_bool(bs_sv_suffix(Bs_Sv(str->data, str->size), Bs_Sv(pattern->data, pattern->size)));
 }
 
 // Bit
@@ -1776,8 +1764,7 @@ static Bs_Value bs_bytes_push(Bs *bs, Bs_Value *args, size_t arity) {
         const Bs_Str *src = (const Bs_Str *) args[0].as.object;
         bs_da_push_many(bs, b, src->data, src->size);
     } else if (args[0].as.object->type == BS_OBJECT_C_INSTANCE) {
-        const Bs_Buffer *s =
-            &bs_flex_member_as(((Bs_C_Instance *) args[0].as.object)->data, Bs_Buffer);
+        const Bs_Buffer *s = &bs_flex_member_as(((Bs_C_Instance *) args[0].as.object)->data, Bs_Buffer);
         bs_da_push_many(bs, b, s->data, s->count);
     }
 
@@ -1812,8 +1799,7 @@ static Bs_Value bs_bytes_insert(Bs *bs, Bs_Value *args, size_t arity) {
         data = src->data;
         size = src->size;
     } else if (args[1].as.object->type == BS_OBJECT_C_INSTANCE) {
-        const Bs_Buffer *s =
-            &bs_flex_member_as(((Bs_C_Instance *) args[1].as.object)->data, Bs_Buffer);
+        const Bs_Buffer *s = &bs_flex_member_as(((Bs_C_Instance *) args[1].as.object)->data, Bs_Buffer);
         data = s->data;
         size = s->count;
     }
@@ -2383,8 +2369,7 @@ static Bs_Value bs_random_number(Bs *bs, Bs_Value *args, size_t arity) {
         bs_arg_check_value_type(bs, args, 1, BS_VALUE_NUM);
     }
 
-    const double result =
-        (double) bs_random_u64(&bs_this_c_instance_data_as(args, Bs_Random)) / UINT64_MAX;
+    const double result = (double) bs_random_u64(&bs_this_c_instance_data_as(args, Bs_Random)) / UINT64_MAX;
     if (!arity) {
         return bs_value_num(result);
     }
@@ -2569,8 +2554,7 @@ static Bs_Value bs_meta_compile(Bs *bs, Bs_Value *args, size_t arity) {
         .write = bs_meta_error_write,
     };
 
-    const Bs_Closure *closure =
-        bs_compile(bs, Bs_Sv_Static("<meta>"), input, false, false, true, 0);
+    const Bs_Closure *closure = bs_compile(bs, Bs_Sv_Static("<meta>"), input, false, false, true, 0);
 
     config->error = save;
 
@@ -2621,8 +2605,7 @@ static Bs_Value bs_meta_eval(Bs *bs, Bs_Value *args, size_t arity) {
     Bs_Str     *str = (Bs_Str *) args[0].as.object;
     const Bs_Sv input = Bs_Sv(str->data, str->size);
 
-    const Bs_Closure *closure =
-        bs_compile(bs, Bs_Sv_Static("<meta>"), input, false, false, true, 0);
+    const Bs_Closure *closure = bs_compile(bs, Bs_Sv_Static("<meta>"), input, false, false, true, 0);
 
     if (!closure) {
         Bs_Error error = bs_error_begin(bs);
@@ -2653,8 +2636,7 @@ static void bs_add_fn(Bs *bs, Bs_Table *table, const char *key, Bs_C_Fn_Ptr fn) 
 
 void bs_core_init(Bs *bs, int argc, char **argv) {
     {
-        bs_io_reader_class =
-            bs_c_class_new(bs, Bs_Sv_Static("Reader"), sizeof(Bs_File), bs_io_reader_init);
+        bs_io_reader_class = bs_c_class_new(bs, Bs_Sv_Static("Reader"), sizeof(Bs_File), bs_io_reader_init);
 
         bs_io_reader_class->can_fail = true;
         bs_io_reader_class->free = bs_io_file_free;
@@ -2667,8 +2649,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("seek"), bs_io_reader_seek);
         bs_c_class_add(bs, bs_io_reader_class, Bs_Sv_Static("tell"), bs_io_reader_tell);
 
-        bs_io_writer_class =
-            bs_c_class_new(bs, Bs_Sv_Static("Writer"), sizeof(Bs_File), bs_io_writer_init);
+        bs_io_writer_class = bs_c_class_new(bs, Bs_Sv_Static("Writer"), sizeof(Bs_File), bs_io_writer_init);
 
         bs_io_writer_class->can_fail = true;
         bs_io_writer_class->free = bs_io_file_free;
@@ -2678,8 +2659,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         bs_c_class_add(bs, bs_io_writer_class, Bs_Sv_Static("write"), bs_io_writer_write);
         bs_c_class_add(bs, bs_io_writer_class, Bs_Sv_Static("writeln"), bs_io_writer_writeln);
 
-        bs_io_direntry_class =
-            bs_c_class_new(bs, Bs_Sv_Static("DirEntry"), sizeof(Bs_Dir_Entry), bs_io_direntry_init);
+        bs_io_direntry_class = bs_c_class_new(bs, Bs_Sv_Static("DirEntry"), sizeof(Bs_Dir_Entry), bs_io_direntry_init);
 
         bs_io_direntry_class->mark = bs_io_direntry_mark;
 
@@ -2747,8 +2727,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         }
         bs_add(bs, os, "args", bs_value_object(args));
 
-        Bs_C_Class *process_class =
-            bs_c_class_new(bs, Bs_Sv_Static("Process"), sizeof(Bs_Process), bs_process_init);
+        Bs_C_Class *process_class = bs_c_class_new(bs, Bs_Sv_Static("Process"), sizeof(Bs_Process), bs_process_init);
 
         process_class->can_fail = true;
         process_class->mark = bs_process_mark;
@@ -2840,8 +2819,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
     }
 
     {
-        bs_bytes_class =
-            bs_c_class_new(bs, Bs_Sv_Static("Bytes"), sizeof(Bs_Buffer), bs_bytes_init);
+        bs_bytes_class = bs_c_class_new(bs, Bs_Sv_Static("Bytes"), sizeof(Bs_Buffer), bs_bytes_init);
 
         bs_bytes_class->free = bs_bytes_free;
         bs_bytes_class->show = bs_bytes_show;
@@ -2873,8 +2851,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
 
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("sort"), bs_array_sort);
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("resize"), bs_array_resize);
-        bs_builtin_object_methods_add(
-            bs, BS_OBJECT_ARRAY, Bs_Sv_Static("reverse"), bs_array_reverse);
+        bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("reverse"), bs_array_reverse);
 
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("fill"), bs_array_fill);
         bs_builtin_object_methods_add(bs, BS_OBJECT_ARRAY, Bs_Sv_Static("slice"), bs_array_slice);
@@ -2916,8 +2893,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         Bs_Table *math = bs_table_new(bs);
 
         {
-            Bs_C_Class *random_class =
-                bs_c_class_new(bs, Bs_Sv_Static("Random"), sizeof(Bs_Random), bs_random_init);
+            Bs_C_Class *random_class = bs_c_class_new(bs, Bs_Sv_Static("Random"), sizeof(Bs_Random), bs_random_init);
 
             bs_c_class_add(bs, random_class, Bs_Sv_Static("number"), bs_random_number);
             bs_c_class_add(bs, random_class, Bs_Sv_Static("bytes"), bs_random_bytes);
@@ -2935,8 +2911,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
         Bs_Table *meta = bs_table_new(bs);
 
         {
-            bs_meta_error_class = bs_c_class_new(
-                bs, Bs_Sv_Static("Error"), sizeof(Bs_Meta_Error), bs_meta_error_init);
+            bs_meta_error_class = bs_c_class_new(bs, Bs_Sv_Static("Error"), sizeof(Bs_Meta_Error), bs_meta_error_init);
 
             bs_meta_error_class->mark = bs_meta_error_mark;
 
@@ -2946,8 +2921,7 @@ void bs_core_init(Bs *bs, int argc, char **argv) {
             bs_c_class_add(bs, bs_meta_error_class, Bs_Sv_Static("line"), bs_meta_error_line);
             bs_c_class_add(bs, bs_meta_error_class, Bs_Sv_Static("message"), bs_meta_error_message);
             bs_c_class_add(bs, bs_meta_error_class, Bs_Sv_Static("example"), bs_meta_error_example);
-            bs_c_class_add(
-                bs, bs_meta_error_class, Bs_Sv_Static("explanation"), bs_meta_error_explanation);
+            bs_c_class_add(bs, bs_meta_error_class, Bs_Sv_Static("explanation"), bs_meta_error_explanation);
 
             bs_add(bs, meta, "Error", bs_value_object(bs_meta_error_class));
         }

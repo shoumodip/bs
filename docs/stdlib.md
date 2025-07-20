@@ -820,7 +820,7 @@ io.println("ayo noice!".replace(r, "\{type: \\2, count: \\1}"))
 $ bs demo.bs
 foo bar baz
 foo---bar---baz
-foo bar ba
+foo bar baz
 {type: apples, count: 69}, {type: oranges, count: 420}
 {type: apples, count: 69}, 420  oranges
 ayo noice!

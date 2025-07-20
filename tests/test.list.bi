@@ -1461,7 +1461,7 @@ builtin_methods/error_undefined_str.bs:1:4: error: undefined method: foo
 :b shell 24
 ../bin/bs core/string.bs
 :i returncode 0
-:b stdout 274
+:b stdout 275
 Foo
 bar
 
@@ -1476,7 +1476,7 @@ nil
 ["foo bar baz"]
 foo bar baz
 foo---bar---baz
-foo bar ba
+foo bar baz
 foo bar baz
 foo bar baz  
    foo bar baz
