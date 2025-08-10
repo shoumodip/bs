@@ -28,19 +28,10 @@ $ bs factorial.bs
 <a href="https://github.com/shoumodip/bs/releases/latest/download/bs-linux-x86_64.zip" download>Linux<br>(x86_64)</a>
 </div>
 <div class="link">
-<a href="https://github.com/shoumodip/bs/releases/latest/download/bs-macos-x86_64.zip" download>MacOS<br>(x86_64)</a>
-</div>
-<div class="link">
 <a href="https://github.com/shoumodip/bs/releases/latest/download/bs-windows-x86_64.zip" download>Windows<br>(x86_64)</a>
 </div>
 <div class="link">
-<a href="https://github.com/shoumodip/bs/releases/latest/download/bs-linux-arm64.zip" download>Linux<br>(ARM64)</a>
-</div>
-<div class="link">
 <a href="https://github.com/shoumodip/bs/releases/latest/download/bs-macos-arm64.zip" download>MacOS<br>(ARM64)</a>
-</div>
-<div class="link">
-<a href="https://github.com/shoumodip/bs/releases/latest/download/bs-windows-arm64.zip" download>Windows<br>(ARM64)</a>
 </div>
 </div>
 
